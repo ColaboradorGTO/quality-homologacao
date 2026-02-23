@@ -95,7 +95,7 @@ export const DashBoardRecursosHumanos = ({}) => {
 
   switch (componentToShow) {
     case "/recursosHumanos/ActionPesquisaFuncionarios":
-      component = <ActionPesquisaFuncionarios usuarioLogado={usuarioLogado} />;
+      component = <ActionPesquisaFuncionarios usuarioLogado={usuarioLogado} ID={ID} />;
       break;
     default:
       component = null;
