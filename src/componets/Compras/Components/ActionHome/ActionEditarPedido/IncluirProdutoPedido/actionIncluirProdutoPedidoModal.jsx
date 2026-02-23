@@ -1,0 +1,48 @@
+import { Fragment } from "react"
+import { Modal } from "react-bootstrap"
+import { HeaderModal } from "../../../../../Modais/HeaderModal/HeaderModal";
+import { FormularioIncluirProdutoPedido } from "./formularioIncluir";
+
+export const ActionIncluirProdutoPedidoModal = ({
+  show, 
+  handleClose,
+  usuarioLogado,
+  optionsModulos,
+  dadosDetalheGradePedido,
+  dadosDetalhePedido,
+  dadosVisualizarPedido
+}) => {
+  
+  return (
+
+    <Fragment>
+      <Modal
+        show={show}
+        onHide={handleClose}
+        class="modal-content"
+        size="lg"
+        centered
+      >
+
+        <HeaderModal
+          title={`Pedido para VESTUARIO Nº ${dadosDetalhePedido[0]?.IDPEDIDO}`}
+          subTitle={"Inclusão de Itens do Pedido"}
+          handleClose={handleClose}
+        />
+
+        <Modal.Body>
+
+          <FormularioIncluirProdutoPedido 
+            handleClose={handleClose}
+            usuarioLogado={usuarioLogado}
+            optionsModulos={optionsModulos}
+            dadosDetalheGradePedido={dadosDetalheGradePedido}
+            dadosDetalhePedido={dadosDetalhePedido}
+            dadosVisualizarPedido={dadosVisualizarPedido}
+         />
+          
+        </Modal.Body>
+      </Modal>
+    </Fragment>
+  )
+}

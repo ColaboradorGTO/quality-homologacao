@@ -1,0 +1,4 @@
+.p-datatable .p-datatable-tbody > tr.p-highlight {
+  background-color: #7A59AD !important; /* verde claro */
+  color: #FFFFFF !important;           /* texto branco */
+}

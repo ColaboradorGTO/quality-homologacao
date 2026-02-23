@@ -1,0 +1,186 @@
+{
+  "Parceiro": [
+    {
+      "id": 1,
+      "label": "Selecione...",
+      "value": "0"
+    },
+    {
+      "id": 2,
+      "label": "Funcionário",
+      "value": "FUNCIONARIO"
+    },
+    {
+      "id": 3,
+      "label": "Parceiro de Negócios Apoio",
+      "value": "PN"
+    },
+    {
+      "id": 4,
+      "label": "Parceiro de Negócios PJ",
+      "value": "PN"
+    },
+    {
+      "id": 5,
+      "label": "Marketing",
+      "value": "MARKETING"
+    },
+    {
+      "id": 6,
+      "label": "PN PJ",
+      "value": "PN PJ"
+    }
+  ],
+  "optionsTipoFrete": [
+    {
+      "value": "PAGO",
+      "label": "PAGO - CIF"
+    },
+    {
+      "value": "APAGAR",
+      "label": "A PAGAR - FOB"
+    }
+  ],
+  "optionsTipoPedido": [
+    {
+      "value": "VESTUARIO",
+      "label": "VESTUÁRIO"
+    },
+    {
+      "value": "CALCADOS",
+      "label": "CALÇADOS"
+    },
+    {
+      "value": "ARTIGOS",
+      "label": "ARTIGOS"
+    },
+    {
+      "value": "ACESSORIOS",
+      "label": "ACESSÓRIOS"
+    }
+  ],
+  "optionsEnviar": [
+    {
+      "value": "NE",
+      "label": "NÃO ENVIAR"
+    },
+    {
+      "value": "ET",
+      "label": "ETIQUETA"
+    },
+    {
+      "value": "AR",
+      "label": "ARQUIVO"
+    }
+  ],
+  "optionsFiscal": [
+    {
+      "value": "S",
+      "label": "Simples Nacional"
+    },
+    {
+      "value": "N",
+      "label": "Lucro Presumido"
+    },
+    {
+      "value": "R",
+      "label": "Lucro Real"
+    }
+  ],
+  "situacao": [
+    {
+      "label": "Ativo",
+      "value": "True"
+    },
+    {
+      "label": "Inativo",
+      "value": "False"
+    }
+  ],
+  "localizacao": [
+    {
+      "label": "Loja",
+      "value": "Loja"
+    },
+    {
+      "label": "Escritório",
+      "value": "Escritório"
+    }
+  ],
+  "InscricaoEstadual": [
+    {
+      "label": "Contribuinte ICMS",
+      "value": "1"
+    },
+    {
+      "label": "Contribuinte Isento de IE",
+      "value": "2"
+    },
+    {
+      "label": "Não Contribuinte Com ou Sem IE",
+      "value": "9"
+    }
+  ],
+  "Departamentos": [
+    {
+      "label": "Administrativo",
+      "value": "ADMINISTRATIVO"
+    },
+    {
+      "label": "Gerência",
+      "value": "GERENCIA"
+    },
+    {
+      "label": "TI",
+      "value": "TI"
+    },
+    {
+      "label": "Financeiro",
+      "value": "FINANCEIRO"
+    },
+    {
+      "label": "Comercial",
+      "value": "COMERCIAL"
+    },
+    {
+      "label": "Compras",
+      "value": "COMPRAS"
+    },
+    {
+      "label": "Contabilidade",
+      "value": "CONTABILIDADE"
+    },
+    {
+      "label": "Marketing",
+      "value": "MARKETING"
+    },
+    {
+      "label": "RH",
+      "value": "RH"
+    },
+    {
+      "label": "Cadastro",
+      "value": "CADASTRO"
+    },
+    {
+      "label": "CD",
+      "value": "CD"
+    },
+    {
+      "label": "Controladoria",
+      "value": "CONTROLADORIA"
+    },
+    {
+      "label": "DP",
+      "value": "DP"
+    },
+    {
+      "label": "Prevenção e Perdas",
+      "value": "PREVENCAOPERDAS"
+    },
+    {
+      "label": "PSF",
+      "value": "PSF"
+    }
+  ]
+}

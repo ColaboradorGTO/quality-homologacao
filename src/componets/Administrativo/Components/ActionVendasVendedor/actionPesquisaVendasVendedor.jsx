@@ -1,0 +1,194 @@
+import { Fragment, useEffect, useState } from "react"
+import { InputField } from "../../../Buttons/Input";
+import { ButtonType } from "../../../Buttons/ButtonType";
+import { InputSelectAction } from "../../../Inputs/InputSelectAction";
+import { ActionMain } from "../../../Actions/actionMain";
+import { get } from "../../../../api/funcRequest";
+import { ActionListaVendasVendedor } from "./actionListaVendasVendedor";
+import { getDataAtual } from "../../../../utils/dataAtual";
+import { AiOutlineSearch } from "react-icons/ai";
+import { useQuery } from "react-query";
+import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
+import { MultSelectAction } from "../../../Select/MultSelectAction";
+
+
+export const ActionPesquisaVendasVendedor = () => {
+  const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
+  const [dataPesquisaFim, setDataPesquisaFim] = useState('');
+  const [marcaSelecionada, setMarcaSelecionada] = useState([])
+  const [empresaSelecionada, setEmpresaSelecionada] = useState('')
+  const [empresaSelecionadaNome, setEmpresaSelecionadaNome] = useState('')
+  const [percComissaoSelecionada, setPercComissaoSelecionada] = useState('');
+  const [ufSelecionado, setUfSelecionado] = useState('');
+
+  useEffect(() => {
+    const dataInicio = getDataAtual()
+    const dataFim = getDataAtual()
+    setDataPesquisaInicio(dataInicio)
+    setDataPesquisaFim(dataFim)
+
+  }, [])
+ 
+  const { data: optionsMarcas = [], error: errorMarcas, isLoading: isLoadingMarcas, refetch: refetchMarcas } = useQuery(
+    'marcasLista',
+    async () => {
+      const response = await get(`/marcasLista`);
+      return response.data;
+    },
+    { staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000, }
+  );
+   
+  const { data: optionsEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas } = useQuery(
+    ['listaEmpresaComercial', marcaSelecionada],
+    async () => {
+      const response = await get(`/listaEmpresaComercial?idMarca=${marcaSelecionada}`);
+      
+      return response.data;
+    },
+    {enabled: Boolean(marcaSelecionada), staleTime: 5 * 60 * 1000, cacheTime: 60 * 60 * 1000,}
+  );
+
+  const fetchListaVendasVendedor = async ( ) => {
+    const urlBase = `/venda-vendedor-adm?idGrupo=${marcaSelecionada}&idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&uf=${ufSelecionado}`;    
+    let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
+    urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+    try {
+      animacaoCarregamento('Carregando dados...', true);
+                                              
+      const primeiraPagina = 1;
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const page = primeiraResposta.page || primeiraPagina;
+      const pageSize = primeiraResposta.pageSize || 1000;
+      const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
+      const totalPages = Math.ceil(totalRows / pageSize);
+
+      let allData = [...(primeiraResposta.data || [])];
+
+      if (totalPages > 1) {
+      for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          allData.push(...(responsePage.data || []));
+      }
+      }
+
+      return allData;
+    } catch (error) {
+        console.error('Erro ao buscar dados da api:', error);
+      throw error;
+    } finally {
+      fecharAnimacaoCarregamento();
+    }
+  };
+   
+  const { data: dadosVendasVendedor = [], error: errorVendasVendedor, isLoading: isLoadingVendasVendedor, refetch: refetchListaVendasVendedor } = useQuery(
+    ['venda-vendedor-adm',],
+    () => fetchListaVendasVendedor(),
+    {
+      enabled: false,
+    }
+  );
+
+  const handleSelectComissoes = (e) => {
+    setPercComissaoSelecionada(e.value);
+  };
+
+  const handleSelectEmpresa = (selectedOptions) => {  
+    const values = selectedOptions.map((option) => option.value);
+    setEmpresaSelecionada(values);
+  }
+
+  const handleSelectMarca = (e) => {
+    setMarcaSelecionada(e.value);
+  };
+
+  const handleClick = () => {
+    refetchListaVendasVendedor()
+  }
+
+  const optionsUF = [ 
+    { id: 1, value: '0', label: 'Todos' },
+    { id: 2, value: 'DF', label: 'DF' },
+    { id: 3, value: 'GO', label: 'GO' },
+  ]
+
+  const optionComissoes = [
+    { id: 1, value: '0', label: 'Nenhum' },
+    { id: 2, value: '1', label: '2%' },
+    { id: 3, value: '2', label: '4%' },
+    { id: 4, value: '3', label: '6%' },
+  ]
+
+  return (
+
+    <Fragment>
+
+      <ActionMain
+        linkComponentAnterior={["Home"]}
+        linkComponent={["Vendas por Vendedor e Período"]}
+        title="Vendas por Vendedor e Período"
+        subTitle={empresaSelecionadaNome}
+
+        InputFieldDTInicioComponent={InputField}
+        labelInputFieldDTInicio={"Data Início"}
+        valueInputFieldDTInicio={dataPesquisaInicio}
+        onChangeInputFieldDTInicio={e => setDataPesquisaInicio(e.target.value)}
+
+        InputFieldDTFimComponent={InputField}
+        labelInputFieldDTFim={"Data Fim"}
+        valueInputFieldDTFim={dataPesquisaFim}
+        onChangeInputFieldDTFim={e => setDataPesquisaFim(e.target.value)}
+
+        MultSelectEmpresaComponent={MultSelectAction}
+        optionsMultSelectEmpresa={[
+          { value: '0', label: 'Selecione uma loja' },
+          ...optionsEmpresas.map((empresa) => ({
+            value: empresa.IDEMPRESA,
+            label: empresa.NOFANTASIA,
+          }))
+        ]}
+        labelMultSelectEmpresa={"Empresa"}
+        valueMultSelectEmpresa={[empresaSelecionada]}
+        onChangeMultSelectEmpresa={handleSelectEmpresa}
+
+        InputSelectMarcasComponent={InputSelectAction}
+        labelSelectMarcas={"Marca"}
+        optionsMarcas={optionsMarcas.map((marca) => ({
+          value: marca.IDGRUPOEMPRESARIAL,
+          label: marca.DSGRUPOEMPRESARIAL,
+        }))}
+        valueSelectMarca={marcaSelecionada}
+        onChangeSelectMarcas={handleSelectMarca}
+
+        InputSelectUFComponent={InputSelectAction}
+        labelSelectUF={"UF"}
+        optionsSelectUF={optionsUF.map((empresa) => ({
+          value: empresa.value,
+          label: empresa.label,
+        }))}
+        onChangeSelectUF={e => setUfSelecionado(e.value)}
+        valueSelectUF={ufSelecionado}
+
+        InputSelectComissoesComponent={InputSelectAction}
+        labelSelectComissoes={"% Comissão"}
+        optionsComissoes={optionComissoes.map((empresa) => ({
+          value: empresa.value,
+          label: empresa.label,
+        }))}
+        valueSelectComissoes={percComissaoSelecionada}
+        onChangeSelectComissoes={handleSelectComissoes}
+
+        ButtonSearchComponent={ButtonType}
+        linkNomeSearch={"Pesquisar"}
+        onButtonClickSearch={handleClick}
+        corSearch={"primary"}
+        IconSearch={AiOutlineSearch}
+
+      />
+
+        
+      <ActionListaVendasVendedor dadosVendasVendedor={dadosVendasVendedor} percComissaoSelecionada={percComissaoSelecionada} />
+
+    </Fragment>
+  )
+}

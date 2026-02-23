@@ -1,0 +1,24 @@
+/* Layout normal (tela completa) */
+.layout-normal {
+  width: 100%;
+  height: auto;
+  padding: 20px;
+}
+
+/* Layout de cupom */
+.layout-cupom {
+  width: 80mm; /* Dimensão padrão para cupons */
+  height: auto;
+  padding: 10px;
+  font-size: 12px;
+}
+
+/* Estilos comuns */
+hr {
+  border: 1px dashed;
+}
+
+/* Adicione isso ao seu arquivo styles.css */
+.custom-swal {
+  z-index: 9999 !important; /* Garantindo que o z-index tenha prioridade */
+}

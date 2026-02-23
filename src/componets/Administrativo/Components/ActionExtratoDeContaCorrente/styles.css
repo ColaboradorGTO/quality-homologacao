@@ -1,0 +1,17 @@
+/* Adicionar no seu arquivo CSS */
+.linha-espaco {
+  height: 20px !important; /* Altura do espaçamento */
+  background: transparent !important;
+  border: none !important;
+}
+
+.linha-espaco td {
+  border: none !important;
+  padding: 0 !important;
+  height: 20px !important;
+}
+
+/* Opcional: Bordas mais visíveis entre seções */
+.table-success {
+  border-top: 2px solid #d4edda !important;
+}

@@ -1,0 +1,7 @@
+.rotate-table {
+    transform: rotate(90deg);
+    transform-origin: top left;
+    width: 100%; /* Ajuste a largura para caber na tela após a rotação */
+    height: 100%; /* Ajuste a altura para caber na tela após a rotação */
+    overflow: auto; /* Permite rolagem se necessário */
+  }
