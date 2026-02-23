@@ -8,7 +8,6 @@ import { ButtonType } from "../../../Buttons/ButtonType";
 import { AiOutlineSearch } from "react-icons/ai";
 import { get } from "../../../../api/funcRequest";
 import { getDataAtual } from "../../../../utils/dataAtual";
-import { useFetchData } from "../../../../hooks/useFetchData";
 import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
 
@@ -20,8 +19,6 @@ export const ActionPesquisaEstoqueVendaGrupoSubGrupo = () => {
   const [subGrupoSelecionado, setSubGrupoSelecionado] = useState([]);
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
   const [dataPesquisaFim, setDataPesquisaFim] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(1000);
 
   useEffect(() => {
     const dataInicial = getDataAtual();
@@ -38,66 +35,59 @@ export const ActionPesquisaEstoqueVendaGrupoSubGrupo = () => {
       const response = await get(`/marcasLista`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, }
+    { staleTime: 60 * 60 * 1000, }
   );
-  
 
-    const { data: dadosGrupos = [], error: errorGrupo, isLoading: isLoadingGrupo, refetch: refetchGrupo } = useQuery(
+
+  const { data: dadosGrupos = [], error: errorGrupo, isLoading: isLoadingGrupo, refetch: refetchGrupo } = useQuery(
     'grupo-produto',
     async () => {
       const response = await get(`/grupo-produto`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, }
+    { staleTime: 60 * 60 * 1000, }
   );
 
 
 
-      const { data: dadosSubGrupos = [], error: errorSubGrupo, isLoading: isLoadingSubGrupo, refetch: refetchSubGrupo } = useQuery(
+  const { data: dadosSubGrupos = [], error: errorSubGrupo, isLoading: isLoadingSubGrupo, refetch: refetchSubGrupo } = useQuery(
     'subgrupo-produto',
     async () => {
       const response = await get(`/subgrupo-produto?idGrupo=${grupoSelecionado}`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, }
+    { staleTime: 60 * 60 * 1000, }
   );
 
-  
 
-    const fetchGrupoSubGrupo = async () => {
+
+  const fetchGrupoSubGrupo = async () => {
+    const urlBase = `/vendas-estoque-grupo-subGrupo?dataInicio=${dataPesquisaInicio}&dataFim=${dataPesquisaFim}&idMarca=${marcaSelecionada}&idGrupo=${grupoSelecionado}&idGrade=${subGrupoSelecionado}`;
+    let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
+    urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
+      animacaoCarregamento('Carregando dados...', true);
 
-      const urlApi = `/vendasEstoqueGrupoSubGrupo?dataInicio=${dataPesquisaInicio}&dataFim=${dataPesquisaFim}&idMarca=${marcaSelecionada}&idGrupo=${grupoSelecionado}&idGrade=${subGrupoSelecionado}`;
-      const response = await get(urlApi);
+      const primeiraPagina = 1;
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const page = primeiraResposta.page || primeiraPagina;
+      const pageSize = primeiraResposta.pageSize || 1000;
+      const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
+      const totalPages = Math.ceil(totalRows / pageSize);
 
-      if (response.data.length && response.data.length === pageSize) {
-        let allData = [...response.data];
-        animacaoCarregamento(`Carregando... Página ${currentPage} de ${response.data.length}`, true);
+      let allData = [...(primeiraResposta.data || [])];
 
-        async function fetchNextPage(currentPage) {
-          try {
-            currentPage++;
-            const responseNextPage = await get(`${urlApi}&page=${currentPage}`);
-            if (responseNextPage.length) {
-              allData.push(...responseNextPage.data);
-              return fetchNextPage(currentPage);
-            } else {
-              return allData;
-            }
-          } catch (error) {
-            console.error('Erro ao buscar próxima página:', error);
-            throw error;
-          }
+      if (totalPages > 1) {
+        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          allData.push(...(responsePage.data || []));
         }
-
-        await fetchNextPage(currentPage);
-        return allData;
-      } else {
-
-        return response.data;
       }
+
+      return allData;
     } catch (error) {
-      console.error('Erro ao buscar dados:', error);
+      console.error('Erro ao buscar dados da api:', error);
       throw error;
     } finally {
       fecharAnimacaoCarregamento();
@@ -106,9 +96,9 @@ export const ActionPesquisaEstoqueVendaGrupoSubGrupo = () => {
 
 
   const { data: dadosGrupoSubGrupo = [], error: erroGrupoSubGrupo, isLoading: isLoadingGrupoSubGrupo, refetch: refetchGrupoSubGrupo } = useQuery(
-    'vendasEstoqueGrupoSubGrupo',
-    () => fetchGrupoSubGrupo(dataPesquisaInicio, dataPesquisaFim, grupoSelecionado, subGrupoSelecionado, currentPage, pageSize),
-    { enabled: false, staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    'vendas-estoque-grupo-subGrupo',
+    () => fetchGrupoSubGrupo(),
+    { enabled: false, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
   );
 
   const handleSelectMarcas = (e) => {
@@ -132,7 +122,6 @@ export const ActionPesquisaEstoqueVendaGrupoSubGrupo = () => {
   }
 
   const handleClick = () => {
-    setCurrentPage(prevPage => prevPage + 1);
     refetchGrupoSubGrupo()
     setTabelaVisivel(true)
   }

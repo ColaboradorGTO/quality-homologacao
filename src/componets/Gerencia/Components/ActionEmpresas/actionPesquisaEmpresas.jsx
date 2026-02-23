@@ -7,6 +7,7 @@ import { InputSelectAction } from "../../../Inputs/InputSelectAction";
 import { ActionListaEmpresas } from "./actionListaEmpresas";
 import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
+import { useEffect } from "react";
 
 export const ActionPesquisaEmpresas = ({ usuarioLogado }) => {
   const [empresaSelecionada, setEmpresaSelecionada] = useState('')

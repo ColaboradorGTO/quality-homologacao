@@ -14,8 +14,6 @@ export const ActionListaEstoqueVendaGrupoSubGrupo = ({ dadosGrupoSubGrupo }) => 
   const dataTableRef = useRef();
   const [rowSelection, setRowSelection] = useState(null);
 
-
-
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
   };
@@ -128,9 +126,8 @@ export const ActionListaEstoqueVendaGrupoSubGrupo = ({ dadosGrupoSubGrupo }) => 
     const percentualEstoquePrecoVenda = (parseFloat(estoquePrecoVenda) * 100) / parseFloat(estoquePrecoVenda);
     const percentualPrecoVenda = calcularPercentualPrecoVenda(item);
     const mediaVendas = calcularMediaVendas(item);
-    const cobertura = calcularCobertura(item);
-
-
+    const cobertura = (toFloat(qtdPosicionamento) / toFloat(mediaVendas))
+  
     return {
       contador,
       DSGRUPOEMPRESARIAL: item.vendaMarca.DSGRUPOEMPRESARIAL,
@@ -302,7 +299,7 @@ export const ActionListaEstoqueVendaGrupoSubGrupo = ({ dadosGrupoSubGrupo }) => 
                 sortable={coluna.sortable}
                 headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
                 footerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
-                bodyStyle={{ fontSize: '0.8rem' }}
+                bodyStyle={{ fontSize: '0.8rem', border: '1px solid #e9e9e9' }}
               />
             ))}
           </DataTable>

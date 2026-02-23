@@ -108,7 +108,7 @@ export const ActionListaPrecoProdutoGrupoSubGrupo = ({ dadosListaEstoque }) => {
     {
       field: 'NOEMPRESA',
       header: 'Empresa',
-      body: row => <th>{row.NOEMPRESA}</th>,
+      body: row => <p style={{width: '150px'}}>{row.NOEMPRESA}</p>,
       sortable: true,
     },
     {
@@ -132,7 +132,7 @@ export const ActionListaPrecoProdutoGrupoSubGrupo = ({ dadosListaEstoque }) => {
     {
       field: 'DSNOME',
       header: 'Produto',
-      body: row => <th>{row.DSNOME}</th>,
+      body: row => <p style={{width: '150px'}}>{row.DSNOME}</p>,
       sortable: true,
     },
     {
@@ -212,6 +212,9 @@ export const ActionListaPrecoProdutoGrupoSubGrupo = ({ dadosListaEstoque }) => {
             selection={rowSelection}
             onSelectionChange={(e) => setRowSelection(e.value)}
             rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+            filterDisplay="menu"
             showGridlines
             stripedRows
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
@@ -227,7 +230,7 @@ export const ActionListaPrecoProdutoGrupoSubGrupo = ({ dadosListaEstoque }) => {
                 sortable={coluna.sortable}
                 headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
                 footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
-                bodyStyle={{ fontSize: '0.8rem' }}
+                bodyStyle={{ fontSize: '0.8rem', fontWeight: 600, border: '1px solid #e9e9e9' }}
 
               />
             ))}

@@ -24,8 +24,7 @@ export const ActionPesquisaEstoqueProdutos = () => {
   const [dataPesquisaFimC, setDataPesquisaFimC] = useState('')
   const [descricaoProduto, setDescricaoProduto] = useState('')
   const [marcaProduto, setMarcaProduto] = useState('')
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(1000);
+
 
   useEffect(() => {
     const dataInicial = getDataAtual();
@@ -50,7 +49,7 @@ export const ActionPesquisaEstoqueProdutos = () => {
       return response.data;
     },
     
-    {  staleTime: 5 * 60 * 1000, }
+    {  staleTime: 60 * 60 * 1000, }
     
   );
   
@@ -61,7 +60,7 @@ export const ActionPesquisaEstoqueProdutos = () => {
       return response.data;
     },
     
-    {  staleTime: 5 * 60 * 1000, }
+    {  staleTime: 60 * 60 * 1000, }
     
   );
   
@@ -72,7 +71,7 @@ export const ActionPesquisaEstoqueProdutos = () => {
       return response.data;
     },
     
-    {  staleTime: 5 * 60 * 1000, }
+    {  staleTime: 60 * 60 * 1000, }
     
   );
 
@@ -82,45 +81,37 @@ export const ActionPesquisaEstoqueProdutos = () => {
       const response = await get(`/lista-marca-produto?idSubGrupo=${subGrupoSelecionado}`);
       return response.data;
     },
-    {  staleTime: 5 * 60 * 1000, }
+    {  staleTime: 60 * 60 * 1000, }
   );
 
 
-
   const fetchVendasEstoque = async () => {
+    const urlBase = `/vendasEstoqueProduto?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&dataPesquisaInicioB=${dataPesquisaInicioB}&dataPesquisaFimB=${dataPesquisaFimB}&dataPesquisaInicioC=${dataPesquisaInicioC}&dataPesquisaFimC=${dataPesquisaFimC}&descricaoProduto=${descricaoProduto}&idFornecedor=${fornecedorSelecionado}&idGrupo=${grupoSelecionado}&idGrade=${subGrupoSelecionado}&idMarcaProduto=${marcaProduto}`;
+    let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
+    urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
+      animacaoCarregamento('Carregando dados...', true);
 
-      const urlApi = `/vendasEstoqueProduto?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&dataPesquisaInicioB=${dataPesquisaInicioB}&dataPesquisaFimB=${dataPesquisaFimB}&dataPesquisaInicioC=${dataPesquisaInicioC}&dataPesquisaFimC=${dataPesquisaFimC}&descricaoProduto=${descricaoProduto}&idFornecedor=${fornecedorSelecionado}&idGrupo=${grupoSelecionado}&idGrade=${subGrupoSelecionado}&idMarcaProduto=${marcaProduto}`;
-      const response = await get(urlApi);
+      const primeiraPagina = 1;
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const page = primeiraResposta.page || primeiraPagina;
+      const pageSize = primeiraResposta.pageSize || 1000;
+      const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
+      const totalPages = Math.ceil(totalRows / pageSize);
 
-      if (response.data.length && response.data.length === pageSize) {
-        let allData = [...response.data];
-        animacaoCarregamento(`Carregando... Página ${currentPage} de ${response.data.length}`, true);
+      let allData = [...(primeiraResposta.data || [])];
 
-        async function fetchNextPage(currentPage) {
-          try {
-            currentPage++;
-            const responseNextPage = await get(`${urlApi}&page=${currentPage}`);
-            if (responseNextPage.length) {
-              allData.push(...responseNextPage.data);
-              return fetchNextPage(currentPage);
-            } else {
-              return allData;
-            }
-          } catch (error) {
-            console.error('Erro ao buscar próxima página:', error);
-            throw error;
-          }
+      if (totalPages > 1) {
+        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          allData.push(...(responsePage.data || []));
         }
-
-        await fetchNextPage(currentPage);
-        return allData;
-      } else {
-
-        return response.data;
       }
+
+      return allData;
     } catch (error) {
-      console.error('Erro ao buscar dados:', error);
+      console.error('Erro ao buscar dados da api:', error);
       throw error;
     } finally {
       fecharAnimacaoCarregamento();
@@ -129,7 +120,7 @@ export const ActionPesquisaEstoqueProdutos = () => {
 
   const { data: dadosEstoqueVendas = [], error: erroVendasEstoque, isLoading: isLoadingVendasEstoque, refetch: refetchVendasEstoque } = useQuery(
     'vendasEstoqueProduto',
-    () => fetchVendasEstoque(dataPesquisaInicio, dataPesquisaFim, dataPesquisaInicioB, dataPesquisaFimB, dataPesquisaInicioC, dataPesquisaFimC, descricaoProduto, fornecedorSelecionado, grupoSelecionado, subGrupoSelecionado, marcaProduto, currentPage, pageSize),
+    () => fetchVendasEstoque(),
     { enabled: false, staleTime: 60 * 60 * 1000}
   );
 
@@ -156,7 +147,7 @@ export const ActionPesquisaEstoqueProdutos = () => {
   }
 
   const handleClick = () => {
-    setCurrentPage(prevPage => prevPage + 1);
+
     refetchVendasEstoque();
     setTabelaVisivel(true)
   

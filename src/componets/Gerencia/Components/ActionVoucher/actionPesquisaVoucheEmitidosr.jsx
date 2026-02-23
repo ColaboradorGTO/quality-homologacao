@@ -8,6 +8,7 @@ import { ActionListaVoucher } from "./actionListaVoucher";
 import Swal from 'sweetalert2'
 import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
+import { useEffect } from "react";
 
 export const ActionPesquisaVoucherEmitido = ({usuarioLogado}) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
