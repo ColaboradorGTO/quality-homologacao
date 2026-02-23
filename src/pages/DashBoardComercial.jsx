@@ -29,6 +29,7 @@ export const DashBoardComercial = () => {
   const storedModule = localStorage.getItem('moduloselecionado');
   const selectedModule = JSON.parse(storedModule);
   const [menuSelected, setMenuSelected] = useState(null);
+  const [moduloSelecionado, setModuloSelecionado] = useState(null);
 
   const navigate = useNavigate();
 
@@ -54,9 +55,10 @@ export const DashBoardComercial = () => {
     if (storedMenuFilho) {
       setMenuSelected(selectedModule);
     }
-
-  }, [usuarioLogado]);
-
+  
+  }, [usuarioLogado, selectedModule]);
+  
+  
   const { data: optionsModulosPage = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
     'menus-usuario',
     async () => {
@@ -66,6 +68,7 @@ export const DashBoardComercial = () => {
     },
     { enabled: Boolean(usuarioLogado?.id), staleTime: 5 * 60 * 1000, }
   );
+
 
   function handleShowComponent(componentName) {
     const menuFilhoSelecionado = selectedModule.menuPai.menuFilho.find(
