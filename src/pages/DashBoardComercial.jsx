@@ -7,6 +7,7 @@ import { MenuButton } from "../componets/Buttons/menuButton";
 import { FooterMain } from "../componets/Footer";
 import { useQuery } from "react-query";
 import { get } from "../api/funcRequest";
+import { useContextGlobal } from "../componets/Comercial/hooks/useContextGlobal";
 const ResumoDashBoardComercial = lazy(() => import("../componets/Comercial/Components/ResumoComercial/ResumoDashBoardComercial").then(module => ({ default: module.ResumoDashBoardComercial })));
 const ActionPesquisaMetas = lazy(() => import("../componets/Comercial/Components/ActionMetas/actionPesquisaMetas").then(module => ({ default: module.ActionPesquisaMetas })));
 const ActionPesquisaPremiacoes = lazy(() => import("../componets/Comercial/Components/ActionPremiacoes/ActionPesquisaPremiacao").then(module => ({ default: module.ActionPesquisaPremiacoes })));
@@ -29,7 +30,7 @@ export const DashBoardComercial = () => {
   const storedModule = localStorage.getItem('moduloselecionado');
   const selectedModule = JSON.parse(storedModule);
   const [menuSelected, setMenuSelected] = useState(null);
-  const [moduloSelecionado, setModuloSelecionado] = useState(null);
+
 
   const navigate = useNavigate();
 
