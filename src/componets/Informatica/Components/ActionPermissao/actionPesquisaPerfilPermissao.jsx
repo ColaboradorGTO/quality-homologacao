@@ -9,6 +9,7 @@ import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../ut
 import { ActionListaPerfilPermissao } from "./actionListaPerfilPermissao";
 import Swal from "sweetalert2";
 import { useEffect } from "react";
+import { useCopiarPermissaoUsuario } from "./hooks/useEditarPermissao";
 
 
 export const ActionPesquisaPerfilPermissao = ({ usuarioLogado, ID }) => {
@@ -17,10 +18,14 @@ export const ActionPesquisaPerfilPermissao = ({ usuarioLogado, ID }) => {
   const [empresaSelecionada, setEmpresaSelecionada] = useState('');
   const [usuarioSelecionado, setUsuarioSelecionado] = useState('');
   const [usuarioClonado, setUsuarioClonado] = useState('');
+  const [usuarioOrigem, setUsuarioOrigem] = useState('');
+  const [usuarioDestino, setUsuarioDestino] = useState('');
   const [copiarPermissao, setCopiarPermissao] = useState('');
   const [funcionarioClonarId, setFuncionarioClonarId] = useState('');
   const [permissoesSelecionadas, setPermissoesSelecionadas] = useState([]);
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [btnVisivel, setBtnVisivel] = useState(false)
 
   useEffect(() => {
     const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
@@ -86,15 +91,15 @@ export const ActionPesquisaPerfilPermissao = ({ usuarioLogado, ID }) => {
     }
   };
 
-  const { data: dadosFuncionarios = [], error: errorFuncionario, isLoading: isLoadingFuncionario } = useQuery(
+  const { data: dadosFuncionarios = [], error: errorFuncionario, isLoading: isLoadingFuncionario, refetch: refetchFuncionarios } = useQuery(
     ['funcionarios-loja-ativos', empresaSelecionada],
     () => fetchListaFuncionarios(),
-    { enabled: Boolean(empresaSelecionada), staleTime: Infinity, cacheTime: Infinity, }
+    { enabled: false, staleTime: Infinity, cacheTime: Infinity, }
   );
 
 
   const fetchListaPermissoes = async () => {
-    console.log(usuarioClonado, 'usuarioClonado');
+
     const urlBase = `/menus-usuario-excecao?idUsuario=${usuarioClonado}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
@@ -131,7 +136,7 @@ export const ActionPesquisaPerfilPermissao = ({ usuarioLogado, ID }) => {
   const { data: dadosPermissoes = [], error: errorPermissoes, isLoading: isLoadingPermissoes, refetch } = useQuery(
     ['menus-usuario-excecao', ],
     () => fetchListaPermissoes(),
-    { enabled: true, staleTime: 5 * 60 * 1000, }
+    { enabled: true, staleTime: 60 * 60 * 1000, }
   );
 
 
@@ -148,6 +153,24 @@ export const ActionPesquisaPerfilPermissao = ({ usuarioLogado, ID }) => {
         text: 'Selecione um funcionário para copiar as permissões!',
         timer: 3000,
       })
+    }
+  }
+
+  const {
+    handleSubmit
+  } = useCopiarPermissaoUsuario({ selectedItems, usuarioClonado, usuarioSelecionado, usuarioLogado, usuarioOrigem, usuarioDestino });
+  
+  const handleClonar = () => {
+    if(selectedItems.length === 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Atenção',
+        text: 'Selecione pelo menos uma permissão para clonar!',
+        timer: 3000,
+      });
+      return;
+    } else {
+      handleSubmit();
     }
   }
 
@@ -203,6 +226,11 @@ export const ActionPesquisaPerfilPermissao = ({ usuarioLogado, ID }) => {
         corSearch={"primary"}
         IconSearch={AiOutlineSearch}
 
+        ButtonTypeCadastro={ButtonType}
+        linkNome={"Clonar Permissões"}
+        onButtonClickCadastro={handleClonar}
+        corCadastro={"success"}
+        styleCadastro={{ display: btnVisivel ? 'block' : 'none' }}
       />
 
       {tabelaVisivel && (
@@ -218,6 +246,11 @@ export const ActionPesquisaPerfilPermissao = ({ usuarioLogado, ID }) => {
           usuarioLogado={usuarioLogado}
           usuarioClonado={usuarioClonado}
           setusUarioClonado={setUsuarioClonado}
+          setBtnVisivel={setBtnVisivel}
+          btnVisivel={btnVisivel}
+          selectedItems={selectedItems}
+          setSelectedItems={setSelectedItems}
+          handleClonar={handleClonar}
         />
 
       )}

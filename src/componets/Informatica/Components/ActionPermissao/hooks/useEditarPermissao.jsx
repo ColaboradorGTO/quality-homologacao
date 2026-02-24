@@ -14,6 +14,8 @@ export const useCopiarPermissaoUsuario = ({
   usuarioSelecionado,
   setSelectedItems,
   usuarioLogado,
+  usuarioOrigem, 
+  usuarioDestino,
   optionsModulos
 }) => {
   const [moduloSelecionado, setModuloSelecionado] = useState('');

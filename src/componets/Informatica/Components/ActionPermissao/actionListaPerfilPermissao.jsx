@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useRef } from "react"
+import React, { Fragment, useState, useRef,useEffect } from "react"
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { useReactToPrint } from "react-to-print";
@@ -12,7 +12,7 @@ import { ButtonType } from "../../../Buttons/ButtonType";
 import { FaRegClone } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { ActionUpdatePermissaoModal } from "./ActionUpdatePermissao/actionUpdatePermissaoModal";
-import { get } from "../../../../api/funcRequest";
+
 
 export const ActionListaPerfilPermissao = ({
   dadosPermissoes,
@@ -23,77 +23,86 @@ export const ActionListaPerfilPermissao = ({
   handleClonar,
   optionsModulos,
   usuarioLogado,
-  funcionarioClonarId,
+  btnVisivel,
+  setBtnVisivel,
+  selectedItems,
+  setSelectedItems
 }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
-  const [data, setData] = useState('');
-  const [rowClick, setRowClick] = useState(false);
-  const [selectedItems, setSelectedItems] = useState([]);
   const [dadosEditarPermissao, setDadosEditarPermissao] = useState([]);
   const [modalEditarPermissao, setModalEditarPermissao] = useState(false);
   const [first, setFirst] = useState(0)
   const [rowState, setRowState] = useState(10)
-  const [btnVisivel, setBtnVisivel] = useState(false)
   const [rowSelection, setRowSelection] = useState(null);
+  const [selectAllChecked, setSelectAllChecked] = useState(false);
 
   const {
     handleSubmit
   } = useCopiarPermissaoUsuario({ selectedItems, usuarioClonado, usuarioSelecionado, usuarioLogado });
 
+  useEffect(() => {
+    const itensSelecionaveis = dados.filter(item => item.IDPERFIL)
 
+    const dadosPaginadosAtual = dados.slice(first, first + rowState);
+    const intensSelecionaveisPaginaAtual = dadosPaginadosAtual.filter(item => selectedItems.some(selected => selected.IDPERFIL === item.IDPERFIL));
+    
+    if(selectedItems.length === 0) {
+      setSelectAllChecked(false);
+    } else if(
+      selectedItems.length === itensSelecionaveis.length ||
+      (selectedItems.length === intensSelecionaveisPaginaAtual.length && 
+        intensSelecionaveisPaginaAtual.length > 0 && 
+        intensSelecionaveisPaginaAtual.every(item => selectedItems.some(selected => selected.IDPERFIL === item.IDPERFIL))
+      )
+    ) {
+      setSelectAllChecked(true);
+    } else {
+      setSelectAllChecked(false);
+    }
+  
+  }, [selectedItems, first, rowState]);
+  
   const onPage = (event) => {
     setFirst(event.first);
     setRowState(event.rows)
   }
 
-  const getVisibleItems = () => {
-    const start = Number.isInteger(first) ? first : 0;
-    const cnt = Number.isInteger(rowState) ? rowState : 10;
-    return dados.slice(start, start + cnt)
-  };
-
-  const isAllVisibleSelected = () => {
-    const visiveis = getVisibleItems();
-    if (!visiveis || visiveis.length === 0) return false;
-    return visiveis.every(v => selectedItems.some(s => s.IDPERFIL === v.IDPERFIL));
-  }
-
   const onSelectAllChange = (e) => {
-    const checked = e?.checked ?? e?.target?.checked ?? false;
-    if (!checked) {
+   
+    if (e.checked) {
+      Swal.fire({
+        icon: 'question',
+        title: 'Selecione o modo de seleção',
+        text: 'Deseja selecionar todos da tabela ou somente o que está em tela?',
+        showConfirmButton: true,
+        showCancelButton: true,
+        showCloseButton: true,
+        confirmButtonText: 'Todos os registros',
+        cancelButtonText: 'Apenas o que está tela',
+        cancelButtonColor: '#2196F3',
+        allowOutsideClick: false,
+      }).then((result) => {
+  
+        if (result.isConfirmed) {
+          const itensSelecionaveis = dados.filter(item => item.IDPERFIL);
+          setSelectedItems([...itensSelecionaveis]);
+          setBtnVisivel(true);
+        } else if(result.dismiss === Swal.DismissReason.cancel) {
+          const dadosPaginadosAtual = dados.slice(first, first + rowState);
+          const itensSelecionaveisPaginaAtual = dadosPaginadosAtual.filter(item => item.IDPERFIL);
+          setSelectedItems([...itensSelecionaveisPaginaAtual]);
+          setBtnVisivel(true);
+        } else {
+          setBtnVisivel(false);
+          setSelectedItems([]);
+        }
+  
+      })
+      
+    } else {
       setBtnVisivel(false);
       setSelectedItems([]);
-      return;
     }
-    Swal.fire({
-      icon: 'question',
-      title: 'Selecione o modo de seleção',
-      text: 'Deseja selecionar todos da tabela ou somente o que está em tela?',
-      showConfirmButton: true,
-      showCancelButton: true,
-      showCloseButton: true,
-      confirmButtonText: 'Todos os registros',
-      cancelButtonText: 'Apenas o que está tela',
-      cancelButtonColor: '#2196F3',
-      allowOutsideClick: false,
-    }).then((result) => {
-
-      if (result.isConfirmed) {
-        setBtnVisivel(true);
-        setSelectedItems([...dados]);
-        return;
-      }
-
-      if (result.dismiss === Swal.DismissReason.cancel) {
-        const visiveis = getVisibleItems();
-        setBtnVisivel(true);
-        setSelectedItems([...visiveis]);
-        return;
-      }
-      setBtnVisivel(false); setSelectedItems([]);
-      return;
-
-    })
 
   };
 
@@ -272,15 +281,7 @@ export const ActionListaPerfilPermissao = ({
   const colunasFuncionarios = [
     {
       field: '',
-      selectionMode: 'multiple',
-      header: (
-        <div className="custom-control custom-checkbox">
-          <Checkbox
-            checked={isAllVisibleSelected()}
-            onChange={onSelectAllChange}
-          />
-        </div>
-      ),
+      header: 'selecao',
       body: (rowData) => {
         return (
           <div className="custom-control custom-checkbox">
@@ -291,8 +292,12 @@ export const ActionListaPerfilPermissao = ({
                 let _selected = [...selectedItems];
                 if (e.checked) {
                   _selected.push(rowData);
+                  setBtnVisivel(true);
                 } else {
                   _selected = _selected.filter(item => item.IDPERFIL !== rowData.IDPERFIL);
+                  if (_selected.length === 0) {
+                    setBtnVisivel(false);
+                  }
                 }
                 setSelectedItems(_selected);
               }}
@@ -375,35 +380,6 @@ export const ActionListaPerfilPermissao = ({
   ]
 
 
-  const handleEdit = async (IDMENUFILHO) => {
-
-    try {
-      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioSelecionado}&idMenuFilho=${Number(IDMENUFILHO)}`)
-      if (response.data && response.data.length > 0) {
-        setDadosEditarPermissao(response.data);
-        setModalEditarPermissao(true);
-      }
-    } catch (error) {
-      console.error('Erro ao buscar detalhes da venda: ', error);
-    }
-  };
-
-  const headerTemplate = () => {
-    return (
-      <div style={{ width: '100%', backgroundColor: '' }} >
-        <ButtonType
-          textButton={"Clonar Permissão"}
-          onClickButtonType={handleSubmit}
-          Icon={FaRegClone}
-          iconColor={"white"}
-          iconSize={20}
-          cor={"success"}
-        />
-
-      </div>
-    )
-  }
-
   return (
 
     <Fragment>
@@ -422,6 +398,20 @@ export const ActionListaPerfilPermissao = ({
           />
 
         </div>
+
+         <div style={{ width: "100%", display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+
+          <div className="custom-control custom-checkbox">
+            <Checkbox
+              checked={selectAllChecked}
+              onChange={onSelectAllChange}
+            />
+            <span>
+              {selectAllChecked ? "Desmarcar Todos" : "Marcar Todos"}
+            </span>
+          </div>
+
+        </div>
         <div className="card" ref={dataTableRef}>
 
 
@@ -430,7 +420,6 @@ export const ActionListaPerfilPermissao = ({
             value={dados}
             size="small"
             dataKey="IDPERFIL"
-            header={headerTemplate}
             globalFilter={globalFilterValue}
             sortOrder={-1}
             paginator={true}
