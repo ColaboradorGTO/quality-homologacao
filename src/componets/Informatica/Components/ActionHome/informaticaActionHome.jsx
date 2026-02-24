@@ -29,21 +29,25 @@ export const InformaticaActionHome = ({ usuarioLogado, ID }) => {
 
 
   const getIPUsuario = async () => {
-    try {
-      const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
-      let usuarioIP = ipWhoisData?.ip;
+    let usuarioIP = null;
 
-      if (!usuarioIP) {
+    try {
+        const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+        usuarioIP = ipWhoisData?.ip;
+    } catch (error) {
+        console.error("Erro ao buscar IP via ipwho.is:", error);
+    }
+
+    if (!usuarioIP) {
+        try {
         const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
         usuarioIP = ipifyData?.ip;
-      }
-
-      setIpUsuario(usuarioIP);
-      return usuarioIP;
-    } catch (error) {
-      console.error("Erro ao buscar IP:", error);
-      return null;
+        } catch (error) {
+        console.error("Erro ao buscar IP via ipify.org:", error);
+        }
     }
+    setIpUsuario(usuarioIP);
+    return usuarioIP;
   };
 
   const { data: dadosEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch } = useQuery(

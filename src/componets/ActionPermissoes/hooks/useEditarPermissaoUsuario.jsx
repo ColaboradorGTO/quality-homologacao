@@ -59,7 +59,7 @@ export const useEditarPermissaoUsuario = () => {
     }
     setIpUsuario(usuarioIP);
     return usuarioIP;
-};
+  };
     
 
   // const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(

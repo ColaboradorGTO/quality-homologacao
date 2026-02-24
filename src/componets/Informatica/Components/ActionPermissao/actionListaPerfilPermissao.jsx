@@ -11,8 +11,6 @@ import { useCopiarPermissaoUsuario } from "./hooks/useEditarPermissao";
 import { ButtonType } from "../../../Buttons/ButtonType";
 import { FaRegClone } from "react-icons/fa";
 import Swal from "sweetalert2";
-import { ButtonTable } from "../../../ButtonsTabela/ButtonTable";
-import { CiEdit } from "react-icons/ci";
 import { ActionUpdatePermissaoModal } from "./ActionUpdatePermissao/actionUpdatePermissaoModal";
 import { get } from "../../../../api/funcRequest";
 
@@ -374,24 +372,6 @@ export const ActionListaPerfilPermissao = ({
       body: row => <p style={{ width: '100px', fontWeight: 600, margin: '0px' }}>{row.N4 == 'True' ? 'Sim' : 'Não'}</p>,
       sortable: true,
     },
-/*     {
-      field: 'IDMENUFILHO',
-      header: 'Editar',
-      body: (row) => {
-        return (
-          <ButtonTable
-            onClickButton={() => handleClickEdit(row)}
-            Icon={CiEdit}
-            iconColor={"white"}
-            iconSize={30}
-            cor={"success"}
-            width="40px"
-            height="40px"
-          />
-        )
-      },
-      sortable: true,
-    } */
   ]
 
 
@@ -399,29 +379,12 @@ export const ActionListaPerfilPermissao = ({
 
     try {
       const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioSelecionado}&idMenuFilho=${Number(IDMENUFILHO)}`)
-      if (response.data) {
+      if (response.data && response.data.length > 0) {
         setDadosEditarPermissao(response.data);
         setModalEditarPermissao(true);
       }
     } catch (error) {
       console.error('Erro ao buscar detalhes da venda: ', error);
-    }
-  };
-
-  const handleClickEdit = (row) => {
-    if (optionsModulos[0]?.ALTERAR == 'True') {
-      if (row && row.IDMENUFILHO) {
-        handleEdit(row.IDMENUFILHO);
-      }
-
-    } else {
-      Swal.fire({
-        icon: 'info',
-        title: 'Atenção',
-        text: 'Você não tem permissão para editar!',
-        showConfirmButton: true,
-        timer: 3000,
-      })
     }
   };
 

@@ -241,6 +241,22 @@ export const Permissoes = ({}) => {
                                     />
                                     
                                 </div>
+                                <div className="col-sm-6 col-md-6 col-lg-6 col-xl-6  ">
+                                    <div style={{ width: '100%' }} className="mb-2 ">
+
+                                        <label style={{ color: '#fff', fontSize: '1.5rem' }} htmlFor="">Selecione um Departamento</label>
+                                    </div>
+
+                                    <Select
+                                        options={Departamentos?.map((item) => ({
+                                            value: item.label,
+                                            label: item.value
+                                        }))}
+                                        value={departamentoSelecionado}
+                                        onChange={(e) => setDepartamentoSelecionado(e)}
+                                    />
+                                
+                                </div>
 
                                 <div className="col-sm-6 col-md-6 col-lg-6 col-xl-6  ">
                                     <div style={{ width: '100%' }} className="mb-2 ">
@@ -258,22 +274,7 @@ export const Permissoes = ({}) => {
                                     />
                                 
                                 </div>
-                                <div className="col-sm-6 col-md-6 col-lg-6 col-xl-6  ">
-                                    <div style={{ width: '100%' }} className="mb-2 ">
-
-                                        <label style={{ color: '#fff', fontSize: '1.5rem' }} htmlFor="">Selecione um Departamento</label>
-                                    </div>
-
-                                    <Select
-                                        options={Departamentos?.map((item) => ({
-                                            value: item.label,
-                                            label: item.value
-                                        }))}
-                                        value={departamentoSelecionado}
-                                        onChange={(e) => setDepartamentoSelecionado(e)}
-                                    />
-                                
-                                </div>
+                               
                                 <div className="col-sm-6 col-md-6 col-lg-6 col-xl-6  ">
                                     <div style={{ width: '100%' }} className="mb-2 ">
 

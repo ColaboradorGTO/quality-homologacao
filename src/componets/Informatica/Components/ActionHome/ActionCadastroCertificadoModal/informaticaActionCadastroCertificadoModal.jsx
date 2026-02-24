@@ -41,16 +41,26 @@ export const InformaticaActionCertificadoModal = ({ show, handleClose, dadosDeta
     }
   }, [navigate]);
 
-  useEffect(() => {
-    getIPUsuario();
-  }, [usuarioLogado]);
-
   const getIPUsuario = async () => {
-    const response = await axios.get('http://ipwho.is/');
-    if (response.data) {
-      setIpUsuario(response.data.ip);
+    let usuarioIP = null;
+
+    try {
+        const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+        usuarioIP = ipWhoisData?.ip;
+    } catch (error) {
+        console.error("Erro ao buscar IP via ipwho.is:", error);
     }
-    return response.data;
+
+    if (!usuarioIP) {
+        try {
+        const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+        usuarioIP = ipifyData?.ip;
+        } catch (error) {
+        console.error("Erro ao buscar IP via ipify.org:", error);
+        }
+    }
+    setIpUsuario(usuarioIP);
+    return usuarioIP;
   };
 
   const onSubmit = async (data) => {
@@ -113,7 +123,7 @@ export const InformaticaActionCertificadoModal = ({ show, handleClose, dadosDeta
 
       const textDados = JSON.stringify(putData);
       let textoFuncao = 'INFORMATICA/ATUALIZAR LINK RELATORIO BI';
-
+      const ipUsuario = await getIPUsuario();
       const postData = {
         IDFUNCIONARIO: usuarioLogado.id,
         PATHFUNCAO: textoFuncao,

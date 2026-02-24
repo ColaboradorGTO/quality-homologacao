@@ -24,10 +24,10 @@ const ActionPesquisaNfce = lazy(() => import("../componets/Informatica/Component
 
 export const DashBoardInformatica = () => {
   const [actionVisivel, setActionVisivel] = useState(true);
+  const [usuarioLogado, setUsuarioLogado] = useState(null);
+  const [componentToShow, setComponentToShow] = useState("");
   const storedModule = localStorage.getItem('moduloselecionado');
   const selectedModule = JSON.parse(storedModule);
-  const [componentToShow, setComponentToShow] = useState("");
- const [usuarioLogado, setUsuarioLogado] = useState(null);
 
   useEffect(() => {
     const usuarioArmazenado = localStorage.getItem('usuario');
@@ -40,9 +40,6 @@ export const DashBoardInformatica = () => {
   useEffect(() => {
 
   }, [usuarioLogado]);
-  function handleShowComponent(componentName) {
-    setComponentToShow(componentName);
-  }
 
   const { data: optionsModulosPage = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
     'menus-usuario',
@@ -53,6 +50,31 @@ export const DashBoardInformatica = () => {
     },
     { enabled: Boolean(usuarioLogado?.id), staleTime: 5 * 60 * 1000, }
   );
+
+  function handleShowComponent(componentName) {
+    const menuFilhoSelecionado = selectedModule.menuPai.menuFilho.find(
+      menu => menu.URL === componentName
+    );
+  
+    if (menuFilhoSelecionado) {
+      // Salvar todas as informações do menu selecionado no localStorage
+      localStorage.setItem('menuFilhoSelecionado', JSON.stringify({
+        ID: menuFilhoSelecionado.ID,
+        DSNOME: menuFilhoSelecionado.DSNOME,
+        URL: menuFilhoSelecionado.URL,
+        ALTERAR: menuFilhoSelecionado.ALTERAR,
+        CRIAR: menuFilhoSelecionado.CRIAR,
+        VISUALIZAR: menuFilhoSelecionado.VISUALIZAR,
+        N1: menuFilhoSelecionado.N1,
+        N2: menuFilhoSelecionado.N2,
+        N3: menuFilhoSelecionado.N3,
+        N4: menuFilhoSelecionado.N4,
+        ADMINISTRADOR: menuFilhoSelecionado.ADMINISTRADOR
+      }));
+    }
+
+    setComponentToShow(componentName);
+  }
   
   const permissaoUsuario = selectedModule.menuPai.menuFilho;
   const {   
