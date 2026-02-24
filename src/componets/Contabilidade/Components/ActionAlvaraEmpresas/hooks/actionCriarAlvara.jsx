@@ -4,10 +4,10 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import { removerFormatacaoMoeda } from "../../../../../utils/formatMoeda";
 import { useEffect } from "react";
-import { useQuery } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 import { converterArquivosParaBase64 } from "../../../../../utils/converterFileBase64";
 
-export const useCriarAlvara = ({ handleClose, dadosAlvaraSelecionado, usuarioLogado, optionsModulos, refetchAlvaraEmpresa }) => {
+export const useCriarAlvara = ({ handleClose, dadosAlvaraSelecionado, usuarioLogado, optionsModulos, refetchAlvaraEmpresa, idAlvaraSelecionado, refetchAlvaraSelecionado }) => {
     const [arquivoAlvara, setArquivoAlvara] = useState([])
     const [descricaoDetalheAndamento, setDescricaoDetalheAndamento] = useState('')
     const [dataFimCompetencia, setDataFimCompetencia] = useState('')
@@ -49,8 +49,18 @@ export const useCriarAlvara = ({ handleClose, dadosAlvaraSelecionado, usuarioLog
         { enabled: true, staleTime: 60 * 60 * 1000, }
     );
 
-    const arquivoConvertido = converterArquivosParaBase64(arquivoAlvara)
-    console.log(arquivoConvertido, 'arquivoConvertido')
+    const { data: vinculoAlvaraEmpresa = [], error: errorvinculoAlvaraEmpresa, isLoading: isLoadingvinculoAlvaraEmpresa, refetch: refetchvinculoAlvaraEmpresa } = useQuery(
+        ['vinculo-alvaras-empresa', dadosAlvaraSelecionado?.[0]?.IDEMPRESA],
+        async () => {
+            const response = await get(`/alvaras-empresa-detalhe?idFilial=${Number(dadosAlvaraSelecionado?.[0]?.IDEMPRESA)}`);
+            console.log(response, 'response.data status alvara')
+            return response.data;
+        },
+        { enabled: !!dadosAlvaraSelecionado?.[0]?.IDEMPRESA, }
+    );
+
+    //const arquivoConvertido = converterArquivosParaBase64(arquivoAlvara)
+    // console.log(arquivoConvertido, 'arquivoConvertido')
 
     /*     useEffect(() => {
             setStatusAlvara({ value: dadosAlvaraSelecionado?.[0]?.STATIVO == 'True' || "False", label: dadosAlvaraSelecionado?.[0]?.STATIVO == 'True' ? 'Ativo' : 'Inativo' })
@@ -69,9 +79,9 @@ export const useCriarAlvara = ({ handleClose, dadosAlvaraSelecionado, usuarioLog
     ];
 
     //console.log(IDSTATUSANDAMENTO, 'arquivoAlvara')
-    console.log(dadosAlvaraSelecionado, 'dadosAlvaraSelecionado hook')
+    //console.log(dadosAlvaraSelecionado, 'dadosAlvaraSelecionado hook')
 
-    const onSubmit = async (data) => {
+    const onSubmit = async () => {
         if (optionsModulos[0]?.ALTERAR !== 'True') {
             Swal.fire({
                 title: 'Acesso Negado',
@@ -102,35 +112,30 @@ export const useCriarAlvara = ({ handleClose, dadosAlvaraSelecionado, usuarioLog
 
         if (!confirmacao.isConfirmed) return;
 
-        /*   const postData = {
-              IDVINCULO: dadosAlvaraSelecionado?.[0]?.IDVINCULO,
-              STATIVO: String(statusAlvara?.value),
-              DTINICIOCOMPETENCIA: dataIncioCompetencia,
-              DTFIMCOMPETENCIA: dataFimCompetencia,
-              IDSTATUSANDAMENTO: Number(statusAndamento?.value),
-              DESCRICAODETALHEANDAMENTO: descricaoDetalheAndamento,
-              METRAGEMEMPRESA: Number(metragemLoja),
-              IDFUNCIONARIO: Number(usuarioLogado.id),
-              ARQUIVOSALVARA: arquivoConvertido,
-          }
-   */
-        const postData = {
-            IDEMPRESA: dadosAlvaraSelecionado?.[0]?.IDVINCULO,
-            IDALVARA: String(statusAlvara?.value),
-            STATIVO: dataIncioCompetencia,
-            DTINICIOCOMPETENCIA: dataFimCompetencia,
-            DTFIMCOMPETENCIA: Number(statusAndamento?.value),
-            IDSTATUSANDAMENTO: descricaoDetalheAndamento,
-            DESCRICAODETALHEANDAMENTO: Number(metragemLoja),
-            METRAGEMEMPRESA:Number(metragemLoja),//
-            IDFUNCIONARIO: Number(usuarioLogado.id),//
-            ARQUIVOSALVARA: arquivoConvertido,
+        const tratarResposta = (response) => {
+            if (!response.data?.success) {
+                throw new Error(response.data?.msg);
+            }
+            return response.data;
         }
 
+        const arquivosConvertidos = await converterArquivosParaBase64(arquivoAlvara);
+
+        const postData = {
+            IDEMPRESA: dadosAlvaraSelecionado?.[0]?.IDEMPRESA,
+            IDALVARA: idAlvaraSelecionado,
+            STATIVO: "True",
+            DTINICIOCOMPETENCIA: dataIncioCompetencia,
+            DTFIMCOMPETENCIA: dataFimCompetencia,
+            IDSTATUSANDAMENTO: Number(statusAndamento?.value),
+            DESCRICAODETALHEANDAMENTO: descricaoDetalheAndamento,
+            METRAGEMEMPRESA: Number(metragemLoja),
+            IDFUNCIONARIO: Number(usuarioLogado.id),
+            ARQUIVOSALVARA: arquivosConvertidos,
+        }
 
         try {
             const response = await post('vinculoAlvarasEmpresa', postData)
-
             const textDados = JSON.stringify(postData)
             let textoFuncao = 'CONTABILIDADE/EDITAR ALVARA PREFEITURA';
             const ipUsuario = await getIPUsuario();
@@ -144,17 +149,31 @@ export const useCriarAlvara = ({ handleClose, dadosAlvaraSelecionado, usuarioLog
 
             await post('/log-web', CreateLog)
 
+            console.log(response, 'response')
+            if (response?.success === false) {
+                Swal.fire({
+                    title: 'Atenção',
+                    text: response.msg,
+                    icon: 'info',
+                    customClass: {
+                        container: 'custom-swal',
+                    }
+                });
+                return;
+            }
+
             Swal.fire({
-                title: 'Atualização',
+                title: 'Sucesso',
                 text: 'Atualização Realizada com Sucesso',
                 icon: 'success',
-                timer: 3000,
                 customClass: {
                     container: 'custom-swal',
                 }
             });
-            handleClose()
-            refetchAlvaraEmpresa()
+
+            refetchAlvaraSelecionado();
+            refetchAlvaraEmpresa();
+            handleClose();
             return response.data;
         } catch (error) {
 
@@ -180,7 +199,7 @@ export const useCriarAlvara = ({ handleClose, dadosAlvaraSelecionado, usuarioLog
                     container: 'custom-swal',
                 }
             });
-            return responsPost.data
+            return responsPost
         }
     }
 

@@ -8,15 +8,16 @@ import FormField from "../../../../../../Formularios/FormField";
 import { BsBuilding, BsPerson } from "react-icons/bs";
 import Select from "react-select"
 import { AiOutlineFileText } from "react-icons/ai";
-import { ActionEditarListaArquivosAnexados } from "./actionEditarListaArquivoAnexado";
 import { AlertError } from "../../../../../../Inputs/alertError";
 import { useEditarAlvara } from "../../../hooks/actionEditarAlvara";
 import { useCriarArquivoAlvara } from "../../../hooks/actionCriarArquivoAlvara";
 import { converterArquivosParaBase64 } from "../../../../../../../utils/converterFileBase64";
+import { ActionEditarListaArquivosAnexados } from "./actionEditarListaArquivoAnexado";
+import { schema } from "./schema/schemaValidarEditarAlvara";
 
 //import { ActionListaAlvaraPrefeitura } from "./ActionAvaraPrefeituraLista/actionListaAlvaraPrefeitura.jsx";
 
-export const FormularioEditarDetalhesAlvara = ({ dadosAlvaraSelecionado, handleClose, usuarioLogado, optionsModulos, refetchAlvaraEmpresa }) => {
+export const FormularioEditarDetalhesAlvara = ({ dadosAlvaraSelecionado, handleClose, usuarioLogado, optionsModulos, refetchAlvaraEmpresa, refetchAlvaraSelecionado, refetchVinculoAlvara }) => {
     const { handleSubmit, formState: { errors }, clearErrors, control, setError, register } = useForm({
         mode: "onChange"
     });
@@ -39,25 +40,23 @@ export const FormularioEditarDetalhesAlvara = ({ dadosAlvaraSelecionado, handleC
         metragemLoja,
         setMetragemLoja,
         onSubmit
-    } = useEditarAlvara({ handleClose, usuarioLogado, optionsModulos, dadosAlvaraSelecionado, refetchAlvaraEmpresa });
+    } = useEditarAlvara({ handleClose, usuarioLogado, optionsModulos, dadosAlvaraSelecionado, refetchAlvaraEmpresa, refetchAlvaraSelecionado });
 
 
     const {
         onCriarArquivo
-    } = useCriarArquivoAlvara({ usuarioLogado, optionsModulos, dadosAlvaraSelecionado, refetchAlvaraEmpresa });
+    } = useCriarArquivoAlvara({ usuarioLogado, optionsModulos, dadosAlvaraSelecionado, refetchAlvaraEmpresa, refetchVinculoAlvara });
 
     const handleUploadArquivo = async (e) => {
         const filesList = e.target.files;
         if (!filesList?.length) return;
 
         try {
-            
+
             const arquivosConvertidos = await converterArquivosParaBase64(filesList);
 
             if (!arquivosConvertidos?.length) return;
-
             const idVinculo = dadosAlvaraSelecionado?.[0]?.IDVINCULO;
-
             await onCriarArquivo(idVinculo, arquivosConvertidos);
 
             e.target.value = null; // limpa input
@@ -70,19 +69,20 @@ export const FormularioEditarDetalhesAlvara = ({ dadosAlvaraSelecionado, handleC
         dadosAlvaraSelecionado?.[0]?.ARQUIVOSALVARAS || [];
 
     const temArquivos = arquivosAlvara.length > 0;
+
     const handleValidatedSubmit = async () => {
         try {
 
             const dadosParaValidar = {
-                Empresa: usuarioLogado?.NOFANTASIA,
-                operador: usuarioLogado?.NOFUNCIONARIO,
-                historicoDigitado: motivoAjuste,
-                dataLancamento: dados?.[0]?.DTHORAFECHAMENTOCAIXA,
-                dinheiroInformado: dadosDetelheCaixa?.[0]?.TOTALFECHAMENTOVRQUEBRACAIXA,
-                dinheiroAjuste: dinheiroAjuste
+                statusAlvaraSelecionado: statusAlvara,
+                dataInicioCompetenciaSelecionada: dataIncioCompetencia,
+                dataFimCompetenciaSelecionada: dataFimCompetencia,
+                statusAndamento: statusAndamento,
+                metragemLojaDigitado: metragemLoja,
+                descricaoDetalheAndamentoDigitado: descricaoDetalheAndamento
             };
 
-            // await schema.validate(dadosParaValidar, { abortEarly: false });
+            await schema.validate(dadosParaValidar, { abortEarly: false });
             onSubmit();
 
         } catch (validationError) {
@@ -109,7 +109,7 @@ export const FormularioEditarDetalhesAlvara = ({ dadosAlvaraSelecionado, handleC
     //console.log(dataFimCompetencia, "dataIncioCompetencia")
     return (
         <Fragment>
-            <form onSubmit={handleSubmit(onSubmit)} >
+            <form onSubmit={handleSubmit(handleValidatedSubmit)} >
                 <span class="d-flex align-items-center">
                     <AiOutlineFileText size={25} />
                     <h4 class="font-weight-bold" style={{ margin: 0, marginLeft: "10px" }}>
@@ -125,7 +125,7 @@ export const FormularioEditarDetalhesAlvara = ({ dadosAlvaraSelecionado, handleC
                             <Select
                                 className="basic-single"
                                 classNamePrefix={"select"}
-                                name="departamentoFuncionario"
+                                name="statusAlvaraSelecionado"
                                 options={optionsStatus?.map((item) => ({
                                     value: item.value,
                                     label: item.label
@@ -137,11 +137,11 @@ export const FormularioEditarDetalhesAlvara = ({ dadosAlvaraSelecionado, handleC
                                 }}
                             //onChange={(e) => setStatusAlvara(e.value)}
                             />
-                            {errors.moduloEscolhido && (
+                            {errors.statusAlvaraSelecionado && (
                                 <AlertError
-                                    error={errors.moduloEscolhido?.value || errors.moduloEscolhido}
+                                    error={errors.statusAlvaraSelecionado?.value || errors.statusAlvaraSelecionado}
                                     onClose={clearErrors}
-                                    fieldName="moduloEscolhido"
+                                    fieldName="statusAlvaraSelecionado"
                                 />
                             )}
                             {/* <Controller
@@ -165,12 +165,13 @@ export const FormularioEditarDetalhesAlvara = ({ dadosAlvaraSelecionado, handleC
                     <div class="row mt-3">
                         <div class="col-sm-6 col-xl-6">
                             <Controller
-                                name="Dt. Inicio:"
+                                name="dataInicioCompetenciaSelecionada"
                                 control={control}
                                 render={({ field }) => (
                                     <FormField
+                                        {...field}
                                         label={"Dt. Inicio:"}
-                                        name="Dt. Inicio:"
+                                        name="dataInicioCompetenciaSelecionada"
                                         type="date"
                                         value={dataIncioCompetencia}
                                         onChange={(e) => setDataIncioCompetencia(e.target.value)}
@@ -183,12 +184,13 @@ export const FormularioEditarDetalhesAlvara = ({ dadosAlvaraSelecionado, handleC
                         </div>
                         <div class="col-sm-6 col-xl-6">
                             <Controller
-                                name="Dt. Inicio:"
+                                name="dataFimCompetenciaSelecionada"
                                 control={control}
                                 render={({ field }) => (
                                     <FormField
+                                        {...field}
                                         label={"Dt. Fim:"}
-                                        name="Dt. Fim:"
+                                        name="dataFimCompetenciaSelecionada"
                                         type="date"
                                         value={dataFimCompetencia}
                                         onChange={(e) => setDataFimCompetencia(e.target.value)}
@@ -208,7 +210,7 @@ export const FormularioEditarDetalhesAlvara = ({ dadosAlvaraSelecionado, handleC
                             <Select
                                 className="basic-single"
                                 classNamePrefix={"select"}
-                                name="departamentoFuncionario"
+                                name="statusAndamento"
                                 options={optionsStatusAlvara?.map((item) => ({
                                     value: item.IDSTATUS,
                                     label: item.DESCRICAO
@@ -218,15 +220,15 @@ export const FormularioEditarDetalhesAlvara = ({ dadosAlvaraSelecionado, handleC
                                 value={statusAndamento}
                                 onChange={(opt) => {
                                     setStatusAndamento(opt ?? null);
-                                    clearErrors("contaSelecionada");
+                                    clearErrors("statusAndamento");
                                 }}
                             //onChange={(e) => setStatusAndamento(e.value)}
                             />
-                            {errors.moduloEscolhido && (
+                            {errors.statusAndamento && (
                                 <AlertError
-                                    error={errors.moduloEscolhido?.value || errors.moduloEscolhido}
+                                    error={errors.statusAndamento?.value || errors.statusAndamento}
                                     onClose={clearErrors}
-                                    fieldName="moduloEscolhido"
+                                    fieldName="statusAndamento"
                                 />
                             )}
 
@@ -249,12 +251,13 @@ export const FormularioEditarDetalhesAlvara = ({ dadosAlvaraSelecionado, handleC
                         </div>
                         <div class="col-sm-6 col-xl-6">
                             <Controller
-                                name="Metragem:"
+                                name="metragemLojaDigitado"
                                 control={control}
                                 render={({ field }) => (
                                     <FormField
+                                        {...field}
                                         label={"Metragem:"}
-                                        name="Metragem:"
+                                        name="metragemLojaDigitado"
                                         type="text"
                                         value={metragemLoja}
                                         onChange={(e) => setMetragemLoja(e.target.value).replace(/\D/g, "")}
@@ -268,11 +271,12 @@ export const FormularioEditarDetalhesAlvara = ({ dadosAlvaraSelecionado, handleC
                     <div class="row mt-3">
                         <div class="col-sm-6 col-xl-6">
                             <Controller
-                                name="DETALHEANDAMENTO"
+                                name="descricaoDetalheAndamentoDigitado"
                                 control={control}
                                 render={({ field }) => (
                                     <FormField
                                         {...field}
+                                        name="descricaoDetalheAndamentoDigitado"
                                         label="Detalhe Andamento"
                                         type="textarea"
                                         value={descricaoDetalheAndamento}
@@ -297,6 +301,7 @@ export const FormularioEditarDetalhesAlvara = ({ dadosAlvaraSelecionado, handleC
                         usuarioLogado={usuarioLogado}
                         refetchAlvaraEmpresa={refetchAlvaraEmpresa}
                         handleClose={handleClose}
+                        refetchVinculoAlvara={refetchVinculoAlvara}
                     />
                 ) : (
                     <div className="form-group ">
@@ -311,7 +316,7 @@ export const FormularioEditarDetalhesAlvara = ({ dadosAlvaraSelecionado, handleC
             </div>
             <FooterModal
                 ButtonTypeCadastrar={ButtonTypeModal}
-                onClickButtonCadastrar={onSubmit}
+                onClickButtonCadastrar={handleSubmit(handleValidatedSubmit)}
                 tipoBtnCadastrar={"submit"}
                 textButtonCadastrar={"Salvar Alterações"}
                 corCadastrar="success"

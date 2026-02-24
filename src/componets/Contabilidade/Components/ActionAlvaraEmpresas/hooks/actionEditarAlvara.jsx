@@ -4,9 +4,9 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import { removerFormatacaoMoeda } from "../../../../../utils/formatMoeda";
 import { useEffect } from "react";
-import { useQuery } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 
-export const useEditarAlvara = ({ handleClose, dadosAlvaraSelecionado, usuarioLogado, optionsModulos, refetchAlvaraEmpresa }) => {
+export const useEditarAlvara = ({ handleClose, dadosAlvaraSelecionado, usuarioLogado, optionsModulos, refetchAlvaraEmpresa, refetchAlvaraSelecionado }) => {
     const [arquivoAlvara, setArquivoAlvara] = useState([])
     const [descricaoDetalheAndamento, setDescricaoDetalheAndamento] = useState('')
     const [dataFimCompetencia, setDataFimCompetencia] = useState('')
@@ -68,6 +68,7 @@ export const useEditarAlvara = ({ handleClose, dadosAlvaraSelecionado, usuarioLo
 
     //console.log(IDSTATUSANDAMENTO, 'arquivoAlvara')
     console.log(dadosAlvaraSelecionado, 'dadosAlvaraSelecionado hook')
+
 
     const onSubmit = async (data) => {
         if (optionsModulos[0]?.ALTERAR !== 'True') {
@@ -137,8 +138,9 @@ export const useEditarAlvara = ({ handleClose, dadosAlvaraSelecionado, usuarioLo
                     container: 'custom-swal',
                 }
             });
-            handleClose()
-            refetchAlvaraEmpresa()
+            refetchAlvaraSelecionado();
+            refetchAlvaraEmpresa();
+            handleClose();
             return response.data;
         } catch (error) {
 

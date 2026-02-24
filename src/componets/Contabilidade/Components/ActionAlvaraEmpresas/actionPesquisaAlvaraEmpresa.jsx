@@ -20,6 +20,7 @@ export const ActionPesquisaAlvaraEmpresa = ({ usuarioLogado, ID }) => {
     const [tipoAlvara, setTipoAlvara] = useState('');
     const [tipoAvaraAplicado, setTipoAvaraAplicado] = useState('');
     const [tabelaVisivel, setTabelaVisivel] = useState(false);
+    const [idEmpresaSelecionada, setIdEmpresaSelecionada] = useState(null);
     const [produto, setProduto] = useState('')
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(1000);
@@ -116,7 +117,22 @@ export const ActionPesquisaAlvaraEmpresa = ({ usuarioLogado, ID }) => {
     const { data: dadosAlvaraEmpresa = [], error: errorAlvaraEmpresa, isLoading: isLoadingAlvaraEmpresa, refetch: refetchAlvaraEmpresa } = useQuery(
         ['fetchListaAlvaraEmpresa', empresaSelecionada, marcaSelecionada, satusFilialSelecionada, ufSelecionada],
         fetchListaAlvaraEmpresa,
-        { enabled: false, staleTime: 5 * 60 * 1000 },
+        { enabled: false },
+    );
+
+    const {
+        data: dadosAlvaraEmpresaSelecionada = [],  refetch: refetchAlvaraSelecionado, isLoading : isLoadingAlvaraSelecionado} = useQuery(
+        ['vinculo-alvara', idEmpresaSelecionada],
+        async () => {
+            const response = await get(
+                `/alvaras-empresa-detalhe?idFilial=${idEmpresaSelecionada}`
+            );
+            return response.data;
+        },
+        {
+            enabled: !!idEmpresaSelecionada,
+           
+        }
     );
 
     const optionsUf = [
@@ -226,6 +242,11 @@ export const ActionPesquisaAlvaraEmpresa = ({ usuarioLogado, ID }) => {
                     optionsModulos={optionsModulos}
                     usuarioLogado={usuarioLogado}
                     refetchAlvaraEmpresa={refetchAlvaraEmpresa}
+                    dadosAlvaraEmpresaSelecionada={dadosAlvaraEmpresaSelecionada}
+                    refetchAlvaraSelecionado={refetchAlvaraSelecionado}
+                    idEmpresaSelecionada = {idEmpresaSelecionada}
+                    setIdEmpresaSelecionada={setIdEmpresaSelecionada}
+
                 />
             )}
 

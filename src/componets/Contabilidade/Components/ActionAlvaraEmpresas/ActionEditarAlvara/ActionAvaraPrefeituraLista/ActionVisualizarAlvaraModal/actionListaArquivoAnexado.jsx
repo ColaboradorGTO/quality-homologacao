@@ -11,6 +11,7 @@ import { FaPencilAlt } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { get } from "../../../../../../../api/funcRequest";
 import { FaPlus, FaRegEye } from "react-icons/fa6";
+import axiosInstance from "../../../../../../../api/api";
 //import { ActionCadastrarAlvaraModal } from "./ActionCadastrarAlvaraModal/ActionCadastrarAlvaraModal";
 //import { ActionVisualizarDetalhesAlvaraModal } from "./ActionVisualizarAlvaraModal/actionVisualizarDetalhesAlvaraModal";
 
@@ -90,24 +91,30 @@ export const ActionListaArquivosAnexados = ({ dadosAlvaraSelecionado, optionsMod
         return mime.split("/")[1].toUpperCase();
     };
 
-    const dados = dadosAlvaraSelecionado?.map((item) => {
-
-        return {
-            IDVINCULO: item?.IDVINCULO,
-            IDEMPRESA: item?.IDEMPRESA,
-            NOMEARQUIVOALVARA: item?.ARQUIVOSALVARAS[0]?.NOMEARQUIVOALVARA,
-            TIPOARQUIVOALVARA: item?.ARQUIVOSALVARAS[0]?.TIPOARQUIVOALVARA,
-            DTHORACRIACAO: item?.ARQUIVOSALVARAS[0]?.DTHORACRIACAO,
-            STATIVO: item?.ARQUIVOSALVARAS[0]?.STATIVO === "True" ? "Ativo" : "Inativo",
-            IDARQUIVOSALVARA: item?.ARQUIVOSALVARAS[0]?.IDARQUIVOSALVARA
-        };
-    });
+    console.log(dadosAlvaraSelecionado, "dadosAlvaraSelecionado tabela")
+    const dados =
+        dadosAlvaraSelecionado
+            ?.flatMap((item) =>
+                item?.ARQUIVOSALVARAS?.map((arquivo) => ({
+                    IDVINCULO: item?.IDVINCULO,
+                    IDEMPRESA: item?.IDEMPRESA,
+                    IDARQUIVOSALVARA: arquivo?.IDARQUIVOSALVARA,
+                    NOMEARQUIVOALVARA: arquivo?.NOMEARQUIVOALVARA,
+                    TIPOARQUIVOALVARA: arquivo?.TIPOARQUIVOALVARA,
+                    DTHORACRIACAO: arquivo?.DTHORACRIACAO,
+                    STATIVO: arquivo?.STATIVO === "True" ? "Ativo" : "Inativo",
+                })) || []
+            )
+            ?.map((item, index) => ({
+                ...item,
+                CONTADOR: index + 1,
+            })) || [];
 
     const colunasEmpresasAlvaras = [
         {
-            field: 'IDEMPRESA',
+            field: 'CONTADOR',
             header: '#',
-            body: row => <th> {row.IDEMPRESA} </th>,
+            body: row => <th> {row.CONTADOR} </th>,
             sortable: true,
         },
         {
@@ -167,16 +174,16 @@ export const ActionListaArquivosAnexados = ({ dadosAlvaraSelecionado, optionsMod
     ]
 
     const handleVisualizarArquivo = async (row) => {
+        const baseURL = axiosInstance.defaults.baseURL;
+        try {
+            const url = `${baseURL}/visualizar-anexo-alvara?idArquivoAlvara=${row.IDARQUIVOSALVARA}`;
 
-        //const url = await get(`/visualizar-anexo-alvara?idArquivoAlvara=${row.IDARQUIVOSALVARA}`);
-
-
-        //const url = `/visualizar-anexo-alvara?idArquivoAlvara=${row.IDARQUIVOSALVARA}`;
-        const url = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/contabilidade/arquivos-anexos-alvaras-empresa.xsjs?id=${row.IDARQUIVOSALVARA}`;
-
-        window.open(url, "_blank");
+            window.open(url, "_blank");
+        }
+        catch (error) {
+            console.error("Erro ao visualizar arquivo:", error);
+        }
     };
-
 
     const handleClickVisualizarAlvara = (row) => {
         if (optionsModulos[0]?.ALTERAR === 'True') {

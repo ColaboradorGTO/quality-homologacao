@@ -13,11 +13,20 @@ import { ActionAlvaraEmpresaModal } from "./ActionEditarAlvara/actionAlvaraEmpre
 import Swal from "sweetalert2";
 import { get } from "../../../../api/funcRequest";
 
-export const ActionListaAlvaras = ({ dadosAlvaraEmpresa, tipoAvaraAplicado, optionsModulos, usuarioLogado, refetchAlvaraEmpresa }) => {
+export const ActionListaAlvaras = ({
+    dadosAlvaraEmpresa,
+    tipoAvaraAplicado,
+    optionsModulos,
+    usuarioLogado,
+    refetchAlvaraEmpresa,
+    refetchAlvaraSelecionado,
+    dadosAlvaraEmpresaSelecionada,
+    setIdEmpresaSelecionada
+}) => {
     const [globalFilterValue, setGlobalFilterValue] = useState('');
     const [rowSelection, setRowSelection] = useState(null);
     const [modalAlvaraEmpresa, setModalAlvaraEmpresa] = useState(false);
-    const [dadosAlvaraEmpresaSelecionada, setDadosAlvaraEmpresaSelecionada] = useState([])
+    //const [dadosAlvaraEmpresaSelecionada, setDadosAlvaraEmpresaSelecionada] = useState([])
     const dataTableRef = useRef();
 
     const onGlobalFilterChange = (e) => {
@@ -349,9 +358,9 @@ export const ActionListaAlvaras = ({ dadosAlvaraEmpresa, tipoAvaraAplicado, opti
 
     const handleClickAjusteAlvara = (row) => {
         if (optionsModulos[0]?.ALTERAR === 'True') {
-            //console.log(optionsModulos[0]?.ALTERAR,'optionsModulos[0]?.ALTERAR')
             if (row && row.IDEMPRESA) {
-                handleEditarAlvara(row.IDEMPRESA);
+                setIdEmpresaSelecionada(row.IDEMPRESA)
+                setModalAlvaraEmpresa(true);
             }
         } else {
             Swal.fire({
@@ -366,7 +375,8 @@ export const ActionListaAlvaras = ({ dadosAlvaraEmpresa, tipoAvaraAplicado, opti
         }
     };
 
-    const handleEditarAlvara = async (IDEMPRESA) => {
+
+    /* const handleEditarAlvara = async (IDEMPRESA) => {
         try {
             const response = await get(`/alvaras-empresa-detalhe?idFilial=${IDEMPRESA}`);
             console.log(response, 'response.data')
@@ -377,7 +387,7 @@ export const ActionListaAlvaras = ({ dadosAlvaraEmpresa, tipoAvaraAplicado, opti
         } catch (error) {
             console.error('Erro ao buscar dados Alvaras: ', error);
         }
-    };
+    }; */
 
     return (
 
@@ -441,6 +451,7 @@ export const ActionListaAlvaras = ({ dadosAlvaraEmpresa, tipoAvaraAplicado, opti
                 usuarioLogado={usuarioLogado}
                 optionsModulos={optionsModulos}
                 refetchAlvaraEmpresa={refetchAlvaraEmpresa}
+                refetchAlvaraSelecionado={refetchAlvaraSelecionado}
             />
 
         </Fragment>

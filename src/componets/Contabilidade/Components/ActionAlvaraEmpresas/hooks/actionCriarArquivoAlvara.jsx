@@ -6,7 +6,7 @@ import { removerFormatacaoMoeda } from "../../../../../utils/formatMoeda";
 import { useEffect } from "react";
 import { useQuery } from "react-query";
 
-export const useCriarArquivoAlvara = ({ handleClose, dadosAlvaraSelecionado, usuarioLogado, optionsModulos, refetchAlvaraEmpresa }) => {
+export const useCriarArquivoAlvara = ({ handleClose, dadosAlvaraSelecionado, usuarioLogado, optionsModulos, refetchAlvaraEmpresa, refetchVinculoAlvara }) => {
     /*   const [arquivoAlvara, setArquivoAlvara] = useState([])
       const [descricaoDetalheAndamento, setDescricaoDetalheAndamento] = useState('')
       const [dataFimCompetencia, setDataFimCompetencia] = useState('')
@@ -148,15 +148,27 @@ export const useCriarArquivoAlvara = ({ handleClose, dadosAlvaraSelecionado, usu
 
             await post('/log-web', postCreateLog)
 
+            if (response?.success === false) {
+                Swal.fire({
+                    title: 'Atenção',
+                    text: response.msg,
+                    icon: 'info',
+                    customClass: {
+                        container: 'custom-swal',
+                    }
+                });
+                return;
+            }
+
             Swal.fire({
-                title: 'Atualização',
+                title: 'Sucesso',
                 text: 'Atualização Realizada com Sucesso',
                 icon: 'success',
-                timer: 3000,
                 customClass: {
                     container: 'custom-swal',
                 }
             });
+            refetchVinculoAlvara();
             //handleClose()
             return response.data;
         } catch (error) {

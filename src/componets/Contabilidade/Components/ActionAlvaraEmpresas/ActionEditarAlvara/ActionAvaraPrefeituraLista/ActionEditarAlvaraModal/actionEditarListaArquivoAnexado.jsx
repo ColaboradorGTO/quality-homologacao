@@ -16,10 +16,11 @@ import { useCancelarArquivoAlvara } from "../../../hooks/actionCancelarArquivoAl
 import { useEditarArquivoAlvara } from "../../../hooks/actionEditarArquivoAlvara";
 import { useCriarArquivoAlvara } from "../../../hooks/actionCriarArquivoAlvara";
 import { converterArquivosParaBase64 } from "../../../../../../../utils/converterFileBase64";
+import axiosInstance from "../../../../../../../api/api";
 //import { ActionCadastrarAlvaraModal } from "./ActionCadastrarAlvaraModal/ActionCadastrarAlvaraModal";
 //import { ActionVisualizarDetalhesAlvaraModal } from "./ActionVisualizarAlvaraModal/actionVisualizarDetalhesAlvaraModal";
 
-export const ActionEditarListaArquivosAnexados = ({ dadosAlvaraSelecionado, optionsModulos, usuarioLogado, refetchAlvaraEmpresa, handleClose }) => {
+export const ActionEditarListaArquivosAnexados = ({ dadosAlvaraSelecionado, optionsModulos, usuarioLogado, refetchAlvaraEmpresa, handleClose, refetchVinculoAlvara }) => {
     const [globalFilterValue, setGlobalFilterValue] = useState('');
     const [rowSelection, setRowSelection] = useState(null);
     const [modalCadastrarAlvaraEmpresa, setModalCadastrarAlvaraEmpresa] = useState(false);
@@ -33,17 +34,17 @@ export const ActionEditarListaArquivosAnexados = ({ dadosAlvaraSelecionado, opti
 
     const {
         onSubmit
-    } = useCancelarArquivoAlvara({ usuarioLogado, refetchAlvaraEmpresa, optionsModulos, dadosAlvaraSelecionado, refetchAlvaraEmpresa });
+    } = useCancelarArquivoAlvara({ usuarioLogado, refetchAlvaraEmpresa, optionsModulos, dadosAlvaraSelecionado, refetchAlvaraEmpresa, refetchVinculoAlvara });
 
     const {
 
         onEditarArquivo,
-    } = useEditarArquivoAlvara({ usuarioLogado, refetchAlvaraEmpresa, optionsModulos, dadosAlvaraSelecionado, refetchAlvaraEmpresa });
+    } = useEditarArquivoAlvara({ usuarioLogado, refetchAlvaraEmpresa, optionsModulos, dadosAlvaraSelecionado, refetchAlvaraEmpresa, refetchVinculoAlvara });
 
     const {
 
         onCriarArquivo
-    } = useCriarArquivoAlvara({ usuarioLogado, refetchAlvaraEmpresa, optionsModulos, dadosAlvaraSelecionado, refetchAlvaraEmpresa });
+    } = useCriarArquivoAlvara({ usuarioLogado, refetchAlvaraEmpresa, optionsModulos, dadosAlvaraSelecionado, refetchAlvaraEmpresa, refetchVinculoAlvara });
 
     const onGlobalFilterChange = (e) => {
         setGlobalFilterValue(e.target.value);
@@ -219,20 +220,17 @@ export const ActionEditarListaArquivosAnexados = ({ dadosAlvaraSelecionado, opti
     ]
 
 
+    const handleVisualizarArquivo = async (row) => {
+        const baseURL = axiosInstance.defaults.baseURL;
+        try {
+            const url = `${baseURL}/visualizar-anexo-alvara?idArquivoAlvara=${row.IDARQUIVOSALVARA}`;
 
-    const handleVisualizarArquivo = (row) => {
-        //const url = `/visualizar-anexo-alvara?idArquivoAlvara=${row.IDARQUIVOSALVARA}`;
-        const url = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/contabilidade/arquivos-anexos-alvaras-empresa.xsjs?id=${row.IDARQUIVOSALVARA}`;
-
-        window.open(url, "_blank");
+            window.open(url, "_blank");
+        }
+        catch (error) {
+            console.error("Erro ao visualizar arquivo:", error);
+        }
     };
-
-    /*    const handleClickEditarAlvara = (row) => {
-           if (fileInputRef.current) {
-               fileInputRef.current.click();
-           }
-   
-       }; */
 
 
     const handleClickCriarAlvara = () => {
@@ -246,28 +244,28 @@ export const ActionEditarListaArquivosAnexados = ({ dadosAlvaraSelecionado, opti
     };
 
 
-const handleFileChange = async (event) => {
-    const filesList = event.target.files;
-    if (!filesList?.length) return;
+    const handleFileChange = async (event) => {
+        const filesList = event.target.files;
+        if (!filesList?.length) return;
 
-   
-    const arquivosConvertidos = await converterArquivosParaBase64(filesList);
 
-    if (!arquivosConvertidos?.length) return;
+        const arquivosConvertidos = await converterArquivosParaBase64(filesList);
 
-    if (modoArquivo === 'editar' && rowEditando) {
-        await onEditarArquivo(rowEditando, arquivosConvertidos);
-    }
+        if (!arquivosConvertidos?.length) return;
 
-    if (modoArquivo === 'criar') {
-        const idVinculo = dadosAlvaraSelecionado?.[0]?.IDVINCULO;
-        await onCriarArquivo(idVinculo, arquivosConvertidos);
-    }
+        if (modoArquivo === 'editar' && rowEditando) {
+            await onEditarArquivo(rowEditando, arquivosConvertidos);
+        }
 
-    event.target.value = null;
-    setRowEditando(null);
-    setModoArquivo(null);
-};
+        if (modoArquivo === 'criar') {
+            const idVinculo = dadosAlvaraSelecionado?.[0]?.IDVINCULO;
+            await onCriarArquivo(idVinculo, arquivosConvertidos);
+        }
+
+        event.target.value = null;
+        setRowEditando(null);
+        setModoArquivo(null);
+    };
     /* const handleFileChange = async (event) => {
         const arquivosConvertidos = await handleSelecionarArquivos(event);
 

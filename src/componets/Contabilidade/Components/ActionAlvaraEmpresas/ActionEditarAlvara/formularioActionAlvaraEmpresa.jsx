@@ -11,12 +11,12 @@ import Select from "react-select"
 import { AiOutlineHome } from "react-icons/ai";
 import { MdOutlinePhoneEnabled } from "react-icons/md";
 import { CiUser } from "react-icons/ci";
-import { mascaraCNPJ } from "../../../../../utils/mascaraCNPJ";
+//import { mascaraCNPJ } from "../../../../../utils/mascaraCNPJ";
 import { mascaraTelefone } from "../../../../../utils/mascaraTelefone";
 import { ActionListaAlvaraPrefeitura } from "./ActionAvaraPrefeituraLista/actionListaAlvaraPrefeitura.jsx";
 import { useCriarAlvara } from "../hooks/actionCriarAlvara.jsx";
 
-export const FormularioActionAlvaraEmpresa = ({ show, dadosAlvaraEmpresaSelecionada, handleClose, dadosDetelheCaixa, usuarioLogado, optionsModulos, refetchAlvaraEmpresa }) => {
+export const FormularioActionAlvaraEmpresa = ({ show, dadosAlvaraEmpresaSelecionada, handleClose, dadosDetelheCaixa, usuarioLogado, optionsModulos, refetchAlvaraEmpresa, refetchAlvaraSelecionado }) => {
     const { handleSubmit, formState: { errors }, clearErrors, control, setError, register } = useForm({
         mode: "onChange"
     });
@@ -44,7 +44,7 @@ export const FormularioActionAlvaraEmpresa = ({ show, dadosAlvaraEmpresaSelecion
         setOperador,
         setDataLancamento,
         dataTableRef
-    } = useCriarAlvara({ show, handleClose, dadosDetelheCaixa, usuarioLogado, optionsModulos });
+    } = useCriarAlvara({ show, handleClose, dadosDetelheCaixa, usuarioLogado, optionsModulos, refetchAlvaraSelecionado });
 
     const handleValidatedSubmit = async () => {
         try {
@@ -193,7 +193,7 @@ export const FormularioActionAlvaraEmpresa = ({ show, dadosAlvaraEmpresaSelecion
                                         name="CNPJ"
                                         type="text"
                                         readOnly={true}
-                                        value={mascaraCNPJ(dadosAlvaraEmpresaSelecionada[0]?.NUCNPJ)}
+                                        value={dadosAlvaraEmpresaSelecionada[0]?.NUCNPJ}
                                         errors={errors}
                                         clearErrors={clearErrors}
                                     />
@@ -656,6 +656,7 @@ export const FormularioActionAlvaraEmpresa = ({ show, dadosAlvaraEmpresaSelecion
                 optionsModulos={optionsModulos}
                 usuarioLogado={usuarioLogado}
                 refetchAlvaraEmpresa={refetchAlvaraEmpresa}
+                refetchAlvaraSelecionado={refetchAlvaraSelecionado}
 
             />
 

@@ -14,15 +14,32 @@ import { FaPlus, FaRegEye } from "react-icons/fa6";
 import { ActionCadastrarAlvaraModal } from "./ActionCadastrarAlvaraModal/actionCadastrarAlvaraModal";
 import { ActionVisualizarDetalhesAlvaraModal } from "./ActionVisualizarAlvaraModal/actionVisualizarDetalhesAlvaraModal";
 import { ActionEditarDetalhesAlvaraModal } from "./ActionEditarAlvaraModal/actionEditarDetalhesAlvaraModal";
+import { useQuery } from "react-query";
 
-export const ActionListaAlvaraPrefeitura = ({ dadosAlvaraEmpresaSelecionada, optionsModulos, usuarioLogado, refetchAlvaraEmpresa }) => {
+export const ActionListaAlvaraPrefeitura = ({ dadosAlvaraEmpresaSelecionada, optionsModulos, usuarioLogado, refetchAlvaraEmpresa, refetchAlvaraSelecionado }) => {
     const [globalFilterValue, setGlobalFilterValue] = useState('');
     const [rowSelection, setRowSelection] = useState(null);
     const [modalCadastrarAlvaraEmpresa, setModalCadastrarAlvaraEmpresa] = useState(false);
     const [modalVisualizarAlvaraEmpresa, setModalVisualizarAlvaraEmpresa] = useState(false);
     const [modalEditarAlvaraEmpresa, setModalEditarAlvaraEmpresa] = useState(false);
-    const [dadosAlvaraSelecionado, setDadosAlvaraSelecionado] = useState([]);
+    //const [dadosAlvaraSelecionado, setDadosAlvaraSelecionado] = useState([]);
+    const [idVinculoAlvara, setIdVinculoAlvara] = useState(null);
     const dataTableRef = useRef();
+
+    const {
+        data: dadosAlvaraSelecionado = [], refetch: refetchVinculoAlvara, isLoading: isLoadingVinculoAlvara } = useQuery(
+            ['vinculo-alvara-empresa', idVinculoAlvara],
+            async () => {
+                const response = await get(
+                    `/vinculo-alvaras-empresa?idFilial=${idVinculoAlvara}`
+                );
+                return response.data;
+            },
+            {
+                enabled: !!idVinculoAlvara,
+
+            }
+        );
 
     const onGlobalFilterChange = (e) => {
         setGlobalFilterValue(e.target.value);
@@ -87,7 +104,7 @@ export const ActionListaAlvaraPrefeitura = ({ dadosAlvaraEmpresaSelecionada, opt
         XLSX.utils.book_append_sheet(workbook, worksheet, "Alvarás Empresas");
         XLSX.writeFile(workbook, "alvaras_empresas.xlsx");
     };
-
+    //console.log(dadosAlvaraEmpresaSelecionada, "dadosAlvaraEmpresaSelecionada lista ")
     const dados = dadosAlvaraEmpresaSelecionada
         .flatMap((empresa) => {
             return empresa.LISTA_ALVARAS
@@ -104,7 +121,7 @@ export const ActionListaAlvaraPrefeitura = ({ dadosAlvaraEmpresaSelecionada, opt
         })
         .map((item, index) => ({
             ...item,
-            CONTADOR: index + 1, 
+            CONTADOR: index + 1,
         }));
 
     const colunasEmpresasAlvaras = [
@@ -183,19 +200,25 @@ export const ActionListaAlvaraPrefeitura = ({ dadosAlvaraEmpresaSelecionada, opt
     };
 
     const handleViualizarAlvara = async (IDVINCULO) => {
-        try {
-            const response = await get(`/vinculo-alvaras-empresa?idFilial=${IDVINCULO}`);
-            console.log(response, 'response.data')
-            if (response.data && response.data.length > 0) {
-                setDadosAlvaraSelecionado(response.data);
-                setModalVisualizarAlvaraEmpresa(true);
-            }
-        } catch (error) {
-            console.error('Erro ao buscar dados Alvaras: ', error);
-        }
+        setIdVinculoAlvara(IDVINCULO);
+        setModalVisualizarAlvaraEmpresa(true);
+
     };
 
- const handleClickEditarAlvara = (row) => {
+    /*    const handleViualizarAlvara = async (IDVINCULO) => {
+           try {
+               const response = await get(`/vinculo-alvaras-empresa?idFilial=${IDVINCULO}`);
+               console.log(response, 'response.data')
+               if (response.data && response.data.length > 0) {
+                   setDadosAlvaraSelecionado(response.data);
+                   setModalVisualizarAlvaraEmpresa(true);
+               }
+           } catch (error) {
+               console.error('Erro ao buscar dados Alvaras: ', error);
+           }
+       }; */
+
+    const handleClickEditarAlvara = (row) => {
         if (optionsModulos[0]?.ALTERAR === 'True') {
             if (row && row.IDVINCULO) {
                 handleEditarAlvara(row.IDVINCULO);
@@ -212,8 +235,11 @@ export const ActionListaAlvaraPrefeitura = ({ dadosAlvaraEmpresaSelecionada, opt
             });
         }
     };
-
     const handleEditarAlvara = async (IDVINCULO) => {
+        setIdVinculoAlvara(IDVINCULO);
+        setModalEditarAlvaraEmpresa(true);
+    };
+    /* const handleEditarAlvara = async (IDVINCULO) => {
         try {
             const response = await get(`/vinculo-alvaras-empresa?idFilial=${IDVINCULO}`);
             console.log(response, 'response.data')
@@ -225,7 +251,7 @@ export const ActionListaAlvaraPrefeitura = ({ dadosAlvaraEmpresaSelecionada, opt
             console.error('Erro ao buscar dados Alvaras: ', error);
         }
     };
-
+ */
     const handleClickCadastrarAlvara = () => {
         if (optionsModulos[0]?.ALTERAR === 'True') {
             setModalCadastrarAlvaraEmpresa(true);
@@ -241,7 +267,7 @@ export const ActionListaAlvaraPrefeitura = ({ dadosAlvaraEmpresaSelecionada, opt
             });
         }
     };
-    
+
 
     return (
 
@@ -314,10 +340,12 @@ export const ActionListaAlvaraPrefeitura = ({ dadosAlvaraEmpresaSelecionada, opt
             <ActionCadastrarAlvaraModal
                 show={modalCadastrarAlvaraEmpresa}
                 handleClose={() => setModalCadastrarAlvaraEmpresa(false)}
-                dadosAlvaraEmpresa={dadosAlvaraEmpresaSelecionada}
+                dadosAlvaraSelecionado={dadosAlvaraEmpresaSelecionada}
                 optionsModulos={optionsModulos}
                 usuarioLogado={usuarioLogado}
                 refetchAlvaraEmpresa={refetchAlvaraEmpresa}
+                refetchAlvaraSelecionado={refetchAlvaraSelecionado}
+                idAlvaraSelecionado={4}
             />
 
             <ActionVisualizarDetalhesAlvaraModal
@@ -327,6 +355,7 @@ export const ActionListaAlvaraPrefeitura = ({ dadosAlvaraEmpresaSelecionada, opt
                 optionsModulos={optionsModulos}
                 usuarioLogado={usuarioLogado}
                 refetchAlvaraEmpresa={refetchAlvaraEmpresa}
+
             />
 
             <ActionEditarDetalhesAlvaraModal
@@ -336,6 +365,8 @@ export const ActionListaAlvaraPrefeitura = ({ dadosAlvaraEmpresaSelecionada, opt
                 optionsModulos={optionsModulos}
                 usuarioLogado={usuarioLogado}
                 refetchAlvaraEmpresa={refetchAlvaraEmpresa}
+                refetchAlvaraSelecionado={refetchAlvaraSelecionado}
+                refetchVinculoAlvara={refetchVinculoAlvara}
             />
         </Fragment>
     )

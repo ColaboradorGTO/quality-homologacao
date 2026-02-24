@@ -6,7 +6,7 @@ import { removerFormatacaoMoeda } from "../../../../../utils/formatMoeda";
 import { useEffect } from "react";
 import { useQuery } from "react-query";
 
-export const useCancelarArquivoAlvara = ({ handleClose, dadosAlvaraSelecionado, usuarioLogado, optionsModulos, refetchAlvaraEmpresa }) => {
+export const useCancelarArquivoAlvara = ({ handleClose, dadosAlvaraSelecionado, usuarioLogado, optionsModulos, refetchAlvaraEmpresa, refetchVinculoAlvara }) => {
     const [arquivoAlvara, setArquivoAlvara] = useState([])
     const [descricaoDetalheAndamento, setDescricaoDetalheAndamento] = useState('')
     const [dataFimCompetencia, setDataFimCompetencia] = useState('')
@@ -111,7 +111,7 @@ export const useCancelarArquivoAlvara = ({ handleClose, dadosAlvaraSelecionado, 
                 }
             });
 
-            refetchAlvaraEmpresa();
+            refetchVinculoAlvara();
             return response.data;
 
         } catch (error) {

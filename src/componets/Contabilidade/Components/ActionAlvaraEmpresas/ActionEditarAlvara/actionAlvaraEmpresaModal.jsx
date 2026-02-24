@@ -6,7 +6,7 @@ import { FormularioActionAlvaraEmpresa } from "./formularioActionAlvaraEmpresa";
 import { GrCertificate } from "react-icons/gr";
 import { BsFileEarmarkText } from "react-icons/bs";
 
-export const ActionAlvaraEmpresaModal = ({show, dadosAlvaraEmpresaSelecionada,dadosAlvaraEmpresa, optionsModulos, usuarioLogado, refetchAlvaraEmpresa, handleClose }) => {
+export const ActionAlvaraEmpresaModal = ({show, dadosAlvaraEmpresaSelecionada,dadosAlvaraEmpresa, optionsModulos, usuarioLogado, refetchAlvaraEmpresa, handleClose, refetchAlvaraSelecionado }) => {
     const { register, handleSubmit, errors } = useForm();
 
     return (
@@ -33,7 +33,8 @@ export const ActionAlvaraEmpresaModal = ({show, dadosAlvaraEmpresaSelecionada,da
                         optionsModulos={optionsModulos}
                         refetchAlvaraEmpresa={refetchAlvaraEmpresa}
                         handleClose={handleClose}
-                        dadosAlvaraEmpresaSelecionada={dadosAlvaraEmpresaSelecionada}  
+                        dadosAlvaraEmpresaSelecionada={dadosAlvaraEmpresaSelecionada}
+                        refetchAlvaraSelecionado={refetchAlvaraSelecionado}  
                     />
                    
                 </Modal.Body>

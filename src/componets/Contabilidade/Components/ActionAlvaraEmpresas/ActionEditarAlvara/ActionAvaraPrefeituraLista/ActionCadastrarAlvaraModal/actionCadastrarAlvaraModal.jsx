@@ -6,9 +6,9 @@ import { GrCertificate } from "react-icons/gr";
 import { BsFileEarmarkText } from "react-icons/bs";
 import { FormularioCadastrarActionAlvara } from "./formularioCadastrarAlvaraModal";
 
-export const ActionCadastrarAlvaraModal = ({show, dadosAlvaraEmpresaSelecionada,dadosAlvaraEmpresa, optionsModulos, usuarioLogado, refetchAlvaraEmpresa, handleClose }) => {
+export const ActionCadastrarAlvaraModal = ({show, dadosAlvaraEmpresa, optionsModulos, usuarioLogado, refetchAlvaraEmpresa, handleClose, dadosAlvaraSelecionado, idAlvaraSelecionado, refetchAlvaraSelecionado  }) => {
     const { register, handleSubmit, errors } = useForm();
-
+    //console.log(dadosAlvaraEmpresaSelecionada, "dadosAlvaraEmpresaSelecionada modal cadastro")
     return (
         <Fragment>
             <Modal
@@ -32,7 +32,9 @@ export const ActionCadastrarAlvaraModal = ({show, dadosAlvaraEmpresaSelecionada,
                         optionsModulos={optionsModulos}
                         refetchAlvaraEmpresa={refetchAlvaraEmpresa}
                         handleClose={handleClose}
-                        dadosAlvaraEmpresaSelecionada={dadosAlvaraEmpresaSelecionada}  
+                       dadosAlvaraSelecionado={dadosAlvaraSelecionado}
+                       idAlvaraSelecionado={idAlvaraSelecionado} 
+                       refetchAlvaraSelecionado={refetchAlvaraSelecionado} 
                     />
                    
                 </Modal.Body>

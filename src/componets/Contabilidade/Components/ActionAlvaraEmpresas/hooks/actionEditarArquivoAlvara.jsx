@@ -4,9 +4,9 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import { removerFormatacaoMoeda } from "../../../../../utils/formatMoeda";
 import { useEffect } from "react";
-import { useQuery } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 
-export const useEditarArquivoAlvara = ({ handleClose, dadosAlvaraSelecionado, usuarioLogado, optionsModulos, refetchAlvaraEmpresa }) => {
+export const useEditarArquivoAlvara = ({ handleClose, dadosAlvaraSelecionado, usuarioLogado, optionsModulos, refetchAlvaraEmpresa, refetchVinculoAlvara }) => {
     const [arquivoAlvara, setArquivoAlvara] = useState([])
     const [descricaoDetalheAndamento, setDescricaoDetalheAndamento] = useState('')
     const [dataFimCompetencia, setDataFimCompetencia] = useState('')
@@ -71,30 +71,30 @@ export const useEditarArquivoAlvara = ({ handleClose, dadosAlvaraSelecionado, us
         { value: 'False', label: 'Inativo' },
     ];
 
-/*     const handleSelecionarArquivos = async (event) => {
-        const files = Array.from(event.target.files || []);
-
-        const arquivosConvertidos = await Promise.all(
-            files.map(file => {
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-
-                    reader.onload = () => {
-                        resolve({
-                            ARQUIVOBASE64: reader.result.split(',')[1],
-                            NOMEARQUIVO: file.name,
-                            TIPOARQUIVO: file.type
-                        });
-                    };
-
-                    reader.onerror = reject;
-                    reader.readAsDataURL(file);
-                });
-            })
-        );
-
-        return arquivosConvertidos;
-    }; */
+    /*     const handleSelecionarArquivos = async (event) => {
+            const files = Array.from(event.target.files || []);
+    
+            const arquivosConvertidos = await Promise.all(
+                files.map(file => {
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+    
+                        reader.onload = () => {
+                            resolve({
+                                ARQUIVOBASE64: reader.result.split(',')[1],
+                                NOMEARQUIVO: file.name,
+                                TIPOARQUIVO: file.type
+                            });
+                        };
+    
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                    });
+                })
+            );
+    
+            return arquivosConvertidos;
+        }; */
 
     const onEditarArquivo = async (row, arquivos) => {
         if (optionsModulos[0]?.ALTERAR !== 'True') {
@@ -151,15 +151,27 @@ export const useEditarArquivoAlvara = ({ handleClose, dadosAlvaraSelecionado, us
 
             await post('/log-web', postData)
 
+            if (response?.success === false) {
+                Swal.fire({
+                    title: 'Atenção',
+                    text: response.msg,
+                    icon: 'info',
+                    customClass: {
+                        container: 'custom-swal',
+                    }
+                });
+                return;
+            }
+
             Swal.fire({
-                title: 'Atualização',
+                title: 'Sucesso',
                 text: 'Atualização Realizada com Sucesso',
                 icon: 'success',
-                timer: 3000,
                 customClass: {
                     container: 'custom-swal',
                 }
             });
+           refetchVinculoAlvara()
             //handleClose()
             return response.data;
         } catch (error) {
