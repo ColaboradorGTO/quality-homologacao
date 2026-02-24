@@ -15,8 +15,6 @@ export const ActionListaVendasPeriodoProduto = ({ dadosVendasConsolidadas }) => 
   const dataTableRef = useRef();
   const [rowSelection, setRowSelection] = useState(null);
 
-
-
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
   };

@@ -12,10 +12,8 @@ import { toFloat } from "../../../../utils/toFloat";
 
 export const ActionListaVendasPeriodoLoja = ({ dadosVendasPeriodo }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
-  const dataTableRef = useRef();
   const [rowSelection, setRowSelection] = useState(null);
-
-
+  const dataTableRef = useRef();
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
