@@ -41,6 +41,8 @@ export const Permissoes = ({}) => {
         administrador,
         setAdministrador,
         usuarioLogado,
+        departamentoSelecionado, 
+        setDepartamentoSelecionado,
         handleSubmit
     } = useEditarPermissaoUsuario();
 
@@ -52,7 +54,7 @@ export const Permissoes = ({}) => {
     const [selectedModule, setSelectedModule] = useState(null)
     const [moduloUsuario, setModuloUsuario] = useState(null);
     const [empresaSelecionada, setEmpresaSelecionada] = useState('');
-    const [departamentoSelecionado, setDepartamentoSelecionado] = useState('');
+    
     const navigate = useNavigate();
     const menuLeft = useRef(null);
 
@@ -172,7 +174,7 @@ export const Permissoes = ({}) => {
         command: () => selecioneModulos(modulo.DSMODULO), 
     }));
 
-    console.log(dadosFuncionarios, 'dadosFuncionarios')
+ 
     return (
 
         <Fragment>
@@ -249,8 +251,8 @@ export const Permissoes = ({}) => {
 
                                     <Select
                                         options={Departamentos?.map((item) => ({
-                                            value: item.label,
-                                            label: item.value
+                                            value: item.value,
+                                            label: item.label
                                         }))}
                                         value={departamentoSelecionado}
                                         onChange={(e) => setDepartamentoSelecionado(e)}
@@ -283,13 +285,13 @@ export const Permissoes = ({}) => {
 
                                     <Select
                                         options={dadosFuncionarios?.map((item) => ({
-                                            value: item.IDFUNCIONARIO,
+                                            value: item.ID,
                                             label: `${item.NOLOGIN} - ${item.NOFUNCIONARIO} `
                                         }))}
                                         value={funcionarioSelecionado}
                                         onChange={(e) => setFuncionarioSelecionado(e)}
                                     />
-                                
+                                    {console.log(funcionarioSelecionado, 'funcionarioSelecionado')}
                                 </div>
                             </div>
 

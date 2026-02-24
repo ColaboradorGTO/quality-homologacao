@@ -19,6 +19,7 @@ export const useEditarPerfilPermissaoUsuario = ({dadosEditarPermissao, handleClo
   const [ipUsuario, setIpUsuario] = useState('');
   const [idMenuFilho, setIdMenuFilho] = useState('');
   const [nomeMenuFilho, setNomeMenuFilho] = useState('');
+  const [departamentoSelecionado, setDepartamentoSelecionado] = useState('');
   const navigate = useNavigate();
 
 
@@ -62,6 +63,7 @@ export const useEditarPerfilPermissaoUsuario = ({dadosEditarPermissao, handleClo
       setNivel4(dadosEditarPermissao[0]?.N4 == 'True' ? 'Sim' : 'Não');
       setAdministrador(dadosEditarPermissao[0]?.ADMINISTRADOR == 'True' ? 'Sim' : 'Não');
       setIdMenuFilho(dadosEditarPermissao[0]?.IDMENUFILHO);
+     
     }
 
   }, [])

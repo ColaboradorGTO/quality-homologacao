@@ -1,7 +1,8 @@
 import { useState } from "react";
 import Swal from "sweetalert2";
 import axios from "axios";
-import { post, get } from "../../../../../api/funcRequest";
+import { post, put, get } from "../../../../../api/funcRequest";
+import {  Departamentos } from '../../../../../../parceiro.json';
 
 export const useCopiarPermissaoUsuario = ({
   selectedItems,
@@ -9,6 +10,7 @@ export const useCopiarPermissaoUsuario = ({
   usuarioLogado,
   usuarioOrigem, 
   usuarioDestino,
+  usuarioDestinoSelecionado,
   optionsModulos
 }) => {
   const [moduloSelecionado, setModuloSelecionado] = useState('');
@@ -24,8 +26,9 @@ export const useCopiarPermissaoUsuario = ({
   const [nivel4, setNivel4] = useState('False');
   const [administrador, setAdministrador] = useState('False');
   const [ipUsuario, setIpUsuario] = useState('');
+  const [departamentoSelecionado, setDepartamentoSelecionado] = useState('');
 
-
+ 
   const getIPUsuario = async () => {
     let usuarioIP = null;
 
@@ -120,6 +123,58 @@ export const useCopiarPermissaoUsuario = ({
         textoLoading += ` (${menuFilhosJaExistentes.length} já existente(s))`;
       }
 
+      const responseFuncionario = await get(`/funcionarios-loja-ativos?byId=${usuarioDestino}`);
+      const funcionarioDestino = responseFuncionario.data?.[0];
+
+      if(funcionarioDestino?.DEPARTAMENTO === null || funcionarioDestino?.DEPARTAMENTO === undefined || funcionarioDestino?.DEPARTAMENTO == '') {
+  
+        // Criar opções para o select
+        const departamentosOptions = Departamentos.reduce((acc, dept) => {
+          acc[dept.value] = dept.label;
+          return acc;
+        }, {});
+
+        const { value: departamentoEscolhido } = await Swal.fire({
+          icon: 'warning',
+          title: 'Atenção',
+          html: `
+            O funcionário selecionado não possui departamento cadastrado.<br>
+            Por favor, selecione um departamento:
+          `,
+          input: 'select',
+          inputOptions: departamentosOptions,
+          inputPlaceholder: 'Selecione um departamento',
+          showCancelButton: true,
+          confirmButtonText: 'Confirmar',
+          cancelButtonText: 'Cancelar',
+          inputValidator: (value) => {
+            return new Promise((resolve) => {
+              if (value) {
+                resolve();
+              } else {
+                resolve('Você precisa selecionar um departamento!');
+              }
+            });
+          }
+        });
+
+        if (!departamentoEscolhido) {
+          return; // Usuário cancelou
+        }
+
+        // Definir o departamento selecionado
+        setDepartamentoSelecionado({ 
+          value: departamentoEscolhido, 
+          label: departamentosOptions[departamentoEscolhido] 
+        });
+      } else {
+        // Se já tem departamento, manter o atual
+        setDepartamentoSelecionado({ 
+          value: funcionarioDestino.DEPARTAMENTO, 
+          label: Departamentos.find(d => d.value === funcionarioDestino.DEPARTAMENTO)?.label || funcionarioDestino.DEPARTAMENTO 
+        });
+      }
+
       Swal.fire({
         title: 'Criando permissões...',
         text: textoLoading,
@@ -164,7 +219,13 @@ export const useCopiarPermissaoUsuario = ({
         };
 
         await post(`/criar-perfil-usuario`, payload);
+        const putFuncionarioData = {
+          ID: parseInt(usuarioDestino),
+          DEPARTAMENTO: departamentoSelecionado?.value,
+        }
 
+        await put('/funcionario-departamento/:id', putFuncionarioData);
+        
         const ipUsuario = await getIPUsuario();
         const logData = {
           IDFUNCIONARIO: String(usuarioLogado?.id ?? ''),

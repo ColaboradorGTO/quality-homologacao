@@ -18,6 +18,7 @@ export const useEditarPermissaoUsuario = () => {
   const [nivel3, setNivel3] = useState('False');
   const [nivel4, setNivel4] = useState('True');
   const [administrador, setAdministrador] = useState('False');
+  const [departamentoSelecionado, setDepartamentoSelecionado] = useState('');
 
   const [usuarioLogado, setUsuarioLogado] = useState(null);
   const [ipUsuario, setIpUsuario] = useState('');
@@ -87,6 +88,17 @@ export const useEditarPermissaoUsuario = () => {
   //   });
   //   return;
   // }
+  
+  if(departamentoSelecionado == '') {
+    Swal.fire({
+      type: 'error',
+      title: 'Atenção',
+      text: 'Selecione um departamento',
+      showConfirmButton: false,
+      timer: 1500
+    });
+    return;
+  }
   
   if (moduloSelecionado == '') {
     Swal.fire({
@@ -236,8 +248,13 @@ export const useEditarPermissaoUsuario = () => {
         IDUSERULTIMAALTERACAO: String(usuarioLogado.id),
       };
 
+      const putFuncionarioData = {
+        ID: funcionarioSelecionado?.value,
+        DEPARTAMENTO: departamentoSelecionado?.value,
+      }
+
       const response = await post(`/criar-perfil-usuario`, payload);
-      
+      const responseFuncionario = await put('/funcionario-departamento/:id', putFuncionarioData);
       const textDados = JSON.stringify(payload);
       const textoFuncao = `PERMISSÕES USUARIO / NOVA PERMISSÃO - Item ${i + 1}/${menuFilhoNovos.length}`;
       
@@ -249,6 +266,7 @@ export const useEditarPermissaoUsuario = () => {
       };
       
       await post('/log-web', createData);
+    
     }
 
     let mensagem = `${menuFilhoNovos.length} nova(s) permissão(ões) criada(s) com sucesso!`;
@@ -264,7 +282,6 @@ export const useEditarPermissaoUsuario = () => {
       showConfirmButton: false,
       timer: 2500
     });
-
   } catch (error) {
     console.error('Erro ao processar permissões:', error);
     Swal.fire({
@@ -303,6 +320,8 @@ export const useEditarPermissaoUsuario = () => {
     administrador,
     setAdministrador,
     usuarioLogado,
+    departamentoSelecionado,
+    setDepartamentoSelecionado,
     handleSubmit
   }
 }

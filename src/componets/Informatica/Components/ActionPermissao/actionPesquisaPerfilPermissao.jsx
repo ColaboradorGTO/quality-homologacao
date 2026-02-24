@@ -16,13 +16,9 @@ export const ActionPesquisaPerfilPermissao = ({ usuarioLogado, ID }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [empresaSelecionada, setEmpresaSelecionada] = useState('');
-  const [usuarioSelecionado, setUsuarioSelecionado] = useState('');
-  const [usuarioClonado, setUsuarioClonado] = useState('');
   const [usuarioOrigem, setUsuarioOrigem] = useState('');
   const [usuarioDestino, setUsuarioDestino] = useState('');
-  const [copiarPermissao, setCopiarPermissao] = useState('');
-  const [funcionarioClonarId, setFuncionarioClonarId] = useState('');
-  const [permissoesSelecionadas, setPermissoesSelecionadas] = useState([]);
+  const [usuarioDestinoSelecionado, setUsuarioDestinoSelecionado] = useState('');
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
   const [selectedItems, setSelectedItems] = useState([]);
   const [btnVisivel, setBtnVisivel] = useState(false)
@@ -94,7 +90,7 @@ export const ActionPesquisaPerfilPermissao = ({ usuarioLogado, ID }) => {
   const { data: dadosFuncionarios = [], error: errorFuncionario, isLoading: isLoadingFuncionario, refetch: refetchFuncionarios } = useQuery(
     ['funcionarios-loja-ativos', empresaSelecionada],
     () => fetchListaFuncionarios(),
-    { enabled: Boolean(empresaSelecionada), staleTime: Infinity, cacheTime: Infinity, }
+    { enabled: Boolean(empresaSelecionada), staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000, }
   );
 
 
@@ -136,7 +132,7 @@ export const ActionPesquisaPerfilPermissao = ({ usuarioLogado, ID }) => {
   const { data: dadosPermissoes = [], error: errorPermissoes, isLoading: isLoadingPermissoes, refetch } = useQuery(
     ['menus-usuario-excecao', usuarioOrigem],
     () => fetchListaPermissoes(),
-    { enabled: Boolean(usuarioOrigem), staleTime: 60 * 60 * 1000, }
+    { enabled: Boolean(usuarioOrigem), staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000, }
   );
 
 
@@ -156,9 +152,14 @@ export const ActionPesquisaPerfilPermissao = ({ usuarioLogado, ID }) => {
     }
   }
 
+  const handleUserDestinoChange = (e) => {
+    setUsuarioDestino(String(e.value ?? ""));
+    setUsuarioDestinoSelecionado(e);
+  }
+
   const {
     handleSubmit
-  } = useCopiarPermissaoUsuario({ selectedItems, usuarioClonado, usuarioSelecionado, usuarioLogado, optionsModulos, usuarioOrigem, usuarioDestino });
+  } = useCopiarPermissaoUsuario({ selectedItems,  usuarioLogado, optionsModulos, usuarioOrigem, usuarioDestino, usuarioDestinoSelecionado });
   
   const handleClonar = () => {
     if(selectedItems.length === 0) {
@@ -170,6 +171,7 @@ export const ActionPesquisaPerfilPermissao = ({ usuarioLogado, ID }) => {
       });
       return;
     } else {
+   
       handleSubmit();
     }
   }
@@ -200,12 +202,12 @@ export const ActionPesquisaPerfilPermissao = ({ usuarioLogado, ID }) => {
         optionsEmpresas={[
           ...dadosFuncionarios.map((item) => ({
             value: item.ID,
-            label: `${item.NOLOGIN} -  ${item.NOFUNCIONARIO}`
+            label: `${item.NOLOGIN} -  ${item.NOFUNCIONARIO} - ${item.DEPARTAMENTO}`
           }))
         ]}
 
         labelSelectEmpresa={"Origem da Permissão"}
-        valueSelectEmpresa={console.log(usuarioOrigem)}
+        valueSelectEmpresa={usuarioOrigem}
         onChangeSelectEmpresa={(e) => setUsuarioOrigem(String(e.value ?? ""))}
 
         InputSelectGrupoComponent={InputSelectAction}
@@ -213,7 +215,7 @@ export const ActionPesquisaPerfilPermissao = ({ usuarioLogado, ID }) => {
           { value: '', label: 'Selecione...' },
           ...dadosFuncionarios.map((item) => ({
             value: item.ID,
-            label: `${item.NOLOGIN} -  ${item.NOFUNCIONARIO}`
+            label: `${item.NOLOGIN} -  ${item.NOFUNCIONARIO} - ${item.DEPARTAMENTO}`
           }))
         ]}
         labelSelectGrupo={"Destino da Permissão"}

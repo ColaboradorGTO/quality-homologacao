@@ -439,7 +439,6 @@ export const ActionListaPerfilPermissao = ({
         </div>
       </div>
 
-    
     </Fragment>
   )
 }
