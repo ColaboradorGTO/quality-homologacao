@@ -7,23 +7,17 @@ import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../../Tables/headerTable";;
 import { Checkbox } from "primereact/checkbox";
-import { useCopiarPermissaoUsuario } from "./hooks/useEditarPermissao";
 import Swal from "sweetalert2";
-import { ActionUpdatePermissaoModal } from "./ActionUpdatePermissao/actionUpdatePermissaoModal";
 
 
 export const ActionListaPerfilPermissao = ({
   dadosPermissoes,
-  handleClick,
-  usuarioLogado,
   btnVisivel,
   setBtnVisivel,
   selectedItems,
   setSelectedItems
 }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
-  const [dadosEditarPermissao, setDadosEditarPermissao] = useState([]);
-  const [modalEditarPermissao, setModalEditarPermissao] = useState(false);
   const [first, setFirst] = useState(0)
   const [rowState, setRowState] = useState(10)
   const [rowSelection, setRowSelection] = useState(null);
@@ -445,13 +439,7 @@ export const ActionListaPerfilPermissao = ({
         </div>
       </div>
 
-      <ActionUpdatePermissaoModal
-        show={modalEditarPermissao}
-        handleClose={() => setModalEditarPermissao(false)}
-        handleClick={handleClick}
-        dadosEditarPermissao={dadosEditarPermissao}
-        usuarioLogado={usuarioLogado}
-      />
+    
     </Fragment>
   )
 }
