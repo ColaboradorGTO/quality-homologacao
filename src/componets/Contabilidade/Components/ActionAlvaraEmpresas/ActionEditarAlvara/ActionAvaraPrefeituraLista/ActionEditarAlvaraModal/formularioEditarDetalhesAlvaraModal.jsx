@@ -1,11 +1,8 @@
 import { Fragment } from "react"
-import { HeaderModal } from "../../../../../../Modais/HeaderModal/HeaderModal";
 import { ButtonTypeModal } from "../../../../../../Buttons/ButtonTypeModal";
 import { FooterModal } from "../../../../../../Modais/FooterModal/footerModal";
 import { Controller, useForm } from "react-hook-form";
 import FormField from "../../../../../../Formularios/FormField";
-//import { schema } from "./schemaCadastrarQuebraCaixa";
-import { BsBuilding, BsPerson } from "react-icons/bs";
 import Select from "react-select"
 import { AiOutlineFileText } from "react-icons/ai";
 import { AlertError } from "../../../../../../Inputs/alertError";
@@ -15,9 +12,16 @@ import { converterArquivosParaBase64 } from "../../../../../../../utils/converte
 import { ActionEditarListaArquivosAnexados } from "./actionEditarListaArquivoAnexado";
 import { schema } from "./schema/schemaValidarEditarAlvara";
 
-//import { ActionListaAlvaraPrefeitura } from "./ActionAvaraPrefeituraLista/actionListaAlvaraPrefeitura.jsx";
+export const FormularioEditarDetalhesAlvara = ({
+    dadosAlvaraSelecionado,
+    handleClose,
+    usuarioLogado,
+    optionsModulos,
+    refetchAlvaraEmpresa,
+    refetchAlvaraSelecionado,
+    refetchVinculoAlvara
+}) => {
 
-export const FormularioEditarDetalhesAlvara = ({ dadosAlvaraSelecionado, handleClose, usuarioLogado, optionsModulos, refetchAlvaraEmpresa, refetchAlvaraSelecionado, refetchVinculoAlvara }) => {
     const { handleSubmit, formState: { errors }, clearErrors, control, setError, register } = useForm({
         mode: "onChange"
     });
@@ -40,39 +44,47 @@ export const FormularioEditarDetalhesAlvara = ({ dadosAlvaraSelecionado, handleC
         metragemLoja,
         setMetragemLoja,
         onSubmit
-    } = useEditarAlvara({ handleClose, usuarioLogado, optionsModulos, dadosAlvaraSelecionado, refetchAlvaraEmpresa, refetchAlvaraSelecionado });
 
+    } = useEditarAlvara({
+        handleClose,
+        usuarioLogado,
+        optionsModulos,
+        dadosAlvaraSelecionado,
+        refetchAlvaraEmpresa,
+        refetchAlvaraSelecionado
+    });
 
     const {
         onCriarArquivo
-    } = useCriarArquivoAlvara({ usuarioLogado, optionsModulos, dadosAlvaraSelecionado, refetchAlvaraEmpresa, refetchVinculoAlvara });
+
+    } = useCriarArquivoAlvara({
+        usuarioLogado,
+        optionsModulos,
+        refetchVinculoAlvara
+    });
 
     const handleUploadArquivo = async (e) => {
         const filesList = e.target.files;
         if (!filesList?.length) return;
 
         try {
-
             const arquivosConvertidos = await converterArquivosParaBase64(filesList);
 
             if (!arquivosConvertidos?.length) return;
             const idVinculo = dadosAlvaraSelecionado?.[0]?.IDVINCULO;
             await onCriarArquivo(idVinculo, arquivosConvertidos);
 
-            e.target.value = null; // limpa input
+            e.target.value = null;
         } catch (error) {
             console.error("Erro ao enviar arquivo:", error);
         }
     };
 
-    const arquivosAlvara =
-        dadosAlvaraSelecionado?.[0]?.ARQUIVOSALVARAS || [];
-
+    const arquivosAlvara = dadosAlvaraSelecionado?.[0]?.ARQUIVOSALVARAS || [];
     const temArquivos = arquivosAlvara.length > 0;
 
     const handleValidatedSubmit = async () => {
         try {
-
             const dadosParaValidar = {
                 statusAlvaraSelecionado: statusAlvara,
                 dataInicioCompetenciaSelecionada: dataIncioCompetencia,
@@ -100,13 +112,11 @@ export const FormularioEditarDetalhesAlvara = ({ dadosAlvaraSelecionado, handleC
                     }
                 });
             }
-
             const errorMessages = validationError.errors || [validationError.message];
             //console.log(`Erro de validação:\n${errorMessages.join('\n')}`);
         }
     };
 
-    //console.log(dataFimCompetencia, "dataIncioCompetencia")
     return (
         <Fragment>
             <form onSubmit={handleSubmit(handleValidatedSubmit)} >
@@ -116,11 +126,11 @@ export const FormularioEditarDetalhesAlvara = ({ dadosAlvaraSelecionado, handleC
                         PREFEITURA (LICENÇA DE FUNCIONAMENTO)
                     </h4>
                 </span>
+
                 <div class="form-group">
-
                     <div class="row mt-3">
-
                         <div class="col-sm-6 col-xl-6">
+
                             <label className="form-label" htmlFor={""}>Status:</label>
                             <Select
                                 className="basic-single"
@@ -135,7 +145,6 @@ export const FormularioEditarDetalhesAlvara = ({ dadosAlvaraSelecionado, handleC
                                     setStatusAlvara(opt ?? null);
                                     clearErrors("contaSelecionada");
                                 }}
-                            //onChange={(e) => setStatusAlvara(e.value)}
                             />
                             {errors.statusAlvaraSelecionado && (
                                 <AlertError
@@ -144,21 +153,6 @@ export const FormularioEditarDetalhesAlvara = ({ dadosAlvaraSelecionado, handleC
                                     fieldName="statusAlvaraSelecionado"
                                 />
                             )}
-                            {/* <Controller
-                                name="Status:"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormField
-                                        label={"Status:"}
-                                        name="Status:"
-                                        type="text"
-                                        value={dadosAlvaraSelecionado?.[0]?.STATIVO === "True" ? "Ativo" : "Inativo"}
-                                        errors={errors}
-                                        readOnly={true}
-                                        clearErrors={clearErrors}
-                                    />
-                                )}
-                            /> */}
                         </div>
                     </div>
 
@@ -182,6 +176,7 @@ export const FormularioEditarDetalhesAlvara = ({ dadosAlvaraSelecionado, handleC
                                 )}
                             />
                         </div>
+                        
                         <div class="col-sm-6 col-xl-6">
                             <Controller
                                 name="dataFimCompetenciaSelecionada"
@@ -199,7 +194,6 @@ export const FormularioEditarDetalhesAlvara = ({ dadosAlvaraSelecionado, handleC
                                     />
                                 )}
                             />
-
                         </div>
                     </div>
 
@@ -216,13 +210,11 @@ export const FormularioEditarDetalhesAlvara = ({ dadosAlvaraSelecionado, handleC
                                     label: item.DESCRICAO
 
                                 }))}
-
                                 value={statusAndamento}
                                 onChange={(opt) => {
                                     setStatusAndamento(opt ?? null);
                                     clearErrors("statusAndamento");
                                 }}
-                            //onChange={(e) => setStatusAndamento(e.value)}
                             />
                             {errors.statusAndamento && (
                                 <AlertError
@@ -231,24 +223,8 @@ export const FormularioEditarDetalhesAlvara = ({ dadosAlvaraSelecionado, handleC
                                     fieldName="statusAndamento"
                                 />
                             )}
-
-                            {/*  <Controller
-                                name="Status Andamento:"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormField
-                                        label={"Status Andamento:"}
-                                        name="Status Andamento:"
-                                        type="text"
-                                        readOnly={true}
-                                        value={dadosAlvaraSelecionado?.[0]?.DESCRICAOSTATUS}
-                                        onChange={(e) => setMetragem(e.value)}
-                                        errors={errors}
-                                        clearErrors={clearErrors}
-                                    />
-                                )}
-                            /> */}
                         </div>
+
                         <div class="col-sm-6 col-xl-6">
                             <Controller
                                 name="metragemLojaDigitado"
@@ -268,6 +244,7 @@ export const FormularioEditarDetalhesAlvara = ({ dadosAlvaraSelecionado, handleC
                             />
                         </div>
                     </div>
+
                     <div class="row mt-3">
                         <div class="col-sm-6 col-xl-6">
                             <Controller
@@ -297,11 +274,11 @@ export const FormularioEditarDetalhesAlvara = ({ dadosAlvaraSelecionado, handleC
                 {temArquivos ? (
                     <ActionEditarListaArquivosAnexados
                         dadosAlvaraSelecionado={dadosAlvaraSelecionado}
-                        optionsModulos={optionsModulos}
-                        usuarioLogado={usuarioLogado}
                         refetchAlvaraEmpresa={refetchAlvaraEmpresa}
-                        handleClose={handleClose}
                         refetchVinculoAlvara={refetchVinculoAlvara}
+                        handleClose={handleClose}
+                        usuarioLogado={usuarioLogado}
+                        optionsModulos={optionsModulos}
                     />
                 ) : (
                     <div className="form-group ">

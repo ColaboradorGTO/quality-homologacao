@@ -1,103 +1,32 @@
 import { Fragment } from "react"
-import { HeaderModal } from "../../../../../../Modais/HeaderModal/HeaderModal";
 import { ButtonTypeModal } from "../../../../../../Buttons/ButtonTypeModal";
 import { FooterModal } from "../../../../../../Modais/FooterModal/footerModal";
 import { Controller, useForm } from "react-hook-form";
 import FormField from "../../../../../../Formularios/FormField";
-//import { schema } from "./schemaCadastrarQuebraCaixa";
-//import { useCadastrarAlvara } from "../../../hooks/actionCriarAlvara";
-import { BsBuilding, BsPerson } from "react-icons/bs";
-import Select from "react-select"
 import { AiOutlineFileText } from "react-icons/ai";
 import { ActionListaArquivosAnexados } from "./actionListaArquivoAnexado";
-import { useCriarAlvara } from "../../../hooks/actionCriarAlvara";
 
-//import { ActionListaAlvaraPrefeitura } from "./ActionAvaraPrefeituraLista/actionListaAlvaraPrefeitura.jsx";
+export const FormularioVisualizarDetalhesAlvara = ({
+    dadosAlvaraSelecionado,
+    handleClose,
+}) => {
 
-export const FormularioVisualizarDetalhesAlvara = ({ show, dadosAlvaraSelecionado, handleClose, dadosDetelheCaixa, usuarioLogado, optionsModulos, refetchAlvaraEmpresa }) => {
-    const { handleSubmit, formState: { errors }, clearErrors, control, setError, register } = useForm({
+    const { formState: { errors }, clearErrors, control } = useForm({
         mode: "onChange"
     });
-    const {
-        onSubmit,
-        empresa,
-        setEmpresa,
-        motivoAjuste,
-        setMotivoAjuste,
-        dataLancamento,
-        dataAtualFormatada,
-        setDataAtualFormatada,
-        dinheiroInformado,
-        setDinheiroInformado,
-        dinheiroAjuste,
-        setDinheiroAjuste,
-        dadosQuebraCaixasModal,
-        setDadosQuebraCaixasModal,
-        modalVisivelImprimir,
-        setModalVisivelImprimir,
-        modalQuebraVisivel,
-        setModalQuebraVisivel,
-        dados,
-        operador,
-        setOperador,
-        setDataLancamento,
-        dataTableRef
-    } = useCriarAlvara({ show, handleClose, dadosDetelheCaixa, usuarioLogado, optionsModulos });
 
-    const handleValidatedSubmit = async () => {
-        try {
-
-            const dadosParaValidar = {
-                Empresa: usuarioLogado?.NOFANTASIA,
-                operador: usuarioLogado?.NOFUNCIONARIO,
-                historicoDigitado: motivoAjuste,
-                dataLancamento: dados?.[0]?.DTHORAFECHAMENTOCAIXA,
-                dinheiroInformado: dadosDetelheCaixa?.[0]?.TOTALFECHAMENTOVRQUEBRACAIXA,
-                dinheiroAjuste: dinheiroAjuste
-            };
-
-            // await schema.validate(dadosParaValidar, { abortEarly: false });
-            onSubmit();
-
-        } catch (validationError) {
-            console.error('❌ Erro de validação:', validationError);
-
-            clearErrors();
-
-            if (validationError.inner && validationError.inner.length > 0) {
-                validationError.inner.forEach(error => {
-                    if (error.path) {
-                        setError(error.path, {
-                            type: 'manual',
-                            message: error.message
-                        });
-                    }
-                });
-            }
-
-            const errorMessages = validationError.errors || [validationError.message];
-            //console.log(`Erro de validação:\n${errorMessages.join('\n')}`);
-        }
-    };
-
-    const options = [
-        { value: 'Todos', label: 'Todos' },
-        { value: 'Ativo', label: 'Ativo' },
-        { value: 'Inativo', label: 'Inativo' },
-    ];
     return (
         <Fragment>
-            <form onSubmit={handleSubmit(handleValidatedSubmit)} >
+            <form>
                 <span class="d-flex align-items-center">
                     <AiOutlineFileText size={25} />
                     <h4 class="font-weight-bold" style={{ margin: 0, marginLeft: "10px" }}>
                         PREFEITURA (LICENÇA DE FUNCIONAMENTO)
                     </h4>
                 </span>
+
                 <div class="form-group">
-
                     <div class="row mt-3">
-
                         <div class="col-sm-6 col-xl-6">
                             <Controller
                                 name="Status:"
@@ -193,6 +122,7 @@ export const FormularioVisualizarDetalhesAlvara = ({ show, dadosAlvaraSelecionad
                             />
                         </div>
                     </div>
+
                     <div class="row mt-3">
                         <div class="col-sm-6 col-xl-6">
                             <Controller
@@ -216,22 +146,14 @@ export const FormularioVisualizarDetalhesAlvara = ({ show, dadosAlvaraSelecionad
                     </div>
                 </div>
             </form>
+
             <div style={{ marginTop: "3rem" }}>
                 <ActionListaArquivosAnexados
                     dadosAlvaraSelecionado={dadosAlvaraSelecionado}
-                    optionsModulos={optionsModulos}
-                    usuarioLogado={usuarioLogado}
-                    refetchAlvaraEmpresa={refetchAlvaraEmpresa}
-                    handleClose={handleClose}
                 />
             </div>
+
             <FooterModal
-                /*   ButtonTypeCadastrar={ButtonTypeModal}
-                  onClickButtonCadastrar={handleValidatedSubmit}
-                  tipoBtnCadastrar={"submit"}
-                  textButtonCadastrar={"Adicionar"}
-                  corCadastrar="success"
-   */
                 ButtonTypeFechar={ButtonTypeModal}
                 textButtonFechar={"Fechar"}
                 onClickButtonFechar={handleClose}

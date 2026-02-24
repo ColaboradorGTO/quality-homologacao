@@ -9,47 +9,58 @@ import HeaderTable from "../../../../../../Tables/headerTable";
 import { ButtonTable } from "../../../../../../ButtonsTabela/ButtonTable";
 import { FaPencilAlt } from "react-icons/fa";
 import Swal from "sweetalert2";
-import { get } from "../../../../../../../api/funcRequest";
-import { FaBinoculars, FaPaperclip, FaPlus, FaRegEye } from "react-icons/fa6";
+import { FaPaperclip, FaRegEye } from "react-icons/fa6";
 import { BsTrash3 } from "react-icons/bs";
 import { useCancelarArquivoAlvara } from "../../../hooks/actionCancelarArquivoAlvara";
 import { useEditarArquivoAlvara } from "../../../hooks/actionEditarArquivoAlvara";
 import { useCriarArquivoAlvara } from "../../../hooks/actionCriarArquivoAlvara";
 import { converterArquivosParaBase64 } from "../../../../../../../utils/converterFileBase64";
 import axiosInstance from "../../../../../../../api/api";
-//import { ActionCadastrarAlvaraModal } from "./ActionCadastrarAlvaraModal/ActionCadastrarAlvaraModal";
-//import { ActionVisualizarDetalhesAlvaraModal } from "./ActionVisualizarAlvaraModal/actionVisualizarDetalhesAlvaraModal";
 
-export const ActionEditarListaArquivosAnexados = ({ dadosAlvaraSelecionado, optionsModulos, usuarioLogado, refetchAlvaraEmpresa, handleClose, refetchVinculoAlvara }) => {
+export const ActionEditarListaArquivosAnexados = ({
+    dadosAlvaraSelecionado,
+    optionsModulos,
+    usuarioLogado,
+    refetchVinculoAlvara
+}) => {
+
     const [globalFilterValue, setGlobalFilterValue] = useState('');
     const [rowSelection, setRowSelection] = useState(null);
-    const [modalCadastrarAlvaraEmpresa, setModalCadastrarAlvaraEmpresa] = useState(false);
-    const [modalVisualizarAlvaraEmpresa, setModalVisualizarAlvaraEmpresa] = useState(false);
-
     const [rowEditando, setRowEditando] = useState(null);
     const [modoArquivo, setModoArquivo] = useState(null);
-
     const fileInputRef = useRef(null);
     const dataTableRef = useRef();
 
     const {
         onSubmit
-    } = useCancelarArquivoAlvara({ usuarioLogado, refetchAlvaraEmpresa, optionsModulos, dadosAlvaraSelecionado, refetchAlvaraEmpresa, refetchVinculoAlvara });
+
+    } = useCancelarArquivoAlvara({
+        usuarioLogado,
+        optionsModulos,
+        refetchVinculoAlvara
+    });
 
     const {
-
         onEditarArquivo,
-    } = useEditarArquivoAlvara({ usuarioLogado, refetchAlvaraEmpresa, optionsModulos, dadosAlvaraSelecionado, refetchAlvaraEmpresa, refetchVinculoAlvara });
+
+    } = useEditarArquivoAlvara({
+        usuarioLogado,
+        optionsModulos,
+        refetchVinculoAlvara
+    });
 
     const {
-
         onCriarArquivo
-    } = useCriarArquivoAlvara({ usuarioLogado, refetchAlvaraEmpresa, optionsModulos, dadosAlvaraSelecionado, refetchAlvaraEmpresa, refetchVinculoAlvara });
+
+    } = useCriarArquivoAlvara({
+        usuarioLogado,
+        optionsModulos,
+        refetchVinculoAlvara
+    });
 
     const onGlobalFilterChange = (e) => {
         setGlobalFilterValue(e.target.value);
     };
-
 
     const handlePrint = useReactToPrint({
         content: () => dataTableRef.current,
@@ -62,14 +73,16 @@ export const ActionEditarListaArquivosAnexados = ({ dadosAlvaraSelecionado, opti
         doc.autoTable({
             head: [[
                 "#",
-                "Dt.Inicio",
-                "Dt.Fim",
+                "Nome",
+                "Dt.Tipo",
+                "Dt.Inclusão",
                 "Status",
             ]],
             body: (dados || []).map((item) => [
-                item?.IDEMPRESA,
-                item?.DTINICIOCOMPETENCIAALVARA,
-                item?.DTFIMCOMPETENCIAALVARA,
+                item?.CONTADOR,
+                item?.NOMEARQUIVOALVARA,
+                item?.TIPOARQUIVOALVARA,
+                item?.DTHORACRIACAO,
                 item?.STATIVO,
             ]),
             horizontalPageBreak: true,
@@ -86,15 +99,17 @@ export const ActionEditarListaArquivosAnexados = ({ dadosAlvaraSelecionado, opti
 
         const header = [
             "#",
-            "Dt.Inicio",
-            "Dt.Fim",
+            "Nome",
+            "Dt.Tipo",
+            "Dt.Inclusão",
             "Status",
         ];
 
         const data = (dados || []).map(item => [
-            item?.IDEMPRESA,
-            item?.DTINICIOCOMPETENCIAALVARA,
-            item?.DTFIMCOMPETENCIAALVARA,
+            item?.CONTADOR,
+            item?.NOMEARQUIVOALVARA,
+            item?.TIPOARQUIVOALVARA,
+            item?.DTHORACRIACAO,
             item?.STATIVO,
         ]);
 
@@ -116,26 +131,24 @@ export const ActionEditarListaArquivosAnexados = ({ dadosAlvaraSelecionado, opti
         return mime.split("/")[1].toUpperCase();
     };
 
-    const dados = dadosAlvaraSelecionado
-        ?.flatMap((item) =>
-            item?.ARQUIVOSALVARAS?.map((arquivo) => ({
-                IDVINCULO: item?.IDVINCULO,
-                IDEMPRESA: item?.IDEMPRESA,
-                IDSTATUS: item?.IDSTATUS,
-                NOMEARQUIVOALVARA: arquivo?.NOMEARQUIVOALVARA,
-                TIPOARQUIVOALVARA: arquivo?.TIPOARQUIVOALVARA,
-                DTHORACRIACAO: arquivo?.DTHORACRIACAO,
-                STATIVO: arquivo?.STATIVO === "True" ? "Ativo" : "Inativo",
-                IDARQUIVOSALVARA: arquivo?.IDARQUIVOSALVARA
+    const dados = dadosAlvaraSelecionado?.flatMap((item) =>
+        item?.ARQUIVOSALVARAS?.map((arquivo) => ({
+            IDVINCULO: item?.IDVINCULO,
+            IDEMPRESA: item?.IDEMPRESA,
+            IDSTATUS: item?.IDSTATUS,
+            NOMEARQUIVOALVARA: arquivo?.NOMEARQUIVOALVARA,
+            TIPOARQUIVOALVARA: arquivo?.TIPOARQUIVOALVARA,
+            DTHORACRIACAO: arquivo?.DTHORACRIACAO,
+            STATIVO: arquivo?.STATIVO === "True" ? "Ativo" : "Inativo",
+            IDARQUIVOSALVARA: arquivo?.IDARQUIVOSALVARA
 
-            })) || []
-        )
+        })) || []
+    )
         ?.map((item, index) => ({
             ...item,
             CONTADOR: index + 1
         }));
 
-    console.log(dadosAlvaraSelecionado, "dadosAlvaraSelecionado action")
     const colunasEmpresasAlvaras = [
         {
             field: 'CONTADOR',
@@ -219,19 +232,17 @@ export const ActionEditarListaArquivosAnexados = ({ dadosAlvaraSelecionado, opti
         }
     ]
 
-
     const handleVisualizarArquivo = async (row) => {
         const baseURL = axiosInstance.defaults.baseURL;
+
         try {
             const url = `${baseURL}/visualizar-anexo-alvara?idArquivoAlvara=${row.IDARQUIVOSALVARA}`;
-
             window.open(url, "_blank");
         }
         catch (error) {
             console.error("Erro ao visualizar arquivo:", error);
         }
     };
-
 
     const handleClickCriarAlvara = () => {
         setModoArquivo('criar');
@@ -243,11 +254,9 @@ export const ActionEditarListaArquivosAnexados = ({ dadosAlvaraSelecionado, opti
         fileInputRef.current?.click();
     };
 
-
     const handleFileChange = async (event) => {
         const filesList = event.target.files;
         if (!filesList?.length) return;
-
 
         const arquivosConvertidos = await converterArquivosParaBase64(filesList);
 
@@ -265,86 +274,6 @@ export const ActionEditarListaArquivosAnexados = ({ dadosAlvaraSelecionado, opti
         event.target.value = null;
         setRowEditando(null);
         setModoArquivo(null);
-    };
-    /* const handleFileChange = async (event) => {
-        const arquivosConvertidos = await handleSelecionarArquivos(event);
-
-        if (!arquivosConvertidos?.length) return;
-
-        if (modoArquivo === 'editar' && rowEditando) {
-            await onEditarArquivo(rowEditando, arquivosConvertidos);
-        }
-
-        if (modoArquivo === 'criar') {
-            const idVinculo = dadosAlvaraSelecionado?.[0]?.IDVINCULO;
-            await onCriarArquivo(idVinculo, arquivosConvertidos);
-        }
-
-        event.target.value = null;
-        setRowEditando(null);
-        setModoArquivo(null);
-    }; */
-
-
-
-    /* 
-        const handleFileChange = (event) => {
-             if (!rowSelecionadaEditar) return;
-            const file = event.target.files[0];
-    
-            if (!file) return;
-    
-            console.log("Arquivo selecionado:", file);
-            handleSelecionarArquivos(event);
-            // - mandar para API
-            // - atualizar estado
-            // - abrir modal
-        }; */
-
-    const handleClickVisualizarAlvara = (row) => {
-        if (optionsModulos[0]?.ALTERAR === 'True') {
-            if (row && row.IDVINCULO) {
-                handleViualizarAlvara(row.IDVINCULO);
-            }
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Atenção!',
-                text: 'Você não tem permissão para editar alvará.',
-                confirmButtonColor: '#7352A5',
-                customClass: {
-                    container: 'custom-swal',
-                },
-            });
-        }
-    };
-
-    const handleViualizarAlvara = async (IDVINCULO) => {
-        try {
-            const response = await get(`/vinculo-alvaras-empresa?idFilial=${IDVINCULO}`);
-            if (response.data && response.data.length > 0) {
-                setDadosAlvaraSelecionado(response.data);
-                setModalVisualizarAlvaraEmpresa(true);
-            }
-        } catch (error) {
-            console.error('Erro ao buscar dados Alvaras: ', error);
-        }
-    };
-
-    const handleClickCadastrarAlvara = () => {
-        if (optionsModulos[0]?.ALTERAR === 'True') {
-            setModalCadastrarAlvaraEmpresa(true);
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Atenção!',
-                text: 'Você não tem permissão para cadastrar alvará.',
-                confirmButtonColor: '#7352A5',
-                customClass: {
-                    container: 'custom-swal',
-                },
-            });
-        }
     };
 
     const handleClickCancelarAlvara = async (row) => {
@@ -371,7 +300,9 @@ export const ActionEditarListaArquivosAnexados = ({ dadosAlvaraSelecionado, opti
                 <div className="panel-hdr mb-4">
 
                     <h3>LISTA DE ARQUIVOS ANEXADOS DO ALVARÁ</h3>
+
                 </div>
+
                 <div style={{ marginBottom: "1rem" }}>
                     <HeaderTable
                         globalFilterValue={globalFilterValue}
@@ -380,8 +311,6 @@ export const ActionEditarListaArquivosAnexados = ({ dadosAlvaraSelecionado, opti
                         exportToExcel={exportToExcel}
                         exportToPDF={exportToPDF}
                     />
-
-
                 </div>
                 <div style={{ marginTop: "1rem", marginLeft: "0.8rem", marginBottom: "1rem" }}>
                     <ButtonTable
@@ -395,7 +324,6 @@ export const ActionEditarListaArquivosAnexados = ({ dadosAlvaraSelecionado, opti
                         height="37px"
                         flexDirection="row"
                     />
-
                 </div>
 
                 <div className="card" ref={dataTableRef}>
@@ -418,7 +346,6 @@ export const ActionEditarListaArquivosAnexados = ({ dadosAlvaraSelecionado, opti
                         emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
                     >
                         {colunasEmpresasAlvaras.map(coluna => (
-
                             <Column
                                 key={coluna.field}
                                 field={coluna.field}
@@ -429,7 +356,6 @@ export const ActionEditarListaArquivosAnexados = ({ dadosAlvaraSelecionado, opti
                                 headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '1rem' }}
                                 footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
                                 bodyStyle={{ fontSize: '1rem' }}
-
                             />
                         ))}
                     </DataTable>
@@ -442,18 +368,6 @@ export const ActionEditarListaArquivosAnexados = ({ dadosAlvaraSelecionado, opti
                 style={{ display: "none" }}
                 onChange={handleFileChange}
             />
-
-            {/* <ActionCadastrarAlvaraModal
-                show={modalCadastrarAlvaraEmpresa}
-                handleClose={() => setModalCadastrarAlvaraEmpresa(false)}
-                dadosAlvaraEmpresa={dadosAlvaraEmpresaSelecionada}
-            />
- */}
-            {/*    <ActionVisualizarDetalhesAlvaraModal
-                show={modalVisualizarAlvaraEmpresa}
-                handleClose={() => setModalVisualizarAlvaraEmpresa(false)}
-                dadosAlvaraSelecionado={dadosAlvaraSelecionado}
-            /> */}
         </Fragment>
     )
 }

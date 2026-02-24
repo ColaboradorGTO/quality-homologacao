@@ -1,13 +1,19 @@
 import { Fragment } from "react"
 import Modal from 'react-bootstrap/Modal';
 import { HeaderModal } from "../../../../../../Modais/HeaderModal/HeaderModal";
-import { useForm } from "react-hook-form";
-import { GrCertificate } from "react-icons/gr";
-import { BsFileEarmarkText } from "react-icons/bs";
 import { FormularioEditarDetalhesAlvara } from "./formularioEditarDetalhesAlvaraModal";
 
-export const ActionEditarDetalhesAlvaraModal = ({show, dadosAlvaraSelecionado ,dadosAlvaraEmpresa, optionsModulos, usuarioLogado, refetchAlvaraEmpresa, handleClose, refetchAlvaraSelecionado, refetchVinculoAlvara }) => {
-    const { register, handleSubmit, errors } = useForm();
+export const ActionEditarDetalhesAlvaraModal = ({
+    show,
+    dadosAlvaraSelecionado,
+    dadosAlvaraEmpresa,
+    optionsModulos,
+    usuarioLogado,
+    refetchAlvaraEmpresa,
+    handleClose,
+    refetchAlvaraSelecionado,
+    refetchVinculoAlvara
+}) => {
 
     return (
         <Fragment>
@@ -16,7 +22,7 @@ export const ActionEditarDetalhesAlvaraModal = ({show, dadosAlvaraSelecionado ,d
                 onHide={handleClose}
                 size="lg"
                 className="modal fade"
-                id="CadAlvaraEmpresa"
+                id="EditarAlvaraEmpresa"
                 tabIndex={-1}
                 role="dialog"
                 aria-hidden="true"
@@ -30,15 +36,13 @@ export const ActionEditarDetalhesAlvaraModal = ({show, dadosAlvaraSelecionado ,d
                         dadosAlvaraEmpresa={dadosAlvaraEmpresa}
                         usuarioLogado={usuarioLogado}
                         optionsModulos={optionsModulos}
-                        refetchAlvaraEmpresa={refetchAlvaraEmpresa}
                         handleClose={handleClose}
-                        dadosAlvaraSelecionado={dadosAlvaraSelecionado}  
+                        dadosAlvaraSelecionado={dadosAlvaraSelecionado}
+                        refetchAlvaraEmpresa={refetchAlvaraEmpresa}
                         refetchAlvaraSelecionado={refetchAlvaraSelecionado}
                         refetchVinculoAlvara={refetchVinculoAlvara}
                     />
-                   
                 </Modal.Body>
-
             </Modal>
         </Fragment>
     )

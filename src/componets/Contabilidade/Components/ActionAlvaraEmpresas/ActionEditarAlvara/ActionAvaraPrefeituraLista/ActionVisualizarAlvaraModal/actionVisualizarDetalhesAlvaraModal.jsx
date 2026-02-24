@@ -1,13 +1,15 @@
 import { Fragment } from "react"
 import Modal from 'react-bootstrap/Modal';
 import { HeaderModal } from "../../../../../../Modais/HeaderModal/HeaderModal";
-import { useForm } from "react-hook-form";
-import { GrCertificate } from "react-icons/gr";
-import { BsFileEarmarkText } from "react-icons/bs";
 import { FormularioVisualizarDetalhesAlvara } from "./formularioVisualizarDetalhesAlvaraModal";
 
-export const ActionVisualizarDetalhesAlvaraModal = ({show, dadosAlvaraSelecionado ,dadosAlvaraEmpresa, optionsModulos, usuarioLogado, refetchAlvaraEmpresa, handleClose }) => {
-    const { register, handleSubmit, errors } = useForm();
+export const ActionVisualizarDetalhesAlvaraModal = ({
+    show,
+    dadosAlvaraSelecionado,
+    optionsModulos,
+    usuarioLogado,
+    handleClose
+}) => {
 
     return (
         <Fragment>
@@ -16,7 +18,7 @@ export const ActionVisualizarDetalhesAlvaraModal = ({show, dadosAlvaraSelecionad
                 onHide={handleClose}
                 size="lg"
                 className="modal fade"
-                id="CadAlvaraEmpresa"
+                id="DetalhesAlvaraEmpresa"
                 tabIndex={-1}
                 role="dialog"
                 aria-hidden="true"
@@ -27,16 +29,13 @@ export const ActionVisualizarDetalhesAlvaraModal = ({show, dadosAlvaraSelecionad
                 />
                 <Modal.Body>
                     <FormularioVisualizarDetalhesAlvara
-                        dadosAlvaraEmpresa={dadosAlvaraEmpresa}
                         usuarioLogado={usuarioLogado}
                         optionsModulos={optionsModulos}
-                        refetchAlvaraEmpresa={refetchAlvaraEmpresa}
                         handleClose={handleClose}
-                        dadosAlvaraSelecionado={dadosAlvaraSelecionado}  
+                        dadosAlvaraSelecionado={dadosAlvaraSelecionado}
                     />
-                   
-                </Modal.Body>
 
+                </Modal.Body>
             </Modal>
         </Fragment>
     )

@@ -1,13 +1,20 @@
 import { useState } from "react"
-import { get, post, put } from "../../../../../api/funcRequest";
+import { get, post } from "../../../../../api/funcRequest";
 import Swal from "sweetalert2";
 import axios from "axios";
-import { removerFormatacaoMoeda } from "../../../../../utils/formatMoeda";
-import { useEffect } from "react";
-import { useQuery, useQueryClient } from "react-query";
+import { useQuery } from "react-query";
 import { converterArquivosParaBase64 } from "../../../../../utils/converterFileBase64";
 
-export const useCriarAlvara = ({ handleClose, dadosAlvaraSelecionado, usuarioLogado, optionsModulos, refetchAlvaraEmpresa, idAlvaraSelecionado, refetchAlvaraSelecionado }) => {
+export const useCriarAlvara = ({
+    handleClose,
+    dadosAlvaraSelecionado,
+    usuarioLogado,
+    optionsModulos,
+    refetchAlvaraEmpresa,
+    idAlvaraSelecionado,
+    refetchAlvaraSelecionado
+}) => {
+
     const [arquivoAlvara, setArquivoAlvara] = useState([])
     const [descricaoDetalheAndamento, setDescricaoDetalheAndamento] = useState('')
     const [dataFimCompetencia, setDataFimCompetencia] = useState('')
@@ -49,43 +56,16 @@ export const useCriarAlvara = ({ handleClose, dadosAlvaraSelecionado, usuarioLog
         { enabled: true, staleTime: 60 * 60 * 1000, }
     );
 
-    const { data: vinculoAlvaraEmpresa = [], error: errorvinculoAlvaraEmpresa, isLoading: isLoadingvinculoAlvaraEmpresa, refetch: refetchvinculoAlvaraEmpresa } = useQuery(
-        ['vinculo-alvaras-empresa', dadosAlvaraSelecionado?.[0]?.IDEMPRESA],
-        async () => {
-            const response = await get(`/alvaras-empresa-detalhe?idFilial=${Number(dadosAlvaraSelecionado?.[0]?.IDEMPRESA)}`);
-            console.log(response, 'response.data status alvara')
-            return response.data;
-        },
-        { enabled: !!dadosAlvaraSelecionado?.[0]?.IDEMPRESA, }
-    );
-
-    //const arquivoConvertido = converterArquivosParaBase64(arquivoAlvara)
-    // console.log(arquivoConvertido, 'arquivoConvertido')
-
-    /*     useEffect(() => {
-            setStatusAlvara({ value: dadosAlvaraSelecionado?.[0]?.STATIVO == 'True' || "False", label: dadosAlvaraSelecionado?.[0]?.STATIVO == 'True' ? 'Ativo' : 'Inativo' })
-            setDataIncioCompetencia(dadosAlvaraSelecionado?.[0]?.DTINICIOCOMPETENCIAALVARA)
-            setDataFimCompetencia(dadosAlvaraSelecionado?.[0]?.DTFIMCOMPETENCIAALVARA)
-            setStatusAndamento({ value: dadosAlvaraSelecionado?.[0]?.IDSTATUS, label: dadosAlvaraSelecionado?.[0]?.DESCRICAOSTATUS })
-            setMetragemLoja(dadosAlvaraSelecionado?.[0]?.METRAGEMEMPRESA)
-            setDescricaoDetalheAndamento(dadosAlvaraSelecionado?.[0]?.DESCRICAODETALHEANDAMENTO)
-            setArquivoAlvara(dadosAlvaraSelecionado?.[0]?.ARQUIVOSALVARAS)
-        }, [dadosAlvaraSelecionado]) */
-
-
     const optionsStatus = [
         { value: 'True', label: 'Ativo' },
         { value: 'False', label: 'Inativo' },
     ];
 
-    //console.log(IDSTATUSANDAMENTO, 'arquivoAlvara')
-    //console.log(dadosAlvaraSelecionado, 'dadosAlvaraSelecionado hook')
-
     const onSubmit = async () => {
         if (optionsModulos[0]?.ALTERAR !== 'True') {
             Swal.fire({
                 title: 'Acesso Negado',
-                text: 'Você não tem permissão para alterar este Alvara.',
+                text: 'Você não tem permissão para adicionar alvara.',
                 icon: 'error',
                 timer: 3000,
                 customClass: {
@@ -107,17 +87,9 @@ export const useCriarAlvara = ({ handleClose, dadosAlvaraSelecionado, usuarioLog
             customClass: {
                 container: 'custom-swal',
             },
-
         });
 
         if (!confirmacao.isConfirmed) return;
-
-        const tratarResposta = (response) => {
-            if (!response.data?.success) {
-                throw new Error(response.data?.msg);
-            }
-            return response.data;
-        }
 
         const arquivosConvertidos = await converterArquivosParaBase64(arquivoAlvara);
 
@@ -137,7 +109,7 @@ export const useCriarAlvara = ({ handleClose, dadosAlvaraSelecionado, usuarioLog
         try {
             const response = await post('vinculoAlvarasEmpresa', postData)
             const textDados = JSON.stringify(postData)
-            let textoFuncao = 'CONTABILIDADE/EDITAR ALVARA PREFEITURA';
+            let textoFuncao = 'CONTABILIDADE/ADICIONAR ALVARA PREFEITURA';
             const ipUsuario = await getIPUsuario();
 
             const CreateLog = {
@@ -149,7 +121,6 @@ export const useCriarAlvara = ({ handleClose, dadosAlvaraSelecionado, usuarioLog
 
             await post('/log-web', CreateLog)
 
-            console.log(response, 'response')
             if (response?.success === false) {
                 Swal.fire({
                     title: 'Atenção',
@@ -174,12 +145,13 @@ export const useCriarAlvara = ({ handleClose, dadosAlvaraSelecionado, usuarioLog
             refetchAlvaraSelecionado();
             refetchAlvaraEmpresa();
             handleClose();
+
             return response.data;
         } catch (error) {
 
             const textDados = JSON.stringify(postData)
             const ipUsuario = await getIPUsuario();
-            let textoFuncao = 'CONTABILIDADE/ERRO AOEDITAR ALVARA PREFEITURA';
+            let textoFuncao = 'CONTABILIDADE/ERRO AO ADICIONAR ALVARA PREFEITURA';
 
             const CreateLog = {
                 IDFUNCIONARIO: String(usuarioLogado.id),

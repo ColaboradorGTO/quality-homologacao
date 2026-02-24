@@ -1,21 +1,24 @@
 import { Fragment } from "react"
-import { HeaderModal } from "../../../../../../Modais/HeaderModal/HeaderModal";
 import { ButtonTypeModal } from "../../../../../../Buttons/ButtonTypeModal";
 import { FooterModal } from "../../../../../../Modais/FooterModal/footerModal";
 import { Controller, useForm } from "react-hook-form";
 import FormField from "../../../../../../Formularios/FormField";
-//import { schema } from "./schemaCadastrarQuebraCaixa";
 import { useCriarAlvara } from "../../../hooks/actionCriarAlvara";
-import { BsBuilding, BsPerson } from "react-icons/bs";
 import Select from "react-select"
 import { AiOutlineFileText } from "react-icons/ai";
 import { AlertError } from "../../../../../../Inputs/alertError";
-import { converterArquivosParaBase64 } from "../../../../../../../utils/converterFileBase64";
 import { schema } from "./schema/schemaValidacaoCadastroAlvara";
 
-//import { ActionListaAlvaraPrefeitura } from "./ActionAvaraPrefeituraLista/actionListaAlvaraPrefeitura.jsx";
+export const FormularioCadastrarActionAlvara = ({
+    dadosAlvaraSelecionado,
+    handleClose,
+    usuarioLogado,
+    optionsModulos,
+    refetchAlvaraEmpresa,
+    idAlvaraSelecionado,
+    refetchAlvaraSelecionado
+}) => {
 
-export const FormularioCadastrarActionAlvara = ({ show, dadosAlvaraSelecionado, handleClose, dadosDetelheCaixa, usuarioLogado, optionsModulos, refetchAlvaraEmpresa, idAlvaraSelecionado, refetchAlvaraSelecionado }) => {
     const { handleSubmit, formState: { errors }, clearErrors, control, setError, register } = useForm({
         mode: "onChange"
     });
@@ -37,9 +40,7 @@ export const FormularioCadastrarActionAlvara = ({ show, dadosAlvaraSelecionado, 
         metragemLoja,
         setMetragemLoja,
         onSubmit
-    } = useCriarAlvara({ show, handleClose, dadosDetelheCaixa, usuarioLogado, optionsModulos, dadosAlvaraSelecionado, idAlvaraSelecionado, refetchAlvaraEmpresa, refetchAlvaraSelecionado });
-
-    //console.log(arquivoAlvara, "arquivoAlvara form");
+    } = useCriarAlvara({ handleClose, usuarioLogado, optionsModulos, dadosAlvaraSelecionado, idAlvaraSelecionado, refetchAlvaraEmpresa, refetchAlvaraSelecionado });
 
     const handleValidatedSubmit = async () => {
         try {
@@ -85,8 +86,8 @@ export const FormularioCadastrarActionAlvara = ({ show, dadosAlvaraSelecionado, 
                         PREFEITURA (LICENÇA DE FUNCIONAMENTO)
                     </h4>
                 </span>
-                <div class="form-group">
 
+                <div class="form-group">
                     <div class="row mt-3">
 
                         <div class="col-sm-6 col-xl-6">
@@ -113,44 +114,12 @@ export const FormularioCadastrarActionAlvara = ({ show, dadosAlvaraSelecionado, 
                                     fieldName="statusAlvara"
                                 />
                             )}
-                            {/* <Controller
-                                name="Status:"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormField
-                                        label={"Status:"}
-                                        name="Status:"
-                                        type="text"
-                                        value={dadosAlvaraSelecionado?.[0]?.STATIVO === "True" ? "Ativo" : "Inativo"}
-                                        errors={errors}
-                                        readOnly={true}
-                                        clearErrors={clearErrors}
-                                    />
-                                )}
-                            /> */}
+
                         </div>
                     </div>
 
                     <div class="row mt-3">
                         <div class="col-sm-6 col-xl-6">
-                            {/*    <Controller
-                                name="dataAdmissaoFuncionario"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormField
-                                        name="dataAdmissaoFuncionario"
-                                        label={"Data do Criação*"}
-                                        type="date"
-                                        errors={errors}
-                                        clearErrors={clearErrors}
-                                        value={dataAdmissao}
-                                        onChangeModal={e => setDataAdmissao(e.target.value)}
-                                        min={minDataAdmissao}
-                                    // max={maxDataAdmissao}
-                                    />
-                                )}
-                            /> */}
-
                             <Controller
                                 name="dataInicioCompetenciaSelecionada"
                                 control={control}
@@ -185,7 +154,6 @@ export const FormularioCadastrarActionAlvara = ({ show, dadosAlvaraSelecionado, 
                                     />
                                 )}
                             />
-
                         </div>
                     </div>
 
@@ -208,7 +176,6 @@ export const FormularioCadastrarActionAlvara = ({ show, dadosAlvaraSelecionado, 
                                     setStatusAndamento(opt ?? null);
                                     clearErrors("statusAndamento");
                                 }}
-                            //onChange={(e) => setStatusAndamento(e.value)}
                             />
                             {errors.statusAndamento && (
                                 <AlertError
@@ -217,23 +184,6 @@ export const FormularioCadastrarActionAlvara = ({ show, dadosAlvaraSelecionado, 
                                     fieldName="statusAndamento"
                                 />
                             )}
-
-                            {/*  <Controller
-                                name="Status Andamento:"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormField
-                                        label={"Status Andamento:"}
-                                        name="Status Andamento:"
-                                        type="text"
-                                        readOnly={true}
-                                        value={dadosAlvaraSelecionado?.[0]?.DESCRICAOSTATUS}
-                                        onChange={(e) => setMetragem(e.value)}
-                                        errors={errors}
-                                        clearErrors={clearErrors}
-                                    />
-                                )}
-                            /> */}
                         </div>
                         <div class="col-sm-6 col-xl-6">
                             <Controller
@@ -296,12 +246,6 @@ export const FormularioCadastrarActionAlvara = ({ show, dadosAlvaraSelecionado, 
                                     />
                                 )}
                             />
-                            {/*   <label className="form-label mr-2" htmlFor={""}>Anexar Arquivo:</label>
-                            <input
-                                type="file"
-                                accept="application/pdf"
-                                onChange={(e) => setArquivoAlvara(e.target.files[0])}
-                            /> */}
                         </div>
                     </div>
                 </div>

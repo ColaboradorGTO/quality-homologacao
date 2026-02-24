@@ -1,18 +1,15 @@
-import React, { Fragment, useEffect, useState } from "react"
+import React, { Fragment, useState } from "react"
 import { ActionListaAlvaras } from "./actionListaAlvaraEmpresa";
 import { ActionMain } from "../../../Actions/actionMain";
 import { ButtonType } from "../../../Buttons/ButtonType";
 import { AiOutlineSearch } from "react-icons/ai";
-import { InputField } from "../../../Buttons/Input";
 import { get } from "../../../../api/funcRequest";
 import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
-import Swal from "sweetalert2";
 import { InputSelectAction } from "../../../Inputs/InputSelectAction";
 import { useFetchData } from "../../../../hooks/useFetchData";
 
 export const ActionPesquisaAlvaraEmpresa = ({ usuarioLogado, ID }) => {
-    const [filtros, setFiltros] = useState({});
     const [marcaSelecionada, setMarcaSelecionada] = useState('');
     const [ufSelecionada, setUfSelecionada] = useState('');
     const [satusFilialSelecionada, setSatusFilialSelecionada] = useState('');
@@ -21,16 +18,8 @@ export const ActionPesquisaAlvaraEmpresa = ({ usuarioLogado, ID }) => {
     const [tipoAvaraAplicado, setTipoAvaraAplicado] = useState('');
     const [tabelaVisivel, setTabelaVisivel] = useState(false);
     const [idEmpresaSelecionada, setIdEmpresaSelecionada] = useState(null);
-    const [produto, setProduto] = useState('')
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(1000);
-
-    //console.log(marcaSelecionada, 'marcaSelecionada')
-    //console.log(ufSelecionada, 'uf')
-    //console.log(satusFilialSelecionada, 'status')
-    //console.log(empresaSelecionada, 'empresa')
-    //console.log(tipoAlvara, 'tipoAlvara')
-    //console.log(usuarioLogado.id, 'usuarioLogado')
 
     const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
         'menus-usuario-excecao',
@@ -42,7 +31,8 @@ export const ActionPesquisaAlvaraEmpresa = ({ usuarioLogado, ID }) => {
         { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
     );
 
-    const { data: marcas = [], error: errorMarcas, isLoading: isLoadingMarcas } = useFetchData('marcasLista', '/marcasLista');
+    const { data: marcas = [], error: errorMarcas, isLoading: isLoadingMarcas }
+        = useFetchData('marcasLista', '/marcasLista');
 
     const { data: alvarasLista = [], error: errorAlvara, isLoading: isLoadingAlvara, refetch: refetchAlvara
     } = useQuery(
@@ -52,11 +42,8 @@ export const ActionPesquisaAlvaraEmpresa = ({ usuarioLogado, ID }) => {
 
             return response.data;
         },
-        {
-            staleTime: 5 * 60 * 1000
-        }
+        { staleTime: 5 * 60 * 1000 }
     );
-
 
     const { data: empresasLista = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas
     } = useQuery(
@@ -68,11 +55,8 @@ export const ActionPesquisaAlvaraEmpresa = ({ usuarioLogado, ID }) => {
 
             return response.data;
         },
-        {
-            staleTime: 5 * 60 * 1000
-        }
+        { staleTime: 5 * 60 * 1000 }
     );
-    // console.log(empresasLista, 'empresasLista')
 
     const fetchListaAlvaraEmpresa = async () => {
         try {
@@ -115,25 +99,22 @@ export const ActionPesquisaAlvaraEmpresa = ({ usuarioLogado, ID }) => {
     };
 
     const { data: dadosAlvaraEmpresa = [], error: errorAlvaraEmpresa, isLoading: isLoadingAlvaraEmpresa, refetch: refetchAlvaraEmpresa } = useQuery(
-        ['fetchListaAlvaraEmpresa', empresaSelecionada, marcaSelecionada, satusFilialSelecionada, ufSelecionada],
+        ['fetchListaAlvaraEmpresa', empresaSelecionada, marcaSelecionada, satusFilialSelecionada, ufSelecionada, tipoAlvara],
         fetchListaAlvaraEmpresa,
-        { enabled: false },
+        { enabled: true, staleTime: 5 * 60 * 1000 },
     );
 
     const {
-        data: dadosAlvaraEmpresaSelecionada = [],  refetch: refetchAlvaraSelecionado, isLoading : isLoadingAlvaraSelecionado} = useQuery(
-        ['vinculo-alvara', idEmpresaSelecionada],
-        async () => {
-            const response = await get(
-                `/alvaras-empresa-detalhe?idFilial=${idEmpresaSelecionada}`
-            );
-            return response.data;
-        },
-        {
-            enabled: !!idEmpresaSelecionada,
-           
-        }
-    );
+        data: dadosAlvaraEmpresaSelecionada = [], refetch: refetchAlvaraSelecionado, isLoading: isLoadingAlvaraSelecionado } = useQuery(
+            ['vinculo-alvara', idEmpresaSelecionada],
+            async () => {
+                const response = await get(
+                    `/alvaras-empresa-detalhe?idFilial=${idEmpresaSelecionada}`
+                );
+                return response.data;
+            },
+            { enabled: !!idEmpresaSelecionada, }
+        );
 
     const optionsUf = [
         { value: '', label: 'Todos' },
@@ -157,7 +138,6 @@ export const ActionPesquisaAlvaraEmpresa = ({ usuarioLogado, ID }) => {
     }
 
     return (
-
         <Fragment>
             <ActionMain
                 linkComponentAnterior={["Home"]}
@@ -234,19 +214,17 @@ export const ActionPesquisaAlvaraEmpresa = ({ usuarioLogado, ID }) => {
 
             />
 
-
             {tabelaVisivel && (
                 <ActionListaAlvaras
                     dadosAlvaraEmpresa={dadosAlvaraEmpresa}
                     tipoAvaraAplicado={tipoAvaraAplicado}
                     optionsModulos={optionsModulos}
-                    usuarioLogado={usuarioLogado}
-                    refetchAlvaraEmpresa={refetchAlvaraEmpresa}
                     dadosAlvaraEmpresaSelecionada={dadosAlvaraEmpresaSelecionada}
+                    idEmpresaSelecionada={idEmpresaSelecionada}
+                    refetchAlvaraEmpresa={refetchAlvaraEmpresa}
                     refetchAlvaraSelecionado={refetchAlvaraSelecionado}
-                    idEmpresaSelecionada = {idEmpresaSelecionada}
                     setIdEmpresaSelecionada={setIdEmpresaSelecionada}
-
+                    usuarioLogado={usuarioLogado}
                 />
             )}
 

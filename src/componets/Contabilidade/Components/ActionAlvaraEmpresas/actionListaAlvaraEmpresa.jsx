@@ -1,7 +1,6 @@
 import React, { Fragment, useRef, useState } from "react"
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { formatMoeda } from "../../../../utils/formatMoeda";
 import { useReactToPrint } from "react-to-print";
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
@@ -9,9 +8,9 @@ import * as XLSX from 'xlsx';
 import HeaderTable from "../../../Tables/headerTable";
 import { ButtonTable } from "../../../ButtonsTabela/ButtonTable";
 import { FaRegFileAlt } from "react-icons/fa";
-import { ActionAlvaraEmpresaModal } from "./ActionEditarAlvara/actionAlvaraEmpresaModal";
 import Swal from "sweetalert2";
-import { get } from "../../../../api/funcRequest";
+import { mascaraCNPJ } from "../../../../utils/mascaraCNPJ";
+import { ActionAlvaraEmpresaModal } from "./ActionEditarAlvara/actionAlvaraEmpresaModal";
 
 export const ActionListaAlvaras = ({
     dadosAlvaraEmpresa,
@@ -21,12 +20,11 @@ export const ActionListaAlvaras = ({
     refetchAlvaraEmpresa,
     refetchAlvaraSelecionado,
     dadosAlvaraEmpresaSelecionada,
-    setIdEmpresaSelecionada
+    setIdEmpresaSelecionada,
 }) => {
     const [globalFilterValue, setGlobalFilterValue] = useState('');
     const [rowSelection, setRowSelection] = useState(null);
     const [modalAlvaraEmpresa, setModalAlvaraEmpresa] = useState(false);
-    //const [dadosAlvaraEmpresaSelecionada, setDadosAlvaraEmpresaSelecionada] = useState([])
     const dataTableRef = useRef();
 
     const onGlobalFilterChange = (e) => {
@@ -157,8 +155,6 @@ export const ActionListaAlvaras = ({
         XLSX.writeFile(workbook, "alvaras_empresas.xlsx");
     };
 
-
-
     const getTextoStatusAlvara = (alvara) => {
         const status = alvara?.DESCRICAOSTATUS;
         return status && String(status).trim().length ? status : "Não Iniciado";
@@ -222,7 +218,6 @@ export const ActionListaAlvaras = ({
     });
 
 
-
     const colunasEmpresasAlvaras = [
         {
             field: 'IDEMPRESA',
@@ -239,7 +234,7 @@ export const ActionListaAlvaras = ({
         {
             field: 'NUCNPJ',
             header: 'cnpj',
-            body: row => <th> {row.NUCNPJ} </th>,
+            body: row => <th> {mascaraCNPJ(row.NUCNPJ)} </th>,
             sortable: true,
         },
         {
@@ -375,20 +370,6 @@ export const ActionListaAlvaras = ({
         }
     };
 
-
-    /* const handleEditarAlvara = async (IDEMPRESA) => {
-        try {
-            const response = await get(`/alvaras-empresa-detalhe?idFilial=${IDEMPRESA}`);
-            console.log(response, 'response.data')
-            if (response.data && response.data.length > 0) {
-                setDadosAlvaraEmpresaSelecionada(response.data);
-                setModalAlvaraEmpresa(true);
-            }
-        } catch (error) {
-            console.error('Erro ao buscar dados Alvaras: ', error);
-        }
-    }; */
-
     return (
 
         <Fragment>
@@ -397,6 +378,7 @@ export const ActionListaAlvaras = ({
                 <div className="panel-hdr mb-4">
 
                     <h3>Lista de Produtos - Preços</h3>
+
                 </div>
                 <div style={{ marginBottom: "1rem" }}>
                     <HeaderTable

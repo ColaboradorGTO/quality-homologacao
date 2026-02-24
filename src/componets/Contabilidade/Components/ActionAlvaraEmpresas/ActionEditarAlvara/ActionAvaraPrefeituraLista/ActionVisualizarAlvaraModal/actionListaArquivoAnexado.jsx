@@ -7,19 +7,14 @@ import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../../../../../Tables/headerTable";
 import { ButtonTable } from "../../../../../../ButtonsTabela/ButtonTable";
-import { FaPencilAlt } from "react-icons/fa";
-import Swal from "sweetalert2";
-import { get } from "../../../../../../../api/funcRequest";
-import { FaPlus, FaRegEye } from "react-icons/fa6";
+import { FaRegEye } from "react-icons/fa6";
 import axiosInstance from "../../../../../../../api/api";
-//import { ActionCadastrarAlvaraModal } from "./ActionCadastrarAlvaraModal/ActionCadastrarAlvaraModal";
-//import { ActionVisualizarDetalhesAlvaraModal } from "./ActionVisualizarAlvaraModal/actionVisualizarDetalhesAlvaraModal";
 
-export const ActionListaArquivosAnexados = ({ dadosAlvaraSelecionado, optionsModulos, usuarioLogado, refetchAlvaraEmpresa, handleClose }) => {
+export const ActionListaArquivosAnexados = ({
+    dadosAlvaraSelecionado,
+}) => {
     const [globalFilterValue, setGlobalFilterValue] = useState('');
     const [rowSelection, setRowSelection] = useState(null);
-    const [modalCadastrarAlvaraEmpresa, setModalCadastrarAlvaraEmpresa] = useState(false);
-    const [modalVisualizarAlvaraEmpresa, setModalVisualizarAlvaraEmpresa] = useState(false);
     const dataTableRef = useRef();
 
     const onGlobalFilterChange = (e) => {
@@ -37,17 +32,19 @@ export const ActionListaArquivosAnexados = ({ dadosAlvaraSelecionado, optionsMod
         doc.autoTable({
             head: [[
                 "#",
-                "Dt.Inicio",
-                "Dt.Fim",
+                "Nome",
+                "Dt.Tipo",
+                "Dt.Inclusão",
                 "Status",
             ]],
             body: (dados || []).map((item) => [
-                item?.IDEMPRESA,
-                item?.DTINICIOCOMPETENCIAALVARA,
-                item?.DTFIMCOMPETENCIAALVARA,
+                item?.CONTADOR,
+                item?.NOMEARQUIVOALVARA,
+                item?.TIPOARQUIVOALVARA,
+                item?.DTHORACRIACAO,
                 item?.STATIVO,
             ]),
-            horizontalPageBreak: true,
+            horizontalPageBreak: false,
             horizontalPageBreakBehaviour: "immediately",
             styles: { fontSize: 8 },
             headStyles: { fontSize: 8 },
@@ -61,15 +58,17 @@ export const ActionListaArquivosAnexados = ({ dadosAlvaraSelecionado, optionsMod
 
         const header = [
             "#",
-            "Dt.Inicio",
-            "Dt.Fim",
+            "Nome",
+            "Dt.Tipo",
+            "Dt.Inclusão",
             "Status",
         ];
 
         const data = (dados || []).map(item => [
-            item?.IDEMPRESA,
-            item?.DTINICIOCOMPETENCIAALVARA,
-            item?.DTFIMCOMPETENCIAALVARA,
+            item?.CONTADOR,
+            item?.NOMEARQUIVOALVARA,
+            item?.TIPOARQUIVOALVARA,
+            item?.DTHORACRIACAO,
             item?.STATIVO,
         ]);
 
@@ -91,24 +90,21 @@ export const ActionListaArquivosAnexados = ({ dadosAlvaraSelecionado, optionsMod
         return mime.split("/")[1].toUpperCase();
     };
 
-    console.log(dadosAlvaraSelecionado, "dadosAlvaraSelecionado tabela")
-    const dados =
-        dadosAlvaraSelecionado
-            ?.flatMap((item) =>
-                item?.ARQUIVOSALVARAS?.map((arquivo) => ({
-                    IDVINCULO: item?.IDVINCULO,
-                    IDEMPRESA: item?.IDEMPRESA,
-                    IDARQUIVOSALVARA: arquivo?.IDARQUIVOSALVARA,
-                    NOMEARQUIVOALVARA: arquivo?.NOMEARQUIVOALVARA,
-                    TIPOARQUIVOALVARA: arquivo?.TIPOARQUIVOALVARA,
-                    DTHORACRIACAO: arquivo?.DTHORACRIACAO,
-                    STATIVO: arquivo?.STATIVO === "True" ? "Ativo" : "Inativo",
-                })) || []
-            )
-            ?.map((item, index) => ({
-                ...item,
-                CONTADOR: index + 1,
-            })) || [];
+    const dados = dadosAlvaraSelecionado?.flatMap((item) =>
+        item?.ARQUIVOSALVARAS?.map((arquivo) => ({
+            IDVINCULO: item?.IDVINCULO,
+            IDEMPRESA: item?.IDEMPRESA,
+            IDARQUIVOSALVARA: arquivo?.IDARQUIVOSALVARA,
+            NOMEARQUIVOALVARA: arquivo?.NOMEARQUIVOALVARA,
+            TIPOARQUIVOALVARA: arquivo?.TIPOARQUIVOALVARA,
+            DTHORACRIACAO: arquivo?.DTHORACRIACAO,
+            STATIVO: arquivo?.STATIVO === "True" ? "Ativo" : "Inativo",
+        })) || []
+    )
+        ?.map((item, index) => ({
+            ...item,
+            CONTADOR: index + 1,
+        })) || [];
 
     const colunasEmpresasAlvaras = [
         {
@@ -177,58 +173,10 @@ export const ActionListaArquivosAnexados = ({ dadosAlvaraSelecionado, optionsMod
         const baseURL = axiosInstance.defaults.baseURL;
         try {
             const url = `${baseURL}/visualizar-anexo-alvara?idArquivoAlvara=${row.IDARQUIVOSALVARA}`;
-
             window.open(url, "_blank");
         }
         catch (error) {
             console.error("Erro ao visualizar arquivo:", error);
-        }
-    };
-
-    const handleClickVisualizarAlvara = (row) => {
-        if (optionsModulos[0]?.ALTERAR === 'True') {
-            if (row && row.IDVINCULO) {
-                handleViualizarAlvara(row.IDVINCULO);
-            }
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Atenção!',
-                text: 'Você não tem permissão para editar alvará.',
-                confirmButtonColor: '#7352A5',
-                customClass: {
-                    container: 'custom-swal',
-                },
-            });
-        }
-    };
-
-    const handleViualizarAlvara = async (IDVINCULO) => {
-        try {
-            const response = await get(`/vinculo-alvaras-empresa?idFilial=${IDVINCULO}`);
-            console.log(response, 'response.data')
-            if (response.data && response.data.length > 0) {
-                setDadosAlvaraSelecionado(response.data);
-                setModalVisualizarAlvaraEmpresa(true);
-            }
-        } catch (error) {
-            console.error('Erro ao buscar dados Alvaras: ', error);
-        }
-    };
-
-    const handleClickCadastrarAlvara = () => {
-        if (optionsModulos[0]?.ALTERAR === 'True') {
-            setModalCadastrarAlvaraEmpresa(true);
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Atenção!',
-                text: 'Você não tem permissão para cadastrar alvará.',
-                confirmButtonColor: '#7352A5',
-                customClass: {
-                    container: 'custom-swal',
-                },
-            });
         }
     };
 
@@ -238,6 +186,7 @@ export const ActionListaArquivosAnexados = ({ dadosAlvaraSelecionado, optionsMod
                 <div className="panel-hdr mb-4">
 
                     <h3>LISTA DE ARQUIVOS ANEXADOS DO ALVARÁ</h3>
+
                 </div>
                 <div style={{ marginBottom: "2rem" }}>
                     <HeaderTable
@@ -247,7 +196,6 @@ export const ActionListaArquivosAnexados = ({ dadosAlvaraSelecionado, optionsMod
                         exportToExcel={exportToExcel}
                         exportToPDF={exportToPDF}
                     />
-
                 </div>
                 <div className="card" ref={dataTableRef}>
                     <DataTable
@@ -286,17 +234,6 @@ export const ActionListaArquivosAnexados = ({ dadosAlvaraSelecionado, optionsMod
                     </DataTable>
                 </div>
             </div>
-            {/* <ActionCadastrarAlvaraModal
-                show={modalCadastrarAlvaraEmpresa}
-                handleClose={() => setModalCadastrarAlvaraEmpresa(false)}
-                dadosAlvaraEmpresa={dadosAlvaraEmpresaSelecionada}
-            />
- */}
-            {/*    <ActionVisualizarDetalhesAlvaraModal
-                show={modalVisualizarAlvaraEmpresa}
-                handleClose={() => setModalVisualizarAlvaraEmpresa(false)}
-                dadosAlvaraSelecionado={dadosAlvaraSelecionado}
-            /> */}
         </Fragment>
     )
 }

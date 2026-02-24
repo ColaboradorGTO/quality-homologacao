@@ -11,18 +11,24 @@ import { FaPencilAlt } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { get } from "../../../../../../api/funcRequest";
 import { FaPlus, FaRegEye } from "react-icons/fa6";
+import { useQuery } from "react-query";
 import { ActionCadastrarAlvaraModal } from "./ActionCadastrarAlvaraModal/actionCadastrarAlvaraModal";
 import { ActionVisualizarDetalhesAlvaraModal } from "./ActionVisualizarAlvaraModal/actionVisualizarDetalhesAlvaraModal";
 import { ActionEditarDetalhesAlvaraModal } from "./ActionEditarAlvaraModal/actionEditarDetalhesAlvaraModal";
-import { useQuery } from "react-query";
 
-export const ActionListaAlvaraPrefeitura = ({ dadosAlvaraEmpresaSelecionada, optionsModulos, usuarioLogado, refetchAlvaraEmpresa, refetchAlvaraSelecionado }) => {
+export const ActionListaAlvaraPrefeitura = ({
+    dadosAlvaraEmpresaSelecionada,
+    optionsModulos,
+    usuarioLogado,
+    refetchAlvaraEmpresa,
+    refetchAlvaraSelecionado
+}) => {
+
     const [globalFilterValue, setGlobalFilterValue] = useState('');
     const [rowSelection, setRowSelection] = useState(null);
     const [modalCadastrarAlvaraEmpresa, setModalCadastrarAlvaraEmpresa] = useState(false);
     const [modalVisualizarAlvaraEmpresa, setModalVisualizarAlvaraEmpresa] = useState(false);
     const [modalEditarAlvaraEmpresa, setModalEditarAlvaraEmpresa] = useState(false);
-    //const [dadosAlvaraSelecionado, setDadosAlvaraSelecionado] = useState([]);
     const [idVinculoAlvara, setIdVinculoAlvara] = useState(null);
     const dataTableRef = useRef();
 
@@ -35,10 +41,7 @@ export const ActionListaAlvaraPrefeitura = ({ dadosAlvaraEmpresaSelecionada, opt
                 );
                 return response.data;
             },
-            {
-                enabled: !!idVinculoAlvara,
-
-            }
+            { enabled: !!idVinculoAlvara, }
         );
 
     const onGlobalFilterChange = (e) => {
@@ -61,7 +64,7 @@ export const ActionListaAlvaraPrefeitura = ({ dadosAlvaraEmpresaSelecionada, opt
                 "Status",
             ]],
             body: (dados || []).map((item) => [
-                item?.IDEMPRESA,
+                item?.CONTADOR,
                 item?.DTINICIOCOMPETENCIAALVARA,
                 item?.DTFIMCOMPETENCIAALVARA,
                 item?.STATIVO,
@@ -86,7 +89,7 @@ export const ActionListaAlvaraPrefeitura = ({ dadosAlvaraEmpresaSelecionada, opt
         ];
 
         const data = (dados || []).map(item => [
-            item?.IDEMPRESA,
+            item?.CONTADOR,
             item?.DTINICIOCOMPETENCIAALVARA,
             item?.DTFIMCOMPETENCIAALVARA,
             item?.STATIVO,
@@ -104,7 +107,7 @@ export const ActionListaAlvaraPrefeitura = ({ dadosAlvaraEmpresaSelecionada, opt
         XLSX.utils.book_append_sheet(workbook, worksheet, "Alvarás Empresas");
         XLSX.writeFile(workbook, "alvaras_empresas.xlsx");
     };
-    //console.log(dadosAlvaraEmpresaSelecionada, "dadosAlvaraEmpresaSelecionada lista ")
+
     const dados = dadosAlvaraEmpresaSelecionada
         .flatMap((empresa) => {
             return empresa.LISTA_ALVARAS
@@ -205,19 +208,6 @@ export const ActionListaAlvaraPrefeitura = ({ dadosAlvaraEmpresaSelecionada, opt
 
     };
 
-    /*    const handleViualizarAlvara = async (IDVINCULO) => {
-           try {
-               const response = await get(`/vinculo-alvaras-empresa?idFilial=${IDVINCULO}`);
-               console.log(response, 'response.data')
-               if (response.data && response.data.length > 0) {
-                   setDadosAlvaraSelecionado(response.data);
-                   setModalVisualizarAlvaraEmpresa(true);
-               }
-           } catch (error) {
-               console.error('Erro ao buscar dados Alvaras: ', error);
-           }
-       }; */
-
     const handleClickEditarAlvara = (row) => {
         if (optionsModulos[0]?.ALTERAR === 'True') {
             if (row && row.IDVINCULO) {
@@ -239,19 +229,7 @@ export const ActionListaAlvaraPrefeitura = ({ dadosAlvaraEmpresaSelecionada, opt
         setIdVinculoAlvara(IDVINCULO);
         setModalEditarAlvaraEmpresa(true);
     };
-    /* const handleEditarAlvara = async (IDVINCULO) => {
-        try {
-            const response = await get(`/vinculo-alvaras-empresa?idFilial=${IDVINCULO}`);
-            console.log(response, 'response.data')
-            if (response.data && response.data.length > 0) {
-                setDadosAlvaraSelecionado(response.data);
-                setModalEditarAlvaraEmpresa(true);
-            }
-        } catch (error) {
-            console.error('Erro ao buscar dados Alvaras: ', error);
-        }
-    };
- */
+
     const handleClickCadastrarAlvara = () => {
         if (optionsModulos[0]?.ALTERAR === 'True') {
             setModalCadastrarAlvaraEmpresa(true);
@@ -268,15 +246,13 @@ export const ActionListaAlvaraPrefeitura = ({ dadosAlvaraEmpresaSelecionada, opt
         }
     };
 
-
     return (
-
         <Fragment>
-
             <div className="panel">
                 <div className="panel-hdr mb-4">
 
                     <h3>ALVARÁS - PREFEITURA (LICENÇA DE FUNCIONAMENTO)</h3>
+
                 </div>
                 <div style={{ marginBottom: "0.5rem" }}>
                     <HeaderTable
@@ -355,7 +331,6 @@ export const ActionListaAlvaraPrefeitura = ({ dadosAlvaraEmpresaSelecionada, opt
                 optionsModulos={optionsModulos}
                 usuarioLogado={usuarioLogado}
                 refetchAlvaraEmpresa={refetchAlvaraEmpresa}
-
             />
 
             <ActionEditarDetalhesAlvaraModal
@@ -368,6 +343,7 @@ export const ActionListaAlvaraPrefeitura = ({ dadosAlvaraEmpresaSelecionada, opt
                 refetchAlvaraSelecionado={refetchAlvaraSelecionado}
                 refetchVinculoAlvara={refetchVinculoAlvara}
             />
+
         </Fragment>
     )
 }    
