@@ -15,7 +15,6 @@ import { toFloat } from "../../../../utils/toFloat";
 import { useQuery } from 'react-query';
 
 export const ResumoDashBoardComercial = ({ }) => {
-  const [clickContador, setClickContador] = useState(0);
   const [dataPesquisa, setDataPesquisa] = useState(''); 
 
   useEffect(() => {

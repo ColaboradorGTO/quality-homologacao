@@ -351,10 +351,12 @@ export const ActionListaDetalhe = ({ dadosDetalheFechamento }) => {
                     sortOrder={-1}
                     // paginator={true}
                     rows={10}
-
+                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+                    filterDisplay="menu"
                     showGridlines
                     stripedRows
-                    emptyMessage="Sem Registros para Exibir"
+                    emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
                 >
                     {colunasFechamento.map(coluna => (
                         <Column
