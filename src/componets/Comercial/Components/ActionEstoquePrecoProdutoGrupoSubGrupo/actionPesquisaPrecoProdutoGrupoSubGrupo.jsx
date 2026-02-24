@@ -8,7 +8,6 @@ import { ActionMain } from "../../../Actions/actionMain";
 import { AiOutlineSearch } from "react-icons/ai";
 import { ActionListaPrecoProdutoGrupoSubGrupo } from "./actionListaPrecoProdutoGrupoSubGrupo";
 import { getDataAtual } from "../../../../utils/dataAtual";
-import { useFetchData } from "../../../../hooks/useFetchData";
 import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
 
@@ -27,7 +26,6 @@ export const ActionPesquisaPrecoProdutoGrupoSubGrupo = () => {
   const [precoProduto, setPrecoProduto] = useState('')
   const [descricaoProduto, setDescricaoProduto] = useState('')
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(1000);
 
   useEffect(() => {
     const dataInicial = getDataAtual()
@@ -44,7 +42,7 @@ export const ActionPesquisaPrecoProdutoGrupoSubGrupo = () => {
       const response = await get(`/marcasLista`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, }
+    { enabled: true, staleTime: 5 * 60 * 1000, }
   );
 
 
@@ -55,7 +53,7 @@ export const ActionPesquisaPrecoProdutoGrupoSubGrupo = () => {
       const response = await get(`/listaEmpresaComercial?idMarca=${marcaSelecionada}`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, }
+    { enabled: Boolean(marcaSelecionada), staleTime: 5 * 60 * 1000, }
   );
 
 
@@ -65,7 +63,7 @@ export const ActionPesquisaPrecoProdutoGrupoSubGrupo = () => {
       const response = await get(`/grupo-produto`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, }
+    { enabled: true, staleTime: 5 * 60 * 1000, }
   );
 
 
@@ -75,7 +73,7 @@ export const ActionPesquisaPrecoProdutoGrupoSubGrupo = () => {
       const response = await get(`/subgrupo-produto?idGrupo=${grupoSelecionado}`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, }
+    { enabled: Boolean(grupoSelecionado), staleTime: 5 * 60 * 1000, }
   );
 
 
@@ -85,7 +83,7 @@ export const ActionPesquisaPrecoProdutoGrupoSubGrupo = () => {
       const response = await get(`/fornecedor-produto`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, }
+    { enabled: true, staleTime: 5 * 60 * 1000, }
   );
 
 

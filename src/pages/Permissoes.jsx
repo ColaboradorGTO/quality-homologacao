@@ -12,6 +12,7 @@ import { useEditarPermissaoUsuario } from "../componets/ActionPermissoes/hooks/u
 import { AiOutlineClear } from "react-icons/ai";
 import { Menu } from "primereact/menu";
 import { Button } from "primereact/button";
+import {  Departamentos } from '../../parceiro.json';
 
 export const Permissoes = ({}) => {
     const {
@@ -51,6 +52,7 @@ export const Permissoes = ({}) => {
     const [selectedModule, setSelectedModule] = useState(null)
     const [moduloUsuario, setModuloUsuario] = useState(null);
     const [empresaSelecionada, setEmpresaSelecionada] = useState('');
+    const [departamentoSelecionado, setDepartamentoSelecionado] = useState('');
     const navigate = useNavigate();
     const menuLeft = useRef(null);
 
@@ -263,12 +265,12 @@ export const Permissoes = ({}) => {
                                     </div>
 
                                     <Select
-                                        options={dadosFuncionarios?.map((item) => ({
-                                            value: item.IDFUNCIONARIO,
-                                            label: `${item.NOLOGIN} - ${item.NOFUNCIONARIO} `
+                                        options={Departamentos?.map((item) => ({
+                                            value: item.label,
+                                            label: item.value
                                         }))}
-                                        value={funcionarioSelecionado}
-                                        onChange={(e) => setFuncionarioSelecionado(e)}
+                                        value={departamentoSelecionado}
+                                        onChange={(e) => setDepartamentoSelecionado(e)}
                                     />
                                 
                                 </div>

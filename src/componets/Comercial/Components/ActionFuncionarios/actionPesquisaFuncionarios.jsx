@@ -43,7 +43,7 @@ export const ActionPesquisaFuncionario = ({ usuarioLogado }) => {
       const response = await get(`/listaEmpresasIformatica`);
       return response.data;
     },
-    { staleTime: 60 * 60 * 1000, }
+    { enabled: true, staleTime: 60 * 60 * 1000, }
   );
 
 

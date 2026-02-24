@@ -3,7 +3,7 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { get, post, put } from "../../../api/funcRequest";
-import { useQuery } from "react-query";
+
 
 export const useEditarPermissaoUsuario = () => {
   const [moduloSelecionado, setModuloSelecionado] = useState('');

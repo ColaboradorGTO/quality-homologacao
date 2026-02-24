@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from "react"
+import React, { Fragment, useState } from "react"
 import { ActionListaProductoPreco } from "./actionListaProdutosPreco";
 import { InputSelectAction } from "../../../Inputs/InputSelectAction";
 import { ActionMain } from "../../../Actions/actionMain";
@@ -20,7 +20,7 @@ export const ActionPesquisaProductoPreco = () => {
       const response = await get(`/marcasLista`);
       return response.data;
     },
-    { staleTime: 60 * 60 * 1000, }
+    { enabled: true, staleTime: 60 * 60 * 1000, }
   );
 
   const { data: dadosEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas } = useQuery(
@@ -29,15 +29,9 @@ export const ActionPesquisaProductoPreco = () => {
       const response = await get(`/listaEmpresaComercial?idMarca=${marcaSelecionada}`);
       return response.data;
     },
-    { staleTime: 60 * 60 * 1000, }
+    { enabled: Boolean(marcaSelecionada), staleTime: 60 * 60 * 1000, }
   );
 
-  useEffect(() => {
-    if (marcaSelecionada) {
-      refetchEmpresas();
-    }
-    refetchMarcas()
-  }, [marcaSelecionada, refetchEmpresas])
 
   const fetchListaProdutos = async () => {
     const urlBase = `/lista-produtos?idEmpresa=${empresaSelecionada}`;
@@ -73,7 +67,7 @@ export const ActionPesquisaProductoPreco = () => {
   };
 
   const { data: dadosProdutos = [], error: errorPrdoutos, isLoading: isLoadingProdutos, refetch: refetchListaProdutos } = useQuery(
-    ['produtos',],
+    ['lista-produtos',],
     () => fetchListaProdutos(),
     { enabled: false, staleTime: 60 * 60 * 1000 }
   );

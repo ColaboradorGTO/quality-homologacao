@@ -40,26 +40,20 @@ export const ActionPesquisaRotatividade = () => {
       const response = await get(`/marcasLista`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, }
+    { enabled: true, staleTime: 60 * 60 * 1000, }
   );
   
-     const { data: dadosEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresa, refetch: refetchEmpresa } = useQuery(
+  const { data: dadosEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresa, refetch: refetchEmpresa } = useQuery(
     'listaEmpresaComercial',
     async () => {
       const response = await get(`/listaEmpresaComercial?idMarca=${marcaSelecionada}`);
       return response.data;
     },
 
-    { enabled : Boolean(marcaSelecionada),  staleTime: 5 * 60 * 1000, }
+    { enabled: Boolean(marcaSelecionada),  staleTime: 60 * 60 * 1000, }
 
   );
 
-  useEffect(() => {
-    if (marcaSelecionada) {
-      refetchEmpresa();
-      setEmpresaSelecionada('');
-    }
-  }, [marcaSelecionada, refetchEmpresa]);
 
   const { data: dadosFornecedor = [], error: errorFornecedor, isLoading: isLoadingFornecedor, refetch: refetchFornecedor } = useQuery(
     'parceiro-negocio',
@@ -67,7 +61,7 @@ export const ActionPesquisaRotatividade = () => {
       const response = await get(`/parceiro-negocio`);
       return response.data;
     },
-    { staleTime: 60 * 60 * 1000, }
+    { enabled: true, staleTime: 60 * 60 * 1000, }
   );
   
   const { data: dadosGrupo = [], error: errorGrupo, isLoading: isLoadingGrupo, refetch: refetchGrupo } = useQuery(
@@ -76,7 +70,7 @@ export const ActionPesquisaRotatividade = () => {
       const response = await get(`/listaProdutoSap`);
       return response.data;
     },
-    { staleTime: 60 * 60 * 1000, }
+    { enabled: true, staleTime: 60 * 60 * 1000, }
   );
 
   const { data: dadosGrade = [], error: errorGrade, isLoading: isLoadingGrade, refetch: refetchGrade } = useQuery(
@@ -85,7 +79,7 @@ export const ActionPesquisaRotatividade = () => {
       const response = await get(`/listaGrade?idGrupo=${grupoSelecionado}`);
       return response.data;
     },
-    { staleTime: 60 * 60 * 1000, }
+    { enabled: Boolean(grupoSelecionado), staleTime: 60 * 60 * 1000, }
   );
 
 

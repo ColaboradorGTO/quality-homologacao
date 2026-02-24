@@ -53,7 +53,7 @@ export const ActionPesquisaVendasRelatorio = () => {
       const response = await get(`/marcasLista`);
       return response.data;
     },
-    { staleTime: 60 * 60 * 1000, }
+    { enabled: true, staleTime: 60 * 60 * 1000, }
   );
 
 
@@ -63,7 +63,7 @@ export const ActionPesquisaVendasRelatorio = () => {
       const response = await get(`/listaEmpresaComercial?idMarca=${marcaSelecionada}`);
       return response.data;
     },
-    { staleTime: 60 * 60 * 1000, }
+    { enabled: Boolean(marcaSelecionada), staleTime: 60 * 60 * 1000, }
   );
 
 
@@ -73,7 +73,7 @@ export const ActionPesquisaVendasRelatorio = () => {
       const response = await get(`/grupo-produto`);
       return response.data;
     },
-    { staleTime: 60 * 60 * 1000, }
+    { enabled: true, staleTime: 60 * 60 * 1000, }
   );
 
 
@@ -83,7 +83,7 @@ export const ActionPesquisaVendasRelatorio = () => {
       const response = await get(`/subgrupo-produto?idGrupo=${grupoSelecionado}`);
       return response.data;
     },
-    { staleTime: 60 * 60 * 1000, }
+    { enabled: Boolean(grupoSelecionado), staleTime: 60 * 60 * 1000, }
   );
 
 
@@ -93,17 +93,17 @@ export const ActionPesquisaVendasRelatorio = () => {
       const response = await get(`/lista-fornecedor-produto`);
       return response.data;
     },
-    { staleTime: 60 * 60 * 1000, }
+    { enabled: true, staleTime: 60 * 60 * 1000, }
   );
 
 
   const { data: dadosColaborador = [], error: errorColaborador, isLoading: isLoadingColaborador, refetch: refetchColaborador } = useQuery(
-    'funcionarioRelatorio',
+    'funcionario-relatorio',
     async () => {
-      const response = await get(`/funcionarioRelatorio?idEmpresa=${empresaSelecionada}`);
+      const response = await get(`/funcionario-relatorio?idEmpresa=${empresaSelecionada}`);
       return response.data;
     },
-    { staleTime: 60 * 60 * 1000, }
+    { enabled: Boolean(empresaSelecionada), staleTime: 60 * 60 * 1000, }
   );
 
 
@@ -113,7 +113,7 @@ export const ActionPesquisaVendasRelatorio = () => {
       const response = await get(`/lista-marca-produto?idSubGrupo=${subGrupoSelecionado}`);
       return response.data;
     },
-    { staleTime: 60 * 60 * 1000, }
+    { enabled: Boolean(subGrupoSelecionado), staleTime: 60 * 60 * 1000, }
   );
 
 
@@ -271,7 +271,7 @@ export const ActionPesquisaVendasRelatorio = () => {
 
   const { data: dadosEstoqueVendasPosicionamento = [], error: erroVendasEstoque, isLoading: isLoadingVendasEstoque, refetch: refetchVendasEstoque } = useQuery(
     'vendas-posicionamento-estoque',
-    () => fetchVendasEstoque(empresaSelecionada, dataPesquisaInicio, dataPesquisaFim, produtoPesquisado, fornecedorSelecionado, grupoSelecionado, subGrupoSelecionado, marcaSelecionada, currentPage, pageSize),
+    () => fetchVendasEstoque(),
     { enabled: false, staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
   );
 
@@ -359,11 +359,8 @@ export const ActionPesquisaVendasRelatorio = () => {
   };
 
   const handleEmpresaChange = (selectedOptions) => {
-
     const values = selectedOptions.map((option) => option.value);
     setEmpresaSelecionada(values);
-
-
   }
 
   const handleGrupoChange = (selectedOptions) => {
@@ -661,5 +658,3 @@ export const ActionPesquisaVendasRelatorio = () => {
     </Fragment>
   )
 }
-
-// TOTAL DE LINHAS 2203

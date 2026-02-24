@@ -123,7 +123,7 @@ export const ActionPesquisaVendasPeriodo = () => {
   };
 
   const { data: dadosVendasPeriodo = [], error: errorVendasPeriodo, isLoading: isLoadingVendasPeriodo, refetch: refetchVendasPeriodo } = useQuery(
-    ['vendas-produtos',],
+    ['vendasProdutos',],
     () => fetchVendasPeriodo(),
     { enabled: false, }
   );
@@ -166,7 +166,7 @@ export const ActionPesquisaVendasPeriodo = () => {
 
 
   const { data: dadosVendasConsolidadas = [], error: errorVendasConsolidadas, isLoading: isLoadingVendasConsolidadas, refetch: refetchVendasConsolidadas } = useQuery(
-    ['vendas-produtos-consolidado',],
+    ['vendasProdutosConsolidado',],
     () => fetchVendasConsolidadas(),
     { enabled: false, }
   );

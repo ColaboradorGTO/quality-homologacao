@@ -49,7 +49,7 @@ export const ActionPesquisaEstoqueProdutos = () => {
       return response.data;
     },
     
-    {  staleTime: 60 * 60 * 1000, }
+    { enabled: true, staleTime: 60 * 60 * 1000, }
     
   );
   
@@ -60,7 +60,7 @@ export const ActionPesquisaEstoqueProdutos = () => {
       return response.data;
     },
     
-    {  staleTime: 60 * 60 * 1000, }
+    { enabled: Boolean(grupoSelecionado), staleTime: 60 * 60 * 1000, }
     
   );
   
@@ -71,7 +71,7 @@ export const ActionPesquisaEstoqueProdutos = () => {
       return response.data;
     },
     
-    {  staleTime: 60 * 60 * 1000, }
+    { enabled: true, staleTime: 60 * 60 * 1000, }
     
   );
 
@@ -81,7 +81,7 @@ export const ActionPesquisaEstoqueProdutos = () => {
       const response = await get(`/lista-marca-produto?idSubGrupo=${subGrupoSelecionado}`);
       return response.data;
     },
-    {  staleTime: 60 * 60 * 1000, }
+    { enabled: Boolean(subGrupoSelecionado), staleTime: 60 * 60 * 1000, }
   );
 
 
