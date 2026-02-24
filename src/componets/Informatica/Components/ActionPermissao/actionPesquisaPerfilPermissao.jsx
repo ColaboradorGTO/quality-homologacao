@@ -94,13 +94,13 @@ export const ActionPesquisaPerfilPermissao = ({ usuarioLogado, ID }) => {
   const { data: dadosFuncionarios = [], error: errorFuncionario, isLoading: isLoadingFuncionario, refetch: refetchFuncionarios } = useQuery(
     ['funcionarios-loja-ativos', empresaSelecionada],
     () => fetchListaFuncionarios(),
-    { enabled: false, staleTime: Infinity, cacheTime: Infinity, }
+    { enabled: Boolean(empresaSelecionada), staleTime: Infinity, cacheTime: Infinity, }
   );
 
 
   const fetchListaPermissoes = async () => {
 
-    const urlBase = `/menus-usuario-excecao?idUsuario=${usuarioClonado}`;
+    const urlBase = `/menus-usuario-excecao?idUsuario=${usuarioOrigem}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
@@ -134,14 +134,14 @@ export const ActionPesquisaPerfilPermissao = ({ usuarioLogado, ID }) => {
   };
 
   const { data: dadosPermissoes = [], error: errorPermissoes, isLoading: isLoadingPermissoes, refetch } = useQuery(
-    ['menus-usuario-excecao', ],
+    ['menus-usuario-excecao', usuarioOrigem],
     () => fetchListaPermissoes(),
-    { enabled: true, staleTime: 60 * 60 * 1000, }
+    { enabled: Boolean(usuarioOrigem), staleTime: 60 * 60 * 1000, }
   );
 
 
   const handleClick = () => {
-    if (usuarioSelecionado && usuarioClonado) {
+    if (usuarioOrigem && usuarioDestino) {
       setCurrentPage(prevPage => prevPage + 1);
       setTabelaVisivel(true);
       refetch();
@@ -159,7 +159,7 @@ export const ActionPesquisaPerfilPermissao = ({ usuarioLogado, ID }) => {
   const {
     handleSubmit
   } = useCopiarPermissaoUsuario({ selectedItems, usuarioClonado, usuarioSelecionado, usuarioLogado, usuarioOrigem, usuarioDestino });
-  
+  console.log(usuarioOrigem, 'usuarioOrigem')
   const handleClonar = () => {
     if(selectedItems.length === 0) {
       Swal.fire({
@@ -205,8 +205,8 @@ export const ActionPesquisaPerfilPermissao = ({ usuarioLogado, ID }) => {
         ]}
 
         labelSelectEmpresa={"Origem da Permissão"}
-        valueSelectEmpresa={usuarioClonado}
-        onChangeSelectEmpresa={(e) => setUsuarioClonado(String(e.value ?? ""))}
+        valueSelectEmpresa={console.log(usuarioOrigem)}
+        onChangeSelectEmpresa={(e) => setUsuarioOrigem(String(e.value ?? ""))}
 
         InputSelectGrupoComponent={InputSelectAction}
         optionsGrupos={[
@@ -217,8 +217,8 @@ export const ActionPesquisaPerfilPermissao = ({ usuarioLogado, ID }) => {
           }))
         ]}
         labelSelectGrupo={"Destino da Permissão"}
-        valueSelectGrupo={usuarioSelecionado}
-        onChangeSelectGrupo={(e) => setUsuarioSelecionado(String(e.value ?? ""))}
+        valueSelectGrupo={usuarioDestino}
+        onChangeSelectGrupo={(e) => setUsuarioDestino(String(e.value ?? ""))}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}
@@ -233,27 +233,24 @@ export const ActionPesquisaPerfilPermissao = ({ usuarioLogado, ID }) => {
         styleCadastro={{ display: btnVisivel ? 'block' : 'none' }}
       />
 
-      {tabelaVisivel && (
+      
 
-        <ActionListaPerfilPermissao
-          dadosPermissoes={dadosPermissoes}
-          usuarioSelecionado={usuarioSelecionado}
-          funcionarioClonarId={funcionarioClonarId}
-          permissoesSelecionadas={permissoesSelecionadas}
-          setPermissoesSelecionadas={setPermissoesSelecionadas}
-          handleClick={handleClick}
-          optionsModulos={optionsModulos}
-          usuarioLogado={usuarioLogado}
-          usuarioClonado={usuarioClonado}
-          setusUarioClonado={setUsuarioClonado}
-          setBtnVisivel={setBtnVisivel}
-          btnVisivel={btnVisivel}
-          selectedItems={selectedItems}
-          setSelectedItems={setSelectedItems}
-          handleClonar={handleClonar}
-        />
+      <ActionListaPerfilPermissao
+        dadosPermissoes={dadosPermissoes}
+        usuarioSelecionado={usuarioSelecionado}
+        funcionarioClonarId={funcionarioClonarId}
+        permissoesSelecionadas={permissoesSelecionadas}
+        setPermissoesSelecionadas={setPermissoesSelecionadas}
+        handleClick={handleClick}
+        optionsModulos={optionsModulos}
+        usuarioLogado={usuarioLogado}
+        setBtnVisivel={setBtnVisivel}
+        btnVisivel={btnVisivel}
+        selectedItems={selectedItems}
+        setSelectedItems={setSelectedItems}
+        handleClonar={handleClonar}
+      />
 
-      )}
 
     </Fragment>
   )

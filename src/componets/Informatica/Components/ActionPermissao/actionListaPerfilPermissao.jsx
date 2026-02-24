@@ -8,8 +8,6 @@ import * as XLSX from 'xlsx';
 import HeaderTable from "../../../Tables/headerTable";;
 import { Checkbox } from "primereact/checkbox";
 import { useCopiarPermissaoUsuario } from "./hooks/useEditarPermissao";
-import { ButtonType } from "../../../Buttons/ButtonType";
-import { FaRegClone } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { ActionUpdatePermissaoModal } from "./ActionUpdatePermissao/actionUpdatePermissaoModal";
 
@@ -17,11 +15,6 @@ import { ActionUpdatePermissaoModal } from "./ActionUpdatePermissao/actionUpdate
 export const ActionListaPerfilPermissao = ({
   dadosPermissoes,
   handleClick,
-  usuarioClonado,
-  setUsuarioClonado,
-  usuarioSelecionado,
-  handleClonar,
-  optionsModulos,
   usuarioLogado,
   btnVisivel,
   setBtnVisivel,
@@ -35,10 +28,6 @@ export const ActionListaPerfilPermissao = ({
   const [rowState, setRowState] = useState(10)
   const [rowSelection, setRowSelection] = useState(null);
   const [selectAllChecked, setSelectAllChecked] = useState(false);
-
-  const {
-    handleSubmit
-  } = useCopiarPermissaoUsuario({ selectedItems, usuarioClonado, usuarioSelecionado, usuarioLogado });
 
   useEffect(() => {
     const itensSelecionaveis = dados.filter(item => item.IDPERFIL)
