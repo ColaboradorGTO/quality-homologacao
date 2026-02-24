@@ -31,7 +31,6 @@ export const DashBoardComercial = () => {
   const selectedModule = JSON.parse(storedModule);
   const [menuSelected, setMenuSelected] = useState(null);
 
-
   const navigate = useNavigate();
 
   useEffect(() => {
