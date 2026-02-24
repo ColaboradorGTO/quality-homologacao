@@ -1,17 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Swal from "sweetalert2";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import { post, get } from "../../../../../api/funcRequest";
-import { useQuery } from "react-query";
 
 export const useCopiarPermissaoUsuario = ({
-  usuarioOrigemId,
-  usuarioDestinoId,
-  permissoesSelecionadas,
-  usuarioClonado,
   selectedItems,
-  usuarioSelecionado,
   setSelectedItems,
   usuarioLogado,
   usuarioOrigem, 
@@ -56,17 +49,18 @@ export const useCopiarPermissaoUsuario = ({
   };
 
   const handleSubmit = async () => {
-    // if (optionsModulos[0]?.ALTERAR === 'False') {
-    //   Swal.fire({
-    //     icon: 'error',
-    //     title: 'Atenção',
-    //     text: 'Você não tem permissão para alterar as permissões de usuário.',
-    //     showConfirmButton: false,
-    //     timer: 1500
-    //   });
-    //   return;
-    // }
-    console.log(usuarioDestino, 'usuarioDestino')
+    if (optionsModulos[0]?.ALTERAR === 'False') {
+      Swal.fire({
+        icon: 'error',
+        title: 'Atenção',
+        html: `${usuarioLogado?.NOFUNCIONARIO} Você não tem permissão para alterar as permissões de usuário.`,
+        showConfirmButton: false,
+        timer: 1500
+      });
+      return;
+    }
+
+
     if (!usuarioDestino) {
       Swal.fire({
         icon: 'error',

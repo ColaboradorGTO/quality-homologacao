@@ -158,8 +158,8 @@ export const ActionPesquisaPerfilPermissao = ({ usuarioLogado, ID }) => {
 
   const {
     handleSubmit
-  } = useCopiarPermissaoUsuario({ selectedItems, usuarioClonado, usuarioSelecionado, usuarioLogado, usuarioOrigem, usuarioDestino });
-  console.log(usuarioOrigem, 'usuarioOrigem')
+  } = useCopiarPermissaoUsuario({ selectedItems, usuarioClonado, usuarioSelecionado, usuarioLogado, optionsModulos, usuarioOrigem, usuarioDestino });
+  
   const handleClonar = () => {
     if(selectedItems.length === 0) {
       Swal.fire({
@@ -234,23 +234,13 @@ export const ActionPesquisaPerfilPermissao = ({ usuarioLogado, ID }) => {
       />
 
       
-
       <ActionListaPerfilPermissao
         dadosPermissoes={dadosPermissoes}
-        usuarioSelecionado={usuarioSelecionado}
-        funcionarioClonarId={funcionarioClonarId}
-        permissoesSelecionadas={permissoesSelecionadas}
-        setPermissoesSelecionadas={setPermissoesSelecionadas}
-        handleClick={handleClick}
-        optionsModulos={optionsModulos}
-        usuarioLogado={usuarioLogado}
         setBtnVisivel={setBtnVisivel}
         btnVisivel={btnVisivel}
         selectedItems={selectedItems}
         setSelectedItems={setSelectedItems}
-        handleClonar={handleClonar}
       />
-
 
     </Fragment>
   )
