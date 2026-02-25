@@ -11,6 +11,7 @@ import { FaRegFileAlt } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { mascaraCNPJ } from "../../../../utils/mascaraCNPJ";
 import { ActionAlvaraEmpresaModal } from "./ActionEditarAlvara/actionAlvaraEmpresaModal";
+import { get } from "../../../../api/funcRequest";
 
 export const ActionListaAlvaras = ({
     dadosAlvaraEmpresa,
@@ -18,13 +19,12 @@ export const ActionListaAlvaras = ({
     optionsModulos,
     usuarioLogado,
     refetchAlvaraEmpresa,
-    refetchAlvaraSelecionado,
-    dadosAlvaraEmpresaSelecionada,
-    setIdEmpresaSelecionada,
 }) => {
+    
     const [globalFilterValue, setGlobalFilterValue] = useState('');
     const [rowSelection, setRowSelection] = useState(null);
     const [modalAlvaraEmpresa, setModalAlvaraEmpresa] = useState(false);
+    const [dadosAlvaraEmpresaSelecionada, setDadosAlvaraEmpresaSelecionada] = useState(null);
     const dataTableRef = useRef();
 
     const onGlobalFilterChange = (e) => {
@@ -354,8 +354,7 @@ export const ActionListaAlvaras = ({
     const handleClickAjusteAlvara = (row) => {
         if (optionsModulos[0]?.ALTERAR === 'True') {
             if (row && row.IDEMPRESA) {
-                setIdEmpresaSelecionada(row.IDEMPRESA)
-                setModalAlvaraEmpresa(true);
+                handleEditAlvaraEmpresa(row.IDEMPRESA)
             }
         } else {
             Swal.fire({
@@ -369,6 +368,30 @@ export const ActionListaAlvaras = ({
             });
         }
     };
+
+    const handleEditAlvaraEmpresa = async (IDEMPRESA) => {
+        try {
+            const response = await get(`/alvaras-empresa-detalhe?idFilial=${IDEMPRESA}`)
+            if (response.data && response.data.length > 0) {
+                setDadosAlvaraEmpresaSelecionada(response.data)
+                setModalAlvaraEmpresa(true)
+                return response.data;
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Atenção',
+                    text: 'Nenhum dado encontrado para o alvará selecionado.',
+                    customClass: {
+                        container: 'custom-swal',
+                    },
+                    timer: 3000
+                })
+                return;
+            }
+        } catch (error) {
+            console.log(error, "não foi possivel pegar os dados da tabela ")
+        }
+    }
 
     return (
 
@@ -433,7 +456,7 @@ export const ActionListaAlvaras = ({
                 usuarioLogado={usuarioLogado}
                 optionsModulos={optionsModulos}
                 refetchAlvaraEmpresa={refetchAlvaraEmpresa}
-                refetchAlvaraSelecionado={refetchAlvaraSelecionado}
+                refetchAlvaraSelecionado={handleEditAlvaraEmpresa}
             />
 
         </Fragment>

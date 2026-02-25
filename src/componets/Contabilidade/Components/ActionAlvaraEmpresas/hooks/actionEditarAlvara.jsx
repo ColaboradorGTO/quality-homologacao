@@ -26,7 +26,7 @@ export const useEditarAlvara = ({
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
             usuarioIP = ipWhoisData?.ip;
         } catch (error) {
             console.error("Erro ao buscar IP via ipwho.is:", error);
@@ -48,7 +48,6 @@ export const useEditarAlvara = ({
         'options-status-alvara',
         async () => {
             const response = await get(`/status-alvara`);
-            console.log(response, 'response.data status alvara')
             return response.data;
         },
         { enabled: true, staleTime: 60 * 60 * 1000, }

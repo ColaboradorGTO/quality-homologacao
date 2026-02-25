@@ -20,11 +20,11 @@ export const ActionPesquisaProductoPreco = () => {
 
       const urlApi = `/buscar-produtos?descProd=${produto}`;
       const response = await get(urlApi);
-      
+
       if (response.data.length && response.data.length === pageSize) {
         let allData = [...response.data];
         animacaoCarregamento(`Carregando... Página ${currentPage} de ${response.data.length}`, true);
-  
+
         async function fetchNextPage(currentPage) {
           try {
             currentPage++;
@@ -40,11 +40,11 @@ export const ActionPesquisaProductoPreco = () => {
             throw error;
           }
         }
-  
+
         await fetchNextPage(currentPage);
         return allData;
       } else {
-       
+
         return response.data;
       }
     } catch (error) {
@@ -55,14 +55,13 @@ export const ActionPesquisaProductoPreco = () => {
     }
   };
 
-  
+
   const { data: dadosProdutos = [], error: errorProdutos, isLoading: isLoadingProdutos, refetch: refetchListaProdutos } = useQuery(
     ['buscar-produtos', produto, currentPage, pageSize],
-      fetchListaProdutos,
+    fetchListaProdutos,
     { enabled: Boolean(produto.length > 5), staleTime: 5 * 60 * 1000 },
   );
 
-  // console.log('dadosProdutos:', dadosProdutos);
 
   const handleClick = () => {
     if (produto.length > 5) {
@@ -107,7 +106,7 @@ export const ActionPesquisaProductoPreco = () => {
         placeHolderInputFieldComponent={'Código de Barras / Nome Produto'}
         valueInputField={produto}
         onChangeInputField={(e) => setProduto(e.target.value)}
-      
+
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}

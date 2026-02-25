@@ -17,7 +17,6 @@ export const ActionPesquisaAlvaraEmpresa = ({ usuarioLogado, ID }) => {
     const [tipoAlvara, setTipoAlvara] = useState('');
     const [tipoAvaraAplicado, setTipoAvaraAplicado] = useState('');
     const [tabelaVisivel, setTabelaVisivel] = useState(false);
-    const [idEmpresaSelecionada, setIdEmpresaSelecionada] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(1000);
 
@@ -104,17 +103,6 @@ export const ActionPesquisaAlvaraEmpresa = ({ usuarioLogado, ID }) => {
         { enabled: true, staleTime: 5 * 60 * 1000 },
     );
 
-    const {
-        data: dadosAlvaraEmpresaSelecionada = [], refetch: refetchAlvaraSelecionado, isLoading: isLoadingAlvaraSelecionado } = useQuery(
-            ['vinculo-alvara', idEmpresaSelecionada],
-            async () => {
-                const response = await get(
-                    `/alvaras-empresa-detalhe?idFilial=${idEmpresaSelecionada}`
-                );
-                return response.data;
-            },
-            { enabled: !!idEmpresaSelecionada, }
-        );
 
     const optionsUf = [
         { value: '', label: 'Todos' },
@@ -219,11 +207,7 @@ export const ActionPesquisaAlvaraEmpresa = ({ usuarioLogado, ID }) => {
                     dadosAlvaraEmpresa={dadosAlvaraEmpresa}
                     tipoAvaraAplicado={tipoAvaraAplicado}
                     optionsModulos={optionsModulos}
-                    dadosAlvaraEmpresaSelecionada={dadosAlvaraEmpresaSelecionada}
-                    idEmpresaSelecionada={idEmpresaSelecionada}
                     refetchAlvaraEmpresa={refetchAlvaraEmpresa}
-                    refetchAlvaraSelecionado={refetchAlvaraSelecionado}
-                    setIdEmpresaSelecionada={setIdEmpresaSelecionada}
                     usuarioLogado={usuarioLogado}
                 />
             )}

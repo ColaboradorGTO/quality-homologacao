@@ -14,7 +14,7 @@ export const useEditarArquivoAlvara = ({
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
             usuarioIP = ipWhoisData?.ip;
         } catch (error) {
             console.error("Erro ao buscar IP via ipwho.is:", error);
@@ -31,7 +31,7 @@ export const useEditarArquivoAlvara = ({
         setIpUsuario(usuarioIP);
         return usuarioIP;
     };
-
+    
     const onEditarArquivo = async (row, arquivos) => {
         if (optionsModulos[0]?.ALTERAR !== 'True') {
             Swal.fire({

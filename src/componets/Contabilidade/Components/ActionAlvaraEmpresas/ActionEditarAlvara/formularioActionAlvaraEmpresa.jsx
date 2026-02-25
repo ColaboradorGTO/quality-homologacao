@@ -139,7 +139,7 @@ export const FormularioActionAlvaraEmpresa = ({
                                         name="CNPJ"
                                         type="text"
                                         readOnly={true}
-                                        value={mascaraCNPJ(dadosAlvaraEmpresaSelecionada[0]?.NUCNPJ)}
+                                        value={mascaraCNPJ(String(dadosAlvaraEmpresaSelecionada[0]?.NUCNPJ))}
                                         errors={errors}
                                         clearErrors={clearErrors}
                                     />
