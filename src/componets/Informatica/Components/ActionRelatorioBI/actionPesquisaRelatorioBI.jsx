@@ -10,11 +10,21 @@ import Swal from "sweetalert2";
 
 export const ActionPesquisaRelatorioBI = ({ usuarioLogado, ID }) => {
   const [modalVisivel, setModalVisivel] = useState(false);
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
+  
+  useEffect(() => {
+    const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
+    if (menuSalvo) {
+      const menuParsed = JSON.parse(menuSalvo);
+      setMenuFilhoAtual(menuParsed);
+    }
+  }, []);
+  
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
-    'menus-usuario-excecao',
+    ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
-      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${ID}`);
+      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
 
       return response.data;
     },
@@ -28,7 +38,7 @@ export const ActionPesquisaRelatorioBI = ({ usuarioLogado, ID }) => {
       return response.data;
     },
     {
-      staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000
+      staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000
     }
   );
 

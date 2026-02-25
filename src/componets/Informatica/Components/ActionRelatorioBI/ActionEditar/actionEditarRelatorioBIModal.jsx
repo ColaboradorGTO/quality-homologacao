@@ -1,29 +1,9 @@
-import React, { Fragment, useEffect, useState } from "react"
+import React, { Fragment  } from "react"
 import Modal from 'react-bootstrap/Modal';
 import { HeaderModal } from "../../../../Modais/HeaderModal/HeaderModal";
 import { FormularioEditarRelatorioBI } from "./formulario";
 
 export const ActionEditarRelatorioBIModal = ({ show, handleClose, dadosRelatorio, refetch, dadosRelatorios, optionModulos, usuarioLogado }) => {
-  const [statusSelecionado, setStatusSelecionado] = useState('');
-  const [descricao, setDescricao] = useState('');
-  const optionsStatus = [
-    { value: "True", label: "Ativo" },
-    { value: "False", label: "Inativo" },
-  ]
-
-  useEffect(() => {
-    if (dadosRelatorios && dadosRelatorios[0]?.DSRELATORIOBI) {
-      setDescricao(dadosRelatorios[0]?.DSRELATORIOBI)
-    }
-  }, [dadosRelatorios])
-
-  useEffect(() => {
-    if (dadosRelatorios && dadosRelatorios[0]?.STATIVO) {
-      setStatusSelecionado(dadosRelatorios[0]?.STATIVO)
-    }
-
-  }, [dadosRelatorios])
-
 
   return (
 

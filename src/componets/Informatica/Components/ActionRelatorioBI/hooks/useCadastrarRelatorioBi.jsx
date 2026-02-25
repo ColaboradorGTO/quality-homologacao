@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import Swal from "sweetalert2";
 import { post } from "../../../../../api/funcRequest";
 import axios from "axios";
@@ -10,19 +10,26 @@ export const useCadastrarRelatorioBi = ({ handleClose, refetch, optionsModulos, 
   const [ipUsuario, setIpUsuario] = useState('');
 
   const getIPUsuario = async () => {
+    let usuarioIP = null;
+
     try {
-      const response = await axios.get('https://api.ipify.org?format=json9');
-      if (response.data && response.data.ip) {
-        return response.data.ip;
-      }
-      throw new Error("Resposta inválida do ipfy.org");
+      const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+      usuarioIP = ipWhoisData?.ip;
     } catch (error) {
-      const responseIP2 = await axios.get('https://api.ipwho.org/me');
-      return responseIP2.data?.data?.ip;
-
+      console.error("Erro ao buscar IP via ipwho.is:", error);
     }
-  };
 
+    if (!usuarioIP) {
+      try {
+        const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+        usuarioIP = ipifyData?.ip;
+      } catch (error) {
+        console.error("Erro ao buscar IP via ipify.org:", error);
+      }
+    }
+    setIpUsuario(usuarioIP);
+    return usuarioIP;
+  };
 
   const optionsStatus = [
     { value: "True", label: "Ativo" },
@@ -34,29 +41,24 @@ export const useCadastrarRelatorioBi = ({ handleClose, refetch, optionsModulos, 
     if (optionsModulos?.CRIAR === 'False') {
       Swal.fire({
         title: 'Atenção',
-        text: 'Você não tem permissão para cadastrar Relatório BI.',
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para cadastrar Relatório BI.`,
         icon: 'warning',
-        confirmButtonText: 'OK'
-      });
-    }
-
-    if (!data.descricaoRelatorio || !statusSelecionado) {
-      Swal.fire({
-        position: 'center',
-        icon: 'error',
-        title: 'Preencha todos os campos!',
+        confirmButtonText: 'OK',
         customClass: {
           container: 'custom-swal',
         },
         showConfirmButton: false,
-        timer: 1500
+        timer: 5000
       });
       return;
     }
+
+
     const postData = {
       DSRELATORIOBI: data.descricaoRelatorio,
       STATIVO: statusSelecionado
     }
+
     try {
 
       const response = await post('/createRelatorioInformaticaBI', postData)
@@ -73,40 +75,31 @@ export const useCadastrarRelatorioBi = ({ handleClose, refetch, optionsModulos, 
       })
       const textDados = JSON.stringify(postData);
       let textoFuncao = 'INFORMATICA/CRIANDO RELATORIO BI';
-
       const ipUsuario = await getIPUsuario();
 
       const createData = {
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario,
+        IP: ipUsuario || 'IP não disponível',
       };
 
-      const responsePost = await post('/log-web', createData);
+      await post('/log-web', createData);
 
       setStatusSelecionado('');
       refetch();
       handleClose();
-      return responsePost.data;
+      return response.data;
 
     } catch (error) {
-
-      const postData = {
-        DSRELATORIOBI: data.descricaoRelatorio,
-        STATIVO: statusSelecionado
-      }
-
       const textDados = JSON.stringify(postData);
       let textoFuncao = 'INFORMATICA/ERRO AO CRIAR RELATORIO BI';
-
       const ipUsuario = await getIPUsuario();
-
       const createData = {
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario,
+        IP: ipUsuario || 'IP não disponível',
       };
 
       const responsePost = await post('/log-web', createData);
@@ -119,11 +112,12 @@ export const useCadastrarRelatorioBi = ({ handleClose, refetch, optionsModulos, 
           container: 'custom-swal',
         },
         showConfirmButton: false,
-        timer: 1500
+        timer: 5000
       });
       return responsePost.data;
     }
   }
+  
   return {
     onSubmit,
     descricao,
