@@ -73,11 +73,11 @@ export const useCadastrarRelatorioBi = ({ handleClose, refetchListaRelatorio, op
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario,
+        IP: ipUsuario || 'IP não disponível',
       };
       
       await post('/log-web', createData);
-      
+
       Swal.fire({
         position: 'top-end',
         icon: 'success',
@@ -105,7 +105,7 @@ export const useCadastrarRelatorioBi = ({ handleClose, refetchListaRelatorio, op
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario,
+        IP: ipUsuario || 'IP não disponível',
       };
       
       const responsePost = await post('/log-web', createData);

@@ -120,7 +120,7 @@ export const useEditarRelatorioBi = ({
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario,
+                IP: ipUsuario || 'IP não disponível',
             };
     
             const responsePost = await post('/log-web', postData);
