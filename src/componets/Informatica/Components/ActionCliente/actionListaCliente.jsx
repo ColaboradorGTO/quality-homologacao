@@ -10,14 +10,14 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { useReactToPrint } from "react-to-print";
+import Swal from "sweetalert2";
 
 export const ActionListaCliente = ({ dadosCliente }) => {
   const [modalClienteVisivel, setModalClienteVisivel] = useState(false);
   const [dadosClienteSelecionado, setDadosClienteSelecionado] = useState([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
-  const [size] = useState('small');
-  const dataTableRef = useRef();
   const [rowSelection, setRowSelection] = useState(null);
+  const dataTableRef = useRef();
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -74,7 +74,7 @@ export const ActionListaCliente = ({ dadosCliente }) => {
       NUTELCELULAR: item.NUTELCELULAR,
       EEMAIL: item.EEMAIL,
       TPCLIENTE: item.TPCLIENTE,
-      STATIVO: item.STATIVO,
+      STATIVO: item.STATIVO == 'True' ? 'ATIVO' : 'INATIVO',
       IDCLIENTE: item.IDCLIENTE,
     }
   });
@@ -89,7 +89,7 @@ export const ActionListaCliente = ({ dadosCliente }) => {
     {
       field: 'DSNOMERAZAOSOCIAL',
       header: 'Nome',
-      body: row => <th>{row.DSNOMERAZAOSOCIAL}</th>,
+      body: row => <th style={{textTransform: 'uppercase'}}>{row.DSNOMERAZAOSOCIAL}</th>,
       sortable: true,
     },
     {
@@ -107,7 +107,7 @@ export const ActionListaCliente = ({ dadosCliente }) => {
     {
       field: 'EEMAIL',
       header: 'E-mail',
-      body: row => <th>{row.EEMAIL}</th>,
+      body: row => <th style={{textTransform: 'uppercase'}}>{row.EEMAIL}</th>,
       sortable: true,
     },
     {
@@ -121,8 +121,8 @@ export const ActionListaCliente = ({ dadosCliente }) => {
       header: 'Status',
       body: (
         (row) => (
-          <th style={{ color: row.STATIVO == 'True' ? 'blue' : 'red' }}>
-            {row.STATIVO == 'True' ? 'Ativo' : 'Inativo'}
+          <th style={{ color: row.STATIVO == 'ATIVO' ? 'blue' : 'red' }}>
+            {row.STATIVO}
           </th>
         )
       ),
@@ -158,9 +158,15 @@ export const ActionListaCliente = ({ dadosCliente }) => {
   const handleDetalhar = async (IDCLIENTE) => {
     try {
       const response = await get(`/lista-cliente?idCliente=${IDCLIENTE}`)
-      if (response.data) {
+      if (response.data && response.data.length > 0) {
         setDadosClienteSelecionado(response.data)
         setModalClienteVisivel(true)
+      } else {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Nenhum detalhe encontrado',
+          text: 'Não foi possível encontrar detalhes para o cliente selecionado.',
+        })
       }
     } catch (error) {
       console.log('Erro ao buscar detalhes do Cliente: ', error)
@@ -195,7 +201,7 @@ export const ActionListaCliente = ({ dadosCliente }) => {
             title="Lista de Clientes"
             value={dados}
             globalFilter={globalFilterValue}
-            size={size}
+            size="small"
             sortOrder={-1}
             paginator={true}
             rows={10}
@@ -219,9 +225,9 @@ export const ActionListaCliente = ({ dadosCliente }) => {
                 body={coluna.body}
                 footer={coluna.footer}
                 sortable={coluna.sortable}
-                headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+                headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '1rem' }}
                 footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
-                bodyStyle={{ fontSize: '0.8rem', border: '1px solid #e9e9e9' }}
+                bodyStyle={{ fontSize: '1rem', border: '1px solid #e9e9e9' }}
               />
             ))}
           </DataTable>

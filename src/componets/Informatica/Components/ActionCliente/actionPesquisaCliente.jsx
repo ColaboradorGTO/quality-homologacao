@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from "react"
+import React, { Fragment, useState } from "react"
 import { ButtonType } from "../../../Buttons/ButtonType";
 import { InputSelectAction } from "../../../Inputs/InputSelectAction";
 import { InputField } from "../../../Buttons/Input";
@@ -18,8 +18,6 @@ export const ActionPesquisaCliente = () => {
   const [dsCliente, setDsCliente] = useState('');
   const [tipoClienteSelecionado, setTipoClienteSelecionado] = useState('');
   const [statusSelecionado, setStatusSelecionado] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(1000);
 
   const { data: optionsMarcas = [], error: errorMarcas, isLoading: isLoadingMarcas } = useQuery(
     'marcasLista',
@@ -27,9 +25,8 @@ export const ActionPesquisaCliente = () => {
       const response = await get(`/marcasLista`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000 }
+    { staleTime: 60 * 60 * 1000 }
   );
-
 
   const { data: optionsEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas } = useQuery(
     ['listaEmpresaComercial', marcaSelecionada],
@@ -41,14 +38,8 @@ export const ActionPesquisaCliente = () => {
         return [];
       }
     },
-    { enabled: false, staleTime: 5 * 60 * 1000 }
+    { enabled: Boolean(marcaSelecionada), staleTime: 60 * 60 * 1000 }
   );
-  useEffect(() => {
-    if (marcaSelecionada) {
-      refetchEmpresas();
-    }
-  }, [marcaSelecionada, refetchEmpresas]);
-
 
   const fetchListaCliente = async () => {
     const urlBase = `/lista-cliente?idMarca=${marcaSelecionada}&idEmpresa=${empresaSelecionada}&descCliente=${dsCliente}&cpf=${cpfCnpj}&tpCliente=${tipoClienteSelecionado}&status=${statusSelecionado}`;
@@ -86,18 +77,15 @@ export const ActionPesquisaCliente = () => {
 
   const { data: dadosCliente = [], error: erroCliente, isLoading: isLoadingCliente, refetch: refetchListaCliente } = useQuery(
     'lista-cliente',
-    () => fetchListaCliente(marcaSelecionada, empresaSelecionada, dsCliente, cpfCnpj, tipoClienteSelecionado, statusSelecionado, currentPage, pageSize),
-    { enabled: false, staleTime: 5 * 60 * 1000 }
+    () => fetchListaCliente(),
+    { enabled: false, staleTime: 60 * 60 * 1000 }
   );
-
-  
 
   const handleChangeEmpresa = (e) => {
     const selectedEmpresa = optionsEmpresas.find(empresa => empresa.IDEMPRESA === e.value);
     setEmpresaSelecionadaNome(selectedEmpresa.NOFANTASIA);
     setEmpresaSelecionada(e.value);
   }
-
 
   const handleChangeMarca = (e) => {
     setMarcaSelecionada(e.value);
@@ -115,7 +103,6 @@ export const ActionPesquisaCliente = () => {
   }
 
   const handleClick = () => {
-    setCurrentPage(prevPage => prevPage + 1);
     refetchListaCliente();
     setTabelaVisivel(false)
   }

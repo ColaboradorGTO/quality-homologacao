@@ -18,8 +18,8 @@ export const ActionClienteModal = ({show, handleClose, dadosClienteSelecionado})
     >
 
       <HeaderModal
-        title={"Dados de Empresa"}
-        subTitle={"Atualização Diária dos PDVs da Empresa"}
+        title={"Clientes"}
+        subTitle={"Visualizar dados Clientes"}
         handleClose={handleClose}
       />
 
@@ -56,7 +56,7 @@ export const ActionClienteModal = ({show, handleClose, dadosClienteSelecionado})
                 type="text"
                 className="form-control input"
                 readOnly={true}
-                value={dadosClienteSelecionado[0]?.STATIVO}
+                value={dadosClienteSelecionado[0]?.STATIVO == 'True' ? 'ATIVO' : 'INATIVO'}
                 onChangeModal
                 label="Status"
               />
@@ -411,7 +411,6 @@ export const ActionClienteModal = ({show, handleClose, dadosClienteSelecionado})
         corFechar="secondary"
 
       />
-
 
     </Modal>
 
