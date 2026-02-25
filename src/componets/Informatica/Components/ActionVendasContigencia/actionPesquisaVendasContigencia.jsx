@@ -16,8 +16,6 @@ export const ActionPesquisaVendasContigencia = () => {
   const [empresaSelecionadaNome, setEmpresaSelecionadaNome] = useState('');
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
   const [dataPesquisaFim, setDataPesquisaFim] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(1000);
 
   useEffect(() => {
     const dataInicio = getDataAtual();
@@ -36,7 +34,7 @@ export const ActionPesquisaVendasContigencia = () => {
       return response.data;
     },
     {
-      staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000
+      staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000
     }
   );
 
@@ -74,13 +72,12 @@ export const ActionPesquisaVendasContigencia = () => {
     }
   };
 
-
   const { data: dadosVendasContigencia = [], error: errorVendas, isLoading: isLoadingVendas, refetch: refetchVendasContigencia} = useQuery(
-    ['venda-contigencia',  empresaSelecionada, dataPesquisaInicio, dataPesquisaFim, currentPage, pageSize],
-    () => fetchVendasContigencia( empresaSelecionada, dataPesquisaInicio, dataPesquisaFim, currentPage, pageSize),
+    ['venda-contigencia',],
+    () => fetchVendasContigencia(),
     {
       enabled: false, 
-      staleTime: 5 * 60 * 1000,
+      staleTime: 60 * 60 * 1000,
     }
   );
 
@@ -91,8 +88,7 @@ export const ActionPesquisaVendasContigencia = () => {
   }
 
   const handleClick = () => {
-    setCurrentPage(+1)
-    refetchVendasContigencia(empresaSelecionada)
+    refetchVendasContigencia()
     setTabelaVisivel(false)
   }
 
@@ -135,8 +131,6 @@ export const ActionPesquisaVendasContigencia = () => {
         IconSearch={AiOutlineSearch}
 
       />
-
-
       
       <ActionListaVendasContigencia  dadosVendasContigencia={dadosVendasContigencia} />
      

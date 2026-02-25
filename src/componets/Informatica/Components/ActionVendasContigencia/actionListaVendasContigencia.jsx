@@ -9,8 +9,8 @@ import HeaderTable from "../../../Tables/headerTable";
 
 export const ActionListaVendasContigencia = ({ dadosVendasContigencia }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
-  const dataTableRef = useRef();
   const [rowSelection, setRowSelection] = useState(null);
+  const dataTableRef = useRef();
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
