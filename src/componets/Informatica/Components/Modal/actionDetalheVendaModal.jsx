@@ -1,11 +1,10 @@
-import { Fragment, useState } from "react";
+import { Fragment } from "react";
 import Modal from 'react-bootstrap/Modal';
 import { HeaderModal } from "../../../Modais/HeaderModal/HeaderModal";
 import { InputFieldModal } from "../../../Buttons/InputFieldModal";
 import { FooterModal } from "../../../Modais/FooterModal/footerModal";
 import { ButtonTypeModal } from "../../../Buttons/ButtonTypeModal";
 import { formatMoeda } from "../../../../utils/formatMoeda";
-import { dataFormatada } from "../../../../utils/dataFormatada";
 import { toFloat } from "../../../../utils/toFloat";
 
 export const ActionDetalheVendaModal = ({show, handleClose,dadosVendas}) => {
@@ -30,13 +29,6 @@ export const ActionDetalheVendaModal = ({show, handleClose,dadosVendas}) => {
           />
 
           <Modal.Body>
-          {/* <header>
-            <h3><b> Venda Nº {dadosVendas[0]?.IDVENDA} </b></h3>
-            <p>Operador: {dadosVendas[0]?.NOFUNCIONARIO}</p>
-            <p>Cliente: Consumidor Final</p>
-            <p>CPF: Não Informado</p>
-          </header> */}
-            
 
             <div class="form-group">
               <div class="row">

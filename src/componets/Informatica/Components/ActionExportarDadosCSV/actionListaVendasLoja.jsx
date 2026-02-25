@@ -1,5 +1,4 @@
 import React, { Fragment, useEffect, useRef, useState } from "react"
-import { dataFormatada } from "../../../../utils/dataFormatada"
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { get } from "../../../../api/funcRequest"
@@ -15,6 +14,7 @@ import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { useReactToPrint } from "react-to-print";
 import { toFloat } from "../../../../utils/toFloat";
+import Swal from "sweetalert2";
 
 export const ActionListaVendas = ({ dadosVendasLoja }) => {
   const [dadosPagamentoModal, setDadosPagamentoModal] = useState([]);
@@ -23,7 +23,6 @@ export const ActionListaVendas = ({ dadosVendasLoja }) => {
   const [totalVRTOTALPAGO, setTotalVRTOTALPAGO] = useState(0);
   const [dadosVendas, setDadosVendas] = useState([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
-  const [size] = useState('small');
   const dataTableRef = useRef();
 
   const onGlobalFilterChange = (e) => {
@@ -89,8 +88,8 @@ export const ActionListaVendas = ({ dadosVendasLoja }) => {
       DTHORAFECHAMENTO: item.DTHORAFECHAMENTO,
       NOFUNCIONARIO: item.NOFUNCIONARIO,
       VRTOTALPAGO: item.VRTOTALPAGO,
-      STCONTINGENCIA: item.STCONTINGENCIA,
-      STCONFERIDO: item.STCONFERIDO,
+      STCONTINGENCIA: item.STCONTINGENCIA == 'False' ? 'Contigência' : 'Emitida',
+      STCONFERIDO: item.STCONFERIDO == 1 ? 'SIM' : 'NÃO',
 
     };
   });
@@ -170,8 +169,8 @@ export const ActionListaVendas = ({ dadosVendasLoja }) => {
       header: 'Nota',
       body: (
         (row) => (
-          <p style={{ fontWeight: 700, color: row.STCONTINGENCIA == 'False' ? 'red' : 'blue' }}>
-            {row.STCONTINGENCIA == 'False' ? 'Contigência' : 'Emitida'}
+          <p style={{ fontWeight: 700, color: row.STCONTINGENCIA == 'Contigência' ? 'red' : 'blue' }}>
+            {row.STCONTINGENCIA}
 
           </p>
         )
@@ -183,8 +182,8 @@ export const ActionListaVendas = ({ dadosVendasLoja }) => {
       header: 'Migrado Sap',
       body: (
         (row) => (
-          <p style={{ fontWeight: 700, color: row.STCONFERIDO == 1 ? 'blue' : 'red' }}>
-            {row.STCONFERIDO == 1 ? 'Sim' : 'Não'}
+          <p style={{ fontWeight: 700, color: row.STCONFERIDO == 'SIM' ? 'blue' : 'red' }}>
+            {row.STCONFERIDO}
 
           </p>
         )
@@ -237,9 +236,17 @@ export const ActionListaVendas = ({ dadosVendasLoja }) => {
   const handleDetalha = async (IDVENDA) => {
     try {
       const response = await get(`/detalhe-Venda?idVenda=${IDVENDA}`);
-      if (response.data) {
+      if (response.data && response.data.length > 0) {
         setDadosVendas(response.data);
         setModalDetalheVendasVisivel(true);
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Nenhum detalhe encontrado',
+          text: 'Não foram encontrados detalhes para esta venda.',
+          confirmButtonText: 'OK'
+        })
+        return;
       }
     } catch (error) {
       console.log(error, "não foi possível carregar os dados da tabela, detalhe Venda");
@@ -255,9 +262,17 @@ export const ActionListaVendas = ({ dadosVendasLoja }) => {
   const handleEditPagamento = async (IDVENDA) => {
     try {
       const response = await get(`/vendas-recebimentos?idVenda=${IDVENDA}`)
-      if (response.data) {
+      if (response.data && response.data.length > 0) {
         setDadosPagamentoModal(response.data)
         setModalPagamentoVisivel(true)
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Nenhum recebimento encontrado',
+          text: 'Não foram encontrados recebimentos para esta venda.',
+          confirmButtonText: 'OK'
+        })
+        return;
       }
     } catch (error) {
       console.log(error, 'não foi possivel pegar os dados da tabela')
@@ -291,7 +306,7 @@ export const ActionListaVendas = ({ dadosVendasLoja }) => {
 
           <DataTable
             value={dados}
-            size={size}
+            size="small"
             globalFilter={globalFilterValue}
             sortOrder={-1}
             paginator={true}

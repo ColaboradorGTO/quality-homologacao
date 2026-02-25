@@ -1,19 +1,18 @@
 import React, { Fragment, useEffect, useState } from "react"
-import { AiOutlineSearch, AiOutlineUpload } from "react-icons/ai";
+import { AiOutlineSearch } from "react-icons/ai";
 import { get } from "../../../../api/funcRequest";
 import { ActionMain } from "../../../Actions/actionMain";
 import { InputField } from "../../../Buttons/Input";
 import { InputSelectAction } from "../../../Inputs/InputSelectAction";
 import { ButtonType } from "../../../Buttons/ButtonType";
-import { MdAdd, MdOutlineAttachMoney } from "react-icons/md";
-import { FaDownload, FaHandshake } from "react-icons/fa";
+import { FaDownload } from "react-icons/fa";
 import { getDataAtual } from "../../../../utils/dataAtual";
 import { ActionListaVendas } from "./actionListaVendasLoja";
 import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
 import * as XLSX from 'xlsx';
 import Swal from "sweetalert2";
-import { FcDownload } from "react-icons/fc";
+
 
 export const ActionPesquisaExportarDadosCSVCredSystem = () => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
@@ -40,7 +39,7 @@ export const ActionPesquisaExportarDadosCSVCredSystem = () => {
       return response.data;
     },
     {
-      staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000
+      staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000
     }
   );
 
@@ -81,8 +80,8 @@ export const ActionPesquisaExportarDadosCSVCredSystem = () => {
 
   const { data: dadosVendasLoja = [], error: erroVendas, isLoading: isLoadingVendas, refetch: refetchListaVendas } = useQuery(
     'vendas-loja-informatica',
-    () => fetchListaVendas(empresaSelecionada, dataPesquisaInicio, dataPesquisaFim, currentPage, pageSize),
-    { enabled: false, staleTime: 5 * 60 * 1000 }
+    () => fetchListaVendas(),
+    { enabled: false, staleTime: 60 * 60 * 1000 }
   );
 
   const fetchListaClientes = async () => {
@@ -121,8 +120,8 @@ export const ActionPesquisaExportarDadosCSVCredSystem = () => {
 
   const { data: dadosListaCliente = [], error: erroCliente, isLoading: isLoadingCliente, refetch: refetchListaClientes } = useQuery(
     'lista-cliente-credsystem',
-    () => fetchListaClientes(empresaSelecionada, dataPesquisaInicio, dataPesquisaFim, currentPage, pageSize),
-    { enabled: false, staleTime: 5 * 60 * 1000 }
+    () => fetchListaClientes(),
+    { enabled: false, staleTime: 60 * 60 * 1000 }
   );
 
   const dadosCliente = dadosListaCliente.map((item) => {
@@ -383,8 +382,8 @@ export const ActionPesquisaExportarDadosCSVCredSystem = () => {
 
   const { data: dadosListaParceria = [], error: erroParceria, isLoading: isLoadingParceria, refetch: refetchListaParceria } = useQuery(
     'lista-parceria-credsystem',
-    () => fetchListaParceria(empresaSelecionada, dataPesquisaInicio, dataPesquisaFim, currentPage, pageSize),
-    { enabled: false, staleTime: 5 * 60 * 1000 }
+    () => fetchListaParceria(),
+    { enabled: false, staleTime: 60 * 60 * 1000 }
   );
 
   const dadosParceria = dadosListaParceria.map((item) => {
@@ -478,28 +477,6 @@ export const ActionPesquisaExportarDadosCSVCredSystem = () => {
     setTabelaVisivel(true);
   }
 
-  /*   const handleClickCadastro = async () => {
-      setCurrentPage((prevPage) => prevPage + 1);
-  
-      const clientes = await refetchListaClientes();
-  
-      if(clientes.data.length) {
-        exportToExcelCliente(clientes.data);
-        console.log('clientes', clientes.data);
-      } else {
-        Swal.fire({
-          position: 'center',
-          icon: 'info',
-          title: 'Não há dados para o periodo selecionado! Tente novamente',
-          customClass: {
-            container: 'custom-swal',
-          },
-          showConfirmButton: false,
-          timer: 3000,
-        });
-      }
-    } */
-
   const handleClickCadastro = async () => {
     animacaoCarregamento('Buscando dados de clientes...', true);
 
@@ -528,35 +505,12 @@ export const ActionPesquisaExportarDadosCSVCredSystem = () => {
       Swal.fire({
         position: 'center',
         icon: 'info',
-        title: 'Não há dados para o período selecionado! Tente novamente',
-        showConfirmButton: false,
-        timer: 3000,
+        text: 'Não há dados para o período selecionado! Tente novamente',
+        showConfirmButton: true,
+        timer: 6000,
       });
     }
   };
-
-
-  /*  const handleClickPagamento = async () => {
-     setCurrentPage((prevPage) => prevPage + 1);
- 
-     const pagamentos = await refetchListaPagamentos();
- 
-     if(pagamentos.data.length) {
-       exportToExcelPagamento(pagamentos.data);
-       console.log('pagamentos', pagamentos.data);
-     } else {
-       Swal.fire({
-         position: 'center',
-         icon: 'info',
-         title: 'Não há dados para o periodo selecionado! Tente novamente',
-         customClass: {
-           container: 'custom-swal',
-         },
-         showConfirmButton: false,
-         timer: 3000,
-       });
-     }
-   } */
 
   const handleClickPagamento = async () => {
     animacaoCarregamento('Buscando dados de pagamentos...', true);
@@ -585,9 +539,9 @@ export const ActionPesquisaExportarDadosCSVCredSystem = () => {
       Swal.fire({
         position: 'center',
         icon: 'info',
-        title: 'Não há dados para o período selecionado! Tente novamente',
-        showConfirmButton: false,
-        timer: 3000,
+        text: 'Não há dados para o período selecionado! Tente novamente',
+        showConfirmButton: true,
+        timer: 6000,
       });
     }
   };
@@ -621,11 +575,12 @@ export const ActionPesquisaExportarDadosCSVCredSystem = () => {
         customClass: {
           container: 'custom-swal',
         },
-        showConfirmButton: false,
-        timer: 3000,
+        showConfirmButton: true,
+        timer: 6000,
       });
     }
   }
+
   return (
 
     <Fragment>
