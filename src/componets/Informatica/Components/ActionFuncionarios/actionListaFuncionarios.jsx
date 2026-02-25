@@ -1,14 +1,12 @@
 import React, { Fragment, useEffect, useState, useRef } from "react"
 import { ButtonTable } from "../../../ButtonsTabela/ButtonTable";
 import { dataFormatada } from "../../../../utils/dataFormatada";
-import { get, post, put } from "../../../../api/funcRequest";
+import { get } from "../../../../api/funcRequest";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { CiEdit } from "react-icons/ci";
 import { MdOutlineAttachMoney } from "react-icons/md";
 import { FaUserAltSlash, FaUserTimes } from "react-icons/fa";
-import { ActionUpdateFuncionarioModal } from "./actionUpdateFuncionarioModal";
-import { ActionUpdateDescontoFuncionarioModal } from "./actionUpdateDescontoFuncionarioModal";
 import { useReactToPrint } from "react-to-print";
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
@@ -18,14 +16,13 @@ import { toFloat } from "../../../../utils/toFloat";
 import { formatarPorcentagem } from "../../../../utils/formatarPorcentagem";
 import Swal from "sweetalert2";
 import { getDataAtual } from "../../../../utils/dataAtual";
-import axios from "axios";
-import { useNavigate } from "react-router-dom"
 import { FaCheck } from "react-icons/fa6";
 import { ActionEditarFuncionario } from "./ActionEditar/actionEditarFuncionario";
 import { useDesligarFuncionario } from "./hooks/useDesligarFuncionario";
 import { useAtivarFuncionario } from "./hooks/useAtivarFuncionario";
+import { ActionEditarDescontoFuncionarioModal } from "./ActionDesconto/actionEditarDescontoFuncionarioModal";
 
-export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usuarioLogado, handleClick }) => {
+export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usuarioLogado, handleClick, refetch }) => {
   const [modalAlterarFuncionarioVisivel, setModalAlterarFuncionarioVisivel] = useState(false);
   const [modalDescontoVisivel, setModalDescontoVisivel] = useState(false);
   const [dadosAtualizarFuncionarios, setDadosAtualizarFuncionarios] = useState([]);
@@ -34,8 +31,8 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
   const [data, setData] = useState('');
   const dataTableRef = useRef();
   const [rowSelection, setRowSelection] = useState(null);
-  const { handleDesligarFuncionario } = useDesligarFuncionario({ optionsModulos, usuarioLogado, handleClick })
-  const { handleAtivarFuncionario } = useAtivarFuncionario({ optionsModulos, usuarioLogado, handleClick })
+  const { handleDesligarFuncionario } = useDesligarFuncionario({ optionsModulos, usuarioLogado, handleClick, refetch })
+  const { handleAtivarFuncionario } = useAtivarFuncionario({ optionsModulos, usuarioLogado, handleClick, refetch })
 
 
 
@@ -329,10 +326,20 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
   const handleEdit = async (IDFUNCIONARIO) => {
     try {
       const response = await get(`/funcionarios-loja?byId=${IDFUNCIONARIO}`)
-      if (response.data) {
+      if (response.data && response.data.length > 0) {
         setDadosAtualizarFuncionarios(response.data)
-
         setModalAlterarFuncionarioVisivel(true);
+      } else {
+        Swal.fire({
+          title: 'Erro',
+          text: 'Dados do Funcionário não encontrado.',
+          icon: 'error',
+          timer: 3000,
+          customClass: {
+            container: 'custom-swal',
+          }
+        })
+        return;
       }
     } catch (error) {
       console.error('Erro ao buscar detalhes da venda: ', error);
@@ -361,9 +368,20 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
   const handleDesconto = async (IDFUNCIONARIO) => {
     try {
       const response = await get(`/funcionarios-loja?byId=${IDFUNCIONARIO}`)
-      if (response.data) {
+      if (response.data && response.data.length > 0) {
         setDadosDescontoFuncionarios(response.data)
         setModalDescontoVisivel(true);
+      } else {
+        Swal.fire({
+          title: 'Erro',
+          text: 'Dados do Funcionário não encontrado.',
+          icon: 'error',
+          timer: 3000,
+          customClass: {
+            container: 'custom-swal',
+          }
+        })
+        return;
       }
     } catch (error) {
       console.error('Erro ao buscar detalhes da venda: ', error);
@@ -456,21 +474,16 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
         optionsModulos={optionsModulos} 
         usuarioLogado={usuarioLogado}
       />
-      {/* <ActionUpdateFuncionarioModal
-        show={modalAlterarFuncionarioVisivel}
-        handleClose={() => setModalAlterarFuncionarioVisivel(false)}
-        dadosAtualizarFuncionarios={dadosAtualizarFuncionarios}
-      /> */}
 
-
-      <ActionUpdateDescontoFuncionarioModal
+      <ActionEditarDescontoFuncionarioModal
         show={modalDescontoVisivel}
         handleClose={() => setModalDescontoVisivel(false)}
         dadosDescontoFuncionarios={dadosDescontoFuncionarios}
+        optionsModulos={optionsModulos}
+        usuarioLogado={usuarioLogado}
         handleClick={handleClick}
+        refetch={refetch}
       />
-
     </Fragment>
   )
 }
-

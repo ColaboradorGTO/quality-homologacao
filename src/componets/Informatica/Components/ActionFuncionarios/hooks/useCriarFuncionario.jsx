@@ -51,7 +51,7 @@ export const useCriarFuncionario = ({ handleClose, usuarioLogado, optionsModulos
     let usuarioIP = null;
 
     try {
-      const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+      const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
       usuarioIP = ipWhoisData?.ip;
     } catch (error) {
       console.error("Erro ao buscar IP via ipwho.is:", error);
@@ -159,7 +159,7 @@ export const useCriarFuncionario = ({ handleClose, usuarioLogado, optionsModulos
 
       const textDados = JSON.stringify(postData)
       const textoFuncao = 'RH/AUTORIZAÇÃO DESCONTO FOLHA FUNCIONARIO';
-
+      const ipUsuario = await getIPUsuario();
       const createLog = {
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,

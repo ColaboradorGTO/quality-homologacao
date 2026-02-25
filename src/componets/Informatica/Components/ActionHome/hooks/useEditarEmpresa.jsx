@@ -79,7 +79,6 @@ export const useEditarEmpresa = ({
 
         try {
 
-            const ipUsuario = await getIPUsuario();
             const postData = {
                 IDEMPRESA: dadosListaCaixa[0]?.IDEMPRESA,
                 HORAATUALIZA: horaAtualizado,
@@ -96,14 +95,10 @@ export const useEditarEmpresa = ({
 
             const response = await put('/atualiza-empresa-diario/:id', postData)
             const responseSTCaixa = await put('/atualizar-todos-caixa', postDataSTCaixa)
-            //console.log('responseSTCaixa', responseSTCaixa.data)
-            //console.log(postDataSTCaixa, 'postDataSTCaixa')
             const textDados = JSON.stringify(postData);
             let textFuncao = 'INFORMATICA/EDIÇÃO DE ATUALIZAÇÃO DIÁRIA DOS PDVs DA EMPRESA';
-
+            const ipUsuario = await getIPUsuario();
             const postDataEditarCaixa = {
-
-
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textFuncao,
                 DADOS: textDados,

@@ -23,7 +23,7 @@ export const useCriarCaixaPDV = ({ dadosListaCaixa, handleClose, refetchListaCai
     let usuarioIP = null;
 
     try {
-      const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+      const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
       usuarioIP = ipWhoisData?.ip;
     } catch (error) {
       console.error("Erro ao buscar IP via ipwho.is:", error);
@@ -121,13 +121,13 @@ export const useCriarCaixaPDV = ({ dadosListaCaixa, handleClose, refetchListaCai
         IP: ipUsuario,
       };
 
-      const responsePost = await post('/log-web', postData);
+      await post('/log-web', postData);
 
       if (refetchListaCaixa && dadosListaCaixa[0]?.IDEMPRESA) {
         await refetchListaCaixa(dadosListaCaixa[0].IDEMPRESA);
       }
       handleClose();
-      return responsePost.data;
+      return response.data;
     } catch (error) {
 
       
