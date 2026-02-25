@@ -1,7 +1,6 @@
 import React, { Fragment, useRef, useState } from "react"
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { dataFormatada } from "../../../../utils/dataFormatada";
 import { ButtonTable } from "../../../ButtonsTabela/ButtonTable";
 import { GrView } from "react-icons/gr";
 import HeaderTable from "../../../Tables/headerTable";
@@ -9,9 +8,12 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { useReactToPrint } from "react-to-print";
+import Swal from "sweetalert2";
 
 export const ActionListaVendasAlloc = ({ dadosVendasAlloc }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [dadosVendasDetalhe, setDadosVendasDetalhe] = useState([]);
+  const [modalDetalhe, setModalDetalhe] = useState(false);
   const dataTableRef = useRef();
 
   const onGlobalFilterChange = (e) => {
@@ -88,71 +90,72 @@ export const ActionListaVendasAlloc = ({ dadosVendasAlloc }) => {
     {
       field: 'contador',
       header: '#',
-      body: row => row.contador,
+      body: row => <th>{row.contador}</th>,
       sortable: true,
     },
     {
       field: 'IDEMPRESA',
       header: 'Loja',
-      body: row => row.IDEMPRESA,
+      body: row => <th>{row.IDEMPRESA}</th>,
       sortable: true,
     },
     {
       field: 'DTVENDA',
       header: 'DT Venda',
-      body: row => row.DTVENDA,
+      body: row => <th>{row.DTVENDA}</th>,
       sortable: true,
     },
     {
       field: 'IDVENDA',
       header: 'Nº Venda',
-      body: row => row.IDVENDA,
+      body: row => <th>{row.IDVENDA}</th>,
       sortable: true,
     },
     {
       field: 'DTEMVIO',
       header: 'DT Envio',
-      body: row => row.DTEMVIO,
+      body: row => <th>{row.DTEMVIO}</th>,
       sortable: true,
     },
     {
       field: 'IDRETORNOALLOC',
       header: 'Nº Retorno Alloc',
-      body: row => parseFloat(row.IDRETORNOALLOC),
+      body: row => <th>{row.IDRETORNOALLOC}</th>,
       sortable: true,
     },
     {
       field: 'CUPOM_CODIGO',
       header: 'Cumpom Código',
-      body: row => row.CUPOM_CODIGO,
+      body: row => <th>{row.CUPOM_CODIGO}</th>,
       sortable: true,
     },
     {
       field: 'IDRETORNOPAGAMENTO',
       header: 'Nº Retorno Pag',
-      body: row => row.IDRETORNOPAGAMENTO,
+      body: row => <th>{row.IDRETORNOPAGAMENTO}</th>,
       sortable: true,
     },
     {
       field: 'STSTATUS',
       header: 'Situação',
-      body: row => row.STSTATUS,
+      body: row => <th>{row.STSTATUS}</th>,
       sortable: true,
     },
     {
-      field: '',
+      field: 'IDVENDA',
       header: 'Detalhar',
       body: (
         (row) => (
           <div style={{ display: "flex", justifyContent: "space-around" }}>
             <div className="p-1">
               <ButtonTable
-                titleButton={"Alterar"}
-                onClickButton={() => handleClickEdit(row)}
+                titleButton={"Detalhar Venda"}
+                onClickButton={() => handleClickDetalhar(row)}
                 Icon={GrView}
                 iconSize={18}
+                disabledBTN={true}
                 iconColor={"#fff"}
-                cor={"success"}
+                cor={"primary"}
                 width="40px"
                 height="30px"
               />
@@ -168,7 +171,14 @@ export const ActionListaVendasAlloc = ({ dadosVendasAlloc }) => {
     try {
       const response = await get(`/atualizarFuncionario?idFuncionario=${IDVENDA}`)
       if (response.data && response.data.length > 0) {
-
+        setDadosVendasDetalhe(response.data);
+        setModalDetalhe(true);
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Nenhum detalhe encontrado',
+          text: 'Não foram encontrados detalhes para esta venda.',
+        })
       }
     } catch (error) {
       console.error('Erro ao buscar detalhes da venda: ', error);

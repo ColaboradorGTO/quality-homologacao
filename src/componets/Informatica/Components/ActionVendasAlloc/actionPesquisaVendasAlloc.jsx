@@ -13,15 +13,12 @@ import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../ut
 
 export const ActionPesquisaVendasAlloc = () => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
-  const [clickContador, setClickContador] = useState(0);
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
   const [dataPesquisaFim, setDataPesquisaFim] = useState('');
   const [empresaSelecionada, setEmpresaSelecionada] = useState('');
   const [empresaSelecionadaNome, setEmpresaSelecionadaNome] = useState('');
   const [venda, setVenda] = useState('');
   const [situacaoVenda, setSituacaoVenda] = useState('Todas');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(1000);
 
   useEffect(() => {
     const dataInicio = getDataAtual();
@@ -40,12 +37,12 @@ export const ActionPesquisaVendasAlloc = () => {
       return response.data;
     },
     {
-      staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000
+      staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000
     }
   );
 
   const fetchListaVendasAlloc = async () => {
-    const urlBase = `/vendas-alloc?idVenda=${venda}&idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&status=${situacaoVenda}`;
+    const urlBase = `/vendas-alloc?idVenda=${venda}&idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&stVendasAlloc=${situacaoVenda}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
@@ -79,9 +76,9 @@ export const ActionPesquisaVendasAlloc = () => {
   };
 
   const { data: dadosVendasAlloc = [], error: errorVendas, isLoading: isLoadingVendas, refetch: refecthVendasAlloc } = useQuery(
-    ['vendas-alloc', venda, empresaSelecionada, dataPesquisaInicio, dataPesquisaFim, situacaoVenda, currentPage, pageSize],
-    () => fetchListaVendasAlloc(venda, empresaSelecionada, dataPesquisaInicio, dataPesquisaFim, situacaoVenda, currentPage, pageSize),
-    { enabled: false }
+    ['vendas-alloc',],
+    () => fetchListaVendasAlloc(),
+    { enabled: false, staleTime: 60 * 60 * 1000 }
   );
 
 
@@ -96,13 +93,9 @@ export const ActionPesquisaVendasAlloc = () => {
   }
 
   const handleClick = () => {
-    setClickContador(prevContador => prevContador + 1);
 
-    if (clickContador % 2 === 0) {
-      setTabelaVisivel(true)
-      refecthVendasAlloc()
-    }
-
+    setTabelaVisivel(true)
+    refecthVendasAlloc()    
   }
 
   const situacao = [
@@ -166,8 +159,6 @@ export const ActionPesquisaVendasAlloc = () => {
         valueInputField={venda}
         onChangeInputField={(e) => setVenda(e.target.value)}
 
-
-
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}
         onButtonClickSearch={handleClick}
@@ -178,9 +169,8 @@ export const ActionPesquisaVendasAlloc = () => {
 
       {tabelaVisivel && (
 
-        <div className="card">
-          <ActionListaVendasAlloc dadosVendasAlloc={dadosVendasAlloc} />
-        </div>
+        <ActionListaVendasAlloc dadosVendasAlloc={dadosVendasAlloc} />
+        
       )}
     </Fragment>
   )
