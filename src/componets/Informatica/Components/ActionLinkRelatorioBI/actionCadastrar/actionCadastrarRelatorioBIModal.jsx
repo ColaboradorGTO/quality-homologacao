@@ -7,7 +7,8 @@ export const ActionCadastrarRelatorioBIModal = ({
   handleClose,
   refetchListaRelatorio,
   optionsModulos,
-  usuarioLogado
+  usuarioLogado,
+  dadosEmpresas
 }) => {
 
   return (
@@ -32,7 +33,7 @@ export const ActionCadastrarRelatorioBIModal = ({
             refetchListaRelatorio={refetchListaRelatorio}
             optionsModulos={optionsModulos}
             usuarioLogado={usuarioLogado}
-
+            dadosEmpresas={dadosEmpresas}
           />
         </Modal.Body>
       </Modal>

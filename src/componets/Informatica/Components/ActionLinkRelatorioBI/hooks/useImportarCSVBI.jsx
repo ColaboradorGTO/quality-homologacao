@@ -1,70 +1,51 @@
 import Swal from "sweetalert2";
-import { get, post,put } from "../../../../../api/funcRequest";
+import { get, post } from "../../../../../api/funcRequest";
 import axios from "axios";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import * as XLSX from 'xlsx';
 import { useQuery } from "react-query";
 
 
-export const useImportarCSVBI = ({optionsModulos, handleClose}) => {
-  const [relatorioSelecionadoTabela, setRelatorioSelecionadoTabela] = useState(null);
-  const [linkRelatorioBI, setLinkRelatorioBI] = useState('');
-  const [usuarioLogado, setUsuarioLogado] = useState(null);
-  const [ipUsuario, setIpUsuario] = useState('');
-  const [file, setFile] = useState(null);
-  const navigate = useNavigate();
+export const useImportarCSVBI = ({optionsModulos, handleClose, usuarioLogado}) => {
+    const [relatorioSelecionado, setRelatorioSelecionado] = useState(null);
+    const [ipUsuario, setIpUsuario] = useState('');
+    const [file, setFile] = useState(null);
 
-  useEffect(() => {
-    const usuarioArmazenado = localStorage.getItem('usuario');
 
-    if (usuarioArmazenado) {
-      try {
-        const parsedUsuario = JSON.parse(usuarioArmazenado);
-        setUsuarioLogado(parsedUsuario);
-      } catch (error) {
-        console.error('Erro ao parsear o usuário do localStorage:', error);
-      }
-    } else {
-      navigate('/');
-    }
-  }, [navigate]);
+    const getIPUsuario = async () => {
+        let usuarioIP = null;
 
-  useEffect(() => {
-    getIPUsuario();
-  }, [usuarioLogado]);
-
-const getIPUsuario = async () => {
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
-            let usuarioIP = ipWhoisData?.ip;
+        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+        usuarioIP = ipWhoisData?.ip;
+        } catch (error) {
+        console.error("Erro ao buscar IP via ipwho.is:", error);
+        }
 
-            if (!usuarioIP) {
+        if (!usuarioIP) {
+        try {
             const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
             usuarioIP = ipifyData?.ip;
-            }
-
-            setIpUsuario(usuarioIP);
-            return usuarioIP;
         } catch (error) {
-            console.error("Erro ao buscar IP:", error);
-            return null;
+            console.error("Erro ao buscar IP via ipify.org:", error);
         }
+        }
+        setIpUsuario(usuarioIP);
+        return usuarioIP;
     };
 
-  const { data: dadosBI = [], error: errorListaBI, isLoading: isLoadingBI, refetch } = useQuery(
-    'relatorioInformaticaBI?status=True',
-    async () => {
-      const response = await get(`/relatorioInformaticaBI?status=True`);
-      return response.data;
-    },
-    {
-      staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000
-    }
-  );
+    const { data: dadosBI = [], error: errorListaBI, isLoading: isLoadingBI, refetch } = useQuery(
+        'relatorioInformaticaBI?status=True',
+        async () => {
+            const response = await get(`/relatorioInformaticaBI?status=True`);
+            return response.data;
+        },
+        {staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000}
+    );
 
 
     const processFile = async (file) => {
+
         return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -73,18 +54,41 @@ const getIPUsuario = async () => {
             if (file.name.endsWith('.csv')) {
                 const content = e.target.result;
                 const lines = content.split('\n');
-                for (let line of lines) {
-                const [link] = line.split(',');
-                if (link && link.trim()) data.push(link.trim());
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i];
+                    // Pula a primeira linha se for cabeçalho
+                    if (i === 0 && (line.toLowerCase().includes('idempresa') || line.toLowerCase().includes('link'))) {
+                        continue;
+                    }
+                    const [idEmpresa, link, stAtivo] = line.split(',');
+                    if (link && link.trim() && idEmpresa && idEmpresa.trim()) {
+                        data.push({
+                            IDEMPRESA: idEmpresa.toString().trim(),
+                            LINK: link.toString().trim(),
+                            STATIVO: stAtivo ? stAtivo.toString().trim() : 'True'
+                        });
+                    }
                 }
             } else if (file.name.endsWith('.xls') || file.name.endsWith('.xlsx')) {
                 const workbook = XLSX.read(e.target.result, { type: 'array' });
                 const sheet = workbook.Sheets[workbook.SheetNames[0]];
                 const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-                for (let row of rows) {
-                if (row[0] && row[0].toString().trim()) data.push(row[0].toString().trim());
+                for (let i = 0; i < rows.length; i++) {
+                    const row = rows[i];
+                    // Pula a primeira linha se for cabeçalho
+                    if (i === 0 && row[1] && (row[1].toString().toLowerCase().includes('link') || row[0].toString().toLowerCase().includes('idempresa'))) {
+                        continue;
+                    }
+                    if (row[1] && row[1].toString().trim() && row[0] && row[0].toString().trim()) {
+                        data.push({
+                            IDEMPRESA: row[0].toString().trim(),
+                            LINK: row[1].toString().trim(),
+                            STATIVO: row[2] ? row[2].toString().trim() : 'True'
+                        });
+                    }
                 }
             }
+            
             resolve(data);
             } catch (err) {
             reject(err);
@@ -100,14 +104,19 @@ const getIPUsuario = async () => {
     };
 
     const onSubmitArquivo = async (e) => {
-       // e.preventDefault();
+
         if(optionsModulos[0]?.CRIAR == 'False') {
             Swal.fire({
                 icon: 'warning',
                 title: 'Acesso Negado',
-                text: 'Você não tem permissão para criar novos relatórios.',
+                html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para criar novos relatórios.`,
+                confirmButtonText: 'OK',
+                customClass: {
+                    container: 'custom-swal',
+                }
             });
             return;
+        
         }
 
         if (!file) {
@@ -115,29 +124,40 @@ const getIPUsuario = async () => {
             return;
         }
 
+        if (!relatorioSelecionado?.value) {
+            Swal.fire({ icon: 'warning', title: 'Selecione um relatório!' });
+            return;
+        }
+
         try {
-            const links = await processFile(file);
-            if (!links.length) {
+            const dadosArquivo = await processFile(file);
+            
+            if (!dadosArquivo.length) {
                 Swal.fire({ icon: 'warning', title: 'Arquivo vazio ou inválido!' });
                 return;
             }
-            for (const link of links) {
+            for (const item of dadosArquivo) {
                 const postData = {
-                IDRELATORIOBI: relatorioSelecionadoTabela?.IDRELATORIOBI,
-                IDEMPRESA: relatorioSelecionadoTabela?.IDEMPRESA,
-                LINK: link,
-                STATIVO: 'True',
+                    IDRELATORIOBI: parseInt(relatorioSelecionado?.value),
+                    IDEMPRESA: parseInt(item.IDEMPRESA),
+                    LINK: item.LINK,
+                    STATIVO: item.STATIVO,
                 };
-                await put('/criarlinkRelatorioBI', postData);
+                
+                await post('/criarlinkRelatorioBI', postData);
+           
             }
 
 
             Swal.fire({
                 position: 'center',
                 icon: 'success',
-                title: 'Relatórios atualizados com sucesso!',
+                title: 'Dados importados com sucesso!',
                 showConfirmButton: false,
-                timer: 1500
+                customClass: {
+                    container: 'custom-swal',
+                },
+                timer: 5000
             });
             handleClose();
         } catch (err) {
@@ -146,7 +166,10 @@ const getIPUsuario = async () => {
                 icon: 'error',
                 title: 'Erro ao importar arquivo!',
                 showConfirmButton: false,
-                timer: 1500
+                customClass: {
+                    container: 'custom-swal',
+                },
+                timer: 5000
             });
             console.error(err);
         }
@@ -155,8 +178,8 @@ const getIPUsuario = async () => {
 
 
     return {
-        linkRelatorioBI,
-        setLinkRelatorioBI,
+        relatorioSelecionado,
+        setRelatorioSelecionado,
         dadosBI,
         file,
         setFile,

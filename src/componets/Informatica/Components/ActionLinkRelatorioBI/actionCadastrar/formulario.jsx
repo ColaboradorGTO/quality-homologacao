@@ -8,7 +8,7 @@ import { useCadastrarRelatorioBi } from '../hooks/useCadastrarRelatorioBi';
 import { schema } from './schemaValidarRelatorio';
 import { AlertError } from '../../../../Inputs/alertError';
 
-export const FormularioCadastroLinkBi = ({ handleClose, optionsModulos, usuarioLogado, refetchListaRelatorio }) => {
+export const FormularioCadastroLinkBi = ({ handleClose, optionsModulos, usuarioLogado, refetchListaRelatorio, dadosEmpresas }) => {
     const { handleSubmit, formState: { errors }, clearErrors, control, setError, register, } = useForm({
         mode: "onChange"
     });
@@ -21,11 +21,10 @@ export const FormularioCadastroLinkBi = ({ handleClose, optionsModulos, usuarioL
         setRelatorioSelecionado,
         statusSelecionado,
         setStatusSelecionado,
-        dadosEmpresas,
         dadosBI,
         onSubmit,
         optionsStatus
-    } = useCadastrarRelatorioBi({ handleClose, optionsModulos, usuarioLogado, refetchListaRelatorio });
+    } = useCadastrarRelatorioBi({ handleClose, optionsModulos, usuarioLogado, refetchListaRelatorio, dadosEmpresas });
 
     const handleValidatedSubmit = async () => {
         try {

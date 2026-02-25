@@ -200,7 +200,6 @@ export const ActionListaBalanco = ({
     ]
 
 
-
     const handleEditResumoBalanco = async (IDRESUMOBALANCO, NUMEROCOLETOR) => {
 
         try {

@@ -8,16 +8,21 @@ import Select from 'react-select';
 import { Fragment } from 'react';
 import { useImportarCSVBI } from './hooks/useImportarCSVBI';
 
-export const ActionImportarRelatorioBIModal = ({ show, handleClose, relatorioSelecionadoTabela, optionsModulos }) => {
+export const ActionImportarRelatorioBIModal = ({
+  show,
+  handleClose,
+  optionsModulos,
+  usuarioLogado
+}) => {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const {
-    linkRelatorioBI,
-    setLinkRelatorioBI,
+    relatorioSelecionado,
+    setRelatorioSelecionado,
     dadosBI,
     file,
     setFile,
     onSubmitArquivo
-  } = useImportarCSVBI({ optionsModulos, handleClose })
+  } = useImportarCSVBI({ optionsModulos, handleClose, usuarioLogado })
 
 
   return (
@@ -49,15 +54,12 @@ export const ActionImportarRelatorioBIModal = ({ show, handleClose, relatorioSel
 
                   <Select
                     closeMenuOnSelect={false}
-                    defaultValue={
-                      relatorioSelecionadoTabela
-                        ? { value: relatorioSelecionadoTabela.IDRELATORIOBI, label: relatorioSelecionadoTabela.DSRELATORIOBI }
-                        : null}
-                    isMulti
                     options={dadosBI.map((item) => ({
                       value: item.IDRELATORIOBI,
                       label: item.DSRELATORIOBI
                     }))}
+                    value={relatorioSelecionado}
+                    onChange={(e) => setRelatorioSelecionado(e)}
                   />
                 </div>
 
@@ -73,8 +75,6 @@ export const ActionImportarRelatorioBIModal = ({ show, handleClose, relatorioSel
 
               </div>
             </div>
-
-            {/* https://app.powerbi.com/view?r=eyJrIjoiZWRkOTVkNmYtNGM2MS00YjVlLTkxYzQtZTcwY2FmN2IxNjQ0IiwidCI6ImRmNDJhNzdjLWVlY2ItNDEyNC1iOTRiLWU4NjhlNmQ5MDkwYSJ9 */}
           </form>
         </Modal.Body>
 

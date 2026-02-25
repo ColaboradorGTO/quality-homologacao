@@ -3,7 +3,6 @@ import { get, put } from "../../../../api/funcRequest";
 import { ButtonTable } from "../../../ButtonsTabela/ButtonTable";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { useForm } from "react-hook-form";
 import { CiEdit } from "react-icons/ci";
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
@@ -63,7 +62,7 @@ export const ActionListaLinkRelatorioBi = ({ dadosBI, handleTabelaVisivel, optio
     return {
       NOFANTASIA: item.NOFANTASIA,
       DSRELATORIOBI: item.DSRELATORIOBI,
-      STATIVO: item.STATIVO,
+      STATIVO: item.STATIVO == 'True' ? 'Ativo' : 'Inativo',
       IDRELATORIOBI: item.IDRELATORIOBI,
     }
   });
@@ -87,8 +86,8 @@ export const ActionListaLinkRelatorioBi = ({ dadosBI, handleTabelaVisivel, optio
       header: 'Status',
       body: (
         (row) => (
-          <th style={{ color: row.STATIVO == 'True' ? 'blue' : 'red' }}>
-            {row.STATIVO == 'True' ? 'Ativo' : 'Inativo'}
+          <th style={{ color: row.STATIVO == 'Ativo' ? 'blue' : 'red' }}>
+            {row.STATIVO}
           </th>
         )
       ),
@@ -124,9 +123,21 @@ export const ActionListaLinkRelatorioBi = ({ dadosBI, handleTabelaVisivel, optio
   const handleDetalhar = async (IDRELATORIOBI) => {
     try {
       const response = await get(`/linkRelatorioBI?idRelatorio=${IDRELATORIOBI}`)
-      if (response.data) {
+      if (response.data && response.data.length > 0) {
         setDadosLinkRelatorioBI(response.data)
         setModalVisivel(true)
+      } else {
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: 'Nenhum dado encontrado para este relatório.',
+          customClass: {
+            container: 'custom-swal',
+          },
+          showConfirmButton: false,
+          timer: 1500
+        });
+        return;
       }
 
     } catch (error) {

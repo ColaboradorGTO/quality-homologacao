@@ -1,7 +1,6 @@
 import Swal from 'sweetalert2';
 import { useEffect, useState } from 'react';
 import { get, post, put } from '../../../../../api/funcRequest';
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useQuery } from 'react-query';
 export const useEditarRelatorioBi = ({
@@ -20,17 +19,25 @@ export const useEditarRelatorioBi = ({
     const [ipUsuario, setIpUsuario] = useState('');
 
     const getIPUsuario = async () => {
-        try {
-            const response = await axios.get('https://api.ipify.org?format=json9');
-            if (response.data && response.data.ip) {
-                return response.data.ip;
-            }
-            throw new Error("Resposta inválida do ipfy.org");
-        } catch (error) {
-            const responseIP2 = await axios.get('https://api.ipwho.org/me');
-            return responseIP2.data?.data?.ip;
+        let usuarioIP = null;
 
+        try {
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+            usuarioIP = ipWhoisData?.ip;
+        } catch (error) {
+            console.error("Erro ao buscar IP via ipwho.is:", error);
         }
+
+        if (!usuarioIP) {
+            try {
+                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+                usuarioIP = ipifyData?.ip;
+            } catch (error) {
+                console.error("Erro ao buscar IP via ipify.org:", error);
+            }
+        }
+        setIpUsuario(usuarioIP);
+        return usuarioIP;
     };
 
     const { data: dadosListaBI = [], error: errorListaBI, isLoading: isLoadingBI, refetch } = useQuery(
@@ -56,22 +63,12 @@ export const useEditarRelatorioBi = ({
         if (optionsModulos[0]?.ALTERAR === 'False') {
             Swal.fire({
                 title: 'Atenção',
-                text: 'Você não tem permissão para cadastrar Relatório BI.',
+                html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para cadastrar Relatório BI.`,
                 icon: 'warning',
-                confirmButtonText: 'OK'
-            });
-        }
-
-        if (!empresaSelecionada || !relatorioSelecionado || !statusSelecionado || !linkRelatorioBI) {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'Preencha todos os campos!',
+                confirmButtonText: 'OK',
                 customClass: {
                     container: 'custom-swal',
-                },
-                showConfirmButton: false,
-                timer: 1500
+                }
             });
             return;
         }
@@ -86,7 +83,18 @@ export const useEditarRelatorioBi = ({
         try {
 
             const response = await put('/linkRelatorioBI/:id', putData);
-
+            const textDados = JSON.stringify(putData);
+            let textoFuncao = 'INFORMATICA/ATUALIZAR LINK RELATORIO BI';
+            const ipUsuario = await getIPUsuario();
+            
+            const postData = {
+                IDFUNCIONARIO: String(usuarioLogado.id),
+                PATHFUNCAO: textoFuncao,
+                DADOS: textDados,
+                IP: ipUsuario,
+            };
+            await post('/log-web', postData);
+            
             Swal.fire({
                 position: 'top-end',
                 icon: 'success',
@@ -97,25 +105,26 @@ export const useEditarRelatorioBi = ({
                 showConfirmButton: false,
                 timer: 1500,
             });
+            
+            handleTabelaVisivel()
+            handleClose()
+            return response.data;
 
+        } catch (error) {
             const textDados = JSON.stringify(putData);
             let textoFuncao = 'INFORMATICA/ATUALIZAR LINK RELATORIO BI';
-
+    
             const ipUsuario = await getIPUsuario();
-
+    
             const postData = {
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
                 IP: ipUsuario,
             };
-
+    
             const responsePost = await post('/log-web', postData);
-            handleTabelaVisivel()
-            handleClose()
-            return responsePost.data;
 
-        } catch (error) {
             Swal.fire({
                 position: 'top-end',
                 icon: 'error',
@@ -127,21 +136,9 @@ export const useEditarRelatorioBi = ({
                 timer: 1500,
             });
             console.log(error);
+            return responsePost.data;
         }
 
-        const textDados = JSON.stringify(putData);
-        let textoFuncao = 'INFORMATICA/ATUALIZAR LINK RELATORIO BI';
-
-        const ipUsuario = await getIPUsuario();
-
-        const postData = {
-            IDFUNCIONARIO: String(usuarioLogado.id),
-            PATHFUNCAO: textoFuncao,
-            DADOS: textDados,
-            IP: ipUsuario,
-        };
-
-        const responsePost = await post('/log-web', postData);
     };
 
     const optionsStatus = [

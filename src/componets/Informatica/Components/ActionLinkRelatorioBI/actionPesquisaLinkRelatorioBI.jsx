@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react"
+import React, { Fragment, useEffect, useState } from "react"
 import { ButtonType } from "../../../Buttons/ButtonType";
 import { ActionMain } from "../../../Actions/actionMain";
 import { InputSelectAction } from "../../../Inputs/InputSelectAction";
@@ -21,20 +21,25 @@ export const ActionPesquisaLinkRelatorioBi = ({ usuarioLogado, ID }) => {
   const [relatorioSelecionado, setRelatorioSelecionado] = useState('');
   const [empresaSelecionada, setEmpresaSelecionada] = useState('');
   const [empresaSelecionadaNome, setEmpresaSelecionadaNome] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(1000);
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
+  useEffect(() => {
+    const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
+    if (menuSalvo) {
+      const menuParsed = JSON.parse(menuSalvo);
+      setMenuFilhoAtual(menuParsed);
+    }
+  }, []);
 
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
-    'menus-usuario-excecao',
+    ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
-      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${ID}`);
+      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
 
       return response.data;
     },
     { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
   );
-
 
   const { data: dadosEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresa } = useQuery(
     'listaEmpresasIformatica',
@@ -43,10 +48,9 @@ export const ActionPesquisaLinkRelatorioBi = ({ usuarioLogado, ID }) => {
       return response.data;
     },
     {
-      staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000
+      staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000
     }
   );
-
 
   const fetchListaRelatorio = async () => {
     const urlBase = `/linkRelatorioBI?idRelatorio=${relatorioSelecionado}&idEmpresa=${empresaSelecionada}`;
@@ -54,7 +58,7 @@ export const ActionPesquisaLinkRelatorioBi = ({ usuarioLogado, ID }) => {
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
       animacaoCarregamento('Carregando dados...', true);
-                                            
+
       const primeiraPagina = 1;
       const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
       const page = primeiraResposta.page || primeiraPagina;
@@ -65,15 +69,15 @@ export const ActionPesquisaLinkRelatorioBi = ({ usuarioLogado, ID }) => {
       let allData = [...(primeiraResposta.data || [])];
 
       if (totalPages > 1) {
-      for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
           animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
           const responsePage = await get(`${urlApi}&page=${currentPage}`);
           allData.push(...(responsePage.data || []));
-      }
+        }
       }
 
       return allData;
-  
+
     } catch (error) {
       console.error('Erro ao buscar dados da api', error);
       throw error;
@@ -82,54 +86,12 @@ export const ActionPesquisaLinkRelatorioBi = ({ usuarioLogado, ID }) => {
     }
   };
 
-/*   const fetchListaRelatorio = async () => {
-    try {
 
-      const urlApi = `/linkRelatorioBI?idRelatorio=${relatorioSelecionado}&idEmpresa=${empresaSelecionada}`;
-      const response = await get(urlApi);
-
-      if (response.data.length && response.data.length === pageSize) {
-        let allData = [...response.data];
-        animacaoCarregamento(`Carregando... Página ${currentPage} de ${response.data.length}`, true);
-
-        async function fetchNextPage(currentPage) {
-          try {
-            currentPage++;
-            const responseNextPage = await get(`${urlApi}&page=${currentPage}`);
-            if (responseNextPage.length) {
-              allData.push(...responseNextPage.data);
-              return fetchNextPage(currentPage);
-            } else {
-              return allData;
-            }
-          } catch (error) {
-            console.error('Erro ao buscar próxima página:', error);
-            throw error;
-          }
-        }
-
-        await fetchNextPage(currentPage);
-        return allData;
-      } else {
-
-        return response.data;
-      }
-
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      throw error;
-    } finally {
-      fecharAnimacaoCarregamento();
-    }
-  }; */
-
-  const { data: dadosBI = [], error: erroCliente, isLoading: isLoadingCliente, refetch: refetchListaRelatorio } = useQuery(
-    ['lista-cliente', relatorioSelecionado, empresaSelecionada, currentPage, pageSize],
-    () => fetchListaRelatorio(relatorioSelecionado, empresaSelecionada, currentPage, pageSize),
-    { enabled: false, staleTime: 5 * 60 * 1000 }
+  const { data: dadosBI = [], error: erroLink, isLoading: isLoadingLink, refetch: refetchListaRelatorio } = useQuery(
+    ['linkRelatorioBI', ],
+    () => fetchListaRelatorio(),
+    { enabled: false, staleTime: 60 * 60 * 1000 }
   );
-
-
 
   const { data: dadosRelatorios = [], error: errorrRelatorio, isLoading: isLoadingRelatorio, refetch } = useQuery(
     'relatorioInformaticaBI',
@@ -138,7 +100,7 @@ export const ActionPesquisaLinkRelatorioBi = ({ usuarioLogado, ID }) => {
       return response.data;
     },
     {
-      staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000
+      staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000
     }
   );
 
@@ -173,10 +135,8 @@ export const ActionPesquisaLinkRelatorioBi = ({ usuarioLogado, ID }) => {
   }
 
   const handleTabelaVisivel = () => {
-
     refetchListaRelatorio()
     setTabelaVisivel(true)
-
   }
 
   return (
@@ -244,13 +204,15 @@ export const ActionPesquisaLinkRelatorioBi = ({ usuarioLogado, ID }) => {
         refetchListaRelatorio={refetchListaRelatorio}
         optionsModulos={optionsModulos}
         usuarioLogado={usuarioLogado}
+        dadosEmpresas={dadosEmpresas}
       />
 
       <ActionImportarRelatorioBIModal
         show={modalImportarRelatorio}
         handleClose={() => setModalImportarRelatorio(false)}
         optionsModulos={optionsModulos}
-
+        usuarioLogado={usuarioLogado}
+        relatorioSelecionado={relatorioSelecionado}
       />
 
     </Fragment>
