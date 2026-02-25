@@ -10,7 +10,6 @@ import 'jspdf-autotable';
 
 export const ActionListaProdutosQuality = ({ dadosProdutosQuality }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
-  const [size, setSize] = useState('small');
   const dataTableRef = useRef();
   const [rowSelection, setRowSelection] = useState(null);
 
@@ -122,7 +121,7 @@ export const ActionListaProdutosQuality = ({ dadosProdutosQuality }) => {
           <DataTable
             title="Lista de Produtos Quality"
             value={dados}
-            size={size}
+            size="small"
             sortOrder={-1}
             paginator={true}
             rows={10}

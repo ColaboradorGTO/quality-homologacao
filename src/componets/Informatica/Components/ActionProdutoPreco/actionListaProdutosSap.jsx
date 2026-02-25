@@ -11,7 +11,6 @@ import HeaderTable from '../../../Tables/headerTable';
 
 export const ActionListaProdutosSap = ({ dadosProdutosSap }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
-  const [size, setSize] = useState('small');
   const dataTableRef = useRef();
 
   const onGlobalFilterChange = (e) => {
@@ -153,7 +152,7 @@ export const ActionListaProdutosSap = ({ dadosProdutosSap }) => {
           <DataTable
             title="Produtos Preços"
             value={dados}
-            size={size}
+            size="small"
             globalFilterValue={globalFilterValue}
             sortOrder={-1}
             paginator={true}

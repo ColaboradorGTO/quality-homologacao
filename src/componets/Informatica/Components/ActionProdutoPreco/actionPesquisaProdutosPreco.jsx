@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from "react"
+import React, { Fragment, useState } from "react"
 import { ActionMain } from "../../../Actions/actionMain";
 import { InputField } from "../../../Buttons/Input";
 import { ButtonType } from "../../../Buttons/ButtonType";
@@ -9,6 +9,7 @@ import { AiOutlineSearch } from "react-icons/ai";
 import { InputSelectAction } from "../../../Inputs/InputSelectAction";
 import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
+import Swal from "sweetalert2";
 
 
 export const ActionPesquisaProdutosPreco = () => {
@@ -18,8 +19,6 @@ export const ActionPesquisaProdutosPreco = () => {
   const [empresaSelecionadaNome, setEmpresaSelecionadaNome] = useState('')
   const [marcaSelecionada, setMarcaSelecionada] = useState('')
   const [codBarra, setCodBarra] = useState('')
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(1000);
 
   const { data: optionsMarcas = [], error: errorMarcas, isLoading: isLoadingMarcas } = useQuery(
     'marcasLista',
@@ -27,9 +26,8 @@ export const ActionPesquisaProdutosPreco = () => {
       const response = await get(`/marcasLista`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000 }
+    { staleTime: 60 * 60 * 1000 }
   );
-
 
   const { data: optionsEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas } = useQuery(
     ['listaEmpresaComercial', marcaSelecionada],
@@ -41,16 +39,12 @@ export const ActionPesquisaProdutosPreco = () => {
         return [];
       }
     },
-    { enabled: false, staleTime: 5 * 60 * 1000 }
+    { enabled: Boolean(marcaSelecionada), staleTime: 60 * 60 * 1000 }
   );
-  useEffect(() => {
-    if (marcaSelecionada) {
-      refetchEmpresas();
-    }
-  }, [marcaSelecionada, refetchEmpresas]);
+  
 
 
-    const fetchProdutoSap = async () => {
+  const fetchProdutoSap = async () => {
     const urlBase = `/produto-preco-novo?idEmpresa=${empresaSelecionada}&dsProduto=${codBarra}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
@@ -87,12 +81,12 @@ export const ActionPesquisaProdutosPreco = () => {
 
   const { data: dadosProdutosSap = [], error: erroQuebra, isLoading: isLoadingQuebra, refetch: refetchProdutoSap } = useQuery(
     '/produto-preco-novo',
-    () => fetchProdutoSap(empresaSelecionada, codBarra, currentPage, pageSize),
+    () => fetchProdutoSap(),
     { enabled: false, staleTime: 5 * 60 * 1000 }
   );
 
 
-      const fetchProdutosQuality = async () => {
+  const fetchProdutosQuality = async () => {
     const urlBase = `produtoQuality?descricaoProduto=${codBarra}&idEmpresa=${empresaSelecionada}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
@@ -129,8 +123,8 @@ export const ActionPesquisaProdutosPreco = () => {
 
   const { data: dadosProdutosQuality = [], error: erroQuality, isLoading: isLoadingQuality, refetch: refetchProdutosQuality } = useQuery(
     'produtoQuality',
-    () => fetchProdutosQuality(empresaSelecionada, codBarra, currentPage, pageSize),
-    { enabled: false, staleTime: 5 * 60 * 1000 }
+    () => fetchProdutosQuality(),
+    { enabled: false, staleTime: 60 * 60 * 1000 }
   );
 
 
@@ -151,10 +145,15 @@ export const ActionPesquisaProdutosPreco = () => {
 
   const handleClickSap = () => {
     if (empresaSelecionada === '') {
-      alert('Selecione uma Marca e uma Empresa')
+      Swal.fire({
+        icon: 'warning',
+        title: 'Selecione uma empresa',
+        text: 'Por favor, selecione uma empresa.',
+        confirmButtonText: 'OK'
+        
+      })
     } else {
-      // setCurrentPage(prevPage => prevPage + 1);
-      refetchProdutoSap(empresaSelecionada)
+      refetchProdutoSap()
       setTabelaSapVisivel(true);
       setTabelaQualityVisivel(false);
     }
@@ -162,10 +161,15 @@ export const ActionPesquisaProdutosPreco = () => {
 
   const handleClickQuality = () => {
     if (empresaSelecionada === '') {
-      alert('Selecione uma Marca e uma Empresa')
+      Swal.fire({
+        icon: 'warning',
+        title: 'Selecione uma empresa',
+        text: 'Por favor, selecione uma empresa.',
+        confirmButtonText: 'OK'
+        
+      })
     } else {
-      // setCurrentPage(prevPage => prevPage + 1);
-      refetchProdutosQuality(empresaSelecionada)
+      refetchProdutosQuality()
       setTabelaQualityVisivel(true);
       setTabelaSapVisivel(false);
     }
