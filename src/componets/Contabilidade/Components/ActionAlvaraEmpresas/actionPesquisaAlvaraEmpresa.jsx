@@ -104,17 +104,14 @@ export const ActionPesquisaAlvaraEmpresa = ({ usuarioLogado, ID }) => {
         { enabled: true, staleTime: 5 * 60 * 1000 },
     );
 
-    const {
-        data: dadosAlvaraEmpresaSelecionada = [], refetch: refetchAlvaraSelecionado, isLoading: isLoadingAlvaraSelecionado } = useQuery(
-            ['vinculo-alvara', idEmpresaSelecionada],
-            async () => {
-                const response = await get(
-                    `/alvaras-empresa-detalhe?idFilial=${idEmpresaSelecionada}`
-                );
-                return response.data;
-            },
-            { enabled: !!idEmpresaSelecionada }
-        );
+    const { data: dadosAlvaraEmpresaSelecionada = [], refetch: refetchAlvaraSelecionado, isLoading: isLoadingAlvaraSelecionado } = useQuery(
+        ['alvaras-empresa-detalhe', idEmpresaSelecionada],
+        async () => {
+            const response = await get(`/alvaras-empresa-detalhe?idFilial=${idEmpresaSelecionada}`);
+            return response.data;
+        },
+        { enabled: !!idEmpresaSelecionada }
+    );
 
 
     const optionsUf = [
@@ -225,9 +222,7 @@ export const ActionPesquisaAlvaraEmpresa = ({ usuarioLogado, ID }) => {
                 refetchAlvaraSelecionado={refetchAlvaraSelecionado}
                 setIdEmpresaSelecionada={setIdEmpresaSelecionada}
                 usuarioLogado={usuarioLogado}
-                isLoadingAlvaraSelecionado={isLoadingAlvaraSelecionado}
             />
-
 
         </Fragment>
     )

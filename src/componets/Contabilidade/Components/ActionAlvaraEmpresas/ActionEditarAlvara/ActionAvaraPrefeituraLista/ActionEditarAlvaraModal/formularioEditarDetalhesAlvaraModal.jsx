@@ -235,9 +235,10 @@ export const FormularioEditarDetalhesAlvara = ({
                                         {...field}
                                         label={"Metragem:"}
                                         name="metragemLojaDigitado"
-                                        type="text"
+                                        type="number"
+                                        inputMode="numeric"
                                         value={metragemLoja}
-                                        onChange={(e) => setMetragemLoja(e.target.value).replace(/\D/g, "")}
+                                        onChange={(e) => setMetragemLoja(e.target.value)}
                                         errors={errors}
                                         clearErrors={clearErrors}
                                     />

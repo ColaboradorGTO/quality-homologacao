@@ -15,6 +15,7 @@ import { ActionCadastrarAlvaraModal } from "./ActionCadastrarAlvaraModal/actionC
 import { ActionVisualizarDetalhesAlvaraModal } from "./ActionVisualizarAlvaraModal/actionVisualizarDetalhesAlvaraModal";
 import { ActionEditarDetalhesAlvaraModal } from "./ActionEditarAlvaraModal/actionEditarDetalhesAlvaraModal";
 import { formatarDataParaBR } from "../../../../../../utils/dataFormatada";
+import { useQuery } from "react-query";
 
 export const ActionListaAlvaraPrefeitura = ({
     dadosAlvaraEmpresaSelecionada,
@@ -30,8 +31,19 @@ export const ActionListaAlvaraPrefeitura = ({
     const [modalVisualizarAlvaraEmpresa, setModalVisualizarAlvaraEmpresa] = useState(false);
     const [modalEditarAlvaraEmpresa, setModalEditarAlvaraEmpresa] = useState(false);
     const [idVinculoAlvara, setIdVinculoAlvara] = useState(null);
-    const [dadosAlvaraSelecionado, setDadosAlvaraSelecionado] = useState(null);
     const dataTableRef = useRef();
+
+
+    const { data: dadosAlvaraSelecionado = [], refetch: refetchVinculoAlvara, isLoading: isLoadingVinculoAlvara } = useQuery(
+        ['vinculo-alvara', idVinculoAlvara],
+        async () => {
+            const response = await get(
+                `/vinculo-alvaras-empresa?idFilial=${idVinculoAlvara}`
+            );
+            return response.data;
+        },
+        { enabled: !!idVinculoAlvara }
+    );
 
 
     const onGlobalFilterChange = (e) => {
@@ -175,11 +187,7 @@ export const ActionListaAlvaraPrefeitura = ({
     ]
 
     const handleClickEditarAlvara = (row) => {
-        if (optionsModulos[0]?.ALTERAR === 'True') {
-            if (row && row.IDVINCULO) {
-                handleEditarAlvara(row.IDVINCULO)
-            }
-        } else {
+        if (optionsModulos[0]?.ALTERAR !== 'True') {
             Swal.fire({
                 icon: 'error',
                 title: 'Atenção!',
@@ -189,32 +197,12 @@ export const ActionListaAlvaraPrefeitura = ({
                     container: 'custom-swal',
                 },
             });
+            return;
         }
-    };
 
-    const handleEditarAlvara = async (IDVINCULO) => {
-        try {
-            const response = await get(`/vinculo-alvaras-empresa?idFilial=${IDVINCULO}`)
-            if (response.data && response.data.length > 0) {
-                setDadosAlvaraSelecionado(response.data)
-                setModalEditarAlvaraEmpresa(true)
-                return response.data;
-            } else {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Atenção',
-                    text: 'Nenhum dado encontrado para o alvará selecionado.',
-                    customClass: {
-                        container: 'custom-swal',
-                    },
-                    timer: 3000
-                })
-                return;
-            }
-        } catch (error) {
-            console.log(error, "não foi possivel pegar os dados da tabela ")
-        }
-    }
+        setIdVinculoAlvara(row.IDVINCULO);
+        setModalEditarAlvaraEmpresa(true);
+    };
 
     const handleClickVisualizarAlvara = (row) => {
         if (optionsModulos[0]?.ALTERAR === 'True') {
@@ -351,7 +339,7 @@ export const ActionListaAlvaraPrefeitura = ({
                 usuarioLogado={usuarioLogado}
                 refetchAlvaraEmpresa={refetchAlvaraEmpresa}
                 refetchAlvaraSelecionado={refetchAlvaraSelecionado}
-                refetchVinculoAlvara={handleEditarAlvara}
+                refetchVinculoAlvara={refetchVinculoAlvara}
             />
 
         </Fragment>
