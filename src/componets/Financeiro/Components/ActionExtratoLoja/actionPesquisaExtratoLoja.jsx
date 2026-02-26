@@ -12,14 +12,11 @@ import { useFetchData } from "../../../../hooks/useFetchData"
 import Swal from "sweetalert2"
 import { ActionListaExtratoContaCorrenteLoja } from "./actionListaExtratoLojaCopia"
 
-export const ActionPesquisaExtratoLoja = ({ usuarioLogado, ID }) => {
+export const ActionPesquisaExtratoLoja = ({ usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
   const [dataPesquisaFim, setDataPesquisaFim] = useState('');
   const [empresaSelecionada, setEmpresaSelecionada] = useState('');
-  const [isLoadingPesquisa, setIsLoadingPesquisa] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(500);
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
   useEffect(() => {
@@ -86,8 +83,8 @@ export const ActionPesquisaExtratoLoja = ({ usuarioLogado, ID }) => {
   };
 
   const { data: dadosExtratoLojaPeriodo = [], error: errorExtratoLoja, isLoading: isLoadingExtratoLoja, refetch: refetchExtratoLoja } = useQuery(
-    ['lista-extrato', empresaSelecionada, dataPesquisaInicio, dataPesquisaFim, currentPage, pageSize],
-    () => fetchExtratoLoja(empresaSelecionada, dataPesquisaInicio, dataPesquisaFim, currentPage, pageSize),
+    ['lista-extrato',],
+    () => fetchExtratoLoja(),
     { enabled: false, staleTime: 60 * 60 * 1000 }
   );
 
@@ -105,10 +102,7 @@ export const ActionPesquisaExtratoLoja = ({ usuarioLogado, ID }) => {
       })
     } else {
       setTabelaVisivel(true)
-      setIsLoadingPesquisa(true);
-      setCurrentPage(+1);
       refetchExtratoLoja()
-
     }
   }
 
@@ -151,7 +145,7 @@ export const ActionPesquisaExtratoLoja = ({ usuarioLogado, ID }) => {
 
       {tabelaVisivel && (
         <Fragment>
-          <div className="card">
+         
             <ActionListaExtratoContaCorrenteLoja
               dadosExtratoLojaPeriodo={dadosExtratoLojaPeriodo}
               usuarioLogado={usuarioLogado}
@@ -159,7 +153,7 @@ export const ActionPesquisaExtratoLoja = ({ usuarioLogado, ID }) => {
               empresaSelecionada={empresaSelecionada}
               handleClick={handleClick}
             />
-          </div>
+          
 
         </Fragment>
       )}

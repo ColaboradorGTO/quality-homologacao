@@ -16,6 +16,7 @@ import { useUpdateStatusConferido } from "./hooks/useUpdateStatusConferido";
 import { ModalEditarDepositoDaLoja } from "./ActionEditarDeposito/modalEditarDepositoDaLoja";
 import { get } from "../../../../api/funcRequest";
 import { useUpdateStatusDeposito } from "./hooks/useUpdateStatusDeposito";
+import Swal from "sweetalert2";
 
 export const ActionListaExtratoContaCorrenteLoja = ({
   dadosExtratoLojaPeriodo,
@@ -30,7 +31,7 @@ export const ActionListaExtratoContaCorrenteLoja = ({
 
   const {
     handleSubmit
-  } = useUpdateStatusConferido({optionsModulos, usuarioLogado, handleClick })
+  } = useUpdateStatusConferido({ optionsModulos, usuarioLogado, handleClick })
 
   const {
     handleCancelar
@@ -119,7 +120,7 @@ export const ActionListaExtratoContaCorrenteLoja = ({
           className: 'linha-espaco'
         });
 
-     
+
       }
 
       // Vendas Dinheiro
@@ -243,7 +244,7 @@ export const ActionListaExtratoContaCorrenteLoja = ({
           STCONFERIDO: deposito['STCONFERIDO'],
           IDDEPOSITOLOJA: deposito['IDDEPOSITOLOJA'] // ✅ ID para os botões
         };
-  
+
         dadosProcessados.push(depositoProcessado);
       });
 
@@ -280,7 +281,7 @@ export const ActionListaExtratoContaCorrenteLoja = ({
 
   const rowClassName = (rowData) => {
     if (rowData.tipo === 'espaco') {
-      return <span>&nbsp;</span>; 
+      return <span>&nbsp;</span>;
     }
     return rowData.className || '';
   };
@@ -381,12 +382,12 @@ export const ActionListaExtratoContaCorrenteLoja = ({
     {
       field: 'Opções',
       header: 'Opções',
-      body: row => {   
-        if (row.STCANCELADO === "False" &&  (row.STCONFERIDO === "False" || row.STCONFERIDO === null ||row.STCONFERIDO === "")
+      body: row => {
+        if (row.STCANCELADO === "False" && (row.STCONFERIDO === "False" || row.STCONFERIDO === null || row.STCONFERIDO === "")
         ) {
           return (
             <div style={{ display: 'flex', justifyContent: 'center', width: "150px" }}>
-              <div style={{padding: '10px'}}>
+              <div style={{ padding: '10px' }}>
 
                 <ButtonTable
                   titleButton={"Confirmar Conferência"}
@@ -398,7 +399,7 @@ export const ActionListaExtratoContaCorrenteLoja = ({
                   height="30px"
                 />
               </div>
-              <div style={{padding: '10px'}}>
+              <div style={{ padding: '10px' }}>
 
                 <ButtonTable
                   titleButton={"Cancelar Depósito"}
@@ -411,8 +412,8 @@ export const ActionListaExtratoContaCorrenteLoja = ({
                 />
               </div>
 
-              <div style={{padding: '10px'}}>
-                
+              <div style={{ padding: '10px' }}>
+
                 <ButtonTable
                   titleButton={"Editar Depósito"}
                   cor={"warning"}
@@ -427,7 +428,7 @@ export const ActionListaExtratoContaCorrenteLoja = ({
           );
         } else if (row.STCANCELADO === "False" && row.STCONFERIDO === "True") {
           return <td></td>;
-        } else if (row.STCANCELADO === "True" && (row.STCONFERIDO === "False" || row.STCONFERIDO === null || row.STCONFERIDO === "") ) {
+        } else if (row.STCANCELADO === "True" && (row.STCONFERIDO === "False" || row.STCONFERIDO === null || row.STCONFERIDO === "")) {
           return (
             <ButtonTable
               titleButton={"Confirmar Conferência"}
@@ -447,39 +448,52 @@ export const ActionListaExtratoContaCorrenteLoja = ({
     },
   ]
 
-   const handleEdit = async (IDDEPOSITOLOJA) => {
-      try {
-        const response = await get(`/deposito-loja?idDeposito=${IDDEPOSITOLOJA}`);
-        if (response.data && response.data.length > 0) {
-          setDadosDeposito(response.data);
-          setModalEditar(true);
-        }
-      } catch (error) {
-        console.error('Erro ao buscar detalhes da venda: ', error);
-      }
-    };
-  
-  
-    const handleClickEdit = (row) => {
-      if(optionsModulos[0]?.ALTERAR == 'True') {
-  
-        if (row && row.IDDEPOSITOLOJA) {
-          handleEdit(row.IDDEPOSITOLOJA);
-        }
+  const handleEdit = async (IDDEPOSITOLOJA) => {
+    try {
+      const response = await get(`/deposito-loja?idDeposito=${IDDEPOSITOLOJA}`);
+      if (response.data && response.data.length > 0) {
+        setDadosDeposito(response.data);
+        setModalEditar(true);
       } else {
         Swal.fire({
-          position: 'top-end',
           icon: 'error',
-          title: `Você não tem permissão para alterar!`,
+          title: 'Erro',
+          text: 'Detalhes do depósito não encontrados.',
           customClass: {
             container: 'custom-swal',
           },
           showConfirmButton: false,
           timer: 3000,
         });
+
+        return;
       }
-  
-    };
+    } catch (error) {
+      console.error('Erro ao buscar detalhes da venda: ', error);
+    }
+  };
+
+
+  const handleClickEdit = (row) => {
+    if (optionsModulos[0]?.ALTERAR == 'True') {
+
+      if (row && row.IDDEPOSITOLOJA) {
+        handleEdit(row.IDDEPOSITOLOJA);
+      }
+    } else {
+      Swal.fire({
+        position: 'top-end',
+        icon: 'error',
+        title: `Você não tem permissão para alterar!`,
+        customClass: {
+          container: 'custom-swal',
+        },
+        showConfirmButton: false,
+        timer: 3000,
+      });
+    }
+
+  };
 
   return (
     <Fragment>
@@ -488,7 +502,7 @@ export const ActionListaExtratoContaCorrenteLoja = ({
         <div className="panel-hdr">
           <h2>Extrato de Conta Corrente</h2>
         </div>
-  
+
         <div style={{ marginBottom: "1rem" }}>
           <HeaderTable
             globalFilterValue={globalFilterValue}
@@ -509,7 +523,7 @@ export const ActionListaExtratoContaCorrenteLoja = ({
             globalFilter={globalFilterValue}
             header={
               <table className="table table-bordered  table-responsive-lg table-striped w-100">
-  
+
                 <thead style={{ width: '100%' }}>
                   <tr>
                     <th>Informativo</th>
@@ -527,11 +541,11 @@ export const ActionListaExtratoContaCorrenteLoja = ({
                     <td style={{ textAlign: "right", fontSize: "12px" }}><b> {`${formatMoeda(saldoAnterior)}`}</b></td>
                     <td colSpan={2}></td>
                   </tr>
-  
+
                   <tr>
                     <td colspan="9"></td>
                   </tr>
-  
+
                   <tr>
                     <td colspan="9"></td>
                   </tr>
@@ -541,21 +555,21 @@ export const ActionListaExtratoContaCorrenteLoja = ({
           >
             {colunasEstoqueAtual.map((coluna, index) => (
               <Column
-              key={coluna.field}
-              field={coluna.field}
-              header={coluna.header}
-              body={coluna.body}
-              footer={coluna.footer}
-              sortable={coluna.sortable}
-              headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '1rem' }}
-              footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
-              bodyStyle={{ fontSize: '1rem', fontWeight: 900 }}
+                key={coluna.field}
+                field={coluna.field}
+                header={coluna.header}
+                body={coluna.body}
+                footer={coluna.footer}
+                sortable={coluna.sortable}
+                headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '1rem' }}
+                footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
+                bodyStyle={{ fontSize: '1rem', fontWeight: 900 }}
               />
             ))}
           </DataTable>
         </div>
       </div>
-  
+
       <ModalEditarDepositoDaLoja
         show={modalEditar}
         handleClose={() => setModalEditar(false)}

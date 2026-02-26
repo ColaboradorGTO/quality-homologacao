@@ -22,19 +22,19 @@ export const useUpdateDeposito = ({ handleClose, optionsModulos, usuarioLogado, 
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
-            usuarioIP = ipWhoisData?.ip;
+        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+        usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP via ipwho.is:", error);
+        console.error("Erro ao buscar IP via ipwho.is:", error);
         }
 
         if (!usuarioIP) {
-            try {
-                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-                usuarioIP = ipifyData?.ip;
-            } catch (error) {
-                console.error("Erro ao buscar IP via ipify.org:", error);
-            }
+        try {
+            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+            usuarioIP = ipifyData?.ip;
+        } catch (error) {
+            console.error("Erro ao buscar IP via ipify.org:", error);
+        }
         }
         setIpUsuario(usuarioIP);
         return usuarioIP;
@@ -210,7 +210,7 @@ export const useUpdateDeposito = ({ handleClose, optionsModulos, usuarioLogado, 
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'IP não disponívels'
             }
 
             await post('/log-web', postLogData)
@@ -225,7 +225,7 @@ export const useUpdateDeposito = ({ handleClose, optionsModulos, usuarioLogado, 
                     container: 'custom-swal',
                 }
             })
-            // handleClose()
+            handleClose()
             return response.data
         } catch (error) {
             const textDados = JSON.stringify(putData)
@@ -234,11 +234,11 @@ export const useUpdateDeposito = ({ handleClose, optionsModulos, usuarioLogado, 
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: `FINANCEIRO/ERRO AO ATUALIZAR DEPOSITO`,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'IP não disponível'
             }
 
             const responsePost = await post('/log-web', postLogData)
-            // handleClose()
+            handleClose()
 
             Swal.fire({
                 position: 'center',

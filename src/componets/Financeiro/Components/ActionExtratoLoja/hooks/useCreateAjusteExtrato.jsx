@@ -24,19 +24,19 @@ export const useCreateAjusteExtrato = ({ handleClose, optionsModulos, usuarioLog
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
-            usuarioIP = ipWhoisData?.ip;
+        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+        usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP via ipwho.is:", error);
+        console.error("Erro ao buscar IP via ifconfig.me:", error);
         }
 
         if (!usuarioIP) {
-            try {
-                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-                usuarioIP = ipifyData?.ip;
-            } catch (error) {
-                console.error("Erro ao buscar IP via ipify.org:", error);
-            }
+        try {
+            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+            usuarioIP = ipifyData?.ip;
+        } catch (error) {
+            console.error("Erro ao buscar IP via ipify.org:", error);
+        }
         }
         setIpUsuario(usuarioIP);
         return usuarioIP;
@@ -77,7 +77,7 @@ export const useCreateAjusteExtrato = ({ handleClose, optionsModulos, usuarioLog
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: `FINANCEIRO/AJUSTE EXTRATO CRIADO`,
                 DADOS: dados,
-                IP: ipUsuario
+                IP: ipUsuario || 'IP não disponível'
             }
     
             await post('/log-web', postLogData)
@@ -92,7 +92,7 @@ export const useCreateAjusteExtrato = ({ handleClose, optionsModulos, usuarioLog
                     container: 'custom-swal',
                 }
             })
-            // handleClose()
+            handleClose()
             return response.data
         } catch (error) {
             const dados = JSON.stringify(postData)
@@ -101,11 +101,11 @@ export const useCreateAjusteExtrato = ({ handleClose, optionsModulos, usuarioLog
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: `FINANCEIRO/ERRO AO CRIAR AJUSTE EXTRATO`,
                 DADOS: dados,
-                IP: ipUsuario
+                IP: ipUsuario || 'IP não disponível'
             }
     
             const responsePost = await post('/log-web', postLogData)
-            // handleClose()
+            handleClose()
 
              Swal.fire({
                 position: 'center',

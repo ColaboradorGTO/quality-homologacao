@@ -18,19 +18,19 @@ export const useUpdateStatusConferido = ({handleClick, optionsModulos, usuarioLo
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
-            usuarioIP = ipWhoisData?.ip;
+        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+        usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP via ipwho.is:", error);
+        console.error("Erro ao buscar IP via ipwho.is:", error);
         }
 
         if (!usuarioIP) {
-            try {
-                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-                usuarioIP = ipifyData?.ip;
-            } catch (error) {
-                console.error("Erro ao buscar IP via ipify.org:", error);
-            }
+        try {
+            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+            usuarioIP = ipifyData?.ip;
+        } catch (error) {
+            console.error("Erro ao buscar IP via ipify.org:", error);
+        }
         }
         setIpUsuario(usuarioIP);
         return usuarioIP;
@@ -78,7 +78,7 @@ export const useUpdateStatusConferido = ({handleClick, optionsModulos, usuarioLo
                             IDFUNCIONARIO: String(usuarioLogado.id),
                             PATHFUNCAO: textoFuncao,
                             DADOS: textdados,
-                            IP: ipUsuario
+                            IP: ipUsuario || 'IP não disponível'
                         };
     
                         await post("/log-web", dadosLog);
@@ -104,7 +104,7 @@ export const useUpdateStatusConferido = ({handleClick, optionsModulos, usuarioLo
                             "IDFUNCIONARIO": String(usuarioLogado.id),
                             "PATHFUNCAO": textoFuncao,
                             "DADOS": textdados,
-                            "IP": ipUsuario
+                            "IP": ipUsuario || 'IP não disponível'
                         });
     
                         Swal.fire('Erro!', 'Erro ao Confirmar Status.', 'error');

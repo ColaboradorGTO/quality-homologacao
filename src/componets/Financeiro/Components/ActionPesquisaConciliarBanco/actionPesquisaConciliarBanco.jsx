@@ -9,9 +9,10 @@ import { ActionListaConciliarPorBanco } from "./actionListaConciliarBanco"
 import { InputSelectAction } from "../../../Inputs/InputSelectAction"
 import { useQuery } from 'react-query';
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento"
+import { useEffect } from "react"
 
 
-export const ActionPesquisaConciliarBanco = ({usuarioLogado, ID}) => {
+export const ActionPesquisaConciliarBanco = ({usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [tabelaVisivelConsolidado, setTabelaVisivelConsolidado] = useState(false);
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('')
@@ -21,9 +22,25 @@ export const ActionPesquisaConciliarBanco = ({usuarioLogado, ID}) => {
   const [dataPesquisaInicioC, setDataPesquisaInicioC] = useState('')
   const [dataPesquisaFimC, setDataPesquisaFimC] = useState('')
   const [contaSelecionada, setContaSelecionada] = useState('')
-  const [isLoadingPesquisa, setIsLoadingPesquisa] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(500); 
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
+
+  useEffect(() => {
+    const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
+    if (menuSalvo) {
+      const menuParsed = JSON.parse(menuSalvo);
+      setMenuFilhoAtual(menuParsed);
+    }
+  }, []);
+
+  const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
+    ['menus-usuario-excecao', menuFilhoAtual?.ID],
+    async () => {
+      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
+
+      return response.data;
+    },
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
+  );
 
   const { data: dadosContaBanco } = useQuery(
     'contaBanco',
@@ -31,16 +48,7 @@ export const ActionPesquisaConciliarBanco = ({usuarioLogado, ID}) => {
       const response = await get(`/contaBanco`);
       return response.data;
     },
-    { enabled: true, staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
-  );
-
-  const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
-    'menus-usuario-excecao',
-    async () => {
-      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${ID}`);
-      return response.data;
-    },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
+    { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
   );
 
   const fetchConciliarBanco = async () => {
@@ -80,7 +88,7 @@ export const ActionPesquisaConciliarBanco = ({usuarioLogado, ID}) => {
   const { data: dadosConciliarBanco = [], error: errorConciliarBanco, isLoading: isLoadingConciliarBanco, refetch: refetchConciliarBanco } = useQuery(
     ['deposito-loja-conciliacao'],
     () => fetchConciliarBanco(),
-    { enabled: false, staleTime: 5 * 60 * 1000 }
+    { enabled: false, staleTime: 60 * 60 * 1000 }
   )
 
   const fetchConciliarBancoConsolidado = async () => {
@@ -118,9 +126,9 @@ export const ActionPesquisaConciliarBanco = ({usuarioLogado, ID}) => {
   };
 
   const { data: dadosConciliarBancoConsolidado = [], error: errorBancoConsolidado, isLoading: isLoadingBancoConsolidado, refetch: refetchBancoConsolidado } = useQuery(
-    ['deposito-loja-consolidado',  contaSelecionada, dataPesquisaInicio, dataPesquisaFim, dataPesquisaInicioB, dataPesquisaFimB, dataPesquisaInicioC, dataPesquisaFimC, currentPage, pageSize],
-    () => fetchConciliarBancoConsolidado(contaSelecionada, dataPesquisaInicio, dataPesquisaFim, dataPesquisaInicioB, dataPesquisaFimB, dataPesquisaInicioC, dataPesquisaFimC, currentPage, pageSize),
-    { enabled: false }
+    ['deposito-loja-consolidado', ],
+    () => fetchConciliarBancoConsolidado(),
+    { enabled: false, staleTime: 60 * 60 * 1000 }
   )
 
   

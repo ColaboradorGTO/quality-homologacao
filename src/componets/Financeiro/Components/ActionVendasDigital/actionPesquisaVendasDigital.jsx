@@ -20,7 +20,6 @@ export const ActionPesquisaVendasDigital = () => {
   const [dataPesquisaFim, setDataPesquisaFim] = useState('');
   const [empresaSelecionada, setEmpresaSelecionada] = useState('')
   const [empresaSelecionadaNome, setEmpresaSelecionadaNome] = useState('')
-  const [currentPage, setCurrentPage] = useState(1)
 
   
   useEffect(() => {
@@ -69,7 +68,7 @@ export const ActionPesquisaVendasDigital = () => {
   const { data: dadosVendasDetalhadas = [], error: errorVendasDetalhada, isLoading: isLoadingVendasDetalhada, refetch: refetchVendaDetalhada } = useQuery(
     ['venda-digital'],
     () => refetchVendasDetalhadas(),
-    { enabled: false, staleTime: 5 * 60 * 1000 }
+    { enabled: false, staleTime: 60 * 60 * 1000 }
   );
  
   const handleChangeEmpresa = (e) => {

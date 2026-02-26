@@ -9,11 +9,10 @@ import { ActionListaCaixaZerado } from "./actionListaCaixaZerado"
 import { ActionListaCaixaStatus } from "./actionListaCaixaStatus"
 import { AiOutlineSearch } from "react-icons/ai"
 import { useQuery } from 'react-query';
-import Swal from 'sweetalert2'
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento"
 import { useFetchData, useFetchEmpresas } from "../../../../hooks/useFetchData"
 
-export const ActionPesquisaCaixaStatus = ({usuarioLogado, ID}) => {
+export const ActionPesquisaCaixaStatus = ({usuarioLogado }) => {
   const [tabelaCaixaStatus, setTabelaCaixaStatus] = useState(false);
   const [tabelaCaixaZerado, setTabelaCaixaZerado] = useState(false);
   const [empresaSelecionada, setEmpresaSelecionada] = useState('');
@@ -21,10 +20,7 @@ export const ActionPesquisaCaixaStatus = ({usuarioLogado, ID}) => {
   const [marcaSelecionada, setMarcaSelecionada] = useState('');
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
   const [dataPesquisaFim, setDataPesquisaFim] = useState('');
-  const [isLoadingPesquisa, setIsLoadingPesquisa] = useState(false);
-  const [isQueryCaixaZerado, setIsQueryCaixaZerado] = useState(false);
-  const [isQueryCaixaStatus, setIsQueryCaixaStatus] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
   useEffect(() => {
     const dataInicial = getDataAtual();
@@ -33,17 +29,27 @@ export const ActionPesquisaCaixaStatus = ({usuarioLogado, ID}) => {
     setDataPesquisaFim(dataFinal);
   }, [])
 
-  const { data: optionsMarcas = [], error: errorMarcas, isLoading: isLoadingMarcas } = useFetchData('marcasLista', '/marcasLista');
-  const { data: optionsEmpresas = [],} = useFetchEmpresas(marcaSelecionada);
+
+  useEffect(() => {
+    const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
+    if (menuSalvo) {
+      const menuParsed = JSON.parse(menuSalvo);
+      setMenuFilhoAtual(menuParsed);
+    }
+  }, []);
 
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
-    'menus-usuario-excecao',
+    ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
-      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${ID}`);
+      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
+
       return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
   );
+
+  const { data: optionsMarcas = [], error: errorMarcas, isLoading: isLoadingMarcas } = useFetchData('marcasLista', '/marcasLista');
+  const { data: optionsEmpresas = [],} = useFetchEmpresas(marcaSelecionada);
 
   const fetchCaixaStatus = async () => {
     const urlBase = `/lista-caixas-status?idMarca=${marcaSelecionada}&idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
@@ -80,7 +86,7 @@ export const ActionPesquisaCaixaStatus = ({usuarioLogado, ID}) => {
   const { data: dadosCaixaStatus = [], error: errorCaixaStatus, isLoading: isLoadingCaixaStatus, refetch: refetchCaixaStatus } = useQuery(
     ['lista-caixas-status'],
     () => fetchCaixaStatus(),
-    { enabled: false, staleTime: 5 * 60 * 1000 }
+    { enabled: false, staleTime: 60 * 60 * 1000 }
   );
 
 
@@ -120,7 +126,7 @@ export const ActionPesquisaCaixaStatus = ({usuarioLogado, ID}) => {
   const { data: dadosCaixaZerados = [], error: errorCaixaZerado, isLoading: isLoadingCaixaZerado, refetch: refetchCaixaZerado } = useQuery(
     ['lista-caixas-zerados', ],
     () => fetchCaixaZerado(),
-    { enabled: false, staleTime: 5 * 60 * 1000 }
+    { enabled: false, staleTime: 60 * 60 * 1000 }
   );
 
   const handleChangeEmpresa = (e) => {
@@ -142,26 +148,15 @@ export const ActionPesquisaCaixaStatus = ({usuarioLogado, ID}) => {
   }
 
   const handleClick = () => {
-    if (marcaSelecionada) {
-      setTabelaCaixaStatus(true)
-      setTabelaCaixaZerado(false)
-      refetchCaixaStatus()
-    } else {
-      Swal.fire('Erro', 'Por favor, Verifique os Campos', 'error');
-    }
+    setTabelaCaixaStatus(true)
+    setTabelaCaixaZerado(false)
+    refetchCaixaStatus()
   }
 
   const handleClickPesqCaixaStatus = () => {
-
-
-    if (marcaSelecionada) {
-      setTabelaCaixaZerado(true)
-      setTabelaCaixaStatus(false)
-      refetchCaixaZerado()
-
-    } else {
-      Swal.fire('Erro', 'Por favor, Verifique os Campos', 'error');
-    }
+    setTabelaCaixaZerado(true)
+    setTabelaCaixaStatus(false)
+    refetchCaixaZerado()
   }
 
 

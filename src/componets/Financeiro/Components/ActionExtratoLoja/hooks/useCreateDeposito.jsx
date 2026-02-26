@@ -25,23 +25,23 @@ export const useCreateDeposito = ({ handleClose, optionsModulos, usuarioLogado, 
 
     }, [usuarioLogado]);
 
-   const getIPUsuario = async () => {
+    const getIPUsuario = async () => {
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
-            usuarioIP = ipWhoisData?.ip;
+        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+        usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP via ipwho.is:", error);
+        console.error("Erro ao buscar IP via ipwho.is:", error);
         }
 
         if (!usuarioIP) {
-            try {
-                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-                usuarioIP = ipifyData?.ip;
-            } catch (error) {
-                console.error("Erro ao buscar IP via ipify.org:", error);
-            }
+        try {
+            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+            usuarioIP = ipifyData?.ip;
+        } catch (error) {
+            console.error("Erro ao buscar IP via ipify.org:", error);
+        }
         }
         setIpUsuario(usuarioIP);
         return usuarioIP;
@@ -98,7 +98,7 @@ export const useCreateDeposito = ({ handleClose, optionsModulos, usuarioLogado, 
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'IP não disponível'
             }
     
             await post('/log-web', postLogData)
@@ -122,7 +122,7 @@ export const useCreateDeposito = ({ handleClose, optionsModulos, usuarioLogado, 
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: `FINANCEIRO/ERRO AO CRIAR AJUSTE EXTRATO`,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'IP não disponível'
             }
     
             await post('/log-web', postLogData)
