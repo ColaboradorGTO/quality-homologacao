@@ -12,9 +12,7 @@ import { useEffect } from "react";
 import { useCopiarPermissaoUsuario } from "./hooks/useEditarPermissao";
 
 
-export const ActionPesquisaPerfilPermissao = ({ usuarioLogado, ID }) => {
-  const [tabelaVisivel, setTabelaVisivel] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
+export const ActionPesquisaPerfilPermissao = ({ usuarioLogado }) => {
   const [empresaSelecionada, setEmpresaSelecionada] = useState('');
   const [usuarioOrigem, setUsuarioOrigem] = useState('');
   const [usuarioDestino, setUsuarioDestino] = useState('');
@@ -137,25 +135,9 @@ export const ActionPesquisaPerfilPermissao = ({ usuarioLogado, ID }) => {
 
 
   const handleClick = () => {
-    if (usuarioOrigem && usuarioDestino) {
-      setCurrentPage(prevPage => prevPage + 1);
-      setTabelaVisivel(true);
-      refetch();
-
-    } else {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Atenção',
-        text: 'Selecione um funcionário para copiar as permissões!',
-        timer: 3000,
-      })
-    }
+    refetch();
   }
 
-  const handleUserDestinoChange = (e) => {
-    setUsuarioDestino(String(e.value ?? ""));
-    setUsuarioDestinoSelecionado(e);
-  }
 
   const {
     handleSubmit

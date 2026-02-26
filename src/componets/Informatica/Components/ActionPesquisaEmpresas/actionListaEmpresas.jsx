@@ -12,13 +12,9 @@ import HeaderTable from "../../../Tables/headerTable";
 import { Column } from "primereact/column";
 import { get } from "../../../../api/funcRequest";
 import { ActionDetalheModalEmpresa } from "./ActionModalDetalheEmpresa/actionDetalheModalEmpresa";
-import { SiElasticsearch } from "react-icons/si";
 import { ActionEditarEmpresa } from "./ActionEditarEmpresa/actionEditarEmpresaModal";
 
-
-
 export const ActionListaEmpresas = ({ dadosEmpresas, optionsModulos, usuarioLogado, refetch }) => {
-
     const [modalVisivel, setModalVisivel] = useState(false)
     const [dadosDetalhesEmpresa, setDadosDetalhesEmpresa] = useState([])
     const [globalFilterValue, setGlobalFilterValue] = useState("")
@@ -28,10 +24,8 @@ export const ActionListaEmpresas = ({ dadosEmpresas, optionsModulos, usuarioLoga
 
     const onGlobalFilterChange = (e) => {
         setGlobalFilterValue(e.target.value);
-
     };
      
-
     const handlePrint = useReactToPrint({
         content: () => dataTableRef.current,
         documentTitle: "Lista Empresa"
@@ -40,14 +34,12 @@ export const ActionListaEmpresas = ({ dadosEmpresas, optionsModulos, usuarioLoga
     const exportToPDF = () => {
         const doc = new jsPDF();
         doc.autoTable({
-            head: [['ID Empresa', 'Empresa', 'CNPJ', 'Insc, Estadual', 'CNAE', 'Status']],
+            head: [['ID Empresa', 'Empresa', 'E-mail', 'Telefone']],
             body: dados.map(item => [
                 item.IDEMPRESA,
                 item.NOFANTASIA,
-                item.NUCNPJ,
-                item.NUINSCESTADUAL,
-                item.CNAE,
-                item.STATIVO
+                item.EEMAILPRINCIPAL,
+                item.NUTELGERENCIA,
 
             ]),
             horizontalPageBreak: true,
@@ -59,14 +51,12 @@ export const ActionListaEmpresas = ({ dadosEmpresas, optionsModulos, usuarioLoga
     const exportToExcel = () => {
         const worksheet = XLSX.utils.json_to_sheet(dados);
         const workbook = XLSX.utils.book_new();
-        const header = ["ID Empresa", "Empresa", "CNPJ", "Insc, Estadual", "CNAE", "Status"];
+        const header = ["ID Empresa", "Empresa", "E-mail", "Telefone"];
         worksheet["!cols"] = [
             { wpx: 50, captions: "ID Empresa" },
             { wpx: 200, captions: "Empresa" },
-            { wpx: 100, captions: "CNPJ" },
-            { wpx: 100, captions: "Insc, Estadual" },
-            { wpx: 100, captions: "CNAE" },
-            { wpx: 100, captions: "Status" },
+            { wpx: 100, captions: "E-mail" },
+            { wpx: 100, captions: "Telefone" },
         ];
 
         XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: "A1" });
@@ -75,20 +65,19 @@ export const ActionListaEmpresas = ({ dadosEmpresas, optionsModulos, usuarioLoga
 
     };
 
-    const dados = Array.isArray(dadosEmpresas) ? dadosEmpresas.map((item, index) => {
+    const dados = dadosEmpresas.map((item, index) => {
+    
         return {
             IDEMPRESA: item.IDEMPRESA,
             NOFANTASIA: item.NOFANTASIA,
-            NUINSCESTADUAL: item.NUINSCESTADUAL,
-            NUCNPJ: item.NUCNPJ,
-            CNAE: item.CNAE,
-            STATIVO: item.STATIVO == 'True' ? 'Ativo' : 'Inativo',
+            EEMAILPRINCIPAL: item.EEMAILPRINCIPAL,
+            NUTELGERENCIA: item.NUTELGERENCIA,
         };
-    }) : [];
+    });
     const colunaListaEmpresas = [
         {
             field: "IDEMPRESA",
-            header: "ID Empresa",
+            header: "ID",
             body: row => <th>{row.IDEMPRESA}</th>,
             sortable: true,
         },
@@ -99,27 +88,16 @@ export const ActionListaEmpresas = ({ dadosEmpresas, optionsModulos, usuarioLoga
             sortable: true,
         },
         {
-            field: 'NUCNPJ',
-            header: 'CNPJ',
-            body: row => <th>{row.NUCNPJ}</th>,
+            field: 'EEMAILPRINCIPAL',
+            header: 'E-mail',
+            body: row => <th>{row.EEMAILPRINCIPAL}</th>,
             sortable: true,
         },
+    
         {
-            field: 'NUINSCESTADUAL',
-            header: 'Insc. Estadual',
-            body: row => <th>{row.NUINSCESTADUAL}</th>,
-            sortable: true,
-        },
-        {
-            field: 'CNAE',
-            header: 'CNAE',
-            body: row => <th>{row.CNAE}</th>,
-            sortable: true,
-        },
-        {
-            field: 'STATIVO',
-            header: 'Status',
-            body: row => <th style={{ color: row.STATIVO == 'Ativo' ? 'blue' : 'red' }}>{row.STATIVO}</th>,
+            field: 'NUTELGERENCIA',
+            header: 'Telefone',
+            body: row => <th>{row.NUTELGERENCIA}</th>,
             sortable: true,
         },
         {
@@ -161,7 +139,18 @@ export const ActionListaEmpresas = ({ dadosEmpresas, optionsModulos, usuarioLoga
             if (response.data && response.data.length > 0) {
                 setDadosDetalhesEmpresa(response.data)
                 setModalVisivel(true)
-
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro',
+                    text: 'Detalhes da empresa não encontrados.',
+                    confirmButtonColor: '#7352A5',
+                    timer: 3000,    
+                    customClass: {
+                        container: 'custom-swal',
+                    },
+                });
+                return;
             }
         } catch (error) {
             console.error("Erro ao buscar detalhes da empresa:", error);
@@ -193,9 +182,20 @@ export const ActionListaEmpresas = ({ dadosEmpresas, optionsModulos, usuarioLoga
         try {
             const response = await get(`/empresas?idEmpresa=${IDEMPRESA}`);
             if (response.data && response.data.length > 0) {
-
                 setDadosEditarEmpresa(response.data);
                 setModalEditar(true)
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro',
+                    text: 'Detalhes da empresa não encontrados.',
+                    confirmButtonColor: '#7352A5',
+                    timer: 3000,    
+                    customClass: {
+                        container: 'custom-swal',
+                    },
+                });
+                return;
             }
         } catch (error) {
             console.error("erro ao buscar detahes da empresa:", error);

@@ -8,7 +8,7 @@ import { ActionCadastrarRelatorioBIModal } from "./ActionCadastrar/actionCadastr
 import { useQuery } from "react-query";
 import Swal from "sweetalert2";
 
-export const ActionPesquisaRelatorioBI = ({ usuarioLogado, ID }) => {
+export const ActionPesquisaRelatorioBI = ({ usuarioLogado }) => {
   const [modalVisivel, setModalVisivel] = useState(false);
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 

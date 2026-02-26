@@ -46,7 +46,7 @@ export const useEditarPerfilPermissaoUsuario = ({dadosEditarPermissao, handleClo
       }
       throw new Error("Resposta inválida do ipfy.org");
     } catch (error) {
-      const responseIP2 = await axios.get('https://api.ipwho.org/me');
+      const responseIP2 = await axios.get('https://ifconfig.me/ip');
       return responseIP2.data?.data?.ip;
       
     }

@@ -1,7 +1,6 @@
 import Swal from "sweetalert2";
 import { post, put } from "../../../../../api/funcRequest";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export const useEditarEmpresa = ({ dadosEditarEmpresa, handleClose, refetch, usuarioLogado }) => {
@@ -20,30 +19,36 @@ export const useEditarEmpresa = ({ dadosEditarEmpresa, handleClose, refetch, usu
     const [ipUsuario, setIpUsuario] = useState('');
  
     const getIPUsuario = async () => {
+        let usuarioIP = null;
+
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
-            let usuarioIP = ipWhoisData?.ip;
-            if (!usuarioIP) {
-                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-                usuarioIP = ipifyData?.ip;
-            }
-            setIpUsuario(usuarioIP);
-            return usuarioIP;
+        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+        usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP:", error);
-            return null;
+        console.error("Erro ao buscar IP via ipwho.is:", error);
         }
+
+        if (!usuarioIP) {
+        try {
+            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+            usuarioIP = ipifyData?.ip;
+        } catch (error) {
+            console.error("Erro ao buscar IP via ipify.org:", error);
+        }
+        }
+        setIpUsuario(usuarioIP);
+        return usuarioIP;
     };
 
     useEffect(() => {
         if (dadosEditarEmpresa) {
             setGrupoEmpresa(dadosEditarEmpresa[0]?.IDGRUPOEMPRESARIAL == 1 ? "TO - TESOURA DE OURO" : dadosEditarEmpresa[0]?.IDGRUPOEMPRESARIAL == 2 ? "MG - MAGAZINE" : dadosEditarEmpresa[0]?.IDGRUPOEMPRESARIAL == 3 ? "YO - YORUS" : dadosEditarEmpresa[0]?.IDGRUPOEMPRESARIAL == 4 ? "FC - FREE CENTER" : "");
-            setSituacao(dadosEditarEmpresa[0]?.STATIVO == "True" || dadosEditarEmpresa[0]?.STATIVO == "ATIVO" ? "ATIVO" : dadosEditarEmpresa[0]?.STATIVO == "False" ? "INATIVO" : "");
+            setSituacao({value: dadosEditarEmpresa[0]?.STATIVO == "True" ? "ATIVO" : "INATIVO", label: dadosEditarEmpresa[0]?.STATIVO == "True" ? "ATIVO" : "INATIVO"});
             setDataCriacao(dadosEditarEmpresa[0]?.DTULTATUALIZACAO);
             setNomeFantasia(dadosEditarEmpresa[0]?.NOFANTASIA);
             setCep(dadosEditarEmpresa[0]?.NUCEP)
             setEndereco(dadosEditarEmpresa[0]?.EENDERECO)
-            setComplemento(dadosEditarEmpresa[0]?.ECOMPLEMENTO == '' ? "Atualizando" : "")
+            setComplemento(dadosEditarEmpresa[0]?.ECOMPLEMENTO)
             setBairro(dadosEditarEmpresa[0]?.EBAIRRO)
             setCidade(dadosEditarEmpresa[0]?.ECIDADE)
             setUF(dadosEditarEmpresa[0]?.SGUF)
@@ -65,13 +70,13 @@ export const useEditarEmpresa = ({ dadosEditarEmpresa, handleClose, refetch, usu
             NUINSCESTADUAL: String(dadosEditarEmpresa[0]?.NUINSCESTADUAL),
             NUINSCMUNICIPAL: String(dadosEditarEmpresa[0]?.NUINSCMUNICIPAL),
             CNAE: String(dadosEditarEmpresa[0]?.CNAE),
-            EENDERECO: String(endereco),
-            ECOMPLEMENTO: String(complemento),
-            EBAIRRO: String(bairro),
-            ECIDADE: String(cidade),
-            SGUF: dadosEditarEmpresa[0]?.SGUF,
+            EENDERECO: endereco,
+            ECOMPLEMENTO: complemento,
+            EBAIRRO: bairro,
+            ECIDADE: cidade,
+            SGUF: uf,
             NUUF: Number(uf === 'DF' ? 53 : 52),
-            NUCEP: String(cep),
+            NUCEP: cep,
             NUIBGE: String(dadosEditarEmpresa[0]?.NUIBGE),
             EEMAILPRINCIPAL: String(dadosEditarEmpresa[0]?.EEMAILPRINCIPAL),
             EEMAILCOMERCIAL: String(dadosEditarEmpresa[0]?.EEMAILCOMERCIAL),
@@ -86,7 +91,7 @@ export const useEditarEmpresa = ({ dadosEditarEmpresa, handleClose, refetch, usu
             NUCNAE: String(dadosEditarEmpresa[0]?.NUCNAE),
             STECOMMERCE: String(dadosEditarEmpresa[0]?.STECOMMERCE),
             DTULTATUALIZACAO: String(dadosEditarEmpresa[0]?.DTULTATUALIZACAO),
-            STATIVO: String(situacao),
+            STATIVO: situacao?.value,
             ALIQPIS: Number(dadosEditarEmpresa[0]?.ALIQPIS),
             ALIQCOFINS: Number(dadosEditarEmpresa[0]?.ALIQCOFINS)
         }

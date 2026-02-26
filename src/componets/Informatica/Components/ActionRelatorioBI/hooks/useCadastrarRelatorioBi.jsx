@@ -4,7 +4,6 @@ import { post } from "../../../../../api/funcRequest";
 import axios from "axios";
 
 export const useCadastrarRelatorioBi = ({ handleClose, refetch, optionsModulos, usuarioLogado }) => {
-
   const [statusSelecionado, setStatusSelecionado] = useState('');
   const [descricao, setDescricao] = useState('');
   const [ipUsuario, setIpUsuario] = useState('');
@@ -117,7 +116,7 @@ export const useCadastrarRelatorioBi = ({ handleClose, refetch, optionsModulos, 
       return responsePost.data;
     }
   }
-  
+
   return {
     onSubmit,
     descricao,

@@ -48,13 +48,14 @@ export const FormularioEditar = ({ handleClose, dadosEditarEmpresa, refetch, usu
   const options = [
     {
       value: "True",
-      label: "Ativo"
+      label: "ATIVO"
     },
     {
       value: "False",
-      label: "Inativo"
+      label: "INATIVO"
     }
   ]
+
   const handleValidatedSubmit = async () => {
     try {
       const dadosParaValidar = {
@@ -93,7 +94,7 @@ export const FormularioEditar = ({ handleClose, dadosEditarEmpresa, refetch, usu
       <form onSubmit={handleSubmit(handleValidatedSubmit)} >
 
         <div className="form-group">
-          <input type="hidden" header="IDEmpresaAtualizar" id="IDEmpresaAtualizar" value="" />
+          
           <div className="row">
             <div className="col-sm-4 col-xl-4">
               <InputFieldModal
@@ -101,6 +102,7 @@ export const FormularioEditar = ({ handleClose, dadosEditarEmpresa, refetch, usu
                 type="text"
                 readOnly={true}
                 value={grupoEmpresa}
+                onChangeModal={(e) => setGrupoEmpresa(e.target.value)}
               />
             </div>
             <div className="col-sm-4 col-xl-4">
@@ -109,12 +111,14 @@ export const FormularioEditar = ({ handleClose, dadosEditarEmpresa, refetch, usu
                 Situação:
               </label>
               <Select
-                options={options}
-                value={options.find(option =>
-                  (situacao === 'ATIVO' && option.value === 'True') ||
-                  (situacao === 'INATIVO' && option.value === 'False')
-                )}
-                onChange={(e) => setSituacao(e.value === 'True' ? 'ATIVO' : 'INATIVO')}
+                className="basic-single"
+                classNamePrefix={"select"}
+                options={options.map((item) => ({
+                  value: item.value,
+                  label: item.label
+                }))}
+                value={situacao}
+                onChange={(e) => setSituacao(e)}
               />
               {errors.situacaoSelecionada && (
                 <AlertError
@@ -132,6 +136,7 @@ export const FormularioEditar = ({ handleClose, dadosEditarEmpresa, refetch, usu
                 type="datetime"
                 readOnly={true}
                 value={dataFormatada(dataCriacao)}
+                onChangeModal={(e) => setDataCriacao(e.target.value)}
               />
             </div>
           </div>
@@ -143,6 +148,7 @@ export const FormularioEditar = ({ handleClose, dadosEditarEmpresa, refetch, usu
                 type="text"
                 readOnly={true}
                 value={nomeFantasia}
+                onChangeModal={(e) => setNomeFantasia(e.target.value)}
               />
             </div>
           </div>
@@ -189,8 +195,8 @@ export const FormularioEditar = ({ handleClose, dadosEditarEmpresa, refetch, usu
                   <InputFieldModal
                     label={"Complemento"}
                     type="text"
-
                     value={complemento}
+                    onChangeModal={(e) => setComplemento(e.target.value)}
                   />
                 </div>
 
@@ -273,6 +279,7 @@ export const FormularioEditar = ({ handleClose, dadosEditarEmpresa, refetch, usu
                         clearErrors={clearErrors}
                         value={email}
                         onChangeModal={(e) => setEmail(e.target.value)}
+                        readOnly={true}
                       />
                     )}
                   />
