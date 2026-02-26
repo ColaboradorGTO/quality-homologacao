@@ -220,6 +220,18 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
     try {
       const data = await processFile(file);
 
+      if (data.length > 1000) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Limite Excedido',
+          html: `
+            Limite máximo permitido: 1.000 produtos por promoção.
+            Caso contrário, os produtos não serão inseridos na promoção.
+          `,
+        });
+        return; // Interrompe o processamento
+      }
+
       if (isOrigem) {
         setFileProdutoOrigem(JSON.stringify(data));
       } else {
