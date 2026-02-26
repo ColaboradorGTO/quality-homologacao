@@ -185,9 +185,18 @@ export const InformaticaActionListCaixa = ({
 
     try {
       const response = await get(`/lista-caixas?idCaixaWeb=${IDCAIXAWEB}`);
-      if (response.data) {
+      if (response.data && response.data.length > 0) {
         setCaixaSelecionadoTabela(response.data)
         setModalVisivel(true)
+      } else {
+        Swal.fire({
+          position: 'center',
+          icon: 'info',
+          title: 'Nenhum dado encontrado para este caixa.',
+          showConfirmButton: true,
+          timer: 3000
+        })
+        return;
       }
       return response.data;
 

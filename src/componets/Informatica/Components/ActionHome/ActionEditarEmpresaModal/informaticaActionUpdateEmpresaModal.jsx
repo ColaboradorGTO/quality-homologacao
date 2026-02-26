@@ -17,19 +17,19 @@ export const InformaticaActionUpdateEmpresaModal = ({ show, handleClose, dadosLi
   const [caixaListaLimpar, setCaixaListaLimpar] = useState([]);
   const dataTableRef = useRef();
 
-     const handleCheckboxChange = (id, tipo) => {
-        if (tipo === 'atualizar') {
-            setCaixaListaAtualiza(prevState => {
-                const item = `A${id}`;
-                return prevState.includes(item) ? prevState.filter(i => i !== item) : [...prevState, item];
-            });
-        } else if (tipo === 'limpar') {
-            setCaixaListaLimpar(prevState => {
-                const item = `L${id}`;
-                return prevState.includes(item) ? prevState.filter(i => i !== item) : [...prevState, item];
-            });
-        }
-    };
+  const handleCheckboxChange = (id, tipo) => {
+    if (tipo === 'atualizar') {
+      setCaixaListaAtualiza(prevState => {
+        const item = `A${id}`;
+        return prevState.includes(item) ? prevState.filter(i => i !== item) : [...prevState, item];
+      });
+    } else if (tipo === 'limpar') {
+      setCaixaListaLimpar(prevState => {
+        const item = `L${id}`;
+        return prevState.includes(item) ? prevState.filter(i => i !== item) : [...prevState, item];
+      });
+    }
+  };
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -41,13 +41,13 @@ export const InformaticaActionUpdateEmpresaModal = ({ show, handleClose, dadosLi
   });
 
 
-    const dados = dadosListaCaixa.map((item, index) => {
-        return {
-            IDCAIXAWEB: item.IDCAIXAWEB,
-            DSCAIXA: item.DSCAIXA,
-            NOFANTASIA: item.NOFANTASIA,
-        }
-    });
+  const dados = dadosListaCaixa.map((item, index) => {
+    return {
+      IDCAIXAWEB: item.IDCAIXAWEB,
+      DSCAIXA: item.DSCAIXA,
+      NOFANTASIA: item.NOFANTASIA,
+    }
+  });
 
   const exportToPDF = () => {
     const doc = new jsPDF();
@@ -78,74 +78,74 @@ export const InformaticaActionUpdateEmpresaModal = ({ show, handleClose, dadosLi
     XLSX.writeFile(workbook, 'lista_caixas.xlsx');
   };
 
-      const colunasCaixa = [
-        {
-            field: 'IDCAIXAWEB',
-            header: 'ID',
-            key: 'id',
-            body: row => <th>{row.IDCAIXAWEB}</th>,
-            sortable: true,
+  const colunasCaixa = [
+    {
+      field: 'IDCAIXAWEB',
+      header: 'ID',
+      key: 'id',
+      body: row => <th>{row.IDCAIXAWEB}</th>,
+      sortable: true,
 
-        },
-        {
-            field: 'DSCAIXA',
-            header: 'CAIXA',
-            body: row => <th>{row.DSCAIXA}</th>,
-            sortable: true,
+    },
+    {
+      field: 'DSCAIXA',
+      header: 'CAIXA',
+      body: row => <th>{row.DSCAIXA}</th>,
+      sortable: true,
 
-        },
-        {
-            field: 'IDCAIXAWEB',
-            header: 'Atualizar',
-            key: 'atualizar',
-            body: (row) => {
-                return (
-                    <div className="custom-control custom-checkbox">
-                        <input
-                            type="checkbox"
-                            //id={row.IDCAIXAWEB}
-                            //checked={caixaListaAtualiza.includes(row.IDCAIXAWEB)}
-                            id={`atualizar-${row.IDCAIXAWEB}`}
-                            checked={caixaListaAtualiza.includes(`A${row.IDCAIXAWEB}`)}
-                            onChange={() => handleCheckboxChange(row.IDCAIXAWEB, 'atualizar')}
-                        />
-                    </div>
-                )
-            },
-            sortable: true,
+    },
+    {
+      field: 'IDCAIXAWEB',
+      header: 'Atualizar',
+      key: 'atualizar',
+      body: (row) => {
+        return (
+          <div className="custom-control custom-checkbox">
+            <input
+              type="checkbox"
+              //id={row.IDCAIXAWEB}
+              //checked={caixaListaAtualiza.includes(row.IDCAIXAWEB)}
+              id={`atualizar-${row.IDCAIXAWEB}`}
+              checked={caixaListaAtualiza.includes(`A${row.IDCAIXAWEB}`)}
+              onChange={() => handleCheckboxChange(row.IDCAIXAWEB, 'atualizar')}
+            />
+          </div>
+        )
+      },
+      sortable: true,
 
-        },
-        {
-            field: 'IDCAIXAWEB',
-            header: 'Limpar e Atualizar',
-            body: (row) => {
-                return (
-                    <div className="custom-control custom-checkbox">
-                        <input
-                            type="checkbox"
-                            //id={row.IDCAIXAWEB}
-                            //checked={caixaListaLimpar.includes(row.IDCAIXAWEB)}
-                            id={`limpar-${row.IDCAIXAWEB}`}
-                            checked={caixaListaLimpar.includes(`L${row.IDCAIXAWEB}`)}
-                            onChange={() => handleCheckboxChange(row.IDCAIXAWEB, 'limpar')}
+    },
+    {
+      field: 'IDCAIXAWEB',
+      header: 'Limpar e Atualizar',
+      body: (row) => {
+        return (
+          <div className="custom-control custom-checkbox">
+            <input
+              type="checkbox"
+              //id={row.IDCAIXAWEB}
+              //checked={caixaListaLimpar.includes(row.IDCAIXAWEB)}
+              id={`limpar-${row.IDCAIXAWEB}`}
+              checked={caixaListaLimpar.includes(`L${row.IDCAIXAWEB}`)}
+              onChange={() => handleCheckboxChange(row.IDCAIXAWEB, 'limpar')}
 
-                        />
-                    </div>
-                )
-            },
-            sortable: true,
-        },
+            />
+          </div>
+        )
+      },
+      sortable: true,
+    },
 
-    ]
+  ]
 
-    const atualizacaoDiario = [
-        { value: "True", label: "SIM" },
-        { value: "False", label: "NÃO" }
-    ]
-    const status = [
-        { value: "True", label: "Aberta" },
-        { value: "False", label: "Fechada" }
-    ]
+  const atualizacaoDiario = [
+    { value: "True", label: "SIM" },
+    { value: "False", label: "NÃO" }
+  ]
+  const status = [
+    { value: "True", label: "Aberta" },
+    { value: "False", label: "Fechada" }
+  ]
 
 
   return (
@@ -173,8 +173,8 @@ export const InformaticaActionUpdateEmpresaModal = ({ show, handleClose, dadosLi
             globalFilterValue={globalFilterValue}
             setGlobalFilterValue={setGlobalFilterValue}
             caixaListaAtualiza={caixaListaAtualiza}
-            setCaixaListaAtualiza={setCaixaListaAtualiza}   
-            caixaListaLimpar ={caixaListaLimpar}
+            setCaixaListaAtualiza={setCaixaListaAtualiza}
+            caixaListaLimpar={caixaListaLimpar}
             status={status}
             atualizacaoDiario={atualizacaoDiario}
             handleClose={handleClose}
@@ -230,7 +230,7 @@ export const InformaticaActionUpdateEmpresaModal = ({ show, handleClose, dadosLi
 
 
         </Modal.Body>
-        
+
       </Modal>
     </Fragment>
   )

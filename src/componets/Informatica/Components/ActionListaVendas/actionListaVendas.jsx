@@ -1,5 +1,4 @@
 import React, { Fragment, useEffect, useState, useRef } from "react"
-import { dataFormatada } from "../../../../utils/dataFormatada"
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { get } from "../../../../api/funcRequest"
@@ -17,6 +16,7 @@ import HeaderTable from "../../../Tables/headerTable";
 import { toFloat } from "../../../../utils/toFloat";
 import { ColumnGroup } from "primereact/columngroup";
 import { Row } from "primereact/row";
+import Swal from "sweetalert2";
 
 export const ActionListaVendas = ({ dadosVendasLoja }) => {
   const [dadosPagamentoModal, setDadosPagamentoModal] = useState([]);
@@ -83,6 +83,7 @@ export const ActionListaVendas = ({ dadosVendasLoja }) => {
 
   const dados = dadosVendasLoja.map((item, index) => {
     let contador = index + 1;
+    
     return {
       contador,
       IDCAIXAWEB: `${item.IDCAIXAWEB} - ${item.DSCAIXA}`,
@@ -92,7 +93,7 @@ export const ActionListaVendas = ({ dadosVendasLoja }) => {
       DTHORAFECHAMENTO: item.DTHORAFECHAMENTO,
       NOFUNCIONARIO: item.NOFUNCIONARIO,
       VRTOTALPAGO: item.VRTOTALPAGO,
-      STCONTINGENCIA: item.STCONTINGENCIA,
+      STCONTINGENCIA: item.STCONTINGENCIA == 'False' ? 'Contigência' : 'Emitida',
       STCONFERIDO: item.STCONFERIDO,
 
     };
@@ -187,8 +188,8 @@ export const ActionListaVendas = ({ dadosVendasLoja }) => {
       header: 'Nota',
       body: (
         (row) => (
-          <th style={{ color: row.STCONTINGENCIA == 'false' ? 'red' : 'blue' }}>
-            {row.STCONTINGENCIA == 'false' ? 'Contigência' : 'Emitida'}
+          <th style={{ color: row.STCONTINGENCIA == 'Contigência' ? 'red' : 'blue' }}>
+            {row.STCONTINGENCIA}
 
           </th>
         )
@@ -209,7 +210,8 @@ export const ActionListaVendas = ({ dadosVendasLoja }) => {
       sortable: true,
     },
     {
-      field: 'STCONFERIDO',
+      
+      field: 'IDVENDA',
       header: 'Opções',
       body: (
         (row) => (
@@ -265,9 +267,20 @@ export const ActionListaVendas = ({ dadosVendasLoja }) => {
   const handleDetalha = async (IDVENDA) => {
     try {
       const response = await get(`/detalhe-venda?idVenda=${IDVENDA}`);
-      if (response.data) {
+      if (response.data && response.data.length > 0) {
         setDadosVendas(response.data);
         setModalDetalheVendasVisivel(true);
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Nenhum detalhe encontrado',
+          text: `Não foram encontrados detalhes para esta venda .`,
+          confirmButtonText: 'OK',
+          customClass: {
+            container: 'custom-swal',
+          }
+        })
+        return;
       }
     } catch (error) {
       console.error(error, "não foi possível carregar os dados da tabela, detalhe Venda");
@@ -276,16 +289,27 @@ export const ActionListaVendas = ({ dadosVendasLoja }) => {
 
   const handleClickDetalhar = (row) => {
     if (row && row.IDVENDA) {
-      handleDetalha(row);
+      handleDetalha(row.IDVENDA);
     }
   }
 
   const handleEditPagamento = async (IDVENDA) => {
     try {
       const response = await get(`/recebimento?idVenda=${IDVENDA}`)
-      if (response.data) {
+      if (response.data && response.data.length > 0) {
         setDadosPagamentoModal(response.data)
         setModalPagamentoVisivel(true)
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Nenhum recebimento encontrado',
+          text: `Não foram encontrados recebimentos para esta venda .`,
+          confirmButtonText: 'OK',
+          customClass: {
+            container: 'custom-swal',
+          }
+        })
+        return;
       }
     } catch (error) {
       console.error(error, 'não foi possivel pegar os dados da tabela')

@@ -86,7 +86,6 @@ export const DashBoardInformatica = () => {
   }, {});
 
 
-
   let component = null;
 
   switch (componentToShow) {

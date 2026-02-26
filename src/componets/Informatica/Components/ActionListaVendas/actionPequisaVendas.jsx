@@ -35,7 +35,7 @@ export const ActionPesquisaVendas = () => {
       return response.data;
     },
     {
-      staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000
+      staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000
     }
   );
 
@@ -76,8 +76,8 @@ export const ActionPesquisaVendas = () => {
 
   const { data: dadosVendasLoja = [], error: erroCliente, isLoading: isLoadingCliente, refetch: refetchListaVendas } = useQuery(
     'vendas-loja-informatica',
-    () => fetchListaVendas(empresaSelecionada, dataPesquisaInicio, dataPesquisaFim, currentPage, pageSize),
-    { enabled: false, staleTime: 5 * 60 * 1000 }
+    () => fetchListaVendas(),
+    { enabled: false, staleTime: 60 * 60 * 1000 }
   );
 
   
@@ -88,10 +88,8 @@ export const ActionPesquisaVendas = () => {
   }
 
   const handleTabelaVisivel = () => {
-    setCurrentPage(+1);
-    refetchListaVendas(empresaSelecionada);
+    refetchListaVendas();
     setTabelaVisivel(true);
-    
   };
 
 
@@ -133,12 +131,9 @@ export const ActionPesquisaVendas = () => {
         corSearch={"primary"}
         IconSearch={AiOutlineSearch}
       />
-
-     
       
       <ActionListaVendas dadosVendasLoja={dadosVendasLoja} />
       
-
     </Fragment>
   )
 }

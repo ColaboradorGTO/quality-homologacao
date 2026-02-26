@@ -1,7 +1,6 @@
 import Swal from "sweetalert2";
-import { post, put } from "../../../../../api/funcRequest";
+import { post } from "../../../../../api/funcRequest";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from 'axios'
 import { getDataAtual } from "../../../../../utils/dataAtual";
 

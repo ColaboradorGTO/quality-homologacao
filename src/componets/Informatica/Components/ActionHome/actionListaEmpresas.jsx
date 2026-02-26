@@ -195,24 +195,43 @@ export const ActionListaEmpresas = ({ dadosEmpresas, setActionVisivel, optionsMo
   ]
 
   const refetchListaCaixa = async (IDEMPRESA) => {
-  try {
-    const response = await get(`/lista-caixas?idEmpresa=${IDEMPRESA}`);
-    if (response.data) {
-      setDadosListaCaixa(response.data);
+    try {
+      const response = await get(`/lista-caixas?idEmpresa=${IDEMPRESA}`);
+      if (response.data && response.data.length > 0) {
+        setDadosListaCaixa(response.data);
+      } else {
+        Swal.fire({
+          position: 'center',
+          icon: 'info',
+          title: 'Nenhum caixa encontrado para esta empresa.',
+          showConfirmButton: true,
+          timer: 3000
+        })
+        return;
+      }
+    } catch (error) {
+      console.error('Erro ao recarregar lista de caixas:', error);
     }
-  } catch (error) {
-    console.error('Erro ao recarregar lista de caixas:', error);
-  }
-};
+  };
 
   const handleEditarEmpresa = async (IDEMPRESA) => {
     try {
       const response = await get(`/listaEmpresas?idEmpresa=${IDEMPRESA}`);
-      if (response.data) {
+      if (response.data && response.data.length > 0) {
         setDadosDetalheEmpresas(response.data);
         setModalCertificado(true);
 
+      } else {
+        Swal.fire({
+          position: 'center',
+          icon: 'info',
+          title: 'Detalhes da empresa não encontrados.',
+          showConfirmButton: true,
+          timer: 3000
+        })
+        return;
       }
+      return response.data;
     } catch (error) {
       console.log(error, 'não foi possível carregar os detalhes da empresa')
     }
@@ -229,7 +248,7 @@ export const ActionListaEmpresas = ({ dadosEmpresas, setActionVisivel, optionsMo
         position: 'center',
         icon: 'error',
         title: 'Você não tem permissão!',
-        text: 'Acesso Negado para Editar Empresas',
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Acesso Negado para Editar Empresas`,
         showConfirmButton: true,
         timer: 3000
       })
@@ -245,6 +264,15 @@ export const ActionListaEmpresas = ({ dadosEmpresas, setActionVisivel, optionsMo
         setDadosListaCaixa(response.data);
         setDadosAtualizaEmpresa(responseAtualiza.data);
         setModalEditarEmpresa(true);
+      } else {
+        Swal.fire({
+          position: 'center',
+          icon: 'info',
+          title: 'Nenhum dado encontrado para atualizar a empresa.',
+          showConfirmButton: true,
+          timer: 3000
+        })
+        return;
       }
     } catch (error) {
       console.log(error, 'não foi possível carregar os detalhes da empresa')
@@ -261,7 +289,7 @@ export const ActionListaEmpresas = ({ dadosEmpresas, setActionVisivel, optionsMo
         position: 'center',
         icon: 'error',
         title: 'Você não tem permissão!',
-        text: 'Acesso Negado para Atualizar Empresas',
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Acesso Negado para Atualizar Empresas`,
         showConfirmButton: true,
         timer: 3000
       })
@@ -273,12 +301,21 @@ export const ActionListaEmpresas = ({ dadosEmpresas, setActionVisivel, optionsMo
     try {
       const response = await get(`/lista-caixas?idEmpresa=${IDEMPRESA}`);
 
-      if (response.data) {
+      if (response.data && response.data.length > 0) {
         setDadosListaCaixa(response.data)
         setActionListaCaixaVisivel(true);
         setTabelaVisivel(false);
         setActionVisivel(false)
 
+      } else {
+        Swal.fire({
+          position: 'center',
+          icon: 'info',
+          title: 'Nenhum caixa encontrado para esta empresa.',
+          showConfirmButton: true,
+          timer: 3000
+        })
+        return;
       }
       return response.data;
 
@@ -299,7 +336,7 @@ export const ActionListaEmpresas = ({ dadosEmpresas, setActionVisivel, optionsMo
         position: 'center',
         icon: 'error',
         title: 'Você não tem permissão!',
-        text: 'Acesso Negado para Listar Caixas',
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Acesso Negado para Listar Caixas`,
         showConfirmButton: true,
         timer: 3000
       })
@@ -378,6 +415,8 @@ export const ActionListaEmpresas = ({ dadosEmpresas, setActionVisivel, optionsMo
         show={modalCertificado}
         handleClose={() => setModalCertificado(false)}
         dadosDetalheEmpresas={dadosDetalheEmpresas}
+        usuarioLogado={usuarioLogado}
+        optionsModulos={optionsModulos}
       />
 
       {actionListaCaixaVisivel && (
