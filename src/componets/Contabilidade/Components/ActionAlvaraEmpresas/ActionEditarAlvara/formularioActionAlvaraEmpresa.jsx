@@ -11,6 +11,9 @@ import { CiUser } from "react-icons/ci";
 import { mascaraTelefone } from "../../../../../utils/mascaraTelefone";
 import { mascaraCNPJ } from "../../../../../utils/mascaraCNPJ.js";
 import { ActionListaAlvaraPrefeitura } from "./ActionAvaraPrefeituraLista/actionListaAlvaraPrefeitura.jsx";
+import { ActionListaAlvaraBombeiro } from "./ActionAvaraBombeiroLista/actionListaAlvaraBombeiro.jsx";
+import { ActionListaAlvaraMeioAmbiente } from "./ActionAvaraMeioAmbienteLista/actionListaAlvaraMeioAmbiente.jsx";
+import { ActionListaAlvaraVigilanciaSanitaria } from "./ActionAvaraVigilanciaSanitariaLista/actionListaAlvaraVigilanciaSanitaria.jsx";
 
 export const FormularioActionAlvaraEmpresa = ({
     dadosAlvaraEmpresaSelecionada,
@@ -31,7 +34,7 @@ export const FormularioActionAlvaraEmpresa = ({
 
     return (
         <Fragment>
-            <form>
+            <form className="border p-2 rounded h-100 shadow-sm bg-white">
                 <span class="d-flex align-items-center">
                     <BsBuilding size={25} />
                     <h1 class="font-weight-bold" style={{ margin: 0, marginLeft: "15px" }}>
@@ -185,7 +188,7 @@ export const FormularioActionAlvaraEmpresa = ({
                     </div>
                 </div>
 
-                <hr style={{ borderTop: "1px dashed #999" }} />
+                <hr style={{ borderTop: "1px dashed #eeeeee", margin: "30px 0" }} />
 
                 <div class="form-group">
 
@@ -310,7 +313,7 @@ export const FormularioActionAlvaraEmpresa = ({
                     </div>
                 </div>
 
-                <hr style={{ borderTop: "2px dashed #999" }} />
+                <hr style={{ borderTop: "1px dashed #eeeeee", margin: "30px 0" }} />
 
                 <span class="d-flex align-items-center">
                     <MdOutlinePhoneEnabled size={25} />
@@ -454,18 +457,56 @@ export const FormularioActionAlvaraEmpresa = ({
 
                 </div>
 
-                <hr style={{ borderTop: "2px dashed #999" }} />
+                <hr style={{ borderTop: "1px dashed #eeeeee", margin: "30px 0" }} />
 
+
+                <div className="row m-0 g-3">
+
+                    <div className="col-12 col-xl-6">
+                        <ActionListaAlvaraBombeiro
+                            dadosAlvaraEmpresaSelecionada={dadosAlvaraEmpresaSelecionada}
+                            handleClose={handleClose}
+                            optionsModulos={optionsModulos}
+                            usuarioLogado={usuarioLogado}
+                            refetchAlvaraEmpresa={refetchAlvaraEmpresa}
+                            refetchAlvaraSelecionado={refetchAlvaraSelecionado}
+                        />
+                    </div>
+
+                    <div className="col-12 col-xl-6">
+                        <ActionListaAlvaraMeioAmbiente
+                            dadosAlvaraEmpresaSelecionada={dadosAlvaraEmpresaSelecionada}
+                            handleClose={handleClose}
+                            optionsModulos={optionsModulos}
+                            usuarioLogado={usuarioLogado}
+                            refetchAlvaraEmpresa={refetchAlvaraEmpresa}
+                            refetchAlvaraSelecionado={refetchAlvaraSelecionado}
+                        />
+                    </div>
+
+                    <div className="col-12 col-xl-6">
+                        <ActionListaAlvaraVigilanciaSanitaria
+                            dadosAlvaraEmpresaSelecionada={dadosAlvaraEmpresaSelecionada}
+                            handleClose={handleClose}
+                            optionsModulos={optionsModulos}
+                            usuarioLogado={usuarioLogado}
+                            refetchAlvaraEmpresa={refetchAlvaraEmpresa}
+                            refetchAlvaraSelecionado={refetchAlvaraSelecionado}
+                        />
+                    </div>
+
+                    <div className="col-12 col-xl-6">
+                        <ActionListaAlvaraPrefeitura
+                            dadosAlvaraEmpresaSelecionada={dadosAlvaraEmpresaSelecionada}
+                            handleClose={handleClose}
+                            optionsModulos={optionsModulos}
+                            usuarioLogado={usuarioLogado}
+                            refetchAlvaraEmpresa={refetchAlvaraEmpresa}
+                            refetchAlvaraSelecionado={refetchAlvaraSelecionado}
+                        />
+                    </div>
+                </div>
             </form>
-            <ActionListaAlvaraPrefeitura
-                dadosAlvaraEmpresaSelecionada={dadosAlvaraEmpresaSelecionada}
-                handleClose={handleClose}
-                optionsModulos={optionsModulos}
-                usuarioLogado={usuarioLogado}
-                refetchAlvaraEmpresa={refetchAlvaraEmpresa}
-                refetchAlvaraSelecionado={refetchAlvaraSelecionado}
-            />
-
             <FooterModal
                 ButtonTypeFechar={ButtonTypeModal}
                 textButtonFechar={"Fechar"}

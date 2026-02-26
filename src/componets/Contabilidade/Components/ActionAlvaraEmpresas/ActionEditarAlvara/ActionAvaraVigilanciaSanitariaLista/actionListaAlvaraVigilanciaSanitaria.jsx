@@ -17,7 +17,7 @@ import { ActionEditarDetalhesAlvaraModal } from "./ActionEditarAlvaraModal/actio
 import { formatarDataParaBR } from "../../../../../../utils/dataFormatada";
 import { useQuery } from "react-query";
 
-export const ActionListaAlvaraPrefeitura = ({
+export const ActionListaAlvaraVigilanciaSanitaria = ({
     dadosAlvaraEmpresaSelecionada,
     optionsModulos,
     usuarioLogado,
@@ -113,7 +113,7 @@ export const ActionListaAlvaraPrefeitura = ({
     const dados = dadosAlvaraEmpresaSelecionada
         .flatMap((empresa) => {
             return empresa.LISTA_ALVARAS
-                .filter(alvara => alvara.IDALVARA === 4)
+                .filter(alvara => alvara.IDALVARA === 3)
                 .flatMap(alvara =>
                     alvara.ITEMS.map(item => ({
                         IDVINCULO: item.IDVINCULO,
@@ -249,7 +249,7 @@ export const ActionListaAlvaraPrefeitura = ({
             <div className="panel">
                 <div className="panel-hdr m-3">
 
-                    <h2>ALVARÁS - PREFEITURA (LICENÇA DE FUNCIONAMENTO)</h2>
+                    <h2>ALVARÁS - VIGILÂNCIA SANITÁRIA (LICENÇA SANITÁRIA)</h2>
 
                 </div>
                 <div style={{ marginBottom: "0.5rem" }}>
@@ -319,7 +319,7 @@ export const ActionListaAlvaraPrefeitura = ({
                 usuarioLogado={usuarioLogado}
                 refetchAlvaraEmpresa={refetchAlvaraEmpresa}
                 refetchAlvaraSelecionado={refetchAlvaraSelecionado}
-                idAlvaraSelecionado={4}
+                idAlvaraSelecionado={3}
             />
 
             <ActionVisualizarDetalhesAlvaraModal
