@@ -24,9 +24,11 @@ export const ActionListaAlvaras = ({
     setIdEmpresaSelecionada,
     isLoadingAlvaraSelecionado
 }) => {
+    
     const [globalFilterValue, setGlobalFilterValue] = useState('');
     const [rowSelection, setRowSelection] = useState(null);
     const [modalAlvaraEmpresa, setModalAlvaraEmpresa] = useState(false);
+    const [dadosAlvaraEmpresaSelecionada, setDadosAlvaraEmpresaSelecionada] = useState(null);
     const dataTableRef = useRef();
 
     const onGlobalFilterChange = (e) => {
@@ -370,6 +372,30 @@ export const ActionListaAlvaras = ({
         setIdEmpresaSelecionada(row.IDEMPRESA);
         setModalAlvaraEmpresa(true);
     };
+
+    const handleEditAlvaraEmpresa = async (IDEMPRESA) => {
+        try {
+            const response = await get(`/alvaras-empresa-detalhe?idFilial=${IDEMPRESA}`)
+            if (response.data && response.data.length > 0) {
+                setDadosAlvaraEmpresaSelecionada(response.data)
+                setModalAlvaraEmpresa(true)
+                return response.data;
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Atenção',
+                    text: 'Nenhum dado encontrado para o alvará selecionado.',
+                    customClass: {
+                        container: 'custom-swal',
+                    },
+                    timer: 3000
+                })
+                return;
+            }
+        } catch (error) {
+            console.log(error, "não foi possivel pegar os dados da tabela ")
+        }
+    }
 
     return (
 

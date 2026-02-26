@@ -11,7 +11,6 @@ import { FaPencilAlt } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { get } from "../../../../../../api/funcRequest";
 import { FaPlus, FaRegEye } from "react-icons/fa6";
-import { useQuery } from "react-query";
 import { ActionCadastrarAlvaraModal } from "./ActionCadastrarAlvaraModal/actionCadastrarAlvaraModal";
 import { ActionVisualizarDetalhesAlvaraModal } from "./ActionVisualizarAlvaraModal/actionVisualizarDetalhesAlvaraModal";
 import { ActionEditarDetalhesAlvaraModal } from "./ActionEditarAlvaraModal/actionEditarDetalhesAlvaraModal";
@@ -31,19 +30,9 @@ export const ActionListaAlvaraPrefeitura = ({
     const [modalVisualizarAlvaraEmpresa, setModalVisualizarAlvaraEmpresa] = useState(false);
     const [modalEditarAlvaraEmpresa, setModalEditarAlvaraEmpresa] = useState(false);
     const [idVinculoAlvara, setIdVinculoAlvara] = useState(null);
+    const [dadosAlvaraSelecionado, setDadosAlvaraSelecionado] = useState(null);
     const dataTableRef = useRef();
 
-    const {
-        data: dadosAlvaraSelecionado = [], refetch: refetchVinculoAlvara, isLoading: isLoadingVinculoAlvara } = useQuery(
-            ['vinculo-alvara-empresa', idVinculoAlvara],
-            async () => {
-                const response = await get(
-                    `/vinculo-alvaras-empresa?idFilial=${idVinculoAlvara}`
-                );
-                return response.data;
-            },
-            { enabled: !!idVinculoAlvara, }
-        );
 
     const onGlobalFilterChange = (e) => {
         setGlobalFilterValue(e.target.value);
@@ -185,6 +174,48 @@ export const ActionListaAlvaraPrefeitura = ({
         }
     ]
 
+    const handleClickEditarAlvara = (row) => {
+        if (optionsModulos[0]?.ALTERAR === 'True') {
+            if (row && row.IDVINCULO) {
+                handleEditarAlvara(row.IDVINCULO)
+            }
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Atenção!',
+                text: 'Você não tem permissão para editar alvará.',
+                confirmButtonColor: '#7352A5',
+                customClass: {
+                    container: 'custom-swal',
+                },
+            });
+        }
+    };
+
+    const handleEditarAlvara = async (IDVINCULO) => {
+        try {
+            const response = await get(`/vinculo-alvaras-empresa?idFilial=${IDVINCULO}`)
+            if (response.data && response.data.length > 0) {
+                setDadosAlvaraSelecionado(response.data)
+                setModalEditarAlvaraEmpresa(true)
+                return response.data;
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Atenção',
+                    text: 'Nenhum dado encontrado para o alvará selecionado.',
+                    customClass: {
+                        container: 'custom-swal',
+                    },
+                    timer: 3000
+                })
+                return;
+            }
+        } catch (error) {
+            console.log(error, "não foi possivel pegar os dados da tabela ")
+        }
+    }
+
     const handleClickVisualizarAlvara = (row) => {
         if (optionsModulos[0]?.ALTERAR === 'True') {
             if (row && row.IDVINCULO) {
@@ -207,28 +238,6 @@ export const ActionListaAlvaraPrefeitura = ({
         setIdVinculoAlvara(IDVINCULO);
         setModalVisualizarAlvaraEmpresa(true);
 
-    };
-
-    const handleClickEditarAlvara = (row) => {
-        if (optionsModulos[0]?.ALTERAR === 'True') {
-            if (row && row.IDVINCULO) {
-                handleEditarAlvara(row.IDVINCULO);
-            }
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Atenção!',
-                text: 'Você não tem permissão para editar alvará.',
-                confirmButtonColor: '#7352A5',
-                customClass: {
-                    container: 'custom-swal',
-                },
-            });
-        }
-    };
-    const handleEditarAlvara = async (IDVINCULO) => {
-        setIdVinculoAlvara(IDVINCULO);
-        setModalEditarAlvaraEmpresa(true);
     };
 
     const handleClickCadastrarAlvara = () => {
@@ -342,7 +351,7 @@ export const ActionListaAlvaraPrefeitura = ({
                 usuarioLogado={usuarioLogado}
                 refetchAlvaraEmpresa={refetchAlvaraEmpresa}
                 refetchAlvaraSelecionado={refetchAlvaraSelecionado}
-                refetchVinculoAlvara={refetchVinculoAlvara}
+                refetchVinculoAlvara={handleEditarAlvara}
             />
 
         </Fragment>
