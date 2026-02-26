@@ -145,61 +145,12 @@ export const ActionListaExtratoMovimentoBonificacao = ({
 
   ]
 
-  const handleEditar = async (IDFUNCIONARIO) => {
-    try {
-      const response = await get(`/despesaTodasLojas?idEmpresa=${IDFUNCIONARIO}`);
-
-      if (response.data) {
-        setDadosDespesasLojaDetalhe(response.data)
-        setModalDespesasVisivel(true);
-      }
-    } catch (error) {
-      console.error('Erro ao buscar detalhes da despesa: ', error);
-    }
-  };
-  
-  const handleClickEditar = (row) => {
-    if (row && row.IDFUNCIONARIO) {
-      handleEditar(row.IDFUNCIONARIO);
-    }
-  };
-
-
-  const handleShowModal = () => {
-    if(optionsModulos[0]?.CRIAR == 'True')  {
-      setModalVisivel(true);
-    } else {
-      Swal.fire({
-        position: 'center',
-        icon: 'error',
-        title: 'Acesso Negado!',
-        text: 'Você não tem permissão para editar esta despesa.',
-        showConfirmButton: false,
-        timer: 1500,
-        customClass: {
-          container: 'custom-swal',
-        }
-      })
-    }
-  }
 
   return (
 
     <Fragment>
 
         <div className="resultado">
-          <div className="mb-4">
-            <ButtonType
-
-              textButton="Cadastrar Bonificação"
-              type="button"
-              cor="success"
-              Icon={MdOutlineAdd}
-              iconColor="#fff"
-              iconSize={25}
-              onClickButtonType={handleShowModal}
-            />
-          </div>
 
           <div>
             <table id="" class="table table-bordered  table-responsive-lg table-striped " width="100%">
@@ -272,15 +223,6 @@ export const ActionListaExtratoMovimentoBonificacao = ({
 
         </div>
 
-      <ActionCadastroDepositoBonificacaoModal 
-        show={modalVisivel}
-        handleClose={() => setModalVisivel(false)}
-        usuarioLogado={usuarioLogado}
-        funcionarioSelecionado={funcionarioSelecionado}
-        setFuncionarioSelecionado={setFuncionarioSelecionado}
-        optionsModulos={optionsModulos}
-        optionsFuncionarios={optionsFuncionarios}
-      />
     </Fragment>
   )
 }

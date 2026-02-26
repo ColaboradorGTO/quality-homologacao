@@ -7,12 +7,16 @@ import { ActionListaExtratoMovimentoBonificacao } from "./actionListaExtratoMovi
 import { get } from "../../../../api/funcRequest";
 import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
+import { MdOutlineAdd } from "react-icons/md";
+import { ActionCadastroDepositoBonificacaoModal } from "./CadastrarBonificao/actionCadastroDepositoBonificacaoModal";
+import Swal from "sweetalert2";
 
 export const ActionPesquisaExtratoMovimentoBonificacao = ({usuarioLogado}) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [funcionarioSelecionado, setFuncionarioSelecionado] = useState('');
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
-
+  const [modalVisivel, setModalVisivel] = useState(false);
+  
   useEffect(() => {
     const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
     if (menuSalvo) {
@@ -112,6 +116,23 @@ export const ActionPesquisaExtratoMovimentoBonificacao = ({usuarioLogado}) => {
   }
 
 
+  const handleShowModal = () => {
+    if(optionsModulos[0]?.CRIAR == 'True')  {
+      setModalVisivel(true);
+    } else {
+      Swal.fire({
+        position: 'center',
+        icon: 'error',
+        title: 'Acesso Negado!',
+        text: 'Você não tem permissão para editar esta despesa.',
+        showConfirmButton: false,
+        timer: 1500,
+        customClass: {
+          container: 'custom-swal',
+        }
+      })
+    }
+  }
   
   return (
 
@@ -139,6 +160,12 @@ export const ActionPesquisaExtratoMovimentoBonificacao = ({usuarioLogado}) => {
         onButtonClickSearch={handleClick}
         corSearch={"primary"}
         IconSearch={AiOutlineSearch}
+
+        ButtonTypeCadastro={ButtonType}
+        linkNome={"Cadastrar Bonificação"}
+        onButtonClickCadastro
+        corCadastro="success"
+        IconCadastro={MdOutlineAdd}
       />
 
       {tabelaVisivel && (
@@ -155,6 +182,16 @@ export const ActionPesquisaExtratoMovimentoBonificacao = ({usuarioLogado}) => {
           />
         </div>
       )}
+
+      <ActionCadastroDepositoBonificacaoModal 
+        show={modalVisivel}
+        handleClose={() => setModalVisivel(false)}
+        usuarioLogado={usuarioLogado}
+        funcionarioSelecionado={funcionarioSelecionado}
+        setFuncionarioSelecionado={setFuncionarioSelecionado}
+        optionsModulos={optionsModulos}
+        optionsFuncionarios={optionsFuncionarios}
+      />
     </Fragment>
   )
 }
