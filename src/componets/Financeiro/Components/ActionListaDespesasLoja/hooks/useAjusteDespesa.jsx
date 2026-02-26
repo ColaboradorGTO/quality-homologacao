@@ -21,7 +21,7 @@ export const useAjusteDespesa = ({ dadosDespesasLojaDetalhe, usuarioLogado, hand
     let usuarioIP = null;
 
     try {
-      const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+      const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
       usuarioIP = ipWhoisData?.ip;
     } catch (error) {
       console.error("Erro ao buscar IP via ipwho.is:", error);
@@ -110,7 +110,7 @@ export const useAjusteDespesa = ({ dadosDespesasLojaDetalhe, usuarioLogado, hand
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || 'IP não disponível',
       }
       
       await post('/log-web', createData)
@@ -136,7 +136,7 @@ export const useAjusteDespesa = ({ dadosDespesasLojaDetalhe, usuarioLogado, hand
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || 'IP não disponível',
       }
       
       const response = await post('/log-web', createData)

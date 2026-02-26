@@ -19,10 +19,10 @@ export const useEditarFatura = ({ dadosDetalheFaturaCaixa, optionsModulos, handl
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
-            usuarioIP = ipWhoisData?.ip;
+        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+        usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP via ipwho.is:", error);
+        console.error("Erro ao buscar IP via ipwho.is:", error);
         }
 
         if (!usuarioIP) {
@@ -92,7 +92,7 @@ export const useEditarFatura = ({ dadosDetalheFaturaCaixa, optionsModulos, handl
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: `FINANCEIRO/ALTERAÇÃO DE FATURA`,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'IP não disponível',
             }
 
             await post('/log-web', postData)
@@ -117,7 +117,7 @@ export const useEditarFatura = ({ dadosDetalheFaturaCaixa, optionsModulos, handl
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: `FINANCEIRO/ERRO AO ALTERAR FATURA`,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'IP não disponível',
             }
 
             const responsePost = await post('/log-web', postData)

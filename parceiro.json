@@ -182,5 +182,33 @@
       "label": "PSF",
       "value": "PSF"
     }
+  ],
+  "optionsQuebraDeCaixa": [
+    {
+      "value": "",
+      "label": "Todas"
+    },
+    {
+      "value": "Positiva",
+      "label": "Positiva"
+    },
+    {
+      "value": "Negativa",
+      "label": "Negativa"
+    }
+  ],
+  "optionsUF": [
+    {
+      "value": "",
+      "label": "Todos"
+    },
+    {
+      "value": "DF",
+      "label": "DF"
+    },
+    {
+      "value": "GO",
+      "label": "GO"
+    }
   ]
 }

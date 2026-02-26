@@ -10,10 +10,10 @@ export const useConferirQuebra = ({optionsModulos, usuarioLogado, selectedItems,
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
-            usuarioIP = ipWhoisData?.ip;
+        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+        usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP via ipwho.is:", error);
+        console.error("Erro ao buscar IP via ipwho.is:", error);
         }
 
         if (!usuarioIP) {
@@ -28,7 +28,6 @@ export const useConferirQuebra = ({optionsModulos, usuarioLogado, selectedItems,
         return usuarioIP;
     };
 
-    console.log(selectedItems, 'selectedItems no useConferirQuebra');
 
     const conferir = async (data) => {
         if(optionsModulos[0]?.ALTERAR == 'False') {
@@ -82,7 +81,7 @@ export const useConferirQuebra = ({optionsModulos, usuarioLogado, selectedItems,
                         IDFUNCIONARIO: String(usuarioLogado.id),
                         PATHFUNCAO: `FINANCEIRO/CONFERIR QUEBRA DE CAIXA SELECIONADA`,
                         DADOS: textDados,
-                        IP: ipUsuario
+                        IP: ipUsuario || 'IP não disponível'
                     }
                     
                     await post('/log-web', postData)
@@ -106,7 +105,7 @@ export const useConferirQuebra = ({optionsModulos, usuarioLogado, selectedItems,
                         IDFUNCIONARIO: String(usuarioLogado.id),
                         PATHFUNCAO: `FINANCEIRO/ERRO AO CONFERIR QUEBRA DE CAIXA SELECIONADA`,
                         DADOS: textDados,
-                        IP: ipUsuario
+                        IP: ipUsuario || 'IP não disponível'
                     }
                     
                     const responsePost = await post('/log-web', postData)

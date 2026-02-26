@@ -14,8 +14,9 @@ import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../ut
 import { IoMdCheckmark } from "react-icons/io";
 import Swal from "sweetalert2";
 import { useConferirTodasQuebras } from "./hooks/useConfeririTodasQuebras";
+import {optionsQuebraDeCaixa, optionsUF} from "../../../../../parceiro.json";
 
-export const ActionPesquisaQuebraCaixaLoja = ({usuarioLogado, ID}) => {
+export const ActionPesquisaQuebraCaixaLoja = ({usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [tabelaVisivelPositiva, setTabelaVisivelPositiva] = useState(false);
   const [tabelaVisivelNegativa, setTabelaVisivelNegativa] = useState(false);
@@ -28,9 +29,8 @@ export const ActionPesquisaQuebraCaixaLoja = ({usuarioLogado, ID}) => {
   const [quebraSelecionada, setQuebraSelecionada] = useState('')
   const [cpfOperadorQuebra, setCpfOperadorQuebra] = useState('');
   const [ufSelecionado, setUfSelecionado] = useState('');
-  const [currentPage, setCurrentPage] = useState(1)
-  const [pageSize, setPageSize] = useState(1000)
   const [selectedItems, setSelectedItems] = useState([]);
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
   useEffect(() => {
     const dataInicial = getDataAtual();
@@ -40,13 +40,31 @@ export const ActionPesquisaQuebraCaixaLoja = ({usuarioLogado, ID}) => {
 
   }, []);
 
+  useEffect(() => {
+    const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
+    if (menuSalvo) {
+      const menuParsed = JSON.parse(menuSalvo);
+      setMenuFilhoAtual(menuParsed);
+    }
+  }, []);
+
+  const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
+    ['menus-usuario-excecao', menuFilhoAtual?.ID],
+    async () => {
+      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
+
+      return response.data;
+    },
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
+  );
+
   const { data: optionsMarcas = [], error: errorMarcas, isLoading: isLoadingMarcas } = useQuery(
     'marcasLista',
     async () => {
       const response = await get(`/marcasLista`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000 }
+    { staleTime: 60 * 60 * 1000 }
   );
 
   const { data: optionsEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas } = useQuery(
@@ -59,19 +77,10 @@ export const ActionPesquisaQuebraCaixaLoja = ({usuarioLogado, ID}) => {
         return [];
       }
     },
-    { enabled: Boolean(marcaSelecionada), staleTime: 5 * 60 * 1000 }
+    { enabled: Boolean(marcaSelecionada), staleTime: 60 * 60 * 1000 }
   );
 
-  const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
-    'menus-usuario-excecao',
-    async () => {
-      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${ID}`);
-      return response.data;
-    },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
-  );
 
-   
   const fetchQuebra = async () => {  
     const urlBase = `/quebra-caixa-loja?idEmpresa=${empresaSelecionada}&idMarca=${marcaSelecionada}&cpfOperadorQuebra=${cpfOperadorQuebra}&stQuebraPositivaNegativa=${quebraSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&uf=${ufSelecionado}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
@@ -108,7 +117,7 @@ export const ActionPesquisaQuebraCaixaLoja = ({usuarioLogado, ID}) => {
   const { data: dadosQuebraDeCaixa = [], error: erroQuebra, isLoading: isLoadingQuebra, refetch: refetchQuebra } = useQuery(
     'quebra-caixa-loja',
     () => fetchQuebra(),
-    { enabled: false, staleTime: 5 * 60 * 1000 }
+    { enabled: false, staleTime: 60 * 60 * 1000 }
   );
 
 
@@ -149,7 +158,7 @@ export const ActionPesquisaQuebraCaixaLoja = ({usuarioLogado, ID}) => {
   const {data: dadosQuebraDeCaixaPositiva = [], error: erroQuebraPositiva, isLoading: isLoadingQuebraPositiva, refetch: refetchQuebraPositiva} = useQuery(
     'quebra-caixa-loja-Positiva',
     () => getListaQuebraDeCaixaPositiva(),
-    { enabled: false, staleTime: 5 * 60 * 1000 }
+    { enabled: false, staleTime: 60 * 60 * 1000 }
   )
 
 
@@ -188,8 +197,8 @@ export const ActionPesquisaQuebraCaixaLoja = ({usuarioLogado, ID}) => {
 
   const {data: dadosQuebraDeCaixaNegativa = [], error: erroQuebraNegativa, isLoading: isLoadingQuebraNegativa, refetch: refetchQuebraNegativa} = useQuery(
     'lista-Quebra-Caixa-Negativa',
-    () => getListaQuebraDeCaixaNegativa(marcaSelecionada, empresaSelecionada,  cpfOperadorQuebra, quebraSelecionada, dataPesquisaInicio, dataPesquisaFim, currentPage, pageSize),
-    { enabled: false, staleTime: 5 * 60 * 1000 }
+    () => getListaQuebraDeCaixaNegativa(),
+    { enabled: false, staleTime: 60 * 60 * 1000 }
   )
 
   const selectQuebraDeCaixa = (e) => {
@@ -235,38 +244,6 @@ export const ActionPesquisaQuebraCaixaLoja = ({usuarioLogado, ID}) => {
     }
   };
 
-  const optionsQuebraDeCaixa = [
-    {
-      id: 0,
-      value: "",
-      label: 'Todas'
-    },
-    {
-      id: 1,
-      value: "Positiva",
-      label: 'Positiva'
-    },
-    {
-      id: 2,
-      value: "Negativa",
-      label: 'Negativa'
-    },
-  ]
-
-  const optionsUF = [
-    {
-      value: "0",
-      label: 'Todos'
-    },
-    {
-      value: "DF",
-      label: 'DF'
-    },
-    {
-      value: "GO",
-      label: 'GO'
-    },
-  ]
 
   const {
     conferirTodas

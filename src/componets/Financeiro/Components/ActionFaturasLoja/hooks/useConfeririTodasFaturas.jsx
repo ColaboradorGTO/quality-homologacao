@@ -15,10 +15,10 @@ export const useConferirTodasFaturas = ({
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
-            usuarioIP = ipWhoisData?.ip;
+        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+        usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP via ipwho.is:", error);
+        console.error("Erro ao buscar IP via ipwho.is:", error);
         }
 
         if (!usuarioIP) {
@@ -32,8 +32,6 @@ export const useConferirTodasFaturas = ({
         setIpUsuario(usuarioIP);
         return usuarioIP;
     };
-
-
 
     const conferirTodas = async (data) => {
         if(optionsModulos[0]?.ALTERAR == 'False') {
@@ -88,7 +86,7 @@ export const useConferirTodasFaturas = ({
                         IDFUNCIONARIO: String(usuarioLogado.id),
                         PATHFUNCAO: `FINANCEIRO/CONFERIR TODAS FATURAS SELECIONADAS`,
                         DADOS: textDados,
-                        IP: ipUsuario
+                        IP: ipUsuario || 'IP não disponível',
                     }
                     
                     await post('/log-web', postData)
@@ -112,7 +110,7 @@ export const useConferirTodasFaturas = ({
                         IDFUNCIONARIO: String(usuarioLogado.id),
                         PATHFUNCAO: `FINANCEIRO/ERRO AO CONFERIR TODAS FATURAS SELECIONADAS`,
                         DADOS: textDados,
-                        IP: ipUsuario
+                        IP: ipUsuario || 'IP não disponível',
                     }
                     
                     const responsePost = await post('/log-web', postData)

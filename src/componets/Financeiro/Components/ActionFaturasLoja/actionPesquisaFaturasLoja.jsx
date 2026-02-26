@@ -26,7 +26,8 @@ export const ActionPesquisaFaturasLoja = ({ usuarioLogado, ID }) => {
   const [codigoFatura, setCodigoFatura] = useState('')
   const [isLoadingPesquisa, setIsLoadingPesquisa] = useState(true)
   const [selectedItems, setSelectedItems] = useState([]);
-
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
+  
   useEffect(() => {
     const dataInicial = getDataAtual();
     const dataFinal = getDataAtual();
@@ -35,6 +36,24 @@ export const ActionPesquisaFaturasLoja = ({ usuarioLogado, ID }) => {
   }, [])
 
   const { data: optionsEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas } = useFetchData('listaEmpresasIformatica', '/listaEmpresasIformatica');
+
+  useEffect(() => {
+    const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
+    if (menuSalvo) {
+      const menuParsed = JSON.parse(menuSalvo);
+      setMenuFilhoAtual(menuParsed);
+    }
+  }, []);
+
+  const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
+    ['menus-usuario-excecao', menuFilhoAtual?.ID],
+    async () => {
+      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
+
+      return response.data;
+    },
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
+  );
 
   useEffect(() => {
     if (errorEmpresas) {
@@ -128,15 +147,6 @@ export const ActionPesquisaFaturasLoja = ({ usuarioLogado, ID }) => {
     { enabled: false, staleTime: 5 * 60 * 1000 }
   );
 
-  const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
-    'menus-usuario-excecao',
-    async () => {
-      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${ID}`);
-      console.log(response.data, 'response.data');
-      return response.data;
-    },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
-  );
 
   const handleChangeEmpresa = (e) => {
     const empresa = optionsEmpresas.find((item) => item.IDEMPRESA === e.value);

@@ -11,10 +11,10 @@ export const useAtivarCancelar = ({ usuarioLogado, optionsModulos, handleClick }
     let usuarioIP = null;
 
     try {
-      const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
-      usuarioIP = ipWhoisData?.ip;
+    const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+    usuarioIP = ipWhoisData?.ip;
     } catch (error) {
-      console.error("Erro ao buscar IP via ipwho.is:", error);
+    console.error("Erro ao buscar IP via ifconfig.me:", error);
     }
 
     if (!usuarioIP) {
@@ -67,7 +67,7 @@ export const useAtivarCancelar = ({ usuarioLogado, optionsModulos, handleClick }
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || 'IP não disponível'
       }
 
       await post('/log-web', postData)
@@ -82,7 +82,7 @@ export const useAtivarCancelar = ({ usuarioLogado, optionsModulos, handleClick }
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || 'IP não disponível'
       }
 
       const responsePost = await post('/log-web', postData)

@@ -11,15 +11,14 @@ export const useConferirTodasQuebras = ({
 }) => {
     const [ipUsuario, setIpUsuario] = useState('');
 
-
     const getIPUsuario = async () => {
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
-            usuarioIP = ipWhoisData?.ip;
+        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+        usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP via ipwho.is:", error);
+        console.error("Erro ao buscar IP via ipwho.is:", error);
         }
 
         if (!usuarioIP) {
@@ -33,7 +32,6 @@ export const useConferirTodasQuebras = ({
         setIpUsuario(usuarioIP);
         return usuarioIP;
     };
-
 
     const conferirTodas = async (data) => {
         if(optionsModulos[0]?.ALTERAR == 'False') {
@@ -87,7 +85,7 @@ export const useConferirTodasQuebras = ({
                             IDFUNCIONARIO: String(usuarioLogado.id),
                             PATHFUNCAO: `FINANCEIRO/CONFIRMAR TODAS QUEBRAS DE CAIXA SELECIONADAS`,
                             DADOS: textDados,
-                            IP: ipUsuario
+                            IP: ipUsuario || 'IP não disponível'
                         }
                         
                         await post('/log-web', postData)
@@ -114,7 +112,7 @@ export const useConferirTodasQuebras = ({
                         IDFUNCIONARIO: String(usuarioLogado.id),
                         PATHFUNCAO: `FINANCEIRO/ERRO AO CONFIRMAR TODAS QUEBRAS DE CAIXA SELECIONADAS`,
                         DADOS: textDados,
-                        IP: ipUsuario
+                        IP: ipUsuario || 'IP não disponível'
                     }
                     
                     const responsePost = await post('/log-web', postData)

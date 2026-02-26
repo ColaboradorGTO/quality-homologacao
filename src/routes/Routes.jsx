@@ -13,6 +13,7 @@ const DashBoardPromocao = lazy(() => import("../pages/DashBoardPromocao").then(m
 const DashBoardComercial = lazy(() => import("../pages/DashBoardComercial").then(module => ({ default: module.DashBoardComercial })));
 const DashBoardInformatica = lazy(() => import("../pages/DashBoardInformatica").then(module => ({ default: module.DashBoardInformatica })));
 const ModuloTeste = lazy(() => import("../pages/ModuloTeste").then(module => ({ default: module.ModuloTeste })));
+const Permissoes = lazy(() => import("../pages/Permissoes").then(module => ({ default: module.Permissoes })));
 
 const DashBoardGerencia = lazy(() => import("../pages/DashBoardGerencia").then(module => ({ default: module.DashBoardGerencia })));
 
@@ -24,7 +25,6 @@ const DashBoardExpedicao = lazy(() => import("../pages/DashBoardExpedicao").then
 const DashBoardMarketing = lazy(() => import("../pages/DashBoardMarketing").then(module => ({ default: module.DashBoardMarketing })));
 const DashBoardComprasDM = lazy(() => import("../pages/DashBoardComprasDm").then(module => ({ default: module.DashBoardComprasDM })));
 const DashBoardEtiquetagem = lazy(() => import("../pages/DashBoardEtiquetagem").then(module => ({ default: module.DashBoardEtiquetagem })));
-const Permissoes = lazy(() => import("../pages/Permissoes").then(module => ({ default: module.Permissoes })));
 const DashBoardMenus = lazy(() => import("../pages/DashBoardMenus").then(module => ({ default: module.DashBoardMenus })));
 
 // Componente de Loading
