@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Swal from "sweetalert2";
-import { post, put } from "../../../../../api/funcRequest";
+import { put } from "../../../../../api/funcRequest";
 import axios from "axios";
 
 
@@ -21,22 +21,25 @@ export const useAtualizarVendasContigencia = ({ dadosVendas, usuarioLogado, opti
     };
 
     const getIPUsuario = async () => {
+        let usuarioIP = null;
+
         try {
-            // const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
-            // let usuarioIP = ipWhoisData?.ip;
-            let usuarioIP ;
-
-            if (!usuarioIP) {
-                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-                usuarioIP = ipifyData?.ip;
-            }
-
-            setIpUsuario(usuarioIP);
-            return usuarioIP;
+        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+        usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP:", error);
-            return null;
+        console.error("Erro ao buscar IP via ipwho.is:", error);
         }
+
+        if (!usuarioIP) {
+        try {
+            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+            usuarioIP = ipifyData?.ip;
+        } catch (error) {
+            console.error("Erro ao buscar IP via ipify.org:", error);
+        }
+        }
+        setIpUsuario(usuarioIP);
+        return usuarioIP;
     };
     
     
@@ -45,7 +48,11 @@ export const useAtualizarVendasContigencia = ({ dadosVendas, usuarioLogado, opti
             Swal.fire({
                 icon: "error",
                 title: "Atenção!",
-                text: "Você não tem permissão para confirmar o Balanço Avulso!",
+                html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para validar vendas!`,
+                confirmButtonText: 'OK',
+                customClass: {
+                    container: 'custom-swal',
+                }
             });
             return;
         }

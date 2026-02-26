@@ -225,9 +225,19 @@ export const ActionListaVendas = ({ dadosVendas, usuarioLogado, optionsModulos }
     try {
       const response = await get(`/status-sefaz?idVenda=${IDVENDA}`)
       
-      if (response) {
-        setDadosSefaz(response);
+      if (response.data && response.data.length > 0) {
+        setDadosSefaz(response.data);
         setModalConsultaSefaz(true);
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Nenhum dado encontrado',
+          text: 'Não foram encontrados dados de consulta para esta venda.',
+          customClass: {
+            container: 'custom-swal',
+          }
+        });
+        return;
       }
     } catch (error) {
       console.error('Erro ao buscar detalhes da venda: ', error);
