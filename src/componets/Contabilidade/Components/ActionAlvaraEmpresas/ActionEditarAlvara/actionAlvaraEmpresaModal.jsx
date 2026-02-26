@@ -11,15 +11,15 @@ export const ActionAlvaraEmpresaModal = ({
     usuarioLogado,
     refetchAlvaraEmpresa,
     handleClose,
-    refetchAlvaraSelecionado,
- }) => {
+    refetchAlvaraSelecionado
+}) => {
 
     return (
         <Fragment>
             <Modal
                 show={show}
                 onHide={handleClose}
-                size="lg"
+                size="xl"
                 className="modal fade"
                 id="ModalAlvaraEmpresa"
                 tabIndex={-1}

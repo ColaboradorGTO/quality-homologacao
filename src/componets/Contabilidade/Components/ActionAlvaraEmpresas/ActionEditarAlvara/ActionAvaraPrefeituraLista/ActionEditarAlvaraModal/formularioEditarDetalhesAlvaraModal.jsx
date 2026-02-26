@@ -51,7 +51,8 @@ export const FormularioEditarDetalhesAlvara = ({
         optionsModulos,
         dadosAlvaraSelecionado,
         refetchAlvaraEmpresa,
-        refetchAlvaraSelecionado
+        refetchAlvaraSelecionado,
+        refetchVinculoAlvara
     });
 
     const {

@@ -11,6 +11,7 @@ import { FaRegFileAlt } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { mascaraCNPJ } from "../../../../utils/mascaraCNPJ";
 import { ActionAlvaraEmpresaModal } from "./ActionEditarAlvara/actionAlvaraEmpresaModal";
+import { formatarDataParaBR } from "../../../../utils/dataFormatada";
 
 export const ActionListaAlvaras = ({
     dadosAlvaraEmpresa,
@@ -21,6 +22,7 @@ export const ActionListaAlvaras = ({
     refetchAlvaraSelecionado,
     dadosAlvaraEmpresaSelecionada,
     setIdEmpresaSelecionada,
+    isLoadingAlvaraSelecionado
 }) => {
     const [globalFilterValue, setGlobalFilterValue] = useState('');
     const [rowSelection, setRowSelection] = useState(null);
@@ -279,7 +281,7 @@ export const ActionListaAlvaras = ({
             {
                 field: 'DTFIMALVARABOMBEIRO',
                 header: 'Dt.Fim Bombeiro',
-                body: row => <th>{row.DTFIMALVARABOMBEIRO}</th>,
+                body: row => <th>{formatarDataParaBR(row.DTFIMALVARABOMBEIRO)}</th>,
                 sortable: true,
             },
         ] : []),
@@ -295,7 +297,7 @@ export const ActionListaAlvaras = ({
             {
                 field: 'DTFIMALVARAMEIOAMBIENTE',
                 header: 'St.Fim Meio Ambiente',
-                body: row => <th>{row.DTFIMALVARAMEIOAMBIENTE}</th>,
+                body: row => <th>{formatarDataParaBR(row.DTFIMALVARAMEIOAMBIENTE)}</th>,
                 sortable: true,
             },
         ] : []),
@@ -311,7 +313,7 @@ export const ActionListaAlvaras = ({
             {
                 field: 'DTFIMALVARAVIGILANCIASANITARIA',
                 header: 'Dt.Fim Vigilância Sanitaria',
-                body: row => <th>{row.DTFIMALVARAVIGILANCIASANITARIA}</th>,
+                body: row => <th>{formatarDataParaBR(row.DTFIMALVARAVIGILANCIASANITARIA)}</th>,
                 sortable: true,
             },
         ] : []),
@@ -327,7 +329,7 @@ export const ActionListaAlvaras = ({
             {
                 field: 'DTFIMALVARAPREFEITURA',
                 header: 'Dt.Fim Prefeitura',
-                body: row => <th>{row.DTFIMALVARAPREFEITURA}</th>,
+                body: row => <th>{formatarDataParaBR(row.DTFIMALVARAPREFEITURA)}</th>,
                 sortable: true,
             },
         ] : []),
@@ -352,12 +354,7 @@ export const ActionListaAlvaras = ({
     ]
 
     const handleClickAjusteAlvara = (row) => {
-        if (optionsModulos[0]?.ALTERAR === 'True') {
-            if (row && row.IDEMPRESA) {
-                setIdEmpresaSelecionada(row.IDEMPRESA)
-                setModalAlvaraEmpresa(true);
-            }
-        } else {
+        if (optionsModulos[0]?.ALTERAR !== 'True') {
             Swal.fire({
                 icon: 'error',
                 title: 'Atenção!',
@@ -367,7 +364,11 @@ export const ActionListaAlvaras = ({
                     container: 'custom-swal',
                 },
             });
+            return;
         }
+
+        setIdEmpresaSelecionada(row.IDEMPRESA);
+        setModalAlvaraEmpresa(true);
     };
 
     return (
@@ -434,6 +435,7 @@ export const ActionListaAlvaras = ({
                 optionsModulos={optionsModulos}
                 refetchAlvaraEmpresa={refetchAlvaraEmpresa}
                 refetchAlvaraSelecionado={refetchAlvaraSelecionado}
+                isLoadingAlvaraSelecionado={isLoadingAlvaraSelecionado}
             />
 
         </Fragment>

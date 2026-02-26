@@ -41,7 +41,7 @@ export const FormularioActionAlvaraEmpresa = ({
                 <div class="form-group">
 
                     <div class="row mt-3">
-                        <div class="col-sm-6 col-xl-4">
+                        <div class="col-sm-6 col-xl-1">
                             <Controller
                                 name="ID"
                                 control={control}
@@ -58,7 +58,7 @@ export const FormularioActionAlvaraEmpresa = ({
                                 )}
                             />
                         </div>
-                        <div class="col-sm-6 col-xl-4">
+                        <div class="col-sm-6 col-xl-2">
                             <Controller
                                 name="Status"
                                 control={control}
@@ -76,7 +76,7 @@ export const FormularioActionAlvaraEmpresa = ({
                             />
 
                         </div>
-                        <div class="col-sm-6 col-xl-4">
+                        <div class="col-sm-6 col-xl-3">
                             <label className="form-label" htmlFor={""}>Grupo Empresarial</label>
 
                             <Select
@@ -91,10 +91,8 @@ export const FormularioActionAlvaraEmpresa = ({
                                 menuIsOpen={false}
                             />
                         </div>
-                    </div>
 
-                    <div class="row mt-3">
-                        <div class="col-sm-6 col-xl-4">
+                        <div class="col-sm-6 col-xl-2">
                             <Controller
                                 name="Insc. Estadual"
                                 control={control}
@@ -111,7 +109,7 @@ export const FormularioActionAlvaraEmpresa = ({
                                 )}
                             />
                         </div>
-                        <div class="col-sm-6 col-xl-4">
+                        <div class="col-sm-6 col-xl-2">
                             <Controller
                                 name="Insc. Municipal"
                                 control={control}
@@ -129,7 +127,7 @@ export const FormularioActionAlvaraEmpresa = ({
                             />
 
                         </div>
-                        <div class="col-sm-6 col-xl-4">
+                        <div class="col-sm-6 col-xl-2">
                             <Controller
                                 name="CNPJ"
                                 control={control}
@@ -139,7 +137,7 @@ export const FormularioActionAlvaraEmpresa = ({
                                         name="CNPJ"
                                         type="text"
                                         readOnly={true}
-                                        value={mascaraCNPJ(dadosAlvaraEmpresaSelecionada[0]?.NUCNPJ)}
+                                        value={mascaraCNPJ(String(dadosAlvaraEmpresaSelecionada[0]?.NUCNPJ) || '')}
                                         errors={errors}
                                         clearErrors={clearErrors}
                                     />
@@ -149,7 +147,7 @@ export const FormularioActionAlvaraEmpresa = ({
                     </div>
 
                     <div class="row mt-3">
-                        <div class="col-sm-6 col-xl-12">
+                        <div class="col-sm-6 col-xl-6">
                             <Controller
                                 name="Razão Social"
                                 control={control}
@@ -166,9 +164,8 @@ export const FormularioActionAlvaraEmpresa = ({
                                 )}
                             />
                         </div>
-                    </div>
-                    <div class="row mt-3">
-                        <div class="col-sm-6 col-xl-12">
+
+                        <div class="col-sm-6 col-xl-6">
                             <Controller
                                 name="Nome Fantasia"
                                 control={control}
@@ -188,7 +185,7 @@ export const FormularioActionAlvaraEmpresa = ({
                     </div>
                 </div>
 
-                <hr style={{ borderTop: "2px dashed #999" }} />
+                <hr style={{ borderTop: "1px dashed #999" }} />
 
                 <div class="form-group">
 
@@ -220,7 +217,7 @@ export const FormularioActionAlvaraEmpresa = ({
                     </div>
 
                     <div class="row mt-3">
-                        <div class="col-sm-6 col-xl-12">
+                        <div class="col-sm-6 col-xl-6">
                             <Controller
                                 name="Complemento"
                                 control={control}
@@ -237,9 +234,8 @@ export const FormularioActionAlvaraEmpresa = ({
                                 )}
                             />
                         </div>
-                    </div>
-                    <div class="row mt-3">
-                        <div class="col-sm-6 col-xl-6">
+
+                        <div class="col-sm-6 col-xl-3">
                             <Controller
                                 name="Bairro"
                                 control={control}
@@ -258,7 +254,7 @@ export const FormularioActionAlvaraEmpresa = ({
                         </div>
                     </div>
                     <div class="row mt-3">
-                        <div class="col-sm-6 col-xl-6">
+                        <div class="col-sm-6 col-xl-3">
                             <Controller
                                 name="Cidade"
                                 control={control}
@@ -275,7 +271,7 @@ export const FormularioActionAlvaraEmpresa = ({
                                 )}
                             />
                         </div>
-                        <div class="col-sm-6 col-xl-6">
+                        <div class="col-sm-6 col-xl-1">
                             <Controller
                                 name="UF"
                                 control={control}
@@ -293,8 +289,8 @@ export const FormularioActionAlvaraEmpresa = ({
                             />
                         </div>
                     </div>
-                    <div class="row mt-3">
-                        <div class="col-sm-6 col-xl-12">
+                    <div class="row mt-3 g-3">
+                        <div class="col-sm-6 col-xl-2">
                             <Controller
                                 name="CEP"
                                 control={control}
@@ -323,133 +319,140 @@ export const FormularioActionAlvaraEmpresa = ({
                     </h2>
                 </span>
 
-                {dadosAlvaraEmpresaSelecionada?.[0]?.LISTA_GERENTES?.map((gerente, index) => (
-                    <div key={index} className="form-group mt-3 border p-3 rounded">
+                <div className="row  m-3 g-3">
 
-                        <span className="d-flex align-items-center">
-                            <CiUser size={20} />
-                            <h5 className="font-weight-bold" style={{ margin: 0, marginLeft: "5px" }}>
-                                Gerente da Loja
-                            </h5>
-                        </span>
+                    {dadosAlvaraEmpresaSelecionada?.[0]?.LISTA_GERENTES?.map((gerente, index) => (
+                        <div key={`gerente-${index}`} className="mt-3 col-sm-6 col-xl-6">
+                            <div className="border p-3 rounded h-100 shadow-sm bg-white">
 
-                        <div className="row mt-3">
-                            <div className="col-sm-6 col-xl-12">
-                                <label className="form-label">Nome</label>
-                                <div className="input-group">
-                                    <span className="input-group-text">
-                                        <BsPerson size={17} />
-                                    </span>
-                                    <input
-                                        className="form-control"
-                                        value={gerente?.NOFUNCIONARIO || ""}
-                                        readOnly
-                                    />
+                                <span className="d-flex align-items-center">
+                                    <CiUser size={20} />
+                                    <h5 className="font-weight-bold ms-2 mb-0">
+                                        Gerente da Loja
+                                    </h5>
+                                </span>
+
+                                <div className="row mt-3">
+                                    <div className="col-12">
+                                        <label className="form-label">Nome</label>
+                                        <div className="input-group">
+                                            <span className="input-group-text">
+                                                <BsPerson size={17} />
+                                            </span>
+                                            <input
+                                                className="form-control"
+                                                value={gerente?.NOFUNCIONARIO || ""}
+                                                readOnly
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="row mt-3">
+                                    <div className="col-12">
+                                        <label className="form-label">E-mail</label>
+                                        <div className="input-group">
+                                            <span className="input-group-text">
+                                                <BsEnvelopeAt size={17} />
+                                            </span>
+                                            <input
+                                                className="form-control"
+                                                value={dadosAlvaraEmpresaSelecionada?.[0]?.EEMAILPRINCIPAL || ""}
+                                                readOnly
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="row mt-3">
+                                    <div className="col-12">
+                                        <label className="form-label">Telefone</label>
+                                        <div className="input-group">
+                                            <span className="input-group-text">
+                                                <BsTelephone size={17} />
+                                            </span>
+                                            <input
+                                                className="form-control"
+                                                value={
+                                                    mascaraTelefone(gerente?.TELEFONE) ||
+                                                    "Telefone não cadastrado"
+                                                }
+                                                readOnly
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    ))}
+
+                    {dadosAlvaraEmpresaSelecionada?.[0]?.LISTA_SUPERVISORES?.map((supervisor, index) => (
+                        <div key={`supervisor-${index}`} className="mt-3 col-sm-6 col-xl-6">
+                            <div className="border p-3 rounded h-100 shadow-sm bg-white">
+
+                                <span className="d-flex align-items-center">
+                                    <CiUser size={20} />
+                                    <h5 className="font-weight-bold ms-2 mb-0">
+                                        Supervisor da Loja
+                                    </h5>
+                                </span>
+
+                                <div className="row mt-3">
+                                    <div className="col-12">
+                                        <label className="form-label">Nome</label>
+                                        <div className="input-group">
+                                            <span className="input-group-text">
+                                                <BsPerson size={17} />
+                                            </span>
+                                            <input
+                                                className="form-control"
+                                                value={supervisor?.NOFUNCIONARIO || ""}
+                                                readOnly
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="row mt-3">
+                                    <div className="col-12">
+                                        <label className="form-label">E-mail</label>
+                                        <div className="input-group">
+                                            <span className="input-group-text">
+                                                <BsEnvelopeAt size={17} />
+                                            </span>
+                                            <input
+                                                className="form-control"
+                                                value={dadosAlvaraEmpresaSelecionada?.[0]?.EEMAILPRINCIPAL || ""}
+                                                readOnly
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="row mt-3">
+                                    <div className="col-12">
+                                        <label className="form-label">Telefone</label>
+                                        <div className="input-group">
+                                            <span className="input-group-text">
+                                                <BsTelephone size={17} />
+                                            </span>
+                                            <input
+                                                className="form-control"
+                                                value={
+                                                    mascaraTelefone(supervisor?.TELEFONE) ||
+                                                    "Telefone não cadastrado"
+                                                }
+                                                readOnly
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                    ))}
 
-                        <div className="row mt-3">
-                            <div className="col-sm-6 col-xl-12">
-                                <label className="form-label">E-mail</label>
-                                <div className="input-group">
-                                    <span className="input-group-text">
-                                        <BsEnvelopeAt size={17} />
-                                    </span>
-                                    <input
-                                        className="form-control"
-                                        value={dadosAlvaraEmpresaSelecionada?.[0]?.EEMAILPRINCIPAL || ""}
-                                        readOnly
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="row mt-3">
-                            <div className="col-sm-6 col-xl-12">
-                                <label className="form-label">Telefone</label>
-                                <div className="input-group">
-                                    <span className="input-group-text">
-                                        <BsTelephone size={17} />
-                                    </span>
-                                    <input
-                                        className="form-control"
-                                        value={
-                                            mascaraTelefone(gerente?.TELEFONE) ||
-                                            "Telefone não cadastrado"
-                                        }
-                                        readOnly
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                ))}
-
-                {dadosAlvaraEmpresaSelecionada?.[0]?.LISTA_SUPERVISORES?.map((supervisor, index) => (
-                    <div key={index} className="form-group mt-3 border p-3 rounded">
-
-                        <span className="d-flex align-items-center">
-                            <CiUser size={20} />
-                            <h5 className="font-weight-bold" style={{ margin: 0, marginLeft: "5px" }}>
-                                Supervisor da Loja
-                            </h5>
-                        </span>
-
-                        <div className="row mt-3">
-                            <div className="col-sm-6 col-xl-12">
-                                <label className="form-label">Nome</label>
-                                <div className="input-group">
-                                    <span className="input-group-text">
-                                        <BsPerson size={17} />
-                                    </span>
-                                    <input
-                                        className="form-control"
-                                        value={supervisor?.NOFUNCIONARIO || ""}
-                                        readOnly
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="row mt-3">
-                            <div className="col-sm-6 col-xl-12">
-                                <label className="form-label">E-mail</label>
-                                <div className="input-group">
-                                    <span className="input-group-text">
-                                        <BsEnvelopeAt size={17} />
-                                    </span>
-                                    <input
-                                        className="form-control"
-                                        value={dadosAlvaraEmpresaSelecionada?.[0]?.EEMAILPRINCIPAL || ""}
-                                        readOnly
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="row mt-3">
-                            <div className="col-sm-6 col-xl-12">
-                                <label className="form-label">Telefone</label>
-                                <div className="input-group">
-                                    <span className="input-group-text">
-                                        <BsTelephone size={17} />
-                                    </span>
-                                    <input
-                                        className="form-control"
-                                        value={
-                                            mascaraTelefone(supervisor?.TELEFONE) ||
-                                            "Telefone não cadastrado"
-                                        }
-                                        readOnly
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                ))}
+                </div>
 
                 <hr style={{ borderTop: "2px dashed #999" }} />
 

@@ -17,7 +17,7 @@ export const ActionPesquisaAlvaraEmpresa = ({ usuarioLogado, ID }) => {
     const [tipoAlvara, setTipoAlvara] = useState('');
     const [tipoAvaraAplicado, setTipoAvaraAplicado] = useState('');
     const [tabelaVisivel, setTabelaVisivel] = useState(false);
-    const [idEmpresaSelecionada, setIdEmpresaSelecionada] = useState(null);
+    const [idEmpresaSelecionada, setIdEmpresaSelecionada] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(1000);
 
@@ -99,7 +99,7 @@ export const ActionPesquisaAlvaraEmpresa = ({ usuarioLogado, ID }) => {
     };
 
     const { data: dadosAlvaraEmpresa = [], error: errorAlvaraEmpresa, isLoading: isLoadingAlvaraEmpresa, refetch: refetchAlvaraEmpresa } = useQuery(
-        ['fetchListaAlvaraEmpresa', empresaSelecionada, marcaSelecionada, satusFilialSelecionada, ufSelecionada, tipoAlvara],
+        ['fetchListaAlvaraEmpresa'],
         fetchListaAlvaraEmpresa,
         { enabled: true, staleTime: 5 * 60 * 1000 },
     );
@@ -113,8 +113,9 @@ export const ActionPesquisaAlvaraEmpresa = ({ usuarioLogado, ID }) => {
                 );
                 return response.data;
             },
-            { enabled: !!idEmpresaSelecionada, }
+            { enabled: !!idEmpresaSelecionada }
         );
+
 
     const optionsUf = [
         { value: '', label: 'Todos' },
@@ -214,19 +215,19 @@ export const ActionPesquisaAlvaraEmpresa = ({ usuarioLogado, ID }) => {
 
             />
 
-            {tabelaVisivel && (
-                <ActionListaAlvaras
-                    dadosAlvaraEmpresa={dadosAlvaraEmpresa}
-                    tipoAvaraAplicado={tipoAvaraAplicado}
-                    optionsModulos={optionsModulos}
-                    dadosAlvaraEmpresaSelecionada={dadosAlvaraEmpresaSelecionada}
-                    idEmpresaSelecionada={idEmpresaSelecionada}
-                    refetchAlvaraEmpresa={refetchAlvaraEmpresa}
-                    refetchAlvaraSelecionado={refetchAlvaraSelecionado}
-                    setIdEmpresaSelecionada={setIdEmpresaSelecionada}
-                    usuarioLogado={usuarioLogado}
-                />
-            )}
+            <ActionListaAlvaras
+                dadosAlvaraEmpresa={dadosAlvaraEmpresa}
+                tipoAvaraAplicado={tipoAvaraAplicado}
+                optionsModulos={optionsModulos}
+                dadosAlvaraEmpresaSelecionada={dadosAlvaraEmpresaSelecionada}
+                idEmpresaSelecionada={idEmpresaSelecionada}
+                refetchAlvaraEmpresa={refetchAlvaraEmpresa}
+                refetchAlvaraSelecionado={refetchAlvaraSelecionado}
+                setIdEmpresaSelecionada={setIdEmpresaSelecionada}
+                usuarioLogado={usuarioLogado}
+                isLoadingAlvaraSelecionado={isLoadingAlvaraSelecionado}
+            />
+
 
         </Fragment>
     )

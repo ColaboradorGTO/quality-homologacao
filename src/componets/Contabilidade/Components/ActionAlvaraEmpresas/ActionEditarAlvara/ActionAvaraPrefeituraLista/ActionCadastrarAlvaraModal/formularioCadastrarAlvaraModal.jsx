@@ -40,7 +40,17 @@ export const FormularioCadastrarActionAlvara = ({
         metragemLoja,
         setMetragemLoja,
         onSubmit
-    } = useCriarAlvara({ handleClose, usuarioLogado, optionsModulos, dadosAlvaraSelecionado, idAlvaraSelecionado, refetchAlvaraEmpresa, refetchAlvaraSelecionado });
+        
+    } = useCriarAlvara({
+        handleClose,
+        usuarioLogado,
+        optionsModulos,
+        dadosAlvaraSelecionado,
+        idAlvaraSelecionado,
+        refetchAlvaraEmpresa,
+        refetchAlvaraSelecionado
+    });
+
 
     const handleValidatedSubmit = async () => {
         try {
@@ -238,7 +248,7 @@ export const FormularioCadastrarActionAlvara = ({
                                         name="arquivoAlvara"
                                         type="file"
                                         accept="application/pdf"
-                                        onChange={(e) => setArquivoAlvara(e.target.files[0])}
+                                        onChange={(e) => setArquivoAlvara(e.target.files)}
                                         errors={errors}
                                         width="100%"
                                         height="120px"

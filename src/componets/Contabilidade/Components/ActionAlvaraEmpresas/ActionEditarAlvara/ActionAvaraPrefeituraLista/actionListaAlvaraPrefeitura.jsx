@@ -15,6 +15,7 @@ import { useQuery } from "react-query";
 import { ActionCadastrarAlvaraModal } from "./ActionCadastrarAlvaraModal/actionCadastrarAlvaraModal";
 import { ActionVisualizarDetalhesAlvaraModal } from "./ActionVisualizarAlvaraModal/actionVisualizarDetalhesAlvaraModal";
 import { ActionEditarDetalhesAlvaraModal } from "./ActionEditarAlvaraModal/actionEditarDetalhesAlvaraModal";
+import { formatarDataParaBR } from "../../../../../../utils/dataFormatada";
 
 export const ActionListaAlvaraPrefeitura = ({
     dadosAlvaraEmpresaSelecionada,
@@ -137,13 +138,13 @@ export const ActionListaAlvaraPrefeitura = ({
         {
             field: 'DATA_INICIO',
             header: 'Dt.Inicio',
-            body: row => <th> {row.DATA_INICIO} </th>,
+            body: row => <th> {formatarDataParaBR(row.DATA_INICIO)} </th>,
             sortable: true,
         },
         {
             field: 'DATA_FIM',
             header: 'Dt.Fim',
-            body: row => <th> {row.DATA_FIM} </th>,
+            body: row => <th> {formatarDataParaBR(row.DATA_FIM)} </th>,
             sortable: true,
         },
         {

@@ -11,7 +11,8 @@ export const useEditarAlvara = ({
     usuarioLogado,
     optionsModulos,
     refetchAlvaraEmpresa,
-    refetchAlvaraSelecionado
+    refetchAlvaraSelecionado,
+    refetchVinculoAlvara
 }) => {
     const [arquivoAlvara, setArquivoAlvara] = useState([])
     const [descricaoDetalheAndamento, setDescricaoDetalheAndamento] = useState('')
@@ -26,7 +27,7 @@ export const useEditarAlvara = ({
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
             usuarioIP = ipWhoisData?.ip;
         } catch (error) {
             console.error("Erro ao buscar IP via ipwho.is:", error);
@@ -43,12 +44,10 @@ export const useEditarAlvara = ({
         setIpUsuario(usuarioIP);
         return usuarioIP;
     };
-
     const { data: optionsStatusAlvara = [], error: errorStatus, isLoading: isLoadingStatus, refetch: refetchStatus } = useQuery(
         'options-status-alvara',
         async () => {
             const response = await get(`/status-alvara`);
-            console.log(response, 'response.data status alvara')
             return response.data;
         },
         { enabled: true, staleTime: 60 * 60 * 1000, }
@@ -56,7 +55,7 @@ export const useEditarAlvara = ({
 
 
     useEffect(() => {
-        setStatusAlvara({ value: dadosAlvaraSelecionado?.[0]?.STATIVO == 'True' || "False", label: dadosAlvaraSelecionado?.[0]?.STATIVO == 'True' ? 'Ativo' : 'Inativo' })
+        setStatusAlvara({ value: dadosAlvaraSelecionado?.[0]?.STATIVO, label: dadosAlvaraSelecionado?.[0]?.STATIVO == 'True' ? 'Ativo' : 'Inativo' })
         setDataIncioCompetencia(dadosAlvaraSelecionado?.[0]?.DTINICIOCOMPETENCIAALVARA)
         setDataFimCompetencia(dadosAlvaraSelecionado?.[0]?.DTFIMCOMPETENCIAALVARA)
         setStatusAndamento({ value: dadosAlvaraSelecionado?.[0]?.IDSTATUS, label: dadosAlvaraSelecionado?.[0]?.DESCRICAOSTATUS })
@@ -140,6 +139,7 @@ export const useEditarAlvara = ({
 
             refetchAlvaraSelecionado();
             refetchAlvaraEmpresa();
+            refetchVinculoAlvara();
             handleClose();
 
             return response.data;
