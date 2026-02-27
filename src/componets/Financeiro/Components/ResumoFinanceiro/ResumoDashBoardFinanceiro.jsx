@@ -26,30 +26,30 @@ export const ResumoDashBoardFinaneiro = () => {
   }, [])
 
   const { data: dadosResumoVendas = [], error: errorGrupo, isLoading: isLoadingGrupo, refetch: refetchResumoVendas } = useQuery(
-    'venda-total',
+    ['venda-total', dataPesquisa],
     async () => {
       const response = await get(`/venda-total?dataPesquisa=${dataPesquisa}`);
       return response.data;
     },
-    { enabled: Boolean(isQueryData), staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    { enabled: Boolean(dataPesquisa), staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
   );
 
   const { data: dadosTotalVendasEmpresa = [], error: errorVendaEmpresa, isLoading: isLoadingEmpresa, refetch: refetchTotalVendasEmpresa } = useQuery(
-    'venda-total-empresa',
+    ['venda-total-empresa', dataPesquisa],
     async () => {
       const response = await get(`/venda-total-empresa?dataPesquisa=${dataPesquisa}`);
       return response.data;
     },
-    { enabled: Boolean(isQueryData), staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    { enabled: Boolean(dataPesquisa), staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
   );
 
   const { data: dadosTransacoesEmpresas = [], error: errorTransacoes, isLoading: isLoadingTransacoes, refetch: refetchTransacoes } = useQuery(
-    'venda-pagamentos',
+    ['venda-pagamentos', dataPesquisa],
     async () => {
       const response = await get(`/venda-pagamentos?dataPesquisa=${dataPesquisa}`);
       return response.data;
     },
-    { enabled: Boolean(isQueryData), staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    { enabled: Boolean(dataPesquisa), staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
   );
 
   const calcularTotalDespesasAdiantamento = (item) => {
@@ -93,10 +93,9 @@ export const ResumoDashBoardFinaneiro = () => {
 
  
   const handleClick = () => {
-    setIsQueryData(true);
-    refetchResumoVendas(dataPesquisa)
-    refetchTotalVendasEmpresa(dataPesquisa)
-    refetchTransacoes(dataPesquisa)
+    refetchResumoVendas()
+    refetchTotalVendasEmpresa()
+    refetchTransacoes()
   }
 
   return (
