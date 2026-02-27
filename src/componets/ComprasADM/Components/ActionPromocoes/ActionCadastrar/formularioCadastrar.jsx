@@ -217,6 +217,8 @@ export const FormularioCadastrar = ({ handleClose }) => {
                     textButtonCadastrar={"Cadastrar"}
                     onClickButtonCadastrar={handleCadastrar}
                     corCadastrar="success"
+                    loadingTextCadastrar={"Cadastrando..."}
+                    autoLoadingCadastrar={true}
                 />
             </form>
         </Fragment>

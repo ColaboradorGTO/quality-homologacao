@@ -172,6 +172,8 @@ export const ActionEditarListasPrecosModal = ({ show, handleClose, dadosListaPre
               onClickButtonCadastrar
               textButtonCadastrar={"Imprimir"}
               corCadastrar={"primary"}
+              loadingTextCadastrar={"Cadastrando..."}
+              autoLoadingCadastrar={true}
             />
 
           </form>

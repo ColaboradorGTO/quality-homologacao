@@ -73,10 +73,12 @@ export const FormularioCadastrar = ({handleClose, usuarioLogado, optionsModulos,
                     textButtonFechar={"Fechar"}
                     corFechar={"secondary"}
 
-                        ButtonTypeCadastrar={ButtonTypeModal}
-                        onClickButtonCadastrar={handleSubmit(onSubmit)}
-                        textButtonCadastrar={"Salvar"}
-                        corCadastrar={"success"}
+                    ButtonTypeCadastrar={ButtonTypeModal}
+                    onClickButtonCadastrar={handleSubmit(onSubmit)}
+                    textButtonCadastrar={"Salvar"}
+                    corCadastrar={"success"}
+                    loadingTextCadastrar={"Cadastrando..."}
+                    autoLoadingCadastrar={true}
                 />
             </form>
         </Fragment>

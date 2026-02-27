@@ -96,6 +96,8 @@ export const FomularioEditar = ({dadosDetalheMotivoDevolucao, optionsModulos, us
                     onClickButtonCadastrar={handleSubmit(onSubmit)}
                     textButtonCadastrar={"Atualizar"}
                     corCadastrar={"success"}
+                    loadingTextCadastrar={"Cadastrando..."}
+                    autoLoadingCadastrar={true}
         
                     ButtonTypeFechar={ButtonTypeModal}
                     onClickButtonFechar={handleClose}

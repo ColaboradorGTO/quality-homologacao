@@ -10,24 +10,27 @@ export const useEditarMotivoDevolucao = ({dadosDetalheMotivoDevolucao, optionsMo
   const [idMotivo, setIdMotivo] = useState('')
   const [motivo, setMotivo] = useState('')
   const [ipUsuario, setIpUsuario] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const getIPUsuario = async () => {
+    let usuarioIP = null;
+
     try {
-      const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
-      let usuarioIP = ipWhoisData?.ip;
-
-      if (!usuarioIP) {
-      const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-      usuarioIP = ipifyData?.ip;
-      }
-
-      setIpUsuario(usuarioIP);
-      return usuarioIP;
+      const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+      usuarioIP = ipWhoisData?.ip;
     } catch (error) {
-      console.error("Erro ao buscar IP:", error);
-      return null;
+      console.error("Erro ao buscar IP via ipwho.is:", error);
     }
+
+    if (!usuarioIP) {
+      try {
+        const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+        usuarioIP = ipifyData?.ip;
+      } catch (error) {
+        console.error("Erro ao buscar IP via ipify.org:", error);
+      }
+    }
+    setIpUsuario(usuarioIP);
+    return usuarioIP;
   };
 
   useEffect(() => {
@@ -45,7 +48,7 @@ export const useEditarMotivoDevolucao = ({dadosDetalheMotivoDevolucao, optionsMo
       Swal.fire({
         position: 'center',
         icon: 'warning',
-        title: 'Você não tem permissão para realizar esta ação.',
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para alterar o motivo de devolução.`,
         customClass: {
           container: 'custom-swal',
         },
@@ -54,8 +57,6 @@ export const useEditarMotivoDevolucao = ({dadosDetalheMotivoDevolucao, optionsMo
       });
       return;
     }
-
-    setIsSubmitting(true);
 
     const putData = {
       DSMOTIVO: motivo,
@@ -74,7 +75,7 @@ export const useEditarMotivoDevolucao = ({dadosDetalheMotivoDevolucao, optionsMo
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || 'IP não disponível'
       }
 
       await post('/log-web', postData)
@@ -102,7 +103,7 @@ export const useEditarMotivoDevolucao = ({dadosDetalheMotivoDevolucao, optionsMo
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || 'IP não disponível'
       }
 
       const responsePost = await post('/log-web', postData)
@@ -119,9 +120,7 @@ export const useEditarMotivoDevolucao = ({dadosDetalheMotivoDevolucao, optionsMo
       });
 
       return responsePost.data;
-    } finally {
-      setIsSubmitting(false);
-    }
+    } 
   }
 
 

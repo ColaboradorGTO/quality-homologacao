@@ -182,6 +182,8 @@ export const FormularioEditarDeposito = ({ handleClose, optionsModulos, usuarioL
                     onClickButtonCadastrar={submit}
                     textButtonCadastrar={"Editar Depósito"}
                     corCadastrar={"success"}
+                    loadingTextCadastrar={"Cadastrando..."}
+                    autoLoadingCadastrar={true}
 
                     ButtonTypeFechar={ButtonTypeModal}
                     onClickButtonFechar={handleClose}

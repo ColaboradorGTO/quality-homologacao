@@ -91,6 +91,8 @@ export const ModalImprimirQuebra = ({ show, handleClose, dadosQuebraCaixasModal,
                     onClickButtonCadastrar={() => handlePrint()}
                     textButtonCadastrar={"Confirmar Impressão"}
                     corCadastrar={"success"}
+                    loadingTextCadastrar={"Cadastrando..."}
+                    autoLoadingCadastrar={true}
 
                   />
                 </Modal.Body>
@@ -149,6 +151,8 @@ export const ModalImprimirQuebra = ({ show, handleClose, dadosQuebraCaixasModal,
                     onClickButtonCadastrar={() => handlePrint()}
                     textButtonCadastrar={"Confirmar Impressão"}
                     corCadastrar={"success"}
+                    loadingTextCadastrar={"Cadastrando..."}
+                    autoLoadingCadastrar={true}
 
                   />
                 </Modal.Body>

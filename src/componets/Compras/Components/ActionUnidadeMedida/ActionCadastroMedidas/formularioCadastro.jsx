@@ -80,6 +80,8 @@ export const FormularioCadatro = ({ handleClose, usuarioLogado, refetchListaUnid
                     onClickButtonCadastrar={handleCadastro}
                     textButtonCadastrar={"Salvar"}
                     corCadastrar={"success"}
+                    loadingTextCadastrar={"Cadastrando..."}
+                    autoLoadingCadastrar={true}
                 />
             </form>
         </Fragment>

@@ -291,6 +291,8 @@ export const ModalCadastroDeDepositoDaLoja = ({ show, handleClose }) => {
                   onClickButtonCadastrar={onSubmit}
                   textButtonCadastrar={"Cadastrar Depósito"}
                   corCadastrar={"success"}
+                  loadingTextCadastrar={"Cadastrando..."}
+                  autoLoadingCadastrar={true}
 
                   ButtonTypeFechar={ButtonTypeModal}
                   onClickButtonFechar={handleClose}

@@ -105,6 +105,8 @@ export const FormularioCadastrar = ({ handleClose, usuarioLogado, optionsModulos
                     tipoBtnCadastrar={"submit"}
                     textButtonCadastrar={"Salvar"}
                     corCadastrar={"success"}
+                    loadingTextCadastrar={"Cadastrando..."}
+                    autoLoadingCadastrar={true}
                 />
             </form>
 

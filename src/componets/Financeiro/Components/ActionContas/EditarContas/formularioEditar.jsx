@@ -54,8 +54,6 @@ export const FormularioEditar = ({
         dConta: digitoConta,
         nContaSap: numeroContaSap,
         dsConta: descricaoConta
-        
-
       }
 
       await schema.validate(dadosParaValidar, { abortEarly: false });
@@ -263,6 +261,8 @@ export const FormularioEditar = ({
           tipoBtnCadastrar={"submit"}
           textButtonCadastrar={"Editar"}
           corCadastrar={"success"}
+          loadingTextCadastrar={"Cadastrando..."}
+          autoLoadingCadastrar={true}
         />
       </form>
     </Fragment>

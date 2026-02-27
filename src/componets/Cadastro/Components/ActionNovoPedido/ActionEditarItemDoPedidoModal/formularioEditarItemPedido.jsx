@@ -305,6 +305,8 @@ export const FormularioEditarItemPedido = ({dadosItemPedido, handleClose}) => {
                     onClickButtonCadastrar
                     textButtonCadastrar={"Salvar"}
                     corCadastrar={"success"}
+                    loadingTextCadastrar={"Cadastrando..."}
+                    autoLoadingCadastrar={true}
                 />
             </form>
         </Fragment>

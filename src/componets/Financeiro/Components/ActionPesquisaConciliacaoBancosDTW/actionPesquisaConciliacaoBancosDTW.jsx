@@ -13,7 +13,7 @@ import { ActionListaCompensacaoBancoDTW } from "./actionListaCompensacaoBancoDTW
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento"
 import { useFetchData } from "../../../../hooks/useFetchData"
 
-export const ActionPesquisaConciliacaoBancosDTW = ({ usuarioLogado, ID }) => {
+export const ActionPesquisaConciliacaoBancosDTW = ({ usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [tabelaVisivelConsolidado, setTabelaVisivelConsolidado] = useState(false);
   const [tabelaVisivelCompensacao, setTabelaVisivelCompensacao] = useState(false);
@@ -24,19 +24,29 @@ export const ActionPesquisaConciliacaoBancosDTW = ({ usuarioLogado, ID }) => {
   const [dataPesquisaInicioC, setDataPesquisaInicioC] = useState('')
   const [dataPesquisaFimC, setDataPesquisaFimC] = useState('')
   const [contaSelecionada, setContaSelecionada] = useState('')
-  const [pageSize, setPageSize] = useState(500); 
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
+
+  useEffect(() => {
+    const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
+    if (menuSalvo) {
+      const menuParsed = JSON.parse(menuSalvo);
+      setMenuFilhoAtual(menuParsed);
+    }
+  }, []);
+
+  const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
+    ['menus-usuario-excecao', menuFilhoAtual?.ID],
+    async () => {
+      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
+
+      return response.data;
+    },
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
+  );
 
   const { data: dadosContaBanco = [], error: errorContaBanco, isLoading: isLoadingContaBanco, } = useFetchData('contaBanco', '/contaBanco');
   
   
-  const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
-    'menus-usuario-excecao',
-    async () => {
-      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${ID}`);
-      return response.data;
-    },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
-  );
 
   useEffect(() => {
     if (errorContaBanco) {

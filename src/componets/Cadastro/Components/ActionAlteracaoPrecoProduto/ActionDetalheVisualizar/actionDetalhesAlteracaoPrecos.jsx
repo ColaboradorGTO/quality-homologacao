@@ -206,6 +206,8 @@ export const ActionDetalhesAlteracaoPrecos = ({ show, handleClose, dadosVisualiz
               onClickButtonCadastrar
               textButtonCadastrar={"Salvar"}
               corCadastrar={"success"}
+              loadingTextCadastrar={"Cadastrando..."}
+              autoLoadingCadastrar={true}
             />
 
           </form>

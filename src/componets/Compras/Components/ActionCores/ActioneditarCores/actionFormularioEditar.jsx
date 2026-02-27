@@ -88,6 +88,8 @@ export const FormularioEditar = ({
                     onClickButtonCadastrar={atualzarCores}
                     textButtonCadastrar={"Salvar"}
                     corCadastrar={"success"}
+                    loadingTextCadastrar={"Cadastrando..."}
+                    autoLoadingCadastrar={true}
                 />
             </form>
         </Fragment>

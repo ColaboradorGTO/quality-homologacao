@@ -743,6 +743,8 @@ export const FormularioIncluirProdutoPedido = ({
                     onClickButtonCadastrar
                     textButtonCadastrar={"Salvar"}
                     corCadastrar={"success"}
+                    loadingTextCadastrar={"Cadastrando..."}
+                    autoLoadingCadastrar={true}
                 />
             </form>
         </Fragment>

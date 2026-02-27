@@ -355,6 +355,8 @@ export const ActionVisualizarImprimirPrestacaoContas = ({
             textButtonCadastrar={"Finalizar"}
             corCadastrar={"success"}
             styleCadastrar={{ display: dadosListaContasBalanco[0]?.listagem.STCONCLUIDO == 'False' ? 'none' : 'block' }}
+            loadingTextCadastrar={"Cadastrando..."}
+            autoLoadingCadastrar={true}
 
             ButtonTypeFechar={ButtonTypeModal}
             textButtonFechar={"Imprimir"}

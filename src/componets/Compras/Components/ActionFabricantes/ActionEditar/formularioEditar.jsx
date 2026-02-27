@@ -107,6 +107,8 @@ export const FormularioEditar = ({ handleClose, dadosDetalheFabricante, usuarioL
                     tipoBtnCadastrar={"submit"}
                     textButtonCadastrar={"Salvar"}
                     corCadastrar={"success"}
+                    loadingTextCadastrar={"Cadastrando..."}
+                    autoLoadingCadastrar={true}
                 />
 
             </form>

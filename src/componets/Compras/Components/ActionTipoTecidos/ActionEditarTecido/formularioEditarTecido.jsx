@@ -68,6 +68,8 @@ export const FormularioEditarTecido = ({
                     onClickButtonCadastrar={onSubmit}
                     textButtonCadastrar={"Salvar"}
                     corCadastrar={"success"}
+                    loadingTextCadastrar={"Cadastrando..."}
+                    autoLoadingCadastrar={true}
                 />
 
             </form>

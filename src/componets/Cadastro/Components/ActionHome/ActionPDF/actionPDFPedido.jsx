@@ -77,6 +77,8 @@ export const ActionPDFPedido = ({ show, handleClose, dadosPedido, dadosDetalhePe
           onClickButtonCadastrar={() => handlePrint()}
           textButtonCadastrar={"Imprimir"}
           corCadastrar={"info"}
+          loadingTextCadastrar={"Cadastrando..."}
+          autoLoadingCadastrar={true}
         />
       </Modal>
 

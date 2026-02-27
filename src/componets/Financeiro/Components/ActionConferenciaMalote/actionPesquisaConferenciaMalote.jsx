@@ -11,8 +11,7 @@ import { ActionListaConferenciaMalotes } from "./actionListaConferenciaMalotes"
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento"
 import { get } from "../../../../api/funcRequest"
 
-
-export const ActionPesquisaConferenciaMalote = ({ usuarioLogado, ID }) => {
+export const ActionPesquisaConferenciaMalote = ({ usuarioLogado }) => {
     const [dataPesquisaInicio, setDataPesquisaInicio] = useState("");
     const [dataPesquisaFim, setDataPesquisaFim] = useState("");
     const [marcaSelecionada, setMarcaSelecionada] = useState("");
@@ -21,7 +20,7 @@ export const ActionPesquisaConferenciaMalote = ({ usuarioLogado, ID }) => {
     const [tabelaVisivel, setTabelaVisivel] = useState(false);
     const [statusSelecionado, setStatusSelecionado] = useState("");
     const [pendenciaSelecionada, setPendenciaSelecionada] = useState("");
-    const [currentPage, setCurrentPage] = useState(1);
+    const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
     useEffect(() => {
         const dataInicial = getDataAtual();
@@ -31,13 +30,22 @@ export const ActionPesquisaConferenciaMalote = ({ usuarioLogado, ID }) => {
 
     }, [])
 
+    useEffect(() => {
+        const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
+        if (menuSalvo) {
+        const menuParsed = JSON.parse(menuSalvo);
+        setMenuFilhoAtual(menuParsed);
+        }
+    }, []);
+
     const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
-        'menus-usuario-excecao',
+        ['menus-usuario-excecao', menuFilhoAtual?.ID],
         async () => {
-          const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${ID}`);
-          return response.data;
+        const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
+
+        return response.data;
         },
-        { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
+        { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
     );
    
     const { data: optionsMarcas = [] } = useFetchData('marcasLista', '/marcasLista');
@@ -80,7 +88,7 @@ export const ActionPesquisaConferenciaMalote = ({ usuarioLogado, ID }) => {
     const { data: dadosMalotes = [], error: errorMalotes, isLoading: isLoadingMalotes, refetch } = useQuery(
         ['malotes-loja'],
         () => fetchListaMalotes(),
-        { enabled: false, staleTime: 5 * 60 * 1000, }
+        { enabled: false, staleTime: 60 * 60 * 1000, }
     );
 
     const handleChangeEmpresa = (e) => {
@@ -91,7 +99,6 @@ export const ActionPesquisaConferenciaMalote = ({ usuarioLogado, ID }) => {
 
       
     const handleClick = () => {
-        setCurrentPage(prevPage => prevPage + 1);
         setTabelaVisivel(true);
         refetch();
     }
@@ -215,5 +222,3 @@ export const ActionPesquisaConferenciaMalote = ({ usuarioLogado, ID }) => {
         </Fragment>
     )
 }
-
-

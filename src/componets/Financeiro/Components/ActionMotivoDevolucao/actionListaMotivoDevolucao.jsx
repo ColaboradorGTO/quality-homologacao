@@ -86,7 +86,7 @@ export const ActionListaMotivoDevolucao = ({ dadosMotivoDevolucao, optionsModulo
       IDMOTIVODEVOLUCAO: item.IDMOTIVODEVOLUCAO,
       DSMOTIVO: item.DSMOTIVO,
       DTCRIACAOFORMATADA: item.DTCRIACAOFORMATADA,
-      STATIVO: item.STATIVO,
+      STATIVO: item.STATIVO == 'True' ? 'Ativo' : 'Inativo',
       DTULTALTERACAOFORMATADA: item.DTULTALTERACAOFORMATADA,
     }
   })
@@ -119,7 +119,7 @@ export const ActionListaMotivoDevolucao = ({ dadosMotivoDevolucao, optionsModulo
     {
       field: 'STATIVO',
       header: 'Status',
-      body: row => <th style={{ color: row.STATIVO == 'True' ? 'blue' : 'red' }}>{row.STATIVO == 'True' ? 'Ativo' : 'Inativo'}</th>,
+      body: row => <th style={{ color: row.STATIVO == 'Ativo' ? 'blue' : 'red' }}>{row.STATIVO}</th>,
     },
     {
       field: 'DTULTALTERACAOFORMATADA',
@@ -154,9 +154,21 @@ export const ActionListaMotivoDevolucao = ({ dadosMotivoDevolucao, optionsModulo
   const handleEditar = async (IDMOTIVODEVOLUCAO) => {
     try {
       const response = await get(`/motivo-devolucao?idMotivo=${IDMOTIVODEVOLUCAO}`);
-      if (response.data) {
+      if (response.data && response.data.length > 0) {
         setDadosDetalheMotivoDevolucao(response.data);
         setModalVisivel(true);
+      } else {
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          text: 'Detalhes do motivo de devolução não encontrados.',
+          customClass: {
+            container: 'custom-swal',
+          },
+          showConfirmButton: false,
+          timer: 5000
+        })
+        return;
       }
     } catch (error) {
       console.error('Erro ao buscar detalhes da venda: ', error);
@@ -174,7 +186,7 @@ export const ActionListaMotivoDevolucao = ({ dadosMotivoDevolucao, optionsModulo
       Swal.fire({
         position: 'center',
         icon: 'error',
-        text: `Acesso restrito. Por favor, \n entre em contato com o responsável pela seção.`,
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para realizar esta ação.`,
         customClass: {
           container: 'custom-swal',
         },
@@ -242,7 +254,6 @@ export const ActionListaMotivoDevolucao = ({ dadosMotivoDevolucao, optionsModulo
         </div>
       </div>
 
-
       <ActionEditarMotivoDevolucaoModal
         show={modalVisivel}
         handleClose={() => setModalVisivel(false)}
@@ -250,7 +261,6 @@ export const ActionListaMotivoDevolucao = ({ dadosMotivoDevolucao, optionsModulo
         optionsModulos={optionsModulos}
         usuarioLogado={usuarioLogado}
       />
-
 
     </Fragment>
   )

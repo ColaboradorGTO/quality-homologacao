@@ -281,6 +281,8 @@ export const ActionOrdemTransferenciaModal = ({ show, handleClose, dadosConferen
               textButtonFechar={"Fechar"}
               onClickButtonFechar={handleClose}
               corFechar="secondary"
+              loadingTextCadastrar={"Cadastrando..."}
+              autoLoadingCadastrar={true}
             />
           </div>
         </Modal>

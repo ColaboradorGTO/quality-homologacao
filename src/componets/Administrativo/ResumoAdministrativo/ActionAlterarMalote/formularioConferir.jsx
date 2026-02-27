@@ -238,6 +238,8 @@ export const FormularioConferirMalote = ({
             textButtonCadastrar={"Imprimir"}
             onClickButtonCadastrar={handlePrint}
             corCadastrar="primary"
+            loadingTextCadastrar={"Cadastrando..."}
+            autoLoadingCadastrar={true}
             
             ButtonTypeFechar={ButtonTypeModal}
             textButtonFechar={"Finalizar"}

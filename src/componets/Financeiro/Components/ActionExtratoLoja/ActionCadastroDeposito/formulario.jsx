@@ -186,6 +186,8 @@ export const FormularioCadastroDeposito = ({ handleClose, optionsModulos, usuari
                     onClickButtonCadastrar={submit}
                     textButtonCadastrar={"Cadastrar Depósito"}
                     corCadastrar={"success"}
+                    loadingTextCadastrar={"Cadastrando..."}
+                    autoLoadingCadastrar={true}
 
                     ButtonTypeFechar={ButtonTypeModal}
                     onClickButtonFechar={handleClose}

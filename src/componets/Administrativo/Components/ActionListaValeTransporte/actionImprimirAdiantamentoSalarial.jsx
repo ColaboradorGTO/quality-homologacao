@@ -73,6 +73,8 @@ export const ActionImprimirAdiantamentoSalarial = ({show, handleClose,dadosAdian
             onClickButtonCadastrar={""}
             textButtonCadastrar={"Confirmar Impressão"}
             corCadastrar="success"
+            loadingTextCadastrar={"Cadastrando..."}
+            autoLoadingCadastrar={true}
 
             ButtonTypeFechar={ButtonTypeModal}
             textButtonFechar={"Fechar"}

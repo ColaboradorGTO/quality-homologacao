@@ -70,6 +70,8 @@ export const ActionPDFPedidoSemPreco = ({ show, handleClose, dadosPedidoSemPreco
           onClickButtonCadastrar={() => handlePrint()}
           textButtonCadastrar={"Imprimir"}
           corCadastrar={"info"}
+          loadingTextCadastrar={"Cadastrando..."}
+          autoLoadingCadastrar={true}
         />
       </Modal>
     </Fragment>

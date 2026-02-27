@@ -211,6 +211,8 @@ export const FormularioDetalheMalote = ({ dadosDetalhesMalote, dadosPendenciasMa
         textButtonCadastrar={"Imprimir"}
         onClickButtonCadastrar={handlePrint}
         corCadastrar="primary"
+        loadingTextCadastrar={"Cadastrando..."}
+        autoLoadingCadastrar={true}
 
         ButtonTypeFechar={ButtonTypeModal}
         textButtonFechar={"Fechar"}

@@ -222,6 +222,8 @@ export const FormularioEditarFatura = ({ dadosDetalheFaturaCaixa, handleClose, o
         onClickButtonCadastrar={handleValidatedSubmit}
         textButtonCadastrar={"Confimar Alteração"}
         corCadastrar={"success"}
+        loadingTextCadastrar={"Cadastrando..."}
+        autoLoadingCadastrar={true}
       />
     </form>
   )

@@ -981,6 +981,8 @@ export const FormularioAlteracaoPagamento = ({
               onClickButtonCadastrar={handleValidatedSubmit}
               textButtonCadastrar={"Finalizar Alteração de Pagamentos"}
               corCadastrar={"success"}
+              loadingTextCadastrar={"Cadastrando..."}
+              autoLoadingCadastrar={true}
             />
           </form>
         </>

@@ -206,6 +206,8 @@ export const ActionEditarProdutoImagemModal = ({ show, handleClose, dadosDetalhe
             onClickButtonCadastrar
             textButtonCadastrar={"Salvar"}
             corCadastrar={"success"}
+            loadingTextCadastrar={"Cadastrando..."}
+            autoLoadingCadastrar={true}
           />
         </Modal.Body>
 

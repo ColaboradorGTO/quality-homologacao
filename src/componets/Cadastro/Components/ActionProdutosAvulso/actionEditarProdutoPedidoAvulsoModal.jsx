@@ -484,6 +484,8 @@ export const ActionEditarProodutodPedidoAvulsoModal = ({ show, handleClose }) =>
               onClickButtonCadastrar
               textButtonCadastrar={"Salvar"}
               corCadastrar={"success"}
+              loadingTextCadastrar={"Cadastrando..."}
+              autoLoadingCadastrar={true}
             />
           </form>
         </Modal.Body>

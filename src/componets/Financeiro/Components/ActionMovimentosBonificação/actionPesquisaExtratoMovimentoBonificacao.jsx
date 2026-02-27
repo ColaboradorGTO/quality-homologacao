@@ -15,8 +15,8 @@ export const ActionPesquisaExtratoMovimentoBonificacao = ({ usuarioLogado }) => 
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [funcionarioSelecionado, setFuncionarioSelecionado] = useState('');
   const [funcionario, setFuncionario] = useState([]);
-  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
   const [modalVisivel, setModalVisivel] = useState(false);
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
   useEffect(() => {
     const menuSalvo = localStorage.getItem('menuFilhoSelecionado');

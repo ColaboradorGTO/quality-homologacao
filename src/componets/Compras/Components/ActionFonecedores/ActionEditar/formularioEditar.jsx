@@ -639,6 +639,8 @@ export const FormularioEditar = ({
                     tipoBtnCadastrar={"submit"}
                     textButtonCadastrar={"Salvar"}
                     corCadastrar={"success"}
+                    loadingTextCadastrar={"Cadastrando..."}
+                    autoLoadingCadastrar={true}
                 />
             </form>
         </Fragment>

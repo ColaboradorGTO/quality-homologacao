@@ -223,6 +223,8 @@ export const ActionImprimirVoucherModal = ({ show, handleClose, dadosImprimirVou
             textButtonCadastrar={"PDF"}
             onClickButtonCadastrar={handleExportPDF}
             corCadastrar="danger"
+            loadingTextCadastrar={"Cadastrando..."}
+            autoLoadingCadastrar={true}
 
 
             ButtonTypeFechar={ButtonTypeModal}

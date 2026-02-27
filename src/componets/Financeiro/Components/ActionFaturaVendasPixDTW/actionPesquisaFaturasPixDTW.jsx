@@ -13,7 +13,7 @@ import { ActionFaturaListaVendasPIXCompensacao } from "./actionListaFaturaVendas
 import { ActionFaturaListaVendasPIX } from "./actionListaFaturaVendasPix"
 
 
-export const ActionPesquisaFaturasVendasPixDTW = ({ usuarioLogado, ID }) => {
+export const ActionPesquisaFaturasVendasPixDTW = ({ usuarioLogado }) => {
   const [marcaSelecionada, setMarcaSelecionada] = useState('');
   const [empresaSelecionada, setEmpresaSelecionada] = useState([]);
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
@@ -25,7 +25,7 @@ export const ActionPesquisaFaturasVendasPixDTW = ({ usuarioLogado, ID }) => {
   const [tabelaVendasPixCompensacao, setTabelaVendasPixCompensacao] = useState(false);
   const [pixCompensacaoCapa, setPixCompensacaoCapa] = useState(false);
   const [pixCompensacaoCredito, setPixCompensacaoCredito] = useState(false);
-
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
   useEffect(() => {
     const dataInicial = getDataAtual();
@@ -36,10 +36,19 @@ export const ActionPesquisaFaturasVendasPixDTW = ({ usuarioLogado, ID }) => {
     setDataCompensacaoFim(dataFinal);
   }, [])
 
+  useEffect(() => {
+    const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
+    if (menuSalvo) {
+      const menuParsed = JSON.parse(menuSalvo);
+      setMenuFilhoAtual(menuParsed);
+    }
+  }, []);
+
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
-    'menus-usuario-excecao',
+    ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
-      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${ID}`);
+      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
+
       return response.data;
     },
     { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
@@ -52,7 +61,7 @@ export const ActionPesquisaFaturasVendasPixDTW = ({ usuarioLogado, ID }) => {
       
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000 }
+    { staleTime: 60 * 60 * 1000 }
   );
 
   const { data: optionsEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas } = useQuery(
@@ -61,7 +70,7 @@ export const ActionPesquisaFaturasVendasPixDTW = ({ usuarioLogado, ID }) => {
       const response = await get(`/listaEmpresaComercial?idMarca=${marcaSelecionada}`);
       return response.data;
     },
-    { enabled: Boolean(marcaSelecionada), staleTime: 5 * 60 * 1000 }
+    { enabled: Boolean(marcaSelecionada), staleTime: 60 * 60 * 1000 }
   );
 
   const fetchListaVendasPix = async () => {
@@ -102,7 +111,7 @@ export const ActionPesquisaFaturasVendasPixDTW = ({ usuarioLogado, ID }) => {
   const { data: dadosFaturaVendasPix = [], error: errorVendasPix, isLoading: isLoadingVendasPix, refetch: refetchVendasPix } = useQuery(
     ['venda-total-fatura-pix-empresa'],
     () => fetchListaVendasPix(),
-    { enabled: false, staleTime: 5 * 60 * 1000 }
+    { enabled: false, staleTime: 60 * 60 * 1000 }
   );
 
   const fetchListaVendasPixCompensacao = async () => {
@@ -141,7 +150,7 @@ export const ActionPesquisaFaturasVendasPixDTW = ({ usuarioLogado, ID }) => {
   const { data: dadosFaturaVendasPixCompensacao = [], error: errorVendasPixCompensacao, isLoading: isLoadingVendasPixCompenscao, refetch: refetchVendasPixCompensacao } = useQuery(
     ['venda-total-fatura-pix-empresa-compensada'],
     () => fetchListaVendasPixCompensacao(),
-    { enabled: false, staleTime: 5 * 60 * 1000 }
+    { enabled: false, staleTime: 60 * 60 * 1000 }
   );
 
   const handleClickVendasPix = () => {

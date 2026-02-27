@@ -4,11 +4,11 @@ import axios from "axios";
 import { post, put } from "../../../../../api/funcRequest";
 
 export const useConferirMalote = ({
-  salvarDadosMalotes, 
-  checkedItems, 
-  handleClick, 
+  salvarDadosMalotes,
+  checkedItems,
+  handleClick,
   handleClose,
-  optionsModulos, 
+  optionsModulos,
   usuarioLogado
 }) => {
   const [observacaoFinanceiro, setObservacaoFinanceiro] = useState('');
@@ -19,10 +19,10 @@ export const useConferirMalote = ({
     let usuarioIP = null;
 
     try {
-      const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+      const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
       usuarioIP = ipWhoisData?.ip;
     } catch (error) {
-      console.error("Erro ao buscar IP via ipwho.is:", error);
+      console.error("Erro ao buscar IP via ifconfig.me:", error);
     }
 
     if (!usuarioIP) {
@@ -36,9 +36,9 @@ export const useConferirMalote = ({
     setIpUsuario(usuarioIP);
     return usuarioIP;
   };
-  
+
   const onSalvarMalote = async (status) => {
-    if(optionsModulos[0]?.ALTERAR == 'False') {
+    if (optionsModulos[0]?.ALTERAR == 'False') {
       Swal.fire({
         title: 'Erro!',
         text: `${usuarioLogado?.NOFUNCIONARIO},\nVocê não tem permissão para alterar o Malote!`,
@@ -50,7 +50,7 @@ export const useConferirMalote = ({
       return;
     }
 
-    if(!usuarioLogado?.id || !salvarDadosMalotes[0]?.IDEMPRESA) {
+    if (!usuarioLogado?.id || !salvarDadosMalotes[0]?.IDEMPRESA) {
       if (!salvarDadosMalotes[0]?.IDEMPRESA) {
         Swal.fire({
           title: 'Erro!',
@@ -64,7 +64,7 @@ export const useConferirMalote = ({
       }
     }
 
-    if(salvarDadosMalotes[0]?.STATUSMALOTE == 'Devolvido' && !observacaoFinanceiro.length && !checkedItems.length) {
+    if (salvarDadosMalotes[0]?.STATUSMALOTE == 'Devolvido' && !observacaoFinanceiro.length && !checkedItems.length) {
       Swal.fire({
         title: 'Erro!',
         text: `${usuarioLogado?.NOFUNCIONARIO},\nPara devolver o malote é necessário selecionar as pendências e/ou informar a observação!`,
@@ -83,7 +83,7 @@ export const useConferirMalote = ({
       PENDENCIAS: checkedItems.map(id => ({ IDPENDENCIA: id })),
       IDUSERULTIMAALTERACAO: usuarioLogado?.id
     };
-    
+
     Swal.fire({
       icon: 'question',
       title: `Deseja realmente enviar o Malote?`,
@@ -109,7 +109,7 @@ export const useConferirMalote = ({
             IDFUNCIONARIO: String(usuarioLogado.id),
             PATHFUNCAO: textoFuncao,
             DADOS: textDados,
-            IP: ipUsuario,
+            IP: ipUsuario || 'IP não disponível',
           };
 
           await post('/log-web', createData);
@@ -136,7 +136,7 @@ export const useConferirMalote = ({
             IDFUNCIONARIO: String(usuarioLogado.id),
             PATHFUNCAO: textoFuncao,
             DADOS: textDados,
-            IP: ipUsuario,
+            IP: ipUsuario || 'IP não disponível',
           };
 
           const responsePost = await post('/log-web', createData);

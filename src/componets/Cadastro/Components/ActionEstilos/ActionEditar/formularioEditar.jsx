@@ -95,6 +95,8 @@ export const FormularioEditarEstilos = ({dadosDetalheEstilos }) => {
                     onClickButtonCadastrar={atualzarEstilo}
                     textButtonCadastrar={"Salvar"}
                     corCadastrar={"success"}
+                    loadingTextCadastrar={"Cadastrando..."}
+                    autoLoadingCadastrar={true}
                 />
 
             </form>

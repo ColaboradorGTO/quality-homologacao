@@ -16,10 +16,8 @@ import { ActionConferirMaloteModal } from "./ActionAlterarMalote/actionConferirM
 import { GoDownload } from "react-icons/go";
 import Swal from "sweetalert2";
 
-
 export const ActionListaConferenciaMalotes = ({ dadosMalotes, handleClick, optionsModulos, usuarioLogado  }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
-  const [salvarDadosMalotes, setSalvarDadosMalotes] = useState([]);
   const [dadosDetalhesMalote, setDadosDetalhesMalote] = useState([]);
   const [dadosPendenciasMalotes, setDadosPendenciasMalotes] = useState([]);
   const [dadosConferirMalote, setDadosConferirMalote] = useState([]);
@@ -294,15 +292,6 @@ export const ActionListaConferenciaMalotes = ({ dadosMalotes, handleClick, optio
     },
   ]
 
-  const handleEnviarMalote = async (row) => {
-    if (row) {
-      setSalvarDadosMalotes(row);
-     
-      await onSalvarMalote(salvarDadosMalotes); 
- 
-    }
-  }
-
   const handleClickDetalhar = async (row) => {
     if(optionsModulos[0]?.ALTERAR == 'True') {
       if (row.IDMALOTE) {
@@ -313,7 +302,7 @@ export const ActionListaConferenciaMalotes = ({ dadosMalotes, handleClick, optio
           position: 'center',
           icon: 'error',
           title: 'Erro!',
-          text: 'Você não tem permissão para acessar essa funcionalidade!',
+          html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para acessar essa funcionalidade!`,
           customClass: {
               container: 'custom-swal',
           },
@@ -332,6 +321,19 @@ export const ActionListaConferenciaMalotes = ({ dadosMalotes, handleClick, optio
         setDadosPendenciasMalotes(responsePendencia.data)
         setDadosDetalhesMalote(response.data)
         setModalDetalhe(true)
+      } else {
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: 'Erro!',
+          html: `Não foi possível carregar os detalhes do malote. Por favor, tente novamente mais tarde.`,
+          customClass: {
+            container: 'custom-swal',
+          },
+          showConfirmButton: false,
+          timer: 4000
+        });
+        return;
       }
     } catch (error) {
       console.log(error, "não foi possivel pegar os dados da tabela ")
@@ -349,9 +351,9 @@ export const ActionListaConferenciaMalotes = ({ dadosMalotes, handleClick, optio
           position: 'center',
           icon: 'error',
           title: 'Erro!',
-          text: 'Você não tem permissão para acessar essa funcionalidade!',
+          html: `${usuarioLogado?.NOFUNCIONARIO} <br/>  Você não tem permissão para acessar essa funcionalidade!`,
           customClass: {
-              container: 'custom-swal',
+            container: 'custom-swal',
           },
           showConfirmButton: false,
           timer: 4000
@@ -369,6 +371,19 @@ export const ActionListaConferenciaMalotes = ({ dadosMalotes, handleClick, optio
         setDadosPendenciasMalotes(responsePendencia.data)
         setDadosConferirMalote(response.data)
         setModalConferir(true)
+      } else {
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: 'Erro!',
+          html: `Não foi possível carregar os detalhes do malote para conferência. Por favor, tente novamente mais tarde.`,
+          customClass: {
+            container: 'custom-swal',
+          },
+          showConfirmButton: false,
+          timer: 4000
+        });
+        return;
       }
     } catch (error) {
       console.log(error, "não foi possivel pegar os dados da tabela ")

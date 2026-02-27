@@ -4,24 +4,28 @@ import Swal from "sweetalert2";
 import { post, put } from "../../../../../api/funcRequest";
 
 export const useEditarDeposito = ({ optionsModulos, usuarioLogado, handleClick, handleClickCompensacao }) => {
-const [ipUsuario, setIpUsuario] = useState('');
+    const [ipUsuario, setIpUsuario] = useState('');
 
     const getIPUsuario = async () => {
-        try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
-            let usuarioIP = ipWhoisData?.ip;
+        let usuarioIP = null;
 
-            if (!usuarioIP) {
+        try {
+        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+        usuarioIP = ipWhoisData?.ip;
+        } catch (error) {
+        console.error("Erro ao buscar IP via ipwho.is:", error);
+        }
+
+        if (!usuarioIP) {
+        try {
             const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
             usuarioIP = ipifyData?.ip;
-            }
-
-            setIpUsuario(usuarioIP);
-            return usuarioIP;
         } catch (error) {
-            console.error("Erro ao buscar IP:", error);
-            return null;
+            console.error("Erro ao buscar IP via ipify.org:", error);
         }
+        }
+        setIpUsuario(usuarioIP);
+        return usuarioIP;
     };
 
     const handleCancelar = async (IDDEPOSITOLOJA) => {
@@ -70,7 +74,7 @@ const [ipUsuario, setIpUsuario] = useState('');
                     IDFUNCIONARIO: String(usuarioLogado.id),
                     PATHFUNCAO:  textoFuncao,
                     DADOS: textDados,
-                    IP: ipUsuario   ,
+                    IP: ipUsuario || 'IP não disponível',
                 }
         
                 await post('/log-web', postData)
@@ -95,7 +99,7 @@ const [ipUsuario, setIpUsuario] = useState('');
                     IDFUNCIONARIO: String(usuarioLogado.id),
                     PATHFUNCAO:  textoFuncao,
                     DADOS: textDados,
-                    IP: ipUsuario.ip,
+                    IP: ipUsuario || 'IP não disponível',
                 }
         
                 const responsePost = await post('/log-web', postData)

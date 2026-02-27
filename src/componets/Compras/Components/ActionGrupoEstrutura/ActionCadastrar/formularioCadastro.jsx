@@ -65,6 +65,8 @@ export const FormularioCadastro = ({handleClose, usuarioLogado, optionsModulos, 
               onClickButtonCadastrar={cadastrarGrupoEstrutura}
               textButtonCadastrar={"Salvar"}
               corCadastrar={"success"}
+              loadingTextCadastrar={"Cadastrando..."}
+              autoLoadingCadastrar={true}
             />
 
           </form>

@@ -56,7 +56,7 @@ export const ActionListaContaBanco = ({
   };
 
   const exportToExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(dadosExcel);
+    const worksheet = XLSX.utils.json_to_sheet(dados);
     const workbook = XLSX.utils.book_new();
     const header = ['Nº', 'Banco', 'Ds. Conta', 'Nº Agência', 'Nº Conta', 'Tp. Conta', 'Status'];
     worksheet['!cols'] = [
@@ -73,12 +73,6 @@ export const ActionListaContaBanco = ({
     XLSX.writeFile(workbook, 'contas_bancarias.xlsx');
   };
 
-  const dadosExcel = dadosContaBanco.map((item, index) => {
-
-    return {
-
-    }
-  });
   const dados = dadosContaBanco.map((item, index) => {
     let contador = index + 1;
 
@@ -87,12 +81,12 @@ export const ActionListaContaBanco = ({
       IDCONTABANCO: item.IDCONTABANCO,
       DSCONTABANCO: `${item.IDCONTABANCO} - ${item.DSCONTABANCO}`,
       DSBANCO: item.DSBANCO,
-      NUAGENCIA: item.NUAGENCIA,
+      NUAGENCIA: item.NUAGENCIA ? item.NUAGENCIA : 'Não Informado',
       NUDIGITOAGENCIA: item.NUDIGITOAGENCIA,
-      NUCONTA: item.NUCONTA,
+      NUCONTA: item.NUCONTA ? item.NUCONTA : 'Não Informado',
       NUDIGITOCONTA: item.NUDIGITOCONTA,
       TPPESSOA: item.TPPESSOA,
-      STATIVO: item.STATIVO
+      STATIVO: item.STATIVO == 'True' ? 'ATIVA' : 'INATIVA',
     }
   });
 
@@ -119,13 +113,13 @@ export const ActionListaContaBanco = ({
     {
       field: 'NUAGENCIA',
       header: 'Nº Agência',
-      body: row => <th style={{}}> {!row.NUAGENCIA ? 'Não Informado' : row.NUAGENCIA} </th>,
+      body: row => <th style={{}}> {!row.NUAGENCIA} </th>,
       sortable: true,
     },
     {
       field: 'NUCONTA',
       header: 'Nº Conta',
-      body: row => <th style={{}}> {!row.NUCONTA ? 'Não Informado' : row.NUCONTA} </th>,
+      body: row => <th style={{}}> {!row.NUCONTA} </th>,
       sortable: true,
     },
     {
@@ -138,8 +132,8 @@ export const ActionListaContaBanco = ({
       field: 'STCANCELADO',
       header: 'Status',
       body: row => (
-        <th style={{ color: row.STATIVO == 'True' ? '#2196F3' : '#fd3995 ' }}>
-          {row.STATIVO == 'True' ? 'ATIVA' : 'INATIVA'}
+        <th style={{ color: row.STATIVO == 'ATIVA' ? '#2196F3' : '#fd3995 ' }}>
+          {row.STATIVO}
         </th>
       ),
     },
@@ -176,6 +170,16 @@ export const ActionListaContaBanco = ({
       if (response.data && response.data.length > 0) {
         setDadosDetalheContaBanco(response.data);
         setModalFaturaVisivel(true);
+      } else {
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: 'Detalhes da conta bancária não encontrados.',
+          customClass: {
+            container: 'custom-swal',
+          }
+        });
+        return;
       }
     } catch (error) {
       console.error('Erro ao buscar detalhe conta bancária: ', error);
@@ -258,6 +262,7 @@ export const ActionListaContaBanco = ({
           </DataTable>
         </div>
       </div>
+
       <ActionEditarContaBancoModal
         show={modalFaturaVisivel}
         handleClose={() => setModalFaturaVisivel(false)}
@@ -267,6 +272,7 @@ export const ActionListaContaBanco = ({
         dadosBanco={dadosBanco}
         handleClick={handleClick}
       />
+      
     </Fragment>
   )
 }

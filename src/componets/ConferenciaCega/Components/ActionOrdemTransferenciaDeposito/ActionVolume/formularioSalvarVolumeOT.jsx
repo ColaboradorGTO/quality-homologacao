@@ -91,6 +91,8 @@ export const FormularioSalvarVolumeOT = ({dadosSalvarVolume, handleClose}) => {
           textButtonCadastrar={"Salvar"}
           onClickButtonCadastrar={handleSubmit(onSalvarVolume)}
           corCadastrar={"success"}
+          loadingTextCadastrar={"Cadastrando..."}
+          autoLoadingCadastrar={true}
         />
       </form>
     </Fragment>

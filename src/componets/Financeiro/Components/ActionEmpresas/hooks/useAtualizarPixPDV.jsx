@@ -12,19 +12,19 @@ export const useAtualizarPixPDV = ({dadosPixPDV, handleClose, optionsModulos, us
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
-            usuarioIP = ipWhoisData?.ip;
+        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+        usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP via ipwho.is:", error);
+        console.error("Erro ao buscar IP via ifconfig.me:", error);
         }
 
         if (!usuarioIP) {
-            try {
+        try {
             const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
             usuarioIP = ipifyData?.ip;
-            } catch (error) {
+        } catch (error) {
             console.error("Erro ao buscar IP via ipify.org:", error);
-            }
+        }
         }
         setIpUsuario(usuarioIP);
         return usuarioIP;
@@ -70,7 +70,7 @@ export const useAtualizarPixPDV = ({dadosPixPDV, handleClose, optionsModulos, us
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: `FINANCEIRO/EMPRESAS/ALTERACAO CONFIGURACAO PIX IDEMPRESA: ${dadosPixPDV[0]?.IDEMPRESA}`,
                 DADOS: dados,
-                IP: ipUsuario
+                IP: ipUsuario || 'IP não disponível'
             }
             
             await post('/log-web', postData)
@@ -93,7 +93,7 @@ export const useAtualizarPixPDV = ({dadosPixPDV, handleClose, optionsModulos, us
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: `FINANCEIRO/EMPRESAS/ERRO AO ALTERAR CONFIGURACAO PIX IDEMPRESA: ${dadosPixPDV[0]?.IDEMPRESA}`,
                 DADOS: dados,
-                IP: ipUsuario
+                IP: ipUsuario || 'IP não disponível'
             }
             
             await post('/log-web', postData)

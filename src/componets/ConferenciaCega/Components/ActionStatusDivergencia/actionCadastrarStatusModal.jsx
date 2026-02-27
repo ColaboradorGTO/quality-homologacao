@@ -74,6 +74,8 @@ export const ActionCadastrarStatusModal = ({ show, handleClose }) => {
           onClickButtonCadastrar={handleSubmit(onSubmitInserir)}
           textButtonCadastrar={"Atualizar"}
           corCadastrar={"success"}
+          loadingTextCadastrar={"Cadastrando..."}
+          autoLoadingCadastrar={true}
 
           ButtonTypeFechar={ButtonTypeModal}
           onClickButtonFechar={handleClose}

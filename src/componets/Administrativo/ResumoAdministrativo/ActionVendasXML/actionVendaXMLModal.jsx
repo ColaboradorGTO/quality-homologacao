@@ -99,6 +99,8 @@ export const ActionVendaXMLModal = ({ show, handleClose, dadosDetalheVendasXML }
               textButtonCadastrar={"Copiar XML"}
               onClickButtonCadastrar={handleCopyXML}
               corCadastrar={"primary"}
+              loadingTextCadastrar={"Cadastrando..."}
+              autoLoadingCadastrar={true}
 
               ButtonTypeConfirmar={ButtonTypeModal}
               textButtonConfirmar={"Download"}

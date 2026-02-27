@@ -91,6 +91,8 @@ export const FormularioEditar = ({ dadosPixPDV, handleClose, optionsModulos, usu
         })}
         textButtonCadastrar={"Atualizar"}
         corCadastrar={"success"}
+        loadingTextCadastrar={"Atualizando..."}
+        autoLoadingCadastrar={true} 
 
         ButtonTypeFechar={ButtonTypeModal}
         onClickButtonFechar={handleClose}

@@ -170,6 +170,8 @@ export const ComprasActionCadPromocaoModal = ({ show, handleClose }) => {
           textButtonCadastrar={"Cadastrar"}
           onClickButtonCadastrar
           corCadastrar="primary"
+          loadingTextCadastrar={"Cadastrando..."}
+          autoLoadingCadastrar={true}
         />
 
       </Modal>

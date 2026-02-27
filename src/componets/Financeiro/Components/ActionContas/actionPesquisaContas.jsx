@@ -10,9 +10,10 @@ import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../ut
 import { InputSelectAction } from "../../../Inputs/InputSelectAction"
 import { ActionCadastrarContaBancoModal } from "./CadastrarContas/actionCadastrarContaBancoModal"
 import Swal from "sweetalert2"
+import { useEffect } from "react"
 
 
-export const ActionPesquisaContas = ({ usuarioLogado, ID }) => {
+export const ActionPesquisaContas = ({ usuarioLogado }) => {
   const [modalVisivel, setModalVisivel] = useState(false);
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [bancoSelecionado, setBancoSelecionado] = useState('');
@@ -21,6 +22,25 @@ export const ActionPesquisaContas = ({ usuarioLogado, ID }) => {
   const [empresaSelecionada, setEmpresaSelecionada] = useState('')
   const [empresaSelecionadaNome, setEmpresaSelecionadaNome] = useState('')
   const [codigoFatura, setCodigoFatura] = useState('')
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
+
+  useEffect(() => {
+    const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
+    if (menuSalvo) {
+    const menuParsed = JSON.parse(menuSalvo);
+    setMenuFilhoAtual(menuParsed);
+    }
+  }, []);
+
+  const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
+    ['menus-usuario-excecao', menuFilhoAtual?.ID],
+    async () => {
+    const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
+
+    return response.data;
+    },
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
+  );
 
   const { data: dadosBanco = [], error: errorBanco, isLoading: isLoadingBanco, refetch: refetchBanco } = useQuery(
     'banco',
@@ -77,17 +97,9 @@ export const ActionPesquisaContas = ({ usuarioLogado, ID }) => {
   const { data: dadosContaBanco = [], error: erroContaBanco, isLoading: isLoadingContaBanco, refetch: refetchContaBanco } = useQuery(
     'conta-banco',
     () => fetchContaBanco(),
-    { enabled: false, staleTime: 5 * 60 * 1000 }
+    { enabled: false, staleTime: 60 * 60 * 1000 }
   );
 
-  const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
-    'menus-usuario-excecao',
-    async () => {
-      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${ID}`);
-      return response.data;
-    },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
-  );
 
   const handleChangeEmpresa = (e) => {
     const empresa = optionsEmpresas.find((item) => item.IDEMPRESA === e.value);

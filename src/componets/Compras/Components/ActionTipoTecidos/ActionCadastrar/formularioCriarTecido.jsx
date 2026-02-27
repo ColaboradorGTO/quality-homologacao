@@ -62,6 +62,8 @@ export const FormularioCriarTecido = ({ show, handleClose, usuarioLogado, option
                     tipoBtnCadastrar="submit"
                     textButtonCadastrar={"Salvar"}
                     corCadastrar={"success"}
+                    loadingTextCadastrar={"Cadastrando..."}
+                    autoLoadingCadastrar={true}
                 />
 
             </form>

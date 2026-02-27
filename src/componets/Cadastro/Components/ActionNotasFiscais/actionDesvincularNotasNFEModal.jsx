@@ -315,6 +315,8 @@ export const ActionDesvincularNotasNFEModal = ({ show, handleClose, dadosPedidos
                             textButtonCadastrar={"Desvincular Pedidos"}
                             corCadastrar={"danger"}
                             iconCadastrar={FaArrowLeft}
+                            loadingTextCadastrar={"Cadastrando..."}
+                            autoLoadingCadastrar={true}
                         />
                     )}
                 </Modal.Body>

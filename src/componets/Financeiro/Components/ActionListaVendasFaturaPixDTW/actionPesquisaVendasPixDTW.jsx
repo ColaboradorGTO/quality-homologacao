@@ -18,7 +18,7 @@ import { useIntegrarTodosPagamentosPix } from "./hooks/useIntegrarTodosPagamento
 import { BsCloudUpload } from "react-icons/bs"
 
 
-export const ActionPesquisaVendasPixDTW = ({ usuarioLogado, ID }) => {
+export const ActionPesquisaVendasPixDTW = ({ usuarioLogado }) => {
   const [marcaSelecionada, setMarcaSelecionada] = useState('');
   const [empresaSelecionada, setEmpresaSelecionada] = useState([]);
   const [empresaSelecionadaNome, setEmpresaSelecionadaNome] = useState('');
@@ -34,6 +34,7 @@ export const ActionPesquisaVendasPixDTW = ({ usuarioLogado, ID }) => {
   const [pixCompensacaoDebito, setPixCompensacaoDebito] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
   const [btnVisivel, setBtnVisivel] = useState(false);
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
   useEffect(() => {
     const dataInicial = getDataAtual();
@@ -44,10 +45,20 @@ export const ActionPesquisaVendasPixDTW = ({ usuarioLogado, ID }) => {
     setDataCompensacaoFim(dataFinal);
   }, [])
 
+
+  useEffect(() => {
+    const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
+    if (menuSalvo) {
+      const menuParsed = JSON.parse(menuSalvo);
+      setMenuFilhoAtual(menuParsed);
+    }
+  }, []);
+
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
-    'menus-usuario-excecao',
+    ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
-      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${ID}`);
+      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
+
       return response.data;
     },
     { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
@@ -60,7 +71,7 @@ export const ActionPesquisaVendasPixDTW = ({ usuarioLogado, ID }) => {
     
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
+    { staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
   );
 
   const { data: optionsEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas } = useQuery(
@@ -121,7 +132,7 @@ export const ActionPesquisaVendasPixDTW = ({ usuarioLogado, ID }) => {
   const { data: dadosVendasPix = [], error: errorVendasPix, isLoading: isLoadingVendasPix, refetch: refetchVendasPix } = useQuery(
     ['venda-pix-periodo'],
     () => fetchListaVendasPix(),
-    { enabled: false, staleTime: 5 * 60 * 1000 }
+    { enabled: false, staleTime: 60 * 60 * 1000 }
   );
 
   const fetchListaVendasPixCompensacao = async () => {
@@ -161,7 +172,7 @@ export const ActionPesquisaVendasPixDTW = ({ usuarioLogado, ID }) => {
   const { data: dadosVendasPixCompensacao = [], error: errorVendasPixCompensacao, isLoading: isLoadingVendasPixCompenscao, refetch: refetchVendasPixCompensacao } = useQuery(
     ['venda-pix-periodo'],
     () => fetchListaVendasPixCompensacao(),
-    { enabled: false, staleTime: 5 * 60 * 1000 }
+    { enabled: false, staleTime: 60 * 60 * 1000 }
   );
 
   const handleSelectMarca = (e) => {

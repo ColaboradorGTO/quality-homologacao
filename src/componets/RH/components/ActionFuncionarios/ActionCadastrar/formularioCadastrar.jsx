@@ -563,6 +563,8 @@ export const FormularioCadastrar = ({
                                 textButtonCadastrar={"Confirmar"}
                                 onClickButtonCadastrar={loginConfirmacao}
                                 corCadastrar="success"
+                                loadingTextCadastrar={"Cadastrando..."}
+                                autoLoadingCadastrar={true}
 
                             />
                         </div>

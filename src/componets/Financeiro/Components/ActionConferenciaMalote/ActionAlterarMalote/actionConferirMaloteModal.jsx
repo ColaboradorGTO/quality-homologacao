@@ -15,7 +15,6 @@ export const ActionConferirMaloteModal = ({ dadosConferirMalote, dadosPendencias
         tabIndex={-1}
         role="dialog"
         aria-hidden="true"
-
       >
 
         <div style={{ padding: "10px" }}>

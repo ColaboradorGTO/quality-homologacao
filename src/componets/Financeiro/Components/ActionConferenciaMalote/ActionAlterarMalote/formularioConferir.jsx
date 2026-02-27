@@ -240,18 +240,24 @@ export const FormularioConferirMalote = ({
             onClickButtonCadastrar={handlePrint}
             corCadastrar="primary"
             iconCadastrar={MdOutlineLocalPrintshop}
+            loadingTextCadastrar={"Imprimindo..."}
+            autoLoadingCadastrar={true}
             
             ButtonTypeFechar={ButtonTypeModal}
             textButtonFechar={"Finalizar"}
             onClickButtonFechar={() => onSalvarMalote('Conferência')}
             corFechar="success"
             iconFechar={FaCheck}
+            loadingTextFechar={"Finalizando..."}
+            autoLoadingFechar={true}  
             
             ButtonTypeConfirmar={ButtonTypeModal}
             textButtonConfirmar={"Devolver"}
             onClickButtonConfirmar={() => onSalvarMalote('Devolução')}
             corConfirmar="danger"
             iconConfirmar={FaUpload}
+            loadingTextConfirmar={"Devolvendo..."}
+            autoLoadingConfirmar={true}
 
             ButtonTypeCancelar={ButtonTypeModal}
             textButtonCancelar={"Fechar"}

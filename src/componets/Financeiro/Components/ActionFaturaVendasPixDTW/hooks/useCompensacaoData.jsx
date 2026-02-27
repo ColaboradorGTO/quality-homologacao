@@ -7,21 +7,25 @@ export const useCompensacaoData = ({ usuarioLogado, optionsModulos, handleClickV
     const [ipUsuario, setIpUsuario] = useState('');
 
     const getIPUsuario = async () => {
+        let usuarioIP = null;
+
         try {
-        const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
-        let usuarioIP = ipWhoisData?.ip;
+        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+        usuarioIP = ipWhoisData?.ip;
+        } catch (error) {
+        console.error("Erro ao buscar IP via ifconfig.me:", error);
+        }
 
         if (!usuarioIP) {
-        const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-        usuarioIP = ipifyData?.ip;
+        try {
+            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+            usuarioIP = ipifyData?.ip;
+        } catch (error) {
+            console.error("Erro ao buscar IP via ipify.org:", error);
         }
-
+        }
         setIpUsuario(usuarioIP);
         return usuarioIP;
-        } catch (error) {
-        console.error("Erro ao buscar IP:", error);
-        return null;
-        }
     };
 
     
@@ -75,7 +79,7 @@ export const useCompensacaoData = ({ usuarioLogado, optionsModulos, handleClickV
                         "IDFUNCIONARIO": String(usuarioLogado.id),
                         "PATHFUNCAO": textoFuncao,
                         "DADOS": textdados,
-                        "IP": ipUsuario
+                        "IP": ipUsuario || 'IP não disponível'
                     };
 
                     await post("/log-web", dadosConfirmaDep);

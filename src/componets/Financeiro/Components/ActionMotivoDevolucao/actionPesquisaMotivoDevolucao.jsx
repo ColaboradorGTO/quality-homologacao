@@ -12,15 +12,14 @@ import { useQuery } from 'react-query';
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento"
 import Swal from "sweetalert2"
 
-export const ActionPesquisaMotivoDevolucao = ({ usuarioLogado, ID}) => {
+export const ActionPesquisaMotivoDevolucao = ({ usuarioLogado }) => {
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
   const [dataPesquisaFim, setDataPesquisaFim] = useState('');
   const [numeroMotivoDevolucao, setNumeroMotivoDevolucao] = useState('')
   const [descricaoMotivoDevolucao, setDescricaoMotivoDevolucao] = useState('')
   const [tabelaVisivel, setTabelaVisivel] = useState(false)
-  const [isLoadingPesquisa, setIsLoadingPesquisa] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
   const [modalCriarVisivel, setModalCriarVisivel] = useState(false)
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
   useEffect(() => {
     const dataInicial = getDataAtual();
@@ -29,6 +28,24 @@ export const ActionPesquisaMotivoDevolucao = ({ usuarioLogado, ID}) => {
     setDataPesquisaFim(dataFinal);
   }, [])
   
+  
+  useEffect(() => {
+    const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
+    if (menuSalvo) {
+      const menuParsed = JSON.parse(menuSalvo);
+      setMenuFilhoAtual(menuParsed);
+    }
+  }, []);
+
+  const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
+    ['menus-usuario-excecao', menuFilhoAtual?.ID],
+    async () => {
+      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
+
+      return response.data;
+    },
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
+  );
 
   const fetchMotivoDevolucao = async () => {
     const urlBase = `/motivo-devolucao?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idMotivo=${numeroMotivoDevolucao}&descricaoMotivo=${descricaoMotivoDevolucao}`;
@@ -67,17 +84,7 @@ export const ActionPesquisaMotivoDevolucao = ({ usuarioLogado, ID}) => {
   const { data: dadosMotivoDevolucao = [], error: erroMotivoDevolucao, isLoading: isLoadingDevolucao, refetch: refetchMotivoDevolucao } = useQuery(
     'motivo-devolucao',
     () => fetchMotivoDevolucao(),
-    { enabled: false, staleTime: 5 * 60 * 1000 }
-  );
-
-  const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
-    'menus-usuario-excecao',
-    async () => {
-      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${ID}`);
-
-      return response.data;
-    },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
+    { enabled: false, staleTime: 60 * 60 * 1000 }
   );
 
   const handleClickCadastro = () => {
@@ -87,7 +94,7 @@ export const ActionPesquisaMotivoDevolucao = ({ usuarioLogado, ID}) => {
       Swal.fire({
         position: 'center',
         icon: 'error',
-        html: `Acesso restrito. Por favor, <br> entre em contato com o responsável pela seção.`,
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para realizar esta ação.`,
         customClass: {
           container: 'custom-swal',
         },
@@ -99,8 +106,6 @@ export const ActionPesquisaMotivoDevolucao = ({ usuarioLogado, ID}) => {
 
   const handleClick = () => {
     setTabelaVisivel(true)
-    setIsLoadingPesquisa(true);
-    setCurrentPage(prevPage => prevPage + 1);
     refetchMotivoDevolucao()
   }
 

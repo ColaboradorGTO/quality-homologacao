@@ -160,6 +160,8 @@ export const FormularioEditar = ({
                     onClickButtonCadastrar={handleEditar}
                     textButtonCadastrar={"Salvar"}
                     corCadastrar={"success"}
+                    loadingTextCadastrar={"Cadastrando..."}
+                    autoLoadingCadastrar={true}
                 />
             </form>
          
