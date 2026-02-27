@@ -16,7 +16,7 @@ import { useConsolidarTodasFaturas } from "./hooks/useConsolidarTodasFaturas"
 import { MdOutlineCloudUpload } from "react-icons/md"
 
 
-export const ActionPesquisaFaturasConsolidadas = ({ usuarioLogado, ID }) => {
+export const ActionPesquisaFaturasConsolidadas = ({ usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [tabelaVisivel2, setTabelaVisivel2] = useState(false);
   const [actionMain, setActionMain] = useState(true);
@@ -25,10 +25,8 @@ export const ActionPesquisaFaturasConsolidadas = ({ usuarioLogado, ID }) => {
   const [empresaSelecionada, setEmpresaSelecionada] = useState('')
   const [empresaSelecionadaNome, setEmpresaSelecionadaNome] = useState('')
   const [codigoFatura, setCodigoFatura] = useState('')
-  const [currentPage, setCurrentPage] = useState(1)
-  const [isLoadingPesquisa, setIsLoadingPesquisa] = useState(true)
   const [selectedItems, setSelectedItems] = useState([]);
-
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
   useEffect(() => {
     const dataInicial = getDataAtual();
@@ -36,6 +34,25 @@ export const ActionPesquisaFaturasConsolidadas = ({ usuarioLogado, ID }) => {
     setDataPesquisaInicio(dataInicial);
     setDataPesquisaFim(dataFinal);
   }, [])
+
+
+  useEffect(() => {
+    const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
+    if (menuSalvo) {
+    const menuParsed = JSON.parse(menuSalvo);
+    setMenuFilhoAtual(menuParsed);
+    }
+  }, []);
+
+  const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
+    ['menus-usuario-excecao', menuFilhoAtual?.ID],
+    async () => {
+    const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
+
+    return response.data;
+    },
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
+  );
 
   const { data: optionsEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas } = useFetchData('listaEmpresasIformatica', '/listaEmpresasIformatica');
 
@@ -88,7 +105,7 @@ export const ActionPesquisaFaturasConsolidadas = ({ usuarioLogado, ID }) => {
   const { data: dadosDetalheFatura = [], error: erroFatura, isLoading: isLoadingFatura, refetch: refetchFatura } = useQuery(
     'previa-consolidacao-faturas',
     () => fetchFatura(),
-    { enabled: false, staleTime: 5 * 60 * 1000 }
+    { enabled: false, staleTime: 60 * 60 * 1000 }
   );
 
   const fetchVendaMarcaPeriodo = async () => {
@@ -128,17 +145,7 @@ export const ActionPesquisaFaturasConsolidadas = ({ usuarioLogado, ID }) => {
   const { data: dadosFaturasConsolidadas = [], error: erroFaturaConsolidadas, isLoading: isLoadingFaturaConsolidadas, refetch: refetchFaturaConsolidada } = useQuery(
     'consolidacao-faturas',
     () => fetchVendaMarcaPeriodo(),
-    { enabled: false, staleTime: 5 * 60 * 1000 }
-  );
-
-  const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
-    'menus-usuario-excecao',
-    async () => {
-      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${ID}`);
-      console.log(response.data, 'response.data');
-      return response.data;
-    },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
+    { enabled: false, staleTime: 60 * 60 * 1000 }
   );
 
   const handleChangeEmpresa = (e) => {
@@ -151,8 +158,6 @@ export const ActionPesquisaFaturasConsolidadas = ({ usuarioLogado, ID }) => {
   const handleClick = () => {
     setTabelaVisivel(true)
     setTabelaVisivel2(false)
-    setIsLoadingPesquisa(true);
-    setCurrentPage(prevPage => prevPage + 1);
     refetchFatura()
   }
   const handleClickConciliar = () => {

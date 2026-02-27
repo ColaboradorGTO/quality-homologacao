@@ -10,10 +10,10 @@ export const useIntegrarQuebra = ({optionsModulos, usuarioLogado, selectedItems,
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
-            usuarioIP = ipWhoisData?.ip;
+        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+        usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP via ipwho.is:", error);
+        console.error("Erro ao buscar IP via ipwho.is:", error);
         }
 
         if (!usuarioIP) {
@@ -80,7 +80,7 @@ export const useIntegrarQuebra = ({optionsModulos, usuarioLogado, selectedItems,
                         IDFUNCIONARIO: String(usuarioLogado.id),
                         PATHFUNCAO: `FINANCEIRO/INTEGRAR QUEBRA DE CAIXA SELECIONADA`,
                         DADOS: textDados,
-                        IP: ipUsuario
+                        IP: ipUsuario || 'IP não disponível'
                     }
                     
                     await post('/log-web', postData)
@@ -104,7 +104,7 @@ export const useIntegrarQuebra = ({optionsModulos, usuarioLogado, selectedItems,
                         IDFUNCIONARIO: String(usuarioLogado.id),
                         PATHFUNCAO: `FINANCEIRO/ERRO AO INTEGRAR QUEBRA DE CAIXA SELECIONADA`,
                         DADOS: textDados,
-                        IP: ipUsuario
+                        IP: ipUsuario || 'IP não disponível'
                     }
                     
                     const responsePost = await post('/log-web', postData)

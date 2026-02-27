@@ -8,7 +8,6 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../../Tables/headerTable";
-import { IoMdCheckmark } from "react-icons/io";
 import { toFloat } from "../../../../utils/toFloat";
 import { useConfirmarConsolidacaoFatura } from "./hooks/useConfirmarConsolidacaoFatura";
 import Swal from "sweetalert2";

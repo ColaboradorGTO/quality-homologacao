@@ -7,21 +7,25 @@ export const useCancelarConsolidacaoFatura = ({optionsModulos, usuarioLogado, se
     const [ipUsuario, setIpUsuario] = useState('');
 
     const getIPUsuario = async () => {
-        try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
-            let usuarioIP = ipWhoisData?.ip;
+        let usuarioIP = null;
 
-            if (!usuarioIP) {
+        try {
+        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+        usuarioIP = ipWhoisData?.ip;
+        } catch (error) {
+        console.error("Erro ao buscar IP via ifconfig.me:", error);
+        }
+
+        if (!usuarioIP) {
+        try {
             const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
             usuarioIP = ipifyData?.ip;
-            }
-
-            setIpUsuario(usuarioIP);
-            return usuarioIP;
         } catch (error) {
-            console.error("Erro ao buscar IP:", error);
-            return null;
+            console.error("Erro ao buscar IP via ipify.org:", error);
         }
+        }
+        setIpUsuario(usuarioIP);
+        return usuarioIP;
     };
 
     const cancelar = async (rowData) => {
@@ -113,7 +117,7 @@ export const useCancelarConsolidacaoFatura = ({optionsModulos, usuarioLogado, se
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: `FINANCEIRO/CANCELAR CONSOLIDACAO FATURAS`,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'IP não disponível'
             }
             
             await post('/log-web', postData)
@@ -137,7 +141,7 @@ export const useCancelarConsolidacaoFatura = ({optionsModulos, usuarioLogado, se
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: `FINANCEIRO/ERRO AO CANCELAR CONSOLIDACAO FATURAS`,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'IP não disponível'
             }
             
             const responsePost = await post('/log-web', postData)

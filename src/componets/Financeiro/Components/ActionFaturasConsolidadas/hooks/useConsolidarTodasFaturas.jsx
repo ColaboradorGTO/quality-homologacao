@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { post, put } from "../../../../../api/funcRequest";
+import { post } from "../../../../../api/funcRequest";
 import axios from 'axios'
 import Swal from "sweetalert2";
 
@@ -12,24 +12,26 @@ export const useConsolidarTodasFaturas = ({
     const [ipUsuario, setIpUsuario] = useState('');
 
     const getIPUsuario = async () => {
-        try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
-            let usuarioIP = ipWhoisData?.ip;
+        let usuarioIP = null;
 
-            if (!usuarioIP) {
+        try {
+        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+        usuarioIP = ipWhoisData?.ip;
+        } catch (error) {
+        console.error("Erro ao buscar IP via ifconfig.me:", error);
+        }
+
+        if (!usuarioIP) {
+        try {
             const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
             usuarioIP = ipifyData?.ip;
-            }
-
-            setIpUsuario(usuarioIP);
-            return usuarioIP;
         } catch (error) {
-            console.error("Erro ao buscar IP:", error);
-            return null;
+            console.error("Erro ao buscar IP via ipify.org:", error);
         }
+        }
+        setIpUsuario(usuarioIP);
+        return usuarioIP;
     };
-
-
 
     const conferirTodas = async (rowData) => {
         if(optionsModulos[0]?.ALTERAR == 'False') {
@@ -89,7 +91,7 @@ export const useConsolidarTodasFaturas = ({
                             IDFUNCIONARIO: String(usuarioLogado.id),
                             PATHFUNCAO: ``,
                             DADOS: textDados,
-                            IP: ipUsuario
+                            IP: ipUsuario || 'IP não disponível'
                         }
                         
                         await post('/log-web', postData)
@@ -115,7 +117,7 @@ export const useConsolidarTodasFaturas = ({
                     //     IDFUNCIONARIO: String(usuarioLogado.id),
                     //     PATHFUNCAO: `FINANCEIRO/ERRO AO INTEGRAR TODAS CONSOLIDACOES FATURAS SELECIONADAS`,
                     //     DADOS: textDados,
-                    //     IP: ipUsuario
+                    //     IP: ipUsuario || 'IP não disponível'
                     // }
                     
                     // const responsePost = await post('/log-web', postData)
