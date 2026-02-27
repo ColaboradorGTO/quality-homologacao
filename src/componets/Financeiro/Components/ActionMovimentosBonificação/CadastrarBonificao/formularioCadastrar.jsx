@@ -37,7 +37,7 @@ export const FormularioCadastrar = ({
 
     return (
         <Fragment>
-            <form >
+            <form onSubmit={handleSubmit(onSubmit)}>
 
                 <div className="form-group">
                     <div className="row">
@@ -94,7 +94,7 @@ export const FormularioCadastrar = ({
                     />
                  
                 </div>
-                
+
                 <FooterModal
                     ButtonTypeFechar={ButtonTypeModal}
                     onClickButtonFechar={handleClose}
