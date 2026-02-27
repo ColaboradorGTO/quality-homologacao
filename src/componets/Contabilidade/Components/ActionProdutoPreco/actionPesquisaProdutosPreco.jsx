@@ -59,7 +59,7 @@ export const ActionPesquisaProductoPreco = () => {
   const { data: dadosProdutos = [], error: errorProdutos, isLoading: isLoadingProdutos, refetch: refetchListaProdutos } = useQuery(
     ['buscar-produtos', produto, currentPage, pageSize],
     fetchListaProdutos,
-    { enabled: Boolean(produto.length > 5), staleTime: 5 * 60 * 1000 },
+    { enabled: Boolean(produto.length > 5), staleTime: 60 * 60 * 1000 },
   );
 
 
@@ -118,7 +118,9 @@ export const ActionPesquisaProductoPreco = () => {
 
 
       {tabelaVisivel && (
-        <ActionListaProductoPreco dadosProdutos={dadosProdutos} />
+        <ActionListaProductoPreco
+          dadosProdutos={dadosProdutos}
+        />
       )}
 
     </Fragment>

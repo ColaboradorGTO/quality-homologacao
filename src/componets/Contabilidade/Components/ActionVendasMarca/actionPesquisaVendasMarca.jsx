@@ -10,8 +10,6 @@ import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
 import { getDataAtual } from "../../../../utils/dataAtual";
 
-
-
 export const ActionPesquisaVendasMarca = () => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
@@ -25,18 +23,17 @@ export const ActionPesquisaVendasMarca = () => {
     const dataFinal = getDataAtual();
     setDataPesquisaInicio(dataInicial);
     setDataPesquisaFim(dataFinal);
- 
-  }, [])
 
+  }, [])
 
   const { data: optionsMarcas = [], error: errorMarcas, isLoading: isLoadingMarcas, refetch: refetchMarcas } = useQuery(
     'marcasLista',
     async () => {
       const response = await get(`/marcasLista`);
-     
+
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000 }
+    { staleTime: 60 * 60 * 1000 }
   );
 
 
@@ -45,11 +42,11 @@ export const ActionPesquisaVendasMarca = () => {
 
       const urlApi = `/vendasProdutos?idMarca=${marcaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
       const response = await get(urlApi);
-      
+
       if (response.data.length && response.data.length === pageSize) {
         let allData = [...response.data];
         animacaoCarregamento(`Carregando... Página ${currentPage} de ${response.data.length}`, true);
-  
+
         async function fetchNextPage(currentPage) {
           try {
             currentPage++;
@@ -65,11 +62,11 @@ export const ActionPesquisaVendasMarca = () => {
             throw error;
           }
         }
-  
+
         await fetchNextPage(currentPage);
         return allData;
       } else {
-       
+
         return response.data;
       }
     } catch (error) {
@@ -83,14 +80,12 @@ export const ActionPesquisaVendasMarca = () => {
   const { data: dadosVendasMarca = [], error: errorVendas, isLoading: isLoadingVendas, refetch: refetchListaVendasMarca } = useQuery(
     ['vendas-produtos', marcaSelecionada, dataPesquisaInicio, dataPesquisaFim, currentPage, pageSize],
     () => fetchListaVendasMarca(marcaSelecionada, dataPesquisaInicio, dataPesquisaFim, currentPage, pageSize),
-    { enabled: Boolean(marcaSelecionada), staleTime: 5 * 60 * 1000 }
+    { enabled: Boolean(marcaSelecionada), staleTime: 60 * 60 * 1000 }
   );
-
 
   const handleSelectMarca = (e) => {
     const selectId = e.value;
     setMarcaSelecionada(selectId)
-    
   }
 
   const handleClick = () => {
@@ -98,9 +93,8 @@ export const ActionPesquisaVendasMarca = () => {
     refetchListaVendasMarca(marcaSelecionada)
     setTabelaVisivel(true)
   }
-console.log(optionsMarcas,  "optionsMarcas")
-  return (
 
+  return (
     <Fragment>
       <ActionMain
         linkComponentAnterior={["Home"]}
@@ -129,7 +123,7 @@ console.log(optionsMarcas,  "optionsMarcas")
             label: empresa.DSGRUPOEMPRESARIAL,
           }))
         ]}
-        
+
         labelSelectEmpresa={"Marca"}
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}
@@ -139,7 +133,9 @@ console.log(optionsMarcas,  "optionsMarcas")
       />
 
       {tabelaVisivel && (
-        <ActionListaVendasMarca dadosVendasMarca={dadosVendasMarca} />
+        <ActionListaVendasMarca
+          dadosVendasMarca={dadosVendasMarca}
+        />
       )}
 
     </Fragment>

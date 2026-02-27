@@ -16,6 +16,7 @@ import { TbFileTypeXml } from "react-icons/tb";
 
 export const ActionListaVendasXML = ({ dadosVendasXML }) => {
   const [dadosDetalheVendas, setDadosDetalheVendas] = useState([]);
+  const [rowSelection, setRowSelection] = useState(null);
   const [dadosDetalhePagamento, setDadosDetalhePagamento] = useState([]);
   const [detalheVendaXMLModal, setDetalheVendaXMLModal] = useState(false);
   const [dadosDetalheVendasXML, setDadosDetalheVendasXML] = useState([]);
@@ -88,7 +89,7 @@ export const ActionListaVendasXML = ({ dadosVendasXML }) => {
       TXTMOTIVOCANCELAMENTO: item.TXTMOTIVOCANCELAMENTO,
       VRTOTALPAGO: item.VRTOTALPAGO,
       PROTNFE_INFPROT_XMOTIVO: item.PROTNFE_INFPROT_XMOTIVO,
-      XML_FORMATADO: item.XML_FORMATADO || '' ,
+      XML_FORMATADO: item.XML_FORMATADO || '',
     }
 
   })
@@ -103,7 +104,7 @@ export const ActionListaVendasXML = ({ dadosVendasXML }) => {
     {
       field: 'NOFANTASIA',
       header: 'Empresa',
-      body: row => <th style={{ width: '200px', margin: '0px'}}>{row.NOFANTASIA}</th>,
+      body: row => <th style={{ width: '200px', margin: '0px' }}>{row.NOFANTASIA}</th>,
       sortable: true,
     },
     {
@@ -127,7 +128,7 @@ export const ActionListaVendasXML = ({ dadosVendasXML }) => {
     {
       field: 'CHAVENFE',
       header: 'Chave NF',
-      body: row => <p style={{ width: '150px', margin: '0px', fontWeight: 600}}>{row.CHAVENFE}</p>,
+      body: row => <p style={{ width: '150px', margin: '0px', fontWeight: 600 }}>{row.CHAVENFE}</p>,
       sortable: true,
     },
     {
@@ -145,7 +146,7 @@ export const ActionListaVendasXML = ({ dadosVendasXML }) => {
     {
       field: 'PROTNFE_INFPROT_XMOTIVO',
       header: 'Motivo',
-      body: row => <th>{row.STCANCELADO == 'True' ?  row.TXTMOTIVOCANCELAMENTO : row.PROTNFE_INFPROT_XMOTIVO || 'Sem Motivo'}</th>,
+      body: row => <th>{row.STCANCELADO == 'True' ? row.TXTMOTIVOCANCELAMENTO : row.PROTNFE_INFPROT_XMOTIVO || 'Sem Motivo'}</th>,
       sortable: true,
     },
     {
@@ -166,24 +167,21 @@ export const ActionListaVendasXML = ({ dadosVendasXML }) => {
             />
 
           </div>
-          
-            <div className="p-1">
-              <ButtonTable
-                titleButton={`${row.XML_FORMATADO.length > 0 ? 'Visualizar Xml da Venda' : 'Venda Sem XML'}` }
-                disabledBTN={row.XML_FORMATADO.length === 0}
-                onClickButton={() => clickDetalharVendaXML(row)}
-                Icon={TbFileTypeXml}
-                iconSize={20}
-                iconColor={"#fff"}
-                cor={"info"}
-                width="30px"
-                height="30px"
 
-              />
+          <div className="p-1">
+            <ButtonTable
+              titleButton={`${row.XML_FORMATADO.length > 0 ? 'Visualizar Xml da Venda' : 'Venda Sem XML'}`}
+              disabledBTN={row.XML_FORMATADO.length === 0}
+              onClickButton={() => clickDetalharVendaXML(row)}
+              Icon={TbFileTypeXml}
+              iconSize={20}
+              iconColor={"#fff"}
+              cor={"info"}
+              width="30px"
+              height="30px"
 
-            </div>
-
-       
+            />
+          </div>
         </div>
       ),
     }
@@ -224,18 +222,16 @@ export const ActionListaVendasXML = ({ dadosVendasXML }) => {
       const response = await get(`/venda-xml?idVenda=${IDVENDA}`);
       setDetalheVendaXMLModal(true);
       setDadosDetalheVendasXML(response.data)
-      
+
     } catch (error) {
       console.error(error);
     }
   }
 
-
-
   return (
 
     <Fragment>
-      <div className="panel" style={{marginTop: '6rem'}}>
+      <div className="panel" style={{ marginTop: '6rem' }}>
         <div className="panel-hdr mb-4">
 
           <h3>Lista de Vendas Contigência</h3>
@@ -259,6 +255,8 @@ export const ActionListaVendasXML = ({ dadosVendasXML }) => {
             sortOrder={-1}
             paginator={true}
             rows={10}
+            selectionMode={'single'}
+            selection={rowSelection}
             rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"

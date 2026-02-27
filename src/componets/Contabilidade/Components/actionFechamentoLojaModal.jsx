@@ -7,7 +7,6 @@ import { formatMoeda } from "../../../utils/formatMoeda";
 import { HeaderModal } from "../../Modais/HeaderModal/HeaderModal";
 import { FooterModal } from "../../Modais/FooterModal/footerModal";
 import { ButtonTypeModal } from "../../Buttons/ButtonTypeModal";
-import { mascaraValor } from "../../../utils/mascaraValor";
 import { dataFormatada } from "../../../utils/dataFormatada";
 import { useReactToPrint } from "react-to-print";
 import { jsPDF } from 'jspdf';
@@ -18,8 +17,9 @@ import HeaderTable from "../../Tables/headerTable";
 
 export const ActionFechamentoLojaModal = ({ show, handleClose, dadosDetalheFechamento, dataPesquisa }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
-  const dataTableRef = useRef();
+  const [rowSelection, setRowSelection] = useState(null);
   const [size, setSize] = useState('small')
+  const dataTableRef = useRef();
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -35,17 +35,17 @@ export const ActionFechamentoLojaModal = ({ show, handleClose, dadosDetalheFecha
     doc.autoTable({
       head: [['Caixa', 'Operador', 'Receb. DIN', 'Receb. CART', 'Receb. POS', 'Receb. FAT', 'Inf. DIN', 'Inf. CART', 'Inf. POS', 'Inf. FAT', 'Quebra']],
       body: dados.map(item => [
-         item.DSCAIXA,
-          item.NOFUNCIONARIO,
-          formatMoeda(item.VALORTOTALDINHEIRO),
-          formatMoeda(item.VALORTOTALCARTAO),
-          formatMoeda(item.VALORTOTALPOS),
-          formatMoeda(item.VALORTOTALFATURA),
-          formatMoeda(item.totalDinheiroInformado),
-          formatMoeda(item.CARTAO),
-          formatMoeda(item.POS),
-          formatMoeda(item.FATURA),
-          item.totalQuebraCaixa
+        item.DSCAIXA,
+        item.NOFUNCIONARIO,
+        formatMoeda(item.VALORTOTALDINHEIRO),
+        formatMoeda(item.VALORTOTALCARTAO),
+        formatMoeda(item.VALORTOTALPOS),
+        formatMoeda(item.VALORTOTALFATURA),
+        formatMoeda(item.totalDinheiroInformado),
+        formatMoeda(item.CARTAO),
+        formatMoeda(item.POS),
+        formatMoeda(item.FATURA),
+        item.totalQuebraCaixa
 
       ]),
       horizontalPageBreak: true,
@@ -391,7 +391,8 @@ export const ActionFechamentoLojaModal = ({ show, handleClose, dadosDetalheFecha
                         size={size}
 
                         rows={dados.length}
-
+                        selectionMode={"single"}
+                        selection={rowSelection}
                         showGridlines
                         stripedRows
                         emptyMessage="Sem Registros para Exibir"

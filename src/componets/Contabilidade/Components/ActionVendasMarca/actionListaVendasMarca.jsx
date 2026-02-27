@@ -8,6 +8,7 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../../Tables/headerTable";
+import { formatarDataParaBR } from "../../../../utils/dataFormatada";
 
 export const ActionListaVendasMarca = ({ dadosVendasMarca }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
@@ -127,12 +128,8 @@ export const ActionListaVendasMarca = ({ dadosVendasMarca }) => {
     },
   ]
 
-
-
   return (
-
     <Fragment>
-
       <div className="panel">
         <div className="panel-hdr mb-4">
 
@@ -185,10 +182,8 @@ export const ActionListaVendasMarca = ({ dadosVendasMarca }) => {
               />
             ))}
           </DataTable>
-
         </div>
       </div>
-
     </Fragment>
   )
 }
