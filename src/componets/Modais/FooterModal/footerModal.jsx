@@ -1,5 +1,4 @@
 import { Fragment } from "react"
-import { ButtonTypeModal } from "../../Buttons/ButtonTypeModal"
 
 export const FooterModal = ({ 
   ButtonTypeConfirmar,
@@ -103,13 +102,6 @@ export const FooterModal = ({
             autoLoadingCancelar={autoLoadingCancelar}
           />
         )}
-        {/* <ButtonTypeModal
-          textButton={"Cadastrar "}
-          onClickButtonType={handleClick}
-          cor="success"
-          tipo="button"
-        />
-        <ButtonTypeModal textButton={"Fechar"} onClickButtonType={handleClose} cor="secondary" tipo="button" /> */}
       </div>
     </Fragment>
   )

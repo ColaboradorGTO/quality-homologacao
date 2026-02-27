@@ -35,73 +35,11 @@ export const useCadastrarBonificaoca = ({ handleClose, usuarioLogado, optionsMod
   const onSubmit = async () => {
     if (optionsModulos[0]?.CRIAR == 'False') {
       Swal.fire({
-        icon: 'error',
-        title: 'Erro!',
-        text: 'Você não tem permissão para cadastrar!',
+        icon: 'info',
+        title: 'Acesso Negado!',
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para cadastrar!`,
         timer: 3000,
         customClass: {
-          confirmButton: "btn btn-primary btn-lg",
-          cancelButton: "btn btn-danger btn-lg",
-          container: 'custom-swal',
-        },
-      })
-      return;
-    }
-
-    if (tipoSelecionado == '') {
-      Swal.fire({
-        icon: 'error',
-        title: 'Erro!',
-        text: 'Informe o tipo de movimento!',
-        timer: 3000,
-        customClass: {
-          confirmButton: "btn btn-primary btn-lg",
-          cancelButton: "btn btn-danger btn-lg",
-          container: 'custom-swal',
-        },
-      })
-      return;
-    }
-
-    if (funcionario == '') {
-      Swal.fire({
-        icon: 'error',
-        title: 'Erro!',
-        text: 'Informe o funcionário!',
-        timer: 3000,
-        customClass: {
-          confirmButton: "btn btn-primary btn-lg",
-          cancelButton: "btn btn-danger btn-lg",
-          container: 'custom-swal',
-        },
-      })
-      return;
-    }
-
-    if (valorBonificacao == '' || valorBonificacao == '0') {
-      Swal.fire({
-        icon: 'error',
-        title: 'Erro!',
-        text: 'Informe o valor da bonificação!',
-        timer: 3000,
-        customClass: {
-          confirmButton: "btn btn-primary btn-lg",
-          cancelButton: "btn btn-danger btn-lg",
-          container: 'custom-swal',
-        },
-      })
-      return;
-    }
-
-    if (txtHistorico == '') {
-      Swal.fire({
-        icon: 'error',
-        title: 'Erro!',
-        text: 'Informe o histórico!',
-        timer: 3000,
-        customClass: {
-          confirmButton: "btn btn-primary btn-lg",
-          cancelButton: "btn btn-danger btn-lg",
           container: 'custom-swal',
         },
       })

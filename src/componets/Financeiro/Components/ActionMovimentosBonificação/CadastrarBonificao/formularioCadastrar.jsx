@@ -1,13 +1,11 @@
 import { Fragment } from "react"
-import { InputFieldModal } from "../../../../Buttons/InputFieldModal"
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal"
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal"
 import { useCadastrarBonificaoca } from "../hooks/useCadastrarBonificacao"
 import Select from 'react-select'
-import { mascaraValor } from "../../../../../utils/mascaraValor"
 import { Controller, useForm } from "react-hook-form";
 import { schema } from "./schemaValidationBonificacao";
-import { formatarMoeda, removerFormatacaoMoeda } from "../../../../../utils/formatMoeda"
+import { formatarMoeda } from "../../../../../utils/formatMoeda"
 import FormField from "../../../../Formularios/FormField"
 import { AlertError } from "../../../../Inputs/alertError"
 
@@ -18,7 +16,7 @@ export const FormularioCadastrar = ({
     setFuncionario,
     optionsModulos
 }) => {
-    const { handleSubmit, formState: { errors, isSubmitting: rhfIsSubmitting }, clearErrors, control, setError, setValue } = useForm({
+    const { handleSubmit, formState: { errors }, clearErrors, control, setError, setValue } = useForm({
         mode: "onChange"
     });
     const {
@@ -29,8 +27,7 @@ export const FormularioCadastrar = ({
         OptionsStatus,
         setTipoSelecionado,
         setTxtHistorico,
-        onSubmit,
-        isSubmitting,
+        onSubmit
     } = useCadastrarBonificaoca({ handleClose, usuarioLogado, optionsModulos, funcionario });
 
     const handleValidatedSubmit = async () => {

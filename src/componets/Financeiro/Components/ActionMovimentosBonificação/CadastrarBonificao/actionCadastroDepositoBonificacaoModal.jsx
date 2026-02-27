@@ -3,7 +3,6 @@ import Modal from 'react-bootstrap/Modal';
 import { FormularioCadastrar } from "./formularioCadastrar";
 import { HeaderModal } from "../../../../Modais/HeaderModal/HeaderModal";
 
-
 export const ActionCadastroDepositoBonificacaoModal = ({ 
   show, 
   handleClose, 
@@ -15,7 +14,6 @@ export const ActionCadastroDepositoBonificacaoModal = ({
 }) => {
 
   return (
-
     <Fragment>
       <Modal
         show={show}

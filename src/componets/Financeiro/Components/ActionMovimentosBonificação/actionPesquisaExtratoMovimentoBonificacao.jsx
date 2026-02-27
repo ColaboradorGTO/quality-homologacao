@@ -11,13 +11,13 @@ import { MdOutlineAdd } from "react-icons/md";
 import { ActionCadastroDepositoBonificacaoModal } from "./CadastrarBonificao/actionCadastroDepositoBonificacaoModal";
 import Swal from "sweetalert2";
 
-export const ActionPesquisaExtratoMovimentoBonificacao = ({usuarioLogado}) => {
+export const ActionPesquisaExtratoMovimentoBonificacao = ({ usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [funcionarioSelecionado, setFuncionarioSelecionado] = useState('');
   const [funcionario, setFuncionario] = useState([]);
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
   const [modalVisivel, setModalVisivel] = useState(false);
-  
+
   useEffect(() => {
     const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
     if (menuSalvo) {
@@ -119,23 +119,20 @@ export const ActionPesquisaExtratoMovimentoBonificacao = ({usuarioLogado}) => {
   const handleChangeFuncionario = (e) => {
     setFuncionarioSelecionado(e.value);
     setFuncionario(e);
-    console.log(funcionario, 'funcionario')
   }
 
   const handleShowModal = () => {
-    if(optionsModulos[0]?.CRIAR == 'True')  {
+    if (optionsModulos[0]?.CRIAR == 'True') {
       setModalVisivel(true);
     } else {
       Swal.fire({
-        position: 'center',
-        icon: 'error',
+        icon: 'info',
         title: 'Acesso Negado!',
-        text: 'Você não tem permissão para editar esta despesa.',
-        showConfirmButton: false,
-        timer: 1500,
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para cadastrar!`,
+        timer: 3000,
         customClass: {
           container: 'custom-swal',
-        }
+        },
       })
     }
   }
@@ -147,7 +144,6 @@ export const ActionPesquisaExtratoMovimentoBonificacao = ({usuarioLogado}) => {
         linkComponentAnterior={["Home"]}
         linkComponent={["Extrato de Contas Correntes das Lojas"]}
         title="Extrato de Bonificações Funcionários"
-        // subTitle="Nome da Loja"
 
         InputSelectEmpresaComponent={InputSelectAction}
         optionsEmpresas={[
@@ -158,7 +154,7 @@ export const ActionPesquisaExtratoMovimentoBonificacao = ({usuarioLogado}) => {
           }))
         ]}
         labelSelectEmpresa={"Funcionário"}
-        valueSelectEmpresa={funcionarioSelecionado} 
+        valueSelectEmpresa={funcionarioSelecionado}
         onChangeSelectEmpresa={handleChangeFuncionario}
 
         ButtonSearchComponent={ButtonType}
@@ -172,20 +168,21 @@ export const ActionPesquisaExtratoMovimentoBonificacao = ({usuarioLogado}) => {
         onButtonClickCadastro={handleShowModal}
         corCadastro="success"
         IconCadastro={MdOutlineAdd}
+        styleCadastro={{ display: funcionarioSelecionado ? 'block' : 'none' }}
       />
 
       {tabelaVisivel && (
-        <ActionListaExtratoMovimentoBonificacao 
-          dadosExtratoBonificacao={dadosExtratoBonificacao} 
+        <ActionListaExtratoMovimentoBonificacao
+          dadosExtratoBonificacao={dadosExtratoBonificacao}
           usuarioLogado={usuarioLogado}
           optionsModulos={optionsModulos}
-          funcionarioSelecionado={funcionarioSelecionado}  
+          funcionarioSelecionado={funcionarioSelecionado}
           setFuncionarioSelecionado={setFuncionarioSelecionado}
           optionsFuncionarios={optionsFuncionarios}
         />
       )}
 
-      <ActionCadastroDepositoBonificacaoModal 
+      <ActionCadastroDepositoBonificacaoModal
         show={modalVisivel}
         handleClose={() => setModalVisivel(false)}
         usuarioLogado={usuarioLogado}

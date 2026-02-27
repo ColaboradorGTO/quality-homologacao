@@ -12,19 +12,15 @@ export const ButtonTypeModal = ({
   iconSize,
   style,
   buttonDisabled,
-  // Novas props para controle de loading
-  loading = false,           // Controle externo de loading
-  loadingText,              // Texto durante loading (opcional)
-  autoLoading = true,       // Auto-detecta Promises (default: true)
-  disabled = false          // Controle externo de disabled
+  loading = false,         
+  loadingText,           
+  autoLoading = true,   
+  disabled = false       
 }) => {
   const [internalLoading, setInternalLoading] = useState(false);
-
-  // Determina o estado final de loading e disabled
   const isLoading = loading || internalLoading;
   const isDisabled = disabled || buttonDisabled || isLoading;
 
-  // Handler que controla o loading automaticamente
   const handleClick = async () => {
     if (isDisabled || !onClickButtonType) return;
 
@@ -33,23 +29,21 @@ export const ButtonTypeModal = ({
         setInternalLoading(true);
         const result = onClickButtonType();
         
-        // Se retornar uma Promise, aguarda ela terminar
+        
         if (result && typeof result.then === 'function') {
           await result;
         }
       } catch (error) {
         console.error('Erro no click do botão:', error);
-        // Você pode adicionar tratamento de erro aqui
+
       } finally {
         setInternalLoading(false);
       }
     } else {
-      // Se auto-loading está desabilitado, executa normalmente
       onClickButtonType();
     }
   };
 
-  // Determina o texto do botão
   const displayText = isLoading && loadingText ? loadingText : textButton;
   let btnClasses = "btn waves-effect waves-themed";
 
@@ -82,7 +76,6 @@ export const ButtonTypeModal = ({
           style={style}
           disabled={isDisabled}
         >
-          {/* Ícone de loading durante carregamento */}
           {isLoading ? (
             <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
           ) : (
@@ -96,4 +89,3 @@ export const ButtonTypeModal = ({
     </Fragment>
   );
 };
-
