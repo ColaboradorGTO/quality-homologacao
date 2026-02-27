@@ -11,21 +11,25 @@ export const useCadastrarBonificaoca = ({ handleClose, usuarioLogado, optionsMod
   const [txtHistorico, setTxtHistorico] = useState('');
 
   const getIPUsuario = async () => {
+    let usuarioIP = null;
+
     try {
-      const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
-      let usuarioIP = ipWhoisData?.ip;
-
-      if (!usuarioIP) {
-      const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-      usuarioIP = ipifyData?.ip;
-      }
-
-      setIpUsuario(usuarioIP);
-      return usuarioIP;
+      const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+      usuarioIP = ipWhoisData?.ip;
     } catch (error) {
-      console.error("Erro ao buscar IP:", error);
-      return null;
+      console.error("Erro ao buscar IP via ipwho.is:", error);
     }
+
+    if (!usuarioIP) {
+      try {
+        const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+        usuarioIP = ipifyData?.ip;
+      } catch (error) {
+        console.error("Erro ao buscar IP via ipify.org:", error);
+      }
+    }
+    setIpUsuario(usuarioIP);
+    return usuarioIP;
   };
 
   const onSubmit = async () => {
@@ -122,7 +126,7 @@ export const useCadastrarBonificaoca = ({ handleClose, usuarioLogado, optionsMod
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || 'IP não disponível'
       }
 
 
@@ -131,7 +135,7 @@ export const useCadastrarBonificaoca = ({ handleClose, usuarioLogado, optionsMod
         position: 'center',
         icon: 'success',
         title: 'Cadastrado com sucesso!',
-        customClass:{
+        customClass: {
           container: 'custom-swal',
         },
         showConfirmButton: false,
@@ -148,7 +152,7 @@ export const useCadastrarBonificaoca = ({ handleClose, usuarioLogado, optionsMod
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || 'IP não disponível'
       }
 
       const responsePost = await post('/log-web', postData)

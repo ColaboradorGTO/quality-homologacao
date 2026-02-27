@@ -133,7 +133,7 @@ export const ActionPesquisaExtratoMovimentoBonificacao = ({usuarioLogado}) => {
       })
     }
   }
-  
+
   return (
 
     <Fragment>
@@ -163,24 +163,20 @@ export const ActionPesquisaExtratoMovimentoBonificacao = ({usuarioLogado}) => {
 
         ButtonTypeCadastro={ButtonType}
         linkNome={"Cadastrar Bonificação"}
-        onButtonClickCadastro
+        onButtonClickCadastro={handleShowModal}
         corCadastro="success"
         IconCadastro={MdOutlineAdd}
       />
 
       {tabelaVisivel && (
-
-        <div className="card">
-          
-          <ActionListaExtratoMovimentoBonificacao 
-            dadosExtratoBonificacao={dadosExtratoBonificacao} 
-            usuarioLogado={usuarioLogado}
-            optionsModulos={optionsModulos}
-            funcionarioSelecionado={funcionarioSelecionado}  
-            setFuncionarioSelecionado={setFuncionarioSelecionado}
-            optionsFuncionarios={optionsFuncionarios}
-          />
-        </div>
+        <ActionListaExtratoMovimentoBonificacao 
+          dadosExtratoBonificacao={dadosExtratoBonificacao} 
+          usuarioLogado={usuarioLogado}
+          optionsModulos={optionsModulos}
+          funcionarioSelecionado={funcionarioSelecionado}  
+          setFuncionarioSelecionado={setFuncionarioSelecionado}
+          optionsFuncionarios={optionsFuncionarios}
+        />
       )}
 
       <ActionCadastroDepositoBonificacaoModal 

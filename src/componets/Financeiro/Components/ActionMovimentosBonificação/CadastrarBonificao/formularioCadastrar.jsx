@@ -64,9 +64,9 @@ export const FormularioCadastrar = ({
                                 className="basic-single"
                                 classNamePrefix="select"
                                 // value={tipoSelecionado}
+                                options={OptionsStatus}
                                 defaultValue={tipoSelecionado}
                                 onChange={(e) => setTipoSelecionado(e.value)}
-                                options={OptionsStatus}
                             />
                         </div>
                         <div className="col-sm-6 col-xl-6">
@@ -94,8 +94,8 @@ export const FormularioCadastrar = ({
                     />
                  
                 </div>
+                
                 <FooterModal
-
                     ButtonTypeFechar={ButtonTypeModal}
                     onClickButtonFechar={handleClose}
                     textButtonFechar={"Fechar"}
@@ -105,8 +105,6 @@ export const FormularioCadastrar = ({
                     onClickButtonCadastrar={handleSubmit(onSubmit)}
                     textButtonCadastrar={"Cadastrar"}
                     corCadastrar={"success"}
-                    
-
                 />
             </form>
         </Fragment>

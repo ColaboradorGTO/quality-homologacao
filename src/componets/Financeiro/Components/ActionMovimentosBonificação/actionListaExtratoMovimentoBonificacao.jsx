@@ -1,10 +1,6 @@
 import { Fragment, useRef, useState } from "react"
-import { MdOutlineAdd } from "react-icons/md";
-import { ButtonType } from "../../../Buttons/ButtonType";
-import { get } from "../../../../api/funcRequest";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { ActionCadastroDepositoBonificacaoModal } from "./CadastrarBonificao/actionCadastroDepositoBonificacaoModal";
 import { formatMoeda } from "../../../../utils/formatMoeda";
 import { toFloat } from "../../../../utils/toFloat";
 import HeaderTable from "../../../Tables/headerTable";
@@ -13,18 +9,11 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { dataFormatada } from "../../../../utils/dataFormatada";
-import Swal from "sweetalert2";
 
 
 export const ActionListaExtratoMovimentoBonificacao = ({
-  usuarioLogado, 
   dadosExtratoBonificacao, 
-  optionsModulos, 
-  funcionarioSelecionado, 
-  setFuncionarioSelecionado, 
-  optionsFuncionarios
 }) => {
-  const [modalVisivel, setModalVisivel] = useState(false);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
@@ -142,7 +131,6 @@ export const ActionListaExtratoMovimentoBonificacao = ({
       body: row => <th>{row.OBSERVACAO}</th>,
       sortable: true,
     },
-
   ]
 
 
@@ -150,9 +138,9 @@ export const ActionListaExtratoMovimentoBonificacao = ({
 
     <Fragment>
 
-        <div className="resultado">
+        <div className="panel">
 
-          <div>
+          <div className="panel-hdr">
             <table id="" class="table table-bordered  table-responsive-lg table-striped " width="100%">
             
               <tbody >
@@ -161,7 +149,7 @@ export const ActionListaExtratoMovimentoBonificacao = ({
                   <td></td>
                   <td></td>
                   <td></td>
-                  <td style={{ textAlign: "right", fontSize: "12px" }}><b> {formatMoeda(dados[0]?.VRATUAL) ? '0, 00' : '0, 00'}</b></td>
+                  <td style={{ textAlign: "right", fontSize: "12px" }}><b> {formatMoeda(dados[0]?.VRATUAL) ? formatMoeda(dados[0]?.VRATUAL) : '0, 00'}</b></td>
                   <td colspan="2"></td>
                 </tr>
                 <tr>

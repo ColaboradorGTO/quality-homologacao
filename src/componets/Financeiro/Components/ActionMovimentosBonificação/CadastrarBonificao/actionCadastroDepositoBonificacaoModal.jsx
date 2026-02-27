@@ -1,6 +1,5 @@
 import React, { Fragment } from "react"
 import Modal from 'react-bootstrap/Modal';
-
 import { FormularioCadastrar } from "./formularioCadastrar";
 import { HeaderModal } from "../../../../Modais/HeaderModal/HeaderModal";
 
