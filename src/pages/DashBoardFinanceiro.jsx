@@ -46,27 +46,51 @@ export const DashBoardFinanceiro = () => {
   const [componentToShow, setComponentToShow] = useState("");
   const storedModule = localStorage.getItem('moduloselecionado');
   const selectedModule = JSON.parse(storedModule);
-
+  const [menuSelected, setMenuSelected] = useState(null);
+  
   const navigate = useNavigate();
+  
   useEffect(() => {
     const usuarioArmazenado = localStorage.getItem('usuario');
-
     if (usuarioArmazenado) {
-      try {
-        const parsedUsuario = JSON.parse(usuarioArmazenado);
-        setUsuarioLogado(parsedUsuario);;
-      } catch (error) {
-        console.error('Erro ao parsear o usuário do localStorage:', error);
-      }
-    } else {
-      navigate('/');
+      const parsedUsuario = JSON.parse(usuarioArmazenado);
+      setUsuarioLogado(parsedUsuario);
     }
   }, []);
 
-
   useEffect(() => {
+    const storedMenuFilho = JSON.parse(localStorage.getItem('menufilhoSelecionado'));
 
-  }, [usuarioLogado])
+    if (storedMenuFilho) {
+      setMenuSelected(selectedModule);
+    }
+
+  }, [usuarioLogado]);
+  
+
+  function handleShowComponent(componentName) {
+     const menuFilhoSelecionado = selectedModule.menuPai.menuFilho.find(
+      menu => menu.URL === componentName
+    );
+  
+    if (menuFilhoSelecionado) {
+      // Salvar todas as informações do menu selecionado no localStorage
+      localStorage.setItem('menuFilhoSelecionado', JSON.stringify({
+        ID: menuFilhoSelecionado.ID,
+        DSNOME: menuFilhoSelecionado.DSNOME,
+        URL: menuFilhoSelecionado.URL,
+        ALTERAR: menuFilhoSelecionado.ALTERAR,
+        CRIAR: menuFilhoSelecionado.CRIAR,
+        VISUALIZAR: menuFilhoSelecionado.VISUALIZAR,
+        N1: menuFilhoSelecionado.N1,
+        N2: menuFilhoSelecionado.N2,
+        N3: menuFilhoSelecionado.N3,
+        N4: menuFilhoSelecionado.N4,
+        ADMINISTRADOR: menuFilhoSelecionado.ADMINISTRADOR
+      }));
+    }
+    setComponentToShow(componentName); 
+  }
 
   const { data: optionsModulosPage = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
     'menus-usuario',
@@ -88,16 +112,11 @@ export const DashBoardFinanceiro = () => {
   }, {});
 
 
-  function handleShowComponent(componentName) {
-    setComponentToShow(componentName);
- 
-  }
-
   let component = null;
 
   switch (componentToShow) {
     case "/financeiro/ResumoDashBoardFinaneiro":
-      component = <ResumoDashBoardFinaneiro usuarioLogado={usuarioLogado} ID={ID} />
+      component = <ResumoDashBoardFinaneiro usuarioLogado={usuarioLogado}  />
       break;
     case "/financeiro/ActionPesquisaVendasLoja":
       component = <ActionPesquisaVendasLoja />
@@ -109,7 +128,7 @@ export const DashBoardFinanceiro = () => {
       component = <ActionPesquisaVendasDigital />
       break;
     case "/financeiro/ActionPesquisaVendasPix":
-      component = <ActionPesquisaVendasPix usuarioLogado={usuarioLogado} ID={ID} />
+      component = <ActionPesquisaVendasPix usuarioLogado={usuarioLogado}  />
       break;
     case "/financeiro/ActionPesquisaVendasConciliacao":
       component = <ActionPesquisaVendasConciliacao />
@@ -118,73 +137,73 @@ export const DashBoardFinanceiro = () => {
       component = <ActionPesquisaDepositosLoja />
       break;
     case "/financeiro/ActionPesquisaDespesaLoja":
-      component = <ActionPesquisaDespesaLoja usuarioLogado={usuarioLogado} ID={ID} />
+      component = <ActionPesquisaDespesaLoja usuarioLogado={usuarioLogado}  />
       break;
     case "/financeiro/ActionPesquisaRecebimentosLoja":
       component = <ActionPesquisaRecebimentosLoja />
       break;
     case "/financeiro/ActionPesquisaQuebraCaixaLoja":
-      component = <ActionPesquisaQuebraCaixaLoja usuarioLogado={usuarioLogado} ID={ID} />
+      component = <ActionPesquisaQuebraCaixaLoja usuarioLogado={usuarioLogado}  />
       break;
     case "/financeiro/ActionPesquisaAdiantamentoSalarioLoja":
-      component = <ActionPesquisaAdiantamentoSalarioLoja usuarioLogado={usuarioLogado} ID={ID} />
+      component = <ActionPesquisaAdiantamentoSalarioLoja usuarioLogado={usuarioLogado}  />
       break;
     case "/financeiro/ActionPesquisaMapaCaixa":
-      component = <ActionPesquisaMapaCaixa usuarioLogado={usuarioLogado} ID={ID} />
+      component = <ActionPesquisaMapaCaixa usuarioLogado={usuarioLogado}  />
       break;
     case "/financeiro/ActionPesquisaExtratoLoja":
-      component = <ActionPesquisaExtratoLoja usuarioLogado={usuarioLogado} ID={ID} />
+      component = <ActionPesquisaExtratoLoja usuarioLogado={usuarioLogado}  />
       break;
     case "/financeiro/ActionPesquisaConciliarBanco":
-      component = <ActionPesquisaConciliarBanco usuarioLogado={usuarioLogado} ID={ID}/>
+      component = <ActionPesquisaConciliarBanco usuarioLogado={usuarioLogado} />
       break;
     case "/financeiro/ActionPesquisaRemessaVenda":
-      component = <ActionPesquisaRemessaVenda  usuarioLogado={usuarioLogado} ID={ID} />
+      component = <ActionPesquisaRemessaVenda  usuarioLogado={usuarioLogado}  />
       break;
     case "/financeiro/ActionPesquisaCaixaStatus":
-      component = <ActionPesquisaCaixaStatus usuarioLogado={usuarioLogado} ID={ID} />
+      component = <ActionPesquisaCaixaStatus usuarioLogado={usuarioLogado}  />
       break;
     case "/financeiro/ActionPesquisaDescontoVendas":
       component = <ActionPesquisaDescontoVendas />
       break;
     case "/financeiro/ActionPesquisaExtratoMovimentoBonificacao":
-      component = <ActionPesquisaExtratoMovimentoBonificacao usuarioLogado={usuarioLogado} ID={ID} />
+      component = <ActionPesquisaExtratoMovimentoBonificacao usuarioLogado={usuarioLogado}  />
       break;
     case "/financeiro/ActionPesquisaPedidoCompra":
       component = <ActionPesquisaPedidoCompra />
       break;
     case "/financeiro/ActionPesquisaConciliacaoBancosDTW":
-      component = <ActionPesquisaConciliacaoBancosDTW  usuarioLogado={usuarioLogado} ID={ID} />
+      component = <ActionPesquisaConciliacaoBancosDTW  usuarioLogado={usuarioLogado}  />
       break;
     case "/financeiro/ActionPesquisaVendasPixDTW":
-      component = <ActionPesquisaVendasPixDTW  usuarioLogado={usuarioLogado} ID={ID} />
+      component = <ActionPesquisaVendasPixDTW  usuarioLogado={usuarioLogado}  />
       break;
     case "/financeiro/ActionPesquisaFaturasVendasPixDTW":
-      component = <ActionPesquisaFaturasVendasPixDTW usuarioLogado={usuarioLogado} ID={ID} />
+      component = <ActionPesquisaFaturasVendasPixDTW usuarioLogado={usuarioLogado}  />
       break;
     case "/financeiro/ActionPesquisaFaturasLoja":
-      component = <ActionPesquisaFaturasLoja usuarioLogado={usuarioLogado} ID={ID} />
+      component = <ActionPesquisaFaturasLoja usuarioLogado={usuarioLogado}  />
       break;
     case "/financeiro/ActionPesquisaConferenciaMalote":
-      component = <ActionPesquisaConferenciaMalote usuarioLogado={usuarioLogado} ID={ID} />
+      component = <ActionPesquisaConferenciaMalote usuarioLogado={usuarioLogado}  />
       break;
     case "/financeiro/ActionPesquisaSaldoLoja":
       component = <ActionPesquisaSaldoLoja />
       break;
     case "/financeiro/ActionPesquisaEmpresas":
-      component = <ActionPesquisaEmpresas usuarioLogado={usuarioLogado} ID={ID} />
+      component = <ActionPesquisaEmpresas usuarioLogado={usuarioLogado}  />
       break;
     case "/financeiro/ActionPesquisaMotivoDevolucao":
-      component = <ActionPesquisaMotivoDevolucao usuarioLogado={usuarioLogado} ID={ID} />
+      component = <ActionPesquisaMotivoDevolucao usuarioLogado={usuarioLogado}  />
       break;
     case "/financeiro/ActionPesquisaContas":
-      component = <ActionPesquisaContas usuarioLogado={usuarioLogado} ID={ID} />
+      component = <ActionPesquisaContas usuarioLogado={usuarioLogado}  />
       break;
     case "/financeiro/ActionPesquisaFaturasConsolidadas":
-      component = <ActionPesquisaFaturasConsolidadas usuarioLogado={usuarioLogado} ID={ID} />
+      component = <ActionPesquisaFaturasConsolidadas usuarioLogado={usuarioLogado}  />
       break;
     case "/financeiro/ActionPesquisaQuebraCaixaIntegracao":
-      component = <ActionPesquisaQuebraCaixaIntegracao usuarioLogado={usuarioLogado} ID={ID} />
+      component = <ActionPesquisaQuebraCaixaIntegracao usuarioLogado={usuarioLogado}  />
       break;
     default:
       component = null;
