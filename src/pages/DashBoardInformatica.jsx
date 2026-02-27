@@ -28,7 +28,8 @@ export const DashBoardInformatica = () => {
   const [componentToShow, setComponentToShow] = useState("");
   const storedModule = localStorage.getItem('moduloselecionado');
   const selectedModule = JSON.parse(storedModule);
-
+  const [menuSelected, setMenuSelected] = useState(null);
+  
   useEffect(() => {
     const usuarioArmazenado = localStorage.getItem('usuario');
     if (usuarioArmazenado) {
@@ -38,6 +39,11 @@ export const DashBoardInformatica = () => {
   }, []);
 
   useEffect(() => {
+    const storedMenuFilho = JSON.parse(localStorage.getItem('menufilhoSelecionado'));
+
+    if (storedMenuFilho) {
+      setMenuSelected(selectedModule);
+    }
 
   }, [usuarioLogado]);
 

@@ -74,7 +74,7 @@ export const DashBoardFinanceiro = () => {
     );
   
     if (menuFilhoSelecionado) {
-      // Salvar todas as informações do menu selecionado no localStorage
+
       localStorage.setItem('menuFilhoSelecionado', JSON.stringify({
         ID: menuFilhoSelecionado.ID,
         DSNOME: menuFilhoSelecionado.DSNOME,

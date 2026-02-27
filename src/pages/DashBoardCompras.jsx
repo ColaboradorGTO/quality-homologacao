@@ -30,34 +30,53 @@ const ActionPesquisaProdutosPorPedido = lazy(() => import("../componets/Compras/
 
 export const DashBoardCompras = () => {
   const [usuarioLogado, setUsuarioLogado] = useState(null);
-  const [homeVisivel, setHomeVisivel ] = useState(true);
+  const [homeVisivel, setHomeVisivel] = useState(true);
   const [componentToShow, setComponentToShow] = useState("");
   const storedModule = localStorage.getItem('moduloselecionado');
   const selectedModule = JSON.parse(storedModule);
+  const [menuSelected, setMenuSelected] = useState(null);
+
   const navigate = useNavigate();
 
   useEffect(() => {
     const usuarioArmazenado = localStorage.getItem('usuario');
-
     if (usuarioArmazenado) {
-      try {
-        const parsedUsuario = JSON.parse(usuarioArmazenado);
-        setUsuarioLogado(parsedUsuario);
-
-      } catch (error) {
-        console.error('Erro ao parsear o usuário do localStorage:', error);
-      }
-    } else {
-
-      navigate('/');
+      const parsedUsuario = JSON.parse(usuarioArmazenado);
+      setUsuarioLogado(parsedUsuario);
     }
-  }, [navigate]);
+  }, []);
 
   useEffect(() => {
+    const storedMenuFilho = JSON.parse(localStorage.getItem('menufilhoSelecionado'));
+
+    if (storedMenuFilho) {
+      setMenuSelected(selectedModule);
+    }
 
   }, [usuarioLogado]);
 
+
   function handleShowComponent(componentName) {
+    const menuFilhoSelecionado = selectedModule.menuPai.menuFilho.find(
+      menu => menu.URL === componentName
+    );
+
+    if (menuFilhoSelecionado) {
+
+      localStorage.setItem('menuFilhoSelecionado', JSON.stringify({
+        ID: menuFilhoSelecionado.ID,
+        DSNOME: menuFilhoSelecionado.DSNOME,
+        URL: menuFilhoSelecionado.URL,
+        ALTERAR: menuFilhoSelecionado.ALTERAR,
+        CRIAR: menuFilhoSelecionado.CRIAR,
+        VISUALIZAR: menuFilhoSelecionado.VISUALIZAR,
+        N1: menuFilhoSelecionado.N1,
+        N2: menuFilhoSelecionado.N2,
+        N3: menuFilhoSelecionado.N3,
+        N4: menuFilhoSelecionado.N4,
+        ADMINISTRADOR: menuFilhoSelecionado.ADMINISTRADOR
+      }));
+    }
     setComponentToShow(componentName);
   }
 
@@ -65,15 +84,15 @@ export const DashBoardCompras = () => {
     'menus-usuario',
     async () => {
       const response = await get(`/menus-usuario?idUsuario=${usuarioLogado?.id}&idModulo=${selectedModule?.ID}`);
-      
+
       return response.data;
     },
     { enabled: Boolean(usuarioLogado?.id), staleTime: 5 * 60 * 1000, }
   );
 
   const permissaoUsuario = selectedModule.menuPai.menuFilho;
-  const {   
-    ID, 
+  const {
+    ID,
   } = permissaoUsuario.map(item => ({
     ID: item.ID,
   })).reduce((acc, curr) => {
@@ -106,7 +125,7 @@ export const DashBoardCompras = () => {
     case "/compras/ActionPesquisaTransportador":
       component = <ActionPesquisaTransportador usuarioLogado={usuarioLogado} ID={ID} />;
       break;
-          
+
     case "/compras/ActionPesquisaCondicaoPagamento":
       component = <ActionPesquisaCondicaoPagamento usuarioLogado={usuarioLogado} ID={ID} />;
       break;
@@ -162,7 +181,7 @@ export const DashBoardCompras = () => {
                 handleShowComponent={handleShowComponent}
               />
               <div className="page-content-wrapper">
-                <HeaderMain optionsModulosPage={optionsModulosPage}/>
+                <HeaderMain optionsModulosPage={optionsModulosPage} />
 
                 <main id="js-page-content" role="main" className="page-content">
                   <div className="row">
