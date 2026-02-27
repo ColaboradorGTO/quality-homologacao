@@ -8,12 +8,16 @@ export const FooterModal = ({
   corConfirmar,
   iconConfirmar,
   styleConfirmar,
+  loadingTextConfirmar,
+  autoLoadingConfirmar,
 
   ButtonTypeFechar,
   onClickButtonFechar,
   textButtonFechar,
   corFechar,
   iconFechar,
+  loadingTextFechar,
+  autoLoadingFechar,
 
   ButtonTypeCadastrar,
   onClickButtonCadastrar,
@@ -23,6 +27,8 @@ export const FooterModal = ({
   iconSizeCadastrar,
   styleCadastrar,
   tipoBtnCadastrar,
+  loadingTextCadastrar,
+  autoLoadingCadastrar,
 
   ButtonTypeCancelar,
   onClickButtonCancelar,
@@ -30,7 +36,8 @@ export const FooterModal = ({
   corCancelar,
   iconCancelar,
   iconSizeCancelar,
-
+  loadingTextCancelar,
+  autoLoadingCancelar,
 
   handleClose,
   handleClick, 
@@ -53,6 +60,8 @@ export const FooterModal = ({
             Icon={iconCadastrar}
             iconSize={iconSizeCadastrar}
             style={styleCadastrar}
+            autoLoading={autoLoadingCadastrar}
+            loadingText={loadingTextCadastrar}
           />
 
         )}
@@ -63,6 +72,8 @@ export const FooterModal = ({
             cor={corFechar}
             tipo="button"
             iconFechar={iconFechar}
+            loadingTextFechar={loadingTextFechar}
+            autoLoadingFechar={autoLoadingFechar}
           />
 
         )}
@@ -74,6 +85,8 @@ export const FooterModal = ({
             tipo="button"
             iconConfirmar={iconConfirmar}
             style={styleConfirmar}
+            loadingTextConfirmar={loadingTextConfirmar}
+            autoLoadingConfirmar={autoLoadingConfirmar}
           />
 
         )}
@@ -86,6 +99,8 @@ export const FooterModal = ({
             tipo="button"
             iconCancelar={iconCancelar}
             iconSize={iconSizeCancelar}
+            loadingTextCancelar={loadingTextCancelar}
+            autoLoadingCancelar={autoLoadingCancelar}
           />
         )}
         {/* <ButtonTypeModal

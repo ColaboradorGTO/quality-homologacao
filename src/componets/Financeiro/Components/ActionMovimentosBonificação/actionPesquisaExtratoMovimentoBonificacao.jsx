@@ -14,6 +14,7 @@ import Swal from "sweetalert2";
 export const ActionPesquisaExtratoMovimentoBonificacao = ({usuarioLogado}) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [funcionarioSelecionado, setFuncionarioSelecionado] = useState('');
+  const [funcionario, setFuncionario] = useState([]);
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
   const [modalVisivel, setModalVisivel] = useState(false);
   
@@ -115,6 +116,11 @@ export const ActionPesquisaExtratoMovimentoBonificacao = ({usuarioLogado}) => {
     refetchDadosExtratoBoniFicacao()
   }
 
+  const handleChangeFuncionario = (e) => {
+    setFuncionarioSelecionado(e.value);
+    setFuncionario(e);
+    console.log(funcionario, 'funcionario')
+  }
 
   const handleShowModal = () => {
     if(optionsModulos[0]?.CRIAR == 'True')  {
@@ -153,7 +159,7 @@ export const ActionPesquisaExtratoMovimentoBonificacao = ({usuarioLogado}) => {
         ]}
         labelSelectEmpresa={"Funcionário"}
         valueSelectEmpresa={funcionarioSelecionado} 
-        onChangeSelectEmpresa={(e) => setFuncionarioSelecionado(e.value)}
+        onChangeSelectEmpresa={handleChangeFuncionario}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}
@@ -183,8 +189,8 @@ export const ActionPesquisaExtratoMovimentoBonificacao = ({usuarioLogado}) => {
         show={modalVisivel}
         handleClose={() => setModalVisivel(false)}
         usuarioLogado={usuarioLogado}
-        funcionarioSelecionado={funcionarioSelecionado}
-        setFuncionarioSelecionado={setFuncionarioSelecionado}
+        funcionario={funcionario}
+        setFuncionario={setFuncionario}
         optionsModulos={optionsModulos}
         optionsFuncionarios={optionsFuncionarios}
       />

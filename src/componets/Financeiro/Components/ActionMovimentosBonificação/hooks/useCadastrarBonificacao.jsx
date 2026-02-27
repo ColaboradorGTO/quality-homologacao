@@ -2,12 +2,12 @@ import Swal from "sweetalert2";
 import { post } from "../../../../../api/funcRequest";
 import { useState } from "react";
 import axios from "axios"
+import { removerFormatacaoMoeda } from "../../../../../utils/formatMoeda";
 
-export const useCadastrarBonificaoca = ({ handleClose, usuarioLogado, optionsModulos }) => {
+export const useCadastrarBonificaoca = ({ handleClose, usuarioLogado, optionsModulos, funcionario }) => {
   const [ipUsuario, setIpUsuario] = useState('');
-  const [funcionario, setFuncionario] = useState('');
   const [tipoSelecionado, setTipoSelecionado] = useState('');
-  const [valorBonificao, setValorBonificacao] = useState('');
+  const [valorBonificacao, setValorBonificacao] = useState('');
   const [txtHistorico, setTxtHistorico] = useState('');
 
   const getIPUsuario = async () => {
@@ -78,7 +78,7 @@ export const useCadastrarBonificaoca = ({ handleClose, usuarioLogado, optionsMod
       return;
     }
 
-    if (valorBonificao == '' || valorBonificao == '0') {
+    if (valorBonificacao == '' || valorBonificacao == '0') {
       Swal.fire({
         icon: 'error',
         title: 'Erro!',
@@ -109,9 +109,9 @@ export const useCadastrarBonificaoca = ({ handleClose, usuarioLogado, optionsMod
     }
 
     const data = {
-      IDFUNCIONARIO: funcionario,
-      TIPOMOVIMENTO: tipoSelecionado,
-      VRMOVIMENTO: valorBonificao,
+      IDFUNCIONARIO: funcionario?.value,
+      TIPOMOVIMENTO: tipoSelecionado?.value,
+      VRMOVIMENTO: removerFormatacaoMoeda(valorBonificacao),
       OBSERVACAO: txtHistorico,
       IDFUNCIONARIORESP: usuarioLogado.id
     }
@@ -178,9 +178,7 @@ export const useCadastrarBonificaoca = ({ handleClose, usuarioLogado, optionsMod
   ]
 
   return {
-    funcionario,
-    setFuncionario,
-    valorBonificao,
+    valorBonificacao,
     setValorBonificacao,
     tipoSelecionado,
     txtHistorico,

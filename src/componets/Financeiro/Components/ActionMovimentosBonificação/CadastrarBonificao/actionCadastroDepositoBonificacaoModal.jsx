@@ -8,8 +8,8 @@ export const ActionCadastroDepositoBonificacaoModal = ({
   show, 
   handleClose, 
   usuarioLogado,
-  funcionarioSelecionado, 
-  setFuncionarioSelecionado, 
+  funcionario, 
+  setFuncionario, 
   optionsModulos,
   optionsFuncionarios
 }) => {
@@ -37,8 +37,8 @@ export const ActionCadastroDepositoBonificacaoModal = ({
           <FormularioCadastrar 
             handleClose={handleClose} 
             usuarioLogado={usuarioLogado}
-            funcionarioSelecionado={funcionarioSelecionado}
-            setFuncionarioSelecionado={setFuncionarioSelecionado}  
+            funcionario={funcionario}
+            setFuncionario={setFuncionario}  
             optionsModulos={optionsModulos}
             optionsFuncionarios={optionsFuncionarios}
           />

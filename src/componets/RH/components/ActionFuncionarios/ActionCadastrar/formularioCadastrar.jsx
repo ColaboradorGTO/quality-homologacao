@@ -1,12 +1,12 @@
 import { Fragment } from "react"
 import { Controller, useForm } from "react-hook-form";
+import { schema } from "./schamaValidarFuncionario";
 import { useCriarFuncionario } from "../hooks/useCriarFuncionario";
 import Select from 'react-select';
 import { InputFieldModal } from "../../../../Buttons/InputFieldModal";
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal";
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal";
 import { mascaraCPF, removerMascaraCPF, validarCPF } from "../../../../../utils/formatCPF";
-import { schema } from "./schamaValidarFuncionario";
 import { AlertError } from "../../../../Inputs/alertError"
 import { format, subDays } from "date-fns";
 import FormField from "../../../../Formularios/FormField";

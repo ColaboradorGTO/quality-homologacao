@@ -4,22 +4,25 @@ import { FooterModal } from "../../../../Modais/FooterModal/footerModal"
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal"
 import { useCadastrarBonificaoca } from "../hooks/useCadastrarBonificacao"
 import Select from 'react-select'
-import { useForm } from "react-hook-form"
 import { mascaraValor } from "../../../../../utils/mascaraValor"
+import { Controller, useForm } from "react-hook-form";
+import { schema } from "./schemaValidationBonificacao";
+import { formatarMoeda, removerFormatacaoMoeda } from "../../../../../utils/formatMoeda"
+import FormField from "../../../../Formularios/FormField"
+import { AlertError } from "../../../../Inputs/alertError"
 
-export const FormularioCadastrar = ({ 
-    handleClose, 
-    usuarioLogado, 
-    funcionarioSelecionado, 
-    setFuncionarioSelecionado, 
-    optionsModulos,
-    optionsFuncionarios 
+export const FormularioCadastrar = ({
+    handleClose,
+    usuarioLogado,
+    funcionario,
+    setFuncionario,
+    optionsModulos
 }) => {
-    const { register, handleSubmit, formState: {errors} } = useForm();
+    const { handleSubmit, formState: { errors, isSubmitting: rhfIsSubmitting }, clearErrors, control, setError, setValue } = useForm({
+        mode: "onChange"
+    });
     const {
-        funcionario,
-        setFuncionario,
-        valorBonificao,
+        valorBonificacao,
         setValorBonificacao,
         tipoSelecionado,
         txtHistorico,
@@ -27,30 +30,63 @@ export const FormularioCadastrar = ({
         setTipoSelecionado,
         setTxtHistorico,
         onSubmit,
-    } = useCadastrarBonificaoca({handleClose, usuarioLogado, optionsModulos});
+        isSubmitting,
+    } = useCadastrarBonificaoca({ handleClose, usuarioLogado, optionsModulos, funcionario });
 
-   
-    const handleValorBonificacaoChange = (e) => {
-        const valor = e.target.value.replace(/,/g, '.');
-        setValorBonificacao(valor);
-    };
+    const handleValidatedSubmit = async () => {
+        try {
+            const dadosParaValidar = {
+                valorBonificacaoFuncionario: valorBonificacao,
+                historicoBonificacaoFuncionario: txtHistorico,
+                tipoFuncionario: tipoSelecionado,
+            };
+            await schema.validate(dadosParaValidar, { abortEarly: false });
+            await onSubmit(); // Executa o submit
+        } catch (validationError) {
+            console.error('❌ Erro de validação:', validationError);
+
+            clearErrors();
+
+            if (validationError.inner && validationError.inner.length > 0) {
+                validationError.inner.forEach(error => {
+                    if (error.path) {
+                        setError(error.path, {
+                            type: 'manual',
+                            message: error.message
+                        });
+                    }
+                });
+            }
+
+            const errorMessages = validationError.errors || [validationError.message];
+            console.log(`Erro de validação:\n${errorMessages.join('\n')}`);
+        }
+        
+    }
+    
 
     return (
         <Fragment>
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={handleSubmit(handleValidatedSubmit)}>
 
                 <div className="form-group">
                     <div className="row">
                         <div className="col-sm-6 col-xl-12">
-                            <Select
-                                className="basic-single"
-                                classNamePrefix="select"
-                                options={optionsFuncionarios?.map((item) => {
-                                    return { value: item.IDFUNCIONARIO, label: ` ${item.NOFUNCIONARIO}` }
-                                })}
-                                defaultValue={funcionario}
-                                onChange={(e) => setFuncionario(e.value)}
-                                // value={funcionarioSelecionado}
+                            <Controller
+                                name="nomeFuncionario"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        name="nomeFuncionario"
+                                        label={"Nome do Funcionário"}
+                                        type="text"
+                                        readOnly={true}
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        value={funcionario?.label}
+                                        onChangeModal={e => setFuncionario(e.value)}
+                                    />
+                                )}
                             />
 
                         </div>
@@ -63,36 +99,68 @@ export const FormularioCadastrar = ({
                             <Select
                                 className="basic-single"
                                 classNamePrefix="select"
-                                // value={tipoSelecionado}
-                                options={OptionsStatus}
-                                defaultValue={tipoSelecionado}
-                                onChange={(e) => setTipoSelecionado(e.value)}
+                                name="tipoFuncionario"
+                                options={OptionsStatus.map((item) => {
+                                    return {
+                                        value: item.value,
+                                        label: item.label
+                                    }
+                                })}
+                                value={tipoSelecionado}
+
+                                onChange={(e) => {
+                                    setTipoSelecionado(e)
+                                    clearErrors("tipoFuncionario")
+                                }}
+                                isClearable={true}
+                                isSearchable={true}
                             />
+                            {errors.tipoFuncionario && (
+                                <AlertError
+                                    error={errors.tipoFuncionario}
+                                    onClose={clearErrors}
+                                    fieldName="tipoFuncionario"
+                                />
+                            )}
                         </div>
                         <div className="col-sm-6 col-xl-6">
-                            <InputFieldModal
-                                type="text"
-                                className="form-control input"
-                                label="Valor (R$)"
-                                value={mascaraValor(valorBonificao)}
-                                onChangeModal={handleValorBonificacaoChange}
+                            <Controller
+                                name="valorBonificacaoFuncionario"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        name="valorBonificacaoFuncionario"
+                                        label={"Valor (R$)"}
+                                        type="text"
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        value={valorBonificacao}
+                                        onChangeModal={e => setValorBonificacao(formatarMoeda(e.target.value))}
+                                    />
+                                )}
                             />
+                          
                         </div>
                     </div>
                 </div>
 
                 <div className="">
-                    
-                    <InputFieldModal
-                        id="VrValorDesconto"
-                        type="text"
-                        className="form-control input"
-                        label="Histórico"
-                        placeholder="digite o histórico do depósito..."
-                        value={txtHistorico}
-                        onChangeModal={(e) => setTxtHistorico(e.target.value)}
+                    <Controller
+                        name="historicoBonificacaoFuncionario"
+                        control={control}
+                        render={({ field }) => (
+                            <FormField
+                                name="historicoBonificacaoFuncionario"
+                                label={"Histórico"}
+                                type="text"
+                                errors={errors}
+                                clearErrors={clearErrors}
+                                value={txtHistorico}
+                                onChangeModal={e => setTxtHistorico(e.target.value)}
+                            />
+                        )}
                     />
-                 
+
                 </div>
 
                 <FooterModal
@@ -102,9 +170,11 @@ export const FormularioCadastrar = ({
                     corFechar={"secondary"}
 
                     ButtonTypeCadastrar={ButtonTypeModal}
-                    onClickButtonCadastrar={handleSubmit(onSubmit)}
+                    onClickButtonCadastrar={handleSubmit(handleValidatedSubmit)}
                     textButtonCadastrar={"Cadastrar"}
                     corCadastrar={"success"}
+                    loadingTextCadastrar={"Cadastrando..."}
+                    autoLoadingCadastrar={true}
                 />
             </form>
         </Fragment>
