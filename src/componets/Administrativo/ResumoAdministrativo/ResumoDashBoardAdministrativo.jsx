@@ -353,7 +353,11 @@ export const ResumoDashBoardAdministrativo = ({ usuarioLogado }) => {
 
           <ActionListaVendasPCJ dadosVendasPCJ={dadosVendasPCJ} />
 
-          <ActionListaFechamentoDosCaixas dadosCaixaFechados={dadosCaixaFechados} />
+          <ActionListaFechamentoDosCaixas 
+            dadosCaixaFechados={dadosCaixaFechados} 
+            usuarioLogado={usuarioLogado}
+            optionsModulos={optionsModulos}  
+          />
 
           <ActionListaVendasVendedor dadosVendasVendedor={dadosVendasVendedor} />
 

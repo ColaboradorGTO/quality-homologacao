@@ -59,7 +59,7 @@ export const ActionListaVendasConvenioDesconto = ({ dadosVendasConvenioDesconto 
       'Valor Bruto': formatMoeda(item.VRBRUTOPAGO),
       'Desconto': formatMoeda(item.VRDESPAGO),
       'Valor Líquido': formatMoeda(item.VRLIQPAGO),
-      'Situação': item.STCANCELADO == 'False' ? 'Ativo' : 'Cancelado'
+      'Situação': item.STCANCELADO
     })));
     const workbook = XLSX.utils.book_new();
     const header = ['Nº', 'Caixa', 'Nº Venda', 'NFCe', 'Abertura', 'Operador', 'Conveniado', 'Valor Bruto', 'Desconto', 'Valor Líquido', 'Situação']
@@ -99,6 +99,7 @@ export const ActionListaVendasConvenioDesconto = ({ dadosVendasConvenioDesconto 
       VRBRUTOPAGO: item.VRBRUTOPAGO,
       VRDESPAGO: item.VRDESPAGO,
       VRLIQPAGO: item.VRLIQPAGO,
+      STCANCELADO: item.STCANCELADO == 'False' ? 'Ativo' : 'Cancelado',
       contador,
       vrTotalFaturaLoja
     };
@@ -188,8 +189,8 @@ export const ActionListaVendasConvenioDesconto = ({ dadosVendasConvenioDesconto 
     {
       header: 'Situação',
       body: row => (
-        <th style={{ color: row.STCANCELADO == 'False' ? 'blue' : 'red' }}>
-          {row.STCANCELADO == 'False' ? 'Ativo' : 'Cancelado'}
+        <th style={{ color: row.STCANCELADO == 'Ativo' ? 'blue' : 'red' }}>
+          {row.STCANCELADO}
 
         </th>
       ),

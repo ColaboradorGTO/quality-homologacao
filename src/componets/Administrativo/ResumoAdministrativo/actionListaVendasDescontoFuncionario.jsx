@@ -13,6 +13,7 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../Tables/headerTable";
+import Swal from "sweetalert2";
 
 export const ActionListaVendasDescontoFuncionario = ({ dadosVendasConvenioFuncionario }) => {
   const [modalPagamentoVisivel, setModalPagamentoVisivel] = useState(false)
@@ -229,10 +230,21 @@ export const ActionListaVendasDescontoFuncionario = ({ dadosVendasConvenioFuncio
   const handleEditPagamento = async (IDVENDA) => {
     try {
       const response = await get(`/vendas-recebimentos?idVenda=${IDVENDA}`)
-      if (response.data) {
+      if (response.data && response.data.length > 0) {
         setDadosPagamentoModal(response.data)
         setModalPagamentoVisivel(true)
-
+ 
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Sem Recebimentos',
+          text: 'Esta venda não possui recebimentos para exibir.',
+          confirmButtonText: 'OK',
+          customClass: {
+            container: 'custom-swal',
+          },
+        })
+        return;
       }
     } catch (error) {
       console.log(error, 'não foi possivel pegar os dados da tabela')

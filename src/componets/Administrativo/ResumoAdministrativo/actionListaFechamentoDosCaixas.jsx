@@ -9,7 +9,6 @@ import { FaCashRegister } from "react-icons/fa";
 import { ColumnGroup } from "primereact/columngroup";
 import { Row } from "primereact/row";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import { post, put } from "../../../api/funcRequest";
 import Swal from "sweetalert2";
 import { useReactToPrint } from "react-to-print";
@@ -18,9 +17,11 @@ import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../Tables/headerTable";
 
-export const ActionListaFechamentoDosCaixas = ({ dadosCaixaFechados }) => {
-  const [usuarioLogado, setUsuarioLogado] = useState(null)
-  const navigate = useNavigate();
+export const ActionListaFechamentoDosCaixas = ({ 
+  dadosCaixaFechados,
+  usuarioLogado,
+  optionsModulos
+}) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const dataTableRef = useRef();
   const [ipUsuario, setIpUsuario] = useState('')
@@ -85,30 +86,14 @@ export const ActionListaFechamentoDosCaixas = ({ dadosCaixaFechados }) => {
     XLSX.writeFile(workbook, 'fechamento_caixa.xlsx');
   };
 
-  useEffect(() => {
-    const usuarioArmazenado = localStorage.getItem('usuario');
-
-    if (usuarioArmazenado) {
-      try {
-        const parsedUsuario = JSON.parse(usuarioArmazenado);
-        setUsuarioLogado(parsedUsuario);;
-      } catch (error) {
-        console.error('Erro ao parsear o usuário do localStorage:', error);
-      }
-    } else {
-      navigate('/');
-    }
-  }, [navigate]);
-
-  
   const getIPUsuario = async () => {
     let usuarioIP = null;
 
     try {
-      const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+      const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
       usuarioIP = ipWhoisData?.ip;
     } catch (error) {
-      console.error("Erro ao buscar IP via ipwho.is:", error);
+      console.error("Erro ao buscar IP via ifconfig.me:", error);
     }
 
     if (!usuarioIP) {
@@ -457,7 +442,10 @@ export const ActionListaFechamentoDosCaixas = ({ dadosCaixaFechados }) => {
                 sortOrder={-1}
                 paginator={true}
                 rows={10}
-                rowsPerPageOptions={[5, 10, 20, 50]}
+                rowsPerPageOptions={[5, 10, 20, 50, 100, dados.length]}
+                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+                filterDisplay="menu"
                 showGridlines
                 stripedRows
                 emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}

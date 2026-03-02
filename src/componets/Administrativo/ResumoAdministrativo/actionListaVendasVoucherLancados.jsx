@@ -83,14 +83,14 @@ export const ActionListaVendasVoucherLancado = ({ dadosDetalheVoucher }) => {
       IDVOUCHER: item.IDVOUCHER,
       DTINVOUCHER: item.DTINVOUCHER,
       DTOUTVOUCHER: item.DTOUTVOUCHER,
-      DSCAIXAORIGEM: item.DSCAIXAORIGEM,
-      DSCAIXADESTINO: item.DSCAIXADESTINO,
+      DSCAIXAORIGEM: item.DSCAIXAORIGEM ? 'CAIXA WEB' : 'CAIXA WEB',
+      DSCAIXADESTINO: item.DSCAIXADESTINO ? 'CAIXA WEB' : 'CAIXA WEB',
       NUVOUCHER: item.NUVOUCHER,
       VRVOUCHER: item.VRVOUCHER,
       NOFANTASIA: item.NOFANTASIA,
 
       STATIVO: item.STATIVO,
-      STCANCELADO: item.STCANCELADO,
+      STCANCELADO: item.STCANCELADO == 'False' ? 'Ativo' : 'Cancelado',
       contador,
       vrTotalFaturaLoja
     };
@@ -105,7 +105,7 @@ export const ActionListaVendasVoucherLancado = ({ dadosDetalheVoucher }) => {
     {
       field: 'DSCAIXAORIGEM',
       header: 'Caixa ',
-      body: row => <th style={{ color: 'blue' }}>{row.DSCAIXAORIGEM ? 'CAIXA WEB' : 'CAIXA WEB'}</th>,
+      body: row => <th style={{ color: 'blue' }}>{row.DSCAIXAORIGEM}</th>,
       sortable: true,
     },
     {
@@ -135,7 +135,7 @@ export const ActionListaVendasVoucherLancado = ({ dadosDetalheVoucher }) => {
     {
       field: 'DSCAIXADESTINO',
       header: 'Caixa Recebido',
-      body: row => <th style={{ color: 'blue' }}>{row.DSCAIXADESTINO ? 'CAIXA WEB' : 'CAIXA WEB'}</th>,
+      body: row => <th style={{ color: 'blue' }}>{row.DSCAIXADESTINO}</th>,
       sortable: true,
     },
     {
@@ -148,8 +148,8 @@ export const ActionListaVendasVoucherLancado = ({ dadosDetalheVoucher }) => {
       field: 'STCANCELADO',
       header: 'Situação',
       body: row => (
-        <th style={{ color: row.STCANCELADO == 'False' ? 'blue' : 'red' }}>
-          {row.STCANCELADO == 'False' ? 'Ativo' : 'Cancelado'}
+        <th style={{ color: row.STCANCELADO == 'Ativo' ? 'blue' : 'red' }}>
+          {row.STCANCELADO}
 
         </th>
       ),

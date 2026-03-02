@@ -90,7 +90,7 @@ export const ActionListaDespesasLancada = ({ dadosDetalheDespesas }) => {
       NUNOTAFISCA: item?.NUNOTAFISCA,
 
       STATIVO: item?.STATIVO,
-      STCANCELADO: item?.STCANCELADO,
+      STCANCELADO: item?.STCANCELADO == 'False' ? 'Ativo' : 'Cancelado',
       vrTotalFaturaLoja
     };
   });
@@ -143,8 +143,8 @@ export const ActionListaDespesasLancada = ({ dadosDetalheDespesas }) => {
       field: 'STCANCELADO',
       header: 'Situação',
       body: row => (
-        <th style={{ color: row.STCANCELADO == 'False' ? 'blue' : 'red' }}>
-          {row.STCANCELADO == 'False' ? 'Ativo' : 'Cancelado'}
+        <th style={{ color: row.STCANCELADO == 'Ativo' ? 'blue' : 'red' }}>
+          {row.STCANCELADO}
 
         </th>
       ),
@@ -201,6 +201,9 @@ export const ActionListaDespesasLancada = ({ dadosDetalheDespesas }) => {
             paginator={true}
             rows={10}
             rowsPerPageOptions={[10, 20, 50, 100, dadosDespesasDetalhe.length]}
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+            filterDisplay="menu"
             showGridlines
             stripedRows
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
