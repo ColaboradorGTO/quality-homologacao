@@ -513,6 +513,7 @@ export const ActionListaVendasAtivas = ({
           dadosDetalheRecebimentos={dadosDetalheRecebimentos}
           dadosAtivasVendas={dadosAtivasVendas}
           usuarioLogado={usuarioLogado}
+          optionsModulos={optionsModulos}
         />
       )}
 

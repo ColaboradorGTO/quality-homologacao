@@ -75,12 +75,12 @@ export const FormularioCancelarVenda = ({
         </div>
     
         <FooterModal     
-          
-          ButtonTypeFechar={ButtonTypeModal}
-          textButtonFechar={"Finalizar"}
-          onClickButtonFechar={handleValidatedSubmit}
-          corFechar="success"
-        
+          ButtonTypeCadastrar={ButtonTypeModal}
+          textButtonCadastrar={"Finalizar"}
+          onClickButtonCadastrar={handleValidatedSubmit}
+          corCadastrar="success"
+          loadingTextCadastrar={"Finalizando..."}
+          autoLoadingCadastrar={true}
 
           ButtonTypeCancelar={ButtonTypeModal}
           textButtonCancelar={"Fechar"}

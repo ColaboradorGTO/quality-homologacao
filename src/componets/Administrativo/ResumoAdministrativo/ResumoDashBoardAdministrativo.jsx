@@ -56,9 +56,9 @@ export const ResumoDashBoardAdministrativo = ({ usuarioLogado }) => {
      
       return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 5 * 60 * 1000,}
   );
-
+  
   const { data: dadosEmpresas = [], } = useFetchData('empresas', '/empresas');
 
   const { data: dadosAdiantamentoSalarial = [], error: errorFuncionarios, isLoading: isLoadingFuncionarios, refetch: refetchAdiantamento } = useQuery(
@@ -67,7 +67,7 @@ export const ResumoDashBoardAdministrativo = ({ usuarioLogado }) => {
       const response = await get(`/adiantamentos-salarial?idEmpresa=${empresaSelecionada}&dataPesquisa=${dataPesquisa}`);
       return response.data;
     },
-    { enabled: false, staleTime: 5 * 60 * 1000, }
+    { enabled: false, staleTime: 60 * 60 * 1000, }
   );
 
   const { data: dadosQuebraCaixa = [], error: errorQuebra, isLoading: isLoadingQuebra, refetch: refetchQuebra } = useQuery(
@@ -76,7 +76,7 @@ export const ResumoDashBoardAdministrativo = ({ usuarioLogado }) => {
       const response = await get(`/quebra-caixa-loja-resumo?idEmpresa=${empresaSelecionada}&dataPesquisa=${dataPesquisa}`);
       return response.data;
     },
-    { enabled: false, staleTime: 5 * 60 * 1000, }
+    { enabled: false, staleTime: 60 * 60 * 1000, }
   );
 
   const { data: dadosVendasVendedor = [], error: errorVendasVendedor, isLoading: isLoadingVendasVendedor, refetch: refetchVendasVendedor } = useQuery(
@@ -85,7 +85,7 @@ export const ResumoDashBoardAdministrativo = ({ usuarioLogado }) => {
       const response = await get(`/vendaVendedor?idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisa}&dataPesquisaFim=${dataPesquisa}`);
       return response.data;
     },
-    { enabled: false, staleTime: 5 * 60 * 1000, }
+    { enabled: false, staleTime: 60 * 60 * 1000, }
   );
 
   const { data: dadosVendasAtivas = [], error: errorVendasAtivas, isLoading: isLoadingVendasAtivas, refetch: refetchVendasAtivas } = useQuery(
@@ -94,7 +94,7 @@ export const ResumoDashBoardAdministrativo = ({ usuarioLogado }) => {
       const response = await get(`/venda-ativa?idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisa}&dataPesquisaFim=${dataPesquisa}&statusCancelado=False`);
       return response.data;
     },
-    { enabled: false, staleTime: 5 * 60 * 1000, }
+    { enabled: false, staleTime: 60 * 60 * 1000, }
   );
 
   const { data: dadosVendasCanceladas = [], error: errorVendasCanceladas, isLoading: isLoadingVendasCanceladas, refetch: refetchVendasCanceladas } = useQuery(
@@ -103,7 +103,7 @@ export const ResumoDashBoardAdministrativo = ({ usuarioLogado }) => {
       const response = await get(`/venda-ativa?statusCancelado=True&idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisa}&dataPesquisaFim=${dataPesquisa}`);
       return response.data;
     },
-    { enabled: Boolean(empresaSelecionada), staleTime: 5 * 60 * 1000, }
+    { enabled: Boolean(empresaSelecionada), staleTime: 60 * 60 * 1000, }
   );
 
 
@@ -113,7 +113,7 @@ export const ResumoDashBoardAdministrativo = ({ usuarioLogado }) => {
       const response = await get(`/detalheVoucher?idEmpresa=${empresaSelecionada}&datapesq=${dataPesquisa}`);
       return response.data;
     },
-    { enabled: false, staleTime: 5 * 60 * 1000, }
+    { enabled: false, staleTime: 60 * 60 * 1000, }
   );
 
   const { data: dadosVendasConvenioDesconto = [], error: errorConvenio, isLoading: isLoadingConvenio, refetch: refetchConvenio } = useQuery(
@@ -122,7 +122,7 @@ export const ResumoDashBoardAdministrativo = ({ usuarioLogado }) => {
       const response = await get(`/resumo-venda-convenio?idEmpresa=${empresaSelecionada}&dataFechamento=${dataPesquisa}&statusCancelado=False`);
       return response.data;
     },
-    { enabled: false, staleTime: 5 * 60 * 1000, }
+    { enabled: false, staleTime: 60 * 60 * 1000, }
   );
 
   const { data: dadosVendasConvenioFuncionario = [], error: errorConvenioFuncionario, isLoading: isLoadingConvenioFuncionario, refetch: refetchConvenioFuncionario } = useQuery(
@@ -131,7 +131,7 @@ export const ResumoDashBoardAdministrativo = ({ usuarioLogado }) => {
       const response = await get(`/resumo-venda-convenio-desconto?idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisa}&dataPesquisaFim=${dataPesquisa}&statusCancelado=False`);
       return response.data;
     },
-    { enabled: false, staleTime: 5 * 60 * 1000, }
+    { enabled: false, staleTime: 60 * 60 * 1000, }
   );
 
   const { data: dadosCaixaFechados = [], error: errorCaixaFechado, isLoading: isLoadingCaixaFechado, refetch: refetchCaixaFechado } = useQuery(
@@ -140,7 +140,7 @@ export const ResumoDashBoardAdministrativo = ({ usuarioLogado }) => {
       const response = await get(`/listaCaixasFechados?idEmpresa=${empresaSelecionada}&dataFechamento=${dataPesquisa}`);
       return response.data;
     },
-    { enabled: false, staleTime: 5 * 60 * 1000, }
+    { enabled: false, staleTime: 60 * 60 * 1000, }
   );
 
   const { data: dadosDetalheFaturaLancadas = [], error: errorFaturaLancada, isLoading: isLoadingFaturaLancada, refetch: refetchFaturaLancada } = useQuery(
@@ -149,7 +149,7 @@ export const ResumoDashBoardAdministrativo = ({ usuarioLogado }) => {
       const response = await get(`/detalheFatura?idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisa}&dataPesquisaFim=${dataPesquisa}`);
       return response.data;
     },
-    { enabled: false, staleTime: 5 * 60 * 1000, }
+    { enabled: false, staleTime: 60 * 60 * 1000, }
   );
 
   const { data: dadosResumoVendas = [], error: errorResumoVendas, isLoading: isLoadingResumoVendas, refetch: refetchResumoVendas } = useQuery(
@@ -158,7 +158,7 @@ export const ResumoDashBoardAdministrativo = ({ usuarioLogado }) => {
       const response = await get(`/resumoVenda?idEmpresa=${empresaSelecionada}&dataPesquisa=${dataPesquisa}`);
       return response.data;
     },
-    { enabled: false, staleTime: 5 * 60 * 1000, }
+    { enabled: false, staleTime: 60 * 60 * 1000, }
   );
 
   const { data: dadosDespesaLoja = [], error: errorDespesaLoja, isLoading: isLoadingDespesaLoja, refetch: refetchDespesaLoja } = useQuery(
@@ -167,7 +167,7 @@ export const ResumoDashBoardAdministrativo = ({ usuarioLogado }) => {
       const response = await get(`/despesasLojaADM?idEmpresa=${empresaSelecionada}&dataPesquisa=${dataPesquisa}`);
       return response.data;
     },
-    { enabled: false, staleTime: 5 * 60 * 1000, }
+    { enabled: false, staleTime: 60 * 60 * 1000, }
   );
 
   const { data: dadosMovimentacaoCaixaDoDia = [], error: errorMovimentacao, isLoading: isLoadingMovimentacao, refetch: refetchMovimentacaoCaixaDia } = useQuery(
@@ -176,7 +176,7 @@ export const ResumoDashBoardAdministrativo = ({ usuarioLogado }) => {
       const response = await get(`/listaCaixasMovimento?idEmpresa=${empresaSelecionada}&dataFechamento=${dataPesquisa}`);
       return response.data;
     },
-    { enabled: false, staleTime: 5 * 60 * 1000, }
+    { enabled: false, staleTime: 60 * 60 * 1000, }
   );
 
   const { data: dadosVendasPCJ = [], error: errorVendasPCJ, isLoading: isLoadingVendasPCJ, refetch: refetchVendasPCJ } = useQuery(
@@ -185,7 +185,7 @@ export const ResumoDashBoardAdministrativo = ({ usuarioLogado }) => {
       const response = await get(`/listaCaixasMovimento?idEmpresa=${empresaSelecionada}&dataFechamento=${dataPesquisa}`);
       return response.data;
     },
-    { enabled: false, staleTime: 5 * 60 * 1000, }
+    { enabled: false, staleTime: 60 * 60 * 1000, }
   );
   const { data: dadosMalotes = [], error: errorMalotes, isLoading: isLoadingMalotes, refetch: refetchMalotes } = useQuery(
     'malotes-loja',
@@ -193,7 +193,7 @@ export const ResumoDashBoardAdministrativo = ({ usuarioLogado }) => {
       const response = await get(`/malotes-loja?idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisa}&dataPesquisaFim=${dataPesquisa}`);
       return response.data;
     },
-    { enabled: false, staleTime: 5 * 60 * 1000, }
+    { enabled: false, staleTime: 60 * 60 * 1000, }
   );
 
 
@@ -201,7 +201,7 @@ export const ResumoDashBoardAdministrativo = ({ usuarioLogado }) => {
     try {
       const response = await get(`/extrato-loja-periodo?idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisa}&dataPesquisaFim=${dataPesquisa}`)
 
-      if (response.data) {
+      if (response.data && response.data.length > 0) {
         setDadosExtratoLojaPeriodo(response.data)
       }
       return response.data;
@@ -368,6 +368,7 @@ export const ResumoDashBoardAdministrativo = ({ usuarioLogado }) => {
             empresaSelecionada={empresaSelecionada}
             dadosVendasCanceladas={dadosVendasCanceladas}
             usuarioLogado={usuarioLogado}
+            optionsModulos={optionsModulos}
           />
 
           <ActionListaFaturasLancada dadosDetalheFaturaLancadas={dadosDetalheFaturaLancadas} />

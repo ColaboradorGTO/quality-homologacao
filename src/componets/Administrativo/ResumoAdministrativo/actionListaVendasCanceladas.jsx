@@ -20,8 +20,9 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../Tables/headerTable";
+import Swal from "sweetalert2";
 
-export const ActionListaVendasCanceladas = ({ dadosVendasCanceladas, empresaSelecionada, usuarioLogado }) => {
+export const ActionListaVendasCanceladas = ({ dadosVendasCanceladas, empresaSelecionada, usuarioLogado, optionsModulos }) => {
   const [modalVendaVisivel, setModalVendaVisivel] = useState(false);
   const [modalProdutoVisivel, setModalProdutoVisivel] = useState(false);
   const [modalPagamentoVisivel, setModalPagamentoVisivel] = useState(false);
@@ -248,9 +249,20 @@ export const ActionListaVendasCanceladas = ({ dadosVendasCanceladas, empresaSele
   const handleEditProduto = async (IDVENDA, empresaSelecionada) => {
     try {
       const response = await get(`/detalhe-venda?idVenda=${IDVENDA}&idEmpresa=${empresaSelecionada}`)
-      if (response.data) {
+      if (response.data && response.data.length > 0) {
         setDadosProdutoModal(response.data)
         setModalProdutoVisivel(true)
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Sem Produtos',
+          html: `A venda selecionada não possui produtos vinculados.`,
+          timer: 3000,
+          customClass: {
+            container: 'custom-swal',
+          },
+        })
+        return;
       }
     } catch (error) {
       console.log(error, "não foi possivel pegar os dados da tabela ")
@@ -273,9 +285,20 @@ export const ActionListaVendasCanceladas = ({ dadosVendasCanceladas, empresaSele
 
     try {
       const response = await get(`/resumo-venda-caixa-detalhado?idVenda=${IDVENDA}&idEmpresa=${empresaSelecionada}`);
-      if (response.data) {
+      if (response.data && response.data.length > 0) {
         setDadosVendas(response.data);
         setModalVendaVisivel(true);
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Sem Vendas',
+          html: `A venda selecionada não possui detalhes vinculados.`,
+          timer: 3000,
+          customClass: {
+            container: 'custom-swal',
+          },
+        });
+        return;
       }
     } catch (error) {
       console.log(error, "não foi possivel pegar os dados da tabela ");
@@ -285,9 +308,20 @@ export const ActionListaVendasCanceladas = ({ dadosVendasCanceladas, empresaSele
   const handleEditPagamento = async (IDVENDA) => {
     try {
       const response = await get(`/recebimento-resumo?idVenda=${IDVENDA}`)
-      if (response.data) {
+      if (response.data && response.data.length > 0) {
         setDadosDetalheRecebimentos(response.data)
         setModalPagamentoVisivel(true)
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Sem Recebimentos',
+          html: `A venda selecionada não possui recebimentos vinculados.`,
+          timer: 3000,
+          customClass: {
+            container: 'custom-swal',
+          },
+        });
+        return;
       }
     } catch (error) {
       console.log(error, 'não foi possivel pegar os dados da tabela')
@@ -308,9 +342,21 @@ export const ActionListaVendasCanceladas = ({ dadosVendasCanceladas, empresaSele
   const handleDetalharVendaXML = async (IDVENDA) => {
     try {
       const response = await get(`/venda-xml?idVenda=${IDVENDA}`);
-      setModalXmlVisivel(true);
-      setDadosDetalheVendasXML(response.data)
-
+      if(response.data && response.data.length > 0) {
+        setModalXmlVisivel(true);
+        setDadosDetalheVendasXML(response.data)
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Sem XML',
+          html: `A venda selecionada não possui XML vinculado ou disponível para visualização.`,
+          timer: 3000,
+          customClass: {
+            container: 'custom-swal',
+          },        
+        });
+        return;
+      }
     } catch (error) {
       console.error(error);
     }
@@ -406,6 +452,7 @@ export const ActionListaVendasCanceladas = ({ dadosVendasCanceladas, empresaSele
           dadosDetalheRecebimentos={dadosDetalheRecebimentos}
           usuarioLogado={usuarioLogado}
           dadosAtivasVendas={dadosVendasAtivas}
+          optionsModulos={optionsModulos}
         />
       )}
 

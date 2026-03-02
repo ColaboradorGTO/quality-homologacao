@@ -20,26 +20,26 @@ export const useCancelarVenda = ({
         const response = await get(`/lista-motivo-devolucao`);
         return response.data;
     },
-    { enabled: true, staleTime: 5 * 60 * 1000, }
+    { enabled: true, staleTime: 60 * 60 * 1000, }
     );
 
     const getIPUsuario = async () => {
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
-            usuarioIP = ipWhoisData?.ip;
+        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+        usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP via ipwho.is:", error);
+        console.error("Erro ao buscar IP via ifconfig.me:", error);
         }
 
         if (!usuarioIP) {
-            try {
+        try {
             const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
             usuarioIP = ipifyData?.ip;
-            } catch (error) {
+        } catch (error) {
             console.error("Erro ao buscar IP via ipify.org:", error);
-            }
+        }
         }
         setIpUsuario(usuarioIP);
         return usuarioIP;
