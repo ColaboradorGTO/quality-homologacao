@@ -77,22 +77,22 @@ export const ActionListaBalancoAvulso = ({ dadosBalancoAvulso, usuarioLogado, op
     let usuarioIP = null;
 
     try {
-      const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+      const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
       usuarioIP = ipWhoisData?.ip;
     } catch (error) {
-      console.error("Erro ao buscar IP via ipwho.is:", error);
+      console.error("Erro ao buscar IP via ifconfig.me:", error);
     }
 
     if (!usuarioIP) {
       try {
-        const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-        usuarioIP = ipifyData?.ip;
+          const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+          usuarioIP = ipifyData?.ip;
       } catch (error) {
-        console.error("Erro ao buscar IP via ipify.org:", error);
+          console.error("Erro ao buscar IP via ipify.org:", error);
       }
     }
-    setIpUsuario(usuarioIP);
-    return usuarioIP;
+      setIpUsuario(usuarioIP);
+      return usuarioIP;
   };
 
   const calcularTotalCusto = () => {
@@ -234,7 +234,6 @@ export const ActionListaBalancoAvulso = ({ dadosBalancoAvulso, usuarioLogado, op
       "DSCOLETOR": usuarioLogado.nome,
       "IDPRODUTO": produto.IDPRODUTO,
       "TOTALCONTAGEMGERAL": Number(novaQuantidade),
-
     }
 
     try {
@@ -248,7 +247,7 @@ export const ActionListaBalancoAvulso = ({ dadosBalancoAvulso, usuarioLogado, op
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || 'IP não disponível'
       }
 
       await post('/log-web', postData)
@@ -275,7 +274,7 @@ export const ActionListaBalancoAvulso = ({ dadosBalancoAvulso, usuarioLogado, op
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || 'IP não disponível'  
       }
 
       const responsePost = await post('/log-web', postData)

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import { post, put } from "../../../../../api/funcRequest";
+import { post } from "../../../../../api/funcRequest";
 import axios from "axios";
 import { getDataAtual } from "../../../../../utils/dataAtual";
 
@@ -18,18 +18,18 @@ export const useConfirmarBalancoAvulso = ({ dadosBalancoAvulso, usuarioLogado, o
     let usuarioIP = null;
 
     try {
-      const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+      const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
       usuarioIP = ipWhoisData?.ip;
     } catch (error) {
-      console.error("Erro ao buscar IP via ipwho.is:", error);
+      console.error("Erro ao buscar IP via ifconfig.me:", error);
     }
 
     if (!usuarioIP) {
       try {
-        const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-        usuarioIP = ipifyData?.ip;
+          const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+          usuarioIP = ipifyData?.ip;
       } catch (error) {
-        console.error("Erro ao buscar IP via ipify.org:", error);
+          console.error("Erro ao buscar IP via ipify.org:", error);
       }
     }
     setIpUsuario(usuarioIP);
@@ -100,7 +100,7 @@ export const useConfirmarBalancoAvulso = ({ dadosBalancoAvulso, usuarioLogado, o
               IDFUNCIONARIO: String(usuarioLogado.id),
               PATHFUNCAO: textoFuncao,
               DADOS: textDados,
-              IP: ipUsuario
+              IP: ipUsuario || 'IP não disponível'
             }
 
             const responsePost = await post('/log-web', postData)
@@ -119,7 +119,7 @@ export const useConfirmarBalancoAvulso = ({ dadosBalancoAvulso, usuarioLogado, o
               IDFUNCIONARIO: String(usuarioLogado.id),
               PATHFUNCAO: textoFuncao,
               DADOS: 'ERRO AO CONFIMAR BALANÇO AVULSO',
-              IP: ipUsuario
+              IP: ipUsuario || 'IP não disponível'
             }
 
             const responsePost = await post('/log-web', postData)

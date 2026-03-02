@@ -43,7 +43,7 @@ export const ActionPesquisaAlteracaoPreco = ({ }) => {
       const response = await get(`/marcasLista`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, }
+    { staleTime: 60 * 60 * 1000, }
   );
 
   const { data: dadosEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas } = useQuery(
@@ -53,16 +53,8 @@ export const ActionPesquisaAlteracaoPreco = ({ }) => {
 
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, }
+    { enabled: Boolean(marcaSelecionada), staleTime: 60 * 60 * 1000, }
   );
-
-  useEffect(() => {
-    if (marcaSelecionada) {
-      refetchEmpresas();
-    }
-    refetchMarcas()
-  }, [marcaSelecionada, refetchEmpresas]);
-
 
   const fetchListaAlteracaoPreco = async () => {
     const urlBase = `/alteracaoPreco?idEmpresa=${encodeURIComponent(empresaSelecionada)}&grupo=${encodeURIComponent(
@@ -133,7 +125,7 @@ export const ActionPesquisaAlteracaoPreco = ({ }) => {
       const response = await get(`/grupo-produto`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, cacheTime: 10 * 60 * 1000 }
+    { staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
   );
 
 
@@ -143,10 +135,8 @@ export const ActionPesquisaAlteracaoPreco = ({ }) => {
       const response = await get(`/subgrupo-produto`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, cacheTime: 10 * 60 * 1000 }
+    { staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
   );
-
-
 
 
   useEffect(() => {

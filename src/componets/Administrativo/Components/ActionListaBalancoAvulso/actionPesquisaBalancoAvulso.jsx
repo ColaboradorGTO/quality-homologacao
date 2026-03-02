@@ -22,7 +22,6 @@ export const ActionPesquisaBalancoAvulso = ({usuarioLogado }) => {
   const [modalVisivel, setModalVisivel] = useState(false)
   const [empresaSelecionada, setEmpresaSelecionada] = useState('')
   const [empresaSelecionadaNome, setEmpresaSelecionadaNome] = useState('')
-  const [currentPage, setCurrentPage] = useState(1)
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
  
@@ -60,7 +59,7 @@ export const ActionPesquisaBalancoAvulso = ({usuarioLogado }) => {
       const response = await get(`/empresas`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, cacheTime: 60 * 60 * 1000, }
+    { staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000, }
   );
   
   const { data: dadosBalancoAvulso = [], error: errorBalanco, isLoading: isLoadingBalanco, refetch } = useQuery(
@@ -69,7 +68,7 @@ export const ActionPesquisaBalancoAvulso = ({usuarioLogado }) => {
       const response = await get(`/detalheBalancoAvulso?idFilial=${empresaSelecionada}&coletor=${usuarioLogado.id}`);
       return response.data;
     },
-    { enabled: Boolean(empresaSelecionada), }
+    { enabled: Boolean(empresaSelecionada), staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000, }
   );
   
   const  { enviarConfirmacao, loading } = useConfirmarBalancoAvulso({ dadosBalancoAvulso, usuarioLogado, optionsModulos});
@@ -151,10 +150,8 @@ export const ActionPesquisaBalancoAvulso = ({usuarioLogado }) => {
 
       setTabelaVisivel(false)
       setTabelaProduto(true)
-      setCurrentPage(prevPage => prevPage + 1)
       refetchListaProdutosBalanco(empresaSelecionada, descricaoProduto)
     }
-
   }
 
    
