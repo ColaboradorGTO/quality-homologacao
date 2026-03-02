@@ -126,8 +126,6 @@ export const ActionListaEstoqueUltimaPosicao = ({ dadosEstoqueUltima }) => {
     return `${formatMoeda(totalDinheiro)}   (${formatMoeda(totalVendas)} total)`;
   };
 
-
-
   const colunasEstoqueRotatividade = [
     {
       field: 'contador',

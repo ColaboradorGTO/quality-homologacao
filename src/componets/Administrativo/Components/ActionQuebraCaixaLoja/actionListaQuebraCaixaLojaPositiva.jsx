@@ -12,13 +12,14 @@ import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import Swal from "sweetalert2";
 import { FaCheck, FaRegTrashAlt } from "react-icons/fa";
-import { post, put } from "../../../../api/funcRequest";
+import { useCancelarQuebraCaixa } from "./hooks/useCancelar";
 
 export const ActionListaQuebraCaixaLojaPositiva = ({ dadosQuebraDeCaixaPositiva, handleClick, optionsModulos, usuarioLogado }) => {
-
-  const [ipUsuario, setIpUsuario] = useState('');
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const dataTableRef = useRef();
+  const {
+    handleCancelar
+  } = useCancelarQuebraCaixa({ usuarioLogado, optionsModulos, handleClick })
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
   };
@@ -118,9 +119,7 @@ export const ActionListaQuebraCaixaLojaPositiva = ({ dadosQuebraDeCaixaPositiva,
       header: 'Situação',
       body: (row) => {
         return (
-          
           <th style={{ color: row.STATIVO == "True" ? 'blue' : 'red' }}> {row.STATIVO == 'True' ? "Ativo" : "Inativo"}</th>
-         
         )
       },
       sortable: true,
@@ -143,7 +142,7 @@ export const ActionListaQuebraCaixaLojaPositiva = ({ dadosQuebraDeCaixaPositiva,
                   iconSize={18}
                   width="35px"
                   height="35px"
-                  onClickButton={() => handleClickCancelar(row)}
+                  onClickButton={() => handleClickCancelar(row.IDQUEBRACAIXA, false)}
                 />
 
               </div>
@@ -157,14 +156,11 @@ export const ActionListaQuebraCaixaLojaPositiva = ({ dadosQuebraDeCaixaPositiva,
                   height="35px"
                   onClickButton={() => handleClickImprimir(row)}
                 />
-
               </div>
-
             </div>
           )
         } else {
           return (
-
             <div>
               <ButtonTable
                 titleButton={"Ativar Quebra"}
@@ -173,14 +169,12 @@ export const ActionListaQuebraCaixaLojaPositiva = ({ dadosQuebraDeCaixaPositiva,
                 iconSize={18}
                 width="35px"
                 height="35px"
-                onClickButton={() => handleClickAtivar(row)}
+                onClickButton={() => handleClickCancelar(row.IDQUEBRACAIXA, true)}
               />
-
             </div>
           )
         }
       }
-
     },
   ]
 
@@ -191,6 +185,14 @@ export const ActionListaQuebraCaixaLojaPositiva = ({ dadosQuebraDeCaixaPositiva,
       if (response.data && response.data.length > 0) {
         setDadosQuebraCaixasModal(response.data);
         setModalVisivel(true);
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Atenção',
+          text: 'Detalhes da quebra de caixa não encontrados para impressão.',
+          timer: 6000,
+        });
+        return;
       }
     } catch (error) {
       console.error('Erro ao buscar detalhes da venda: ', error);
@@ -212,90 +214,9 @@ export const ActionListaQuebraCaixaLojaPositiva = ({ dadosQuebraDeCaixaPositiva,
     }
   };
 
-  const handleCancelar = async () => {
-    try {
-      const putData = [{  
-        IDQUEBRACAIXA: dados[0].IDQUEBRACAIXA,
-        STATIVO: 'False'
-      }]
-      const response = await put('/atualizar-status-quebra', putData)
-   
-      const textDados = JSON.stringify(putData)
-      let textoFuncao = '';
-      if(putData[0].STATIVO == 'False') {
-        textoFuncao = 'FINANCEIRO/ATIVADO QUEBRA DE CAIXA';
-      } else {
-        textoFuncao = 'FINANCEIRO/CANCELAMENTO DE QUEBRA DE CAIXA';
-      }
-  
-      const postData = {  
-        IDFUNCIONARIO: usuarioLogado.id,
-        PATHFUNCAO:  textoFuncao,
-        DADOS: textDados,
-        IP: ipUsuario
-      }
-
-      const responsePost = await post('/log-web', postData)
-      handleClick()
-      return responsePost.data;
-    } catch (error) {
-      console.error('Erro ao buscar detalhes da venda: ', error);
-    }
-    
-  }
-
-  const handleClickCancelar = (row) => {
-    if(optionsModulos[0]?.ALTERAR == 'True') {
-      if (row && row.IDQUEBRACAIXA) {
-        handleCancelar(row.IDQUEBRACAIXA);
-        
-      }
-    } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Atenção',
-        text: 'Você não tem permissão para cancelar a quebra de caixa!',
-        timer: 3000,
-      });
-    }
-  };
-
-  const handleAtivar = async () => {
-    try {
-      const putData = [{  
-        IDQUEBRACAIXA: dados[0].IDQUEBRACAIXA,
-        STATIVO: 'True'
-      }]
-      const response = await put('/atualizar-status-quebra', putData)
-   
-      const textDados = JSON.stringify(putData)
-      let textoFuncao = '';
-      if(putData[0].STATIVO == 'True') {
-        textoFuncao = 'FINANCEIRO/ATIVADO QUEBRA DE CAIXA';
-      } else {
-        textoFuncao = 'FINANCEIRO/CANCELAMENTO DE QUEBRA DE CAIXA';
-      }
-  
-      const postData = {  
-        IDFUNCIONARIO: usuarioLogado.id,
-        PATHFUNCAO:  textoFuncao,
-        DADOS: textDados,
-        IP: ipUsuario
-      }
-
-      const responsePost = await post('/log-web', postData)
-    
-      handleClick()
-      return responsePost.data;
-    } catch (error) {
-      console.error('Erro ao buscar detalhes da venda: ', error);
-    }
-    
-  }
-
-  const handleClickAtivar = (row) => {
-    if (row && row.IDQUEBRACAIXA) {
-      handleAtivar(row.IDQUEBRACAIXA);  
+  const handleClickCancelar = (IDQUEBRA, status) => {
+    if (IDQUEBRA) {
+      handleCancelar(IDQUEBRA, status);
     }
   };
 
@@ -306,49 +227,49 @@ export const ActionListaQuebraCaixaLojaPositiva = ({ dadosQuebraDeCaixaPositiva,
         <div className="panel-hdr">
           <h2>Quebra Positivas de Caixa das Lojas</h2>
         </div>
-      <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
-        <HeaderTable
-          globalFilterValue={globalFilterValue}
-          onGlobalFilterChange={onGlobalFilterChange}
-          handlePrint={handlePrint}
-          exportToExcel={exportToExcel}
-          exportToPDF={exportToPDF}
-        />
-      </div>
-      <div className="card" ref={dataTableRef}>
-        <DataTable
-          title="Quebra Negativas de Caixa das Lojas"
-          value={dadosPositiva}
-          globalFilter={globalFilterValue}
-          size="small"
-          sortOrder={-1}
-          paginator={true}
-          rows={10}
-          rowsPerPageOptions={[10, 20, 50, 100, dadosPositiva.length]}
-          paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-          currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
-          filterDisplay="menu"
-          showGridlines
-          stripedRows
-          emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado positiva</div>}
-        >
-          {colunasQuebraDeCaixaPositiva.map(coluna => (
-            <Column
-              key={coluna.field}
-              field={coluna.field}
-              header={coluna.header}
+        <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
+          <HeaderTable
+            globalFilterValue={globalFilterValue}
+            onGlobalFilterChange={onGlobalFilterChange}
+            handlePrint={handlePrint}
+            exportToExcel={exportToExcel}
+            exportToPDF={exportToPDF}
+          />
+        </div>
+        <div className="card" ref={dataTableRef}>
+          <DataTable
+            title="Quebra Positivas de Caixa das Lojas"
+            value={dadosPositiva}
+            globalFilter={globalFilterValue}
+            size="small"
+            sortOrder={-1}
+            paginator={true}
+            rows={10}
+            rowsPerPageOptions={[10, 20, 50, 100, dadosPositiva.length]}
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+            filterDisplay="menu"
+            showGridlines
+            stripedRows
+            emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado positiva</div>}
+          >
+            {colunasQuebraDeCaixaPositiva.map(coluna => (
+              <Column
+                key={coluna.field}
+                field={coluna.field}
+                header={coluna.header}
 
-              body={coluna.body}
-              footer={coluna.footer}
-              sortable={coluna.sortable}
-              headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
-              footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
-              bodyStyle={{ fontSize: '0.8rem' }}
+                body={coluna.body}
+                footer={coluna.footer}
+                sortable={coluna.sortable}
+                headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+                footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
+                bodyStyle={{ fontSize: '0.8rem' }}
 
-            />
-          ))}
-        </DataTable>
-      </div>
+              />
+            ))}
+          </DataTable>
+        </div>
       </div>
     </Fragment>
   )

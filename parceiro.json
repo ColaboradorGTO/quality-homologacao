@@ -197,6 +197,20 @@
       "label": "Negativa"
     }
   ],
+  "optionsQuebraDeCaixaADM": [
+    {
+      "value": "0",
+      "label": "Todas"
+    },
+    {
+      "value": "1",
+      "label": "Positiva"
+    },
+    {
+      "value": "2",
+      "label": "Negativa"
+    }
+  ],
   "optionsUF": [
     {
       "value": "",

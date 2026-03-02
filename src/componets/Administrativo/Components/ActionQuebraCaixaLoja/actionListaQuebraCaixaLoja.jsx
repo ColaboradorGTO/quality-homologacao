@@ -212,12 +212,10 @@ export const ActionListaQuebraCaixaLoja = ({ dadosQuebraDeCaixa, handleClick, qu
                 />
 
               </div>
-
             </div>
           )
         } else {
           return (
-
             <div>
               <ButtonTable
                 titleButton={"Ativar Quebra"}
@@ -228,12 +226,10 @@ export const ActionListaQuebraCaixaLoja = ({ dadosQuebraDeCaixa, handleClick, qu
                 height="35px"
                 onClickButton={() => handleClickCancelar(row.IDQUEBRACAIXA, true)}
               />
-
             </div>
           )
         }
       }
-
     },
   ]
 
@@ -243,6 +239,17 @@ export const ActionListaQuebraCaixaLoja = ({ dadosQuebraDeCaixa, handleClick, qu
       if (response.data && response.data.length > 0) {
         setDadosQuebraCaixasModal(response.data);
         setModalVisivel(true);
+      } else {
+        Swal.fire({
+          title: 'Nenhum dado encontrado',
+          html: `Não foram encontrados dados para a quebra de caixa selecionada.`,
+          icon: 'info',
+          timer: 3000,
+          customClass: {
+            container: 'custom-swal',
+          }
+        });
+        return;
       }
     } catch (error) {
       console.error('Erro ao buscar detalhes da venda: ', error);
@@ -254,7 +261,6 @@ export const ActionListaQuebraCaixaLoja = ({ dadosQuebraDeCaixa, handleClick, qu
       if (row && row.IDQUEBRACAIXA) {
         handleImprimir(row.IDQUEBRACAIXA);
       }
-
     } else {
       Swal.fire({
         title: 'Acesso Negado',
@@ -278,7 +284,6 @@ export const ActionListaQuebraCaixaLoja = ({ dadosQuebraDeCaixa, handleClick, qu
   return (
 
     <Fragment>
-
       <div className="panel">
         <div className="panel-hdr">
           <h2>Lista de Quebra de Caixa</h2>
@@ -318,7 +323,6 @@ export const ActionListaQuebraCaixaLoja = ({ dadosQuebraDeCaixa, handleClick, qu
                 key={coluna.field}
                 field={coluna.field}
                 header={coluna.header}
-
                 body={coluna.body}
                 footer={coluna.footer}
                 sortable={coluna.sortable}

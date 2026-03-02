@@ -28,8 +28,6 @@ export const ActionPesquisaEstoqueLoja = () => {
   const [empresaSelecionada, setEmpresaSelecionada] = useState('')
   const [empresaSelecionadaNome, setEmpresaSelecionadaNome] = useState('')
   const [codBarra, setCodBarra] = useState('');
-  const [currentPage, setCurrentPage] = useState(1)
-  const [isLoadingPesquisa, setIsLoadingPesquisa] = useState(true)
   const animatedComponents = makeAnimated();
 
   useEffect(() => {
@@ -40,15 +38,13 @@ export const ActionPesquisaEstoqueLoja = () => {
 
   }, []);
 
-
   const { data: dadosFornecedor = [], error: errorFornecedor, isLoading: isLoadingFornecedor, refetch: refetchFornecedor } = useQuery(
     ['lista-fornecedor-produto', marcaSelecionada],
     async () => {
       const response = await get(`/lista-fornecedor-produto?idMarca=${marcaSelecionada}`);
-      console.log('response fornecedor:', response.data);
       return response.data;
     },
-    {enabled: false, staleTime: 5 * 60 * 1000, }
+    {enabled: false, staleTime: 60 * 60 * 1000, }
   );
 
   const { data: dadosGrupos = [], error: errorGrupos, isLoading: isLoadingGrupos, refetch: refetchGrupos } = useQuery(
@@ -57,7 +53,7 @@ export const ActionPesquisaEstoqueLoja = () => {
       const response = await get(`/grupo-produto`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, }
+    { staleTime: 60 * 60 * 1000, }
   );
   
   const { data: dadosSubGrupos = [], error: errorSubGrupos, isLoading: isLoadingSubGrupos, refetch: refetchSubGrupos } = useQuery(
@@ -66,9 +62,8 @@ export const ActionPesquisaEstoqueLoja = () => {
       const response = await get(`/subgrupo-produto?idGrupo=${grupoSelecionado}`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, }
+    { staleTime: 60 * 60 * 1000, }
   );
-
 
   const { data: dadosEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas } = useQuery(
     'empresas',
@@ -76,7 +71,7 @@ export const ActionPesquisaEstoqueLoja = () => {
       const response = await get(`/empresas`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000 }
+    { staleTime: 60 * 60 * 1000 }
   );
 
   const { data: dadosMarca = [], error: errorMarcas, isLoading: isLoadingMarcas, refetch: refetchMarcas } = useQuery(
@@ -85,10 +80,9 @@ export const ActionPesquisaEstoqueLoja = () => {
       const response = await get(`/lista-marca-produto?${subGrupoSelecionado}`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, }
+    { staleTime: 60 * 60 * 1000, }
   );
 
-  
   const fetchListaEstoque = async () => {
     const urlBase = `/inventariomovimento?idEmpresa=${empresaSelecionada}&idGrupo=${grupoSelecionado}&idSubGrupo=${subGrupoSelecionado}&idMarca=${marcaSelecionada}&idFornecedor=${fornecedorSelecionado}&descricaoProduto=${codBarra}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&stAtivo=True`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
@@ -233,30 +227,20 @@ export const ActionPesquisaEstoqueLoja = () => {
   }
 
   const handleClickEstoqueAtual = () => {
-    setIsLoadingPesquisa(true)
-    setCurrentPage(prevPage => prevPage + 1)
-
     refetchListaEstoque()
     setTabelaEstoqueAtual(true)
     setTabelaEstoqueRotatividade(false)
     setTabelaEstoqueUltimaPosicao(false)
-    
   }
-  const handleClickEstoqueRotatividade = () => {
-    setIsLoadingPesquisa(true)
-    setCurrentPage(prevPage => prevPage + 1)
 
+  const handleClickEstoqueRotatividade = () => {
     refetchListaEstoqueRotatividade()
     setTabelaEstoqueRotatividade(true)
     setTabelaEstoqueAtual(false)
-    setTabelaEstoqueUltimaPosicao(false)
-    
+    setTabelaEstoqueUltimaPosicao(false)    
   }
   
   const handleClickEstoqueUltimaPosicao = () => {
-    setIsLoadingPesquisa(true)
-    setCurrentPage(prevPage => prevPage + 1)
-
     refetchListaEstoqueUltima()
     setTabelaEstoqueUltimaPosicao(true)
     setTabelaEstoqueRotatividade(false)
