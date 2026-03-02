@@ -12,6 +12,7 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { ActionDetalharVoucherModal } from "./ActionDetalhar/actionDetalharVoucherModal";
+import Swal from "sweetalert2";
 
 export const ActionListaVouchersResumido = ({dadosVoucher}) => {
   const [dadosDetalheVoucher, setDadosDetalheVoucher] = useState([])
@@ -168,13 +169,11 @@ export const ActionListaVouchersResumido = ({dadosVoucher}) => {
     {
       header: 'Detalhar',
       button: true,
-
       body: (row) => (
         <div className="d-flex "
           style={{ justifyContent: "space-between" }}
         >
-          <div>
-            
+          <div> 
           <ButtonTable
               titleButton={"Detalhar Produtos do Voucher"}
               onClickButton={() => handleClickDetalhar(row)}
@@ -188,10 +187,7 @@ export const ActionListaVouchersResumido = ({dadosVoucher}) => {
         </div>
       ),
     }
-
   ]
-
-
  
   const handleClickDetalhar = async (row) => {
     if (row.IDVOUCHER) {
@@ -202,9 +198,20 @@ export const ActionListaVouchersResumido = ({dadosVoucher}) => {
   const handleDetalhar = async (IDVOUCHER) => {
     try {
       const response = await get(`/detalheProdutoVoucher?idVoucher=${IDVOUCHER}`)
-      if (response.data) {
+      if (response.data && response.data.length > 0) {
         setDadosDetalheVoucher(response.data)
         setModalDetalhe(true)
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Nenhum detalhe encontrado',
+          html: `Não foram encontrados detalhes para o voucher selecionado.`,
+          timer: 3000,
+          customClass: {
+            container: 'custom-swal',
+          },
+        })
+        return;
       }
       return response.data
     } catch (error) {
@@ -279,5 +286,3 @@ export const ActionListaVouchersResumido = ({dadosVoucher}) => {
     </Fragment>
   )
 }
-
-

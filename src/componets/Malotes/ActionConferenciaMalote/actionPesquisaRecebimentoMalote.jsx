@@ -11,16 +11,12 @@ import { ButtonType } from "../../Buttons/ButtonType"
 import { getDataAtual } from "../../../utils/dataAtual"
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../utils/animationCarregamento"
 
-export const ActionPesquisaRecebimentoMalote = ({ usuarioLogado }) => {
+export const ActionPesquisaRecebimentoMalote = ({ usuarioLogado, ID }) => {
     const [dataPesquisaInicio, setDataPesquisaInicio] = useState("");
     const [dataPesquisaFim, setDataPesquisaFim] = useState("");
     const [empresaSelecionada, setEmpresaSelecionada] = useState("");
     const [tabelaVisivel, setTabelaVisivel] = useState(false);
-    const [isQuery, setIsQuery] = useState(false);
     const [statusSelecionado, setStatusSelecionado] = useState("");
-    const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize, setPageSize] = useState(500);
-    const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
     useEffect(() => {
         const dataInicial = getDataAtual();
@@ -31,20 +27,11 @@ export const ActionPesquisaRecebimentoMalote = ({ usuarioLogado }) => {
     }, [])
 
     const { data: optionsEmpresas = [] } = useFetchData('empresas', '/empresas');
-
-
-    useEffect(() => {
-        const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
-        if (menuSalvo) {
-            const menuParsed = JSON.parse(menuSalvo);
-            setMenuFilhoAtual(menuParsed);
-        }
-    }, []);
     
     const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
-        ['menus-usuario-excecao', menuFilhoAtual?.ID],
+        ['menus-usuario-excecao', ID],
         async () => {
-            const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
+            const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${ID}`);
             
             return response.data;
         },
@@ -85,13 +72,11 @@ export const ActionPesquisaRecebimentoMalote = ({ usuarioLogado }) => {
     };
 
      const {  data: dadosMalotes = [], error: errorMalotes, isLoading: isLoadingMalotes, refetch: refetchLista  } = useQuery(
-    ['malotes-loja', empresaSelecionada, statusSelecionado, dataPesquisaInicio, dataPesquisaFim, currentPage, pageSize],
+    ['malotes-loja'],
     () => fetchListaMalotes(),
-    { enabled: Boolean(isQuery), cacheTime: 5 * 60 * 1000, staleTime: 5 * 60 * 1000, }
+    { enabled: false, cacheTime: 60 * 60 * 1000, staleTime: 60 * 60 * 1000, }
   );
     const handleClick = () => {
-        setCurrentPage(prevPage => prevPage + 1);
-        setIsQuery(true);
         setTabelaVisivel(true);
         refetchLista();
     }

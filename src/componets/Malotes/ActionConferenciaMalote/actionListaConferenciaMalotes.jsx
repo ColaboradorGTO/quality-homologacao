@@ -316,7 +316,7 @@ export const ActionListaConferenciaMalotes = ({ dadosMalotes, handleClick, optio
         Swal.fire({
           icon: 'error',
           title: 'Acesso Negado',
-          text: 'Você não tem permissão para realizar esta ação.',
+          html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para realizar esta ação.`,
           confirmButtonText: 'OK',
           timer: 3000,
         });

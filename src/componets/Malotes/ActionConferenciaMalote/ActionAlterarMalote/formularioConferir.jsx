@@ -10,12 +10,9 @@ import { ButtonTypeModal } from '../../../Buttons/ButtonTypeModal';
 
 export const FormularioConferirMalote = ({ dadosConferirMalote, dadosPendenciasMalotes, handleClose }) => {
   const [historicoSelecionado, setHistoricoSelecionado] = useState('');
-  const [imprimir, setImprimir] = useState(false);
   const { data: optionsHistoricos = [] } = useFetchData('historicos-malotes', '/historicos-malotes');
   const [salvarDadosMalotes, setSalvarDadosMalotes] = useState([dadosConferirMalote[0]]);
   const [checkedItems, setCheckedItems] = useState([]); 
-  const [conferencia, setModuloConferencia] = useState('Conferência');
-  const [devolucao, setStatusMalote] = useState('Devolução');
   const dataTableRef = useRef();
   const {
     observacaoFinanceiro,
@@ -25,7 +22,6 @@ export const FormularioConferirMalote = ({ dadosConferirMalote, dadosPendenciasM
     onSalvarMalote
   } = useConferirMalote({ salvarDadosMalotes, checkedItems});
   
-  // console.log(dadosConferirMalote, 'dadosConferirMalote')
   const handlePrint = useReactToPrint({
     content: () => dataTableRef.current,
     documentTitle: 'Detalhes do Malote',
@@ -234,11 +230,15 @@ export const FormularioConferirMalote = ({ dadosConferirMalote, dadosPendenciasM
           textButtonFechar={"Finalizar"}
           onClickButtonFechar={() => onSalvarMalote('Conferência')}
           corFechar="success"
+          loadingTextFechar={"Finalizando..."}
+          autoLoadingFechar={true}
           
           ButtonTypeConfirmar={ButtonTypeModal}
           textButtonConfirmar={"Devolver"}
           onClickButtonConfirmar={() => onSalvarMalote('Devolução')}
           corConfirmar="danger"
+          loadingTextConfirmar={"Devolvendo..."}
+          autoLoadingConfirmar={true}
 
           ButtonTypeCancelar={ButtonTypeModal}
           textButtonCancelar={"Fechar"}
