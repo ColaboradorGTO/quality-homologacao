@@ -19,24 +19,24 @@ export const useEditarStatusVoucher = ({
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
-            usuarioIP = ipWhoisData?.ip;
+        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+        usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP via ipwho.is:", error);
+        console.error("Erro ao buscar IP via ifconfig.me:", error);
         }
 
         if (!usuarioIP) {
-            try {
+        try {
             const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
             usuarioIP = ipifyData?.ip;
-            } catch (error) {
+        } catch (error) {
             console.error("Erro ao buscar IP via ipify.org:", error);
-            }
+        }
         }
         setIpUsuario(usuarioIP);
         return usuarioIP;
     };
-    
+
     useEffect(() => {
         setStatusSelecionado(dadosEditarVoucher[0]?.voucher.STSTATUS)
         setTrocaSelecionado(dadosEditarVoucher[0]?.voucher.STTIPOTROCA)
@@ -104,7 +104,7 @@ export const useEditarStatusVoucher = ({
         if (formValues) {
             setIsLoggedIn(true);
             setUsuarioAutorizado(formValues);
-            // await onSubmit();
+            await onSubmit();
         }
 
     }
@@ -184,7 +184,7 @@ export const useEditarStatusVoucher = ({
                 IDFUNCIONARIO: String(usuarioLogado?.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'IP não disponível'
             }
 
             await post('/log-web', postData)
@@ -222,7 +222,7 @@ export const useEditarStatusVoucher = ({
                 IDFUNCIONARIO: String(usuarioLogado?.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'IP não disponível'
             }
 
             const response = await post('/log-web', postData)

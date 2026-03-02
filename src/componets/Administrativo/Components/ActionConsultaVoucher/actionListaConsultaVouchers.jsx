@@ -551,10 +551,18 @@ export const ActionListaConsultaVouchers = ({dadosVoucher, usuarioLogado, option
   const handleDetalhar = async (IDVOUCHER) => {
     try {
       const response = await get(`/detalhesVouchersId?idVoucher=${IDVOUCHER}`);
-      if (response.data) {
+      if (response.data && response.data.length > 0) {
         setDadosDetalheVoucher(response.data);
         setModalDetalhe(true)
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: 'Não foi possível obter os detalhes do voucher.',
+          timer: 3000,
+        });
       }
+      return;
     } catch (error) {
       console.log(error, "não foi possível pegar os dados da tabela");
     }
@@ -571,24 +579,30 @@ export const ActionListaConsultaVouchers = ({dadosVoucher, usuarioLogado, option
       if (response.data && response.data.length > 0) {
         setDadosEditarVoucher(response.data);
         setModalEditarVoucher(true);
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: 'Não foi possível obter os detalhes do voucher para edição.',
+          timer: 3000,
+        });
+        return;
       }
     } catch (error) {
       console.error('Erro ao buscar detalhes da venda: ', error);
     }
   };
 
-  // console.log(optionsModulos[0], 'optionsModulos[0]')
   const handleClickEditar = async (row) => {
     if(optionsModulos[0]?.ALTERAR == 'True'){
-      if (row.IDVOUCHER) {
-       
+      if (row.IDVOUCHER) {       
         openSwal(() =>  handleEdit(row.IDVOUCHER), row)
       }
     } else {
       Swal.fire({
         icon: 'error',
         title: 'Acesso Negado',
-        text: 'Você não tem permissão para editar o voucher.',
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para editar o voucher.`,
         timer: 5000,
       });
     }  
@@ -600,6 +614,14 @@ export const ActionListaConsultaVouchers = ({dadosVoucher, usuarioLogado, option
       if (response.data && response.data.length > 0) {
         setDadosImprimirVoucher(response.data);
         setModalImprimirVoucher(true);
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: 'Não foi possível obter os detalhes do voucher para impressão.',
+          timer: 3000,
+        });
+        return;
       }
     } catch (error) {
       console.error('Erro ao buscar detalhes da venda: ', error);
@@ -615,7 +637,7 @@ export const ActionListaConsultaVouchers = ({dadosVoucher, usuarioLogado, option
       Swal.fire({
         icon: 'error',
         title: 'Acesso Negado',
-        text: 'Você não tem permissão para editar o voucher.',
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para imprimir o voucher.`,
         timer: 3000,
       });
     }  

@@ -22,7 +22,6 @@ export const ActionPesquisaVendasVouchers = () => {
   const [cpfNumeroVenda, setCPFNumeroVenda] = useState('');
   const [empresaSelecionada, setEmpresaSelecionada] = useState('');
   const [marcaSelecionada, setMarcaSelecionada] = useState('')
-  const [currentPage, setCurrentPage] = useState(1);
   const [btnVisivel, setBtnVisivel] = useState(false);
 
   useEffect(() => {
@@ -40,25 +39,18 @@ export const ActionPesquisaVendasVouchers = () => {
       const response = await get(`/marcasLista`);
       return response.data;
     },
-    {enabled: true, staleTime: 5 * 60 * 1000, cacheTime: 30 * 60 * 1000  }
+    {enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 30 * 60 * 1000  }
   );
   
   const { data: optionsEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas } = useQuery(
-    'listaEmpresaComercial',
+    ['listaEmpresaComercial', marcaSelecionada],
     async () => {
       const response = await get(`/listaEmpresaComercial?idMarca=${marcaSelecionada}`);
       
       return response.data;
     },
-    {enabled: false, staleTime: 5 * 60 * 1000, cacheTime: 30 * 60 * 1000 }
+    {enabled: Boolean(marcaSelecionada), staleTime: 60 * 60 * 1000, cacheTime: 30 * 60 * 1000 }
   );
-
-  useEffect(() => {
-    if (marcaSelecionada) {
-      refetchEmpresas();
-    }
-    refetchMarcas()
-  }, [marcaSelecionada, refetchEmpresas]);
 
 
   const fetchListaVendasVendedor = async ( ) => {
@@ -94,12 +86,11 @@ export const ActionPesquisaVendasVouchers = () => {
       fecharAnimacaoCarregamento();
     }
   };
-   
 
   const { data: dadosVendasClientes = [], error: errorVendasVendedor, isLoading: isLoadingVendasVendedor, refetch: refetchListaVendasVendedor } = useQuery(
     ['lista-venda-cliente', ],
     () => fetchListaVendasVendedor(),
-    { enabled: false, staleTime: 5 * 60 * 1000, cacheTime: 30 * 60 * 1000 }
+    { enabled: false, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
   )
 
   const handleSelectGrupo = (e) => {
@@ -111,7 +102,6 @@ export const ActionPesquisaVendasVouchers = () => {
   }
 
   const handleClick = () => {
-    setCurrentPage(prevPage => prevPage + 1)
     refetchListaVendasVendedor()  
     // setTabelaVisivel(true)
     setTabelaPrincipal(true)
@@ -131,7 +121,6 @@ export const ActionPesquisaVendasVouchers = () => {
         linkComponentAnterior={["Home"]}
         linkComponent={["Vendas"]}
         title="Vendas - Vouchers"
-
 
         InputFieldDTInicioComponent={InputField}
         valueInputFieldDTInicio={dataPesquisaInicio}
@@ -214,7 +203,6 @@ export const ActionPesquisaVendasVouchers = () => {
 
       />
     
-      
     </Fragment>
   )
 }

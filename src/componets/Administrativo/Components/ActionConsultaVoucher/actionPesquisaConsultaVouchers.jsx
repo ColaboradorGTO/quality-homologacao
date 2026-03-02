@@ -53,9 +53,8 @@ export const ActionPesquisaConsultaVouchers = ({usuarioLogado}) => {
       const response = await get(`/marcasLista`);
       return response.data;
     },
-    { enabled: true, staleTime: 5 * 60 * 1000 }
+    { enabled: true, staleTime: 60 * 60 * 1000 }
   );
-
 
   const { data: optionsEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas } = useQuery(
     'listaEmpresaComercial',
@@ -64,16 +63,8 @@ export const ActionPesquisaConsultaVouchers = ({usuarioLogado}) => {
 
       return response.data;
     },
-    { enabled: false, staleTime: 5 * 60 * 1000, }
+    { enabled: Boolean(marcaSelecionada), staleTime: 60 * 60 * 1000, }
   );
-  
-  useEffect(() => {
-    if (marcaSelecionada) {
-      refetchEmpresas();
-    }
-  }, [marcaSelecionada, refetchEmpresas]);
-
-
   
   const fetchListaVouchers = async () => {                                          
     const urlBase = `/voucher-completo?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idSubGrupoEmpresa=${marcaSelecionada}&idEmpresa=${empresaSelecionada}`;
