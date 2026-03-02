@@ -9,6 +9,7 @@ import { AiOutlineSearch } from "react-icons/ai";
 import { ActionListaVendasContigencia } from "./actionListaVendasContigencia";
 import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
+import { optionsUF } from "../../../../../parceiro.json";
 
 export const ActionPesquisaVendasContigencia = ({ usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
@@ -18,7 +19,6 @@ export const ActionPesquisaVendasContigencia = ({ usuarioLogado }) => {
   const [empresaSelecionada, setEmpresaSelecionada] = useState('0')
   const [ufSelecionado, setUfSelecionado] = useState('');
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
-
 
   useEffect(() => {
     const dataInicio = getDataAtual();
@@ -51,7 +51,7 @@ export const ActionPesquisaVendasContigencia = ({ usuarioLogado }) => {
       const response = await get(`/marcasLista`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000, }
+    { staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000, }
   );
  
   const { data: optionsEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas } = useQuery(
@@ -61,9 +61,8 @@ export const ActionPesquisaVendasContigencia = ({ usuarioLogado }) => {
       
       return response.data;
     },
-    {enabled: Boolean(marcaSelecionada), staleTime: 5 * 60 * 1000, cacheTime: 60 * 60 * 1000,}
+    {enabled: Boolean(marcaSelecionada), staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000,}
   );
-
 
   const fetchVendasAtivasContigencia  = async () => {
     const urlBase = `venda-ativa?idGrupo=${marcaSelecionada}&idEmpresa=${empresaSelecionada}&ufVenda=${ufSelecionado}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&statusContingencia=True&statusCancelado=False`;
@@ -101,7 +100,7 @@ export const ActionPesquisaVendasContigencia = ({ usuarioLogado }) => {
   const { data: dadosVendasAtivasContigencia = [], error: errorVendasAtivasContigencia, isLoading: isLoadingVendasAtivasContigencia, refetch: refetchVendasAtivasContigencia} = useQuery(
     ['venda-ativa',],
     () => fetchVendasAtivasContigencia(),
-    { enabled: false, staleTime: 5 * 60 * 1000, }
+    { enabled: false, staleTime: 60 * 60 * 1000, }
   );
 
   const handleSelectEmpresa = (e) => {
@@ -117,16 +116,10 @@ export const ActionPesquisaVendasContigencia = ({ usuarioLogado }) => {
     setTabelaVisivel(true);
   };
 
-  const optionsUF = [ 
-    { id: 1, value: '', label: 'Todos' },
-    { id: 2, value: 'DF', label: 'DF' },
-    { id: 3, value: 'GO', label: 'GO' },
-  ]
 
   return (
 
     <Fragment>
-
       <ActionMain
         linkComponentAnterior={["Home"]}
         linkComponent={["Vendas Contingência por Loja e Período"]}
@@ -178,7 +171,6 @@ export const ActionPesquisaVendasContigencia = ({ usuarioLogado }) => {
         onButtonClickSearch={handleClick}
         corSearch={"primary"}
         IconSearch={AiOutlineSearch}
-
 
       />
 

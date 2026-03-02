@@ -372,9 +372,17 @@ export const ActionListaVendasCanceladasEmitidaPDV = ({
   const handleEditProduto = async (IDVENDA) => {
     try {
       const response = await get(`/detalhe-venda?idEmpresa=0&idVenda=${IDVENDA}`)
-      if (response.data) {
+      if (response.data && response.data.length > 0) {
         setDadosProdutoModal(response.data)
         setModalProdutoVisivel(true)
+      } else {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Atenção',
+          text: 'Nenhum dado encontrado para esta venda.',
+          timer: 5000,
+        })
+        return;
       }
     } catch (error) {
       console.log(error, "não foi possivel pegar os dados da tabela ")
@@ -462,9 +470,18 @@ export const ActionListaVendasCanceladasEmitidaPDV = ({
   const handleDetalharVendaXML = async (IDVENDA) => {
     try {
       const response = await get(`/venda-xml?idVenda=${IDVENDA}`);
-      setModalXmlVisivel(true);
-      setDadosVendasXML(response.data)
-
+      if(response.data && response.data.length > 0) {
+        setModalXmlVisivel(true);
+        setDadosVendasXML(response.data)
+      } else {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Atenção',
+          text: 'Nenhum XML encontrado para esta venda.',
+          timer: 5000,
+        })
+        return;
+      }
     } catch (error) {
       console.error(error);
     }
@@ -565,4 +582,3 @@ export const ActionListaVendasCanceladasEmitidaPDV = ({
     </Fragment>
   )
 }
-

@@ -225,8 +225,18 @@ export const ActionListaVendasDescontoFuncionario = ({dadosVendasConvenio, usuar
   const handleEditPagamento = async (IDVENDA) => {
     try {
       const response = await get(`/recebimento?idVenda=${IDVENDA}`)    
-      setDadosDetalheRecebimentos(response.data)
-      setModalPagamentoVisivel(true)
+      if(response.data && response.data.length > 0) {
+        setDadosDetalheRecebimentos(response.data)
+        setModalPagamentoVisivel(true)
+
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Nenhum recebimento encontrado',
+          confirmButtonText: 'Ok',
+        })
+        return;
+      }
     
       return response.data;
     } catch (error) {
