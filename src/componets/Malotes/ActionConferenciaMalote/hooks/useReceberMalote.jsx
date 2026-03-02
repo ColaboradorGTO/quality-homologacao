@@ -86,7 +86,7 @@ export const useReceberMalote = ({ usuarioLogado, optionsModulos, refetchLista }
             IDFUNCIONARIO: String(usuarioLogado.id),
             PATHFUNCAO: textoFuncao,
             DADOS: textDados,
-            IP: ipUsuario,
+            IP: ipUsuario || 'IP não disponível',
           };
 
           await post('/log-web', createData)
@@ -113,7 +113,7 @@ export const useReceberMalote = ({ usuarioLogado, optionsModulos, refetchLista }
             IDFUNCIONARIO: String(usuarioLogado.id),
             PATHFUNCAO: textoFuncao,
             DADOS: textDados,
-            IP: ipUsuario,
+            IP: ipUsuario || 'IP não disponível',
           };
 
           const responsePost = await post('/log-web', createData);

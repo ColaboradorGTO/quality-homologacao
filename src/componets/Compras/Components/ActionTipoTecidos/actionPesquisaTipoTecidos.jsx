@@ -11,24 +11,32 @@ import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
 import { ActionCriarTipoTecidosModal } from "./ActionCadastrar/actionCriarTipoTecidosModal";
 import Swal from "sweetalert2";
+import { useEffect } from "react";
 
 
-export const ActionPesquisaTiposTecidos = ({ usuarioLogado, ID }) => {
+export const ActionPesquisaTiposTecidos = ({ usuarioLogado}) => {
   const [descricao, setDescricao] = useState('');
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [modalVisivel, setModalVisivel] = useState(false);
   const [tecidoSelecionado, setTecidoSelecionado] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(1000);
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
+  useEffect(() => {
+    const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
+    if (menuSalvo) {
+      const menuParsed = JSON.parse(menuSalvo);
+      setMenuFilhoAtual(menuParsed);
+    }
+  }, []);
+  
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
-    'menus-usuario-excecao',
+    ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
-      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${ID}`);
-
+      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
+      
       return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
   );
 
   const fetchListaTecidos = async () => {
@@ -65,8 +73,8 @@ export const ActionPesquisaTiposTecidos = ({ usuarioLogado, ID }) => {
   };
 
   const { data: dadosTecidos = [], error: errorAdiantamento, isLoading: isLoadingAdiantamento, refetch } = useQuery(
-    ['tipoTecidos', tecidoSelecionado, descricao, currentPage, pageSize],
-    () => fetchListaTecidos(tecidoSelecionado, descricao, currentPage, pageSize),
+    ['tipoTecidos',],
+    () => fetchListaTecidos(),
     { enabled: true }
   )
 
@@ -82,14 +90,19 @@ export const ActionPesquisaTiposTecidos = ({ usuarioLogado, ID }) => {
       Swal.fire({
         icon: 'error',
         title: 'Atenção',
-        text: `${usuarioLogado?.NOFUNCIONARIO} Você não tem permissão para cadastrar um novo tipo de tecido.`,
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para cadastrar um novo tipo de tecido.`,
+        timer: 5000,
+        customClass: {
+          container: 'custom-swal',
+        },
+        showConfirmButton: false,
       });
       return;
     }
   }
 
-  const handlePesquisar = () => {
-    setCurrentPage(prevPage => prevPage + 1)
+  const handleClick = () => {
+
     refetch()
     setTabelaVisivel(true)
   }
@@ -125,7 +138,7 @@ export const ActionPesquisaTiposTecidos = ({ usuarioLogado, ID }) => {
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar Tipos de Tecidos"}
-        onButtonClickSearch={handlePesquisar}
+        onButtonClickSearch={handleClick}
         IconSearch={AiOutlineSearch}
         corSearch={"primary"}
 

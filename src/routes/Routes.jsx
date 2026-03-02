@@ -14,15 +14,16 @@ const DashBoardComercial = lazy(() => import("../pages/DashBoardComercial").then
 const DashBoardInformatica = lazy(() => import("../pages/DashBoardInformatica").then(module => ({ default: module.DashBoardInformatica })));
 const ModuloTeste = lazy(() => import("../pages/ModuloTeste").then(module => ({ default: module.ModuloTeste })));
 const Permissoes = lazy(() => import("../pages/Permissoes").then(module => ({ default: module.Permissoes })));
+const DashBoardContabilidade = lazy(() => import("../pages/DashBoardContabilidade").then(module => ({ default: module.DashBoardContabilidade })));
+const DashBoardMarketing = lazy(() => import("../pages/DashBoardMarketing").then(module => ({ default: module.DashBoardMarketing })));
 
 const DashBoardGerencia = lazy(() => import("../pages/DashBoardGerencia").then(module => ({ default: module.DashBoardGerencia })));
 
-const DashBoardCadastro = lazy(() => import("../pages/DashBoardCadastro").then(module => ({ default: module.DashBoardCadastro })));
 const DashBoardCompras = lazy(() => import("../pages/DashBoardCompras").then(module => ({ default: module.DashBoardCompras })));
+
+const DashBoardCadastro = lazy(() => import("../pages/DashBoardCadastro").then(module => ({ default: module.DashBoardCadastro })));
 const DashBoardConferenciaCega = lazy(() => import("../pages/DashBoardConferenciaCega").then(module => ({ default: module.DashBoardConferenciaCega })));
-const DashBoardContabilidade = lazy(() => import("../pages/DashBoardContabilidade").then(module => ({ default: module.DashBoardContabilidade })));
 const DashBoardExpedicao = lazy(() => import("../pages/DashBoardExpedicao").then(module => ({ default: module.DashBoardExpedicao })));
-const DashBoardMarketing = lazy(() => import("../pages/DashBoardMarketing").then(module => ({ default: module.DashBoardMarketing })));
 const DashBoardComprasDM = lazy(() => import("../pages/DashBoardComprasDm").then(module => ({ default: module.DashBoardComprasDM })));
 const DashBoardEtiquetagem = lazy(() => import("../pages/DashBoardEtiquetagem").then(module => ({ default: module.DashBoardEtiquetagem })));
 const DashBoardMenus = lazy(() => import("../pages/DashBoardMenus").then(module => ({ default: module.DashBoardMenus })));
