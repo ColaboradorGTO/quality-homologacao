@@ -7,13 +7,13 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../../Tables/headerTable";
-import { dataFormatada } from "../../../../utils/dataFormatada";
-
 
 export const ActionListaTransacoesLojas = ({ dadosTransacoesEmpresas, dataPesquisa }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
-  const dataTableRef = useRef();
+  const [rowSelection, setRowSelection] = useState(null);
   const [size, setSize] = useState('small')
+  const dataTableRef = useRef();
+
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
   };
@@ -39,14 +39,14 @@ export const ActionListaTransacoesLojas = ({ dadosTransacoesEmpresas, dataPesqui
     const workbook = XLSX.utils.book_new();
     const header = ['Data', 'Loja', 'Autorizador', 'Tipo Pagamento', 'QTD Cupons', 'Valor'];
     worksheet['!cols'] = [
-      { wpx: 100, caption: 'Data' }, 
+      { wpx: 100, caption: 'Data' },
       { wpx: 200, caption: 'Loja' },
       { wpx: 100, caption: 'Autorizador' },
       { wpx: 180, caption: 'Tipo Pagamento' },
       { wpx: 100, caption: 'QTD Cupons' },
       { wpx: 100, caption: 'Valor' }
-      
-    ]; 
+
+    ];
     XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Lista de Transações Por Loja');
     XLSX.writeFile(workbook, 'transacoes_loja.xlsx');
@@ -69,9 +69,9 @@ export const ActionListaTransacoesLojas = ({ dadosTransacoesEmpresas, dataPesqui
   }
 
   const dados = Array.isArray(dadosTransacoesEmpresas) ? dadosTransacoesEmpresas.map((item, index) => {
-  
+
     return {
-     
+
       dataPesquisa: dataPesquisa,
       NOFANTASIA: item.NOFANTASIA,
       NOAUTORIZADOR: item.NOAUTORIZADOR,
@@ -79,7 +79,7 @@ export const ActionListaTransacoesLojas = ({ dadosTransacoesEmpresas, dataPesqui
       QTDE: parseFloat(item.QTDE),
       VALORRECEBIDO: formatMoeda(item.VALORRECEBIDO),
     }
-  }): [];
+  }) : [];
 
   const colunasTransacoes = [
     {
@@ -127,9 +127,6 @@ export const ActionListaTransacoesLojas = ({ dadosTransacoesEmpresas, dataPesqui
     },
   ]
 
- 
-
-
   return (
     <Fragment>
 
@@ -159,6 +156,8 @@ export const ActionListaTransacoesLojas = ({ dadosTransacoesEmpresas, dataPesqui
             sortOrder={-1}
             paginator={true}
             rows={10}
+            selectionMode={"single"}
+            selection={rowSelection}
             rowsPerPageOptions={[5, 10, 20, 50, 100, dados.length]}
             showGridlines
             stripedRows

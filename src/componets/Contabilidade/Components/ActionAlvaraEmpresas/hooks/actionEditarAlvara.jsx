@@ -2,11 +2,18 @@ import { useState } from "react"
 import { get, post, put } from "../../../../../api/funcRequest";
 import Swal from "sweetalert2";
 import axios from "axios";
-import { removerFormatacaoMoeda } from "../../../../../utils/formatMoeda";
 import { useEffect } from "react";
 import { useQuery } from "react-query";
 
-export const useEditarAlvara = ({ handleClose, dadosAlvaraSelecionado, usuarioLogado, optionsModulos, refetchAlvaraEmpresa }) => {
+export const useEditarAlvara = ({
+    handleClose,
+    dadosAlvaraSelecionado,
+    usuarioLogado,
+    optionsModulos,
+    refetchAlvaraEmpresa,
+    refetchAlvaraSelecionado,
+    refetchVinculoAlvara
+}) => {
     const [arquivoAlvara, setArquivoAlvara] = useState([])
     const [descricaoDetalheAndamento, setDescricaoDetalheAndamento] = useState('')
     const [dataFimCompetencia, setDataFimCompetencia] = useState('')
@@ -20,7 +27,7 @@ export const useEditarAlvara = ({ handleClose, dadosAlvaraSelecionado, usuarioLo
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
             usuarioIP = ipWhoisData?.ip;
         } catch (error) {
             console.error("Erro ao buscar IP via ipwho.is:", error);
@@ -37,21 +44,18 @@ export const useEditarAlvara = ({ handleClose, dadosAlvaraSelecionado, usuarioLo
         setIpUsuario(usuarioIP);
         return usuarioIP;
     };
-
     const { data: optionsStatusAlvara = [], error: errorStatus, isLoading: isLoadingStatus, refetch: refetchStatus } = useQuery(
         'options-status-alvara',
         async () => {
             const response = await get(`/status-alvara`);
-            console.log(response, 'response.data status alvara')
             return response.data;
         },
         { enabled: true, staleTime: 60 * 60 * 1000, }
     );
 
-    //  console.log(optionsStatusAlvara , 'optionsStatusAlvara')
 
     useEffect(() => {
-        setStatusAlvara({ value: dadosAlvaraSelecionado?.[0]?.STATIVO == 'True' || "False", label: dadosAlvaraSelecionado?.[0]?.STATIVO == 'True' ? 'Ativo' : 'Inativo' })
+        setStatusAlvara({ value: dadosAlvaraSelecionado?.[0]?.STATIVO, label: dadosAlvaraSelecionado?.[0]?.STATIVO == 'True' ? 'Ativo' : 'Inativo' })
         setDataIncioCompetencia(dadosAlvaraSelecionado?.[0]?.DTINICIOCOMPETENCIAALVARA)
         setDataFimCompetencia(dadosAlvaraSelecionado?.[0]?.DTFIMCOMPETENCIAALVARA)
         setStatusAndamento({ value: dadosAlvaraSelecionado?.[0]?.IDSTATUS, label: dadosAlvaraSelecionado?.[0]?.DESCRICAOSTATUS })
@@ -66,10 +70,7 @@ export const useEditarAlvara = ({ handleClose, dadosAlvaraSelecionado, usuarioLo
         { value: 'False', label: 'Inativo' },
     ];
 
-    //console.log(IDSTATUSANDAMENTO, 'arquivoAlvara')
-    console.log(dadosAlvaraSelecionado, 'dadosAlvaraSelecionado hook')
-
-    const onSubmit = async (data) => {
+    const onSubmit = async () => {
         if (optionsModulos[0]?.ALTERAR !== 'True') {
             Swal.fire({
                 title: 'Acesso Negado',
@@ -95,7 +96,6 @@ export const useEditarAlvara = ({ handleClose, dadosAlvaraSelecionado, usuarioLo
             customClass: {
                 container: 'custom-swal',
             },
-
         });
 
         if (!confirmacao.isConfirmed) return;
@@ -111,7 +111,6 @@ export const useEditarAlvara = ({ handleClose, dadosAlvaraSelecionado, usuarioLo
             IDFUNCIONARIO: Number(usuarioLogado.id),
             ARQUIVOSALVARA: [],
         }
-
         try {
             const response = await put('/vinculoAlvarasEmpresa/:id', putData)
 
@@ -137,8 +136,12 @@ export const useEditarAlvara = ({ handleClose, dadosAlvaraSelecionado, usuarioLo
                     container: 'custom-swal',
                 }
             });
-            handleClose()
-            refetchAlvaraEmpresa()
+
+            refetchAlvaraSelecionado();
+            refetchAlvaraEmpresa();
+            refetchVinculoAlvara();
+            handleClose();
+
             return response.data;
         } catch (error) {
 
@@ -187,5 +190,4 @@ export const useEditarAlvara = ({ handleClose, dadosAlvaraSelecionado, usuarioLo
         setMetragemLoja,
         onSubmit
     }
-
 }

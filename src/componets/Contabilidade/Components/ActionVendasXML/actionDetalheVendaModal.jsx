@@ -16,6 +16,7 @@ import { toFloat } from "../../../../utils/toFloat";
 
 export const ActionDetalheVendaModal = ({ show, handleClose, dadosDetalheVendas, dadosDetalhePagamento }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [rowSelection, setRowSelection] = useState();
   const dataTableRef = useRef();
   const [size, setSize] = useState('small')
 
@@ -118,9 +119,6 @@ export const ActionDetalheVendaModal = ({ show, handleClose, dadosDetalheVendas,
       QTD: item.QTD,
       VUNCOM: item.VUNCOM,
       VRTOTALLIQUIDO: item.VRTOTALLIQUIDO,
-
-
-
     }
   });
 
@@ -238,9 +236,7 @@ export const ActionDetalheVendaModal = ({ show, handleClose, dadosDetalheVendas,
   ]
 
   return (
-
     <Fragment>
-
       <div className="row">
         <Modal
           show={show}
@@ -285,6 +281,8 @@ export const ActionDetalheVendaModal = ({ show, handleClose, dadosDetalheVendas,
                   sortOrder={-1}
                   paginator={true}
                   rows={10}
+                  selectionMode="single"
+                  selection={rowSelection}
                   // rowsPerPageOptions={[5, 10, 20, 50]}
                   showGridlines
                   stripedRows
@@ -335,6 +333,8 @@ export const ActionDetalheVendaModal = ({ show, handleClose, dadosDetalheVendas,
                   sortOrder={-1}
                   paginator={true}
                   rows={10}
+                  selectionMode="single"
+                  selection={rowSelection}
                   // rowsPerPageOptions={[5, 10, 20, 50]}
                   showGridlines
                   stripedRows
@@ -361,8 +361,6 @@ export const ActionDetalheVendaModal = ({ show, handleClose, dadosDetalheVendas,
           </Modal.Body>
 
           <FooterModal
- 
-
             ButtonTypeFechar={ButtonTypeModal}
             textButtonFechar={"Fechar"}
             onClickButtonFechar={handleClose}

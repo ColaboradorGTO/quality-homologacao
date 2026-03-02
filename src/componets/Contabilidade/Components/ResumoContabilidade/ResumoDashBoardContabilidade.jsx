@@ -28,15 +28,14 @@ export const ResumoDashBoardContabilidade = () => {
 
   }, [])
 
-
-  const { data: dadosResumoVendas = [],  refetch: refetchResumoVendas } = useQuery(
+  const { data: dadosResumoVendas = [], refetch: refetchResumoVendas } = useQuery(
     'venda-total',
     async () => {
-      const response = await get(`/venda-total?dataPesquisa=${dataPesquisa}`);   
+      const response = await get(`/venda-total?dataPesquisa=${dataPesquisa}`);
       return response.data;
     },
     {
-      enabled: Boolean(dataPesquisa), staleTime: 5 * 60 * 1000, 
+      enabled: Boolean(dataPesquisa), staleTime: 60 * 60 * 1000,
     }
   );
 
@@ -53,17 +52,17 @@ export const ResumoDashBoardContabilidade = () => {
 
     return (
       (toFloat(item.VALORTOTALDINHEIRO) +
-      toFloat(item.VALORTOTALCARTAO) +
-      toFloat(item.VALORTOTALCONVENIO) +
-      toFloat(item.VALORTOTALPOS) +
-      toFloat(item.VALORTOTALFATURA)) - 
+        toFloat(item.VALORTOTALCARTAO) +
+        toFloat(item.VALORTOTALCONVENIO) +
+        toFloat(item.VALORTOTALPOS) +
+        toFloat(item.VALORTOTALFATURA)) -
       toFloat(item.VALORTOTALDESPESA)
     );
   }
 
   const dadosVendasResumo = Array.isArray(dadosResumoVendas) ? dadosResumoVendas.map((item, index) => {
     let contador = index + 1;
-    const totalDespesasAdiantamento = calcularTotalDespesasAdiantamento(item) ;
+    const totalDespesasAdiantamento = calcularTotalDespesasAdiantamento(item);
     const totalRealizado = calcularTotalRealizado(item);
     return {
       VALORTOTALADIANTAMENTOSALARIAL: parseFloat(item.VALORTOTALADIANTAMENTOSALARIAL),
@@ -78,7 +77,7 @@ export const ResumoDashBoardContabilidade = () => {
       totalRealizado: toFloat(totalRealizado),
       contador
     }
-  }): [];
+  }) : [];
 
 
   const { data: dadosTotalVendasEmpresa = [], error: erroTotalVendas, isLoading: isLoadingTotalVendas, refetch: refetchTotalVendasEmpresa } = useQuery(
@@ -88,7 +87,7 @@ export const ResumoDashBoardContabilidade = () => {
       return response.data;
     },
     {
-     enabled: Boolean(dataPesquisa), staleTime: 5 * 60 * 1000, 
+      enabled: Boolean(dataPesquisa), staleTime: 60 * 60 * 1000,
     }
   );
 
@@ -99,12 +98,12 @@ export const ResumoDashBoardContabilidade = () => {
       return response.data;
     },
     {
-      enabled: Boolean(dataPesquisa), staleTime: 5 * 60 * 1000, 
+      enabled: Boolean(dataPesquisa), staleTime: 60 * 60 * 1000,
     }
   );
 
 
- 
+
   const handleClick = () => {
     setResumoVisivel(true);
     setIsLoadingPesquisa(true);
@@ -136,56 +135,59 @@ export const ResumoDashBoardContabilidade = () => {
         corSearch={"primary"}
       />
 
-    
-        <Fragment>
 
-          <ResultadoResumo
-            nomeVendas="Dinheiro"
-            valorVendas={formatMoeda(toFloat(dadosVendasResumo[0]?.VALORTOTALDINHEIRO))}
-            cardVendas={true}
-            IconVendas={FaRegMoneyBillAlt}
+      <Fragment>
 
-            nomeCartao="Cartão"
-            valorCartao={formatMoeda(toFloat(dadosVendasResumo[0]?.VALORTOTALCARTAO))}
-            cardCartao={true}
-            IconCartao={MdOutlinePayment}
+        <ResultadoResumo
+          nomeVendas="Dinheiro"
+          valorVendas={formatMoeda(toFloat(dadosVendasResumo[0]?.VALORTOTALDINHEIRO))}
+          cardVendas={true}
+          IconVendas={FaRegMoneyBillAlt}
 
-            nomeCliente="POS"
-            cardCliente={true}
-            numeroCliente={formatMoeda(toFloat(dadosVendasResumo[0]?.VALORTOTALPOS))}
-            IconNumeroCliente={BsGem}
+          nomeCartao="Cartão"
+          valorCartao={formatMoeda(toFloat(dadosVendasResumo[0]?.VALORTOTALCARTAO))}
+          cardCartao={true}
+          IconCartao={MdOutlinePayment}
 
-            nomeTicketMedio="Fatura"
-            valorTicketMedio={formatMoeda(toFloat(dadosVendasResumo[0]?.VALORTOTALFATURA))}
-            cardTicketMedio={true}
-            IconTicketMedio={FaRegLightbulb}
+          nomeCliente="POS"
+          cardCliente={true}
+          numeroCliente={formatMoeda(toFloat(dadosVendasResumo[0]?.VALORTOTALPOS))}
+          IconNumeroCliente={BsGem}
 
-            nomeDespesas="Despesas"
-            valorDespesas={formatMoeda(dadosVendasResumo[0]?.totalDespesasAdiantamento)}
-            cardDespesas={true}
-            IconValorDespesas={FaCashRegister}
+          nomeTicketMedio="Fatura"
+          valorTicketMedio={formatMoeda(toFloat(dadosVendasResumo[0]?.VALORTOTALFATURA))}
+          cardTicketMedio={true}
+          IconTicketMedio={FaRegLightbulb}
 
-            nomeEcommerce="Total Realizado"
-            valorEcommerce={formatMoeda(dadosVendasResumo[0]?.totalRealizado)}
-            cardEcommerce={true}
-            IconValorEcommerce={FaCashRegister}
+          nomeDespesas="Despesas"
+          valorDespesas={formatMoeda(dadosVendasResumo[0]?.totalDespesasAdiantamento)}
+          cardDespesas={true}
+          IconValorDespesas={FaCashRegister}
 
-            // nomeVoucher="Convênio"
-            // valorVoucher={formatMoeda(toFloat(dadosVendasResumo[0]?.VALORTOTALCONVENIO))}
-            // cardVoucher={true}
-            // IconVoucher={BsGem}
+          nomeEcommerce="Total Realizado"
+          valorEcommerce={formatMoeda(dadosVendasResumo[0]?.totalRealizado)}
+          cardEcommerce={true}
+          IconValorEcommerce={FaCashRegister}
 
-            iconSize={100}
-            iconColor="white"
-          />
+          // nomeVoucher="Convênio"
+          // valorVoucher={formatMoeda(toFloat(dadosVendasResumo[0]?.VALORTOTALCONVENIO))}
+          // cardVoucher={true}
+          // IconVoucher={BsGem}
 
-          <ActionListaVendasLojasResumo dadosTotalVendasEmpresa={dadosTotalVendasEmpresa} dataPesquisa={dataPesquisa} />
+          iconSize={100}
+          iconColor="white"
+        />
 
-          {/* <ActionListaTransacoesLojas dadosTransacoesEmpresas={dadosTransacoesEmpresas} dataPesquisa={dataPesquisa} /> */}
-        </Fragment>
-  
+        <ActionListaVendasLojasResumo
+          dadosTotalVendasEmpresa={dadosTotalVendasEmpresa}
+          dataPesquisa={dataPesquisa}
+        />
 
-
+        {/* <ActionListaTransacoesLojas
+         dadosTransacoesEmpresas={dadosTransacoesEmpresas}
+          dataPesquisa={dataPesquisa} />
+           */}
+      </Fragment>
     </Fragment>
   )
 }

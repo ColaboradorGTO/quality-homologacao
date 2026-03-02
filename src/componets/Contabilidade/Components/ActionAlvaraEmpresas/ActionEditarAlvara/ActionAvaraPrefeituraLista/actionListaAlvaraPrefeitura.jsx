@@ -14,15 +14,37 @@ import { FaPlus, FaRegEye } from "react-icons/fa6";
 import { ActionCadastrarAlvaraModal } from "./ActionCadastrarAlvaraModal/actionCadastrarAlvaraModal";
 import { ActionVisualizarDetalhesAlvaraModal } from "./ActionVisualizarAlvaraModal/actionVisualizarDetalhesAlvaraModal";
 import { ActionEditarDetalhesAlvaraModal } from "./ActionEditarAlvaraModal/actionEditarDetalhesAlvaraModal";
+import { formatarDataParaBR } from "../../../../../../utils/dataFormatada";
+import { useQuery } from "react-query";
 
-export const ActionListaAlvaraPrefeitura = ({ dadosAlvaraEmpresaSelecionada, optionsModulos, usuarioLogado, refetchAlvaraEmpresa }) => {
+export const ActionListaAlvaraPrefeitura = ({
+    dadosAlvaraEmpresaSelecionada,
+    optionsModulos,
+    usuarioLogado,
+    refetchAlvaraEmpresa,
+    refetchAlvaraSelecionado
+}) => {
+
     const [globalFilterValue, setGlobalFilterValue] = useState('');
     const [rowSelection, setRowSelection] = useState(null);
     const [modalCadastrarAlvaraEmpresa, setModalCadastrarAlvaraEmpresa] = useState(false);
     const [modalVisualizarAlvaraEmpresa, setModalVisualizarAlvaraEmpresa] = useState(false);
     const [modalEditarAlvaraEmpresa, setModalEditarAlvaraEmpresa] = useState(false);
-    const [dadosAlvaraSelecionado, setDadosAlvaraSelecionado] = useState([]);
+    const [idVinculoAlvara, setIdVinculoAlvara] = useState(null);
     const dataTableRef = useRef();
+
+
+    const { data: dadosAlvaraSelecionado = [], refetch: refetchVinculoAlvara, isLoading: isLoadingVinculoAlvara } = useQuery(
+        ['vinculo-alvara', idVinculoAlvara],
+        async () => {
+            const response = await get(
+                `/vinculo-alvaras-empresa?idFilial=${idVinculoAlvara}`
+            );
+            return response.data;
+        },
+        { enabled: !!idVinculoAlvara }
+    );
+
 
     const onGlobalFilterChange = (e) => {
         setGlobalFilterValue(e.target.value);
@@ -44,7 +66,7 @@ export const ActionListaAlvaraPrefeitura = ({ dadosAlvaraEmpresaSelecionada, opt
                 "Status",
             ]],
             body: (dados || []).map((item) => [
-                item?.IDEMPRESA,
+                item?.CONTADOR,
                 item?.DTINICIOCOMPETENCIAALVARA,
                 item?.DTFIMCOMPETENCIAALVARA,
                 item?.STATIVO,
@@ -69,7 +91,7 @@ export const ActionListaAlvaraPrefeitura = ({ dadosAlvaraEmpresaSelecionada, opt
         ];
 
         const data = (dados || []).map(item => [
-            item?.IDEMPRESA,
+            item?.CONTADOR,
             item?.DTINICIOCOMPETENCIAALVARA,
             item?.DTFIMCOMPETENCIAALVARA,
             item?.STATIVO,
@@ -104,7 +126,7 @@ export const ActionListaAlvaraPrefeitura = ({ dadosAlvaraEmpresaSelecionada, opt
         })
         .map((item, index) => ({
             ...item,
-            CONTADOR: index + 1, 
+            CONTADOR: index + 1,
         }));
 
     const colunasEmpresasAlvaras = [
@@ -117,13 +139,13 @@ export const ActionListaAlvaraPrefeitura = ({ dadosAlvaraEmpresaSelecionada, opt
         {
             field: 'DATA_INICIO',
             header: 'Dt.Inicio',
-            body: row => <th> {row.DATA_INICIO} </th>,
+            body: row => <th> {formatarDataParaBR(row.DATA_INICIO)} </th>,
             sortable: true,
         },
         {
             field: 'DATA_FIM',
             header: 'Dt.Fim',
-            body: row => <th> {row.DATA_FIM} </th>,
+            body: row => <th> {formatarDataParaBR(row.DATA_FIM)} </th>,
             sortable: true,
         },
         {
@@ -164,6 +186,24 @@ export const ActionListaAlvaraPrefeitura = ({ dadosAlvaraEmpresaSelecionada, opt
         }
     ]
 
+    const handleClickEditarAlvara = (row) => {
+        if (optionsModulos[0]?.ALTERAR !== 'True') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Atenção!',
+                text: 'Você não tem permissão para editar alvará.',
+                confirmButtonColor: '#7352A5',
+                customClass: {
+                    container: 'custom-swal',
+                },
+            });
+            return;
+        }
+
+        setIdVinculoAlvara(row.IDVINCULO);
+        setModalEditarAlvaraEmpresa(true);
+    };
+
     const handleClickVisualizarAlvara = (row) => {
         if (optionsModulos[0]?.ALTERAR === 'True') {
             if (row && row.IDVINCULO) {
@@ -183,47 +223,9 @@ export const ActionListaAlvaraPrefeitura = ({ dadosAlvaraEmpresaSelecionada, opt
     };
 
     const handleViualizarAlvara = async (IDVINCULO) => {
-        try {
-            const response = await get(`/vinculo-alvaras-empresa?idFilial=${IDVINCULO}`);
-            console.log(response, 'response.data')
-            if (response.data && response.data.length > 0) {
-                setDadosAlvaraSelecionado(response.data);
-                setModalVisualizarAlvaraEmpresa(true);
-            }
-        } catch (error) {
-            console.error('Erro ao buscar dados Alvaras: ', error);
-        }
-    };
+        setIdVinculoAlvara(IDVINCULO);
+        setModalVisualizarAlvaraEmpresa(true);
 
- const handleClickEditarAlvara = (row) => {
-        if (optionsModulos[0]?.ALTERAR === 'True') {
-            if (row && row.IDVINCULO) {
-                handleEditarAlvara(row.IDVINCULO);
-            }
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Atenção!',
-                text: 'Você não tem permissão para editar alvará.',
-                confirmButtonColor: '#7352A5',
-                customClass: {
-                    container: 'custom-swal',
-                },
-            });
-        }
-    };
-
-    const handleEditarAlvara = async (IDVINCULO) => {
-        try {
-            const response = await get(`/vinculo-alvaras-empresa?idFilial=${IDVINCULO}`);
-            console.log(response, 'response.data')
-            if (response.data && response.data.length > 0) {
-                setDadosAlvaraSelecionado(response.data);
-                setModalEditarAlvaraEmpresa(true);
-            }
-        } catch (error) {
-            console.error('Erro ao buscar dados Alvaras: ', error);
-        }
     };
 
     const handleClickCadastrarAlvara = () => {
@@ -241,16 +243,14 @@ export const ActionListaAlvaraPrefeitura = ({ dadosAlvaraEmpresaSelecionada, opt
             });
         }
     };
-    
 
     return (
-
         <Fragment>
-
             <div className="panel">
-                <div className="panel-hdr mb-4">
+                <div className="panel-hdr m-3">
 
-                    <h3>ALVARÁS - PREFEITURA (LICENÇA DE FUNCIONAMENTO)</h3>
+                    <h2>ALVARÁS - PREFEITURA (LICENÇA DE FUNCIONAMENTO)</h2>
+
                 </div>
                 <div style={{ marginBottom: "0.5rem" }}>
                     <HeaderTable
@@ -314,10 +314,12 @@ export const ActionListaAlvaraPrefeitura = ({ dadosAlvaraEmpresaSelecionada, opt
             <ActionCadastrarAlvaraModal
                 show={modalCadastrarAlvaraEmpresa}
                 handleClose={() => setModalCadastrarAlvaraEmpresa(false)}
-                dadosAlvaraEmpresa={dadosAlvaraEmpresaSelecionada}
+                dadosAlvaraSelecionado={dadosAlvaraEmpresaSelecionada}
                 optionsModulos={optionsModulos}
                 usuarioLogado={usuarioLogado}
                 refetchAlvaraEmpresa={refetchAlvaraEmpresa}
+                refetchAlvaraSelecionado={refetchAlvaraSelecionado}
+                idAlvaraSelecionado={4}
             />
 
             <ActionVisualizarDetalhesAlvaraModal
@@ -336,7 +338,10 @@ export const ActionListaAlvaraPrefeitura = ({ dadosAlvaraEmpresaSelecionada, opt
                 optionsModulos={optionsModulos}
                 usuarioLogado={usuarioLogado}
                 refetchAlvaraEmpresa={refetchAlvaraEmpresa}
+                refetchAlvaraSelecionado={refetchAlvaraSelecionado}
+                refetchVinculoAlvara={refetchVinculoAlvara}
             />
+
         </Fragment>
     )
 }    

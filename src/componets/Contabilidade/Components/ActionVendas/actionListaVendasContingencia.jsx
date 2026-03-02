@@ -12,6 +12,7 @@ import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../../Tables/headerTable";
 import Swal from "sweetalert2";
+import { dataHoraFormatada } from "../../../../utils/dataFormatada";
 
 
 export const ActionListaVendasContingencia = ({ dadosVendasContigencia, optionsModulos }) => {
@@ -19,6 +20,7 @@ export const ActionListaVendasContingencia = ({ dadosVendasContigencia, optionsM
   const [dadosDetalhePagamento, setDadosDetalhePagamento] = useState([]);
   const [modalVendas, setModalVendas] = useState(false);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
 
 
@@ -85,6 +87,7 @@ export const ActionListaVendasContingencia = ({ dadosVendasContigencia, optionsM
       VRTOTALPAGO: item.VRTOTALPAGO,
       PROTNFE_INFPROT_XMOTIVO: item.PROTNFE_INFPROT_XMOTIVO,
       IDCHAVENFE: item.IDCHAVENFE,
+      DTHORAFECHAMENTO: item.DTHORAFECHAMENTO
     }
 
   })
@@ -100,6 +103,12 @@ export const ActionListaVendasContingencia = ({ dadosVendasContigencia, optionsM
       field: 'NOFANTASIA',
       header: 'Empresa',
       body: row => <th>{row.NOFANTASIA}</th>,
+      sortable: true,
+    },
+    {
+      field: 'DTHORAFECHAMENTO',
+      header: 'Data',
+      body: row => <th>{dataHoraFormatada(row.DTHORAFECHAMENTO)}</th>,
       sortable: true,
     },
     {
@@ -226,6 +235,8 @@ export const ActionListaVendasContingencia = ({ dadosVendasContigencia, optionsM
             sortOrder={-1}
             paginator={true}
             rows={10}
+            selectionMode={'single'}
+            selection={rowSelection}
             rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"

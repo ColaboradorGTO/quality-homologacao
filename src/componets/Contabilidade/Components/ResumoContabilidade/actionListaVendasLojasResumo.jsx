@@ -12,10 +12,11 @@ import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../../Tables/headerTable";
 import { ActionFechamentoLojaModal } from "../actionFechamentoLojaModal";
-
+import { formatarDataParaBR } from "../../../../utils/dataFormatada";
 
 export const ActionListaVendasLojasResumo = ({ dadosTotalVendasEmpresa, dataPesquisa }) => {
   const [modalVisivel, setModalVisivel] = useState(false);
+  const [rowSelection, setRowSelection] = useState(null);
   const [dadosDetalheFechamento, setDadosDetalheFechamento] = useState([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const dataTableRef = useRef();
@@ -169,7 +170,7 @@ export const ActionListaVendasLojasResumo = ({ dadosTotalVendasEmpresa, dataPesq
     {
       field: 'dataPesquisa',
       header: 'Data',
-      body: row => <th style={{ color: 'blue', width: 100 }}>{row.dataPesquisa}</th>,
+      body: row => <th style={{ color: 'blue', width: 100 }}>{formatarDataParaBR(row.dataPesquisa)}</th>,
       sortable: true,
     },
     {
@@ -291,6 +292,8 @@ export const ActionListaVendasLojasResumo = ({ dadosTotalVendasEmpresa, dataPesq
             sortOrder={-1}
             paginator={true}
             rows={10}
+            selectionMode={'single'}
+            selection={rowSelection}
             rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"

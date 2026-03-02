@@ -50,3 +50,12 @@ export const formatarDataParaISO = (data) => {
   const [dia, mes, ano] = data.split('/');
   return `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
 };
+
+export const formatarDataParaBR =  (data) =>{
+  if (!data) return "";
+
+  const partes = data.split("-");
+  if (partes.length !== 3) return "";
+
+  return partes[2] + "/" + partes[1] + "/" + partes[0];
+};

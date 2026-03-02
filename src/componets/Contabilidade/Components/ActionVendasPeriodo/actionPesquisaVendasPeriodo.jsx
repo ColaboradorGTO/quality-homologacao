@@ -8,8 +8,6 @@ import { InputSelectAction } from "../../Inputs/InputSelectAction";
 import { MultSelectAction } from "../../Select/MultSelectAction";
 import { ButtonType } from "../../Buttons/ButtonType";
 
-
-
 export const ActionPesquisaVendasPeriodo = () => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [tabelaConsolidadaVisivel, setTabelaConsolidadaVisivel] = useState(false);
@@ -66,7 +64,6 @@ export const ActionPesquisaVendasPeriodo = () => {
       const response = await get(`/listaGrupoEmpresas`,)
       if (response.data) {
         setOptionsMarcas(response.data)
-        // console.log(response.data, 'response.data')
       }
 
     } catch (error) {
@@ -95,7 +92,6 @@ export const ActionPesquisaVendasPeriodo = () => {
       const response = await get(`/listaGrupoProduto`)
       if (response.data) { 
         setDadosGrupos(response.data)
-        console.log(response.data, 'response.data')
       }
       return response.data;
 

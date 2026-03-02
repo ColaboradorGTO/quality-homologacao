@@ -1,27 +1,20 @@
 import { useState } from "react"
-import { get, post, put } from "../../../../../api/funcRequest";
+import { post, put } from "../../../../../api/funcRequest";
 import Swal from "sweetalert2";
 import axios from "axios";
-import { removerFormatacaoMoeda } from "../../../../../utils/formatMoeda";
-import { useEffect } from "react";
-import { useQuery } from "react-query";
 
-export const useEditarArquivoAlvara = ({ handleClose, dadosAlvaraSelecionado, usuarioLogado, optionsModulos, refetchAlvaraEmpresa }) => {
-    const [arquivoAlvara, setArquivoAlvara] = useState([])
-    const [descricaoDetalheAndamento, setDescricaoDetalheAndamento] = useState('')
-    const [dataFimCompetencia, setDataFimCompetencia] = useState('')
-    const [dataIncioCompetencia, setDataIncioCompetencia] = useState('')
-    const [statusAndamento, setStatusAndamento] = useState('')
-    const [statusAlvara, setStatusAlvara] = useState('')
-    const [metragemLoja, setMetragemLoja] = useState('')
-
+export const useEditarArquivoAlvara = ({
+    usuarioLogado,
+    optionsModulos,
+    refetchVinculoAlvara
+}) => {
     const [ipUsuario, setIpUsuario] = useState('')
 
     const getIPUsuario = async () => {
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
             usuarioIP = ipWhoisData?.ip;
         } catch (error) {
             console.error("Erro ao buscar IP via ipwho.is:", error);
@@ -38,64 +31,6 @@ export const useEditarArquivoAlvara = ({ handleClose, dadosAlvaraSelecionado, us
         setIpUsuario(usuarioIP);
         return usuarioIP;
     };
-
-    const { data: optionsStatusAlvara = [], error: errorStatus, isLoading: isLoadingStatus, refetch: refetchStatus } = useQuery(
-        'options-status-alvara',
-        async () => {
-            const response = await get(`/status-alvara`);
-            console.log(response, 'response.data status alvara')
-            return response.data;
-        },
-        { enabled: true, staleTime: 60 * 60 * 1000, }
-    );
-    //  console.log(optionsStatusAlvara , 'optionsStatusAlvara')
-
-
-    useEffect(() => {
-        setStatusAlvara(dadosAlvaraSelecionado?.[0]?.STATIVO)
-        setDataIncioCompetencia(dadosAlvaraSelecionado?.[0]?.DTINICIOCOMPETENCIAALVARA)
-        setDataFimCompetencia(dadosAlvaraSelecionado?.[0]?.DTFIMCOMPETENCIAALVARA)
-        setStatusAndamento(dadosAlvaraSelecionado?.[0]?.DESCRICAOSTATUS)
-        setMetragemLoja(dadosAlvaraSelecionado?.[0]?.METRAGEMEMPRESA)
-        setDescricaoDetalheAndamento(dadosAlvaraSelecionado?.[0]?.DESCRICAODETALHEANDAMENTO)
-        setArquivoAlvara(
-            Array.isArray(dadosAlvaraSelecionado?.[0]?.ARQUIVALVARA)
-                ? dadosAlvaraSelecionado?.[0]?.ARQUIVALVARA
-                : []
-        );
-    }, [dadosAlvaraSelecionado])
-
-
-    const optionsStatus = [
-        { value: 'True', label: 'Ativo' },
-        { value: 'False', label: 'Inativo' },
-    ];
-
-/*     const handleSelecionarArquivos = async (event) => {
-        const files = Array.from(event.target.files || []);
-
-        const arquivosConvertidos = await Promise.all(
-            files.map(file => {
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-
-                    reader.onload = () => {
-                        resolve({
-                            ARQUIVOBASE64: reader.result.split(',')[1],
-                            NOMEARQUIVO: file.name,
-                            TIPOARQUIVO: file.type
-                        });
-                    };
-
-                    reader.onerror = reject;
-                    reader.readAsDataURL(file);
-                });
-            })
-        );
-
-        return arquivosConvertidos;
-    }; */
-
     const onEditarArquivo = async (row, arquivos) => {
         if (optionsModulos[0]?.ALTERAR !== 'True') {
             Swal.fire({
@@ -110,10 +45,9 @@ export const useEditarArquivoAlvara = ({ handleClose, dadosAlvaraSelecionado, us
             return;
         }
 
-        console.log(row, 'row')
         const confirmacao = await Swal.fire({
             title: 'Tem certeza?',
-            text: `Certeza que deseja substituir o anexo selecionado?`,
+            text: `Certeza que deseja substituir ou adicionar o anexo?`,
             icon: 'question',
             showCancelButton: true,
             confirmButtonText: 'Sim',
@@ -123,7 +57,6 @@ export const useEditarArquivoAlvara = ({ handleClose, dadosAlvaraSelecionado, us
             customClass: {
                 container: 'custom-swal',
             },
-
         });
 
         if (!confirmacao.isConfirmed) return;
@@ -151,16 +84,29 @@ export const useEditarArquivoAlvara = ({ handleClose, dadosAlvaraSelecionado, us
 
             await post('/log-web', postData)
 
+            if (response?.success === false) {
+                Swal.fire({
+                    title: 'Atenção',
+                    text: response.msg,
+                    icon: 'info',
+                    customClass: {
+                        container: 'custom-swal',
+                    }
+                });
+                return;
+            }
+
             Swal.fire({
-                title: 'Atualização',
+                title: 'Sucesso',
                 text: 'Atualização Realizada com Sucesso',
                 icon: 'success',
-                timer: 3000,
                 customClass: {
                     container: 'custom-swal',
                 }
             });
-            //handleClose()
+
+            refetchVinculoAlvara()
+
             return response.data;
         } catch (error) {
 
@@ -191,24 +137,7 @@ export const useEditarArquivoAlvara = ({ handleClose, dadosAlvaraSelecionado, us
     }
 
     return {
-        optionsStatusAlvara,
-        optionsStatus,
-        arquivoAlvara,
-        setArquivoAlvara,
-        descricaoDetalheAndamento,
-        setDescricaoDetalheAndamento,
-        dataFimCompetencia,
-        setDataFimCompetencia,
-        dataIncioCompetencia,
-        setDataIncioCompetencia,
-        statusAndamento,
-        setStatusAndamento,
-        statusAlvara,
-        setStatusAlvara,
-        metragemLoja,
-        setMetragemLoja,
         onEditarArquivo,
-
     }
 
 }

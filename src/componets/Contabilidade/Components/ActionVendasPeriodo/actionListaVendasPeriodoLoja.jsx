@@ -3,8 +3,6 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { formatMoeda } from "../../../utils/formatMoeda";
 
-
-
 export const ActionListaVendasPeriodoLoja = ({dadosVendasPeriodo}) => {
 
   const calcularTotalQTDProduto = () => {
