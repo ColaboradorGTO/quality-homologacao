@@ -159,7 +159,6 @@ export const ActionPesquisaVendasDescontoFuncionario = ({ usuarioLogado }) => {
         }))}      
         valueSelectFuncionario={funcionarioSelecionado}
         onChangeSelectFuncionario={handleChangeFuncionario}
-
   
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}
