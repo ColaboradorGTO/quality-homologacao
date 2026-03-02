@@ -10,8 +10,7 @@ export const ActionCancelarVendaModal = ({
   handleClick, 
   optionsModulos, 
   usuarioLogado,
-  dadosCancelarVenda,
-  optionsModulos
+  dadosCancelarVenda
 }) => {
 
   return (
