@@ -1,6 +1,6 @@
 import Swal from "sweetalert2"
 import { put, post, get } from "../../../../../api/funcRequest"
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { useQuery } from "react-query";
 
@@ -13,15 +13,14 @@ export const useConsolidarBalanco = ({
 }) => {
     const [ipUsuario, setIpUsuario] = useState('');
 
-
     const getIPUsuario = async () => {
         let usuarioIP = null;
 
         try {
-        const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
         usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-        console.error("Erro ao buscar IP via ipwho.is:", error);
+        console.error("Erro ao buscar IP via ifconfig.me:", error);
         }
 
         if (!usuarioIP) {
@@ -64,7 +63,7 @@ export const useConsolidarBalanco = ({
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'IP não disponível'
             }
 
             await post('/log-web', postData)
@@ -90,7 +89,7 @@ export const useConsolidarBalanco = ({
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'IP não disponível'
             }
             const response = await post('/log-web', postData)
             Swal.fire({
