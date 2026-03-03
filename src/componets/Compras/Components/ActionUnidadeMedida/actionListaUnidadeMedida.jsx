@@ -10,13 +10,14 @@ import { useReactToPrint } from "react-to-print";
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+import Swal from "sweetalert2";
 
 export const ActionListaUnidadeMedida = ({ dadosUnidadeMedidas, usuarioLogado, optionsModulos, handleClick }) => {
   const [modalEditar, setModalEditar] = useState(false);
   const [dadosDetalheUnidadeMedida, setDadosDetalheUnidadeMedida] = useState([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
-
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -137,8 +138,21 @@ export const ActionListaUnidadeMedida = ({ dadosUnidadeMedidas, usuarioLogado, o
   const handleEditar = async (IDUNIDADEMEDIDA) => {
     try {
       const response = await get(`/unidades-de-Medidas?idUnidadeMedida=${IDUNIDADEMEDIDA}`);
-      setDadosDetalheUnidadeMedida(response.data);
-      setModalEditar(true)
+      if(response.data && response.data.length > 0) {
+        setDadosDetalheUnidadeMedida(response.data);
+        setModalEditar(true)
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: 'Não foi possível obter os detalhes da Unidade de Medida.',
+          customClass:{
+            container: 'custom-swal',
+          }
+        });
+        return;
+        
+      }
     } catch (error) {
       console.error(error);
     }
@@ -168,6 +182,9 @@ export const ActionListaUnidadeMedida = ({ dadosUnidadeMedidas, usuarioLogado, o
             value={dados}
             globalFilter={globalFilterValue}
             size="small"
+            selectionMode={'single'}
+            selection={rowSelection}
+            onSelectionChange={(e) => setRowSelection(e.value)}
             sortOrder={-1}
             paginator={true}
             rows={10}

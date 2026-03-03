@@ -1,10 +1,13 @@
 import { Fragment } from "react"
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal"
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal"
-import { InputFieldModal } from "../../../../Buttons/InputFieldModal"
-import { useForm } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form";
 import Select from 'react-select';
 import { useEditarUnidadeMedida } from "../hooks/useEditarUnidadeMedida"
+import { AlertError } from "../../../../Inputs/alertError"
+import FormField from "../../../../Formularios/FormField"
+import { situacao } from "../../../../../../parceiro.json" 
+import { schema } from "./schemaValidarUnidadeMedida";
 
 export const FormularioEditar = ({
     dadosDetalheUnidadeMedida, 
@@ -13,70 +16,120 @@ export const FormularioEditar = ({
     optionsModulos,
     handleClick  
 }) => {
-    const { register, handleSubmit, formState: { errors } } = useForm();
+    const { handleSubmit, formState: { errors }, clearErrors, control, setError, setValue } = useForm({
+        mode: "onChange"
+    });
     const {
         descricao,
         setDescricao,
         sigla,
         setSigla,
-        optionsStatus,
         statusSelecionado,
         setStatusSelecionado,
-        handleEditar
+        onSubmit
         
     } = useEditarUnidadeMedida({dadosDetalheUnidadeMedida, handleClose, usuarioLogado, optionsModulos, handleClick});
     
+        const handleValidatedSubmit = async () => {
+            try {
+                const dadosParaValidar = {
+                    descricaoUnidadeMedida: descricao,
+                    siglaUnidadeMedida: sigla,
+                    situacaoUnidadeMedida: statusSelecionado,
+                };
+                
+                await schema.validate(dadosParaValidar, { abortEarly: false });
+                await onSubmit();
+            } catch (validationError) {
+                console.error('❌ Erro de validação:', validationError);
+    
+                clearErrors();
+    
+                if (validationError.inner && validationError.inner.length > 0) {
+                    validationError.inner.forEach(error => {
+                        if (error.path) {
+                            setError(error.path, {
+                                type: 'manual',
+                                message: error.message
+                            });
+                        }
+                    });
+                }
+    
+                const errorMessages = validationError.errors || [validationError.message];
+                console.log(`Erro de validação:\n${errorMessages.join('\n')}`);
+            }
+    
+        }
+
     return (
         <Fragment>
-            <form onSubmit={handleSubmit(handleEditar)}>
+            <form onSubmit={handleSubmit(handleValidatedSubmit)}>
 
                 <div className="form-group">
                     <div className="row">
                         <div className="col-sm-6 col-xl-6">
-                            <InputFieldModal
-                                label={"Descrição *"}
-                                type={"text"}
-                                id={"IDCatPedido"}
-                                value={descricao}
-                                onChangeModal={(e) => setDescricao(e.target.value)}
-
-                                {...register("IDCatPedido", { required: "Campo obrigatório Informe a Descrição da Unidade de Medida", })}
-                                required={true}
+                            <Controller
+                                name="descricaoUnidadeMedida"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        name="descricaoUnidadeMedida"
+                                        label={"Descrição *"}
+                                        type="text"
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        value={descricao}
+                                        onChangeModal={(e) => setDescricao(e.target.value)}
+                                    />
+                                )}
                             />
                         </div>
                         <div className="col-sm-6 col-xl-3">
-
-                            <InputFieldModal
-                                label={"Sigla *"}
-                                type={"text"}
-                                id={"sigla"}
-                                value={sigla}
-                                onChangeModal={(e) => setSigla(e.target.value)}
-
-                                {...register("sigla", { required: "Campo obrigatório Informe a Sigla da Unidade de Medida", })}
-                                required={true}
+                            <Controller
+                                name="siglaUnidadeMedida"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        name="siglaUnidadeMedida"
+                                        label={"Sigla *"}
+                                        type="text"
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        value={sigla}
+                                        onChangeModal={(e) => setSigla(e.target.value)}
+                                    />
+                                )}
                             />
                         </div>
                         <div className="col-sm-6 col-xl-3">
 
                             <label htmlFor="">Situação *</label>
                             <Select
-
-                                options={optionsStatus.map((item) => {
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="situacaoUnidadeMedida"
+                                value={statusSelecionado}
+                                options={situacao.map((item) => {
                                     return {
                                         value: item.value,
                                         label: item.label
                                     }
                                 })}
-                                value={statusSelecionado}
-                                onChange={(e) => setStatusSelecionado(e)}
+                                onChange={(e) => {
+                                    setStatusSelecionado(e)
+                                    clearErrors("situacaoUnidadeMedida")
+                                }}
                             />
-                            
+                            {errors.situacaoUnidadeMedida && (
+                                <AlertError
+                                    error={errors.situacaoUnidadeMedida}
+                                    onClose={clearErrors}
+                                    fieldName="situacaoUnidadeMedida"
+                                />
+                            )}
                         </div>
                     </div>
-                </div>
-                <div className="form-group">
-                    <h3 className="form-label" htmlFor="vrfat">* Campos Obrigatórios *</h3>
                 </div>
 
                 <FooterModal
@@ -86,10 +139,10 @@ export const FormularioEditar = ({
                     corFechar={"secondary"}
 
                     ButtonTypeCadastrar={ButtonTypeModal}
-                    onClickButtonCadastrar={handleEditar}
+                    onClickButtonCadastrar={handleSubmit(handleValidatedSubmit)}
                     textButtonCadastrar={"Salvar"}
                     corCadastrar={"success"}
-                    loadingTextCadastrar={"Cadastrando..."}
+                    loadingTextCadastrar={"Atualizando..."}
                     autoLoadingCadastrar={true}
                 />
             </form>

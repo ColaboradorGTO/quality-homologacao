@@ -8,16 +8,7 @@ export const schema = yup.object({
 
   siglaUnidadeMedida: yup
     .string()
-    .required('Sigla Obrigatória')
-    .test(
-      'max-length-without-spaces',
-      'Sigla deve ter no máximo 5 caracteres (sem contar espaços)',
-      function (value) {
-        if (!value) return true; 
-        const valueSemEspacos = value.replace(/\s/g, '');
-        return valueSemEspacos.length <= 5;
-      }
-    ),
+    .required('Sigla Obrigatória'),
 
   situacaoUnidadeMedida: yup.object()
     .nullable()

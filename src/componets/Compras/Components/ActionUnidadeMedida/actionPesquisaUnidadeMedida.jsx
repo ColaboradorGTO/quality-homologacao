@@ -17,8 +17,6 @@ export const ActionPesquisaUnidadeMedida = ({ usuarioLogado }) => {
   const [modalVisivel, setModalVisivel] = useState(false);
   const [descricao, setDescricao] = useState("")
   const [unidadeSelecionada, setUnidadeSelecionada] = useState("")
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(1000);
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
 
@@ -90,11 +88,6 @@ export const ActionPesquisaUnidadeMedida = ({ usuarioLogado }) => {
     { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
   )
 
-
-  const handleChangeUnidade = (e) => {
-    setUnidadeSelecionada(e.value)
-  }
-
   const handleClick = () => {
     refetchListaUnidadesMedidas()
     setTabelaVisivel(true)
@@ -146,8 +139,7 @@ export const ActionPesquisaUnidadeMedida = ({ usuarioLogado }) => {
         ]}
         labelSelectSubGrupo={"Por Unidade"}
         valueSelectSubGrupo={unidadeSelecionada}
-        onChangeSelectSubGrupo={handleChangeUnidade}
-
+        onChangeSelectSubGrupo={(e) => setUnidadeSelecionada(e.value)}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar Unidade de Medidas"}
