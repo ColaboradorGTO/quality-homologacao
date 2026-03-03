@@ -92,7 +92,7 @@ export const FormularioEditarEstilos = ({ dadosDetalheEstilos, handleClose, hand
                                             value: item.IDGRUPOESTRUTURA,
                                             label: `${item.CODGRUPOESTRUTURA} - ${item.DSGRUPOESTRUTURA}`
                                         }
-                                    })]}
+                                })]}
                                 onChange={(e) => { 
                                     setSubGrupoSelecionado(e)
                                     clearErrors("subGrupoEstilo")

@@ -33,10 +33,10 @@ export const useEditarEstilos = ({dadosDetalheEstilos, handleClose, handleClick,
         let usuarioIP = null;
 
         try {
-        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
-        usuarioIP = ipWhoisData?.ip;
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+            usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-        console.error("Erro ao buscar IP via ifconfig.me:", error);
+            console.error("Erro ao buscar IP via ifconfig.me:", error);
         }
 
         if (!usuarioIP) {
@@ -65,17 +65,6 @@ export const useEditarEstilos = ({dadosDetalheEstilos, handleClose, handleClick,
             return;
         }
 
-        if (descricao == '') {
-            Swal.fire({
-                position: 'top-end',
-                icon: 'error',
-                title: 'O campo descrição é obrigatório.',
-                showConfirmButton: false,
-                timer: 1500
-            });
-            return;
-        }
-
         const postData = {
             IDVINCESTILOSESTRUTURA: parseInt(dadosDetalheEstilos[0]?.IDVINCESTILOSESTRUTURA),
             IDGRUPOESTRUTURAANTIGA: parseInt(dadosDetalheEstilos[0]?.ID_GRUPOESTILOS),
@@ -84,6 +73,7 @@ export const useEditarEstilos = ({dadosDetalheEstilos, handleClose, handleClick,
             IDGRUPOESTRUTURA: subGrupoSelecionado.value,
             STATIVO: statusSelecionado.value,
         }
+        
         try {
 
             const response = await put('/listaEstilos/:id', postData)
