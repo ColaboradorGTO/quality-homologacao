@@ -1,7 +1,6 @@
 import { Fragment } from "react"
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal"
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal"
-import { InputFieldModal } from "../../../../Buttons/InputFieldModal"
 import Select from 'react-select';
 import { Controller, useForm } from "react-hook-form";
 import { useEditarEstilos } from "../Hooks/useEditarEstilos"
@@ -25,12 +24,12 @@ export const FormularioEditarEstilos = ({ dadosDetalheEstilos, handleClose, hand
         onSubmit
     } = useEditarEstilos({dadosDetalheEstilos, handleClose, handleClick, usuarioLogado, optionsModulos});
 
-     const handleValidatedSubmit = async () => {
+    const handleValidatedSubmit = async () => {
         try {
             const dadosParaValidar = {
-                descricaoTecido: descricao,
+                descricaoEstilo: descricao,
             };
-            
+            console.log(dadosParaValidar, 'dadosParaValidar')
             await schema.validate(dadosParaValidar, { abortEarly: false });
             await onSubmit();
         } catch (validationError) {
@@ -57,11 +56,11 @@ export const FormularioEditarEstilos = ({ dadosDetalheEstilos, handleClose, hand
 
     return (
         <Fragment>
-            <form action="" onSubmit={handleSubmit(handleValidatedSubmit)}>
+            <form onSubmit={handleSubmit(handleValidatedSubmit)}>
                 <div className="form-group">
                     <div className="row">
                         <div className="col-sm-6 col-xl-6">
-                             <Controller
+                            <Controller
                                 name="descricaoEstilo"
                                 control={control}
                                 render={({ field }) => (
@@ -111,7 +110,7 @@ export const FormularioEditarEstilos = ({ dadosDetalheEstilos, handleClose, hand
                             <label htmlFor="">Situação *</label>
                             <Select
                                 className="basic-single"
-                                classNamePrefix={"select"}
+                                classNamePrefix="select"
                                 name="situacaoEstilo"
                                 value={statusSelecionado}
                                 options={situacao.map((item) => {

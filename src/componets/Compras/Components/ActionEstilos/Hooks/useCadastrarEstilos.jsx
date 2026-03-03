@@ -21,13 +21,6 @@ export const useCadastrarEstilos = ({ handleClose, handleClick, usuarioLogado, o
         { enabled: true, staleTime: 60 * 60 * 1000, }
     );
 
-
-    const optionsStatus = [
-        { value: 'True', label: 'ATIVO' },
-        { value: 'False', label: 'INATIVO' }
-    ]
-
-
     const getIPUsuario = async () => {
         let usuarioIP = null;
 
@@ -50,7 +43,7 @@ export const useCadastrarEstilos = ({ handleClose, handleClick, usuarioLogado, o
         return usuarioIP;
     };
 
-    const cadastrarEstilo = async () => {
+    const onSubmit = async () => {
 
         if(optionsModulos[0]?.CRIAR == 'False') {
             Swal.fire({
@@ -64,25 +57,14 @@ export const useCadastrarEstilos = ({ handleClose, handleClick, usuarioLogado, o
             return;
         }
 
-        if (descricao == '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'O campo descrição é obrigatório.',
-                showConfirmButton: false,
-                timer: 1500
-            });
-            return;
-        }
-
-        const putData = [{
+        const putData = {
             DSESTILO: descricao,
             IDESTILO: null,
             IDGRUPOESTRUTURAANTIGA: null,
             IDVINCESTILOSESTRUTURA: null,
             IDGRUPOESTRUTURA: Number(subGrupoSelecionado?.value),
             STATIVO: statusSelecionado?.value,
-        }]
+        }
         try {
 
             const response = await post('/criarlistaEstilos', putData)
@@ -150,11 +132,7 @@ export const useCadastrarEstilos = ({ handleClose, handleClick, usuarioLogado, o
         setStatusSelecionado,
         subGrupoSelecionado,
         setSubGrupoSelecionado,
-        usuarioLogado,
-        ipUsuario,
         dadosGrupoEstrutura,
-        getIPUsuario,
-        optionsStatus,
-        cadastrarEstilo
+        onSubmit
     };
 };

@@ -89,11 +89,11 @@
   ],
   "situacao": [
     {
-      "label": "Ativo",
+      "label": "ATIVO",
       "value": "True"
     },
     {
-      "label": "Inativo",
+      "label": "INATIVO",
       "value": "False"
     }
   ],

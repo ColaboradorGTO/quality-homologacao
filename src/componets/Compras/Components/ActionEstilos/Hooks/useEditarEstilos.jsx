@@ -95,7 +95,7 @@ export const useEditarEstilos = ({dadosDetalheEstilos, handleClose, handleClick,
                 icon: 'success',
                 title: 'Atualizado com sucesso!',
                 showConfirmButton: false,
-                timer: 3000,
+                timer: 5000,
                 customClass: {
                     container: 'custom-swal',
                 }

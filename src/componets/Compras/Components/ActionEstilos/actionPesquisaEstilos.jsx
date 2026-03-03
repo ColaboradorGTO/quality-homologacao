@@ -10,6 +10,7 @@ import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
 import { MdAdd } from "react-icons/md";
 import { ActionCadastrarEstilosModal } from "./ActionCadastrarEstilos/actionCadastrarEstilosModal";
+import Swal from "sweetalert2";
 
 export const ActionPesquisaEstilos = ({usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
@@ -96,7 +97,7 @@ export const ActionPesquisaEstilos = ({usuarioLogado }) => {
       Swal.fire({
         icon: 'error',
         title: 'Atenção',
-        text: `${usuarioLogado?.NOFUNCIONARIO} Você não tem permissão para cadastrar um novo tipo de tecido.`,
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para cadastrar um novo estilo.`,
       });
       return;
     }
@@ -163,8 +164,8 @@ export const ActionPesquisaEstilos = ({usuarioLogado }) => {
         handleClose={(e) => setModalVisivel(false)} 
         usuarioLogado={usuarioLogado}
         optionsModulos={optionsModulos}
+        handleClick={handleClick}
       />
     </Fragment>
   )
 }
-

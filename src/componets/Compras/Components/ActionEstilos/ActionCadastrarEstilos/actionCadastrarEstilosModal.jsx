@@ -4,7 +4,7 @@ import { Formulario } from "./formularioCadastrar";
 import { HeaderModal } from "../../../../Modais/HeaderModal/HeaderModal";
 
 
-export const ActionCadastrarEstilosModal = ({ show, handleClose, usuarioLogado, optionsModulos }) => {
+export const ActionCadastrarEstilosModal = ({ show, handleClose, usuarioLogado, optionsModulos, handleClick }) => {
 
   return (
 
@@ -28,6 +28,7 @@ export const ActionCadastrarEstilosModal = ({ show, handleClose, usuarioLogado, 
             handleClose={handleClose} 
             usuarioLogado={usuarioLogado} 
             optionsModulos={optionsModulos} 
+            handleClick={handleClick}
           />
         </Modal.Body>
 
