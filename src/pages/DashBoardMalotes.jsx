@@ -11,7 +11,7 @@ import { useQuery } from "react-query";
 const ActionPesquisaRecebimentoMalote = lazy(() => import("../componets/Malotes/ActionConferenciaMalote/actionPesquisaRecebimentoMalote").then(module => ({ default: module.ActionPesquisaRecebimentoMalote })));
 
 
-export const DashBoardMalotes = ({ }) => {
+export const DashBoardMalotes = () => {
   const [resumoVisivel, setResumoVisivel] = useState(true);
   const [usuarioLogado, setUsuarioLogado] = useState(null);
   const [componentToShow, setComponentToShow] = useState("");
@@ -50,7 +50,7 @@ export const DashBoardMalotes = ({ }) => {
   const { data: optionsModulosPage = [], error: errorFuncionarios, isLoading: isLoadingFuncionarios, refetch: refetchFuncionarios } = useQuery(
     'menus-usuario',
     async () => {
-      const response = await get(`/menus-usuario?idUsuario=${usuarioLogado?.id}&idModulo=${selectedModule?.ID}`);
+      const response = await get(`/menus-usuario?idUsuario=${usuarioLogado?.id}&idModulo=${ID}`);
       
       return response.data;
     },
@@ -97,7 +97,7 @@ export const DashBoardMalotes = ({ }) => {
   switch (componentToShow) {
    
     case "/malotes/ActionPesquisaRecebimentoMalote":
-        component = <ActionPesquisaRecebimentoMalote usuarioLogado={usuarioLogado} />
+        component = <ActionPesquisaRecebimentoMalote usuarioLogado={usuarioLogado} ID={ID} />
         break;
     default:
       component = null;

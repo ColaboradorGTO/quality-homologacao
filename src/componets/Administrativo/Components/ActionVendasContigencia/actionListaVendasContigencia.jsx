@@ -337,8 +337,18 @@ export const ActionListaVendasContigencia = ({ dadosVendasAtivasContigencia, usu
   const handleDetalharVenda = async (IDVENDA) => {
     try {
       const response = await get(`/resumo-venda-caixa-detalhado?idVenda=${IDVENDA}`);
-      setDadosVendas(response.data);
-      setDetalheVendaModal(true)
+      if(response.data && response.data.length > 0) {
+        setDadosVendas(response.data);
+        setDetalheVendaModal(true)
+
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Nenhum detalhe encontrado',
+          text: `Não foram encontrados detalhes para a venda.`,
+        });
+        return
+      }
     } catch (error) {
       console.error(error);
     }
@@ -353,8 +363,17 @@ export const ActionListaVendasContigencia = ({ dadosVendasAtivasContigencia, usu
   const handleDetalharProduto = async (IDVENDA) => {
     try {
       const response = await get(`/detalhe-venda?idVenda=${IDVENDA}`);
-      setDadosDetalheProduto(response.data);
-      setDetalheVendaProdutoModal(true)
+      if(response.data && response.data.length > 0) {
+        setDadosDetalheProduto(response.data);
+        setDetalheVendaProdutoModal(true)
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Nenhum detalhe encontrado',
+          text: `Não foram encontrados detalhes para os produtos dessa venda.`,
+        });
+        return
+      }
     } catch (error) {
       console.error(error);
     }
@@ -378,9 +397,17 @@ export const ActionListaVendasContigencia = ({ dadosVendasAtivasContigencia, usu
   const handleDetalharRecebimentos = async (IDVENDA) => {
     try {
       const response = await get(`/recebimento?idVenda=${IDVENDA}`);
-      setDetalheRecebimentoModal(true);
-      setDadosDetalheRecebimentos(response.data)
-      
+      if(response.data && response.data.length > 0) {
+        setDetalheRecebimentoModal(true);
+        setDadosDetalheRecebimentos(response.data)
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Nenhum detalhe encontrado',
+          text: `Não foram encontrados detalhes para os recebimentos dessa venda.`,
+        });
+        return
+      }
     } catch (error) {
       console.error(error);
     }
@@ -394,9 +421,17 @@ export const ActionListaVendasContigencia = ({ dadosVendasAtivasContigencia, usu
   const handleDetalharVendaXML = async (IDVENDA) => {
     try {
       const response = await get(`/venda-xml?idVenda=${IDVENDA}`);
-      setDetalheVendaXMLModal(true);
-      setDadosVendasXML(response.data)
-      
+      if(response.data && response.data.length > 0) {
+        setDetalheVendaXMLModal(true);
+        setDadosVendasXML(response.data)
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Nenhum detalhe encontrado',
+          text: `Não foram encontrados detalhes para o XML dessa venda.`,
+        });
+        return
+      }
       return response.data;
     } catch (error) {
       console.error(error);
@@ -405,7 +440,6 @@ export const ActionListaVendasContigencia = ({ dadosVendasAtivasContigencia, usu
 
   const footerGroup = (
     <ColumnGroup>
-
       <Row> 
         <Column footer="Total Pago" colSpan={7} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem', textAlign: 'center' }} />
         <Column footer={calcularTotalValor()} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />  

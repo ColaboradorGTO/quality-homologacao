@@ -15,7 +15,6 @@ export const ActionPesquisaVoucherResumido = () => {
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
   const [dataPesquisaFim, setDataPesquisaFim] = useState('');
   const [numeroVoucher, setNumeroVoucher] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
   
   useEffect(() => {
     const dataInicial = getDataAtual();
@@ -67,16 +66,13 @@ export const ActionPesquisaVoucherResumido = () => {
   );
 
   const handleClick = () => {
-    setCurrentPage(prevPage => prevPage + 1)
     refetchListaResumoVoucher()
     setTabelaVisivel(true)
   }
 
-
   return (
 
     <Fragment>
-
       <ActionMain
         linkComponentAnterior={["Home"]}
         linkComponent={["Vouchers Emitidos"]}

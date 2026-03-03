@@ -10,7 +10,6 @@ import { AiOutlineSearch } from "react-icons/ai";
 import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
 
-
 export const ActionPesquisaBalancoPorLoja = ({usuarioLogado }) => {
   const [descricao, setDescricao] = useState('');
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
@@ -18,8 +17,6 @@ export const ActionPesquisaBalancoPorLoja = ({usuarioLogado }) => {
   const [empresaSelecionada, setEmpresaSelecionada] = useState('')
   const [empresaSelecionadaNome, setEmpresaSelecionadaNome] = useState('')
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1)
-  const [isLoadingPesquisa, setIsLoadingPesquisa] = useState(true)
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
   useEffect(() => {
@@ -54,7 +51,7 @@ export const ActionPesquisaBalancoPorLoja = ({usuarioLogado }) => {
       const response = await get(`/empresas`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000 }
+    { staleTime: 60 * 60 * 1000 }
   );
 
   const fetchListaBalanco = async ( ) => {
@@ -108,11 +105,8 @@ export const ActionPesquisaBalancoPorLoja = ({usuarioLogado }) => {
   }
 
   const handleClick = () => {
-    setCurrentPage(prevPage => prevPage + 1)
     refetchListaBalanco()
-    setIsLoadingPesquisa(true)
     setTabelaVisivel(true)
-    
   }
 
   return (
@@ -143,7 +137,6 @@ export const ActionPesquisaBalancoPorLoja = ({usuarioLogado }) => {
           {value: '', label: 'Todas'},
           ...dadosEmpresas.map((empresa) => {
             return {
-
               value: empresa.IDEMPRESA,
               label: empresa.NOFANTASIA,
             }

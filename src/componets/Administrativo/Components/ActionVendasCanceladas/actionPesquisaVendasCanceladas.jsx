@@ -59,7 +59,7 @@ export const ActionPesquisaVendasCanceladas = ({usuarioLogado }) => {
       const response = await get(`/marcasLista`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, cacheTime: 60 * 60 * 1000, }
+    { staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000, }
   );
   
   const { data: optionsEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas } = useQuery(
@@ -69,7 +69,7 @@ export const ActionPesquisaVendasCanceladas = ({usuarioLogado }) => {
       
       return response.data;
     },
-    {enabled: Boolean(marcaSelecionada), staleTime: 5 * 60 * 1000, cacheTime: 60 * 60 * 1000,}
+    {enabled: Boolean(marcaSelecionada), staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000,}
   );
  
 
@@ -110,7 +110,7 @@ export const ActionPesquisaVendasCanceladas = ({usuarioLogado }) => {
   const { data: dadosVendasCanceladas = [], error: errorVendasMarca, isLoading: isLoadingVendasMarca, refetch: refetchVendasCanceladas } = useQuery(
     ['venda-ativa',  ],
     () => fetchVendasCanceladas(),
-    { enabled: false, staleTime: 5 * 60 * 1000}
+    { enabled: false, staleTime: 60 * 60 * 1000}
   );
 
   
@@ -150,7 +150,7 @@ export const ActionPesquisaVendasCanceladas = ({usuarioLogado }) => {
   const { data: dadosVendasCanceladasMinutos = [], error: errorVendasCanceladas30Minutos, isLoading: isLoadingVendasCanceladas30Minutos, refetch: refetchVendasCanceladas30Minutos } = useQuery(
     ['venda-ativa',  ],
     () => fetchVendasCanceladas30Minutos(),
-    {enabled: false, staleTime: 5 * 60 * 1000 }
+    {enabled: false, staleTime: 60 * 60 * 1000 }
   );
 
   const fetchVendasCanceladasWeb = async () => {
@@ -190,7 +190,7 @@ export const ActionPesquisaVendasCanceladas = ({usuarioLogado }) => {
   const { data: dadosVendasCanceladasWeb = [], error: errorVendasCanceladasWeb, isLoading: isLoadingVendasCanceladasWeb, refetch: refetchVendasCanceladasWeb } = useQuery(
     ['venda-ativa',  ],
     () => fetchVendasCanceladasWeb(),
-    {enabled: false,  staleTime: 5 * 60 * 1000}
+    {enabled: false,  staleTime: 60 * 60 * 1000}
   );
 
   const fetchVendasCanceladasEmitidasPDV = async () => {
@@ -230,7 +230,7 @@ export const ActionPesquisaVendasCanceladas = ({usuarioLogado }) => {
   const { data: dadosVendasCanceladasEmitidasPDV = [], error: errorVendasCanceladasEmitidasPDV, isLoading: isLoadingVendasCanceladasEmitidasPDV, refetch: refetchVendasCanceladasEmitidasPDV } = useQuery(
     ['venda-ativa',  ],
     () => fetchVendasCanceladasEmitidasPDV(),
-    {enabled: false, staleTime: 5 * 60 * 1000 }
+    {enabled: false, staleTime: 60 * 60 * 1000 }
   );
 
 
@@ -271,7 +271,7 @@ export const ActionPesquisaVendasCanceladas = ({usuarioLogado }) => {
   const { data: dadosVendasCanceladasEmTelaPDV = [], error: errorVendasCanceladasEmTelaPDV, isLoading: isLoadingVendasCanceladasEmTelaPDV, refetch: refetchVendasCanceladasEmTelaPDV} = useQuery(
     ['venda-ativa',  ],
     () => fetchVendasCanceladasEmTelaPDV(),
-    {enabled: false, staleTime: 5 * 60 * 1000}
+    {enabled: false, staleTime: 60 * 60 * 1000}
   );
  
   const handleSelectEmpresa = (e) => {

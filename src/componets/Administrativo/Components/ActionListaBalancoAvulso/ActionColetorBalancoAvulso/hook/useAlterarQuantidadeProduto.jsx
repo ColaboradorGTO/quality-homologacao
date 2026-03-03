@@ -10,24 +10,23 @@ export const useAlterarQauntidadeProduto = ({ usuarioLogado, optionsModulos }) =
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
-            usuarioIP = ipWhoisData?.ip;
+        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+        usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP via ipwho.is:", error);
+        console.error("Erro ao buscar IP via ifconfig.me:", error);
         }
 
         if (!usuarioIP) {
-            try {
+        try {
             const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
             usuarioIP = ipifyData?.ip;
-            } catch (error) {
+        } catch (error) {
             console.error("Erro ao buscar IP via ipify.org:", error);
-            }
+        }
         }
         setIpUsuario(usuarioIP);
         return usuarioIP;
     };
-
 
     const handleAlterarQuantidade = async (IDDETALHEBALANCO, TOTALCONTAGEMGERAL) => {
         if(optionsModulos[0]?.ALTERAR == 'False') {
@@ -58,7 +57,7 @@ export const useAlterarQauntidadeProduto = ({ usuarioLogado, optionsModulos }) =
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'IP não disponível'
             }
 
             await post('/log-web', postData)
@@ -84,7 +83,7 @@ export const useAlterarQauntidadeProduto = ({ usuarioLogado, optionsModulos }) =
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'IP não disponível'
             }
 
             const responsePost = await post('/log-web', postData)

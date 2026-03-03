@@ -28,7 +28,7 @@ export const ActionListaAlterarVendaVendedor = ({dadosVendasAtivas, empresaSelec
 
   const handlePrint = useReactToPrint({
     content: () => dataTableRef.current,
-    documentTitle: 'Estoque Atual',
+    documentTitle: 'Venda Vendedor',
   });
 
   const exportToPDF = () => {
@@ -64,7 +64,7 @@ export const ActionListaAlterarVendaVendedor = ({dadosVendasAtivas, empresaSelec
       { wpx: 100, caption: 'Valor' }
     ]; 
     XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Estoque Atual');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Venda Vendedor');
     XLSX.writeFile(workbook, 'venda_vendedor.xlsx');
   };
   
@@ -185,6 +185,15 @@ export const ActionListaAlterarVendaVendedor = ({dadosVendasAtivas, empresaSelec
       if (response.data && response.data.length > 0) {
         setDadosVendasDetalhada(response.data);
         setModalVisivel(true);
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: 'Nenhum detalhe encontrado para esta venda.',
+          confirmButtonText: 'OK',
+          timer: 3000,
+        });
+        return;
       }
       return response.data;
     } catch (error) {
@@ -202,7 +211,7 @@ export const ActionListaAlterarVendaVendedor = ({dadosVendasAtivas, empresaSelec
         title: 'Acesso Negado',
         text: 'Você não tem permissão para alterar a venda.',
         confirmButtonText: 'OK',
-        timer: 3000,
+        timer: 5000,
       });
     }
   };

@@ -375,7 +375,7 @@ export const ActionListaVendasCanceladasMinutos = ({
   const handleEditProduto = async (IDVENDA) => {
     try {
       const response = await get(`/detalhe-venda?idEmpresa=0&idVenda=${IDVENDA}`)
-      if (response.data) {
+      if (response.data && response.data.length > 0) {
         setDadosProdutoModal(response.data)
         setModalProdutoVisivel(true)
         return response.data;
@@ -410,7 +410,7 @@ export const ActionListaVendasCanceladasMinutos = ({
 
     try {
       const response = await get(`/resumo-venda-caixa-detalhado?idEmpresa=0&idVenda=${IDVENDA}`)
-      if (response.data) {
+      if (response.data && response.data.length > 0) {
         setDadosVendas(response.data)
         setModalVendaVisivel(true)
         return response.data;

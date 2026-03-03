@@ -14,9 +14,6 @@ export const ActionPesquisaVendasDigitalMarca = () => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
   const [dataPesquisaFim, setDataPesquisaFim] = useState('');
-  const [isLoadingPesquisa, setIsLoadingPesquisa] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(1000);
 
   useEffect(() => {
     const dataInicial = getDataAtual()
@@ -24,44 +21,34 @@ export const ActionPesquisaVendasDigitalMarca = () => {
     setDataPesquisaInicio(dataInicial)
     setDataPesquisaFim(dataFinal)
   }, [])
-  
-  
 
   const fetchListaVendasMarca = async () => {
-    try {
-      
-      const urlApi = `/venda-digital-marca?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
-      const response = await get(urlApi);
-      
-      if (response.data.length && response.data.length === pageSize) {
-        let allData = [...response.data];
-        animacaoCarregamento(`Carregando... Página ${currentPage} de ${response.data.length}`, true);
-  
-        async function fetchNextPage(currentPage) {
-          try {
-            currentPage++;
-            const responseNextPage = await get(`${urlApi}&page=${currentPage}`);
-            if (responseNextPage.length) {
-              allData.push(...responseNextPage.data);
-              return fetchNextPage(currentPage);
-            } else {
-              return allData;
-            }
-          } catch (error) {
-            console.error('Erro ao buscar próxima página:', error);
-            throw error;
-          }
+    const urlBase = `/venda-digital-marca?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
+    let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
+    urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+      try {
+      animacaoCarregamento('Carregando dados...', true);
+
+      const primeiraPagina = 1;
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const page = primeiraResposta.page || primeiraPagina;
+      const pageSize = primeiraResposta.pageSize || 1000;
+      const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
+      const totalPages = Math.ceil(totalRows / pageSize);
+
+      let allData = [...(primeiraResposta.data || [])];
+
+      if (totalPages > 1) {
+        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          allData.push(...(responsePage.data || []));
         }
-  
-        await fetchNextPage(currentPage);
-        return allData;
-      } else {
-       
-        return response.data;
       }
-  
+
+      return allData
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Erro ao buscar dados:', error);
       throw error;
     } finally {
       fecharAnimacaoCarregamento();
@@ -69,19 +56,16 @@ export const ActionPesquisaVendasDigitalMarca = () => {
   };
    
   const { data: dadosVendasMarca = [], error: errorVendasMarca, isLoading: isLoadingVendasMarca, refetch: refetchListaVendasMarca } = useQuery(
-    ['venda-digital-marca', dataPesquisaInicio, dataPesquisaFim, currentPage, pageSize],
-    () => fetchListaVendasMarca(dataPesquisaInicio, dataPesquisaFim, currentPage, pageSize),
+    ['venda-digital-marca'],
+    () => fetchListaVendasMarca(),
     {
-      enabled: false, staleTime: 5 * 60 * 1000,
+      enabled: false, staleTime: 60 * 60 * 1000,
     }
   );
 
   const handleClick = () => {
-    setIsLoadingPesquisa(true);
-    setCurrentPage(+1);
     refetchListaVendasMarca()
     setTabelaVisivel(true)
-    
   }
 
   return (
@@ -92,7 +76,7 @@ export const ActionPesquisaVendasDigitalMarca = () => {
         linkComponentAnterior={["Home"]}
         linkComponent={["Lista Vendas Digital"]}
         title="Vendas Digital por Marcas e Período"
-        // subTitle="Nome da Loja"
+    
         InputFieldDTInicioComponent={InputField}
         labelInputFieldDTInicio={"Data Início"}
         valueInputFieldDTInicio={dataPesquisaInicio}
@@ -112,13 +96,9 @@ export const ActionPesquisaVendasDigitalMarca = () => {
       />
 
       {tabelaVisivel && (
-        <Fragment>
-
         <ActionListaVendasDigitalMarca dadosVendasMarca={dadosVendasMarca} />
-        </Fragment>
       )}
 
     </Fragment>
   )
 }
-

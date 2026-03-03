@@ -11,7 +11,6 @@ import { useReactToPrint } from "react-to-print";
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
-import { retornaDiasEntreDatas } from "../../../../utils/retornoEntreDias";
 import Swal from "sweetalert2";
 
 export const ActionListaVendasVouchers = ({ 

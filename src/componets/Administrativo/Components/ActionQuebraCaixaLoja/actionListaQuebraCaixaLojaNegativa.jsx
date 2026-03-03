@@ -4,7 +4,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { dataFormatada } from "../../../../utils/dataFormatada";
 import { MdOutlineLocalPrintshop } from "react-icons/md";
-import { get, post, put } from "../../../../api/funcRequest";
+import { get } from "../../../../api/funcRequest";
 import { ModalImprimirQuebra } from "../../Components/ModalImprimirQuebra";
 import HeaderTable from "../../../Tables/headerTable";
 import { useReactToPrint } from "react-to-print";
@@ -13,14 +13,17 @@ import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { FaCheck, FaRegTrashAlt } from "react-icons/fa";
 import { formatMoeda } from "../../../../utils/formatMoeda";
+import { useCancelarQuebraCaixa } from "./hooks/useCancelar";
+import Swal from "sweetalert2";
 
 export const ActionListaQuebraCaixaLojaNegativa = ({ dadosQuebraDeCaixaNegativa, handleClick, optionsModulos, usuarioLogado }) => {
   const [modalVisivel, setModalVisivel] = useState(false);
   const [dadosQuebraCaixasModal, setDadosQuebraCaixasModal] = useState([])
-  const [ipUsuario, setIpUsuario] = useState('');
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const dataTableRef = useRef();
-  
+  const {
+    handleCancelar
+  } = useCancelarQuebraCaixa({ usuarioLogado, optionsModulos, handleClick })
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
   };
@@ -56,7 +59,7 @@ export const ActionListaQuebraCaixaLojaNegativa = ({ dadosQuebraDeCaixaNegativa,
     const workbook = XLSX.utils.book_new();
     const header = ['Nº', 'DT Lançamento', 'Nº Mov', 'Matrícula', 'Colaborador', 'Vr. Quebra Sistema', 'Vr. Quebra Lançado', 'Historíco', 'Situação'];
     worksheet['!cols'] = [
-      { wpx: 50, caption: 'Nº' }, 
+      { wpx: 50, caption: 'Nº' },
       { wpx: 100, caption: 'DT Lançamento' },
       { wpx: 150, caption: 'Nº Mov' },
       { wpx: 100, caption: 'Matrícula' },
@@ -65,8 +68,8 @@ export const ActionListaQuebraCaixaLojaNegativa = ({ dadosQuebraDeCaixaNegativa,
       { wpx: 100, caption: 'Vr. Quebra Lançado' },
       { wpx: 150, caption: 'Historíco' },
       { wpx: 100, caption: 'Situação' }
-      
-    ]; 
+
+    ];
     XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Lista Quebra de Caixas');
     XLSX.writeFile(workbook, 'quebra_caixa_loja.xlsx');
@@ -159,7 +162,7 @@ export const ActionListaQuebraCaixaLojaNegativa = ({ dadosQuebraDeCaixaNegativa,
       body: (row) => {
         return (
           <div style={{ color: row.STATIVO == "True" ? 'blue' : 'red' }}>
-            <th style={{ }}> {row.STATIVO == 'True' ? "Ativo" : "Inativo"}</th>
+            <th style={{}}> {row.STATIVO == 'True' ? "Ativo" : "Inativo"}</th>
           </div>
         )
       },
@@ -171,7 +174,6 @@ export const ActionListaQuebraCaixaLojaNegativa = ({ dadosQuebraDeCaixaNegativa,
       body: (row) => {
         if (row.STATIVO == 'True') {
           return (
-
             <div className="d-flex "
               style={{ justifyContent: "space-between" }}
             >
@@ -181,7 +183,7 @@ export const ActionListaQuebraCaixaLojaNegativa = ({ dadosQuebraDeCaixaNegativa,
                   cor={"danger"}
                   Icon={FaRegTrashAlt}
                   iconSize={18}
-                  onClickButton={() => handleClickCancelar(row)}
+                  onClickButton={() => handleClickCancelar(row.IDQUEBRACAIXA, false)}
                 />
 
               </div>
@@ -195,49 +197,26 @@ export const ActionListaQuebraCaixaLojaNegativa = ({ dadosQuebraDeCaixaNegativa,
                 />
 
               </div>
-
             </div>
           )
         } else {
           return (
-
             <div>
               <ButtonTable
                 titleButton={"Ativar Quebra"}
                 cor={"success"}
                 Icon={FaCheck}
                 iconSize={18}
-                onClickButton={() => handleClickAtivar(row)}
+                onClickButton={() => handleClickCancelar(row.IDQUEBRACAIXA, true)}
               />
 
             </div>
           )
         }
       }
-
     },
-    
+
   ]
-
-  const onSubmit = async () => {
-
-    let textFuncao = `QUEBRA DE CAIXA Nº ${dados[0]?.IDQUEBRACAIXA} DO MOVIMENTO: ${dados[0]?.IDMOVIMENTOCAIXA} FUNCIONARIO: ${dados[0]?.NOMEOPERADOR}`;
-
-    const postData = {  
-      IDFUNCIONARIO: usuarioLogado.id,
-      PATHFUNCAO:  'FINANCEIRO/IMPRESSÃO QUEBRA DE CAIXA',
-      DADOS: textFuncao,
-      IP: ipUsuario
-    }
-   
-    const response = await post('/logWeb', postData)
-    .then(response => { 
-      console.log(response, 'Log de usuário salvo com sucesso!')
-    })
-    .catch (error => {
-      console.log(error, 'erro ao salvar os log de usuário')
-    })    
-  }
 
   const handleImprimir = async (IDQUEBRACAIXA) => {
     try {
@@ -245,6 +224,18 @@ export const ActionListaQuebraCaixaLojaNegativa = ({ dadosQuebraDeCaixaNegativa,
       if (response.data && response.data.length > 0) {
         setDadosQuebraCaixasModal(response.data);
         setModalVisivel(true);
+      } else {
+        Swal.fire({
+          position: 'center',
+          icon: 'warning',
+          title: 'Nenhum dado encontrado para esta quebra de caixa!',
+          showConfirmButton: false,
+          timer: 5000,
+          customClass: {
+            container: 'custom-swal',
+          }
+        })
+        return;
       }
     } catch (error) {
       console.error('Erro ao buscar detalhes da venda: ', error);
@@ -253,86 +244,13 @@ export const ActionListaQuebraCaixaLojaNegativa = ({ dadosQuebraDeCaixaNegativa,
 
   const handleClickImprimir = (row) => {
     if (row && row.IDQUEBRACAIXA) {
-      onSubmit()
       handleImprimir(row.IDQUEBRACAIXA);
     }
   };
 
-  const handleCancelar = async () => {
-    try {
-      const putData = [{  
-        IDQUEBRACAIXA: dados[0].IDQUEBRACAIXA,
-        STATIVO: 'False'
-      }]
-      const response = await put('/atualizar-status-quebra', putData)
-   
-      const textDados = JSON.stringify(putData)
-      let textoFuncao = '';
-      if(putData[0].STATIVO == 'False') {
-        textoFuncao = 'FINANCEIRO/ATIVADO QUEBRA DE CAIXA';
-      } else {
-        textoFuncao = 'FINANCEIRO/CANCELAMENTO DE QUEBRA DE CAIXA';
-      }
-  
-      const postData = {  
-        IDFUNCIONARIO: usuarioLogado.id,
-        PATHFUNCAO:  textoFuncao,
-        DADOS: textDados,
-        IP: ipUsuario
-      }
-
-      const responsePost = await post('/log-web', postData)
-      handleClick()
-      return responsePost.data;
-    } catch (error) {
-      console.error('Erro ao buscar detalhes da venda: ', error);
-    }
-    
-  }
-
-  const handleClickCancelar = (row) => {
-    if (row && row.IDQUEBRACAIXA) {
-      handleCancelar(row.IDQUEBRACAIXA);
-      
-    }
-  };
-
-  const handleAtivar = async () => {
-    try {
-      const putData = [{  
-        IDQUEBRACAIXA: dados[0].IDQUEBRACAIXA,
-        STATIVO: 'True'
-      }]
-      const response = await put('/atualizar-status-quebra', putData)
-   
-      const textDados = JSON.stringify(putData)
-      let textoFuncao = '';
-      if(putData[0].STATIVO == 'True') {
-        textoFuncao = 'FINANCEIRO/ATIVADO QUEBRA DE CAIXA';
-      } else {
-        textoFuncao = 'FINANCEIRO/CANCELAMENTO DE QUEBRA DE CAIXA';
-      }
-  
-      const postData = {  
-        IDFUNCIONARIO: usuarioLogado.id,
-        PATHFUNCAO:  textoFuncao,
-        DADOS: textDados,
-        IP: ipUsuario
-      }
-
-      const responsePost = await post('/log-web', postData)
-    
-      handleClick()
-      return responsePost.data;
-    } catch (error) {
-      console.error('Erro ao buscar detalhes da venda: ', error);
-    }
-    
-  }
-
-  const handleClickAtivar = (row) => {
-    if (row && row.IDQUEBRACAIXA) {
-      handleAtivar(row.IDQUEBRACAIXA);  
+  const handleClickCancelar = (IDQUEBRA, status) => {
+    if (IDQUEBRA) {
+      handleCancelar(IDQUEBRA, status);
     }
   };
 

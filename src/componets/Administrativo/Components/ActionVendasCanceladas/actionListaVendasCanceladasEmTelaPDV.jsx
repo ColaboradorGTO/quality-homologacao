@@ -4,7 +4,6 @@ import { Column } from 'primereact/column';
 import { GrView } from "react-icons/gr";
 import { FaProductHunt } from "react-icons/fa";
 import { MdOutlineAttachMoney } from "react-icons/md";
-import { dataFormatada } from "../../../../utils/dataFormatada";
 import { formatMoeda } from "../../../../utils/formatMoeda";
 import { ButtonTable } from "../../../ButtonsTabela/ButtonTable";
 import { get } from "../../../../api/funcRequest";
@@ -475,8 +474,18 @@ export const ActionListaVendasCanceladasEmTelaPDV = ({
   const handleDetalharVendaXML = async (IDVENDA) => {
     try {
       const response = await get(`/venda-xml?idVenda=${IDVENDA}`);
-      setModalXmlVisivel(true);
-      setDadosVendasXML(response.data)
+      if(response.data && response.data.length > 0) {
+        setModalXmlVisivel(true);
+        setDadosVendasXML(response.data)
+      } else {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Atenção',
+          text: 'Nenhum dado de XML encontrado para esta venda.',
+          timer: 5000,
+        })
+        return;
+      }
 
     } catch (error) {
       console.error(error);
@@ -575,4 +584,3 @@ export const ActionListaVendasCanceladasEmTelaPDV = ({
     </Fragment>
   )
 }
-

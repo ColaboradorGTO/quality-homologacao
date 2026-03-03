@@ -108,18 +108,6 @@ export const ActionListaEstoqueAtual = ({ dadosEstoqueAtual }) => {
       totalCusto: totalCusto,
       totalVenda: totalVenda,
       markup: formatarPorcentagem(markup),
-
-
-      // DATAMOVIMENTO: item.DATAMOVIMENTO,
-      // QTDINICIO: item.QTDINICIO,
-      // QTDENTRADA: item.QTDENTRADA,
-      // QTDENTRADAVOUCHER: item.QTDENTRADAVOUCHER,
-      // QTDSAIDA: item.QTDSAIDA,
-      // QTDSAIDATRANSFERENCIA: item.QTDSAIDATRANSFERENCIA,
-      // QTDRETORNOAJUSTEPEDIDO: item.QTDRETORNOAJUSTEPEDIDO,
-      // QTDAJUSTEBALANCO: item.QTDAJUSTEBALANCO,
-      // QTDENTRADAECOMMERCE: item.QTDENTRADAECOMMERCE,
-      // QTDSAIDAECOMMERCE: item.QTDSAIDAECOMMERCE,
     }
   });
 
@@ -317,8 +305,6 @@ export const ActionListaEstoqueAtual = ({ dadosEstoqueAtual }) => {
             ))}
 
           </DataTable>
-
-      
         </div>
       </div>
     </Fragment>

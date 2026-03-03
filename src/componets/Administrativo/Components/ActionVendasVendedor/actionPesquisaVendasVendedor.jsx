@@ -10,7 +10,7 @@ import { AiOutlineSearch } from "react-icons/ai";
 import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
 import { MultSelectAction } from "../../../Select/MultSelectAction";
-
+import { optionsUF, optionComissoes } from "../../../../../parceiro.json";
 
 export const ActionPesquisaVendasVendedor = () => {
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
@@ -35,7 +35,7 @@ export const ActionPesquisaVendasVendedor = () => {
       const response = await get(`/marcasLista`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000, }
+    { staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000, }
   );
    
   const { data: optionsEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas } = useQuery(
@@ -45,7 +45,7 @@ export const ActionPesquisaVendasVendedor = () => {
       
       return response.data;
     },
-    {enabled: Boolean(marcaSelecionada), staleTime: 5 * 60 * 1000, cacheTime: 60 * 60 * 1000,}
+    {enabled: Boolean(marcaSelecionada), staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000,}
   );
 
   const fetchListaVendasVendedor = async ( ) => {
@@ -105,19 +105,6 @@ export const ActionPesquisaVendasVendedor = () => {
   const handleClick = () => {
     refetchListaVendasVendedor()
   }
-
-  const optionsUF = [ 
-    { id: 1, value: '0', label: 'Todos' },
-    { id: 2, value: 'DF', label: 'DF' },
-    { id: 3, value: 'GO', label: 'GO' },
-  ]
-
-  const optionComissoes = [
-    { id: 1, value: '0', label: 'Nenhum' },
-    { id: 2, value: '1', label: '2%' },
-    { id: 3, value: '2', label: '4%' },
-    { id: 4, value: '3', label: '6%' },
-  ]
 
   return (
 

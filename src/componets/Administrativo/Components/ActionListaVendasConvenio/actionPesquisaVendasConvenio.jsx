@@ -19,7 +19,6 @@ export const ActionPesquisaVendasConvenio = () => {
   const [empresaSelecionada, setEmpresaSelecionada] = useState('')
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [tabelaVisivelDescontoFuncionario, setTabelaVisivelDescontoFuncionario] = useState(false);
-  const [isLoadingPesquisa, setIsLoadingPesquisa] = useState(false);
 
 
   useEffect(() => {
@@ -68,7 +67,7 @@ export const ActionPesquisaVendasConvenio = () => {
   const { data: dadosVendasConvenioFuncionario = [], error: errorVendasConvenioFuncionario, isLoading: isLoadingVendasConvenioFuncionario, refetch: refetchListaVendasConvenioDescontoFuncionario } = useQuery(
     ['desconto-motivo-vendas-adm',],
     () => fetchListaVendasConvenioDescontoFuncionario(),
-    { enabled: false, staleTime: 5 * 60 * 1000,}
+    { enabled: false, staleTime: 60 * 60 * 1000,}
   );
 
   const fetchListaVendasConvenio = async () => {
@@ -107,7 +106,7 @@ export const ActionPesquisaVendasConvenio = () => {
   const { data: dadosVendasConvenio = [], error: errorVendasConvenio, isLoading: isLoadingVendasConvenio, refetch: refetchListaVendasConvenio } = useQuery(
     ['desconto-motivo-vendas-adm',],
     () => fetchListaVendasConvenio(),
-    { enabled: false, staleTime: 5 * 60 * 1000,}
+    { enabled: false, staleTime: 60 * 60 * 1000,}
   );
   
   const handleSelectEmpresa = (e) => {
@@ -121,14 +120,12 @@ export const ActionPesquisaVendasConvenio = () => {
   const handleClick = () => {
     setTabelaVisivel(true);
     setTabelaVisivelDescontoFuncionario(false);
-    setIsLoadingPesquisa(true);
     refetchListaVendasConvenio();
   };
 
   const handleClickDecontoFuncionario = () => {
     setTabelaVisivelDescontoFuncionario(true);
     setTabelaVisivel(false);
-    setIsLoadingPesquisa(true);
     refetchListaVendasConvenioDescontoFuncionario();
   }
 

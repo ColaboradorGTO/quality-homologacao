@@ -50,25 +50,18 @@ export const ActionPesquisaVendasDescontoFuncionario = ({ usuarioLogado }) => {
       const response = await get(`/listaEmpresasIformatica`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, }
+    { staleTime: 60 * 60 * 1000, }
   );
   
   const { data: dadosFuncionarios = [], error: errorFuncionarios, isLoading: isLoadingFuncionarios, refetch: refetchFuncionarios } = useQuery(
-    'listaFuncionarioVendasDesconto',
+    ['listaFuncionarioVendasDesconto', empresaSelecionada],
     async () => {
       const response = await get(`/funcionarios?idEmpresa=${empresaSelecionada}`);
       
       return response.data;
     },
-    { enabled: false, staleTime: 5 * 60 * 1000, cacheTime: 60 * 60 * 1000, }
+    { enabled: Boolean(empresaSelecionada), staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000, }
   );
-
-  useEffect(() => {
-    if (empresaSelecionada) {
-      refetchFuncionarios();
-    }
-    
-  }, [empresaSelecionada, refetchFuncionarios]);
 
   const fetchListaVendasConvenio = async () => {
     const urlBase = `/resumo-venda-convenio-desconto?idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idFuncionario=${funcionarioSelecionado}&statusCancelado=False`;
@@ -166,7 +159,6 @@ export const ActionPesquisaVendasDescontoFuncionario = ({ usuarioLogado }) => {
         }))}      
         valueSelectFuncionario={funcionarioSelecionado}
         onChangeSelectFuncionario={handleChangeFuncionario}
-
   
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}
