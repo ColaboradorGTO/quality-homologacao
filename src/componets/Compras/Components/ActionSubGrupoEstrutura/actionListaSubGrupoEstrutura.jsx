@@ -16,8 +16,8 @@ export const ActionListaSubGrupoEstrutura = ({ dadosSubGrupo, usuarioLogado, opt
   const [modalEditar, setModalEditar] = useState(false);
   const [dadosDetalheSubGrupo, setDadosDetalheSubGrupo] = useState([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
-  
   
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -132,7 +132,7 @@ export const ActionListaSubGrupoEstrutura = ({ dadosSubGrupo, usuarioLogado, opt
   const clickEditar = (row) => {
     if(optionsModulos[0]?.ALTERAR == 'False') {
       Swal.fire({
-        title: 'Erro!',
+        title: 'Acesso Negado!',
         text: `${usuarioLogado?.NOFUNCIONARIO},\nVocê não tem permissão para alterar a SubGrupo de Estrutura Mercadológica!`,
         icon: 'error',
         customClass: {
@@ -151,8 +151,20 @@ export const ActionListaSubGrupoEstrutura = ({ dadosSubGrupo, usuarioLogado, opt
   const handleEditar = async (IDSUBGRUPOESTRUTURA) => {
     try {
       const response = await get(`/subGrupoEstrutura?idSubGrupoEstrutura=${IDSUBGRUPOESTRUTURA}`);
-      setDadosDetalheSubGrupo(response.data);
-      setModalEditar(true)
+      if(response.data && response.data.length > 0) {
+        setDadosDetalheSubGrupo(response.data);
+        setModalEditar(true)
+      } else {
+        Swal.fire({
+          title: 'Erro!',
+          text: 'SubGrupo de Estrutura Mercadológica não encontrado para edição.',
+          icon: 'error',
+          customClass: {
+            container: 'custom-swal',
+          },
+        });
+        return;
+      }
     } catch (error) {
       console.error(error);
     }
@@ -181,6 +193,9 @@ export const ActionListaSubGrupoEstrutura = ({ dadosSubGrupo, usuarioLogado, opt
             value={dados}
             globalFilter={globalFilterValue}
             size="small"
+            selectionMode="single"
+            selection={rowSelection}
+            onSelectionChange={(e) => setRowSelection(e.value)}
             sortOrder={-1}
             paginator={true}
             rows={10}

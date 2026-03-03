@@ -12,14 +12,11 @@ import { useQuery } from "react-query"
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento"
 import Swal from "sweetalert2"
 
-
 export const ActionPesquisaSubGrupoEstrutura = ({usuarioLogado }) => {
   const [descricao, setDescricao] = useState("")
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [modalVisivel, setModalVisivel] = useState(false);
   const [subGrupoSelecionado, setSubGrupoSelecionado] = useState("")
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(1000);
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
 
@@ -80,7 +77,6 @@ export const ActionPesquisaSubGrupoEstrutura = ({usuarioLogado }) => {
     () => fetchListaSubGrupo(),
     { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
   )
-
 
   const handleClick = () => {
     refetchListaSubGrupo()
@@ -145,14 +141,12 @@ export const ActionPesquisaSubGrupoEstrutura = ({usuarioLogado }) => {
 
       />
 
-      
       <ActionListaSubGrupoEstrutura 
         dadosSubGrupo={dadosSubGrupo} 
         usuarioLogado={usuarioLogado}
         optionsModulos={optionsModulos} 
         handleClick={handleClick}  
       />
-      
 
       <ActionCadastroEstruturaModal 
         show={modalVisivel} 

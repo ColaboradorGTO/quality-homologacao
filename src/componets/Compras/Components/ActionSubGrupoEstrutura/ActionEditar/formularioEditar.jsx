@@ -2,21 +2,26 @@ import { Fragment } from "react"
 
 import { useEditarEstruturaMercadologica } from "../hooks/useEditarEstruturaMercadologica"
 import Select from 'react-select';
-import { useForm } from "react-hook-form";
-import { InputFieldModal } from "../../../../Buttons/InputFieldModal";
+import { Controller, useForm } from "react-hook-form";
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal";
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal";
+import { AlertError } from "../../../../Inputs/alertError";
+import FormField from "../../../../Formularios/FormField";
+import { situacao } from "../../../../../../parceiro.json" 
+import { schema } from "./schemaValidarSubGrupo"
 
-export const FormularioEditar = ({  
-    handleClose, 
-    dadosDetalheSubGrupo,  
+export const FormularioEditar = ({
+    handleClose,
+    dadosDetalheSubGrupo,
     usuarioLogado,
     optionsModulos,
-    handleClick  
+    handleClick
 }) => {
-    const { register, handleSubmit, formState: { errors } } = useForm();
+    const { handleSubmit, formState: { errors }, clearErrors, control, setError, setValue } = useForm({
+        mode: "onChange"
+    });
+
     const {
-        optionsStatus,
         statusSelecionado,
         setStatusSelecionado,
         descricao,
@@ -24,32 +29,72 @@ export const FormularioEditar = ({
         subGrupoSelecionado,
         setSubGrupoSelecionado,
         dadosGrupoEstrutura,
-        atualzarSubGrupoEstrutura,
-    
-    } = useEditarEstruturaMercadologica({ handleClose, dadosDetalheSubGrupo,  usuarioLogado, optionsModulos, handleClick });
+        onSubmit
+
+    } = useEditarEstruturaMercadologica({ handleClose, dadosDetalheSubGrupo, usuarioLogado, optionsModulos, handleClick });
+
+
+    const handleValidatedSubmit = async () => {
+        try {
+            const dadosParaValidar = {
+                descricaoSubGrupo: descricao,
+                subGrupo: subGrupoSelecionado,
+                situacaoSubGrupo: statusSelecionado,
+            };
+
+            await schema.validate(dadosParaValidar, { abortEarly: false });
+            await onSubmit();
+        } catch (validationError) {
+            console.error('❌ Erro de validação:', validationError);
+
+            clearErrors();
+
+            if (validationError.inner && validationError.inner.length > 0) {
+                validationError.inner.forEach(error => {
+                    if (error.path) {
+                        setError(error.path, {
+                            type: 'manual',
+                            message: error.message
+                        });
+                    }
+                });
+            }
+
+            const errorMessages = validationError.errors || [validationError.message];
+            console.log(`Erro de validação:\n${errorMessages.join('\n')}`);
+        }
+
+    }
 
     return (
         <Fragment>
-            <form onSubmit={handleSubmit(atualzarSubGrupoEstrutura)}>
+            <form onSubmit={handleSubmit(handleValidatedSubmit)}>
                 <div className="form-group">
                     <div className="row">
                         <div className="col-sm-6 col-xl-6">
-                            <InputFieldModal
-                                label={"Descrição *"}
-                                type={"text"}
-                                id={"IDCatPedido"}
-                                value={descricao}
-                                onChangeModal={(e) => setDescricao(e.target.value)}
-
-                                {...register("IDCatPedido", { required: "Campo obrigatório Informe a Descrição do Grupo Estrutura Mercadológica", })}
-                                required={true}
+                            <Controller
+                                name="descricaoSubGrupo"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        name="descricaoSubGrupo"
+                                        label={"Descrição *"}
+                                        type="text"
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        value={descricao}
+                                        onChangeModal={(e) => setDescricao(e.target.value)}
+                                    />
+                                )}
                             />
                         </div>
                         <div className="col-sm-6 col-xl-3">
 
                             <label htmlFor="">Grupo Estrutura *</label>
                             <Select
-                                value={subGrupoSelecionado}
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="subGrupo"
                                 options={[
                                     { value: '', label: 'Selecione...' },
                                     ...dadosGrupoEstrutura.map((item) => {
@@ -58,29 +103,51 @@ export const FormularioEditar = ({
                                             label: `${item.CODGRUPOESTRUTURA} - ${item.DSGRUPOESTRUTURA}`
                                         }
                                     })]}
-                                onChange={(e) => setSubGrupoSelecionado(e)}
+                                value={subGrupoSelecionado}
+                                onChange={(e) => {
+                                    setSubGrupoSelecionado(e)
+                                    clearErrors('subGrupo')
+                                }}
                             />
+                            {errors.subGrupo && (
+                                <AlertError
+                                    error={errors.subGrupo}
+                                    onClose={clearErrors}
+                                    fieldName="subGrupo"
+                                />
+                            )}
+
                         </div>
                         <div className="col-sm-6 col-xl-3">
 
                             <label htmlFor="">Situação *</label>
                             <Select
-
-                                value={statusSelecionado}
-                                options={optionsStatus.map((item) => {
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="situacaoSubGrupo"
+                                options={situacao.map((item) => {
                                     return {
                                         value: item.value,
                                         label: item.label
                                     }
                                 })}
-                                onChange={(e) => setStatusSelecionado(e)}
+                                value={statusSelecionado}
+                                onChange={(e) => {
+                                    setStatusSelecionado(e)
+                                    clearErrors('situacaoSubGrupo')
+                                }}
                             />
+                            {errors.situacaoSubGrupo && (
+                                <AlertError
+                                    error={errors.situacaoSubGrupo}
+                                    onClose={clearErrors}
+                                    fieldName="situacaoSubGrupo"
+                                />
+                            )}
                         </div>
                     </div>
                 </div>
-                <div className="form-group">
-                    <h3 className="form-label" htmlFor="vrfat">* Campos Obrigatórios *</h3>
-                </div>
+
                 <FooterModal
                     ButtonTypeFechar={ButtonTypeModal}
                     onClickButtonFechar={handleClose}
@@ -88,8 +155,7 @@ export const FormularioEditar = ({
                     corFechar={"secondary"}
 
                     ButtonTypeCadastrar={ButtonTypeModal}
-                    // onClickButtonCadastrar={() => console.log('clicou')}
-                    onClickButtonCadastrar={atualzarSubGrupoEstrutura}
+                    onClickButtonCadastrar={handleSubmit(handleValidatedSubmit)}
                     tipoBtnCadastrar={"submit"}
                     textButtonCadastrar={"Salvar"}
                     corCadastrar={"success"}

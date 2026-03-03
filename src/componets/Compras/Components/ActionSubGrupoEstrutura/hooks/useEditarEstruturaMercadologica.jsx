@@ -4,7 +4,6 @@ import axios from "axios"
 import Swal from 'sweetalert2'
 import { useQuery } from "react-query"
 
-
 export const useEditarEstruturaMercadologica = ({
     handleClose, 
     dadosDetalheSubGrupo,  
@@ -26,13 +25,6 @@ export const useEditarEstruturaMercadologica = ({
         },
         { enabled: true, staleTime: 60 * 60 * 1000, }
     );
-    
-    
-    const optionsStatus = [
-        { value: 'True', label: 'ATIVO' },
-        { value: 'False', label: 'INATIVO' }
-    ]
-
  
     useEffect(() => {
         if (dadosDetalheSubGrupo) {
@@ -47,60 +39,37 @@ export const useEditarEstruturaMercadologica = ({
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
             usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP via ipwho.is:", error);
+            console.error("Erro ao buscar IP via ifconfig.me:", error);
         }
 
         if (!usuarioIP) {
-            try {
-                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-                usuarioIP = ipifyData?.ip;
-            } catch (error) {
-                console.error("Erro ao buscar IP via ipify.org:", error);
-            }
+        try {
+            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+            usuarioIP = ipifyData?.ip;
+        } catch (error) {
+            console.error("Erro ao buscar IP via ipify.org:", error);
+        }
         }
         setIpUsuario(usuarioIP);
         return usuarioIP;
     };
 
 
-    const atualzarSubGrupoEstrutura = async () => {
+    const onSubmit = async () => {
 
         if(optionsModulos[0]?.ALTERAR == 'False') {
             Swal.fire({
                 position: 'center',
                 icon: 'error',
-                title: 'Você não tem permissão para alterar a Estrutura Mercadológica.',
+                html: `${usuarioLogado?.NOFUNCIONARIO} <br> Você não tem permissão para alterar a Estrutura Mercadológica.`,
                 showConfirmButton: false,
                 timer: 3500 
             })
             return;
         }
-
-        if (descricao == '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'O campo descrição é obrigatório.',
-                showConfirmButton: false,
-                timer: 1500
-            });
-            return;
-        }
-
-        if (subGrupoSelecionado == '') {
-            Swal.fire({
-                position: 'top-end',
-                icon: 'error',
-                title: 'O campo Grupo Cor é obrigatório.',
-                showConfirmButton: false,
-                timer: 1500
-            });
-            return;
-        }
-
         
         const putData = {
             IDGRUPOESTRUTURAANTIGA: Number(dadosDetalheSubGrupo[0]?.IDGRUPOESTRUTURA),
@@ -115,8 +84,6 @@ export const useEditarEstruturaMercadologica = ({
         try {
             
             const response = await put('/sub-grupo-estrutura/:id', putData)
-           
-            
             const textDados = JSON.stringify(putData)
             let textFuncao = 'COMPRAS/ALTERAÇÃO DA ESTRUTURA MERCADOLÓGICA';
             const ip = await getIPUsuario();
@@ -125,10 +92,10 @@ export const useEditarEstruturaMercadologica = ({
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textFuncao,
                 DADOS: textDados,
-                IP: ip
+                IP: ip || 'Indisponível'
             }
             
-            const responseLog = await post('/log-web', createtLog)
+            await post('/log-web', createtLog)
             Swal.fire({
                 position: 'center',
                 icon: 'success',
@@ -151,7 +118,7 @@ export const useEditarEstruturaMercadologica = ({
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textFuncao,
                 DADOS: textDados,
-                IP: ip
+                IP: ip || 'Indisponível'
             }
             
             const responseLog = await post('/log-web', createtLog)
@@ -172,7 +139,6 @@ export const useEditarEstruturaMercadologica = ({
     }
 
     return {
-        optionsStatus,
         statusSelecionado,
         setStatusSelecionado,
         descricao,
@@ -181,7 +147,6 @@ export const useEditarEstruturaMercadologica = ({
         setSubGrupoSelecionado,
         dadosDetalheSubGrupo,
         dadosGrupoEstrutura,
-        atualzarSubGrupoEstrutura,
-    
+        onSubmit
     }
 }

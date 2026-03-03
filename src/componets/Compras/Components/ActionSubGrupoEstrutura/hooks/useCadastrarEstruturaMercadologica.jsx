@@ -72,7 +72,7 @@ export const useCadastrarEstruturaMercadologica = ({ handleClose, usuarioLogado,
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textFuncao,
                 DADOS: textDados,
-                IP: ip
+                IP: ip || 'Indisponível'
             }
 
             await post('/log-web', createtLog)
@@ -98,7 +98,7 @@ export const useCadastrarEstruturaMercadologica = ({ handleClose, usuarioLogado,
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textFuncao,
                 DADOS: textDados,
-                IP: ip
+                IP: ip || 'Indisponível'
             }
 
             await post('/log-web', createtLog)
