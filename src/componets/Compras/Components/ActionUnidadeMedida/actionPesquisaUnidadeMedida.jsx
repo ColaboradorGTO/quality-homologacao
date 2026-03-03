@@ -19,7 +19,6 @@ export const ActionPesquisaUnidadeMedida = ({ usuarioLogado }) => {
   const [unidadeSelecionada, setUnidadeSelecionada] = useState("")
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
-
   useEffect(() => {
     const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
     if (menuSalvo) {
