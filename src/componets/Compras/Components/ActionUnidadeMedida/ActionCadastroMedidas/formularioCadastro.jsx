@@ -1,11 +1,11 @@
 import { Fragment } from "react"
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal"
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal"
-import { InputFieldModal } from "../../../../Buttons/InputFieldModal"
 import { Controller, useForm } from "react-hook-form";
 import Select from 'react-select';
 import { useCadastroUnidadeMedida } from "../hooks/useCadastroUnidadeMedida"
 import FormField from "../../../../Formularios/FormField";
+import { schema } from "./schemaValidarUnidadeMedida";
 
 export const FormularioCadatro = ({ handleClose, usuarioLogado, refetchListaUnidadesMedidas, optionsModulos }) => {
     const { handleSubmit, formState: { errors }, clearErrors, control, setError, setValue } = useForm({
@@ -18,16 +18,15 @@ export const FormularioCadatro = ({ handleClose, usuarioLogado, refetchListaUnid
         setDescricao,
         sigla,
         setSigla,
-        optionsStatus,
-        handleCadastro
+        onSubmit
     } = useCadastroUnidadeMedida({ handleClose, usuarioLogado, refetchListaUnidadesMedidas, optionsModulos });
     
     const handleValidatedSubmit = async () => {
         try {
             const dadosParaValidar = {
-                descricaoCores: descricao,
-                grupoCores: grupoCorSelecionado,
-                situacaoCores: statusSelecionado,
+                descricaoUnidadeMedida: descricao,
+                siglaUnidadeMedida: sigla,
+                situacaoUnidadeMedida: statusSelecionado,
             };
             
             await schema.validate(dadosParaValidar, { abortEarly: false });
