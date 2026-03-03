@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react"
+import { Fragment, useState, useEffect } from "react"
 import { ActionMain } from "../../../Actions/actionMain";
 import { InputField } from "../../../Buttons/Input";
 import { InputSelectAction } from "../../../Inputs/InputSelectAction";
@@ -10,23 +10,34 @@ import { ActionListaUnidadeMedida } from "./actionListaUnidadeMedida";
 import { ActionCadastroUnidadeMedidaModal } from "./ActionCadastroMedidas/actionCadastroUnidadeMedidaModal";
 import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
+import Swal from "sweetalert2";
 
-export const ActionPesquisaUnidadeMedida = ({ usuarioLogado, ID }) => {
+export const ActionPesquisaUnidadeMedida = ({ usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [modalVisivel, setModalVisivel] = useState(false);
   const [descricao, setDescricao] = useState("")
   const [unidadeSelecionada, setUnidadeSelecionada] = useState("")
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(1000);
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
+
+  useEffect(() => {
+    const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
+    if (menuSalvo) {
+      const menuParsed = JSON.parse(menuSalvo);
+      setMenuFilhoAtual(menuParsed);
+    }
+  }, []);
+  
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
-    'menus-usuario-excecao',
+    ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
-      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${ID}`);
-
+      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
+      
       return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
   );
 
   const { data: optionsMedidas = [], error: errorMedidas, isLoading: isLoadingMedidas, refetch: refetchMedidas } = useQuery(
@@ -74,9 +85,9 @@ export const ActionPesquisaUnidadeMedida = ({ usuarioLogado, ID }) => {
   };
 
   const { data: dadosUnidadeMedidas = [], error: errorAdiantamento, isLoading: isLoadingAdiantamento, refetch: refetchListaUnidadesMedidas } = useQuery(
-    ['unidades-de-Medidas', unidadeSelecionada, descricao, currentPage, pageSize],
+    ['unidades-de-Medidas', ],
     () => fetchListaUnidadesMedidas(),
-    { enabled: true, staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
   )
 
 
@@ -85,18 +96,28 @@ export const ActionPesquisaUnidadeMedida = ({ usuarioLogado, ID }) => {
   }
 
   const handleClick = () => {
-    setCurrentPage(prevPage => prevPage + 1)
     refetchListaUnidadesMedidas()
     setTabelaVisivel(true)
   }
 
   const handleModal = () => {
-    setModalVisivel(true)
+    if(optionsModulos[0]?.CRIAR == 'True') {
+
+      setModalVisivel(true)
+    } else {
+      Swal.fire({
+        icon: 'info',
+        title: 'Acesso Negado!',
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para cadastrar!`,
+        timer: 5000,
+        customClass: {
+          container: 'custom-swal',
+        },
+      })
+      return;
+    } 
   }
 
-  const handleClose = () => {
-    setModalVisivel(false)
-  }
 
   return (
 
@@ -153,8 +174,9 @@ export const ActionPesquisaUnidadeMedida = ({ usuarioLogado, ID }) => {
 
       <ActionCadastroUnidadeMedidaModal
         show={modalVisivel}
-        handleClose={handleClose}
+        handleClose={() => setModalVisivel(false)}
         refetchListaUnidadesMedidas={refetchListaUnidadesMedidas}
+        handleClick={handleClick}
         optionsModulos={optionsModulos}
         usuarioLogado={usuarioLogado}
       />

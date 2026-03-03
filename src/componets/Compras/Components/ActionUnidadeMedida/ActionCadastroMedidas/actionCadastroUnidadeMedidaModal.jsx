@@ -4,7 +4,14 @@ import { HeaderModal } from "../../../../Modais/HeaderModal/HeaderModal";
 import { FormularioCadatro } from "./formularioCadastro";
 
 
-export const ActionCadastroUnidadeMedidaModal = ({ show, handleClose, usuarioLogado, refetchListaUnidadesMedidas, optionsModulos }) => {
+export const ActionCadastroUnidadeMedidaModal = ({ 
+  show, 
+  handleClose, 
+  usuarioLogado, 
+  refetchListaUnidadesMedidas, 
+  handleClick,
+  optionsModulos 
+}) => {
   return (
 
     <Fragment>
@@ -26,6 +33,7 @@ export const ActionCadastroUnidadeMedidaModal = ({ show, handleClose, usuarioLog
           <FormularioCadatro 
             handleClose={handleClose} 
             refetchListaUnidadesMedidas={refetchListaUnidadesMedidas}
+            handleClick={handleClick}
             optionsModulos={optionsModulos}
             usuarioLogado={usuarioLogado}  
           />
