@@ -4,7 +4,7 @@ import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal"
 import Select from 'react-select';
 import { useCriarTipoTecido } from "../hooks/useCriarTipoTecidos"
 import { Controller, useForm } from "react-hook-form";
-import { schema } from "./schamaValidarTecido";
+import { schema } from "./schemaValidarTecido";
 import FormField from "../../../../Formularios/FormField";
 import { AlertError } from "../../../../Inputs/alertError";
 import { situacao } from "../../../../../../parceiro.json" 

@@ -10,11 +10,13 @@ import { useReactToPrint } from "react-to-print";
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+import Swal from "sweetalert2";
 
 export const ActionListaEstilos = ({dadosEstilos, handleClick, usuarioLogado, optionsModulos}) => {
   const [modalEditar, setModalEditar] = useState(false);
   const [dadosDetalheEstilos, setDadosDetalheEstilos] = useState([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
   
   
@@ -116,11 +118,12 @@ export const ActionListaEstilos = ({dadosEstilos, handleClick, usuarioLogado, op
             <ButtonTable
               titleButton={"Editar Estilo"}
               onClickButton={() => clickEditar(row)}
-              cor={"success"}
+              cor={"primary"}
               Icon={CiEdit}
               iconSize={22}
               iconColor={"#fff"}
-
+              width="35px"
+              height="35px"
             />
           </div>
         )
@@ -138,10 +141,24 @@ export const ActionListaEstilos = ({dadosEstilos, handleClick, usuarioLogado, op
   const handleEditar = async (ID_ESTILOS) => {
     try {
       const response = await get(`/listaEstilos?idEstilo=${ID_ESTILOS}`);
-      setDadosDetalheEstilos(response.data);
-      setModalEditar(true)
+      if(response.data && response.data.length > 0) {
+        setDadosDetalheEstilos(response.data);
+        setModalEditar(true)
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Atenção',
+          text: 'Detalhes do estilo não encontrados.',
+        });
+        return;
+      }
     } catch (error) {
       console.error(error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Erro',
+        text: 'Ocorreu um erro ao buscar os detalhes do estilo.',
+      });
     }
   }
 
@@ -168,6 +185,9 @@ export const ActionListaEstilos = ({dadosEstilos, handleClick, usuarioLogado, op
             value={dados}
             globalFilter={globalFilterValue}
             size="small"
+            selectionMode="single"
+            selection={rowSelection}
+            onSelectionChange={(e) => setRowSelection(e.value)}
             sortOrder={-1}
             paginator={true}
             rows={10}

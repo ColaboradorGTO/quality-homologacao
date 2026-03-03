@@ -6,7 +6,7 @@ import { Controller, useForm } from "react-hook-form";
 import Select from 'react-select';
 import { situacao } from "../../../../../../parceiro.json" 
 import FormField from "../../../../Formularios/FormField"
-import { schema } from "./schamaValidarTecido";
+import { schema } from "./schemaValidarTecido";
 import { AlertError } from "../../../../Inputs/alertError";
 
 export const FormularioEditarTecido = ({ 

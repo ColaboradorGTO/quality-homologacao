@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react"
+import { Fragment, useState, useEffect } from "react"
 import { ButtonType } from "../../../Buttons/ButtonType";
 import { InputField } from "../../../Buttons/Input";
 import { InputSelectAction } from "../../../Inputs/InputSelectAction";
@@ -11,23 +11,32 @@ import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../ut
 import { MdAdd } from "react-icons/md";
 import { ActionCadastrarEstilosModal } from "./ActionCadastrarEstilos/actionCadastrarEstilosModal";
 
-
-export const ActionPesquisaEstilos = ({usuarioLogado, ID}) => {
+export const ActionPesquisaEstilos = ({usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [modalVisivel, setModalVisivel] = useState(false);
   const [descricao, setDescricao] = useState("")
   const [estiloSelecionado, setEstiloSelecionado] = useState("")
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(1000);
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
+  
+  
+  useEffect(() => {
+    const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
+    if (menuSalvo) {
+      const menuParsed = JSON.parse(menuSalvo);
+      setMenuFilhoAtual(menuParsed);
+    }
+  }, []);
   
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
-    'menus-usuario-excecao',
+    ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
-      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${ID}`);
-
+      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
+      
       return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
   );
 
   const fetchListaEstilos = async () => {
@@ -71,9 +80,9 @@ export const ActionPesquisaEstilos = ({usuarioLogado, ID}) => {
   };
   
   const { data: dadosEstilos = [], error: errorAdiantamento, isLoading: isLoadingAdiantamento, refetch: refetchListaEstilos } = useQuery(
-    ['listaEstilos', estiloSelecionado, descricao, currentPage, pageSize],
-    () => fetchListaEstilos(estiloSelecionado, descricao,  currentPage, pageSize),
-    { enabled: true  }
+    ['listaEstilos', ],
+    () => fetchListaEstilos(),
+    { enabled: true, staleTime: 60 * 60 * 1000, }
   )
 
   const handleChangeEstilo = (e) => {
