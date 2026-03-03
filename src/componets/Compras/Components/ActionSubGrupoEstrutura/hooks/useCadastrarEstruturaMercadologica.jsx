@@ -4,14 +4,11 @@ import axios from "axios"
 import Swal from 'sweetalert2'
 import { useQuery } from "react-query"
 
-
 export const useCadastrarEstruturaMercadologica = ({ handleClose, usuarioLogado, optionsModulos, handleClick }) => {
     const [statusSelecionado, setStatusSelecionado] = useState("")
     const [subGrupoSelecionado, setSubGrupoSelecionado] = useState("")
     const [descricao, setDescricao] = useState("")
     const [ipUsuario, setIpUsuario] = useState('');
-
-
 
     const { data: dadosGrupoEstrutura = [], error: errorGrupoEstrutura, isLoading: isLoadingGrupoEstrutura, refetch: refetchGrupoEstrutura } = useQuery(
         'grupoEstrutura',
@@ -23,65 +20,37 @@ export const useCadastrarEstruturaMercadologica = ({ handleClose, usuarioLogado,
         { enabled: true, staleTime: 60 * 60 * 1000, }
     );
 
-    const optionsStatus = [
-        { value: 'True', label: 'ATIVO' },
-        { value: 'False', label: 'INATIVO' }
-    ]
-
     const getIPUsuario = async () => {
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
             usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP via ipwho.is:", error);
+            console.error("Erro ao buscar IP via ifconfig.me:", error);
         }
 
         if (!usuarioIP) {
-            try {
-                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-                usuarioIP = ipifyData?.ip;
-            } catch (error) {
-                console.error("Erro ao buscar IP via ipify.org:", error);
-            }
+        try {
+            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+            usuarioIP = ipifyData?.ip;
+        } catch (error) {
+            console.error("Erro ao buscar IP via ipify.org:", error);
+        }
         }
         setIpUsuario(usuarioIP);
         return usuarioIP;
     };
 
-
-    const cadastrarSubGrupoEstrutura = async () => {
+    const onSubmit = async () => {
         if(optionsModulos[0]?.CRIAR == 'False') {
             Swal.fire({
-                title: 'Erro!',
+                title: 'Acesso Negado!',
                 text: `${usuarioLogado?.NOFUNCIONARIO},\nVocê não tem permissão para criar a Estrutura Mercadológica!`,
                 icon: 'error',
                 customClass: {
                     container: 'custom-swal',
                 },
-            });
-            return;
-        }
-
-        if (descricao == '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'O campo descrição é obrigatório.',
-                showConfirmButton: false,
-                timer: 1500
-            });
-            return;
-        }
-
-        if (subGrupoSelecionado == '') {
-            Swal.fire({
-                position: 'top-end',
-                icon: 'error',
-                title: 'O campo Grupo Cor é obrigatório.',
-                showConfirmButton: false,
-                timer: 1500
             });
             return;
         }
@@ -123,7 +92,7 @@ export const useCadastrarEstruturaMercadologica = ({ handleClose, usuarioLogado,
             return response.data;
         } catch (error) {
             const textDados = JSON.stringify(postData)
-            let textFuncao = 'COMPRAS/ERRO AO CADASTARA ESTRUTURA MERCADOLÓGICA';
+            let textFuncao = 'COMPRAS/ERRO AO CADASTRAR ESTRUTURA MERCADOLÓGICA';
             const ip = await getIPUsuario();
             const createtLog = {
                 IDFUNCIONARIO: String(usuarioLogado.id),
@@ -144,12 +113,11 @@ export const useCadastrarEstruturaMercadologica = ({ handleClose, usuarioLogado,
                     container: 'custom-swal',
                 },
             });
-            console.error('Erro ao alterar a Cor:', error);
+            console.error('Erro ao cadastrar a Estrutura Mercadológica:', error);
         }
     }
 
     return {
-        optionsStatus,
         statusSelecionado,
         setStatusSelecionado,
         descricao,
@@ -157,7 +125,7 @@ export const useCadastrarEstruturaMercadologica = ({ handleClose, usuarioLogado,
         subGrupoSelecionado,
         setSubGrupoSelecionado,
         dadosGrupoEstrutura,
-        cadastrarSubGrupoEstrutura,
+        onSubmit
 
     }
 }

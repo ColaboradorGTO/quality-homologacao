@@ -7,6 +7,8 @@ import { Controller, useForm } from "react-hook-form";
 import FormField from "../../../../Formularios/FormField"
 import { AlertError } from "../../../../Inputs/alertError"
 import { situacao } from "../../../../../../parceiro.json" 
+import { schema } from "./schemaValidarSubGrupo"
+
 
 export const FormularioCadastro = ({  handleClose, usuarioLogado, optionsModulos, handleClick }) => {
     const { handleSubmit, formState: { errors }, clearErrors, control, setError, setValue } = useForm({
@@ -28,7 +30,7 @@ export const FormularioCadastro = ({  handleClose, usuarioLogado, optionsModulos
         try {
             const dadosParaValidar = {
                 descricaoSubGrupo: descricao,
-                siglaSubGrupo: sigla,
+                subGrupo: subGrupoSelecionado,
                 situacaoSubGrupo: statusSelecionado,
             };
             
@@ -122,7 +124,10 @@ export const FormularioCadastro = ({  handleClose, usuarioLogado, optionsModulos
                                     }
                                 })}
                                 value={statusSelecionado}
-                                onChange={(e) => setStatusSelecionado(e)}
+                                onChange={(e) =>  { 
+                                    setStatusSelecionado(e)
+                                    clearErrors('situacaoSubGrupo')
+                                }}
                             />
                             {errors.situacaoSubGrupo && (
                                 <AlertError
