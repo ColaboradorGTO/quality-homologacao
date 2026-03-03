@@ -13,7 +13,7 @@ import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../ut
 import { MultSelectAction } from "../../../Select/MultSelectAction"
 import { useNavigate } from "react-router-dom"
 
-export const ActionPesquisaRecebimentosLoja = () => {
+export const ActionPesquisaRecebimentosLoja = ({ usuarioLogado }) => {
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('')
   const [dataPesquisaFim, setDataPesquisaFim] = useState('')
   const [empresaSelecionada, setEmpresaSelecionada] = useState('')
@@ -26,23 +26,6 @@ export const ActionPesquisaRecebimentosLoja = () => {
   const [tabelaRecebimentosOperador, setTabelaRecebimentosOperador] = useState(false)
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(500);
-  const [usuarioLogado, setUsuarioLogado] = useState(null)
-
-  const navigate = useNavigate();
-  useEffect(() => {
-    const usuarioArmazenado = localStorage.getItem('usuario');
-
-    if (usuarioArmazenado) {
-      try {
-        const parsedUsuario = JSON.parse(usuarioArmazenado);
-        setUsuarioLogado(parsedUsuario);;
-      } catch (error) {
-        console.error('Erro ao parsear o usuário do localStorage:', error);
-      }
-    } else {
-      navigate('/');
-    }
-  }, [navigate]);
 
   useEffect(() => {
     const dataInicial = getDataAtual()
@@ -60,16 +43,16 @@ export const ActionPesquisaRecebimentosLoja = () => {
       const response = await get(`/forma-pagamentos`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, }
+    { staleTime: 60 * 60 * 1000, }
   );
 
-  const { data: dadosFuncionarios = [],  refetch: refetchFuncionarios  } = useQuery(
+  const { data: dadosFuncionarios = [], refetch: refetchFuncionarios } = useQuery(
     ["funcionario-recebimento", usuarioLogado?.IDEMPRESA],
     async () => {
       const response = await get(`/funcionario-recebimento?idEmpresa=${usuarioLogado.IDEMPRESA}`);
       return response.data;
     },
-    { enabled: !!usuarioLogado?.IDEMPRESA, staleTime: 5 * 60 * 1000 }
+    { enabled: !!usuarioLogado?.IDEMPRESA, staleTime: 60 * 60 * 1000 }
   );
 
   useEffect(() => {
@@ -266,7 +249,7 @@ export const ActionPesquisaRecebimentosLoja = () => {
         }))}
         valueSelectFuncionario={colaboradorSelecionado}
         onChangeSelectFuncionario={handleSelectFuncionario}
-        
+
 
         MultSelectSubGrupoComponent={MultSelectAction}
         labelMultSelectSubGrupo={"Parcelas"}
@@ -292,11 +275,15 @@ export const ActionPesquisaRecebimentosLoja = () => {
 
       />
       {tabelaRecebimentos && (
-        <ActionListaRecebimentos dadosRecebimentos={dadosRecebimentos} />
+        <ActionListaRecebimentos
+          dadosRecebimentos={dadosRecebimentos}
+        />
       )}
 
       {tabelaRecebimentosOperador && (
-        <ActionListaRecebimentosOperador dadosRecebimentosOperador={dadosRecebimentosOperador} />
+        <ActionListaRecebimentosOperador
+          dadosRecebimentosOperador={dadosRecebimentosOperador}
+        />
       )}
     </Fragment>
   )

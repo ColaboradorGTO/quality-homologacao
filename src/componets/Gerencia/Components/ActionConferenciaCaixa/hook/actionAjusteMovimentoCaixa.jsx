@@ -4,7 +4,14 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import { removerFormatacaoMoeda } from "../../../../../utils/formatMoeda";
 
-export const useAjusteMovimentoCaixa = ({ handleClose, dadosDetalheFechamento, usuarioLogado, optionsModulos, refetchCaixaMovimento }) => {
+export const useAjusteMovimentoCaixa = ({
+    handleClose,
+    dadosDetalheFechamento,
+    usuarioLogado,
+    optionsModulos,
+    refetchCaixaMovimento
+}) => {
+
     const [empresa, setEmpresa] = useState('')
     const [operadorCaixa, setOperadorCaixa] = useState('')
     const [motivoAjuste, setMotivoAjuste] = useState('')
@@ -19,7 +26,7 @@ export const useAjusteMovimentoCaixa = ({ handleClose, dadosDetalheFechamento, u
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
             usuarioIP = ipWhoisData?.ip;
         } catch (error) {
             console.error("Erro ao buscar IP via ipwho.is:", error);
@@ -36,6 +43,7 @@ export const useAjusteMovimentoCaixa = ({ handleClose, dadosDetalheFechamento, u
         setIpUsuario(usuarioIP);
         return usuarioIP;
     };
+
 
     const onSubmit = async (data) => {
         if (optionsModulos[0]?.ALTERAR == 'False') {
@@ -80,7 +88,7 @@ export const useAjusteMovimentoCaixa = ({ handleClose, dadosDetalheFechamento, u
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || "INDISPONÍVEL"
             }
 
             await post('/log-web', postData)
@@ -107,7 +115,7 @@ export const useAjusteMovimentoCaixa = ({ handleClose, dadosDetalheFechamento, u
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || "INDISPONÍVEL"
             }
 
             const responsPost = await post('/log-web', postData)

@@ -85,7 +85,7 @@ export const ActionPesquisaDespesaLoja = ({ usuarioLogado, optionsEmpresas }) =>
   const { data: dadosDespesasLoja = [], error: erroQuality, isLoading: isLoadingQuality, refetch: refetchDespesas } = useQuery(
     'despesas-loja-empresa',
     () => fetchDespesas(),
-    { enabled: false, staleTime: 5 * 60 * 1000 }
+    { enabled: false, staleTime: 60 * 60 * 1000 }
   );
 
 

@@ -32,14 +32,14 @@ async function getDadosEnderecoViaCep_API_externa(cep) {
 
 async function validaCEP(cep, verificarNaApi = false) {
     const regex = /^[0-9]{5}-?[0-9]{3}$/;
-    
-    if (!regex.test(cep)){
+
+    if (!regex.test(cep)) {
         return false;
     }
 
-    if(verificarNaApi){
+    if (verificarNaApi) {
         let respCep = await getDadosEnderecoViaCep_API_externa(cep);
-        return !(respCep?.erro == 'true'); 
+        return !(respCep?.erro == 'true');
     }
 
     return true;
@@ -102,7 +102,7 @@ export const useCadastrarClienteCPF = ({ usuarioLogado, optionsModulos, handleCl
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
             usuarioIP = ipWhoisData?.ip;
         } catch (error) {
             console.error("Erro ao buscar IP via ipwho.is:", error);
@@ -123,7 +123,7 @@ export const useCadastrarClienteCPF = ({ usuarioLogado, optionsModulos, handleCl
     const { data: optionsCPF = [], error: errorCPF, isLoading: isLoadingCPF } = useQuery(
         ['cliente-todos', cpf],
         async () => {
-            const response = await get(`/cliente-todos?numeroCpfCnpj=${removerMascaraCPF(cpf)}`);   
+            const response = await get(`/cliente-todos?numeroCpfCnpj=${removerMascaraCPF(cpf)}`);
             return response.data;
         },
         { enabled: cpf?.length >= 8, staleTime: 5 * 60 * 1000 }
@@ -149,14 +149,14 @@ export const useCadastrarClienteCPF = ({ usuarioLogado, optionsModulos, handleCl
                 });
                 return;
             }
-           
-            let response = await getDadosEnderecoViaCep_API_externa(cep);    
-         
+
+            let response = await getDadosEnderecoViaCep_API_externa(cep);
+
             if (response.status !== 200) {
                 console.log('API principal falhou, tentando API de redundância...');
                 response = await getDadosEnderecoViaCep_API_redundancia(cep);
             }
-            
+
             if (response.status !== 200) {
                 Swal.fire({
                     title: 'Erro ao buscar CEP',
@@ -168,9 +168,9 @@ export const useCadastrarClienteCPF = ({ usuarioLogado, optionsModulos, handleCl
                 });
                 return;
             }
-            
-            const data = response.data;    
-            
+
+            const data = response.data;
+
             setCep(data.cep || data.zipCode || cep);
             setEndereco(data.logradouro || data.address || '');
             setComplemento(data.complemento || '');
@@ -178,7 +178,7 @@ export const useCadastrarClienteCPF = ({ usuarioLogado, optionsModulos, handleCl
             setCidade(data.localidade || data.city || '');
             setEstado(data.uf || data.state || '');
             setNuIBGE(data.ibge || '');
-            
+
         } catch (error) {
             console.error('Erro ao buscar CEP:', error);
             Swal.fire({
@@ -192,11 +192,11 @@ export const useCadastrarClienteCPF = ({ usuarioLogado, optionsModulos, handleCl
         }
     };
 
-    
+
     useEffect(() => {
         if (optionsCPF.length > 0) {
-            const cliente = optionsCPF[0];    
-            setCepDigitado(false);     
+            const cliente = optionsCPF[0];
+            setCepDigitado(false);
             setIdCliente(cliente?.IDCLIENTE || "");
             setEmpresa(cliente?.IDEMPRESA || "");
             setDataCadastro(cliente?.DTCADASTRO || cliente?.DTULTALTERACAO?.split(" ")[0] || "");
@@ -215,16 +215,16 @@ export const useCadastrarClienteCPF = ({ usuarioLogado, optionsModulos, handleCl
             setEstado(cliente?.SGUF || "");
             setNumeroComercial(cliente?.NUTELCOMERCIAL || "");
             setTipoIndicacaoIE(cliente?.IDINDICACAOIE || (cliente?.SGUF == "DF" ? 2 : 9));
-            
+
             if (cliente?.NUCPFCNPJ?.length <= 11) {
-                setNomeClienteRazao(cliente?.DSNOMERAZAOSOCIAL); 
-                setSobrenome(cliente?.DSAPELIDONOMEFANTASIA);    
+                setNomeClienteRazao(cliente?.DSNOMERAZAOSOCIAL);
+                setSobrenome(cliente?.DSAPELIDONOMEFANTASIA);
             } else {
                 setNomeClienteRazao(cliente?.DSNOMERAZAOSOCIAL);
                 setSobrenome(cliente?.DSAPELIDONOMEFANTASIA);
             }
         } else {
-            setCepDigitado(false); 
+            setCepDigitado(false);
         }
     }, [optionsCPF]);
 
@@ -246,7 +246,7 @@ export const useCadastrarClienteCPF = ({ usuarioLogado, optionsModulos, handleCl
         { value: 1, label: 'Contribuinte ICMS' },
         { value: 2, label: 'Contribuinte Isento de IE' },
     ]
-        
+
     const readOnlyCpf = optionsCPF && optionsCPF.length > 0;
 
     const onSubmit = async () => {
@@ -291,7 +291,7 @@ export const useCadastrarClienteCPF = ({ usuarioLogado, optionsModulos, handleCl
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || "IP NÃO DISPONIVEL"
             }
 
             await post('/log-web', postData)
@@ -311,7 +311,7 @@ export const useCadastrarClienteCPF = ({ usuarioLogado, optionsModulos, handleCl
             handleClose();
             setCpf('');
             setCep('');
-            
+
             return response.data;
         } catch (error) {
             console.error("Erro ao processar cliente:", error);
@@ -325,7 +325,7 @@ export const useCadastrarClienteCPF = ({ usuarioLogado, optionsModulos, handleCl
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: '',
-                IP: ipUsuario
+                IP: ipUsuario || "IP NÃO DISPONIVEL"
             }
             await post('/log-web', postData);
 

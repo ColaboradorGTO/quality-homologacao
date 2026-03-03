@@ -85,7 +85,7 @@ export const ActionPesquisaDepositoLoja = ({usuarioLogado, optionsEmpresas}) => 
   const { data: dadosDepositosLoja = [], error: erroQuality, isLoading: isLoadingQuality, refetch: refetchDepositos } = useQuery(
     'deposito-loja-empresa',
     () => fetchDepositos(),
-    { enabled: false, staleTime: 5 * 60 * 1000 }
+    { enabled: false, staleTime: 60 * 60 * 1000 }
   );
    
 

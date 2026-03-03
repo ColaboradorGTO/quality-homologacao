@@ -11,7 +11,7 @@ import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
 
 
-export const ActionPesquisaVendasDescontoFuncionario = ({usuarioLogado, optionsEmpresas}) => {
+export const ActionPesquisaVendasDescontoFuncionario = ({ usuarioLogado, optionsEmpresas }) => {
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
   const [dataPesquisaFim, setDataPesquisaFim] = useState('');
   const [usuarioSelecionado, setUsuarioSelecionado] = useState('')
@@ -26,7 +26,7 @@ export const ActionPesquisaVendasDescontoFuncionario = ({usuarioLogado, optionsE
     setDataPesquisaFim(dataFinal)
   }, []);
 
-    
+
   useEffect(() => {
     const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
     if (menuSalvo) {
@@ -34,15 +34,15 @@ export const ActionPesquisaVendasDescontoFuncionario = ({usuarioLogado, optionsE
       setMenuFilhoAtual(menuParsed);
     }
   }, []);
-  
+
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
     ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
       const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
-      
+
       return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
   );
 
   const { data: dadosFuncionarios = [], error: errorFornecedor, isLoading: isLoadingFornecedor } = useQuery(
@@ -51,7 +51,7 @@ export const ActionPesquisaVendasDescontoFuncionario = ({usuarioLogado, optionsE
       const response = await get(`/funcionarios?idEmpresa=${usuarioLogado.IDEMPRESA}`);
       return response.data;
     },
-    {enabled: true, staleTime: 5 * 60 * 1000 }
+    { enabled: true, staleTime: 60 * 60 * 1000 }
   );
 
   const fetchVendasConvenio = async () => {
@@ -61,7 +61,7 @@ export const ActionPesquisaVendasDescontoFuncionario = ({usuarioLogado, optionsE
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
       animacaoCarregamento('Carregando dados...', true);
-                                   
+
       const primeiraPagina = 1;
       const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
       const page = primeiraResposta.page || primeiraPagina;
@@ -88,16 +88,16 @@ export const ActionPesquisaVendasDescontoFuncionario = ({usuarioLogado, optionsE
     }
   };
 
-  const { data: dadosVendasConvenioDesconto = [], error: erroVendasConvenio , isLoading: isLoadingVendasConvenio, refetch: refetchVendasConvenio } = useQuery(
+  const { data: dadosVendasConvenioDesconto = [], error: erroVendasConvenio, isLoading: isLoadingVendasConvenio, refetch: refetchVendasConvenio } = useQuery(
     'resumo-venda-convenio-desconto',
     () => fetchVendasConvenio(),
-    { enabled: false, staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    { enabled: false, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
   );
 
   const handleChangeFuncionario = (e) => {
     setUsuarioSelecionado(e.value);
   }
- 
+
   const handleClick = () => {
     setTabelaVisivel(true);
     refetchVendasConvenio();
@@ -112,7 +112,7 @@ export const ActionPesquisaVendasDescontoFuncionario = ({usuarioLogado, optionsE
         linkComponent={["Vendas por Desconto e Período"]}
         title="Vendas por Desconto e Período"
         subTitle="Nome da Loja"
-        
+
         InputSelectPendenciaComponent={InputSelectAction}
         labelSelectPendencia="Selecione a Empresa"
         optionsPendencia={[
@@ -130,7 +130,7 @@ export const ActionPesquisaVendasDescontoFuncionario = ({usuarioLogado, optionsE
         valueInputFieldDTInicioA={dataPesquisaInicio}
         labelInputDTInicioA={"Data Início"}
         onChangeInputFieldDTInicioA={(e) => setDataPesquisaInicio(e.target.value)}
-        
+
         InputFieldDTFimAComponent={InputField}
         labelInputDTFimA={"Data Fim"}
         valueInputFieldDTFimA={dataPesquisaFim}
@@ -141,13 +141,13 @@ export const ActionPesquisaVendasDescontoFuncionario = ({usuarioLogado, optionsE
         optionsFuncionarios={[
           { value: '', label: 'Selecione um Funcionário' },
           ...dadosFuncionarios.map((funcionario) => ({
-          value: funcionario.IDFUNCIONARIO,
-          label: funcionario.NOFUNCIONARIO,
-        }))]}      
+            value: funcionario.IDFUNCIONARIO,
+            label: funcionario.NOFUNCIONARIO,
+          }))]}
         valueSelectFuncionario={usuarioSelecionado}
         onChangeSelectFuncionario={handleChangeFuncionario}
 
-  
+
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}
         onButtonClickSearch={handleClick}
@@ -156,8 +156,10 @@ export const ActionPesquisaVendasDescontoFuncionario = ({usuarioLogado, optionsE
       />
 
       {tabelaVisivel &&
-         
-        <ActionListaVendasDescontoFuncionario dadosVendasConvenioDesconto={dadosVendasConvenioDesconto} />
+
+        <ActionListaVendasDescontoFuncionario
+          dadosVendasConvenioDesconto={dadosVendasConvenioDesconto}
+        />
       }
     </Fragment>
   )

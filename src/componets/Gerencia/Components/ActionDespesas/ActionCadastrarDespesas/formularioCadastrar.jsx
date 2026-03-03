@@ -52,7 +52,7 @@ export const FormularioCadastrar = ({ handleClose, optionsModulos, usuarioLogado
 
             await schema.validate(dadosParaValidar, { abortEarly: false });
             //console.log(dadosParaValidar, 'dadosParaValidar no submit com validação');
-            onSubmit();
+            await onSubmit();
 
         } catch (validationError) {
             clearErrors();
@@ -228,6 +228,7 @@ export const FormularioCadastrar = ({ handleClose, optionsModulos, usuarioLogado
                                         label={"Valor Despesa"}
                                         name="valorDespesa"
                                         type="text"
+                                        placeholder={"R$ 0,00"}
                                         value={vrDespesa}
                                         onChange={(e) => setVrDespesa(formatarMoeda(e.target.value))}
                                         errors={errors}
@@ -243,10 +244,12 @@ export const FormularioCadastrar = ({ handleClose, optionsModulos, usuarioLogado
             </form>
             <FooterModal
                 ButtonTypeCadastrar={ButtonTypeModal}
-                onClickButtonCadastrar={handleValidatedSubmit}
+                onClickButtonCadastrar={handleSubmit(handleValidatedSubmit)}
                 tipoBtnCadastrar={"submit"}
                 textButtonCadastrar={"Cadastrar"}
                 corCadastrar="success"
+                autoLoadingCadastrar={true}
+                loadingTextCadastrar={"Cadastrando..."}
 
                 ButtonTypeFechar={ButtonTypeModal}
                 textButtonFechar={"Fechar"}

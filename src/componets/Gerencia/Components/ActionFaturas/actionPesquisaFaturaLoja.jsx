@@ -82,7 +82,7 @@ export const ActionPesquisaFaturaLoja = ({usuarioLogado, optionsEmpresas}) => {
   const { data: dadosFaturas = [], error: errorVouchers, isLoading: isLoadingVouchers, refetch: refetchListaFaturas } = useQuery(
     ['detalhe-faturas'],
     () => fetchListaFaturas(),
-    {enabled: false, staleTime: 1000 * 60 * 5  }
+    {enabled: false, staleTime: 1000 * 60 * 60  }
   );
 
   const handleClick = () => {

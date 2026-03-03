@@ -44,7 +44,7 @@ export const ActionPesquisaVendasEstrutura = ({usuarioLogado }) => {
       const response = await get(`/lista-fornecedor-produto`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, cacheTime: 10 * 60 * 1000 }
+    { staleTime: 60 * 60 * 1000, cacheTime: 10 * 60 * 1000 }
   );
 
   const { data: dadosGrupos = [], error: errorGrupo, isLoading: isLoadingGrupo } = useQuery(
@@ -53,7 +53,7 @@ export const ActionPesquisaVendasEstrutura = ({usuarioLogado }) => {
       const response = await get(`/grupo-produto`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, cacheTime: 10 * 60 * 1000 }
+    { staleTime: 60 * 60 * 1000, cacheTime: 10 * 60 * 1000 }
   );
 
   const { data: dadosSubGrupos = [], error: errorSubGrupo, isLoading: isLoadingSubGrupo } = useQuery(
@@ -62,7 +62,7 @@ export const ActionPesquisaVendasEstrutura = ({usuarioLogado }) => {
       const response = await get(`/subgrupo-produto`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, cacheTime: 10 * 60 * 1000 }
+    { staleTime: 60 * 60 * 1000, cacheTime: 10 * 60 * 1000 }
   );
 
   const { data: dadosMarcas = [], error: errorMarcas, isLoading: isLoadingMarcas } = useQuery(
@@ -71,7 +71,7 @@ export const ActionPesquisaVendasEstrutura = ({usuarioLogado }) => {
       const response = await get(`/lista-marca-produto`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, cacheTime: 10 * 60 * 1000 }
+    { staleTime: 60 * 60 * 1000, cacheTime: 10 * 60 * 1000 }
   );
 
   const fetchVendasEstrutura = async () => {
@@ -111,7 +111,7 @@ export const ActionPesquisaVendasEstrutura = ({usuarioLogado }) => {
   const { data: dadosVendasEstrutura = [], error: erroVendasEstrutura , isLoading: isLoadingVendasEstrutura, refetch: refetchVendasEstrutura } = useQuery(
     'vendas-por-estrutura',
     () => fetchVendasEstrutura(),
-    { enabled: false, staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    { enabled: false, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
   );
 
   const fetchProdutosMaisVendidos = async () => {
@@ -150,7 +150,7 @@ export const ActionPesquisaVendasEstrutura = ({usuarioLogado }) => {
   const { data: dadosProdutosMaisVendidos = [], error: erroProdutosMaisVendidos , isLoading: isLoadingProdutosMaisVendidos, refetch: refetchProdutosMaisVendidos } = useQuery(
     'produtos-mais-vendidos',
     () => fetchProdutosMaisVendidos(),
-    { enabled: false, staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    { enabled: false, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
   );
 
   const fetchVendasVendedor = async () => {
@@ -189,7 +189,7 @@ export const ActionPesquisaVendasEstrutura = ({usuarioLogado }) => {
   const { data: dadosVendasVendedor = [], error: erroVendasVendedor , isLoading: isLoadingVendasVendedor, refetch: refetchVendasVendedor } = useQuery(
     'vendas-vendedor-estrutura',
     () => fetchVendasVendedor(),
-    { enabled: false, staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    { enabled: false, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
   );
 
 

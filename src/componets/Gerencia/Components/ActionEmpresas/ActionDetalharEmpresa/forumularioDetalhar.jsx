@@ -5,7 +5,7 @@ import { InputFieldModal } from "../../../../Buttons/InputFieldModal"
 import { dataFormatada } from "../../../../../utils/dataFormatada"
 import { mascaraTelefone } from "../../../../../utils/mascaraTelefone"
 
-export const FormularioDetalhar = ({ handleClose, dadosEmpresasDetalhe }) => {
+export const FormularioDetalhar = ({ handleClose, dadosEmpresasDetalhe, usuarioLogado, optionsModulos }) => {
     return (
         <Fragment>
             <form onSubmit="">
