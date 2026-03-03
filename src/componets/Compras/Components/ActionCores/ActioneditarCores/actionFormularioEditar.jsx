@@ -15,7 +15,6 @@ export const FormularioEditar = ({
 }) => {
     const { register, handleSubmit, formState: { errors } } = useForm();
     const {
-        optionsStatus,
         statusSelecionado,
         setStatusSelecionado,
         descricao,
@@ -23,12 +22,12 @@ export const FormularioEditar = ({
         grupoCorSelecionado,
         setGrupoCorSelecionado,
         dadosGrupoCores,
-        atualzarCores,
-    } = useEditarCores({ dadosDetalheCores, usuarioLogado, optionsModulos, refetchListaCores });
+        onSubmit
+    } = useEditarCores({ dadosDetalheCores, usuarioLogado, optionsModulos, handleClose, refetchListaCores });
  
     return (
         <Fragment>
-            <form onSubmit={handleSubmit(atualzarCores)}>
+            <form onSubmit={handleSubmit(onSubmit)}>
 
                 <div className="form-group">
                     <div className="row">
@@ -85,7 +84,7 @@ export const FormularioEditar = ({
                     corFechar={"secondary"}
 
                     ButtonTypeCadastrar={ButtonTypeModal}
-                    onClickButtonCadastrar={atualzarCores}
+                    onClickButtonCadastrar={onSubmit}
                     textButtonCadastrar={"Salvar"}
                     corCadastrar={"success"}
                     loadingTextCadastrar={"Cadastrando..."}

@@ -4,7 +4,7 @@ import axios from "axios"
 import Swal from 'sweetalert2'
 import { useQuery } from "react-query"
 
-export const useEditarCores = ({dadosDetalheCores, usuarioLogado, optionsModulos, refetchListaCores}) => {
+export const useEditarCores = ({dadosDetalheCores, usuarioLogado, optionsModulos, handleClose, refetchListaCores}) => {
     const [statusSelecionado, setStatusSelecionado] = useState("")
     const [grupoCorSelecionado, setGrupoCorSelecionado] = useState("")
     const [descricao, setDescricao] = useState("")
@@ -100,6 +100,9 @@ export const useEditarCores = ({dadosDetalheCores, usuarioLogado, optionsModulos
                     container: 'custom-swal',
                 }
             })
+
+            handleClose();
+            refetchListaCores();
             return response.data;
         } catch (error) {
             const textDados = JSON.stringify(postData)
