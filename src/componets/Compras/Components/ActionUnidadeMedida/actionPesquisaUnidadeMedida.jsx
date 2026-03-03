@@ -176,7 +176,6 @@ export const ActionPesquisaUnidadeMedida = ({ usuarioLogado }) => {
         show={modalVisivel}
         handleClose={() => setModalVisivel(false)}
         refetchListaUnidadesMedidas={refetchListaUnidadesMedidas}
-        handleClick={handleClick}
         optionsModulos={optionsModulos}
         usuarioLogado={usuarioLogado}
       />

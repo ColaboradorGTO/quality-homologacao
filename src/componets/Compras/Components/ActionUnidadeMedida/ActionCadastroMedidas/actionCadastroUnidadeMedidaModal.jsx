@@ -9,7 +9,6 @@ export const ActionCadastroUnidadeMedidaModal = ({
   handleClose, 
   usuarioLogado, 
   refetchListaUnidadesMedidas, 
-  handleClick,
   optionsModulos 
 }) => {
   return (
@@ -33,7 +32,6 @@ export const ActionCadastroUnidadeMedidaModal = ({
           <FormularioCadatro 
             handleClose={handleClose} 
             refetchListaUnidadesMedidas={refetchListaUnidadesMedidas}
-            handleClick={handleClick}
             optionsModulos={optionsModulos}
             usuarioLogado={usuarioLogado}  
           />

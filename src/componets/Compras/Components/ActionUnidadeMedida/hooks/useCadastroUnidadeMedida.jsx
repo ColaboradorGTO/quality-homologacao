@@ -1,7 +1,6 @@
 import Swal from "sweetalert2"
 import { post } from "../../../../../api/funcRequest"
 import { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
 import axios from "axios"
 import { getDataAtual } from "../../../../../utils/dataAtual"
 
@@ -19,31 +18,28 @@ export const useCadastroUnidadeMedida = ({ handleClose, usuarioLogado, refetchLi
     })
 
     const getIPUsuario = async () => {
+        let usuarioIP = null;
+
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
-            let usuarioIP = ipWhoisData?.ip;
-
-            if (!usuarioIP) {
-                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-                usuarioIP = ipifyData?.ip;
-            }
-
-            setIpUsuario(usuarioIP);
-            return usuarioIP;
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+            usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP:", error);
-            return null;
+            console.error("Erro ao buscar IP via ifconfig.me:", error);
         }
+
+        if (!usuarioIP) {
+        try {
+            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+            usuarioIP = ipifyData?.ip;
+        } catch (error) {
+            console.error("Erro ao buscar IP via ipify.org:", error);
+        }
+        }
+        setIpUsuario(usuarioIP);
+        return usuarioIP;
     };
-     
 
-    const optionsStatus = [
-        { value: 'True', label: 'ATIVO' },
-        { value: 'False', label: 'INATIVO' }
-    ]
-
-
-    const handleCadastro = async () => {
+    const onSubmit = async () => {
 
         if(optionsModulos[0]?.ALTERAR == 'False') {
             Swal.fire({
@@ -58,34 +54,7 @@ export const useCadastroUnidadeMedida = ({ handleClose, usuarioLogado, refetchLi
             });
             return;
         }
-
-        if(descricao === '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'O campo descrição é obrigatório.',
-                showConfirmButton: false,
-                timer: 3000,
-                customClass: {
-                    container: 'custom-swal',
-                }
-            });
-            return;
-        }
-
-        if(sigla === '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'O campo sigla é obrigatório.',
-                showConfirmButton: false,
-                timer: 3000,
-                customClass: {
-                    container: 'custom-swal',
-                }
-            });
-        }
-
+  
         const postData = {
             DSUNIDADE: descricao,
             DSSIGLA: sigla,
@@ -102,7 +71,7 @@ export const useCadastroUnidadeMedida = ({ handleClose, usuarioLogado, refetchLi
                 icon: 'success',
                 title: 'Cadastrado com sucesso!',
                 showConfirmButton: false,
-                timer: 3000,
+                timer: 5000,
                 customClass: {
                     container: 'custom-swal',
                 }
@@ -114,12 +83,13 @@ export const useCadastroUnidadeMedida = ({ handleClose, usuarioLogado, refetchLi
                 IDUSUARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'Indisponível'
             }
-            const responseLog = await post('/log-web', createLog)
+            
+            await post('/log-web', createLog)
             handleClose();
             refetchListaUnidadesMedidas();
-            return responseLog.data;
+            return response.data;
     
         } catch (error) {
             const textDados = JSON.stringify(postData)
@@ -129,7 +99,7 @@ export const useCadastroUnidadeMedida = ({ handleClose, usuarioLogado, refetchLi
                 IDUSUARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'Indisponível'
             }
             const responseLog = await post('/log-web', createLog)
             Swal.fire({
@@ -155,9 +125,6 @@ export const useCadastroUnidadeMedida = ({ handleClose, usuarioLogado, refetchLi
         sigla,
         setSigla,
         dataCampo,
-        usuarioLogado,
-        ipUsuario,
-        optionsStatus,
-        handleCadastro,
+        onSubmit
     }
 }

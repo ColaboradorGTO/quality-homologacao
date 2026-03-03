@@ -7,7 +7,7 @@ import Select from 'react-select';
 import { useCadastroUnidadeMedida } from "../hooks/useCadastroUnidadeMedida"
 import FormField from "../../../../Formularios/FormField";
 
-export const FormularioCadatro = ({ handleClose, usuarioLogado, refetchListaUnidadesMedidas, handleClick, optionsModulos }) => {
+export const FormularioCadatro = ({ handleClose, usuarioLogado, refetchListaUnidadesMedidas, optionsModulos }) => {
     const { handleSubmit, formState: { errors }, clearErrors, control, setError, setValue } = useForm({
         mode: "onChange"
     });
@@ -20,7 +20,7 @@ export const FormularioCadatro = ({ handleClose, usuarioLogado, refetchListaUnid
         setSigla,
         optionsStatus,
         handleCadastro
-    } = useCadastroUnidadeMedida({ handleClose, usuarioLogado, refetchListaUnidadesMedidas, handleClick, optionsModulos });
+    } = useCadastroUnidadeMedida({ handleClose, usuarioLogado, refetchListaUnidadesMedidas, optionsModulos });
     
     const handleValidatedSubmit = async () => {
         try {
@@ -98,20 +98,23 @@ export const FormularioCadatro = ({ handleClose, usuarioLogado, refetchListaUnid
 
                             <label htmlFor="">Situação *</label>
                             <Select
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="situacaoUnidadeMedida"
                                 value={statusSelecionado}
-                                options={optionsStatus.map((item) => {
+                                options={situacao.map((item) => {
                                     return {
                                         value: item.value,
                                         label: item.label
                                     }
                                 })}
-                                onChange={(e) => setStatusSelecionado(e)}
+                                onChange={(e) => {
+                                    setStatusSelecionado(e)
+                                    clearErrors("situacaoUnidadeMedida")
+                                }}
                             />
                         </div>
                     </div>
-                </div>
-                <div className="form-group">
-                    <h3 className="form-label" htmlFor="vrfat">* Campos Obrigatórios *</h3>
                 </div>
 
                 <FooterModal
