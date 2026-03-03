@@ -8,14 +8,12 @@ import { ButtonType } from "../../../Buttons/ButtonType"
 import { get } from "../../../../api/funcRequest"
 import { useQuery } from "react-query"
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento"
-import Swal from "sweetalert2"
 import { useEffect } from "react"
 import { getDataAtual } from "../../../../utils/dataAtual"
 
 
 export const ActionPesquisaProdutosPorPedido = () => {
   const [empresaOrigem, setEmpresaOrigem] = useState('')
-  const [empresaDestino, setEmpresaDestino] = useState('')
   const [descricaoProduto, setDescricaoProduto] = useState('')
   const [codBarrasProduto, setCodBarrasProduto] = useState('')
   const [idProduto, setIDProduto] = useState('')
@@ -79,7 +77,7 @@ export const ActionPesquisaProdutosPorPedido = () => {
   const { data: dadosProdutos = [], error: errorProdutos, isLoading: isLoadingProdutos, refetch: refetchProdutos } = useQuery(
     ['produtos-entre-filiais',],
     () => fetchProdutos(),
-    { enabled: false, }
+    { enabled: false, staleTime: 60 * 60 * 1000, }
   );
 
 

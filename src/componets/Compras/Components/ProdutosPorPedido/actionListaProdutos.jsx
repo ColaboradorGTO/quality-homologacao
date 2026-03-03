@@ -11,6 +11,7 @@ import { toFloat } from "../../../../utils/toFloat";
 
 export const ActionListaProdutos = ({ dadosProdutos }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
 
   const onGlobalFilterChange = (e) => {
@@ -211,9 +212,7 @@ export const ActionListaProdutos = ({ dadosProdutos }) => {
       body: row => <th>{row.UM}</th>,
       sortable: true
     },
-    
   ]
-
 
   return (
 
@@ -239,6 +238,8 @@ export const ActionListaProdutos = ({ dadosProdutos }) => {
             globalFilterValue={globalFilterValue}
             size="small"
             selectionMode={'single'}
+            selection={rowSelection}
+            onSelectionChange={(e) => setRowSelection(e.value)}
             sortOrder={-1}
             paginator={true}
             rows={10}
