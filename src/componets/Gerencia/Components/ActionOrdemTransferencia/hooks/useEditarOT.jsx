@@ -216,11 +216,12 @@ export const useEditarOT = ({
       const textDados = JSON.stringify(postData);
       let textoFuncao = 'GERENCIA/EDIÇÃO OT';
       const ipUsuario = await getIPUsuario();
+      
       const createData = {
         IDFUNCIONARIO: String(usuarioLogado?.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario || "IP NÃO DISPONIVEL"
+        IP: ipUsuario || "INDISPONÍVEL"
       };
 
       await post('/log-web', createData)
@@ -242,7 +243,7 @@ export const useEditarOT = ({
         IDFUNCIONARIO: String(usuarioLogado?.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario || "IP NÃO DISPONIVEL"
+        IP: ipUsuario || "INDISPONÍVEL"
       };
 
       const responsePost = await post('/log-web', createData)

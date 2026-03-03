@@ -89,7 +89,7 @@ export const useCadastrarAdiantamentoSalarial = ({ handleClose, optionsModulos, 
         IDFUNCIONARIO: String(usuarioLogado?.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario || 'IP NÃO DISPONIVEIL'
+        IP: ipUsuario || 'INDISPONÍVEL'
       }
       await post('/log-web', createData)
 
@@ -115,11 +115,12 @@ export const useCadastrarAdiantamentoSalarial = ({ handleClose, optionsModulos, 
       const textDados = JSON.stringify(postData)
       let textoFuncao = 'GERENCIA/ERRO AO CADASTRAR ADIANTAMENTO SALARIAL';
       const ipUsuario = await getIPUsuario();
+
       const createData = {
         IDFUNCIONARIO: String(usuarioLogado?.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario || 'IP NÃO DISPONIVEIL'
+        IP: ipUsuario || 'INDISPONÍVEL'
       }
 
       const responsePost = await post('/log-web', createData)

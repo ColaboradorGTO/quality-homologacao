@@ -470,7 +470,7 @@ export const useCriarVoucher = ({
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario || "IP NÃO DISPONIVEL"
+                IP: ipUsuario || "INDISPONÍVEL"
             }
 
             await post('/log-web', postData)
@@ -486,14 +486,15 @@ export const useCriarVoucher = ({
             return response.data;
 
         } catch (error) {
-
+            const textDados = JSON.stringify(putData)
             let textoFuncao = 'VOUCHER /ERRO AO CRIAR VOUCHER';
             const ipUsuario = await getIPUsuario();
+
             const postData = {
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
-                DADOS: '',
-                IP: ipUsuario || "IP NÃO DISPONIVEL"
+                DADOS: textDados,
+                IP: ipUsuario || "INDISPONÍVEL"
             }
             await post('/log-web', postData);
 
@@ -508,7 +509,6 @@ export const useCriarVoucher = ({
             return;
         }
     }
-
 
     return {
         onSubmitVoucher,

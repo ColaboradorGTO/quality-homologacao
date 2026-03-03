@@ -68,7 +68,7 @@ export const useCancelarFatura = ({
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario || 'IP NÃO DISPONIVEL'
+                IP: ipUsuario || 'INDISPONÍVEL'
             }
 
             await post('/log-web', postData)
@@ -94,7 +94,7 @@ export const useCancelarFatura = ({
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario || 'IP NÃO DISPONIVEL'
+                IP: ipUsuario || 'INDISPONÍVEL'
             }
 
             await post('/log-web', postData)

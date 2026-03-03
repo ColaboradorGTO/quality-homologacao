@@ -198,12 +198,13 @@ export const useSalvarOT = ({ handleClick, handleClose, optionsModulos, usuarioL
 
       const textDados = JSON.stringify(postData);
       let textoFuncao = 'EXPEDICAO/OT CRIADA COM SUCESSO';
-      await getIPUsuario();
+      const ipUsuario = await getIPUsuario();
+
       const createData = {
         IDFUNCIONARIO: String(usuarioLogado?.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario || "IP NÃO DISPONIVEL"
+        IP: ipUsuario || "INDISPONÍVEL"
       };
 
       await post('/log-web', createData)
@@ -290,11 +291,12 @@ export const useSalvarOT = ({ handleClick, handleClose, optionsModulos, usuarioL
       const textDados = JSON.stringify(postData);
       let textoFuncao = 'EXPEDICAO/ERRO AO CRIAR OT COM SUCESSO';
       const ipUsuario = await getIPUsuario();
+      
       const createData = {
         IDFUNCIONARIO: String(usuarioLogado?.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario || "IP NÃO DISPONIVEL"
+        IP: ipUsuario || "INDISPONÍVEL"
       };
 
       const responsePost = await post('/log-web', createData)

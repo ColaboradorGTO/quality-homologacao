@@ -112,11 +112,12 @@ export const useCadastroDeposito = ({ handleClose, optionsModulos, usuarioLogado
       const textDados = JSON.stringify(putData)
       let textoFuncao = 'GERENCIA/CADASTRO DEPOSITO ';
       const ipUsuario = await getIPUsuario();
+
       const postData = {
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario || 'IP NÃO DISPONIVEIL'
+        IP: ipUsuario || 'INDISPONÍVEL'
       }
 
       await post('/log-web', postData)
@@ -128,11 +129,12 @@ export const useCadastroDeposito = ({ handleClose, optionsModulos, usuarioLogado
       const textDados = JSON.stringify(putData)
       let textoFuncao = 'GERENCIA/ERRO AO CADASTRAR DEPOSITO ';
       const ipUsuario = await getIPUsuario();
+
       const postData = {
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario || 'IP NÃO DISPONIVEIL'
+        IP: ipUsuario || 'INDISPONÍVEL'
       }
 
       const responsePost = await post('/log-web', postData)

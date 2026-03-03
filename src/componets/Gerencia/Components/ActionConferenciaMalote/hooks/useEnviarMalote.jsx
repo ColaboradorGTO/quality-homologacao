@@ -106,11 +106,13 @@ export const useEnviarMalote = ({
 
     const response = await put('/malotes-por-loja/:id', putData);
     const textDados = JSON.stringify(putData);
+    const ipUsuario = await getIPUsuario();
+
     const createData = {
       IDFUNCIONARIO: String(usuarioLogado.id),
       PATHFUNCAO: 'GERENCIA / REENVIO DE MALOTE',
       DADOS: textDados,
-      IP: ipUsuario || "IP NÃO DISPONIVEL",
+      IP: ipUsuario || "INDISPONÍVEL",
     };
     await post('/log-web', createData);
 
@@ -184,11 +186,13 @@ export const useEnviarMalote = ({
         try {
           const response = await post('/criar-malotes-por-loja', postData);
           const textDados = JSON.stringify(postData);
+          const ipUsuario = await getIPUsuario();
+          
           const createData = {
             IDFUNCIONARIO: String(usuarioLogado.id),
             PATHFUNCAO: 'GERENCIA / ENVIO DE MALOTE',
             DADOS: textDados,
-            IP: ipUsuario || "IP NÃO DISPONIVEL",
+            IP: ipUsuario || "INDISPONÍVEL",
           };
           await post('/log-web', createData);
 
@@ -213,7 +217,7 @@ export const useEnviarMalote = ({
             IDFUNCIONARIO: String(usuarioLogado.id),
             PATHFUNCAO: textoFuncao,
             DADOS: textDados,
-            IP: ipUsuario || "IP NÃO DISPONIVEL",
+            IP: ipUsuario || "INDISPONÍVEL",
           }
 
           const responsePost = await post('/log-web', createData)

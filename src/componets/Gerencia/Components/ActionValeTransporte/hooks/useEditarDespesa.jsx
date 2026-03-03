@@ -65,11 +65,12 @@ export const useEditarDespesa = (usuarioLogado, optionsModulos, refetchDadosLoja
       const textDados = JSON.stringify(postData);
       const textoFuncao = 'FINANCEIRO/ATUALIZAÇÃO DE ESTATUS DA DESPESA';
       const ipUsuario = await getIPUsuario()
+
       const createData = {
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || "INDISPONÍVEL"
       };
 
       await post('/log-web', createData);
@@ -83,7 +84,7 @@ export const useEditarDespesa = (usuarioLogado, optionsModulos, refetchDadosLoja
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || "INDISPONÍVEL"
       };
 
       await post('/log-web', createData);

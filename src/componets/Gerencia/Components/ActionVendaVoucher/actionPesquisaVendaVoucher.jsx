@@ -11,7 +11,7 @@ import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../ut
 import { InputSelectAction } from "../../../Inputs/InputSelectAction";
 import { ActionListaVendaVoucher } from "./actionListaVendaVoucher";
 
-export const ActionPesquisaVendaVoucher = ({usuarioLogado}) => {
+export const ActionPesquisaVendaVoucher = ({ usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
   const [dataPesquisaFim, setDataPesquisaFim] = useState('');
@@ -31,29 +31,29 @@ export const ActionPesquisaVendaVoucher = ({usuarioLogado}) => {
   }, []);
 
   useEffect(() => {
-  
+
   }, [usuarioLogado]);
 
   const { data: dadosEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas } = useQuery(
     'empresas',
     async () => {
       const response = await get(`/empresas`);
-   
+
       return response.data;
     },
-    {enabled: true, staleTime: 5 * 60 * 1000 }
+    { enabled: true, staleTime: 60 * 60 * 1000 }
   );
 
   const fetchListaVouchers = async () => {
     try {
-      
+
       const urlApi = `/lista-venda-cliente?idEmpresa=${usuarioLogado.IDEMPRESA}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
       const response = await get(urlApi);
-      
+
       if (response.data.length && response.data.length === pageSize) {
         let allData = [...response.data];
         animacaoCarregamento(`Carregando... Página ${currentPage} de ${response.data.length}`, true);
-  
+
         async function fetchNextPage(currentPage) {
           try {
             currentPage++;
@@ -69,14 +69,14 @@ export const ActionPesquisaVendaVoucher = ({usuarioLogado}) => {
             throw error;
           }
         }
-  
+
         await fetchNextPage(currentPage);
         return allData;
       } else {
-       
+
         return response.data;
       }
-  
+
     } catch (error) {
       console.error('Error fetching data:', error);
       throw error;
@@ -84,32 +84,32 @@ export const ActionPesquisaVendaVoucher = ({usuarioLogado}) => {
       fecharAnimacaoCarregamento();
     }
   };
-   
+
   const { data: dadosVoucher = [], error: errorVouchers, isLoading: isLoadingVouchers, refetch: refetchListaVouchers } = useQuery(
     ['lista-venda-cliente', usuarioLogado?.IDEMPRESA, dataPesquisaInicio, dataPesquisaFim, currentPage, pageSize],
-    () => fetchListaVouchers(usuarioLogado?.IDEMPRESA,  dataPesquisaInicio, dataPesquisaFim, currentPage, pageSize),
+    () => fetchListaVouchers(usuarioLogado?.IDEMPRESA, dataPesquisaInicio, dataPesquisaFim, currentPage, pageSize),
     {
-      enabled: false, 
+      enabled: false,
     }
   );
 
-  const handleSelectEmpresa = (e) => {   
+  const handleSelectEmpresa = (e) => {
     setEmpresaSelecionada(e.value)
   }
 
   const handleClick = () => {
-    
+
     setCurrentPage(+1);
     refetchListaVouchers()
     setTabelaVisivel(true);
-   
+
   }
 
 
   return (
 
     <Fragment>
-      
+
       <ActionMain
         linkComponentAnterior={["Home"]}
         linkComponent={["Vouchers"]}
@@ -168,9 +168,11 @@ export const ActionPesquisaVendaVoucher = ({usuarioLogado}) => {
 
 
       {tabelaVisivel &&
-        <ActionListaVendaVoucher dadosVoucher={dadosVoucher}/>
+        <ActionListaVendaVoucher
+          dadosVoucher={dadosVoucher}
+        />
       }
-     
+
 
     </Fragment>
   )

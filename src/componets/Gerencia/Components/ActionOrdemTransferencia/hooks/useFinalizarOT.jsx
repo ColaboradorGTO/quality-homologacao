@@ -71,11 +71,12 @@ export const useFinalizarOT = ({ usuarioLogado, optionsModulos, handleClick }) =
                     const textDados = JSON.stringify(putData);
                     let textoFuncao = 'GERENCIA/FINALIZAR OT';
                     const ipUsuario = await getIPUsuario();
+                    
                     const createData = {
                         IDFUNCIONARIO: String(usuarioLogado.id),
                         PATHFUNCAO: textoFuncao,
                         DADOS: textDados,
-                        IP: ipUsuario || "IP NÃO DISPONIVEL"
+                        IP: ipUsuario || "INDISPONÍVEL"
                     };
 
                     await post('/log-web', createData)
@@ -94,11 +95,12 @@ export const useFinalizarOT = ({ usuarioLogado, optionsModulos, handleClick }) =
                     const textDados = JSON.stringify(putData);
                     let textoFuncao = 'GERENCIA/ERRO AO FINALIZAR OT';
                     const ipUsuario = await getIPUsuario();
+
                     const createData = {
                         IDFUNCIONARIO: String(usuarioLogado.id),
                         PATHFUNCAO: textoFuncao,
                         DADOS: textDados,
-                        IP: ipUsuario || "IP NÃO DISPONIVEL"
+                        IP: ipUsuario || "INDISPONÍVEL"
                     };
 
                     const responsePost = await post('/log-web', createData)

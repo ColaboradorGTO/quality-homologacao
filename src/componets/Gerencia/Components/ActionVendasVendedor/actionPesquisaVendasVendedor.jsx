@@ -10,22 +10,22 @@ import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
 import { InputSelectAction } from "../../../Inputs/InputSelectAction";
 
-export const ActionPesquisaVendasVendedor = ({usuarioLogado, ID, optionsEmpresas}) => {
+export const ActionPesquisaVendasVendedor = ({ usuarioLogado, ID, optionsEmpresas }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
   const [dataPesquisaFim, setDataPesquisaFim] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [empresaSelecionada, setEmpresaSelecionada] = useState('');
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
-  
+
   useEffect(() => {
     const dataInicial = getDataAtual();
     const dataFinal = getDataAtual();
     setDataPesquisaInicio(dataInicial);
-    setDataPesquisaFim(dataFinal);  
+    setDataPesquisaFim(dataFinal);
   }, []);
 
-    
+
   useEffect(() => {
     const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
     if (menuSalvo) {
@@ -33,15 +33,15 @@ export const ActionPesquisaVendasVendedor = ({usuarioLogado, ID, optionsEmpresas
       setMenuFilhoAtual(menuParsed);
     }
   }, []);
-  
+
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
     ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
       const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
-      
+
       return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
   );
 
   const fetchVendasVendedor = async () => {
@@ -51,7 +51,7 @@ export const ActionPesquisaVendasVendedor = ({usuarioLogado, ID, optionsEmpresas
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
       animacaoCarregamento('Carregando dados...', true);
-                             
+
       const primeiraPagina = 1;
       const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
       const page = primeiraResposta.page || primeiraPagina;
@@ -81,7 +81,7 @@ export const ActionPesquisaVendasVendedor = ({usuarioLogado, ID, optionsEmpresas
   const { data: dadosVendasVendedor = [], error: erroVendasResumidas, isLoading: isLoadingVendasResumidas, refetch: refetchVendasVendedor } = useQuery(
     'venda-vendedor',
     () => fetchVendasVendedor(),
-    { enabled: false, staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    { enabled: false, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
   );
 
   const handleTabelaVisivel = () => {
@@ -89,8 +89,8 @@ export const ActionPesquisaVendasVendedor = ({usuarioLogado, ID, optionsEmpresas
     refetchVendasVendedor();
     setTabelaVisivel(true);
   };
- 
-  
+
+
   return (
 
     <Fragment>
@@ -117,12 +117,12 @@ export const ActionPesquisaVendasVendedor = ({usuarioLogado, ID, optionsEmpresas
         valueInputFieldDTInicioA={dataPesquisaInicio}
         labelInputDTInicioA={"Data Início"}
         onChangeInputFieldDTInicioA={(e) => setDataPesquisaInicio(e.target.value)}
-        
+
         InputFieldDTFimAComponent={InputField}
         labelInputDTFimA={"Data Fim"}
         valueInputFieldDTFimA={dataPesquisaFim}
         onChangeInputFieldDTFimA={(e) => setDataPesquisaFim(e.target.value)}
-      
+
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}
         onButtonClickSearch={handleTabelaVisivel}
@@ -131,7 +131,9 @@ export const ActionPesquisaVendasVendedor = ({usuarioLogado, ID, optionsEmpresas
 
       />
       {tabelaVisivel && (
-        < ActionListaVendasVendedor dadosVendasVendedor={dadosVendasVendedor}/>
+        < ActionListaVendasVendedor
+          dadosVendasVendedor={dadosVendasVendedor}
+        />
       )}
 
     </Fragment>

@@ -30,7 +30,7 @@ export const useCadastrarValeTransporte = ({ handleClose, usuarioLogado, options
       const response = await get(`/todos-funcionario?idEmpresa=${usuarioLogado.IDEMPRESA}`);
       return response.data;
     },
-    { enabled: true, staleTime: 5 * 60 * 1000, cacheTime: 10 * 60 * 1000 }
+    { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
   );
 
   const getIPUsuario = async () => {
@@ -95,7 +95,7 @@ export const useCadastrarValeTransporte = ({ handleClose, usuarioLogado, options
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || "INDISPONÍVEL"
       }
 
       await post('/log-web', createData)
@@ -122,7 +122,7 @@ export const useCadastrarValeTransporte = ({ handleClose, usuarioLogado, options
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || "INDISPONÍVEL"
       }
 
       const responsePost = await post('/log-web', createData)

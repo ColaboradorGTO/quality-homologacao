@@ -91,7 +91,7 @@ export const useCadastroFaturas = ({
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario || "IP NÃO DISPONIVEL"
+                IP: ipUsuario || "INDISPONÍVEL"
             }
 
             await post('/log-web', createData)
@@ -119,7 +119,7 @@ export const useCadastroFaturas = ({
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario || "IP NÃO DISPONIVEL"
+                IP: ipUsuario || "INDISPONÍVEL"
             } 
 
             const responsePost = await post('/log-web', createData)

@@ -144,7 +144,7 @@ export const useEditarEmpresa = ({ dadosEmpresasDetalhe, handleClose, optionsMod
             const createData = {
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
-                DADOS: putData,
+                DADOS: textDados,
                 IP: ipUsuario || "INDISPONIVEL",
             };
 

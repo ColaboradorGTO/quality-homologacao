@@ -61,7 +61,7 @@ export const ActionPesquisaEstoqueLoja = ({ usuarioLogado, optionsEmpresas }) =>
       const response = await get(`/lista-fornecedor-produto`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    { staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
   );
 
   const { data: dadosGrupos = [], error: errorGrupo, isLoading: isLoadingGrupo } = useQuery(
@@ -70,7 +70,7 @@ export const ActionPesquisaEstoqueLoja = ({ usuarioLogado, optionsEmpresas }) =>
       const response = await get(`/grupo-produto`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    { staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
   );
 
   const { data: dadosSubGrupos = [], error: errorSubGrupo, isLoading: isLoadingSubGrupo } = useQuery(
@@ -79,7 +79,7 @@ export const ActionPesquisaEstoqueLoja = ({ usuarioLogado, optionsEmpresas }) =>
       const response = await get(`/subgrupo-produto`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    { staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
   );
 
   const { data: dadosMarcas = [], error: errorMarcas, isLoading: isLoadingMarcas } = useQuery(
@@ -88,7 +88,7 @@ export const ActionPesquisaEstoqueLoja = ({ usuarioLogado, optionsEmpresas }) =>
       const response = await get(`/lista-marca-produto`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    { staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
   );
 
   const fetchListaEstoque = async () => {

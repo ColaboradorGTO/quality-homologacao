@@ -70,11 +70,12 @@ export const useEmitirNFE = ({ usuarioLogado, optionsModulos, handleClick }) => 
                     const textDados = JSON.stringify(putData);
                     const textoFuncao = `GERENCIA/NFE Emitida com sucesso!`;
                     const ipUsuario = await getIPUsuario();
+                    
                     const createData = {
                         IDFUNCIONARIO: String(usuarioLogado.id),
                         PATHFUNCAO: textoFuncao,
                         DADOS: textDados,
-                        IP: ipUsuario || "IP NÃO DISPONIVEL"
+                        IP: ipUsuario || "INDISPONÍVEL"
                     }
 
                     await post('/log-web', createData);
@@ -94,11 +95,12 @@ export const useEmitirNFE = ({ usuarioLogado, optionsModulos, handleClick }) => 
                     const textDados = JSON.stringify(putData);
                     const textoFuncao = 'GERENCIA/ERRO AO EMITIR NFE';
                     const ipUsuario = await getIPUsuario();
+
                     const createData = {
                         IDFUNCIONARIO: String(usuarioLogado.id),
                         PATHFUNCAO: textoFuncao,
                         DADOS: textDados,
-                        IP: ipUsuario || "IP NÃO DISPONIVEL"
+                        IP: ipUsuario || "INDISPONÍVEL"
                     };
 
                     await post('/log-web', createData);
