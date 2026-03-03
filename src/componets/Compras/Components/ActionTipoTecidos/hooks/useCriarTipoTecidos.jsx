@@ -38,7 +38,7 @@ export const useCriarTipoTecido = ({ handleClose, usuarioLogado, optionsModulos 
     { value: 'False', label: 'INATIVO' }
   ]
 
-  const handleCriar = async () => {
+  const onSubmit = async () => {
     const postData = {
       DSTIPOTECIDO: descricao,
       STATIVO: statusSelecionado.value,
@@ -106,6 +106,6 @@ export const useCriarTipoTecido = ({ handleClose, usuarioLogado, optionsModulos 
     statusSelecionado,
     setStatusSelecionado,
     optionsStatus,
-    handleCriar
+    onSubmit
   }
 }

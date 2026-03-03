@@ -565,7 +565,6 @@ export const FormularioCadastrar = ({
                                 corCadastrar="success"
                                 loadingTextCadastrar={"Cadastrando..."}
                                 autoLoadingCadastrar={true}
-
                             />
                         </div>
                     </div>
