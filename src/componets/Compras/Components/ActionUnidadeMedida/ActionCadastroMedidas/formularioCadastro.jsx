@@ -6,6 +6,9 @@ import Select from 'react-select';
 import { useCadastroUnidadeMedida } from "../hooks/useCadastroUnidadeMedida"
 import FormField from "../../../../Formularios/FormField";
 import { schema } from "./schemaValidarUnidadeMedida";
+import { situacao } from "../../../../../../parceiro.json" 
+import { AlertError } from "../../../../Inputs/alertError";
+
 
 export const FormularioCadatro = ({ handleClose, usuarioLogado, refetchListaUnidadesMedidas, optionsModulos }) => {
     const { handleSubmit, formState: { errors }, clearErrors, control, setError, setValue } = useForm({
@@ -112,6 +115,13 @@ export const FormularioCadatro = ({ handleClose, usuarioLogado, refetchListaUnid
                                     clearErrors("situacaoUnidadeMedida")
                                 }}
                             />
+                            {errors.situacaoUnidadeMedida && (
+                                <AlertError
+                                    error={errors.situacaoUnidadeMedida}
+                                    onClose={clearErrors}
+                                    fieldName="situacaoUnidadeMedida"
+                                />
+                            )}
                         </div>
                     </div>
                 </div>

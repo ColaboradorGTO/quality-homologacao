@@ -22,27 +22,26 @@ export const useEditarUnidadeMedida = ({
         setDataCampo(dataAtual);
     })
 
-    const optionsStatus = [
-        { value: 'True', label: 'ATIVO' },
-        { value: 'False', label: 'INATIVO' }
-    ]
-
     const getIPUsuario = async () => {
+        let usuarioIP = null;
+
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
-            let usuarioIP = ipWhoisData?.ip;
-
-            if (!usuarioIP) {
-                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-                usuarioIP = ipifyData?.ip;
-            }
-
-            setIpUsuario(usuarioIP);
-            return usuarioIP;
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+            usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP:", error);
-            return null;
+            console.error("Erro ao buscar IP via ifconfig.me:", error);
         }
+
+        if (!usuarioIP) {
+        try {
+            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+            usuarioIP = ipifyData?.ip;
+        } catch (error) {
+            console.error("Erro ao buscar IP via ipify.org:", error);
+        }
+        }
+        setIpUsuario(usuarioIP);
+        return usuarioIP;
     };
      
 
@@ -54,7 +53,7 @@ export const useEditarUnidadeMedida = ({
         }
     }, [dadosDetalheUnidadeMedida])
 
-    const handleEditar = async () => {
+    const onSubmit = async () => {
         if(optionsModulos[0]?.ALTERAR == 'False') {
             Swal.fire({
                 title: 'Erro!',
@@ -64,34 +63,6 @@ export const useEditarUnidadeMedida = ({
                 customClass: {
                     container: 'custom-swal',
                 },
-            });
-            return;
-        }
-
-        if(descricao === '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'O campo descrição é obrigatório.',
-                showConfirmButton: false,
-                timer: 3000,
-                customClass: {
-                    container: 'custom-swal',
-                }
-            });
-            return;
-        }
-
-        if(sigla === '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'O campo sigla é obrigatório.',
-                showConfirmButton: false,
-                timer: 3000,
-                customClass: {
-                    container: 'custom-swal',
-                }
             });
             return;
         }
@@ -115,10 +86,10 @@ export const useEditarUnidadeMedida = ({
                 IDUSUARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ip
+                IP: ip || 'Indisponível'
             }
             
-            const responseLog = await post('/log-web', createLog)
+            await post('/log-web', createLog)
 
             Swal.fire({
                 position: 'center',
@@ -135,14 +106,6 @@ export const useEditarUnidadeMedida = ({
             return response.data;
     
         } catch (error) {
-            // const putData = {
-            //     IDUNIDADEMEDIDA: Number(dadosDetalheUnidadeMedida[0].IDUNIDADEMEDIDA),
-            //     DSUNIDADE: descricao,
-            //     DSSIGLA: sigla,
-            //     DTCADASTRO: dataCampo,
-            //     DTULTATUALIZACAO: dataCampo,
-            //     STATIVO: statusSelecionado.value,
-            // }
             const textDados = JSON.stringify(putData)
             let textoFuncao = 'COMPRAS/ERRO AO EDITAR UNIDADES DE MEDIDAS';
             const ip = await getIPUsuario();
@@ -150,7 +113,7 @@ export const useEditarUnidadeMedida = ({
                 IDUSUARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ip
+                IP: ip || 'Indisponível'
             }
             const responseLog = await post('/log-web', createLog)
 
@@ -176,12 +139,9 @@ export const useEditarUnidadeMedida = ({
         sigla,
         setSigla,
         dataCampo,
-        usuarioLogado,
-        ipUsuario,
-        optionsStatus,
         statusSelecionado,
         setStatusSelecionado,
-        handleEditar
+        onSubmit
 
     }
 }
