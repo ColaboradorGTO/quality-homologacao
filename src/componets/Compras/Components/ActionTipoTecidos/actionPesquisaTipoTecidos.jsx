@@ -75,7 +75,7 @@ export const ActionPesquisaTiposTecidos = ({ usuarioLogado}) => {
   const { data: dadosTecidos = [], error: errorAdiantamento, isLoading: isLoadingAdiantamento, refetch } = useQuery(
     ['tipoTecidos',],
     () => fetchListaTecidos(),
-    { enabled: true }
+    { enabled: true, staleTime: 60 * 60 * 1000, }
   )
 
 

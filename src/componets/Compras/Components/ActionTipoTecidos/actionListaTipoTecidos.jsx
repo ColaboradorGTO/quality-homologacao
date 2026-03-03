@@ -16,6 +16,7 @@ export const ActionListaTipoTecidos = ({ dadosTecidos, usuarioLogado, optionsMod
   const [modalEditar, setModalEditar] = useState(false);
   const [dadosDetalheTipoTecido, setDadosDetalheTipoTecido] = useState([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
     
     
@@ -59,7 +60,7 @@ export const ActionListaTipoTecidos = ({ dadosTecidos, usuarioLogado, optionsMod
   
   const dados = dadosTecidos.map((item, index) => {
     let contador = index + 1;
-    // console.log(item.STATIVO, 'item')
+  
     return {
       contador,
       DSTIPOTECIDO: item.DSTIPOTECIDO,
@@ -101,11 +102,12 @@ export const ActionListaTipoTecidos = ({ dadosTecidos, usuarioLogado, optionsMod
             <ButtonTable
               titleButton={"Editar Tecidos"}
               onClickButton={() => clickEditar(row)}
-              cor={"success"}
+              cor={"primary"}
               Icon={CiEdit}
               iconSize={22}
               iconColor={"#fff"}
-
+              width="35px"
+              height="35px"
             />
           </div>
         )
@@ -124,7 +126,7 @@ export const ActionListaTipoTecidos = ({ dadosTecidos, usuarioLogado, optionsMod
       Swal.fire({
         icon: 'error',
         title: 'Acesso Negado!',
-        text: `${usuarioLogado?.NOFUNCIONARIO},\nVocê não tem permissão para editar os Tipos de Tecidos!`,
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para editar os Tipos de Tecidos!`,
         timer: 5000,
       })
     }
@@ -133,8 +135,19 @@ export const ActionListaTipoTecidos = ({ dadosTecidos, usuarioLogado, optionsMod
   const handleEditar = async (IDTPTECIDO) => {
     try {
       const response = await get(`/tipoTecidos?idTecido=${IDTPTECIDO}`);
-      setDadosDetalheTipoTecido(response.data);
-      setModalEditar(true)
+      if(response.data && response.data.length > 0) {
+        setDadosDetalheTipoTecido(response.data);
+        setModalEditar(true);
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro!',
+          text: 'Detalhes do tipo de tecido não encontrados.',
+          timer: 5000,
+        })
+        return;
+      }
+
     } catch (error) {
       console.error(error);
     }
@@ -162,12 +175,18 @@ export const ActionListaTipoTecidos = ({ dadosTecidos, usuarioLogado, optionsMod
           <DataTable
             title="Tipos de Tecidos"
             value={dados}
-            size="small"
             globalFilter={globalFilterValue}
+            size="small"
+            selectionMode="single"
+            selection={rowSelection}
+            onSelectionChange={(e) => setRowSelection(e.value)}
             sortOrder={-1}
             paginator={true}
             rows={10}
             rowsPerPageOptions={[10, 50, 100, 500, dados.length]}
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+            filterDisplay="menu"
             showGridlines
             stripedRows
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado </div>}
@@ -181,9 +200,9 @@ export const ActionListaTipoTecidos = ({ dadosTecidos, usuarioLogado, optionsMod
                 body={coluna.body}
                 footer={coluna.footer}
                 sortable={coluna.sortable}
-                headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+                headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '1rem' }}
                 footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
-                bodyStyle={{ fontSize: '0.8rem' }}
+                bodyStyle={{ fontSize: '1rem' }}
 
               />
             ))}
