@@ -20,21 +20,20 @@ export const FormularioCadastro = ({
         mode: "onChange"
     });
     const {
-        optionsStatus,
         statusSelecionado,
         setStatusSelecionado,
         descricao,
         setDescricao,
         grupoCorSelecionado,
         setGrupoCorSelecionado,
-        dadosGrupoCores,
-        cadastrarCores
+        dadosGrupoCores
     } = useCadastroCores({handleClose, usuarioLogado, refetchListaCores, optionsModulos})
 
     const handleValidatedSubmit = async () => {
         try {
             const dadosParaValidar = {
                 descricaoCores: descricao,
+                grupoCores: grupoCorSelecionado,
                 situacaoCores: statusSelecionado,
             };
             
@@ -66,7 +65,7 @@ export const FormularioCadastro = ({
     return (
         <Fragment>
                 
-            <form onSubmit={handleSubmit(cadastrarCores)}>
+            <form onSubmit={handleSubmit(handleValidatedSubmit)}>
 
                 <div className="form-group">
                     <div className="row">
@@ -89,11 +88,11 @@ export const FormularioCadastro = ({
                         </div>
                         <div className="col-sm-6 col-xl-3">
 
-                        <label htmlFor="">Grupo Cor *</label>
+                            <label htmlFor="">Grupo Cor *</label>
                             <Select
                                 className="basic-single"
                                 classNamePrefix="select"
-                                name="grupoCor"
+                                name="grupoCores"
                                 options={dadosGrupoCores.map((item) => {
                                     return {
                                         value: item.IDGRUPOCOR,
@@ -103,14 +102,14 @@ export const FormularioCadastro = ({
                                 value={grupoCorSelecionado}
                                 onChange={(e) =>  { 
                                     setGrupoCorSelecionado(e)
-                                    clearErrors('grupoCor')
+                                    clearErrors('grupoCores')
                                 }}
                             />
-                            {errors.grupoCor && (
+                            {errors.grupoCores && (
                                 <AlertError
-                                    error={errors.grupoCor}
+                                    error={errors.grupoCores}
                                     onClose={clearErrors}
-                                    fieldName="grupoCor"
+                                    fieldName="grupoCores"
                                 />
                             )}
                         </div>
@@ -118,7 +117,9 @@ export const FormularioCadastro = ({
 
                             <label htmlFor="">Situação *</label>
                             <Select
-
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="situacaoCores"
                                 defaultValue={statusSelecionado}
                                 options={optionsStatus.map((item) => {
                                     return {
@@ -126,13 +127,20 @@ export const FormularioCadastro = ({
                                         label: item.label
                                     }
                                 })}
-                                onChange={(e) => setStatusSelecionado(e)}
+                                onChange={(e) => {
+                                    setStatusSelecionado(e)
+                                    clearErrors('situacaoCores')
+                                }}
                             />
+                            {errors.situacaoCores && (
+                                <AlertError
+                                    error={errors.situacaoCores}
+                                    onClose={clearErrors}
+                                    fieldName="situacaoCores"
+                                />
+                            )}
                         </div>
                     </div>
-                </div>
-                <div className="form-group">
-                    <h3 className="form-label" style={{ color: 'red' }}>* Campos Obrigatórios *</h3>
                 </div>
 
                 <FooterModal
@@ -142,7 +150,7 @@ export const FormularioCadastro = ({
                     corFechar={"secondary"}
 
                     ButtonTypeCadastrar={ButtonTypeModal}
-                    onClickButtonCadastrar={cadastrarCores}
+                    onClickButtonCadastrar={handleSubmit(handleValidatedSubmit)}
                     textButtonCadastrar={"Salvar"}
                     corCadastrar={"success"}
                     loadingTextCadastrar={"Cadastrando..."}
