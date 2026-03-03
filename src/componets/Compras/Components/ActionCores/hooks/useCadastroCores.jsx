@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { post } from "../../../../../api/funcRequest"
+import { get, post } from "../../../../../api/funcRequest"
 import axios from "axios"
 import Swal from 'sweetalert2'
 import { useQuery } from "react-query"
@@ -39,43 +39,19 @@ export const useCadastroCores = ({handleClose, usuarioLogado, refetchListaCores,
 
             return response.data;
         },
-        { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000}
+        { enabled: true, staleTime: 60 * 60 * 1000}
     );
-
-    const optionsStatus = [
-        { value: 'True', label: 'ATIVO' },
-        { value: 'False', label: 'INATIVO' }
-    ]
-
     
     const onSubmit = async () => {
         if(optionsModulos[0]?.CRIAR == 'False') {
             Swal.fire({
-                title: 'Erro!',
-                text: `${usuarioLogado?.NOFUNCIONARIO},\nVocê não tem permissão para cadastrar a Cor!`,
-            });
-
-            return;
-        }
-
-        if (descricao == '') {
-            Swal.fire({
-                position: 'top-end',
-                icon: 'error',
-                title: 'O campo descrição é obrigatório.',
-                showConfirmButton: false,
-                timer: 1500
-            });
-            return;
-        }
-
-        if (grupoCorSelecionado == '') {
-            Swal.fire({
-                position: 'top-end',
-                icon: 'error',
-                title: 'O campo Grupo Cor é obrigatório.',
-                showConfirmButton: false,
-                timer: 1500
+                icon: 'info',
+                title: 'Acesso Negado!',
+                html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para cadastrar a Cor!`,
+                timer: 5000,
+                customClass: {
+                    container: 'custom-swal',
+                },
             });
             return;
         }
@@ -106,12 +82,14 @@ export const useCadastroCores = ({handleClose, usuarioLogado, refetchListaCores,
                 icon: 'success',
                 title: 'Atualizado com sucesso!',
                 showConfirmButton: false,
-                timer: 30000,
+                timer: 5000,
                 customClass: {
                     container: 'custom-swal',
                 }
             })
 
+            handleClose();
+            refetchListaCores();
             return response.data;
         } catch (error) {
             const textDados = JSON.stringify(postData)
@@ -131,7 +109,7 @@ export const useCadastroCores = ({handleClose, usuarioLogado, refetchListaCores,
                 icon: 'error',
                 title: 'Ocorreu um erro ao enviar o formulário. Por favor, tente novamente.',
                 showConfirmButton: false,
-                timer: 30000,
+                timer: 5000,
                 customClass: {
                     container: 'custom-swal',
                 },
@@ -143,7 +121,6 @@ export const useCadastroCores = ({handleClose, usuarioLogado, refetchListaCores,
     }
 
     return {
-        optionsStatus,
         statusSelecionado,
         setStatusSelecionado,
         descricao,

@@ -1,10 +1,10 @@
 import { Fragment } from "react"
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal"
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal"
-import { InputFieldModal } from "../../../../Buttons/InputFieldModal"
 import Select from 'react-select';
 import { useCadastroCores } from "../hooks/useCadastroCores";
 import { Controller, useForm } from "react-hook-form";
+import { situacao } from "../../../../../../parceiro.json" 
 import { schema } from "./schemaValidarCores"
 import FormField from "../../../../Formularios/FormField";
 import { AlertError } from "../../../../Inputs/alertError";
@@ -26,9 +26,10 @@ export const FormularioCadastro = ({
         setDescricao,
         grupoCorSelecionado,
         setGrupoCorSelecionado,
-        dadosGrupoCores
+        dadosGrupoCores,
+        onSubmit
     } = useCadastroCores({handleClose, usuarioLogado, refetchListaCores, optionsModulos})
-
+    
     const handleValidatedSubmit = async () => {
         try {
             const dadosParaValidar = {
@@ -121,7 +122,7 @@ export const FormularioCadastro = ({
                                 classNamePrefix="select"
                                 name="situacaoCores"
                                 defaultValue={statusSelecionado}
-                                options={optionsStatus.map((item) => {
+                                options={situacao.map((item) => {
                                     return {
                                         value: item.value,
                                         label: item.label

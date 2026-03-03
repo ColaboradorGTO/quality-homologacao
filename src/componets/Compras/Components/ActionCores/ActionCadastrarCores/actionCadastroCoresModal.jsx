@@ -34,6 +34,7 @@ export const ActionCadastroCoresModal = ({
             usuarioLogado={usuarioLogado}
             refetchListaCores={refetchListaCores}
             optionsModulos={optionsModulos}
+            handleClose={handleClose}
            
           />
         </Modal.Body>

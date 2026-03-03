@@ -2,18 +2,18 @@ import * as yup from 'yup';
 
 export const schema = yup.object({
 
-  descricaoEstilo: yup
+  descricaoCores: yup
     .string()
     .required('Descrição Obrigatória'),
 
-  subGrupoEstilo: yup.object()
+  grupoCores: yup.object()
     .nullable()
-    .required('Grupo Estrutura Obrigatório')
-    .typeError('Grupo Estrutura Obrigatório'),
+    .required('Grupo Cores Obrigatório')
+    .typeError('Grupo Cores Obrigatório'),
 
-  situacaoEstilo: yup.object()
+  situacaoCores: yup.object()
     .nullable()
-    .required('Situação Obrigatória')
-    .typeError('Situação Obrigatória'),
+    .required('Situação Cores Obrigatória')
+    .typeError('Situação Cores Obrigatória'),
   
 });

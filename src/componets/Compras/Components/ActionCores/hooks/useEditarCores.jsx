@@ -20,34 +20,28 @@ export const useEditarCores = ({dadosDetalheCores, usuarioLogado, optionsModulos
         { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000}
     );
 
-    const optionsStatus = [
-        { value: 'True', label: 'ATIVO' },
-        { value: 'False', label: 'INATIVO' }
-    ]
-
     const getIPUsuario = async () => {
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
             usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP via ipwho.is:", error);
+            console.error("Erro ao buscar IP via ifconfig.me:", error);
         }
 
         if (!usuarioIP) {
             try {
-                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-                usuarioIP = ipifyData?.ip;
+            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+            usuarioIP = ipifyData?.ip;
             } catch (error) {
-                console.error("Erro ao buscar IP via ipify.org:", error);
+            console.error("Erro ao buscar IP via ipify.org:", error);
             }
         }
         setIpUsuario(usuarioIP);
         return usuarioIP;
     };
 
- 
     useEffect(() => {
         if (dadosDetalheCores) {
             setDescricao(dadosDetalheCores[0]?.DS_COR)
@@ -57,36 +51,17 @@ export const useEditarCores = ({dadosDetalheCores, usuarioLogado, optionsModulos
     }, [dadosDetalheCores])
 
     
-    const atualzarCores = async () => {
+    const onSubmit = async () => {
 
         if(optionsModulos[0]?.ALTERAR == 'False') {
             Swal.fire({
-                title: 'Erro!',
-                text: `${usuarioLogado?.NOFUNCIONARIO} \n Você não tem permissão para alterar este registro.`,
-                icon: 'error',
-                confirmButtonText: 'Fechar'
-            });
-            return;
-        }
-
-        if (descricao == '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'O campo descrição é obrigatório.',
-                showConfirmButton: false,
-                timer: 1500
-            });
-            return;
-        }
-
-        if (grupoCorSelecionado == '') {
-            Swal.fire({
-                position: 'top-end',
-                icon: 'error',
-                title: 'O campo Grupo Cor é obrigatório.',
-                showConfirmButton: false,
-                timer: 1500
+                icon: 'info',
+                title: 'Acesso Negado!',
+                html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para alterar a Cor!`,
+                timer: 5000,
+                customClass: {
+                    container: 'custom-swal',
+                },
             });
             return;
         }
@@ -97,6 +72,7 @@ export const useEditarCores = ({dadosDetalheCores, usuarioLogado, optionsModulos
             DSCOR: descricao,
             STATIVO: statusSelecionado.value,
         }
+
         try {
 
             const response = await put('/cores/:id', postData)
@@ -108,10 +84,10 @@ export const useEditarCores = ({dadosDetalheCores, usuarioLogado, optionsModulos
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'Indisponível'
             }
 
-            const responseLog = await post('/log-web', createtLog)
+            await post('/log-web', createtLog)
 
             
             Swal.fire({
@@ -124,7 +100,7 @@ export const useEditarCores = ({dadosDetalheCores, usuarioLogado, optionsModulos
                     container: 'custom-swal',
                 }
             })
-            return responseLog.data;
+            return response.data;
         } catch (error) {
             const textDados = JSON.stringify(postData)
             let textFuncao = 'COMPRAS / ERRO AO ALTERAR COR';
@@ -133,7 +109,7 @@ export const useEditarCores = ({dadosDetalheCores, usuarioLogado, optionsModulos
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'Indisponível'
             }
 
             const responseLog = await post('/log-web', createtLog)
@@ -155,7 +131,6 @@ export const useEditarCores = ({dadosDetalheCores, usuarioLogado, optionsModulos
     }
 
     return {
-        optionsStatus,
         statusSelecionado,
         setStatusSelecionado,
         descricao,
@@ -164,7 +139,7 @@ export const useEditarCores = ({dadosDetalheCores, usuarioLogado, optionsModulos
         setGrupoCorSelecionado,
         dadosDetalheCores,
         dadosGrupoCores,
-        atualzarCores,
+        onSubmit
     
     }
 }
