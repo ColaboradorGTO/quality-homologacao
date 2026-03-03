@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react"
+import { Fragment, useState, useEffect } from "react"
 import { get } from "../../../../api/funcRequest"
 import { AiOutlineSearch } from "react-icons/ai"
 import { InputField } from "../../../Buttons/Input"
@@ -13,22 +13,32 @@ import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../ut
 import Swal from "sweetalert2"
 
 
-export const ActionPesquisaSubGrupoEstrutura = ({usuarioLogado, ID }) => {
+export const ActionPesquisaSubGrupoEstrutura = ({usuarioLogado }) => {
   const [descricao, setDescricao] = useState("")
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [modalVisivel, setModalVisivel] = useState(false);
   const [subGrupoSelecionado, setSubGrupoSelecionado] = useState("")
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(1000);
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
+
+  useEffect(() => {
+    const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
+    if (menuSalvo) {
+      const menuParsed = JSON.parse(menuSalvo);
+      setMenuFilhoAtual(menuParsed);
+    }
+  }, []);
+  
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
-    'menus-usuario-excecao',
+    ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
-      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${ID}`);
-
+      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
+      
       return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
   );
 
   const fetchListaSubGrupo = async () => {
@@ -65,17 +75,14 @@ export const ActionPesquisaSubGrupoEstrutura = ({usuarioLogado, ID }) => {
     }
   };
     
-  const { data: dadosSubGrupo = [], error: errorAdiantamento, isLoading: isLoadingAdiantamento, refetch: refetchListaSubGrupo } = useQuery(
-    ['subGrupoEstrutura', subGrupoSelecionado, descricao, currentPage, pageSize],
-    () => fetchListaSubGrupo(subGrupoSelecionado, descricao,  currentPage, pageSize),
-    { enabled: true, staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+  const { data: dadosSubGrupo = [], error: errorSubGrupo, isLoading: isLoadingSubGrupo, refetch: refetchListaSubGrupo } = useQuery(
+    ['subGrupoEstrutura',],
+    () => fetchListaSubGrupo(),
+    { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
   )
 
-  const handleChangeSubGrupo = (e) => {
-    setSubGrupoSelecionado(e.value)
-  }
+
   const handleClick = () => {
-    setCurrentPage(prevPage => prevPage + 1)
     refetchListaSubGrupo()
     setTabelaVisivel(true)
   }
@@ -105,7 +112,6 @@ export const ActionPesquisaSubGrupoEstrutura = ({usuarioLogado, ID }) => {
         linkComponentAnterior={["Home"]}
         linkComponent={["Relatórios - SubGrupo Estruturas Mercadológicas"]}
 
-
         InputFieldComponent={InputField}
         labelInputField={"Descrição"}
         valueInputField={descricao}
@@ -123,7 +129,7 @@ export const ActionPesquisaSubGrupoEstrutura = ({usuarioLogado, ID }) => {
         ]}
         labelSelectSubGrupo={"Por Sub Grupo "}
         valueSelectSubGrupo={subGrupoSelecionado}
-        onChangeSelectSubGrupo={handleChangeSubGrupo}
+        onChangeSelectSubGrupo={(e) => setSubGrupoSelecionado(e.value)}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar SubGrupo Estruturas"}
