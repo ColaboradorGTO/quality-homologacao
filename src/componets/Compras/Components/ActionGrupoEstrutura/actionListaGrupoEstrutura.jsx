@@ -10,12 +10,14 @@ import { useReactToPrint } from "react-to-print";
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+import Swal from "sweetalert2";
 
 
 export const ActionListaGrupoEstrutura = ({ dadosGrupoEstrutura, usuarioLogado, optionsModulos, handleClick }) => {
   const [modalEditar, setModalEditar] = useState(false);
   const [dadosDetalheGrupo, setDadosDetalheGrupo] = useState([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
 
 
@@ -36,7 +38,7 @@ export const ActionListaGrupoEstrutura = ({ dadosGrupoEstrutura, usuarioLogado, 
         item.contador,
         item.DSGRUPOESTRUTURA,
         item.STATIVO,
-      
+
       ]),
       horizontalPageBreak: true,
       horizontalPageBreakBehaviour: 'immediately'
@@ -65,7 +67,7 @@ export const ActionListaGrupoEstrutura = ({ dadosGrupoEstrutura, usuarioLogado, 
       contador,
       DSGRUPOESTRUTURA: item.DSGRUPOESTRUTURA,
       STATIVO: item.STATIVO == 'True' ? 'ATIVO' : 'INATIVO',
-      IDGRUPOESTRUTURA: item.IDGRUPOESTRUTURA,  
+      IDGRUPOESTRUTURA: item.IDGRUPOESTRUTURA,
     }
   })
 
@@ -116,7 +118,7 @@ export const ActionListaGrupoEstrutura = ({ dadosGrupoEstrutura, usuarioLogado, 
   ]
 
   const clickEditar = (row) => {
-    if(optionsModulos[0]?.ALTERAR == 'False') {
+    if (optionsModulos[0]?.ALTERAR == 'False') {
       Swal.fire({
         title: 'Erro!',
         text: `${usuarioLogado?.NOFUNCIONARIO},\nVocê não tem permissão para editar SubGrupo de Estrutura Mercadológica!`,
@@ -136,8 +138,20 @@ export const ActionListaGrupoEstrutura = ({ dadosGrupoEstrutura, usuarioLogado, 
   const handleEditar = async (IDGRUPOESTRUTURA) => {
     try {
       const response = await get(`/grupoEstrutura?idGrupoEstrutura=${IDGRUPOESTRUTURA}`);
-      setDadosDetalheGrupo(response.data);
-      setModalEditar(true)
+      if (response.data && response.data.length > 0) {
+        setDadosDetalheGrupo(response.data);
+        setModalEditar(true)
+      } else {
+        Swal.fire({
+          title: 'Erro!',
+          text: `Não foi possível obter os detalhes do Grupo de Estrutura selecionado.`,
+          icon: 'error',
+          customClass: {
+            container: 'custom-swal',
+          },
+        });
+        return;
+      }
     } catch (error) {
       console.error(error);
     }
@@ -168,6 +182,9 @@ export const ActionListaGrupoEstrutura = ({ dadosGrupoEstrutura, usuarioLogado, 
             value={dados}
             size="small"
             globalFilter={globalFilterValue}
+            selectionMode="single"
+            selection={rowSelection}
+            onSelectionChange={(e) => setRowSelection(e.value)}
             sortOrder={-1}
             paginator={true}
             rows={10}
