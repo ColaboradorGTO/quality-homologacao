@@ -1,13 +1,13 @@
 import { Fragment } from "react"
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal"
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal"
-import { InputFieldModal } from "../../../../Buttons/InputFieldModal"
 import Select from 'react-select';
 import { useCriarTipoTecido } from "../hooks/useCriarTipoTecidos"
 import { Controller, useForm } from "react-hook-form";
 import { schema } from "./schamaValidarTecido";
 import FormField from "../../../../Formularios/FormField";
 import { AlertError } from "../../../../Inputs/alertError";
+import { situacao } from "../../../../../../parceiro.json" 
 
 export const FormularioCriarTecido = ({ show, handleClose, usuarioLogado, optionsModulos }) => {
     const { handleSubmit, formState: { errors }, clearErrors, control, setError, setValue } = useForm({
@@ -19,7 +19,6 @@ export const FormularioCriarTecido = ({ show, handleClose, usuarioLogado, option
         setDescricao,
         statusSelecionado,
         setStatusSelecionado,
-        optionsStatus,
         onSubmit,
     } = useCriarTipoTecido({ handleClose, usuarioLogado, optionsModulos });
 
@@ -59,16 +58,6 @@ export const FormularioCriarTecido = ({ show, handleClose, usuarioLogado, option
                 <div className="form-group">
                     <div className="row">
                         <div className="col-sm-6 col-xl-6">
-                            {/* <InputFieldModal
-                                label={"Descrição *"}
-                                type={"text"}
-                                id={"DSTIPOTEIDO"}
-                                value={descricao}
-                                onChangeModal={(e) => setDescricao(e.target.value)}
-
-                                {...register("DSTIPO TEIDO", { required: "Campo obrigatório Informe a Descrição do Tipo de Tecido", })}
-                                required={true}
-                            /> */}
                             <Controller
                                 name="descricaoTecido"
                                 control={control}
@@ -93,7 +82,7 @@ export const FormularioCriarTecido = ({ show, handleClose, usuarioLogado, option
                                 className="basic-single"
                                 classNamePrefix={"select"}
                                 name="situacaoTecido"
-                                options={optionsStatus.map((item) => {
+                                options={situacao.map((item) => {
                                     return {
                                         value: item.value,
                                         label: item.label

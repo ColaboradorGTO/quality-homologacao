@@ -150,13 +150,13 @@ export const ActionPesquisaTiposTecidos = ({ usuarioLogado}) => {
 
       />
 
-      {tabelaVisivel && (
-        <ActionListaTipoTecidos
-          dadosTecidos={dadosTecidos}
-          usuarioLogado={usuarioLogado}
-          optionsModulos={optionsModulos}
-        />
-      )}
+      
+      <ActionListaTipoTecidos
+        dadosTecidos={dadosTecidos}
+        usuarioLogado={usuarioLogado}
+        optionsModulos={optionsModulos}
+      />
+    
 
       <ActionCriarTipoTecidosModal
         show={modalVisivel}

@@ -1,15 +1,13 @@
 import { useState, useEffect } from "react";
 import { post, put } from "../../../../../api/funcRequest";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Swal from 'sweetalert2'
 
 
-export const useEditarTecido = ({ dadosDetalheTipoTecido, usuarioLogado, optionsModulos }) => {
+export const useEditarTecido = ({ dadosDetalheTipoTecido, usuarioLogado, optionsModulos, handleClose }) => {
   const [descricao, setDescricao] = useState('')
   const [statusSelecionado, setStatusSelecionado] = useState('')
   const [ipUsuario, setIpUsuario] = useState('');
-  const navigate = useNavigate();
 
   const getIPUsuario = async () => {
     let usuarioIP = null;
@@ -40,10 +38,6 @@ export const useEditarTecido = ({ dadosDetalheTipoTecido, usuarioLogado, options
     }
   }, [])
 
-  const optionsStatus = [
-    { value: 'True', label: 'ATIVO' },
-    { value: 'False', label: 'INATIVO' }
-  ]
 
   const onSubmit = async () => {
     if (optionsModulos[0]?.ALTERAR == 'False') {
@@ -90,16 +84,16 @@ export const useEditarTecido = ({ dadosDetalheTipoTecido, usuarioLogado, options
         IP: ip || 'IP não disponível'
       }
 
-      const responsePost = await post('/log-web', createData)
+      await post('/log-web', createData)
 
-
+      handleClose();
       return response.data;
     } catch (error) {
       const textDados = JSON.stringify(postData);
       let textoFuncao = 'COMPRAS/ERRO AO CADASTRAR TIPOS DE TECIDOS';
 
       const ip = await getIPUsuario();
-      
+
       const createData = {
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
@@ -131,10 +125,6 @@ export const useEditarTecido = ({ dadosDetalheTipoTecido, usuarioLogado, options
     statusSelecionado,
     setStatusSelecionado,
     usuarioLogado,
-    ipUsuario,
-    navigate,
-    getIPUsuario,
-    optionsStatus,
     onSubmit,
   }
 }
