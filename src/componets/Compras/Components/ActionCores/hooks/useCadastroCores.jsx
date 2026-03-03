@@ -14,24 +14,23 @@ export const useCadastroCores = ({handleClose, usuarioLogado, refetchListaCores,
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
             usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP via ipwho.is:", error);
+            console.error("Erro ao buscar IP via ifconfig.me:", error);
         }
 
         if (!usuarioIP) {
-            try {
-                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-                usuarioIP = ipifyData?.ip;
-            } catch (error) {
-                console.error("Erro ao buscar IP via ipify.org:", error);
-            }
+        try {
+            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+            usuarioIP = ipifyData?.ip;
+        } catch (error) {
+            console.error("Erro ao buscar IP via ipify.org:", error);
+        }
         }
         setIpUsuario(usuarioIP);
         return usuarioIP;
     };
-
 
     const { data: dadosGrupoCores = [], error: errorCores, isLoading: isLoadingCores, refetch: refetchCores } = useQuery(
         'grupoCores',
@@ -49,7 +48,7 @@ export const useCadastroCores = ({handleClose, usuarioLogado, refetchListaCores,
     ]
 
     
-    const cadastrarCores = async () => {
+    const onSubmit = async () => {
         if(optionsModulos[0]?.CRIAR == 'False') {
             Swal.fire({
                 title: 'Erro!',
@@ -81,12 +80,13 @@ export const useCadastroCores = ({handleClose, usuarioLogado, refetchListaCores,
             return;
         }
         
+        const postData = {
+            IDGRUPOCOR: Number(grupoCorSelecionado.value),
+            DSCOR: descricao,
+            STATIVO: statusSelecionado.value
+        }
+
         try {
-            const postData = {
-                IDGRUPOCOR: Number(grupoCorSelecionado.value),
-                DSCOR: descricao,
-                STATIVO: statusSelecionado.value
-            }
 
             const response = await post('/cadastrar-cores', postData)
             const textDados = JSON.stringify(postData)
@@ -96,10 +96,10 @@ export const useCadastroCores = ({handleClose, usuarioLogado, refetchListaCores,
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'Indisponível'
             }
             
-            const responseLog = await post('/log-web', createtLog)
+            await post('/log-web', createtLog)
             
             Swal.fire({
                 position: 'center',
@@ -112,7 +112,7 @@ export const useCadastroCores = ({handleClose, usuarioLogado, refetchListaCores,
                 }
             })
 
-            return responseLog.data;
+            return response.data;
         } catch (error) {
             const textDados = JSON.stringify(postData)
             let textFuncao = 'COMPRAS / ERRO NO CADASTRO DA COR';
@@ -121,7 +121,7 @@ export const useCadastroCores = ({handleClose, usuarioLogado, refetchListaCores,
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'Indisponível'
             }
 
             const responseLog = await post('/log-web', createtLog)
@@ -151,6 +151,6 @@ export const useCadastroCores = ({handleClose, usuarioLogado, refetchListaCores,
         grupoCorSelecionado,
         setGrupoCorSelecionado,
         dadosGrupoCores,
-        cadastrarCores,
+        onSubmit
     }
 }
