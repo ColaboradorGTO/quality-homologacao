@@ -10,11 +10,13 @@ import { useReactToPrint } from "react-to-print";
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+import Swal from "sweetalert2";
 
 export const ActionListaCores = ({ dadosCores, usuarioLogado, optionsModulos, refetchListaCores }) => {
   const [modalEditar, setModalEditar] = useState(false);
   const [dadosDetalheCores, setDadosDetalheCores] = useState([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
 
 
@@ -136,8 +138,18 @@ export const ActionListaCores = ({ dadosCores, usuarioLogado, optionsModulos, re
   const handleEditar = async (ID_COR) => {
     try {
       const response = await get(`/listaCores?idCor=${ID_COR}`);
-      setDadosDetalheCores(response.data);
-      setModalEditar(true)
+      if(response.data && response.data.length > 0) {
+        setDadosDetalheCores(response.data);
+        setModalEditar(true)
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: 'Não foi possível obter os detalhes da cor selecionada.',
+          timer: 5000,
+        })
+        return;
+      }
     } catch (error) {
       console.error(error);
     }
@@ -167,6 +179,9 @@ export const ActionListaCores = ({ dadosCores, usuarioLogado, optionsModulos, re
             value={dados}
             globalFilter={globalFilterValue}
             size="small"
+            selectionMode="single"
+            selection={rowSelection}
+            onSelectionChange={(e) => setRowSelection(e.value)}
             sortOrder={-1}
             paginator={true}
             rows={10}

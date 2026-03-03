@@ -3,7 +3,6 @@ import { Modal } from "react-bootstrap"
 import { HeaderModal } from "../../../../Modais/HeaderModal/HeaderModal";
 import { FormularioEditar } from "./actionFormularioEditar";
 
-
 export const ActionEditarCoresModal = ({ 
   show, 
   handleClose, 
@@ -16,7 +15,6 @@ export const ActionEditarCoresModal = ({
   return (
 
     <Fragment>
-
       <Modal
         show={show}
         onHide={handleClose}
@@ -24,7 +22,6 @@ export const ActionEditarCoresModal = ({
         size="xl"
         centered
       >
-
         <HeaderModal
           title={"Cores"}
           subTitle={"Alteração"}

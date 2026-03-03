@@ -11,6 +11,7 @@ import { ActionCadastroCoresModal } from "./ActionCadastrarCores/actionCadastroC
 import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
 import { useEffect } from "react";
+import Swal from "sweetalert2";
 
 
 export const ActionPesquisaCores = ({ usuarioLogado }) => {
@@ -97,8 +98,23 @@ export const ActionPesquisaCores = ({ usuarioLogado }) => {
   const handleChangeCor = (e) => {
     setCorSelecionada(e.value)
   }
+
   const handleModal = () => {
-    setModalVisivel(true)
+    if(optionsModulos[0]?.CRIAR == 'True') {
+
+      setModalVisivel(true)
+    } else {
+      Swal.fire({
+        icon: 'info',
+        title: 'Acesso Negado!',
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para cadastrar!`,
+        timer: 5000,
+        customClass: {
+          container: 'custom-swal',
+        },
+      })
+      return;
+    } 
   }
 
   const handleClose = () => {
@@ -150,14 +166,14 @@ export const ActionPesquisaCores = ({ usuarioLogado }) => {
 
       />
 
-      {tabelaVisivel && (
-        <ActionListaCores 
-          dadosCores={dadosCores} 
-          usuarioLogado={usuarioLogado}
-          optionsModulos={optionsModulos}
-          refetchListaCores={refetchListaCores}  
-        />
-      )}
+    
+      <ActionListaCores 
+        dadosCores={dadosCores} 
+        usuarioLogado={usuarioLogado}
+        optionsModulos={optionsModulos}
+        refetchListaCores={refetchListaCores}  
+      />
+     
 
       <ActionCadastroCoresModal 
         show={modalVisivel} 
