@@ -10,7 +10,7 @@ export const useEmitirNFE = ({ usuarioLogado, optionsModulos, handleClick }) => 
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
             usuarioIP = ipWhoisData?.ip;
         } catch (error) {
             console.error("Erro ao buscar IP via ipwho.is:", error);
@@ -58,7 +58,7 @@ export const useEmitirNFE = ({ usuarioLogado, optionsModulos, handleClick }) => 
             preConfirm: async () => {
                 const putData = {
                     IDRESUMOOT: Number(row.IDRESUMOOT),
-                    IDEMPRESAORIGEM: Number(row.IDEMPRESAORIGEM), 
+                    IDEMPRESAORIGEM: Number(row.IDEMPRESAORIGEM),
                     IDSTATUSOT: 3,
                     NUTOTALVOLUMES: 0,
                     TPVOLUME: "",
@@ -74,7 +74,7 @@ export const useEmitirNFE = ({ usuarioLogado, optionsModulos, handleClick }) => 
                         IDFUNCIONARIO: String(usuarioLogado.id),
                         PATHFUNCAO: textoFuncao,
                         DADOS: textDados,
-                        IP: ipUsuario
+                        IP: ipUsuario || "IP NÃO DISPONIVEL"
                     }
 
                     await post('/log-web', createData);
@@ -98,7 +98,7 @@ export const useEmitirNFE = ({ usuarioLogado, optionsModulos, handleClick }) => 
                         IDFUNCIONARIO: String(usuarioLogado.id),
                         PATHFUNCAO: textoFuncao,
                         DADOS: textDados,
-                        IP: ipUsuario
+                        IP: ipUsuario || "IP NÃO DISPONIVEL"
                     };
 
                     await post('/log-web', createData);

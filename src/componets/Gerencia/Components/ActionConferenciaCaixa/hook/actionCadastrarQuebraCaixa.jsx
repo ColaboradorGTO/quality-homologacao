@@ -7,7 +7,14 @@ import { getDataAtual } from "../../../../../utils/dataAtual";
 import { dataFormatada } from "../../../../../utils/dataFormatada";
 import { removerFormatacaoMoeda } from "../../../../../utils/formatMoeda";
 
-export const useCadastroQuebraCaixa = ({ show, handleClose, dadosDetelheCaixa, usuarioLogado, optionsModulos, refetchCaixaMovimento }) => {
+export const useCadastroQuebraCaixa = ({
+    handleClose,
+    dadosDetelheCaixa,
+    usuarioLogado,
+    optionsModulos,
+    refetchCaixaMovimento
+}) => {
+
     const { register, handleSubmit, errors } = useForm();
     const [empresa, setEmpresa] = useState('')
     const [motivoAjuste, setMotivoAjuste] = useState('')
@@ -26,7 +33,7 @@ export const useCadastroQuebraCaixa = ({ show, handleClose, dadosDetelheCaixa, u
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
             usuarioIP = ipWhoisData?.ip;
         } catch (error) {
             console.error("Erro ao buscar IP via ipwho.is:", error);
@@ -43,6 +50,7 @@ export const useCadastroQuebraCaixa = ({ show, handleClose, dadosDetelheCaixa, u
         setIpUsuario(usuarioIP);
         return usuarioIP;
     };
+
     useEffect(() => {
         const dataAtual = getDataAtual();
         setDataLancamento(dataAtual);
@@ -102,7 +110,7 @@ export const useCadastroQuebraCaixa = ({ show, handleClose, dadosDetelheCaixa, u
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || "IP NÃO DISPONIVEL"
             }
 
             await post('/log-web', createData)
@@ -130,7 +138,7 @@ export const useCadastroQuebraCaixa = ({ show, handleClose, dadosDetelheCaixa, u
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || "IP NÃO DISPONIVEL"
             }
 
             const responsePost = await post('/log-web', createData)

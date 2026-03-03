@@ -4,21 +4,29 @@ import { FooterModal } from '../../../../Modais/FooterModal/footerModal';
 import { ButtonTypeModal } from '../../../../Buttons/ButtonTypeModal';
 import { useEnviarMalote } from '../hooks/useEnviarMalote';
 
-export const FormularioDetalheMalote = ({ 
-  optionsModulos, 
-  usuarioLogado, 
-  dadosDetalhesMalote, 
-  dadosPendenciasMalotes, 
-  salvarDadosMalotes, 
+export const FormularioDetalheMalote = ({
+  optionsModulos,
+  usuarioLogado,
+  dadosDetalhesMalote,
+  dadosPendenciasMalotes,
+  salvarDadosMalotes,
   handleClick,
-  handleClose 
+  handleClose
 }) => {
- 
+
   const {
-    observacaoLoja, 
+    observacaoLoja,
     setObservacaoLoja,
     reenviarMalote
-  } = useEnviarMalote({salvarDadosMalotes, dadosDetalhesMalote, optionsModulos, usuarioLogado, handleClose, handleClick})
+
+  } = useEnviarMalote({
+    salvarDadosMalotes,
+    dadosDetalhesMalote,
+    optionsModulos,
+    usuarioLogado,
+    handleClose,
+    handleClick
+  })
 
   const {
     NOFANTASIA,
@@ -42,11 +50,11 @@ export const FormularioDetalheMalote = ({
     PENDENCIAS
   } = dadosDetalhesMalote[0] || {};
 
-  
+
   let classStatus = 'text-danger';
   let msgStatus = STATUSMALOTE || '';
 
-  
+
   if (STATUSMALOTE === 'Enviado' || STATUSMALOTE === 'Reenviado') {
     classStatus = 'text-info';
     msgStatus += ' e Aguardando Recebimento...';
@@ -57,7 +65,7 @@ export const FormularioDetalheMalote = ({
     classStatus = 'text-success';
   }
 
-  
+
   const showConferencia = STATUSMALOTE === 'Conferido' || STATUSMALOTE === 'Enviado';
   const showDevolucao = !!DATAHORADEVOLVIDO;
   const showReenviado = !!DATAHORAREENVIADO;
@@ -65,7 +73,7 @@ export const FormularioDetalheMalote = ({
   const isReadOnly = STATUSMALOTE !== 'Devolvido';
 
   const enviarDadosMalote = (idMalote) => {
-  
+
     console.log('Reenviando malote:', idMalote);
   };
 
@@ -80,37 +88,37 @@ export const FormularioDetalheMalote = ({
       <h6 className="text-dark fw-900">Data Envio: <span className="text-dark fw-500">{DATAHORAENVIADO || ''}</span></h6>
       <h6 className="text-dark fw-900">Usuário Recepção: <span className="text-dark fw-500">{NOFUNCIONARIORECEPCAO || ''}</span></h6>
       <h6 className="text-dark fw-900">Data Recepção: <span className="text-dark fw-500">{DATAHORARECEBIDO || ''}</span></h6>
-      
+
       {showConferencia && (
         <>
           <h6 className="text-dark fw-900">Usuário Conferência: <span className="text-dark fw-500">{NOFUNCIONARIOCONFERENCIA || ''}</span></h6>
           <h6 className="text-dark fw-900">Data Conferência: <span className="text-dark fw-500">{DATAHORACONFERIDO || ''}</span></h6>
         </>
       )}
-      
+
       {showDevolucao && (
         <>
           <h6 className="text-dark fw-900">Usuário Devolução: <span className="text-dark fw-500">{NOFUNCIONARIODEVOLUCAO || ''}</span></h6>
           <h6 className="text-dark fw-900">Data Devolução: <span className="text-dark fw-500">{DATAHORADEVOLVIDO || ''}</span></h6>
         </>
       )}
-      
+
       {showReenviado && (
         <>
           <h6 className="text-dark fw-900">Usuário Reenvio: <span className="text-dark fw-500">{NOFUNCIONARIOREENVIO || ''}</span></h6>
           <h6 className="text-dark fw-900">Data Reenvio: <span className="text-dark fw-500">{DATAHORAREENVIADO || ''}</span></h6>
         </>
       )}
-      
+
       <h6 className="text-dark fw-900">
         Status: <span className={`${classStatus} fw-500`}>{msgStatus}</span>
       </h6>
-      
+
       {showPendencias && dadosPendenciasMalotes?.length > 0 && (
         <ListaPendencias dadosPendenciasMalotes={dadosPendenciasMalotes} />
       )}
-   
-      
+
+
       <div className="mt-3">
         <label className="text-dark fw-900 h6" htmlFor="observacaoLojaMalote">
           Observações Loja:
@@ -126,7 +134,7 @@ export const FormularioDetalheMalote = ({
           placeholder="..."
         />
       </div>
-   
+
       <div className="mt-3">
         <label className="text-dark fw-900 h6" htmlFor="observacaoFinanceiroMalote">
           Observações Financeiro:
@@ -141,14 +149,14 @@ export const FormularioDetalheMalote = ({
           placeholder="..."
         />
       </div>
-      
+
       <button
         id="btnReenviarMalote"
         className="btn btn-primary mt-3"
         style={{ display: STATUSMALOTE === 'Devolvido' ? 'block' : 'none' }}
         onClick={() => reenviarMalote()}
       >
-        Reenviar Malote 
+        Reenviar Malote
       </button>
 
       <FooterModal

@@ -12,7 +12,7 @@ import { useEffect } from "react";
 export const ActionPesquisaEmpresas = ({ usuarioLogado }) => {
   const [empresaSelecionada, setEmpresaSelecionada] = useState('')
   const [empresaSelecionadaNome, setEmpresaSelecionadaNome] = useState('')
-  const [empresaAplicada, setEmpresaAplicada] = useState(''); 
+  const [empresaAplicada, setEmpresaAplicada] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(1000);
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
@@ -23,15 +23,15 @@ export const ActionPesquisaEmpresas = ({ usuarioLogado }) => {
       setMenuFilhoAtual(menuParsed);
     }
   }, []);
-  
+
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
     ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
       const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
-      
+
       return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
   );
 
   const fetchEmpresasAll = async () => {
@@ -42,7 +42,7 @@ export const ActionPesquisaEmpresas = ({ usuarioLogado }) => {
   const { data: empresasAll = [] } = useQuery(
     ['empresas-all'],
     fetchEmpresasAll,
-    { staleTime: 10 * 60 * 1000, cacheTime: 10 * 60 * 1000 }
+    { staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
   );
 
 
@@ -114,10 +114,13 @@ export const ActionPesquisaEmpresas = ({ usuarioLogado }) => {
         subTitle={empresaSelecionadaNome}
         InputSelectEmpresaComponent={InputSelectAction}
         labelSelectEmpresa={"Empresa"}
-        optionsEmpresas={empresasAll.map((empresa) => ({
-          value: empresa.IDEMPRESA,
-          label: empresa.NOFANTASIA,
-        }))}
+        optionsEmpresas={[
+          { value: "", label: "Todos" },
+          ...empresasAll.map((empresa) => ({
+            value: empresa.IDEMPRESA,
+            label: empresa.NOFANTASIA,
+          }))
+        ]}
         valueSelectEmpresa={empresaSelecionada}
         onChangeSelectEmpresa={handleSelectEmpresa}
         ButtonSearchComponent={ButtonType}

@@ -83,7 +83,7 @@ export const ActionPesquisaConferenciaCaixa = ({ usuarioLogado, optionsEmpresas 
   const { data: dadosMovimentosCaixa = [], error: erroQuality, isLoading: isLoadingQuality, refetch: refetchCaixaMovimento } = useQuery(
     'movimento-caixa-gerencia',
     () => fetchCaixaMovimento(),
-    { enabled: false, staleTime: 5 * 60 * 1000 }
+    { enabled: false, staleTime: 60 * 60 * 1000 }
   );
 
   const handleClick = () => {

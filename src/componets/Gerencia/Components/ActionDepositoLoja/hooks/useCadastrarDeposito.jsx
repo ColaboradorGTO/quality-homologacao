@@ -16,13 +16,14 @@ export const useCadastroDeposito = ({ handleClose, optionsModulos, usuarioLogado
   const [dataMovCaixa, setDataMovCaixa] = useState('');
   const [data, setData] = useState('')
   const [hora, setHora] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [ipUsuario, setIpUsuario] = useState('');
-  
+
   const getIPUsuario = async () => {
     let usuarioIP = null;
 
     try {
-      const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+      const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
       usuarioIP = ipWhoisData?.ip;
     } catch (error) {
       console.error("Erro ao buscar IP via ipwho.is:", error);
@@ -48,7 +49,7 @@ export const useCadastroDeposito = ({ handleClose, optionsModulos, usuarioLogado
 
   }, []);
 
-  
+
   const { data: dadosContaBanco = [], error: errorContaBanco, isLoading: isLoadingContaBanco } = useQuery(
     'contaBanco',
     async () => {
@@ -72,70 +73,6 @@ export const useCadastroDeposito = ({ handleClose, optionsModulos, usuarioLogado
       return;
     }
 
-    if (contaBancoSelecionada == '0') {
-      Swal.fire({
-        title: 'Erro',
-        text: ' Informe a Conta do Depósito.',
-        icon: 'error',
-        timer: 3000,
-        customClass: {
-          container: 'custom-swal',
-        }
-      });
-      return;
-    }
-
-    if (numeroDocDeposito == '0') {
-      Swal.fire({
-        title: 'Erro',
-        text: 'Informe o Nº Doc do Depósito.',
-        icon: 'error',
-        timer: 3000,
-        customClass: {
-          container: 'custom-swal',
-        }
-      });
-      return;
-    }
-
-    if (valorDeposito == '' || valorDeposito == '0') {
-      Swal.fire({
-        title: 'Erro',
-        text: 'Informe o Valor do Depósito.',
-        icon: 'error',
-        timer: 3000,
-        customClass: {
-          container: 'custom-swal',
-        }
-      });
-      return;
-    }
-
-    if (dataMovCaixa == '') {
-      Swal.fire({
-        title: 'Erro',
-        text: 'Informe a Data do Movimento do Caixa.',
-        icon: 'error',
-        timer: 3000,
-        customClass: {
-          container: 'custom-swal',
-        }
-      });
-      return;
-    }
-
-    if (horarioAtual == '') {
-      Swal.fire({
-        title: 'Erro',
-        text: 'Informe a Hora do Movimento do Caixa.',
-        icon: 'error',
-        timer: 3000,
-        customClass: {
-          container: 'custom-swal',
-        }
-      });
-      return;
-    }
 
     const putData = {
       IDEMPRESA: parseInt(usuarioLogado?.IDEMPRESA),
@@ -179,9 +116,9 @@ export const useCadastroDeposito = ({ handleClose, optionsModulos, usuarioLogado
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || 'IP NÃO DISPONIVEIL'
       }
-      
+
       await post('/log-web', postData)
 
       handleClick();
@@ -195,9 +132,9 @@ export const useCadastroDeposito = ({ handleClose, optionsModulos, usuarioLogado
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || 'IP NÃO DISPONIVEIL'
       }
-      
+
       const responsePost = await post('/log-web', postData)
 
       Swal.fire({
@@ -212,6 +149,7 @@ export const useCadastroDeposito = ({ handleClose, optionsModulos, usuarioLogado
 
       return responsePost.data;
     }
+
   }
 
   return {
@@ -233,6 +171,8 @@ export const useCadastroDeposito = ({ handleClose, optionsModulos, usuarioLogado
     setDataMovCaixa,
     dadosContaBanco,
     onSubmit,
+    isSubmitting,
+    setIsSubmitting
   }
 
 }

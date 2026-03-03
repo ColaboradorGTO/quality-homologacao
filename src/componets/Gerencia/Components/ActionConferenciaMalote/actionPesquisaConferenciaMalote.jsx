@@ -84,7 +84,7 @@ export const ActionPesquisaConferenciaMalote = ({ usuarioLogado }) => {
     const { data: dadosMalotes = [], error: errorMalotes, isLoading: isLoadingMalotes, refetch: refetch } = useQuery(
         ['malotes-por-loja', ],
         () => fetchListaMalotes(),
-        { enabled: false, staleTime: 5 * 60 * 1000, }
+        { enabled: false, staleTime: 60 * 60 * 1000, }
     );
    
 

@@ -6,7 +6,7 @@ import { useQuery } from "react-query";
 import { getDataAtual } from "../../../../../utils/dataAtual";
 import { removerFormatacaoMoeda } from "../../../../../utils/formatMoeda";
 
-export const useCadastrarAdiantamentoSalarial = ({handleClose, optionsModulos, usuarioLogado}) => {
+export const useCadastrarAdiantamentoSalarial = ({ handleClose, optionsModulos, usuarioLogado }) => {
   const [textoMotivo, setTextoMotivo] = useState('')
   const [valorDesconto, setValorDesconto] = useState(0)
   const [status, setStatus] = useState('')
@@ -26,7 +26,7 @@ export const useCadastrarAdiantamentoSalarial = ({handleClose, optionsModulos, u
     let usuarioIP = null;
 
     try {
-      const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+      const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
       usuarioIP = ipWhoisData?.ip;
     } catch (error) {
       console.error("Erro ao buscar IP via ipwho.is:", error);
@@ -44,20 +44,19 @@ export const useCadastrarAdiantamentoSalarial = ({handleClose, optionsModulos, u
     return usuarioIP;
   };
 
-
   const { data: dadosFuncionarios = [], error: errorFuncionario, isLoading: isLoadingFuncionario } = useQuery(
     'todos-funcionario',
     async () => {
       const response = await get(`/todos-funcionario?idEmpresa=${usuarioLogado.IDEMPRESA}`);
       return response.data;
     },
-    {enabled: true, staleTime: 5 * 60 * 1000, cacheTime: 10 * 60 * 1000 }
+    { enabled: true, staleTime: 5 * 60 * 1000, cacheTime: 10 * 60 * 1000 }
   );
 
 
 
   const onSubmit = async (data) => {
-    if(optionsModulos[0]?.CRIAR == 'False') {
+    if (optionsModulos[0]?.CRIAR == 'False') {
       Swal.fire({
         title: 'Acesso Negado',
         text: 'Você não tem permissão para cadastrar adiantamento salarial',
@@ -76,7 +75,7 @@ export const useCadastrarAdiantamentoSalarial = ({handleClose, optionsModulos, u
       DTLANCAMENTO: dataLancamento,
       TXTMOTIVO: textoMotivo,
       VRVALORDESCONTO: removerFormatacaoMoeda(valorDesconto),
-      STATIVO:  'True',
+      STATIVO: 'True',
       IDUSR: parseInt(usuarioLogado?.id),
     }
 
@@ -90,10 +89,10 @@ export const useCadastrarAdiantamentoSalarial = ({handleClose, optionsModulos, u
         IDFUNCIONARIO: String(usuarioLogado?.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || 'IP NÃO DISPONIVEIL'
       }
       await post('/log-web', createData)
-      
+
       Swal.fire({
         title: 'Cadastro',
         text: 'Adiantamento Salarial Cadastrado com Sucesso',
@@ -103,14 +102,14 @@ export const useCadastrarAdiantamentoSalarial = ({handleClose, optionsModulos, u
           container: 'custom-swal',
         }
       })
-      
+
       setTextoMotivo('');
       setValorDesconto('');
       setStatus('');
-      
+
       handleClose();
-    
-      
+
+
       return response.data;
     } catch (error) {
       const textDados = JSON.stringify(postData)
@@ -120,7 +119,7 @@ export const useCadastrarAdiantamentoSalarial = ({handleClose, optionsModulos, u
         IDFUNCIONARIO: String(usuarioLogado?.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || 'IP NÃO DISPONIVEIL'
       }
 
       const responsePost = await post('/log-web', createData)

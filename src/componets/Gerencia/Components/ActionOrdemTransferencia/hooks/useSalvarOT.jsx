@@ -13,11 +13,12 @@ export const useSalvarOT = ({ handleClick, handleClose, optionsModulos, usuarioL
   const [dadosProdutosTabela, setDadosProdutosTabela] = useState([]);
   const [produtoSalvo, setProdutoSalvo] = useState([]);
 
+
   const getIPUsuario = async () => {
     let usuarioIP = null;
 
     try {
-      const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+      const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
       usuarioIP = ipWhoisData?.ip;
     } catch (error) {
       console.error("Erro ao buscar IP via ipwho.is:", error);
@@ -202,7 +203,7 @@ export const useSalvarOT = ({ handleClick, handleClose, optionsModulos, usuarioL
         IDFUNCIONARIO: String(usuarioLogado?.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || "IP NÃO DISPONIVEL"
       };
 
       await post('/log-web', createData)
@@ -293,7 +294,7 @@ export const useSalvarOT = ({ handleClick, handleClose, optionsModulos, usuarioL
         IDFUNCIONARIO: String(usuarioLogado?.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || "IP NÃO DISPONIVEL"
       };
 
       const responsePost = await post('/log-web', createData)

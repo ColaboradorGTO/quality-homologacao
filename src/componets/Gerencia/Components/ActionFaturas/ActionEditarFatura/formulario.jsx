@@ -33,8 +33,8 @@ export const Formulario = ({ handleClose, dadosDetalheFatura, usuarioLogado, opt
             }
 
             await schema.validate(dadosParaValidar, { abortEarly: false });
-            
-            onSubmit();
+
+            await onSubmit();
         } catch (validationError) {
             clearErrors();
 
@@ -178,6 +178,8 @@ export const Formulario = ({ handleClose, dadosDetalheFatura, usuarioLogado, opt
                 textButtonConfirmar={"Confirmar Alteração"}
                 onClickButtonConfirmar={handleSubmit(handleValidatedSubmit)}
                 corConfirmar="success"
+                autoLoadingCadastrar={true}
+                loadingTextCadastrar={"Cadastrando..."}
 
                 ButtonTypeFechar={ButtonTypeModal}
                 textButtonFechar={"Fechar"}

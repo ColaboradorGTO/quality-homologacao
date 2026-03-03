@@ -14,7 +14,7 @@ import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../ut
 import { InputSelectAction } from "../../../Inputs/InputSelectAction";
 
 
-export const ActionPesquisaEstoqueLoja = ({usuarioLogado, optionsEmpresas}) => {
+export const ActionPesquisaEstoqueLoja = ({ usuarioLogado, optionsEmpresas }) => {
   const [tabelaVisivelEstoqueAtual, setTabelaVisivelEstoqueAtual] = useState(false);
   const [tabelaVisivelEstoqueRotatividade, setTabelaVisivelEstoqueRotatividade] = useState(false);
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
@@ -36,7 +36,7 @@ export const ActionPesquisaEstoqueLoja = ({usuarioLogado, optionsEmpresas}) => {
     setDataPesquisaFim(dataFinal);
   }, []);
 
-    
+
   useEffect(() => {
     const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
     if (menuSalvo) {
@@ -44,15 +44,15 @@ export const ActionPesquisaEstoqueLoja = ({usuarioLogado, optionsEmpresas}) => {
       setMenuFilhoAtual(menuParsed);
     }
   }, []);
-  
+
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
     ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
       const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
-      
+
       return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
   );
 
   const { data: dadosFornecedor = [], error: errorFornecedor, isLoading: isLoadingFornecedor } = useQuery(
@@ -98,7 +98,7 @@ export const ActionPesquisaEstoqueLoja = ({usuarioLogado, optionsEmpresas}) => {
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
       animacaoCarregamento('Carregando dados...', true);
-                                   
+
       const primeiraPagina = 1;
       const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
       const page = primeiraResposta.page || primeiraPagina;
@@ -124,23 +124,23 @@ export const ActionPesquisaEstoqueLoja = ({usuarioLogado, optionsEmpresas}) => {
       fecharAnimacaoCarregamento();
     }
   };
-   
+
   const { data: dadosEstoqueAtual = [], error: errorEstoque, isLoading: isLoadingEstoque, refetch: refetchListaEstoque } = useQuery(
     ['estoqueAtual'],
     () => fetchListaEstoque(),
     {
-      enabled: false, 
+      enabled: false,
     }
   );
 
-  const  fetchListaEstoqueRotatividade = async () => {
+  const fetchListaEstoqueRotatividade = async () => {
     const idEmpresa = empresaSelecionada == '' ? usuarioLogado?.IDEMPRESA : empresaSelecionada;
     const urlBase = `/inventariomovimento?idEmpresa=${idEmpresa}&idGrupo=${grupoSelecionado}&idSubGrupo=${subGrupoSelecionado}&idMarca=${marcaSelecionada}&idFornecedor=${fornecedorSelecionado}&descricaoProduto=${codBarra}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&stAtivo=`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
       animacaoCarregamento('Carregando dados...', true);
-                                   
+
       const primeiraPagina = 1;
       const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
       const page = primeiraResposta.page || primeiraPagina;
@@ -171,11 +171,11 @@ export const ActionPesquisaEstoqueLoja = ({usuarioLogado, optionsEmpresas}) => {
     ['estoqueAtual'],
     () => fetchListaEstoqueRotatividade(),
     {
-      enabled: false, 
+      enabled: false,
     }
   );
 
- 
+
   const handleChangeGrupos = (selectedOptions) => {
     const values = selectedOptions.map(option => option.value);
     setGrupoSelecionado(values);
@@ -184,7 +184,7 @@ export const ActionPesquisaEstoqueLoja = ({usuarioLogado, optionsEmpresas}) => {
     const values = selectedOptions.map(option => option.value);
     setSubGrupoSelecionado(values);
   };
-  
+
   const handleChangeFornecedor = (selectedOptions) => {
     const values = selectedOptions.map(option => option.value);
     setFornecedorSelecionado(values);
@@ -196,10 +196,10 @@ export const ActionPesquisaEstoqueLoja = ({usuarioLogado, optionsEmpresas}) => {
 
 
   const handleClickEstoqueAtual = () => {
-    
 
-    if(usuarioLogado && usuarioLogado.IDEMPRESA && usuarioLogado.IDGRUPOEMPRESARIAL && usuarioLogado.IDSUBGRUPOEMPRESARIAL) {
-      refetchListaEstoque (usuarioLogado && usuarioLogado.IDEMPRESA && usuarioLogado.IDGRUPOEMPRESARIAL && usuarioLogado.IDSUBGRUPOEMPRESARIAL)
+
+    if (usuarioLogado && usuarioLogado.IDEMPRESA && usuarioLogado.IDGRUPOEMPRESARIAL && usuarioLogado.IDSUBGRUPOEMPRESARIAL) {
+      refetchListaEstoque(usuarioLogado && usuarioLogado.IDEMPRESA && usuarioLogado.IDGRUPOEMPRESARIAL && usuarioLogado.IDSUBGRUPOEMPRESARIAL)
       setTabelaVisivelEstoqueAtual(true)
       setTabelaVisivelEstoqueRotatividade(false)
     } else {
@@ -207,9 +207,9 @@ export const ActionPesquisaEstoqueLoja = ({usuarioLogado, optionsEmpresas}) => {
     }
   }
   const handleClickEstoqueRotatividade = () => {
-    
 
-    if(usuarioLogado && usuarioLogado.IDEMPRESA && usuarioLogado.IDGRUPOEMPRESARIAL && usuarioLogado.IDSUBGRUPOEMPRESARIAL) {
+
+    if (usuarioLogado && usuarioLogado.IDEMPRESA && usuarioLogado.IDGRUPOEMPRESARIAL && usuarioLogado.IDSUBGRUPOEMPRESARIAL) {
       refetchListaEstoqueRotatividade(usuarioLogado && usuarioLogado.IDEMPRESA && usuarioLogado.IDGRUPOEMPRESARIAL && usuarioLogado.IDSUBGRUPOEMPRESARIAL)
       setTabelaVisivelEstoqueRotatividade(true)
       setTabelaVisivelEstoqueAtual(false)
@@ -222,7 +222,7 @@ export const ActionPesquisaEstoqueLoja = ({usuarioLogado, optionsEmpresas}) => {
   return (
 
     <Fragment>
-        
+
       <ActionMain
         linkComponentAnterior={["Home"]}
         linkComponent={["Relatório"]}
@@ -246,16 +246,16 @@ export const ActionPesquisaEstoqueLoja = ({usuarioLogado, optionsEmpresas}) => {
         valueInputFieldDTInicioA={dataPesquisaInicio}
         labelInputDTInicioA={"Data Início"}
         onChangeInputFieldDTInicioA={(e) => setDataPesquisaInicio(e.target.value)}
-        
+
         InputFieldDTFimAComponent={InputField}
         labelInputDTFimA={"Data Fim"}
         valueInputFieldDTFimA={dataPesquisaFim}
         onChangeInputFieldDTFimA={(e) => setDataPesquisaFim(e.target.value)}
 
         labelInputFieldCodBarra={"Cód.Barras / Nome Produto"}
-        
+
         MultSelectGrupoComponent={MultSelectAction}
-        optionsMultSelectGrupo={dadosGrupos.map((grupo) => ( {
+        optionsMultSelectGrupo={dadosGrupos.map((grupo) => ({
           value: grupo.ID_GRUPO,
           label: grupo.GRUPO,
         }))}
@@ -263,7 +263,7 @@ export const ActionPesquisaEstoqueLoja = ({usuarioLogado, optionsEmpresas}) => {
         onChangeMultSelectGrupo={handleChangeGrupos}
         animatedComponentsGrupo={animatedComponents}
         labelMultSelectGrupo={"Grupo"}
-        
+
         MultSelectSubGrupoComponent={MultSelectAction}
         optionsMultSelectSubGrupo={dadosSubGrupos.map((subGrupo) => ({
           value: subGrupo.ID_ESTRUTURA,
@@ -273,18 +273,18 @@ export const ActionPesquisaEstoqueLoja = ({usuarioLogado, optionsEmpresas}) => {
         onChangeMultSelectSubGrupo={handleChangeSubGrupos}
         animatedComponentsSubGrupo={animatedComponents}
         labelMultSelectSubGrupo={"Subgrupo"}
-        
+
         MultSelectMarcaComponent={MultSelectAction}
         optionsMultSelectMarca={dadosMarcas.map((marca) => ({
           value: marca.ID_MARCA,
           label: marca.MARCA,
         }))}
-        
+
         valueMultSelectMarca={marcaSelecionada}
         onChangeMultSelectMarca={handleChangeMarca}
         animatedComponentsMarca={animatedComponents}
         labelMultSelectMarca={"Marca"}
-        
+
         MultSelectFornecedorComponent={MultSelectAction}
         optionsMultSelectFornecedor={dadosFornecedor.map((fornecedor) => ({
           value: fornecedor.ID_FORNECEDOR,
@@ -294,7 +294,7 @@ export const ActionPesquisaEstoqueLoja = ({usuarioLogado, optionsEmpresas}) => {
         onChangeMultSelectFornecedor={handleChangeFornecedor}
         animatedComponentsFornecedor={animatedComponents}
         labelMultSelectFornecedor={"Fornecedor"}
-        
+
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Estoque Atual"}
@@ -307,19 +307,23 @@ export const ActionPesquisaEstoqueLoja = ({usuarioLogado, optionsEmpresas}) => {
         onButtonClickCadastro={handleClickEstoqueRotatividade}
         corCadastro={"success"}
         IconCadastro={AiOutlineSearch}
-        
+
         ButtonTypeCancelar={ButtonType}
         linkCancelar={"Estoque Anterior"}
         corCancelar={"info"}
         IconCancelar={AiOutlineSearch}
       />
 
-      {tabelaVisivelEstoqueAtual &&  (   
-        <ActionListaEstoqueAtual dadosEstoqueAtual={dadosEstoqueAtual} />
+      {tabelaVisivelEstoqueAtual && (
+        <ActionListaEstoqueAtual
+          dadosEstoqueAtual={dadosEstoqueAtual}
+        />
       )}
 
-      {tabelaVisivelEstoqueRotatividade && (   
-        <ActionListaEstoqueRotatividade dadosEstoqueRotatividade={dadosEstoqueRotatividade} />
+      {tabelaVisivelEstoqueRotatividade && (
+        <ActionListaEstoqueRotatividade
+          dadosEstoqueRotatividade={dadosEstoqueRotatividade}
+        />
       )}
 
     </Fragment>

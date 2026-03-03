@@ -22,7 +22,7 @@ export const useEditarStatusVoucher = ({
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
             usuarioIP = ipWhoisData?.ip;
         } catch (error) {
             console.error("Erro ao buscar IP via ipwho.is:", error);
@@ -114,7 +114,7 @@ export const useEditarStatusVoucher = ({
                 IDFUNCIONARIO: String(usuarioLogado?.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || "IP NÃO DISPONIVEL",
             }
 
             const responsePost = await post('/log-web', postData)
@@ -152,7 +152,7 @@ export const useEditarStatusVoucher = ({
                 IDFUNCIONARIO: String(usuarioLogado?.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || "IP NÃO DISPONIVEL",
             }
 
             const responsePost = await post('/log-web', postData)

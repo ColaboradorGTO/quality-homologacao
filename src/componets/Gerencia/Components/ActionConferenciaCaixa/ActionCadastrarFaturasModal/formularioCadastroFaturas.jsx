@@ -36,7 +36,7 @@ export const FormularioCadastrarFaturas = ({ show, handleClose, dadosDetelheFatu
             };
 
             await schema.validate(dadosParaValidar, { abortEarly: false });
-            onSubmit();
+            await onSubmit();
 
         } catch (validationError) {
             console.error('❌ Erro de validação:', validationError);
@@ -146,10 +146,11 @@ export const FormularioCadastrarFaturas = ({ show, handleClose, dadosDetelheFatu
 
                 <FooterModal
                     ButtonTypeCadastrar={ButtonTypeModal}
-                    //onClickButtonCadastrar={handleValidatedSubmit}
-                    tipoBtnCadastrar={"submit"}
+                    onClickButtonCadastrar={handleSubmit(handleValidatedSubmit)}
                     textButtonCadastrar={"Receber Fatura"}
                     corCadastrar="success"
+                    autoLoadingCadastrar={true}
+                    loadingTextCadastrar={"Cadastrando..."}
 
                     ButtonTypeFechar={ButtonTypeModal}
                     textButtonFechar={"Fechar"}

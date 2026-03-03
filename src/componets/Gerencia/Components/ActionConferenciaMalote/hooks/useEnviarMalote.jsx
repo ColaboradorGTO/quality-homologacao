@@ -5,7 +5,16 @@ import { post, put } from "../../../../../api/funcRequest";
 import { formataStringComEspaco } from "../../../../../utils/formataStringComEspaco";
 import { formatarDataParaISO } from "../../../../../utils/dataFormatada";
 
-export const useEnviarMalote = ({ salvarDadosMalotes, dadosDetalhesMalote, handleClick, handleClose, optionsModulos, usuarioLogado, refetch }) => {
+export const useEnviarMalote = ({
+  salvarDadosMalotes,
+  dadosDetalhesMalote,
+  handleClick,
+  handleClose,
+  optionsModulos,
+  usuarioLogado,
+  refetch
+}) => {
+
   const [ipUsuario, setIpUsuario] = useState('');
   const [observacaoLoja, setObservacaoLoja] = useState('');
 
@@ -13,7 +22,7 @@ export const useEnviarMalote = ({ salvarDadosMalotes, dadosDetalhesMalote, handl
     let usuarioIP = null;
 
     try {
-      const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+      const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
       usuarioIP = ipWhoisData?.ip;
     } catch (error) {
       console.error("Erro ao buscar IP via ipwho.is:", error);
@@ -73,7 +82,7 @@ export const useEnviarMalote = ({ salvarDadosMalotes, dadosDetalhesMalote, handl
     });
   };
 
-   const reenviarMalote = async (observacao) => {
+  const reenviarMalote = async (observacao) => {
     if (optionsModulos[0]?.ALTERAR == 'False') {
       Swal.fire({
         icon: 'error',
@@ -101,7 +110,7 @@ export const useEnviarMalote = ({ salvarDadosMalotes, dadosDetalhesMalote, handl
       IDFUNCIONARIO: String(usuarioLogado.id),
       PATHFUNCAO: 'GERENCIA / REENVIO DE MALOTE',
       DADOS: textDados,
-      IP: ipUsuario,
+      IP: ipUsuario || "IP NÃO DISPONIVEL",
     };
     await post('/log-web', createData);
 
@@ -117,7 +126,7 @@ export const useEnviarMalote = ({ salvarDadosMalotes, dadosDetalhesMalote, handl
     handleClick();
     handleClose();
     return response.data;
-  }; 
+  };
 
   const onSalvarMalote = async (malote) => {
     if (!usuarioLogado?.id || !usuarioLogado?.IDEMPRESA) {
@@ -179,7 +188,7 @@ export const useEnviarMalote = ({ salvarDadosMalotes, dadosDetalhesMalote, handl
             IDFUNCIONARIO: String(usuarioLogado.id),
             PATHFUNCAO: 'GERENCIA / ENVIO DE MALOTE',
             DADOS: textDados,
-            IP: ipUsuario,
+            IP: ipUsuario || "IP NÃO DISPONIVEL",
           };
           await post('/log-web', createData);
 
@@ -194,17 +203,17 @@ export const useEnviarMalote = ({ salvarDadosMalotes, dadosDetalhesMalote, handl
 
           refetch();
           return response.data;
-          
+
         } catch (error) {
           const textDados = JSON.stringify(postData)
-          let textoFuncao = 'GERENCIA/ERRO AO ENVIAR MALOTE'; 
+          let textoFuncao = 'GERENCIA/ERRO AO ENVIAR MALOTE';
           const ipUsuario = await getIPUsuario();
 
           const createData = {
             IDFUNCIONARIO: String(usuarioLogado.id),
             PATHFUNCAO: textoFuncao,
             DADOS: textDados,
-            IP: ipUsuario
+            IP: ipUsuario || "IP NÃO DISPONIVEL",
           }
 
           const responsePost = await post('/log-web', createData)
@@ -218,7 +227,7 @@ export const useEnviarMalote = ({ salvarDadosMalotes, dadosDetalhesMalote, handl
               container: 'custom-swal',
             }
           })
-          
+
           return responsePost.data;
         }
 

@@ -42,7 +42,7 @@ export const FormularioCadastrar = ({ handleClose, optionsModulos, usuarioLogado
             };
 
             await schema.validate(dadosParaValidar, { abortEarly: false });
-            onSubmit();
+            await onSubmit();
 
         } catch (validationError) {
             console.error('❌ Erro de validação:', validationError);
@@ -196,10 +196,13 @@ export const FormularioCadastrar = ({ handleClose, optionsModulos, usuarioLogado
 
                 <FooterModal
                     ButtonTypeCadastrar={ButtonTypeModal}
-                    //onClickButtonCadastrar={handleValidatedSubmit}
+                    onClickButtonCadastrar={handleSubmit(handleValidatedSubmit)}
                     tipoBtnCadastrar={"submit"}
                     textButtonCadastrar={"Cadastrar"}
                     corCadastrar="success"
+                    autoLoadingCadastrar={true}
+                    loadingTextCadastrar={"Cadastrando..."}
+
                     ButtonTypeFechar={ButtonTypeModal}
                     textButtonFechar={"Fechar"}
                     onClickButtonFechar={handleClose}

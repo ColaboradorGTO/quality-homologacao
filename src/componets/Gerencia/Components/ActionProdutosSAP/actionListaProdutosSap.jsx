@@ -1,7 +1,7 @@
 import { Fragment, useRef, useState } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { dataFormatada } from '../../../../utils/dataFormatada';
+import { dataFormatada, dataHoraFormatada } from '../../../../utils/dataFormatada';
 import { formatMoeda } from '../../../../utils/formatMoeda';
 import HeaderTable from '../../../Tables/headerTable';
 import { useReactToPrint } from 'react-to-print';
@@ -89,7 +89,7 @@ export const ActionListaProdutosSap = ({ dadosProdutos }) => {
     {
       field: 'DATA_ULTIMA_ALTERACAO_PDV',
       header: 'Data Alteração',
-      body: row => <th>{dataFormatada(row.DATA_ULTIMA_ALTERACAO_PDV)}</th>,
+      body: row => <th>{dataHoraFormatada(row.DATA_ULTIMA_ALTERACAO_PDV)}</th>,
       sortable: true,
     },
     {

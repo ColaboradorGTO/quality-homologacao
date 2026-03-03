@@ -45,7 +45,7 @@ export const ActionPesquisaValeTransporte = ({ usuarioLogado, ID }) => {
       const response = await get(`/despesas-loja-empresa?idEmpresa=${idEmpresa}&dataPesquisa=${dataPesquisaInicio}`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
   );
 
   const handleShowModal = () => {
