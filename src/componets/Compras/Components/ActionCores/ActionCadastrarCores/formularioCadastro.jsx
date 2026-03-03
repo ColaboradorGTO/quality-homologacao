@@ -7,6 +7,7 @@ import { useCadastroCores } from "../hooks/useCadastroCores";
 import { Controller, useForm } from "react-hook-form";
 import { schema } from "./schemaValidarCores"
 import FormField from "../../../../Formularios/FormField";
+import { AlertError } from "../../../../Inputs/alertError";
 
 
 export const FormularioCadastro = ({
@@ -90,15 +91,28 @@ export const FormularioCadastro = ({
 
                         <label htmlFor="">Grupo Cor *</label>
                             <Select
-                                defaultValue={grupoCorSelecionado}
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="grupoCor"
                                 options={dadosGrupoCores.map((item) => {
                                     return {
                                         value: item.IDGRUPOCOR,
                                         label: item.DSGRUPOCOR
                                     }
                                 })}
-                                onChange={(e) => setGrupoCorSelecionado(e)}
+                                value={grupoCorSelecionado}
+                                onChange={(e) =>  { 
+                                    setGrupoCorSelecionado(e)
+                                    clearErrors('grupoCor')
+                                }}
                             />
+                            {errors.grupoCor && (
+                                <AlertError
+                                    error={errors.grupoCor}
+                                    onClose={clearErrors}
+                                    fieldName="grupoCor"
+                                />
+                            )}
                         </div>
                         <div className="col-sm-6 col-xl-3">
 
