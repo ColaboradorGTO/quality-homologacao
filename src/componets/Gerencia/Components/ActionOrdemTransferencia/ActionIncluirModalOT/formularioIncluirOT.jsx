@@ -39,50 +39,28 @@ export const FormularioIncuirOT = ({ handleClose, handleClick, usuarioLogado, op
     }
   }, [usuarioLogado, setEmpresaOrigem]);
 
- /*  const handleValidatedSubmit = async () => {
-    try {
-
-      const dadosParaValidar = {
-        produtoIncluir: produto,
-      }
-      await schema.validate(dadosParaValidar, { abortEarly: false });
-
-      await onSubmit();
-
-    } catch (validationError) {
-      console.error('❌ Erro de validação:', validationError);
-
-      clearErrors();
-
-
-      if (validationError.inner && validationError.inner.length > 0) {
-        validationError.inner.forEach(error => {
-          if (error.path) {
-            setError(error.path, {
-              type: 'manual',
-              message: error.message
-            });
-          }
-        });
-      }
-
-      const errorMessages = validationError.errors || [validationError.message];
-      console.log(`Erro de validação:\n${errorMessages.join('\n')}`);
-    }
-  }; */
-
   return (
     <Fragment>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="row" >
           <div className="col-sm-6 col-xl-6">
-            <InputFieldModal
-              label={"Loja Origem"}
-              type="text"
-              value={usuarioLogado?.NOFANTASIA}
-              onChangeModal={(e) => setEmpresaOrigem(e.target.value)}
-              placeholder={"Loja Origem"}
-              readOnly={true}
+
+            <Controller
+              name="lojaOrigem"
+              control={control}
+              render={({ field }) => (
+                <FormField
+                  name="lojaOrigem"
+                  label={"Loja Origem"}
+                  type="text"
+                  readOnly={true}
+                  value={usuarioLogado?.NOFANTASIA}
+                  onChange={(e) => setEmpresaOrigem(e.target.value)}
+                  errors={errors}
+                  clearErrors={clearErrors}
+                />
+
+              )}
             />
           </div>
           <div className="col-sm-6 col-xl-6" >

@@ -3,17 +3,20 @@ import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal"
 import { FaRegSave } from "react-icons/fa"
 import { InputFieldModal } from "../../../../Buttons/InputFieldModal"
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal"
-import { useForm } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
 import { ActionListaProdutos } from "./actionListaProdutos"
 import { useEditarOT } from "../hooks/useEditarOT"
-export const FormularioConferirOT = ({ 
-    handleClose, 
-    dadosDetalheTransferencia, 
+import FormField from "../../../../Formularios/FormField"
+export const FormularioConferirOT = ({
+    handleClose,
+    dadosDetalheTransferencia,
     handleClick,
     optionsModulos,
-    usuarioLogado 
+    usuarioLogado
 }) => {
-    const { register, handleSubmit, errors } = useForm();
+    const { register, handleSubmit, formState: { errors }, clearErrors, setError, control } = useForm({
+        mode: "onChange"
+    });
     const {
         empresaOrigem,
         setEmpresaOrigem,
@@ -31,63 +34,120 @@ export const FormularioConferirOT = ({
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="row" >
                     <div className="col-sm-6 col-xl-6">
-                        <InputFieldModal
-                            label={"Loja Origem"}
-                            type="text"
-                            readOnly={true}
-                            value={dadosDetalheTransferencia[0]?.EMPRESAORIGEM}
-                            onChangeModal={(e) => setEmpresaOrigem(e.target.value)}
+                        <Controller
+                            name="lojaOrigem"
+                            control={control}
+                            render={({ field }) => (
+                                <FormField
+                                    label={"Loja Origem"}
+                                    name="lojaOrigem"
+                                    type="text"
+                                    readOnly={true}
+                                    value={dadosDetalheTransferencia[0]?.EMPRESAORIGEM}
+                                    onChange={(e) => setEmpresaOrigem(e.target.value)}
+                                    errors={errors}
+                                    clearErrors={clearErrors}
+                                />
+
+                            )}
                         />
+
                     </div>
                     <div className="col-sm-6 col-xl-6" >
-                      
-                        <InputFieldModal
-                            label={"Loja Destino"}
-                            type="text"
-                            readOnly={true}
-                            value={dadosDetalheTransferencia[0]?.EMPRESADESTINO}
-                            onChangeModal={(e) => setEmpresaDestino(e.target.value)}
+
+                        <Controller
+                            name="lojaDestino"
+                            control={control}
+                            render={({ field }) => (
+                                <FormField
+                                    label={"Loja Destino"}
+                                    name="lojaDestino"
+                                    type="text"
+                                    readOnly={true}
+                                    value={dadosDetalheTransferencia[0]?.EMPRESADESTINO}
+                                    onChange={(e) => setEmpresaDestino(e.target.value)}
+                                    errors={errors}
+                                    clearErrors={clearErrors}
+                                />
+
+                            )}
                         />
                     </div>
                 </div>
                 <div className="row" data-select2-id="736">
                     <div className="col-sm-6 col-xl-6">
-                        <InputFieldModal
-                            label={"ID"}
-                            type="text"
-                            readOnly={true}
-                            value={dadosDetalheTransferencia[0]?.IDRESUMOOT}
-                            onChangeModal={(e) => setEmpresaOrigem(e.target.value)}
+
+                        <Controller
+                            name="id"
+                            control={control}
+                            render={({ field }) => (
+                                <FormField
+                                    label={"ID"}
+                                    name="id"
+                                    type="text"
+                                    readOnly={true}
+                                    value={dadosDetalheTransferencia[0]?.IDRESUMOOT}
+                                    onChange={(e) => setEmpresaOrigem(e.target.value)}
+                                    errors={errors}
+                                    clearErrors={clearErrors}
+                                />
+
+                            )}
                         />
                     </div>
                     <div className="col-sm-6 col-xl-6" >
-                      
-                        <InputFieldModal
-                            label={"NF-e"}
-                            type="text"
-                            readOnly={true}
-                            value={dadosDetalheTransferencia[0]?.NUMERONFE}
-                            onChangeModal={(e) => setEmpresaDestino(e.target.value)}
+
+                        <Controller
+                            name="NFe"
+                            control={control}
+                            render={({ field }) => (
+                                <FormField
+                                    label={"NF-e"}
+                                    name="NFe"
+                                    type="text"
+                                    readOnly={true}
+                                    value={dadosDetalheTransferencia[0]?.NUMERONFE}
+                                    onChange={(e) => setEmpresaDestino(e.target.value)}
+                                    errors={errors}
+                                    clearErrors={clearErrors}
+                                />
+                            )}
                         />
                     </div>
                     <div className="col-sm-6 col-xl-6" >
-                      
-                        <InputFieldModal
-                            label={"Status"}
-                            type="text"
-                            readOnly={true}
-                            value={dadosDetalheTransferencia[0]?.DESCRICAOOT}
-                            onChangeModal={(e) => setEmpresaDestino(e.target.value)}
+                        <Controller
+                            name="Status"
+                            control={control}
+                            render={({ field }) => (
+                                <FormField
+                                    label={"Status"}
+                                    name="Status"
+                                    type="text"
+                                    readOnly={true}
+                                    value={dadosDetalheTransferencia[0]?.DESCRICAOOT}
+                                    onChange={(e) => setEmpresaDestino(e.target.value)}
+                                    errors={errors}
+                                    clearErrors={clearErrors}
+                                />
+                            )}
                         />
                     </div>
                     <div className="col-sm-6 col-xl-6" >
-                      
-                        <InputFieldModal
-                            label={"Data"}
-                            type="text"
-                            readOnly={true}
-                            value={dadosDetalheTransferencia[0]?.DATAEXPEDICAOFORMATADA}
-                            onChangeModal={(e) => setEmpresaDestino(e.target.value)}
+                        <Controller
+                            name="Data"
+                            control={control}
+                            render={({ field }) => (
+                                <FormField
+                                    label={"Data"}
+                                    name="Data"
+                                    type="text"
+                                    readOnly={true}
+                                    value={dadosDetalheTransferencia[0]?.DATAEXPEDICAOFORMATADA}
+                                    onChange={(e) => setEmpresaDestino(e.target.value)}
+                                    errors={errors}
+                                    clearErrors={clearErrors}
+                                />
+                            )}
                         />
                     </div>
                 </div>
@@ -95,12 +155,22 @@ export const FormularioConferirOT = ({
 
                 <div className="row mt-4">
                     <div className="col-sm-6 col-xl-6">
-                        <InputFieldModal
-                            label={"Produto"}
-                            type="text"
-                            value={produto}
-                            onChangeModal={(e) => setProduto(e.target.value)}
-                            readOnly={[1, 2, 4, 6, 7].indexOf(dadosDetalheTransferencia[0]?.IDSTATUSOT) >= 0}
+
+                        <Controller
+                            name="Produto"
+                            control={control}
+                            render={({ field }) => (
+                                <FormField
+                                    label={"Data"}
+                                    name="Produto"
+                                    type="text"
+                                    value={produto}
+                                    readOnly={[1, 2, 4, 6, 7].indexOf(dadosDetalheTransferencia[0]?.IDSTATUSOT) >= 0}
+                                    onChange={(e) => setProduto(e.target.value)}
+                                    errors={errors}
+                                    clearErrors={clearErrors}
+                                />
+                            )}
                         />
                     </div>
                 </div>
@@ -123,7 +193,10 @@ export const FormularioConferirOT = ({
                     </div>
                 </div>
 
-                <ActionListaProdutos dadosDetalheTransferencia={dadosDetalheTransferencia} />
+                <ActionListaProdutos
+                    dadosDetalheTransferencia={dadosDetalheTransferencia}
+                />
+
                 <FooterModal
                     ButtonTypeFechar={ButtonTypeModal}
                     textButtonFechar={"Fechar"}

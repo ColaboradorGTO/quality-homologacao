@@ -140,7 +140,6 @@ export const FormularioCadastrarQuebraCaixa = ({ show, handleClose, dadosDetelhe
                                     )}
                                 />
                             </div>
-
                         </div>
                     </div>
                     <div class="form-group">

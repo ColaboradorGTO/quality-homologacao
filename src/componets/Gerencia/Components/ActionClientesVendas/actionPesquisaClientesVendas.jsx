@@ -143,8 +143,7 @@ export const ActionPesquisaClientesVendas = ({ usuarioLogado, optionsEmpresas })
         IconSearch={AiOutlineSearch}
         corSearch={"primary"}
 
-
-
+        
       />
       {tabelaVisivel && (
         <ActionListaClientesVendas

@@ -15,9 +15,9 @@ export const FormularioEditar = ({
     usuarioLogado,
     setDadosDetalheTransferencia
 }) => {
-    const { handleSubmit, formState: { errors }, clearErrors, control, setError } = useForm({
-    mode: "onChange"
-  });
+    const { register, handleSubmit, formState: { errors }, clearErrors, setError, control } = useForm({
+        mode: "onChange"
+    });
     const {
         empresaOrigem,
         setEmpresaOrigem,
@@ -28,29 +28,58 @@ export const FormularioEditar = ({
         dadosProdutos,
         dadosEmpresa,
         onSubmit,
-    } = useEditarOT({ handleClick, handleClose, dadosDetalheTransferencia, optionsModulos, usuarioLogado, setDadosDetalheTransferencia });
+
+    } = useEditarOT({
+        handleClick,
+        handleClose,
+        dadosDetalheTransferencia,
+        optionsModulos,
+        usuarioLogado,
+        setDadosDetalheTransferencia
+    });
+
 
     return (
         <Fragment>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="row" data-select2-id="736">
                     <div className="col-sm-6 col-xl-6">
-                        <InputFieldModal
-                            label={"Loja Origem"}
-                            type="text"
-                            readOnly={true}
-                            value={usuarioLogado?.NOFANTASIA}
-                            onChangeModal={(e) => setEmpresaOrigem(e.target.value)}
+                  
+                        <Controller
+                            name="lojaOrigem"
+                            control={control}
+                            render={({ field }) => (
+                                <FormField
+                                    label={"Loja Origem"}
+                                    name="lojaOrigem"
+                                    type="text"
+                                    readOnly={true}
+                                    value={dadosDetalheTransferencia[0]?.EMPRESAORIGEM}
+                                    onChange={(e) => setEmpresaOrigem(e.target.value)}
+                                    errors={errors}
+                                    clearErrors={clearErrors}
+                                />
+
+                            )}
                         />
                     </div>
                     <div className="col-sm-6 col-xl-6" data-select2-id="735">
+                        <Controller
+                            name="lojaDestino"
+                            control={control}
+                            render={({ field }) => (
+                                <FormField
+                                    label={"Loja Destino"}
+                                    name="lojaDestino"
+                                    type="text"
+                                    readOnly={true}
+                                    value={dadosDetalheTransferencia[0]?.EMPRESADESTINO}
+                                    onChange={(e) => setEmpresaDestino(e.target.value)}
+                                    errors={errors}
+                                    clearErrors={clearErrors}
+                                />
 
-                        <InputFieldModal
-                            label={"Loja Destino"}
-                            type="text"
-                            readOnly={true}
-                            value={dadosDetalheTransferencia[0]?.EMPRESADESTINO}
-                            onChangeModal={(e) => setEmpresaDestino(e.target.value)}
+                            )}
                         />
                     </div>
                 </div>
@@ -71,9 +100,7 @@ export const FormularioEditar = ({
                                     readOnly={dadosDetalheTransferencia[0]?.IDSTATUSOT !== 1}
                                     errors={errors}
                                     clearErrors={clearErrors}
-                                
                                 />
-
                             )}
                         />
                     </div>
