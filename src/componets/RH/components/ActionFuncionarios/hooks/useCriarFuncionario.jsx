@@ -51,10 +51,10 @@ export const useCriarFuncionario = ({ handleClose, usuarioLogado, optionsModulos
     let usuarioIP = null;
 
     try {
-      const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+      const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
       usuarioIP = ipWhoisData?.ip;
     } catch (error) {
-      console.error("Erro ao buscar IP via ipwho.is:", error);
+      console.error("Erro ao buscar IP via ifconfig.me:", error);
     }
 
     if (!usuarioIP) {
@@ -65,7 +65,7 @@ export const useCriarFuncionario = ({ handleClose, usuarioLogado, optionsModulos
         console.error("Erro ao buscar IP via ipify.org:", error);
       }
     }
-    setIpUsuario(usuarioIP);
+      setIpUsuario(usuarioIP);
     return usuarioIP;
   };
 
@@ -97,12 +97,12 @@ export const useCriarFuncionario = ({ handleClose, usuarioLogado, optionsModulos
       setSubGrupoEmpresarialSelecionado(funcionarioExistente?.IDSUBGRUPOEMPRESARIAL);
       setFuncaoSelecionada({ value: funcionarioExistente?.DSFUNCAO, label: funcionarioExistente?.DSFUNCAO });
       setNomeFuncionario(funcionarioExistente?.NOFUNCIONARIO);
-      setLocalizacaoSelecionada({ value: funcionarioExistente?.STLOJA == 'True' ? 'Loja' : 'Escritório', label: funcionarioExistente?.STLOJA == 'True' ? 'Loja' : 'Escritório' });
+      setLocalizacaoSelecionada({ value: funcionarioExistente?.STLOJA == 'True' ? 'True' : 'False', label: funcionarioExistente?.STLOJA == 'True' ? 'Loja' : 'Escritório' });
       setCategoriaContratacao(funcionarioExistente.DSTIPO);
       setDataAdmissao(funcionarioExistente.DATA_ADMISSAO);
       setValorSalario(funcionarioExistente.VALORSALARIO);
       setValorDesconto(funcionarioExistente.PERC);
-      setSituacaoSelecionada({ value: funcionarioExistente?.STATIVO == 'True' ? 'Ativo' : 'Inativo', label: funcionarioExistente?.STATIVO == 'True' ? 'Ativo' : 'Inativo' });
+      setSituacaoSelecionada({ value: funcionarioExistente?.STATIVO == 'True' ? 'True' : 'False', label: funcionarioExistente?.STATIVO == 'True' ? 'Ativo' : 'Inativo' });
       setTipoSelecionado({ value: funcionarioExistente?.DSTIPO, label: funcionarioExistente?.DSTIPO });
       setNoLogin(funcionarioExistente.NOLOGIN);
       setIdPerfil(funcionarioExistente.IDPERFIL);
@@ -156,7 +156,7 @@ export const useCriarFuncionario = ({ handleClose, usuarioLogado, optionsModulos
     }
     try {
       const response = await post('/login', postData);
-
+      const ipUsuario = await getIPUsuario();
       const textDados = JSON.stringify(postData)
       const textoFuncao = 'RH/AUTORIZAÇÃO DESCONTO FOLHA FUNCIONARIO';
 
@@ -164,15 +164,15 @@ export const useCriarFuncionario = ({ handleClose, usuarioLogado, optionsModulos
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || 'Indisponível' 
       }
 
-      const responsePost = await post('/log-web', createLog)
+     await post('/log-web', createLog)
 
       setFormularioVisivelLogin(false);
       setFormularioVisivel(true);
       setIsLoading(true);
-      return responsePost.data;
+      return response.data;
     } catch (error) {
       Swal.showValidationMessage(`Erro ao autenticar: ${error.message}`);
     }
@@ -267,7 +267,7 @@ export const useCriarFuncionario = ({ handleClose, usuarioLogado, optionsModulos
       VALORDISPONIVEL: 0,
       STCONVENIO: String(categoriaContratacao) === 'CLT' ? "True" : "False",
       STDESCONTOFOLHA: String(categoriaContratacao) === 'CLT' ? "True" : "False",
-      STLOJA: localizacaoSelcionada?.value == 'Loja' ? "True" : "False",
+      STLOJA: localizacaoSelcionada?.value,
       DATA_ADMISSAO: String(dataAdmissao),
       TELEFONE: removerMascaraTelefone(telefone),
       DEPARTAMENTO: departamentoSelecionado?.value
@@ -293,8 +293,8 @@ export const useCriarFuncionario = ({ handleClose, usuarioLogado, optionsModulos
       IDPERFIL: idPerfil,
       STCONVENIO: String(categoriaContratacao) === 'CLT' ? "True" : "False",
       STDESCONTOFOLHA: String(categoriaContratacao) === 'CLT' ? "True" : "False",
-      STATIVO: situacaoSelecionada.value == 'Ativo' ? "True" : "False",
-      STLOJA: localizacaoSelcionada.value == 'Loja' ? "True" : "False",
+      STATIVO: situacaoSelecionada.value,
+      STLOJA: localizacaoSelcionada.value,
       TELEFONE: removerMascaraTelefone(telefone),
       DEPARTAMENTO: departamentoSelecionado?.value
     }
@@ -334,7 +334,7 @@ export const useCriarFuncionario = ({ handleClose, usuarioLogado, optionsModulos
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || 'Indisponível'
       }
 
       const responsePost = await post('/log-web', createData)
@@ -352,7 +352,7 @@ export const useCriarFuncionario = ({ handleClose, usuarioLogado, optionsModulos
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || 'Indisponível'
       }
 
       const responsePost = await post('/log-web', createData)

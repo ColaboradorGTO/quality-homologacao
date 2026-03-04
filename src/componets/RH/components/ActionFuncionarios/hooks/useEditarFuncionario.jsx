@@ -10,12 +10,12 @@ import { removerMascaraTelefone } from "../../../../../utils/mascaraTelefone";
 import { removerFormatacaoMoeda } from "../../../../../utils/formatMoeda";
 
 
-export const useEditarFuncionario = ({ 
-  handleClose, 
-  dadosAtualizarFuncionarios, 
-  handleClick, 
+export const useEditarFuncionario = ({
+  handleClose,
+  dadosAtualizarFuncionarios,
+  handleClick,
   refetch,
-  usuarioLogado, 
+  usuarioLogado,
   optionsModulos,
 }) => {
   const [empresaSelecionada, setEmpresaSelecionada] = useState('');
@@ -51,10 +51,10 @@ export const useEditarFuncionario = ({
     let usuarioIP = null;
 
     try {
-      const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+      const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
       usuarioIP = ipWhoisData?.ip;
     } catch (error) {
-      console.error("Erro ao buscar IP via ipwho.is:", error);
+      console.error("Erro ao buscar IP via ifconfig.me:", error);
     }
 
     if (!usuarioIP) {
@@ -85,7 +85,7 @@ export const useEditarFuncionario = ({
       setSubGrupoEmpresarialSelecionado(dadosAtualizarFuncionarios[0]?.IDSUBGRUPOEMPRESARIAL);
       setFuncaoSelecionada({ value: dadosAtualizarFuncionarios[0]?.DSFUNCAO, label: dadosAtualizarFuncionarios[0]?.DSFUNCAO });
       setNomeFuncionario(dadosAtualizarFuncionarios[0]?.NOFUNCIONARIO);
-      setLocalizacaoSelecionada({ value: dadosAtualizarFuncionarios[0]?.STLOJA == 'True' || "False", label: dadosAtualizarFuncionarios[0]?.STLOJA == 'True' ? 'Loja' : 'Escritório' });
+      setLocalizacaoSelecionada({ value: dadosAtualizarFuncionarios[0]?.STLOJA == 'True' ? 'True' : 'False', label: dadosAtualizarFuncionarios[0]?.STLOJA == 'True' ? 'Loja' : 'Escritório' });
       setCategoriaContratacao(dadosAtualizarFuncionarios[0].DSTIPO);
       if (dadosAtualizarFuncionarios[0]?.DATA_ADMISSAO) {
         const dataFormatada = dadosAtualizarFuncionarios[0]?.DATA_ADMISSAO.split('T')[0];
@@ -93,7 +93,7 @@ export const useEditarFuncionario = ({
       }
       setValorSalario(dadosAtualizarFuncionarios[0].VALORSALARIO);
       setValorDesconto(dadosAtualizarFuncionarios[0].PERC);
-      setSituacaoSelecionada({ value: dadosAtualizarFuncionarios[0]?.STATIVO == 'True' ? 'Ativo' : 'Inativo', label: dadosAtualizarFuncionarios[0]?.STATIVO == 'True' ? 'Ativo' : 'Inativo' });
+      setSituacaoSelecionada({ value: dadosAtualizarFuncionarios[0]?.STATIVO == 'True' ? 'True' : 'False', label: dadosAtualizarFuncionarios[0]?.STATIVO == 'True' ? 'Ativo' : 'Inativo' });
       setTipoSelecionado({ value: dadosAtualizarFuncionarios[0]?.DSTIPO, label: dadosAtualizarFuncionarios[0]?.DSTIPO });
       if (dadosAtualizarFuncionarios[0].STCONVENIO == 'True' && dadosAtualizarFuncionarios[0].STDESCONTOFOLHA == 'True') {
         setIsChecked(true);
@@ -106,9 +106,9 @@ export const useEditarFuncionario = ({
       setRepitaSenha(dadosAtualizarFuncionarios[0].PWSENHA);
       setCPF(dadosAtualizarFuncionarios[0].NUCPF);
       setTelefone(dadosAtualizarFuncionarios[0].TELEFONE);
-      setDepartamentoSelecionado({value: dadosAtualizarFuncionarios[0].DEPARTAMENTO, label: dadosAtualizarFuncionarios[0].DEPARTAMENTO});
+      setDepartamentoSelecionado({ value: dadosAtualizarFuncionarios[0].DEPARTAMENTO, label: dadosAtualizarFuncionarios[0].DEPARTAMENTO });
     }
-  
+
   }, [dadosAtualizarFuncionarios]);
 
   const handleRadioChange = (event) => {
@@ -153,6 +153,7 @@ export const useEditarFuncionario = ({
     }
 
   };
+  console.log(situacaoSelecionada.value, 'SITUAÇÃO SELECIONADA')
   const onSubmit = async (e) => {
     let maximoDesconto = 0;
     let dataBase = new Date('2024-08-01')
@@ -225,8 +226,8 @@ export const useEditarFuncionario = ({
       DSFUNCAO: funcaoSelecionada.value,
       STCONVENIO: categoriaContratacao === 'CLT' ? 'True' : 'False',
       STDESCONTOFOLHA: categoriaContratacao === 'CLT' ? 'True' : 'False',
-      STATIVO: situacaoSelecionada.value == 'Ativo' ? "True" : "False",
-      STLOJA: localizacaoSelcionada.value == 'Loja' ? "True" : "False",
+      STATIVO: situacaoSelecionada.value,
+      STLOJA: localizacaoSelcionada.value,
       IDFUNCALTERACAO: usuarioLogado.id,
       MOTIVODESC: '',
       TELEFONE: removerMascaraTelefone(telefone) || '',
@@ -244,7 +245,7 @@ export const useEditarFuncionario = ({
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || 'Indisponível'
       }
 
       await post('/log-web', createData)
@@ -269,7 +270,7 @@ export const useEditarFuncionario = ({
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || 'Indisponível'
       }
       handleClick()
       const responsePost = await post('/log-web', createData)

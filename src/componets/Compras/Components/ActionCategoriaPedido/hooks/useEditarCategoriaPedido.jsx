@@ -33,9 +33,17 @@ export const useEditarCategoriaPedido = ({dadosDetalheCategoriaPedido, handleClo
     };
 
     useEffect(() => {
-        setStatusSelecionado({value: dadosDetalheCategoriaPedido[0]?.STATIVO, label: dadosDetalheCategoriaPedido[0]?.STATIVO == 'True' ? 'ATIVO' : 'INATIVO'})
-        setDescricao(dadosDetalheCategoriaPedido[0].DSCATEGORIAPEDIDO)
-        setTipoCategoriaSelecionado({value: dadosDetalheCategoriaPedido[0]?.TIPOPEDIDO , label: dadosDetalheCategoriaPedido[0]?.TIPOPEDIDO})
+        if(dadosDetalheCategoriaPedido) {
+
+            setStatusSelecionado({value: dadosDetalheCategoriaPedido[0]?.STATIVO, label: dadosDetalheCategoriaPedido[0]?.STATIVO == 'True' ? 'ATIVO' : 'INATIVO'})
+            setDescricao(dadosDetalheCategoriaPedido[0]?.DSCATEGORIAPEDIDO)
+            setTipoCategoriaSelecionado({
+                value: dadosDetalheCategoriaPedido[0]?.TIPOPEDIDO == 'VESTURARIO' ? 'CALCADOS' : dadosDetalheCategoriaPedido[0]?.TIPOPEDIDO ? dadosDetalheCategoriaPedido[0]?.TIPOPEDIDO: 'ARTIGOS',  
+                label: dadosDetalheCategoriaPedido[0]?.TIPOPEDIDO == 'VESTURARIO' ? 'CALCADOS' : dadosDetalheCategoriaPedido[0]?.TIPOPEDIDO ? dadosDetalheCategoriaPedido[0]?.TIPOPEDIDO: 'ARTIGOS'
+            })
+
+            console.log(tipoCategoriaSelecionado, 'TIPO CATEGORIA SELECIONADO')
+        }
     }, [dadosDetalheCategoriaPedido])
 
 
@@ -54,7 +62,7 @@ export const useEditarCategoriaPedido = ({dadosDetalheCategoriaPedido, handleClo
         }
 
         const putData = {
-            IDCATEGORIAPEDIDO: parseInt(dadosDetalheCategoriaPedido[0].IDCATEGORIAPEDIDO),
+            IDCATEGORIAPEDIDO: parseInt(dadosDetalheCategoriaPedido[0]?.IDCATEGORIAPEDIDO),
             DSCATEGORIAPEDIDO: descricao,
             TIPOPEDIDO: tipoCategoriaSelecionado.value,
             STATIVO: statusSelecionado.value,

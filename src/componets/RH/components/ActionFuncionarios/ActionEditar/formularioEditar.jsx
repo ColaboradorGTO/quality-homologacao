@@ -327,7 +327,7 @@ export const FormularioEditar = ({
                   value={localizacaoSelcionada}
                   onChange={(e) => setLocalizacaoSelecionada(e)}
                 />
-                 
+                
                 {errors.localizacaoFuncionario && (
                   <AlertError
                     error={errors.localizacaoFuncionario?.value || errors.localizacaoFuncionario}
