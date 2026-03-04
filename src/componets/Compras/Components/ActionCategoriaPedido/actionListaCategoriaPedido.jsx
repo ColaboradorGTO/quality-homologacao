@@ -13,12 +13,12 @@ import * as XLSX from 'xlsx';
 import Swal from "sweetalert2";
 
 
-export const ActionListaCategoriaPedidos = ({ dadosCategoria, usuarioLogado, optionsModulos }) => {
+export const ActionListaCategoriaPedidos = ({ dadosCategoria, usuarioLogado, optionsModulos, handleClick }) => {
   const [modalEditar, setModalEditar] = useState(false);
   const [dadosDetalheCategoriaPedido, setDadosDetalheCategoriaPedido] = useState([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
-  
   
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -127,7 +127,7 @@ export const ActionListaCategoriaPedidos = ({ dadosCategoria, usuarioLogado, opt
     if(optionsModulos[0]?.ALTERAR == 'False') {
       Swal.fire({
         title: 'Erro!',
-        text: `${usuarioLogado?.NOFUNCIONARIO},\nVocê não tem permissão para alterar a Categoria de Pedido!`,
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para alterar a Categoria de Pedido!`,
         icon: 'error',
         customClass: {
           container: 'custom-swal',
@@ -146,8 +146,20 @@ export const ActionListaCategoriaPedidos = ({ dadosCategoria, usuarioLogado, opt
   const handleEditar = async (IDCATEGORIAPEDIDO) => {
     try {
       const response = await get(`/categoriaPedidos?idCategoriaPedido=${IDCATEGORIAPEDIDO}`);
-      setDadosDetalheCategoriaPedido(response.data);
-      setModalEditar(true)
+      if(response.data && response.data.length > 0) {
+        setDadosDetalheCategoriaPedido(response.data[0]);
+        setModalEditar(true);
+      } else {
+        Swal.fire({
+          title: 'Erro!',
+          html: `Categoria de Pedido não encontrada!`,
+          icon: 'error',
+          customClass: {
+            container: 'custom-swal',
+          },
+        });
+        return;
+      }
     } catch (error) {
       console.error(error);
     }
@@ -177,8 +189,11 @@ export const ActionListaCategoriaPedidos = ({ dadosCategoria, usuarioLogado, opt
           <DataTable
             title="Relatório Categorias de Pedido"
             value={dados}
-            size="small"
             globalFilter={globalFilterValue}
+            size="small"
+            selectionMode="single"
+            selection={rowSelection}
+            onSelectionChange={(e) => setRowSelection(e.value)}
             sortOrder={-1}
             paginator={true}
             rows={10}
@@ -215,6 +230,7 @@ export const ActionListaCategoriaPedidos = ({ dadosCategoria, usuarioLogado, opt
         dadosDetalheCategoriaPedido={dadosDetalheCategoriaPedido}
         usuarioLogado={usuarioLogado}
         optionsModulos={optionsModulos}
+        handleClick={handleClick}
       />
     </Fragment>
   )

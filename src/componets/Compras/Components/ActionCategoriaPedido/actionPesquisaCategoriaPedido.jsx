@@ -24,7 +24,6 @@ export const ActionPesquisaCategoriaPedido = ({ usuarioLogado }) => {
   const [modalVisivel, setModalVisivel] = useState(false);
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
-
   useEffect(() => {
     const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
     if (menuSalvo) {
@@ -154,9 +153,7 @@ export const ActionPesquisaCategoriaPedido = ({ usuarioLogado }) => {
 
 
   return (
-
     <Fragment>
-
       <ActionMain
         title="Relatórios -  Categorias de Pedido"
         subTitle=""

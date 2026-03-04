@@ -36,7 +36,7 @@ export const useCadastrarCategoriaPedido = ({handleClose, usuarioLogado, options
     const onSubmit = async () => {
         if(optionsModulos[0]?.CRIAR == 'False') {
             Swal.fire({
-                title: 'Erro!',
+                title: 'Acesso Negado!',
                 html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para criar uma Categoria de Pedido!`,
                 icon: 'error',
                 customClass: {
@@ -69,7 +69,7 @@ export const useCadastrarCategoriaPedido = ({handleClose, usuarioLogado, options
             Swal.fire({
                 position: 'center',
                 icon: 'success',
-                title: 'Atualizado com sucesso!',
+                title: 'Cadastro realizado com sucesso!',
                 showConfirmButton: false,
                 timer: 5000,
                 customClass: {
