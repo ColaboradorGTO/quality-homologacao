@@ -12,8 +12,7 @@ import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
 import Swal from "sweetalert2";
 
-
-export const ActionPesquisaGrupoEstrutura = ({usuarioLogado, ID }) => {
+export const ActionPesquisaGrupoEstrutura = ({usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [modalVisivel, setModalVisivel] = useState(false);
   const [descricao, setDescricao] = useState("")
@@ -78,21 +77,16 @@ export const ActionPesquisaGrupoEstrutura = ({usuarioLogado, ID }) => {
     { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
   )
 
-  const handleChangeGrupo = (e) => {
-    setGrupoSelecionado(e.value)
-  }
-
   const handleClick = () => {
     refetchListaGrupo()
-    setTabelaVisivel(true)
-      
+    setTabelaVisivel(true)   
   }
 
   const handleCriar = () => {
     if(optionsModulos[0]?.CRIAR == 'False') {
       Swal.fire({
-        title: 'Erro!',
-        text: `${usuarioLogado?.NOFUNCIONARIO},\nVocê não tem permissão para criar SubGrupo de Estrutura Mercadológica!`,
+        title: 'Acesso Negado!',
+        text: `${usuarioLogado?.NOFUNCIONARIO},\nVocê não tem permissão para criar Grupo de Estrutura Mercadológica!`,
         icon: 'error',
         customClass: {
           container: 'custom-swal',

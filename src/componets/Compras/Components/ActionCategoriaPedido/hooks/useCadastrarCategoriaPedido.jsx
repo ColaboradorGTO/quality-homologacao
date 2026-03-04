@@ -2,7 +2,7 @@ import { useState } from "react"
 import { post } from "../../../../../api/funcRequest"
 import axios from "axios"
 import Swal from 'sweetalert2'
-
+import { situacao, optionsTipoCategoria } from "../../../../../../parceiro.json"
 
 export const useCadastrarCategoriaPedido = ({handleClose, usuarioLogado, optionsModulos, handleClick}) => {
     const [statusSelecionado, setStatusSelecionado] = useState('')
@@ -14,56 +14,34 @@ export const useCadastrarCategoriaPedido = ({handleClose, usuarioLogado, options
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
             usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP via ipwho.is:", error);
+            console.error("Erro ao buscar IP via ifconfig.me:", error);
         }
 
         if (!usuarioIP) {
-            try {
-                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-                usuarioIP = ipifyData?.ip;
-            } catch (error) {
-                console.error("Erro ao buscar IP via ipify.org:", error);
-            }
+        try {
+            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+            usuarioIP = ipifyData?.ip;
+        } catch (error) {
+            console.error("Erro ao buscar IP via ipify.org:", error);
+        }
         }
         setIpUsuario(usuarioIP);
         return usuarioIP;
     };
-    
-    const optionsStatus = [
-        { value: 'True', label: 'ATIVO' },
-        { value: 'False', label: 'INATIVO' }
-    ]
 
-    const optionsTipoCategoria = [
-        { value: 'VESTUARIO', label: 'VESTUARIO' },
-        { value: 'CALCADOS', label: 'CALCADOS' },
-        { value: 'ARTIGOS', label: 'ARTIGOS' },
-    ]
-   
-  
-    const cadastrar = async () => {
+
+    const onSubmit = async () => {
         if(optionsModulos[0]?.CRIAR == 'False') {
             Swal.fire({
                 title: 'Erro!',
-                text: `${usuarioLogado?.NOFUNCIONARIO},\nVocê não tem permissão para criar uma Categoria de Pedido!`,
+                html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para criar uma Categoria de Pedido!`,
                 icon: 'error',
                 customClass: {
                     container: 'custom-swal',   
                 },
-            });
-            return;
-        }
-
-        if (descricao == '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'O campo descrição é obrigatório.',
-                showConfirmButton: false,
-                timer: 1500
             });
             return;
         }
@@ -84,7 +62,7 @@ export const useCadastrarCategoriaPedido = ({handleClose, usuarioLogado, options
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textFuncao,
                 DADOS: textDados,
-                IP: ip
+                IP: ip || 'Indisponível'
             }
             
             await post('/log-web', createtLog)
@@ -93,7 +71,7 @@ export const useCadastrarCategoriaPedido = ({handleClose, usuarioLogado, options
                 icon: 'success',
                 title: 'Atualizado com sucesso!',
                 showConfirmButton: false,
-                timer: 3000,
+                timer: 5000,
                 customClass: {
                     container: 'custom-swal',
                 }
@@ -110,7 +88,7 @@ export const useCadastrarCategoriaPedido = ({handleClose, usuarioLogado, options
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textFuncao,
                 DADOS: textDados,
-                IP: ip
+                IP: ip || 'Indisponível'
             }
             
             await post('/log-web', createtLog)
@@ -120,7 +98,7 @@ export const useCadastrarCategoriaPedido = ({handleClose, usuarioLogado, options
                 icon: 'error',
                 title: 'Ocorreu um erro ao enviar o formulário. Por favor, tente novamente.',
                 showConfirmButton: false,
-                timer: 3000,
+                timer: 5000,
                 customClass: {
                     container: 'custom-swal',
                 },
@@ -130,7 +108,7 @@ export const useCadastrarCategoriaPedido = ({handleClose, usuarioLogado, options
     }
 
     return {
-        optionsStatus,
+        situacao,
         optionsTipoCategoria,
         statusSelecionado,
         setStatusSelecionado,
@@ -138,6 +116,6 @@ export const useCadastrarCategoriaPedido = ({handleClose, usuarioLogado, options
         setDescricao,
         tipoCategoriaSelecionado,
         setTipoCategoriaSelecionado,
-        cadastrar
+        onSubmit
     }
 }

@@ -59,6 +59,11 @@
       "label": "ACESSÓRIOS"
     }
   ],
+  "optionsTipoCategoria": [
+    { "value": "VESTUARIO", "label": "VESTUARIO" },
+    { "value": "CALCADOS", "label": "CALCADOS" },
+    { "value": "ARTIGOS", "label": "ARTIGOS" }
+  ],
   "optionsEnviar": [
     {
       "value": "NE",

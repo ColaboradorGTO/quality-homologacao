@@ -1,13 +1,13 @@
 import { Fragment } from "react"
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal"
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal"
-import { InputFieldModal } from "../../../../Buttons/InputFieldModal"
 import { Controller, useForm } from "react-hook-form";
 import Select from 'react-select';
 import { useEditarGrupoEstruturaMercadologica } from "../hooks/useEditarGrupoEstruturaMercadologico"
 import { situacao } from "../../../../../../parceiro.json" 
 import FormField from "../../../../Formularios/FormField";
 import { AlertError } from "../../../../Inputs/alertError";
+import { schema } from "./schemaValidarGrupo";
 
 export const FormularioEditar = ({
   handleClose,
@@ -32,9 +32,8 @@ export const FormularioEditar = ({
   const handleValidatedSubmit = async () => {
     try {
       const dadosParaValidar = {
-        descricaoSubGrupo: descricao,
-        subGrupo: subGrupoSelecionado,
-        situacaoSubGrupo: statusSelecionado,
+        descricaoGrupo: descricao,
+        situacaoGrupo: statusSelecionado,
       };
 
       await schema.validate(dadosParaValidar, { abortEarly: false });

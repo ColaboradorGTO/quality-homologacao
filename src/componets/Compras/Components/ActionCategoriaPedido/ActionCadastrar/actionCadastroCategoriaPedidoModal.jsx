@@ -3,12 +3,10 @@ import { Modal } from "react-bootstrap"
 import { HeaderModal } from "../../../../Modais/HeaderModal/HeaderModal"
 import { FormularioCadastrar } from "./formularioCadastrar"
 
-
 export const ActionCadastroCategoriaPedidoModal = ({ show, handleClose, usuarioLogado, optionsModulos, handleClick }) => {
 
   return (
     <Fragment>
-
       <Modal
         show={show}
         onHide={handleClose}

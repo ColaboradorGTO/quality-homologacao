@@ -3,34 +3,28 @@ import axios from "axios"
 import Swal from 'sweetalert2'
 import { put, post } from "../../../../../api/funcRequest"
 
-
-export const useEditarGrupoEstruturaMercadologica = ({ dadosDetalheGrupo, usuarioLogado, optionsModulos }) => {
+export const useEditarGrupoEstruturaMercadologica = ({ dadosDetalheGrupo, handleClose, usuarioLogado, optionsModulos, handleClick  }) => {
     const [statusSelecionado, setStatusSelecionado] = useState("")
     const [descricao, setDescricao] = useState("")
     const [ipUsuario, setIpUsuario] = useState('');
-
-    const optionsStatus = [
-        { value: 'True', label: 'ATIVO' },
-        { value: 'False', label: 'INATIVO' }
-    ]
 
     const getIPUsuario = async () => {
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
             usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP via ipwho.is:", error);
+            console.error("Erro ao buscar IP via ifconfig.me:", error);
         }
 
         if (!usuarioIP) {
-            try {
-                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-                usuarioIP = ipifyData?.ip;
-            } catch (error) {
-                console.error("Erro ao buscar IP via ipify.org:", error);
-            }
+        try {
+            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+            usuarioIP = ipifyData?.ip;
+        } catch (error) {
+            console.error("Erro ao buscar IP via ipify.org:", error);
+        }
         }
         setIpUsuario(usuarioIP);
         return usuarioIP;
@@ -45,27 +39,17 @@ export const useEditarGrupoEstruturaMercadologica = ({ dadosDetalheGrupo, usuari
         }
     }, [dadosDetalheGrupo])
 
-    const atualzarGrupoEstrutura = async () => {
+    const onSubmit = async () => {
 
         if (optionsModulos[0]?.ALTERAR == 'False') {
             Swal.fire({
                 position: 'center',
-                icon: 'error',
-                title: 'Você não tem permissão para alterar um grupo de estrutura.',
+                icon: 'info',
+                title: 'Acesso Negado!',
+                html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para alterar um grupo de estrutura.`,
                 showConfirmButton: false,
-                timer: 1500
+                timer: 5000
             });
-            return;
-        }
-
-        if (descricao == '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'O campo descrição é obrigatório.',
-                showConfirmButton: false,
-                timer: 1500
-            }); 
             return;
         }
 
@@ -78,6 +62,18 @@ export const useEditarGrupoEstruturaMercadologica = ({ dadosDetalheGrupo, usuari
 
         try {
             const response = await put('/grupo-estrutura/:id', postData)
+            
+            const textDados = JSON.stringify(postData)
+            let textFuncao = 'COMPRAS/ALTERAÇÃO DO GRUPO DA ESTRUTURA MERCADOLÓGICA';
+            const ip = await getIPUsuario();
+            const createtLog = {
+                IDFUNCIONARIO: String(usuarioLogado.id),
+                PATHFUNCAO: textFuncao,
+                DADOS: textDados,
+                IP: ip || 'Indisponível'
+            }
+            
+            await post('/log-web', createtLog)
             Swal.fire({
                 position: 'center',
                 icon: 'success',
@@ -89,19 +85,8 @@ export const useEditarGrupoEstruturaMercadologica = ({ dadosDetalheGrupo, usuari
                 }
             })
 
-            const textDados = JSON.stringify(postData)
-            let textFuncao = 'COMPRAS/ALTERAÇÃO DO GRUPO DA ESTRUTURA MERCADOLÓGICA';
-            const ip = await getIPUsuario();
-            const createtLog = {
-                IDFUNCIONARIO: String(usuarioLogado.id),
-                PATHFUNCAO: textFuncao,
-                DADOS: textDados,
-                IP: ip
-            }
-
-            await post('/log-web', createtLog)
-
-
+            handleClick();
+            handleClose();
             return response.data;
         } catch (error) {
             const textDados = JSON.stringify(postData)
@@ -111,7 +96,7 @@ export const useEditarGrupoEstruturaMercadologica = ({ dadosDetalheGrupo, usuari
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textFuncao,
                 DADOS: textDados,
-                IP: ip
+                IP: ip || 'Indisponível'
             }
 
             await post('/log-web', createtLog)
@@ -130,12 +115,10 @@ export const useEditarGrupoEstruturaMercadologica = ({ dadosDetalheGrupo, usuari
     }
 
     return {
-        optionsStatus,
         statusSelecionado,
         setStatusSelecionado,
         descricao,
         setDescricao,
-        dadosDetalheGrupo,
-        atualzarGrupoEstrutura,
+        onSubmit
     }
 }

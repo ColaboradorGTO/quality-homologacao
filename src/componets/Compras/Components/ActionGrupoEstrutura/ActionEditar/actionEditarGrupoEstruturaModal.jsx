@@ -13,15 +13,12 @@ export const ActionEditarGrupoEstruturaModal = ({
 }) => {
 
   return (
-
     <Fragment>
-
       <Modal
         show={show}
         onHide={handleClose}
         class="modal-content"
         size="xl"
-        
       >
 
         <HeaderModal

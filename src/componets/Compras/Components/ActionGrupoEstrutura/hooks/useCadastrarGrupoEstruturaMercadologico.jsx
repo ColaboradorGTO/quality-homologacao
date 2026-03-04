@@ -1,72 +1,44 @@
 import { useState } from "react"
-import { get, post, } from "../../../../../api/funcRequest"
+import { post } from "../../../../../api/funcRequest"
 import axios from "axios"
 import Swal from 'sweetalert2'
-import { useQuery } from "react-query"
-
 
 export const useCadastrarGrupoEstruturaMercadologica = ({handleClose, usuarioLogado, optionsModulos, handleClick}) => {
     const [statusSelecionado, setStatusSelecionado] = useState("")
     const [descricao, setDescricao] = useState("")
     const [ipUsuario, setIpUsuario] = useState('');
     
-
-    const { data: dadosGrupoEstrutura = [], error: errorGrupoEstrutura, isLoading: isLoadingGrupoEstrutura, refetch: refetchGrupoEstrutura } = useQuery(
-        'grupoEstrutura',
-        async () => {
-            const response = await get(`/grupoEstrutura`);
-
-            return response.data;
-        },
-        { enabled: true, staleTime: 60 * 60 * 1000, }
-    );
-    const optionsStatus = [
-        { value: 'True', label: 'ATIVO' },
-        { value: 'False', label: 'INATIVO' }
-    ]
-
     const getIPUsuario = async () => {
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
             usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP via ipwho.is:", error);
+            console.error("Erro ao buscar IP via ifconfig.me:", error);
         }
 
         if (!usuarioIP) {
-            try {
-                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-                usuarioIP = ipifyData?.ip;
-            } catch (error) {
-                console.error("Erro ao buscar IP via ipify.org:", error);
-            }
+        try {
+            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+            usuarioIP = ipifyData?.ip;
+        } catch (error) {
+            console.error("Erro ao buscar IP via ipify.org:", error);
+        }
         }
         setIpUsuario(usuarioIP);
         return usuarioIP;
     };
     
-    
-    const cadastrarGrupoEstrutura = async () => {
+    const onSubmit = async () => {
         if(optionsModulos[0]?.CRIAR == 'False') {
             Swal.fire({
                 position: 'center',
                 icon: 'error',
-                title: 'Você não tem permissão para criar um novo grupo de estrutura.',
+                title: 'Acesso Negado!',
+                html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para criar um novo grupo de estrutura.`,
                 showConfirmButton: false,
-                timer: 1500
-            });
-            return;
-        }
-
-        if (descricao == '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'O campo descrição é obrigatório.',
-                showConfirmButton: false,
-                timer: 1500
+                timer: 5000
             });
             return;
         }
@@ -79,6 +51,18 @@ export const useCadastrarGrupoEstruturaMercadologica = ({handleClose, usuarioLog
 
         try {
             const response = await post('/cadastro-grupoEstrutura', postData)
+            
+            const textDados = JSON.stringify(postData)
+            let textFuncao = 'COMPRAS/CADASTRO DO GRUPO DA ESTRUTURA MERCADOLÓGICA';
+            const ip = await getIPUsuario();
+            const createtLog = {
+                IDFUNCIONARIO: String(usuarioLogado.id),
+                PATHFUNCAO: textFuncao,
+                DADOS: textDados,
+                IP: ip || 'Indisponível'
+            }
+            
+            await post('/log-web', createtLog)
             Swal.fire({
                 position: 'center',
                 icon: 'success',
@@ -89,18 +73,6 @@ export const useCadastrarGrupoEstruturaMercadologica = ({handleClose, usuarioLog
                     container: 'custom-swal',
                 }
             })
-
-            const textDados = JSON.stringify(postData)
-            let textFuncao = 'COMPRAS/CADASTRO DO GRUPO DA ESTRUTURA MERCADOLÓGICA';
-            const ip = await getIPUsuario();
-            const createtLog = {
-                IDFUNCIONARIO: String(usuarioLogado.id),
-                PATHFUNCAO: textFuncao,
-                DADOS: textDados,
-                IP: ip
-            }
-
-            await post('/log-web', createtLog)
             handleClick();
             handleClose();
 
@@ -113,7 +85,7 @@ export const useCadastrarGrupoEstruturaMercadologica = ({handleClose, usuarioLog
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textFuncao,
                 DADOS: textDados,
-                IP: ip
+                IP: ip || 'Indisponível'
             }
 
             await post('/log-web', createtLog)
@@ -132,13 +104,11 @@ export const useCadastrarGrupoEstruturaMercadologica = ({handleClose, usuarioLog
     }
 
     return {
-        optionsStatus,
         statusSelecionado,
         setStatusSelecionado,
         descricao,
         setDescricao,
-        dadosGrupoEstrutura,
-        cadastrarGrupoEstrutura,
+        onSubmit,
     
     }
 }
