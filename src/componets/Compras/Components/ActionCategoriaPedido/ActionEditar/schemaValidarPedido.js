@@ -2,7 +2,7 @@ import * as yup from 'yup';
 
 export const schema = yup.object({
 
-  descricao: yup
+  descricaoPedido: yup
     .string()
     .required('Descrição Obrigatória'),
 

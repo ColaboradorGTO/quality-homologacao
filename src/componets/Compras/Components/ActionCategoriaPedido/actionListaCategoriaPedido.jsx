@@ -147,7 +147,7 @@ export const ActionListaCategoriaPedidos = ({ dadosCategoria, usuarioLogado, opt
     try {
       const response = await get(`/categoriaPedidos?idCategoriaPedido=${IDCATEGORIAPEDIDO}`);
       if(response.data && response.data.length > 0) {
-        setDadosDetalheCategoriaPedido(response.data[0]);
+        setDadosDetalheCategoriaPedido(response.data);
         setModalEditar(true);
       } else {
         Swal.fire({

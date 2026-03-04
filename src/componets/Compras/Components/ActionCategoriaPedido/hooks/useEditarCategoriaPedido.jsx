@@ -42,7 +42,7 @@ export const useEditarCategoriaPedido = ({dadosDetalheCategoriaPedido, handleClo
                 label: dadosDetalheCategoriaPedido[0]?.TIPOPEDIDO == 'VESTURARIO' ? 'CALCADOS' : dadosDetalheCategoriaPedido[0]?.TIPOPEDIDO ? dadosDetalheCategoriaPedido[0]?.TIPOPEDIDO: 'ARTIGOS'
             })
 
-            console.log(tipoCategoriaSelecionado, 'TIPO CATEGORIA SELECIONADO')
+
         }
     }, [dadosDetalheCategoriaPedido])
 

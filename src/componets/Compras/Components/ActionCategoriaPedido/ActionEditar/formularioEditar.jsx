@@ -104,6 +104,7 @@ export const FormularioEditar = ({
                                     clearErrors('tipoCategoria')
                                 }}
                             />
+                            
                             {errors.tipoCategoria && (
                                 <AlertError
                                     error={errors.tipoCategoria}
