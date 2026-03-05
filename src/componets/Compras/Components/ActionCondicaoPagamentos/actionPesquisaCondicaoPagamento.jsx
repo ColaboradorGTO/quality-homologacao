@@ -11,8 +11,7 @@ import { MdAdd } from "react-icons/md"
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento"
 import { useQuery } from "react-query"
 
-
-export const ActionPesquisaCondicaoPagamento = ({usuarioLogado, ID}) => {
+export const ActionPesquisaCondicaoPagamento = ({ usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [modalVisivel, setModalVisivel] = useState(false);
   const [descricao, setDescricao] = useState('')
@@ -170,4 +169,3 @@ export const ActionPesquisaCondicaoPagamento = ({usuarioLogado, ID}) => {
     </Fragment>
   )
 }
-

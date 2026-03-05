@@ -7,7 +7,7 @@ import { useCadastrarCondicaoPagamento } from "../hooks/useCadastrarCondicaoPaga
 import { schema } from "./schemaValidarPagamento";
 import FormField from "../../../../Formularios/FormField";
 import { AlertError } from "../../../../Inputs/alertError";
-import { onlyNumbers } from "../../../../../utils/onlyNumbers";
+
 
 export const FormularioCadastro = ({ 
     handleClose,
@@ -138,10 +138,7 @@ export const FormularioCadastro = ({
                                         errors={errors}
                                         clearErrors={clearErrors}
                                         value={numeroParcelas}
-                                        onChangeModal={(e) => {
-                                            
-                                            setNumeroParcelas(e.target.valu)
-                                        }}
+                                        onChangeModal={(e) =>  setNumeroParcelas(e.target.value)}
                                     />
                                 )}
                             />
