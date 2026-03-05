@@ -15,7 +15,6 @@ export const ActionEditarTrasnportadorModal = ({
   return (
 
     <Fragment>
-
       <Modal
         show={show}
         onHide={handleClose}
@@ -23,14 +22,11 @@ export const ActionEditarTrasnportadorModal = ({
         size="lg"
         centered
       >
-
         <HeaderModal
           title={"Transportador"}
           subTitle={"Alteração"}
           handleClose={handleClose}
         />
-
-
         <Modal.Body>
           <FormularioEditar
             handleClose={handleClose}

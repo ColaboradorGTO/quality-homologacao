@@ -21,6 +21,7 @@ export const ActionListaTransportador = ({
   const [modalCadastro, setModalCadastro] = useState(false);
   const [dadosDetalheTranspotador, setDadosDetalheTranspotador] = useState([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
 
   const onGlobalFilterChange = (e) => {
@@ -158,7 +159,7 @@ export const ActionListaTransportador = ({
     } else {
       Swal.fire({
         title: 'Erro!',
-        text: `${usuarioLogado?.NOFUNCIONARIO},\nVocê não tem permissão para alterar o Transportador!`,
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para alterar o Transportador!`,
         icon: 'error',
         customClass: {
           container: 'custom-swal',
@@ -171,8 +172,20 @@ export const ActionListaTransportador = ({
   const handleEditar = async (IDTRANSPORTADORA) => {
     try {
       const response = await get(`/transportadoras?idTransportador=${IDTRANSPORTADORA}`);
-      setDadosDetalheTranspotador(response.data);
-      setModalCadastro(true)
+      if(response.data && response.data.length > 0) {
+        setDadosDetalheTranspotador(response.data);
+        setModalCadastro(true);
+      } else {
+        Swal.fire({
+          title: 'Erro!',
+          html: `Transportador não encontrado!`,
+          icon: 'error',
+          customClass: {
+            container: 'custom-swal',
+          },
+        });
+        return;
+      }
     } catch (error) {
       console.error(error);
     }
@@ -202,8 +215,11 @@ export const ActionListaTransportador = ({
           <DataTable
             title="Transportadoras"
             value={dados}
-            size="small"
             globalFilterValue={globalFilterValue}
+            size="small"
+            selectionMode="single"
+            selection={rowSelection}
+            onSelectionChange={(e) => setRowSelection(e.value)}
             sortOrder={-1}
             paginator={true}
             rows={10}

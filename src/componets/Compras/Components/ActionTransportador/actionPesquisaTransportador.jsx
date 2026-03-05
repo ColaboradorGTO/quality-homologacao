@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react"
+import { Fragment, useState, useEffect } from "react"
 import { ActionMain } from "../../../Actions/actionMain";
 import { InputField } from "../../../Buttons/Input";
 import { InputSelectAction } from "../../../Inputs/InputSelectAction";
@@ -10,24 +10,33 @@ import { MdAdd } from "react-icons/md";
 import { ActionCadastroTrasnportadorModal } from "./ActionCadastrar/actionCadastroTransportadorModal";
 import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
+import Swal from "sweetalert2";
 
 
-export const ActionPesquisaTransportador = ({usuarioLogado, ID}) => {
+export const ActionPesquisaTransportador = ({ usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [modalVisivel, setModalVisivel] = useState(false);
   const [transportadorSelecionado, setTransportadorSelecionado] = useState('')
   const [cnpj, setCnpj] = useState('')
   const [razaoSocial, setRazaoSocial] = useState('')
-  const [currentPage, setCurrentPage] = useState(1);
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
+  useEffect(() => {
+    const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
+    if (menuSalvo) {
+      const menuParsed = JSON.parse(menuSalvo);
+      setMenuFilhoAtual(menuParsed);
+    }
+  }, []);
+  
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
-    'menus-usuario-excecao',
+    ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
-      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${ID}`);
-
+      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
+      
       return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
   );
   
   const fetchListaTransporte = async () => {
@@ -67,20 +76,29 @@ export const ActionPesquisaTransportador = ({usuarioLogado, ID}) => {
   const { data: dadosTransportador = [], error: errorCondicoes, isLoading: isLoadingCondicoes, refetch: refetchListaTransporte } = useQuery(
     ['transportadoras'],
     () => fetchListaTransporte(),
-    { enabled: false, staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    { enabled: false, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
   )
 
-
-  const handleChangeSelectTransportador = (e) => {
-    setTransportadorSelecionado(e.value)
-  }
-
   const handleClick = () => {
-    setCurrentPage(prevPage => prevPage + 1);
     refetchListaTransporte();
     setTabelaVisivel(true)
   }
 
+  const handleShowModal = () => {
+    if(optionsModulos[0]?.CRIAR == 'False') {
+      Swal.fire({
+        title: 'Acesso Negado!',
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para cadastrar uma nova Condição de Pagamento!`,
+        icon: 'error',
+        customClass: {
+          container: 'custom-swal',
+        },
+      });
+      return;
+    } else {
+      setModalVisivel(true);
+    }
+  }
 
   return (
 
@@ -111,7 +129,7 @@ export const ActionPesquisaTransportador = ({usuarioLogado, ID}) => {
         ]}
         labelSelectEmpresa={"Por Transportadora"}
         valueSelectEmpresa={transportadorSelecionado}
-        onChangeSelectEmpresa={handleChangeSelectTransportador}
+        onChangeSelectEmpresa={(e) => setTransportadorSelecionado(e.value)}
 
         InputFieldDescricaoComponent={InputField}
         labelInputFieldDescricao={"CNPJ"}
@@ -127,7 +145,7 @@ export const ActionPesquisaTransportador = ({usuarioLogado, ID}) => {
 
         ButtonTypeCadastro={ButtonType}
         linkNome={"Cadastrar Transportador"}
-        onButtonClickCadastro={() => setModalVisivel(true)}
+        onButtonClickCadastro={handleShowModal}
         IconCadastro={MdAdd}
         corCadastro={"success"}
       />

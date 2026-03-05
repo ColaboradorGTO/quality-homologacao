@@ -2,9 +2,10 @@ import { useEffect, useState } from "react"
 import axios from "axios"
 import Swal from 'sweetalert2'
 import { getDataHoraAtual } from "../../../../../utils/dataAtual"
-import { get, post } from "../../../../../api/funcRequest"
+import { get, post, put } from "../../../../../api/funcRequest"
 import { useQuery } from "react-query"
 import { removeMascaraCNPJ, validarCNPJ } from "../../../../../utils/mascaraCNPJ"
+import { situacao } from "../../../../../../parceiro.json"
 
 async function getDadosEnderecoViaCep_API_redundancia(cep) {
     const URL_VIA_CEP = 'https://viacep.com.br/ws/{CEP}/json/';
@@ -67,6 +68,7 @@ export const useCadastrarTransportadora = ({handleClose, usuarioLogado, optionsM
     const [telefone2, setTelefone2] = useState('')
     const [telefone3, setTelefone3] = useState('')
     const [data, setData] = useState('')
+    const [idTransportador, setIdTransportador] = useState('')
     const [ipUsuario, setIpUsuario] = useState('');
     
     const URL_PUBLICAWS = 'https://publica.cnpj.ws/cnpj/{CNPJ}';
@@ -83,27 +85,23 @@ export const useCadastrarTransportadora = ({handleClose, usuarioLogado, optionsM
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
             usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP via ipwho.is:", error);
+            console.error("Erro ao buscar IP via ifconfig.me:", error);
         }
 
         if (!usuarioIP) {
-            try {
-                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-                usuarioIP = ipifyData?.ip;
-            } catch (error) {
-                console.error("Erro ao buscar IP via ipify.org:", error);
-            }
+        try {
+            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+            usuarioIP = ipifyData?.ip;
+        } catch (error) {
+            console.error("Erro ao buscar IP via ipify.org:", error);
+        }
         }
         setIpUsuario(usuarioIP);
         return usuarioIP;
     };
-    const optionsStatus = [
-        { value: 'True', label: 'ATIVO' },
-        { value: 'False', label: 'INATIVO' }
-    ]
 
     async function getDadosCNPJRedundancia_API_externa(cnpj) {
         try {
@@ -310,27 +308,32 @@ export const useCadastrarTransportadora = ({handleClose, usuarioLogado, optionsM
     
     useEffect(() => {
         if(dadosCNPJ && dadosCNPJ.length > 0) {
-            setCnpj(dadosCNPJ[0]?.NUCNPJ || '')
-            setRazaoSocial(dadosCNPJ[0]?.NORAZAOSOCIAL || '')
-            setNomeFantasia(dadosCNPJ[0]?.NOFANTASIA || '')
-            setInscricaoEstadual(dadosCNPJ[0]?.NUINSCESTADUAL || '')
-            setInscricaoMunicipal(dadosCNPJ[0]?.NUINSCMUNICIPAL || '')
-            setEndereco(dadosCNPJ[0]?.EENDERECO || '')
-            setNumero(dadosCNPJ[0]?.ENUMERO || '')
-            setComplemento(dadosCNPJ[0]?.ECOMPLEMENTO || '')
-            setBairro(dadosCNPJ[0]?.EBAIRRO || '')
-            setCidade(dadosCNPJ[0]?.ECIDADE || '')
-            setUf(dadosCNPJ[0]?.SGUF || '')
-            setCep(dadosCNPJ[0]?.NUCEP || '')
-            setNumeroIBGE(dadosCNPJ[0]?.NUIBGE || '')
-            setNomeRepresentante(dadosCNPJ[0]?.NOREPRESENTANTE || '')
-            setEmail(dadosCNPJ[0]?.EEMAIL || '')
-            setTelefone1(dadosCNPJ[0]?.NUTELEFONE1 || '')
-            setTelefone2(dadosCNPJ[0]?.NUTELEFONE2 || '')
-            setTelefone3(dadosCNPJ[0]?.NUTELEFONE3 || '')
-            setStatusSelecionado({value: dadosCNPJ[0]?.STATIVO || 'True', label: dadosCNPJ[0]?.STATIVO == 'True' ? 'ATIVO' : 'INATIVO' })
+            const transportador = dadosCNPJ[0];
+
+            setIdTransportador(transportador.IDTRANSPORTADORA)
+            setCnpj(transportador.NUCNPJ)
+            setRazaoSocial(transportador.NORAZAOSOCIAL)
+            setNomeFantasia(transportador.NOFANTASIA)
+            setInscricaoEstadual(transportador.NUINSCESTADUAL)
+            setInscricaoMunicipal(transportador.NUINSCMUNICIPAL)
+            setEndereco(transportador.EENDERECO)
+            setNumero(transportador.ENUMERO)
+            setComplemento(transportador.ECOMPLEMENTO)
+            setBairro(transportador.EBAIRRO)
+            setCidade(transportador.ECIDADE)
+            setUf(transportador.SGUF)
+            setCep(transportador.NUCEP)
+            setNumeroIBGE(transportador.NUIBGE)
+            setNomeRepresentante(transportador.NOREPRESENTANTE)
+            setEmail(transportador.EEMAIL)
+            setTelefone1(transportador.NUTELEFONE1)
+            setTelefone2(transportador.NUTELEFONE2)
+            setTelefone3(transportador.NUTELEFONE3)
+            setStatusSelecionado({value: transportador.STATIVO || 'True', label: transportador.STATIVO == 'True' ? 'ATIVO' : 'INATIVO' })
         }
     }, [dadosCNPJ])
+
+
 
     async function preenche_dados_registrados(response, cnpj, stUltimaInstancia = false) {
         let cnpjEmpresaVoucher = cnpj.replace(/\D/g, "");
@@ -397,8 +400,9 @@ export const useCadastrarTransportadora = ({handleClose, usuarioLogado, optionsM
     const onSubmit = async () => {
         if(optionsModulos[0]?.CRIAR == 'False') {
             Swal.fire({
-                title: 'Erro!',
-                text: `${usuarioLogado?.NOFUNCIONARIO},\nVocê não tem permissão para cadastrar Transportadora!`,
+                title: 'Acesso Negado!',
+                html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para cadastrar Transportadora!`,
+                timer: 5000,
                 customClass: {
                     container: 'custom-swal',
                 },
@@ -406,107 +410,31 @@ export const useCadastrarTransportadora = ({handleClose, usuarioLogado, optionsM
             return;
         }
 
-        if (cnpj == '' || cnpj.length < 14) {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: `CNPJ Incompleto, Faltam "${14 - cnpj.length}" Dígito(s)!`,
-                text: `Favor Verificar o CNPJ!`,
-                type: 'warning',
-                showConfirmButton: false,
-                timer: 1500
+        const isUpdate = idTransportador && idTransportador !== '' && idTransportador !== '0';
+
+        if(isUpdate == true) {
+            const result = await Swal.fire({
+                title: 'Confirmação',
+                text: 'Transportadora já existe. Deseja atualizar as informações desta transportadora?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Sim',
+                cancelButtonText: 'Não',
+                showConfirmButton: true,
+                customClass: {
+                    container: 'custom-swal',
+                },
             });
-            return;
+
+            // Se o usuário clicou em "Não" ou cancelou, para a execução
+            if (!result.isConfirmed) {
+                return;
+            }
+            // Se chegou aqui, usuário clicou em "Sim", continua com a atualização
         }
 
-        if(razaoSocial == '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'Razão Social não pode ser vazia!',
-                showConfirmButton: false,
-                timer: 1500
-            });
-            return;
-        }
-
-        if(nomeFantasia == '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'Informe o Nome Fantasia do Transportador!',
-                showConfirmButton: false,
-                timer: 1500
-            });
-            return;
-        }
-
-        if(endereco == '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'Informe o Endereço do Transportador!',
-                showConfirmButton: false,
-                timer: 1500
-            });
-            return;
-        }
-
-        if(numero == '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'Informe o Número do Endereço do Transportador!',
-                showConfirmButton: false,
-                timer: 1500
-            });
-            return;
-        }
-
-        if(bairro == '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'Informe o Bairro do Transportador!',
-                showConfirmButton: false,
-                timer: 1500
-            });
-            return;
-        }
-
-        if(cidade == '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'Informe a Cidade do Transportador!',
-                showConfirmButton: false,
-                timer: 1500
-            });
-            return;
-        }
-
-        if(uf == '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'Informe o Estado do Transportador!',
-                showConfirmButton: false,
-                timer: 1500
-            });
-            return;
-        }
-
-        if(cep == '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'Informe o CEP do Transportador!',
-                showConfirmButton: false,
-                timer: 1500
-            });
-            return;
-        }
         const postData = {
+            ...(isUpdate && { IDTRANSPORTADORA: parseInt(idTransportador) }),
             IDGRUPOEMPRESARIAL: parseInt(1),
             IDSUBGRUPOEMPRESARIAL: parseInt(1),
             NORAZAOSOCIAL: razaoSocial,
@@ -532,17 +460,18 @@ export const useCadastrarTransportadora = ({handleClose, usuarioLogado, optionsM
             STATIVO: statusSelecionado?.value,
         }
         try {
-
-            const response = await post('/cadastrar-transportador', postData)
+          
+            const response = isUpdate ? await put('/transportador/:id', postData) : await post('/cadastrar-transportador', postData);
+          
       
             const textDados = JSON.stringify(postData)
-            let textFuncao = 'COMPRAS/CADASTRO-EDIÇÃO DE TRANSPORTADORA';
+            let textFuncao = isUpdate ? 'COMPRAS/EDIÇÃO DE TRANSPORTADORA' : 'COMPRAS/CADASTRO DE TRANSPORTADORA';
             const ipUsuario = await getIPUsuario();
             const createtLog = {
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'Indisponível'
             }
             
             await post('/log-web', createtLog)
@@ -550,7 +479,7 @@ export const useCadastrarTransportadora = ({handleClose, usuarioLogado, optionsM
             Swal.fire({
                 position: 'center',
                 icon: 'success',
-                title: 'Atualizado com sucesso!',
+                title: isUpdate ? 'Transportadora Atualizada com Sucesso!' : 'Transportadora Cadastrada com Sucesso!',
                 showConfirmButton: false,
                 timer: 3000,
                 customClass: {
@@ -559,16 +488,17 @@ export const useCadastrarTransportadora = ({handleClose, usuarioLogado, optionsM
             })
             handleClick();
             handleFechar();
-            return responseLog.data;
+            return response.data;
         } catch (error) {
             const textDados = JSON.stringify(postData)
-            let textFuncao = 'COMPRAS/CADASTRO-EDIÇÃO DE TRANSPORTADORA';
+            const isUpdate = idTransportador && idTransportador !== '' && idTransportador !== '0';
+            let textFuncao = isUpdate ? 'COMPRAS/EDIÇÃO DE TRANSPORTADORA' : 'COMPRAS/CADASTRO DE TRANSPORTADORA';
             const ipUsuario = await getIPUsuario();
             const createtLog = {
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'Indisponível'
             }
 
             const responseLog = await post('/log-web', createtLog)
@@ -576,7 +506,7 @@ export const useCadastrarTransportadora = ({handleClose, usuarioLogado, optionsM
             Swal.fire({
                 position: 'top-end',
                 icon: 'error',
-                title: 'Ocorreu um erro ao enviar o formulário. Por favor, tente novamente.',
+                title: isUpdate ? 'Erro ao Atualizar Transportadora!' : 'Erro ao Cadastrar Transportadora!',
                 showConfirmButton: false,
                 timer: 3000,
                 customClass: {
@@ -584,8 +514,10 @@ export const useCadastrarTransportadora = ({handleClose, usuarioLogado, optionsM
                 },
             });
             console.error('Erro ao criar categoria pedido:', error);
+            return responseLog.data;
         }
     }
+
 
     return {
         statusSelecionado,
@@ -626,7 +558,7 @@ export const useCadastrarTransportadora = ({handleClose, usuarioLogado, optionsM
         setTelefone2,
         telefone3,
         setTelefone3,
-        optionsStatus,
+        situacao,
         handleFechar,
         onSubmit,
     }

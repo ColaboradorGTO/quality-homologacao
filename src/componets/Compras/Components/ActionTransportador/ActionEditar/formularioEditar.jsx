@@ -6,7 +6,7 @@ import Select from 'react-select';
 import { useEditarTransportadora } from "../hooks/useEditarTransportadora"
 import FormField from "../../../../Formularios/FormField"
 import { schema } from "./schema/useEditarSchema"
-import { mascaraCNPJ } from "../../../../../utils/mascaraCNPJ"
+import { AlertError } from "../../../../Inputs/alertError";
 
 
 export const FormularioEditar = ({
@@ -58,7 +58,7 @@ export const FormularioEditar = ({
         setTelefone2,
         telefone3,
         setTelefone3,
-        optionsStatus,
+        situacao,
         onSubmit,
     } = useEditarTransportadora({ handleClose, dadosDetalheTranspotador, usuarioLogado, optionsModulos, handleClick });
    
@@ -83,11 +83,12 @@ export const FormularioEditar = ({
             telefoneTransportador1: telefone1,
             telefoneTransportador2: telefone2,
             telefoneTransportador3: telefone3,
+            situacaoTransportador: statusSelecionado,
           }
     
           await schema.validate(dadosParaValidar, { abortEarly: false });
     
-          onSubmit();
+          await onSubmit();
     
         } catch (validationError) {
           clearErrors();
@@ -124,7 +125,7 @@ export const FormularioEditar = ({
                                         label={"CNPJ"}
                                         name="cnpjTransportador"
                                         type="text"
-                                        value={mascaraCNPJ(cnpj)}
+                                        value={cnpj}
                                         onChange={(e) => setCnpj(e.target.value)}
                                         errors={errors}
                                         clearErrors={clearErrors}
@@ -454,16 +455,29 @@ export const FormularioEditar = ({
                         <div className="col-sm-6 col-xl-3">
 
                             <label htmlFor="">Situação</label>
-                            <Select
-                                options={optionsStatus.map((item) => {
+                               <Select
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="situacaoTransportador"
+                                options={situacao.map((item) => {
                                     return {
                                         value: item.value,
                                         label: item.label
                                     }
                                 })}
                                 value={statusSelecionado}
-                                onChange={(e) => setStatusSelecionado(e)}
+                                onChange={(e) => { 
+                                    setStatusSelecionado(e)
+                                    clearErrors("situacaoTransportador")
+                                }}
                             />
+                             {errors.situacaoTransportador && (
+                                <AlertError
+                                    error={errors.situacaoTransportador}
+                                    onClose={clearErrors}
+                                    fieldName="situacaoTransportador"
+                                />
+                            )}
                         </div>
                     </div>
                 </div>
@@ -475,11 +489,11 @@ export const FormularioEditar = ({
                     corFechar={"secondary"}
 
                     ButtonTypeCadastrar={ButtonTypeModal}
-                    onClickButtonCadastrar
+                    onClickButtonCadastrar={handleSubmit(handleValidatedSubmit)}
                     tipoBtnCadastrar={"submit"}
                     textButtonCadastrar={"Salvar"}
                     corCadastrar={"success"}
-                    loadingTextCadastrar={"Cadastrando..."}
+                    loadingTextCadastrar={"Atualizando..."}
                     autoLoadingCadastrar={true}
                 />
             </form>
