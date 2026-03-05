@@ -8,13 +8,13 @@ import FormField from "../../../../Formularios/FormField";
 import { AlertError } from "../../../../Inputs/alertError";
 import { schema } from "./schemaValidarPagamento";
 
-export const FormularioEditar = ({ 
-    handleClose, 
+export const FormularioEditar = ({
+    handleClose,
     dadosDetalheCondPagamento,
     usuarioLogado,
     optionsModulos,
     handleClick
- }) => {
+}) => {
     const { handleSubmit, formState: { errors }, clearErrors, control, setError, setValue } = useForm({
         mode: "onChange"
     });
@@ -37,9 +37,9 @@ export const FormularioEditar = ({
         optionsParcelado,
         dadosTipoDocumentos,
         onSubmit
-    } = useEditarCondicaoPagamento({dadosDetalheCondPagamento, handleClose, usuarioLogado, optionsModulos, handleClick});
- 
- 
+    } = useEditarCondicaoPagamento({ dadosDetalheCondPagamento, handleClose, usuarioLogado, optionsModulos, handleClick });
+
+
     const handleValidatedSubmit = async () => {
         try {
             const dadosParaValidar = {
@@ -61,12 +61,12 @@ export const FormularioEditar = ({
 
             if (validationError.inner && validationError.inner.length > 0) {
                 validationError.inner.forEach(error => {
-                if (error.path) {
-                    setError(error.path, {
-                    type: 'manual',
-                    message: error.message
-                    });
-                }
+                    if (error.path) {
+                        setError(error.path, {
+                            type: 'manual',
+                            message: error.message
+                        });
+                    }
                 });
             }
 
@@ -114,12 +114,12 @@ export const FormularioEditar = ({
                                     }
                                 })}
                                 value={parceladoSelecionado}
-                                onChange={(e) => { 
+                                onChange={(e) => {
                                     setParceladoSelecionado(e)
                                     clearErrors("parcelaPagamento")
                                 }}
                             />
-                             {errors.parcelaPagamento && (
+                            {errors.parcelaPagamento && (
                                 <AlertError
                                     error={errors.parcelaPagamento}
                                     onClose={clearErrors}
@@ -135,11 +135,16 @@ export const FormularioEditar = ({
                                     <FormField
                                         name="numeroParcelasPagamento"
                                         label={"Número Parcelas *"}
-                                        type="text"
+                                        type="number"
+                                        min={0}
+                                        max={99}
                                         errors={errors}
                                         clearErrors={clearErrors}
                                         value={numeroParcelas}
-                                        onChangeModal={(e) => setNumeroParcelas(e.target.value)}
+                                        onChangeModal={(e) => {
+
+                                            setNumeroParcelas(e.target.valu)
+                                        }}
                                     />
                                 )}
                             />
@@ -156,7 +161,9 @@ export const FormularioEditar = ({
                                     <FormField
                                         name="dia1Pagamento"
                                         label={"Dias 1 Pagamento "}
-                                        type="text"
+                                        type="number"
+                                        min={0}
+                                        max={999}
                                         errors={errors}
                                         clearErrors={clearErrors}
                                         value={dias1Pagamento}
@@ -174,7 +181,9 @@ export const FormularioEditar = ({
                                     <FormField
                                         name="qtdDiaPagamento"
                                         label={"QTD Dias Pagamento "}
-                                        type="text"
+                                        type="number"
+                                        min={0}
+                                        max={999}
                                         errors={errors}
                                         clearErrors={clearErrors}
                                         value={qtdDiasPagamento}
@@ -197,7 +206,7 @@ export const FormularioEditar = ({
                                     }
                                 })}
                                 value={tipoDocumentoSelecionado}
-                                onChange={(e) => { 
+                                onChange={(e) => {
                                     setTipoDocumentoSelecionado(e)
                                     clearErrors("tipoDocumento")
                                 }}
@@ -259,7 +268,7 @@ export const FormularioEditar = ({
                     autoLoadingCadastrar={true}
                 />
             </form>
-         
+
         </Fragment>
     )
 }   
