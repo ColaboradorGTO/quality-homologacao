@@ -7,6 +7,7 @@ import { useCadastrarCondicaoPagamento } from "../hooks/useCadastrarCondicaoPaga
 import { schema } from "./schemaValidarPagamento";
 import FormField from "../../../../Formularios/FormField";
 import { AlertError } from "../../../../Inputs/alertError";
+import { onlyNumbers } from "../../../../../utils/onlyNumbers";
 
 export const FormularioCadastro = ({ 
     handleClose,
@@ -131,11 +132,16 @@ export const FormularioCadastro = ({
                                     <FormField
                                         name="numeroParcelasPagamento"
                                         label={"Número Parcelas *"}
-                                        type="text"
+                                        type="number"
+                                        min={0}
+                                        max={99}
                                         errors={errors}
                                         clearErrors={clearErrors}
                                         value={numeroParcelas}
-                                        onChangeModal={(e) => setNumeroParcelas(e.target.value)}
+                                        onChangeModal={(e) => {
+                                            
+                                            setNumeroParcelas(e.target.valu)
+                                        }}
                                     />
                                 )}
                             />
@@ -152,7 +158,9 @@ export const FormularioCadastro = ({
                                     <FormField
                                         name="dia1Pagamento"
                                         label={"Dias 1 Pagamento "}
-                                        type="text"
+                                        type="number"
+                                        min={0}
+                                        max={999}
                                         errors={errors}
                                         clearErrors={clearErrors}
                                         value={dias1Pagamento}
@@ -170,7 +178,9 @@ export const FormularioCadastro = ({
                                     <FormField
                                         name="qtdDiaPagamento"
                                         label={"QTD Dias Pagamento "}
-                                        type="text"
+                                        type="number"
+                                        min={0}
+                                        max={999}
                                         errors={errors}
                                         clearErrors={clearErrors}
                                         value={qtdDiasPagamento}

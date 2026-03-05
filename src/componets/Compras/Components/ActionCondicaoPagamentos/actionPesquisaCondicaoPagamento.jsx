@@ -19,7 +19,6 @@ export const ActionPesquisaCondicaoPagamento = ({usuarioLogado, ID}) => {
   const [condicaoSelecionada, setCondicaoSelecionada] = useState('')
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
-
   useEffect(() => {
     const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
     if (menuSalvo) {

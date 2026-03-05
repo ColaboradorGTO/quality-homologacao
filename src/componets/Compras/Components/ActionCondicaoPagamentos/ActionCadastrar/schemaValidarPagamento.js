@@ -12,16 +12,46 @@ export const schema = yup.object({
     .typeError('Parcelado Obrigatório'),
 
   numeroParcelasPagamento: yup
-    .string()
-    .required('Número de Parcelas Obrigatório'),
+    .number()
+    .transform((value, originalValue) => {
+      // Se for string vazia ou apenas espaços, retorna undefined para o required pegar
+      if (typeof originalValue === 'string' && originalValue.trim() === '') {
+        return undefined;
+      }
+      return value;
+    })
+    .typeError('Atenção! Informe apenas números válidos')
+    .required('Número de Parcelas Obrigatório')
+    .min(0, 'Número de Parcelas deve ser no mínimo 0')
+    .max(99, 'Número de Parcelas deve ser no máximo 99'),
 
   dia1Pagamento: yup
-    .string()
-    .required('Dia 1 Pagamento Obrigatório'),
+    .number()
+    .transform((value, originalValue) => {
+      // Se for string vazia ou apenas espaços, retorna undefined para o required pegar
+      if (typeof originalValue === 'string' && originalValue.trim() === '') {
+        return undefined;
+      }
+      return value;
+    })
+    .typeError('Atenção! Informe apenas números válidos')
+    .required('Dia 1 Pagamento Obrigatório')
+    .min(0, 'Dia 1 Pagamento deve ser no mínimo 0')
+    .max(999, 'Dia 1 Pagamento deve ser no máximo 999'),
 
   qtdDiaPagamento: yup
-    .string()
-    .required('QTD Dias Pagamento Obrigatório'),
+    .number()
+    .transform((value, originalValue) => {
+      // Se for string vazia ou apenas espaços, retorna undefined para o required pegar
+      if (typeof originalValue === 'string' && originalValue.trim() === '') {
+        return undefined;
+      }
+      return value;
+    })
+    .typeError('Atenção! Informe apenas números válidos')
+    .required('QTD Dias Pagamento Obrigatório')
+    .min(0, 'QTD Dias Pagamento deve ser no mínimo 0')
+    .max(999, 'QTD Dias Pagamento deve ser no máximo 999'),
 
   tipoDocumento: yup.object()
     .nullable()
