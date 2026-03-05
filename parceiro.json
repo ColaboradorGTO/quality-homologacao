@@ -250,5 +250,9 @@
     {  "value": "1", "label": "2%" },
     {  "value": "2", "label": "4%" },
     {  "value": "3", "label": "6%" }
+  ],
+  "optionsParcelado": [
+    { "value": "True", "label": "SIM" },
+    { "value": "False", "label": "NÃO" }
   ]
 }

@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react"
 import axios from 'axios'
 import Swal from "sweetalert2"
-import { post, put } from "../../../../../api/funcRequest"
+import { post, put, get } from "../../../../../api/funcRequest"
 import { toFloat } from "../../../../../utils/toFloat"
 import { getDataHoraAtual } from "../../../../../utils/dataAtual"
 import { useQuery } from "react-query"
 import { situacao, optionsParcelado } from "../../../../../../parceiro.json"
-
 
 export const useEditarCondicaoPagamento = ({
     dadosDetalheCondPagamento, 
@@ -22,15 +21,15 @@ export const useEditarCondicaoPagamento = ({
     const [dias1Pagamento, setDias1Pagamento] = useState('')
     const [qtdDiasPagamento, setQtdDiasPagamento] = useState('')
     const [tipoDocumentoSelecionado, setTipoDocumentoSelecionado] = useState('')
-    const [condPagamento, setCondPagamento] = useState('')
     const [dataUltimaAlteracao, setDataUltimaAlteracao] = useState('');
     const [ipUsuario, setIpUsuario] = useState('');
 
-    const { data: dadosTipoDocumentos = [], error: errorDocumento, isLoading: isLoadingDocumento } = useQuery(
+    const { data: dadosTipoDocumentos = [], error: errorDocumento, isLoading: isLoadingDocumento, refetch } = useQuery(
         'tipoDocumento',
         async () => {
           const response = await get(`/tipoDocumento`);
     
+          console.log('dadosTipoDocumentos', response.data);
           return response.data;
         },
         { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000, }
@@ -45,19 +44,19 @@ export const useEditarCondicaoPagamento = ({
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
             usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP via ipwho.is:", error);
+            console.error("Erro ao buscar IP via ifconfig.me:", error);
         }
 
         if (!usuarioIP) {
-            try {
-                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-                usuarioIP = ipifyData?.ip;
-            } catch (error) {
-                console.error("Erro ao buscar IP via ipify.org:", error);
-            }
+        try {
+            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+            usuarioIP = ipifyData?.ip;
+        } catch (error) {
+            console.error("Erro ao buscar IP via ipify.org:", error);
+        }
         }
         setIpUsuario(usuarioIP);
         return usuarioIP;
@@ -88,17 +87,6 @@ export const useEditarCondicaoPagamento = ({
                     container: 'custom-swal',
                 },
             })
-            return;
-        }
-
-        if (descricao == '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'O campo descrição é obrigatório.',
-                showConfirmButton: false,
-                timer: 1500
-            });
             return;
         }
 
@@ -208,8 +196,6 @@ export const useEditarCondicaoPagamento = ({
         setQtdDiasPagamento,
         tipoDocumentoSelecionado,
         setTipoDocumentoSelecionado,
-        condPagamento,
-        setCondPagamento,
         situacao,
         optionsParcelado,
         dadosTipoDocumentos,

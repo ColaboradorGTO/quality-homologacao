@@ -1,5 +1,4 @@
 import { Fragment } from "react"
-import { InputFieldModal } from "../../../../Buttons/InputFieldModal";
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal";
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal";
 import Select from 'react-select';
@@ -7,7 +6,7 @@ import { useEditarCondicaoPagamento } from "../hooks/useEditarCondicaoPagamento"
 import { Controller, useForm } from "react-hook-form";
 import FormField from "../../../../Formularios/FormField";
 import { AlertError } from "../../../../Inputs/alertError";
-
+import { schema } from "./schemaValidarPagamento";
 
 export const FormularioEditar = ({ 
     handleClose, 
@@ -34,8 +33,6 @@ export const FormularioEditar = ({
         setQtdDiasPagamento,
         tipoDocumentoSelecionado,
         setTipoDocumentoSelecionado,
-        condPagamento,
-        setCondPagamento,
         situacao,
         optionsParcelado,
         dadosTipoDocumentos,
@@ -255,7 +252,7 @@ export const FormularioEditar = ({
                     corFechar={"secondary"}
 
                     ButtonTypeCadastrar={ButtonTypeModal}
-                    onClickButtonCadastrar={handleValidatedSubmit}
+                    onClickButtonCadastrar={handleSubmit(handleValidatedSubmit)}
                     textButtonCadastrar={"Salvar"}
                     corCadastrar={"success"}
                     loadingTextCadastrar={"Atualizando..."}
