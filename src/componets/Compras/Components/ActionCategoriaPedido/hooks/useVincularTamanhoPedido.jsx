@@ -3,7 +3,6 @@ import { post } from "../../../../../api/funcRequest";
 import { useState } from "react";
 import axios from "axios";
 
-
 export const useVincularTamanhoPedido = ({
     usuarioLogado, 
     optionsModulos,
@@ -18,30 +17,29 @@ export const useVincularTamanhoPedido = ({
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
             usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP via ipwho.is:", error);
+            console.error("Erro ao buscar IP via ifconfig.me:", error);
         }
 
         if (!usuarioIP) {
-            try {
-                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-                usuarioIP = ipifyData?.ip;
-            } catch (error) {
-                console.error("Erro ao buscar IP via ipify.org:", error);
-            }
+        try {
+            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+            usuarioIP = ipifyData?.ip;
+        } catch (error) {
+            console.error("Erro ao buscar IP via ipify.org:", error);
+        }
         }
         setIpUsuario(usuarioIP);
         return usuarioIP;
     };
 
-
     const vincularCategoriaTamanho = async () => {
         if(optionsModulos[0]?.CRIAR == 'False') {
             Swal.fire({
                 title: 'Erro!',
-                text: `${usuarioLogado?.NOFUNCIONARIO},\nVocê não tem permissão para criar o Vínculo!`,
+                html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para criar o Vínculo!`,
                 icon: 'error',
                 customClass: {
                     container: 'custom-swal',
@@ -52,22 +50,22 @@ export const useVincularTamanhoPedido = ({
         
         if (categoriaSelecionada == '') {
             Swal.fire({
-                type: 'warning',
                 icon: 'warning',
+                title: 'Atenção!',
                 title: 'A Categoria deve ser Informada!',
                 showConfirmButton: false,
-                timer: 1500
+                timer: 5000
             })
             return;
         }
 
         if (tamanhoSelecionado == '') {
             Swal.fire({
-                type: 'warning',
                 icon: 'warning',
-                title: 'O Tamanho deve ser Informado!',
+                title: 'Atenção!',
+                html: 'O Tamanho deve ser Informado!',
                 showConfirmButton: false,
-                timer: 1500
+                timer: 5000
             })
             return;
         }
@@ -118,7 +116,7 @@ export const useVincularTamanhoPedido = ({
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textFuncao,
                 DADOS: textDados,
-                IP: ip
+                IP: ip || 'Indisponível'
             }
 
             await post('/log-web', createtLog);
@@ -142,7 +140,7 @@ export const useVincularTamanhoPedido = ({
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textFuncao,
                 DADOS: textDados,
-                IP: ip
+                IP: ip || 'Indisponível'
             }
 
             await post('/log-web', createtLog);

@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react"
+import { Fragment, useState, useEffect } from "react"
 import { ButtonType } from "../../../Buttons/ButtonType"
 import { InputField } from "../../../Buttons/Input"
 import { InputSelectAction } from "../../../Inputs/InputSelectAction"
@@ -17,17 +17,25 @@ export const ActionPesquisaCondicaoPagamento = ({usuarioLogado, ID}) => {
   const [modalVisivel, setModalVisivel] = useState(false);
   const [descricao, setDescricao] = useState('')
   const [condicaoSelecionada, setCondicaoSelecionada] = useState('')
-  const [currentPage, setCurrentPage] = useState(1);
- 
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
+
+  useEffect(() => {
+    const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
+    if (menuSalvo) {
+      const menuParsed = JSON.parse(menuSalvo);
+      setMenuFilhoAtual(menuParsed);
+    }
+  }, []);
+  
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
-    'menus-usuario-excecao',
+    ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
-      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${ID}`);
-
+      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
+      
       return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
   );
 
   const { data: optionsCondicoesPagamentos = [], error: errorCondicoesPagamentos, isLoading: isLoadingCondicoesPagamentos, refetch: refetchCondicoes } = useQuery(
@@ -77,12 +85,11 @@ export const ActionPesquisaCondicaoPagamento = ({usuarioLogado, ID}) => {
   const { data: dadosCondicoesPagamentos = [], error: errorCondicoes, isLoading: isLoadingCondicoes, refetch: refetchListaCondicoes } = useQuery(
     ['condicaoPagamento'],
     () => fetchListaCondicoes(),
-    { enabled: true, staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
   )
 
 
   const handleClick = () => {
-    setCurrentPage(prevPage => prevPage + 1);
     refetchListaCondicoes();
     setTabelaVisivel(true);
   }
@@ -90,8 +97,8 @@ export const ActionPesquisaCondicaoPagamento = ({usuarioLogado, ID}) => {
   const handleShowModal = () => {
     if(optionsModulos[0]?.CRIAR == 'False') {
       Swal.fire({
-        title: 'Erro!',
-        text: `${usuarioLogado?.NOFUNCIONARIO},\nVocê não tem permissão para cadastrar uma nova Condição de Pagamento!`,
+        title: 'Acesso Negado!',
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para cadastrar uma nova Condição de Pagamento!`,
         icon: 'error',
         customClass: {
           container: 'custom-swal',
@@ -101,10 +108,6 @@ export const ActionPesquisaCondicaoPagamento = ({usuarioLogado, ID}) => {
     } else {
       setModalVisivel(true);
     }
-  }
-
-  const handleSelectPagamento = (e) => {
-    setCondicaoSelecionada(e.value)
   }
 
   return (
@@ -135,7 +138,7 @@ export const ActionPesquisaCondicaoPagamento = ({usuarioLogado, ID}) => {
         ]}
         labelSelectPagamento={"Por Condição Pagamento"}
         valueSelectPagamento={condicaoSelecionada}
-        onChangeSelectPagamento={handleSelectPagamento}
+        onChangeSelectPagamento={(e) => setCondicaoSelecionada(e.value)}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar Condição Pagamento"}

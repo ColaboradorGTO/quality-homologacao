@@ -78,12 +78,14 @@ export const useEditarCondicaoPagamento = ({dadosDetalheCondPagamento,handleClos
         }
     }, [dadosDetalheCondPagamento])
 
-    const handleEditar = async () => {
+    const onSubmit = async () => {
         if(optionsModulos[0]?.ALTERAR == 'False') {
             Swal.fire({
-                title: 'Erro!',
-                text: `${usuarioLogado?.NOFUNCIONARIO},\nVocê não tem permissão para criar uma Condição de Pagamento!`,
                 icon: 'error',
+                title: 'Acesso Negado!',
+                html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para criar uma Condição de Pagamento!`,
+                timer: 5000,
+                showConfirmButton: false,
                 customClass: {
                     container: 'custom-swal',
                 },
@@ -147,10 +149,10 @@ export const useEditarCondicaoPagamento = ({dadosDetalheCondPagamento,handleClos
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'Indisponível'
             }
 
-            const responseLog = await post('/log-web', createtLog)
+            await post('/log-web', createtLog)
 
         
             Swal.fire({
@@ -158,13 +160,13 @@ export const useEditarCondicaoPagamento = ({dadosDetalheCondPagamento,handleClos
                 icon: 'success',
                 title: 'Atualizado com sucesso!',
                 showConfirmButton: false,
-                timer: 3000,
+                timer: 5000,
                 customClass: {
                     container: 'custom-swal',
                 }
             })
 
-            return responseLog.data;
+            return response.data;
         } catch (error) {
             const textDados = JSON.stringify(postData)
             let textFuncao = 'COMPRAS/EDITAR CATEGORIA DE PEDIDO';
@@ -173,7 +175,7 @@ export const useEditarCondicaoPagamento = ({dadosDetalheCondPagamento,handleClos
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'Indisponível'
             }
 
             const responseLog = await post('/log-web', createtLog)
@@ -208,11 +210,9 @@ export const useEditarCondicaoPagamento = ({dadosDetalheCondPagamento,handleClos
         setTipoDocumentoSelecionado,
         condPagamento,
         setCondPagamento,
-        usuarioLogado,
-        ipUsuario,
         optionsStatus,
         optionsParcelado,
         dadosTipoDocumentos,
-        handleEditar
+        onSubmit
     }
 }

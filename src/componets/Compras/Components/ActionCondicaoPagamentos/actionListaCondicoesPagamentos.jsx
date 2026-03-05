@@ -21,6 +21,7 @@ export const ActionListaCondicoesPagamentos = ({
   const [modalEditar, setModalEditar] = useState(false);
   const [dadosDetalheCondPagamento, setDadosDetalheCondPagamento] = useState([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
 
   const onGlobalFilterChange = (e) => {
@@ -173,8 +174,8 @@ export const ActionListaCondicoesPagamentos = ({
       }
     } else {
       Swal.fire({
-        title: 'Erro!',
-        text: `${usuarioLogado?.NOFUNCIONARIO},\nVocê não tem permissão para editar a Condição de Pagamento!`,
+        title: 'Acesso Negado!',
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para editar a Condição de Pagamento!`,
         icon: 'error',
         customClass: {
           container: 'custom-swal',
@@ -187,8 +188,20 @@ export const ActionListaCondicoesPagamentos = ({
   const handleEditar = async (IDCONDICAOPAGAMENTO) => {
     try {
       const response = await get(`/condicaoPagamento?idCondPagamento=${IDCONDICAOPAGAMENTO}`);
-      setDadosDetalheCondPagamento(response.data);
-      setModalEditar(true)
+      if(response.data && response.data.length > 0) {
+        setDadosDetalheCondPagamento(response.data);
+        setModalEditar(true)
+      } else {
+        Swal.fire({
+          title: 'Erro!',
+          text: `Não foi possível obter os detalhes da Condição de Pagamento selecionada!`,
+          icon: 'error',
+          customClass: {
+            container: 'custom-swal',
+          },
+        })
+        return;
+      }
     } catch (error) {
       console.error(error);
     }
@@ -198,7 +211,7 @@ export const ActionListaCondicoesPagamentos = ({
 
   return (
     <Fragment>
-      <div className="panel" style={{ marginTop: "4rem" }}>
+      <div className="panel" >
         <div className="panel-hdr">
           <h2>Relatório Condições de Pagamentos</h2>
         </div>
@@ -213,13 +226,16 @@ export const ActionListaCondicoesPagamentos = ({
           />
 
         </div>
-        <div className="card mb-4" ref={dataTableRef}>
+        <div className="card " ref={dataTableRef}>
 
           <DataTable
             title="Condições de Pagamentos"
             value={dados}
-            size="small"
             globalFilter={globalFilterValue}
+            size="small"
+            selectionMode="single"
+            selection={rowSelection}
+            onSelectionChange={(e) => setRowSelection(e.value)}
             sortOrder={-1}
             paginator={true}
             rows={10}

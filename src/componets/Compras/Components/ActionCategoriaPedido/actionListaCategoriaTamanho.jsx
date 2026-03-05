@@ -2,20 +2,20 @@ import { Fragment, useRef, useState } from "react"
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { ButtonTable } from "../../../ButtonsTabela/ButtonTable";
-import { put } from "../../../../api/funcRequest";
 import { BsTrash3 } from "react-icons/bs";
-import Swal from "sweetalert2";
 import HeaderTable from "../../../Tables/headerTable";
 import { useReactToPrint } from "react-to-print";
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+import { useExcluirVinculoPedido } from "./hooks/useExcluirVinculoPedido";
 
-
-export const ActionListaCategoriaTamanho = ({ dadosCategoriaTamanhos, usuarioLogado, optionsModulos }) => {
+export const ActionListaCategoriaTamanho = ({ dadosCategoriaTamanhos, usuarioLogado, optionsModulos,handleClick }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
 
+  const { handleExcluir } = useExcluirVinculoPedido({usuarioLogado, optionsModulos, handleClick});
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -120,66 +120,6 @@ export const ActionListaCategoriaTamanho = ({ dadosCategoriaTamanhos, usuarioLog
   ]
 
 
-  const handleExcluir = async (IDCATPEDIDOTAMANHO) => {
-    Swal.fire({
-      title: `Certeza que Deseja Excluir o Vínculo da Categoria?`,
-      text: 'Você não poderá reverter a ação!',
-      icon: 'warning',
-      showCancelButton: true,
-      showConfirmButton: true,
-      cancelButtonText: 'Cancelar',
-      confirmButtonText: 'OK',
-      customClass: {
-        confirmButton: 'btn btn-primary',
-        cancelButton: 'btn btn-danger',
-        loader: 'custom-loader'
-      },
-      buttonsStyling: false
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          const putData = {
-            IDCATPEDIDOTAMANHO: IDCATPEDIDOTAMANHO,
-          }
-          const response = await put(`/deletar-vinculo-tamanho-categoria?IDCATPEDIDOTAMANHO=${IDCATPEDIDOTAMANHO}`, putData)
-          const textDados = JSON.stringify(putData)
-          let textoFuncao = 'COMPRAS/EXCLUSÃO VINCULO CATEGORIA-TAMANHO'
-
-          const postData = {
-            IDFUNCIONARIO: String(usuarioLogado.id),
-            PATHFUNCAO: textoFuncao,
-            DADOS: textDados,
-            IP: ipUsuario
-          }
-
-          const responsePost = await post('/log-web', postData)
-
-          return responsePost.data;
-        } catch (error) {
-          const textDados = JSON.stringify(putData)
-          let textoFuncao = 'COMPRAS/ERRO AO EXCLUIR VINCULO CATEGORIA-TAMANHO'
-
-          const postData = {
-            IDFUNCIONARIO: String(usuarioLogado.id),
-            PATHFUNCAO: textoFuncao,
-            DADOS: textDados,
-            IP: ipUsuario
-          }
-
-          const responsePost = await post('/log-web', postData)
-          Swal.fire({
-            title: 'Erro!',
-            text: `Erro ao excluir o Vínculo da Categoria: ${error}`,
-            icon: 'success'
-          });
-          return responsePost.data;
-        }
-      }
-    })
-  }
-
-
-
   return (
     <Fragment>
       <div className="panel" style={{ marginTop: "4rem" }}>
@@ -202,8 +142,11 @@ export const ActionListaCategoriaTamanho = ({ dadosCategoriaTamanhos, usuarioLog
           <DataTable
             title="Vendas por Loja"
             value={dados}
-            size="small"
             globalFilter={globalFilterValue}
+            size="small"
+            selectionMode="single"
+            selection={rowSelection}
+            onSelectionChange={(e) => setRowSelection(e.value)}
             sortOrder={-1}
             paginator={true}
             rows={10}

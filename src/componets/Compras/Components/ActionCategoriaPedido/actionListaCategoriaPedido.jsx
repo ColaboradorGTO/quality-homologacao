@@ -165,8 +165,6 @@ export const ActionListaCategoriaPedidos = ({ dadosCategoria, usuarioLogado, opt
     }
   }
 
-
-
   return (
     <Fragment>
      <div className="panel" style={{ marginTop: "4rem" }}>
@@ -182,10 +180,8 @@ export const ActionListaCategoriaPedidos = ({ dadosCategoria, usuarioLogado, opt
             exportToExcel={exportToExcel}
             exportToPDF={exportToPDF}
           />
-
         </div>
         <div className="card mb-4" ref={dataTableRef}>
-
           <DataTable
             title="Relatório Categorias de Pedido"
             value={dados}

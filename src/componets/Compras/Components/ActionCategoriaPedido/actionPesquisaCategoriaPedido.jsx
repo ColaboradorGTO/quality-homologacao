@@ -14,7 +14,6 @@ import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../ut
 import { useFetchData } from "../../../../hooks/useFetchData";
 import { useVincularTamanhoPedido } from "./hooks/useVincularTamanhoPedido";
 
-
 export const ActionPesquisaCategoriaPedido = ({ usuarioLogado }) => {
   const [descricao, setDescricao] = useState('');
   const [tamanhoSelecionado, setTamanhoSelecionado] = useState('');
@@ -121,7 +120,7 @@ export const ActionPesquisaCategoriaPedido = ({ usuarioLogado }) => {
   const { data: dadosCategoriaTamanhos = [], error: errorCategoriaTamanhos, isLoading: isLoadingCategoriaTamanhos, refetch: refetchListaCategoriaTamanhos } = useQuery(
     ['vinculo-tamanho-categoria', ],
     () => fetchListaCategoriaTamanhos(),
-    { enabled: Boolean(descricao), staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
+    { enabled: false, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
   )
 
   const { data: dadosVinculados = [], error: errorVinculo, isLoading: isLoadingVinculo, refetch: refetchVinculo } = useQuery(
@@ -130,7 +129,7 @@ export const ActionPesquisaCategoriaPedido = ({ usuarioLogado }) => {
       const response = await get(`/vinculo-tamanho-categoria?idCategoriaPedido=${categoriaSelecionada}&descricao=${descricao}&idTamanho=${tamanhoSelecionado}`);
       return response.data;
     },
-    { enabled: Boolean(categoriaSelecionada, tamanhoSelecionado), staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
+    { enabled: Boolean(categoriaSelecionada || tamanhoSelecionado), staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
   );
 
   const handleClick = () => {
@@ -229,6 +228,7 @@ export const ActionPesquisaCategoriaPedido = ({ usuarioLogado }) => {
           dadosCategoriaTamanhos={dadosCategoriaTamanhos}
           usuarioLogado={usuarioLogado}
           optionsModulos={optionsModulos}
+          handleClick={handleClick}
         />
 
       )}
