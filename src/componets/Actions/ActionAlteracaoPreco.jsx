@@ -15,23 +15,29 @@ export const ActionAlteracaoPreco = ({
   InputFieldDTFimComponent,
   InputFieldCodBarraComponent,
   InputFieldComponent,
-  
+  InputFieldNomeProdutoComponent,
+  InputFieldCodBarrasComponent,
 
   labelInputDTInicio,
-  labelInputDTFim,    
+  labelInputDTFim,
   labelInputFieldCodBarra,
   labelInputField,
-        
-  
+  labelInputNomeProduto,
+  labelInputCodBarras,
+
   valueInputFieldDTInicio,
   valueInputFieldDTFim,
   valueInputFieldCodBarra,
   valueInputField,
+  valueInputFieldNomeProduto,
+  valueInputFieldCodBarras,
 
   onChangeInputFieldDTInicio,
   onChangeInputFieldDTFim,
   onChangeInputFieldCodBarra,
   onChangeInputField,
+  onChangeInputFieldNomeProduto,
+  onChangeInputFieldCodBarras,
 
   placeHolderInputFieldCodBarra,
   placeHolderInputFieldComponent,
@@ -61,7 +67,7 @@ export const ActionAlteracaoPreco = ({
   onNodeTreeSelect,
   onNodeTreeUnselect,
 
-  
+
 
   ButtonSearchComponent,
   linkNomeSearch,
@@ -71,6 +77,8 @@ export const ActionAlteracaoPreco = ({
 
   readOnlyDTInicio,
   readOnlyDTFim,
+  readOnlyNomeProduto,
+  readOnlyCodBarras,
 
   InputCheckBoxAction,
   labelCheckBox,
@@ -80,7 +88,7 @@ export const ActionAlteracaoPreco = ({
   valueCheckBox,
   onChangeCheckBox,
 
-  
+
 }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -104,114 +112,139 @@ export const ActionAlteracaoPreco = ({
 
 
                   <div className="row">
-                
+                    {InputFieldNomeProdutoComponent && (
+                      <InputFieldNomeProdutoComponent
+                        label={labelInputNomeProduto}
+                        type="text"
+                        nome="nomeProduto"
+                        id={id}
+                        readOnly={readOnlyNomeProduto}
+                        value={valueInputFieldNomeProduto}
+                        onChange={onChangeInputFieldNomeProduto}
 
-                      {InputFieldDTInicioComponent && (
-                        <InputFieldDTInicioComponent
-                          label={labelInputDTInicio}
-                          type="date"
-                          nome="dtInicio"
-                          id={id}
-                          readOnly={readOnlyDTInicio}
-                          value={valueInputFieldDTInicio}
-                          onChange={onChangeInputFieldDTInicio}
-
-                        />
-                      )}
-                    
-                      {InputFieldDTFimComponent && (
-                        <InputFieldDTFimComponent
-                          label={labelInputDTFim}
-                          type="date"
-                          id={id}
-                          readOnly={readOnlyDTFim}
-                          value={valueInputFieldDTFim}
-                          onChange={onChangeInputFieldDTFim}
-                        />
-                      )}
-              
-      
-                    {InputSelectEmpresaComponent && (
-                        <InputSelectEmpresaComponent
-                          label={labelSelectEmpresa}
-                          id={id}
-                          options={optionsEmpresas}
-                          value={valueSelectEmpresa}
-                          defaultValue={[valueSelectEmpresa]}
-                          onChange={onChangeSelectEmpresa}
-                          filtroOptions={optionsEmpresas}
-                        />
+                      />
                     )}
 
-                      {InputSelectMarcasComponent && (
-                        <InputSelectMarcasComponent
-                          label={labelSelectMarcas}
-                          nome="idloja"
-                          id={id}
-                          options={optionsMarcas}
-                          onChange={onChangeSelectMarcas}
-                          value={valueSelectMarca}
-                          
-                          type="select"
-                        />
-                      )}
+
+                    {InputFieldCodBarrasComponent && (
+                      <InputFieldCodBarrasComponent
+                        label={labelInputCodBarras}
+                        type="text"
+                        nome="codBarras"
+                        id={id}
+                        readOnly={readOnlyCodBarras}
+                        value={valueInputFieldCodBarras}
+                        onChange={onChangeInputFieldCodBarras}
+
+                      />
+                    )}
+
+                    {InputFieldDTInicioComponent && (
+                      <InputFieldDTInicioComponent
+                        label={labelInputDTInicio}
+                        type="date"
+                        nome="dtInicio"
+                        id={id}
+                        readOnly={readOnlyDTInicio}
+                        value={valueInputFieldDTInicio}
+                        onChange={onChangeInputFieldDTInicio}
+
+                      />
+                    )}
+
+                    {InputFieldDTFimComponent && (
+                      <InputFieldDTFimComponent
+                        label={labelInputDTFim}
+                        type="date"
+                        id={id}
+                        readOnly={readOnlyDTFim}
+                        value={valueInputFieldDTFim}
+                        onChange={onChangeInputFieldDTFim}
+                      />
+                    )}
+
+
+                    {InputSelectEmpresaComponent && (
+                      <InputSelectEmpresaComponent
+                        label={labelSelectEmpresa}
+                        id={id}
+                        options={optionsEmpresas}
+                        value={valueSelectEmpresa}
+                        defaultValue={[valueSelectEmpresa]}
+                        onChange={onChangeSelectEmpresa}
+                        filtroOptions={optionsEmpresas}
+                      />
+                    )}
+
+                    {InputSelectMarcasComponent && (
+                      <InputSelectMarcasComponent
+                        label={labelSelectMarcas}
+                        nome="idloja"
+                        id={id}
+                        options={optionsMarcas}
+                        onChange={onChangeSelectMarcas}
+                        value={valueSelectMarca}
+
+                        type="select"
+                      />
+                    )}
                   </div>
 
-                <div className="row">
-                </div>
+                  <div className="row">
+                  </div>
 
-                <div className="row">
-                  {MenuTreeSelectComponent && (
-                    <MenuTreeSelectComponent
-                    valueMenuSelect={valueTreeSelect}
-                    onChangeMenuSelect={onChangeTreeSelect}
-                    optionsMenuSelect={optionsTreeSelect}
-                    placeholderMenuSelect={placeholderTreeSelect}
-                    onNodeMenuSelect={onNodeTreeSelect} 
-                    onNodeMenuUnselect={onNodeTreeUnselect} 
-                    />
-                  )}
+                  <div className="row">
+                    {MenuTreeSelectComponent && (
+                      <MenuTreeSelectComponent
+                        valueMenuSelect={valueTreeSelect}
+                        onChangeMenuSelect={onChangeTreeSelect}
+                        optionsMenuSelect={optionsTreeSelect}
+                        placeholderMenuSelect={placeholderTreeSelect}
+                        onNodeMenuSelect={onNodeTreeSelect}
+                        onNodeMenuUnselect={onNodeTreeUnselect}
+                      />
+                    )}
 
-                  {InputCheckBoxAction && (
-                    <InputCheckBoxAction
-                      label={labelCheckBox}
-                      nome={nomeCheckBox}
-                      placeholder={placeHolderCheckBox}
-                      checked={checkedBox}
-                      value={valueCheckBox}
-                      onChange={onChangeCheckBox}
-                    />
-                  )}
-                </div>
+                    {InputCheckBoxAction && (
+                      <InputCheckBoxAction
+                        label={labelCheckBox}
+                        nome={nomeCheckBox}
+                        placeholder={placeHolderCheckBox}
+                        checked={checkedBox}
+                        value={valueCheckBox}
+                        onChange={onChangeCheckBox}
+                      />
+                    )}
+                  </div>
 
                   <div className="row ">
                     {InputFieldCodBarraComponent && (
-                        <InputFieldCodBarraComponent
-                          label={labelInputFieldCodBarra}
-                          type="input"
-                          id={id}
-                          placeHolder={placeHolderInputFieldCodBarra}
-                          value={valueInputFieldCodBarra}
-                          onChange={onChangeInputFieldCodBarra}
-              
-                        />
-                      )}
+                      <InputFieldCodBarraComponent
+                        label={labelInputFieldCodBarra}
+                        type="input"
+                        id={id}
+                        placeHolder={placeHolderInputFieldCodBarra}
+                        value={valueInputFieldCodBarra}
+                        onChange={onChangeInputFieldCodBarra}
 
-                      {InputFieldComponent && (
-                        <InputFieldComponent
-                          label={labelInputField}
-                          type="input"
-                          id={id}
-                          placeHolder={placeHolderInputFieldComponent}
-                          value={valueInputField}
-                          onChange={onChangeInputField}
-                          onKeyDow={onKeyDownInputField}
-                        />
-                      )}
+                      />
+                    )}
+
+                    {InputFieldComponent && (
+                      <InputFieldComponent
+                        label={labelInputField}
+                        type="input"
+                        id={id}
+                        placeHolder={placeHolderInputFieldComponent}
+                        value={valueInputField}
+                        onChange={onChangeInputField}
+                        onKeyDow={onKeyDownInputField}
+                      />
+                    )}
                   </div>
                   <div className="row">
-                    
-                  {ButtonSearchComponent && (
+
+                    {ButtonSearchComponent && (
                       <ButtonType
                         textButton={linkNomeSearch}
                         onClickButtonType={onButtonClickSearch}

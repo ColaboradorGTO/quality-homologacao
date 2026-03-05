@@ -3,7 +3,15 @@ import { post, put } from "../../../../../api/funcRequest"
 import { useEffect, useState } from "react"
 import axios from "axios"
 
-export const useEditarFatura = ({ dadosDetalheFatura, usuarioLogado, optionsModulos, handleClose, handleClick, refetchListaFaturas  }) => {
+export const useEditarFatura = ({
+  dadosDetalheFatura,
+  usuarioLogado,
+  optionsModulos,
+  handleClose,
+  handleClick,
+  refetchListaFaturas
+}) => {
+  
   const [empresa, setEmpresa] = useState('')
   const [codAutorizacao, setCodAutorizacao] = useState('')
   const [valorFatura, setValorFatura] = useState(0)
@@ -15,7 +23,7 @@ export const useEditarFatura = ({ dadosDetalheFatura, usuarioLogado, optionsModu
     let usuarioIP = null;
 
     try {
-      const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+      const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
       usuarioIP = ipWhoisData?.ip;
     } catch (error) {
       console.error("Erro ao buscar IP via ipwho.is:", error);
@@ -41,7 +49,7 @@ export const useEditarFatura = ({ dadosDetalheFatura, usuarioLogado, optionsModu
       setEmpresa(usuarioLogado?.IDEMPRESA)
       setNumeroMovimento(`${dadosDetalheFatura[0]?.IDDETALHEFATURA} - ${dadosDetalheFatura[0]?.DSCAIXA} - ${dadosDetalheFatura[0]?.NUCODAUTORIZACAO}`)
     }
-  
+
   }, [dadosDetalheFatura])
 
 
@@ -68,20 +76,20 @@ export const useEditarFatura = ({ dadosDetalheFatura, usuarioLogado, optionsModu
     try {
       const response = await put('/fatura-loja-atualizar', putData);
 
-      
+
       const textDados = JSON.stringify(putData)
       let textoFuncao = 'GERENCIA/ATUALIZAR FATURA';
       const ipUsuario = await getIPUsuario();
-      
+
       const postData = {
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || "INDISPONÍVEL"
       }
-      
+
       await post('/log-web', postData)
-      
+
       Swal.fire({
         title: 'Atualização',
         text: 'Atualização Realizada com Sucesso',
@@ -104,7 +112,7 @@ export const useEditarFatura = ({ dadosDetalheFatura, usuarioLogado, optionsModu
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || "INDISPONÍVEL"
       }
 
       const responsePost = await post('/log-web', postData)

@@ -33,6 +33,8 @@ export const FormularioCadastrar = ({ handleClose, optionsModulos, usuarioLogado
         setDataMovCaixa,
         dadosContaBanco,
         onSubmit,
+        isSubmitting,
+        setIsSubmitting
     } = useCadastroDeposito({ handleClose, optionsModulos, usuarioLogado, handleClick });
 
     const handleValidatedSubmit = async () => {
@@ -48,7 +50,7 @@ export const FormularioCadastrar = ({ handleClose, optionsModulos, usuarioLogado
             };
 
             await schema.validate(dadosParaValidar, { abortEarly: false });
-            onSubmit();
+           await onSubmit();
 
         } catch (validationError) {
             console.error('❌ Erro de validação:', validationError);
@@ -195,7 +197,7 @@ export const FormularioCadastrar = ({ handleClose, optionsModulos, usuarioLogado
                                     <FormField
                                         label={"Valor Depósito"}
                                         name="valorDepositoDigitado"
-                                        type="number"
+                                        type="text"
                                         readOnly={false}
                                         value={valorDeposito}
                                         onChange={(e) => setValorDeposito(formatarMoeda(e.target.value))}
@@ -252,11 +254,12 @@ export const FormularioCadastrar = ({ handleClose, optionsModulos, usuarioLogado
 
                 <FooterModal
                     ButtonTypeCadastrar={ButtonTypeModal}
-                    //onClickButtonCadastrar={handleValidatedSubmit}
-                    tipoBtnCadastrar={"submit"}
+                    onClickButtonCadastrar={handleSubmit(handleValidatedSubmit)}
                     textButtonCadastrar={"Cadastrar"}
                     corCadastrar="success"
-
+                    autoLoadingCadastrar={true}
+                    loadingTextCadastrar={"Cadastrando..."}
+                    
                     ButtonTypeFechar={ButtonTypeModal}
                     textButtonFechar={"Fechar"}
                     onClickButtonFechar={handleClose}

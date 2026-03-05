@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-export const useEditarEmpresa = ({dadosEmpresasDetalhe, handleClose}) => {
+export const useEditarEmpresa = ({ dadosEmpresasDetalhe, handleClose, optionsModulos, usuarioLogado }) => {
     const [grupoEmpresa, setGrupoEmpresa] = useState('');
     const [situacao, setSituacao] = useState('');
     const [dataCriacao, setDataCriacao] = useState('');
@@ -17,40 +17,33 @@ export const useEditarEmpresa = ({dadosEmpresasDetalhe, handleClose}) => {
     const [uf, setUF] = useState('');
     const [email, setEmail] = useState('');
     const [telefone, setTelefone] = useState('')
-    const [usuarioLogado, setUsuarioLogado] = useState(null);
+    //const [usuarioLogado, setUsuarioLogado] = useState(null);
     const [ipUsuario, setIpUsuario] = useState('');
-    const navigate = useNavigate();
 
     const getIPUsuario = async () => {
-    const response = await axios.get('http://ipwho.is/')
-    if (response.data) {
-        setIpUsuario(response.data.ip);
-    }
-    return response.data;
-    }
-    useEffect(() => {
-        getIPUsuario()
-    }, [usuarioLogado])
+        let usuarioIP = null;
 
-    useEffect(() => {
-        const usuarioArmazenado = localStorage.getItem('usuario');
-
-        if (usuarioArmazenado) {
-            try {
-            const parsedUsuario = JSON.parse(usuarioArmazenado);
-            setUsuarioLogado(parsedUsuario);;
-            } catch (error) {
-            console.error('Erro ao parsear o usuário do localStorage:', error);
-            }
-        } else {
-            navigate('/');
+        try {
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+            usuarioIP = ipWhoisData?.ip;
+        } catch (error) {
+            console.error("Erro ao buscar IP via ipwho.is:", error);
         }
-    
-    }, [navigate]);
-    
+
+        if (!usuarioIP) {
+            try {
+                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+                usuarioIP = ipifyData?.ip;
+            } catch (error) {
+                console.error("Erro ao buscar IP via ipify.org:", error);
+            }
+        }
+        setIpUsuario(usuarioIP);
+        return usuarioIP;
+    };
 
     useEffect(() => {
-        if(dadosEmpresasDetalhe) {
+        if (dadosEmpresasDetalhe) {
             setGrupoEmpresa(dadosEmpresasDetalhe[0]?.IDGRUPOEMPRESARIAL == 1 ? "TO - TESOURA DE OURO" : dadosEmpresasDetalhe[0]?.IDGRUPOEMPRESARIAL == 2 ? "MG - MAGAZINE" : dadosEmpresasDetalhe[0]?.IDGRUPOEMPRESARIAL == 3 ? "YO - YORUS" : dadosEmpresasDetalhe[0]?.IDGRUPOEMPRESARIAL == 4 ? "FC - FREE CENTER" : "");
             setSituacao(dadosEmpresasDetalhe[0]?.STATIVO == "True" ? "ATIVO" : dadosEmpresasDetalhe[0]?.STATIVO == "False" ? "INATIVO" : "");
             setDataCriacao(dadosEmpresasDetalhe[0]?.DTULTATUALIZACAO);
@@ -66,6 +59,16 @@ export const useEditarEmpresa = ({dadosEmpresasDetalhe, handleClose}) => {
         }
     }, [])
     const onSubmit = async (data) => {
+        if (optionsModulos[0]?.CRIAR == 'False') {
+            Swal.fire({
+                title: 'Erro!',
+                text: `${usuarioLogado?.NOFUNCIONARIO},\nVocê não tem permissão para editar Empresa!`,
+                icon: 'error',
+                confirmButtonText: 'Ok',
+                customClass: { container: 'custom-swal' },
+            });
+            return;
+        }
 
         const putData = {
             STGRUPOEMPRESARIAL: Number(dadosEmpresasDetalhe[0]?.IDGRUPOEMPRESARIAL),
@@ -80,7 +83,7 @@ export const useEditarEmpresa = ({dadosEmpresasDetalhe, handleClose}) => {
             EENDERECO: String(dadosEmpresasDetalhe[0]?.EENDERECO),
             ECOMPLEMENTO: String(dadosEmpresasDetalhe[0]?.ECOMPLEMENTO),
             EBAIRRO: String(dadosEmpresasDetalhe[0]?.EBAIRRO),
-            ECIDADE:String(dadosEmpresasDetalhe[0]?.ECIDADE),
+            ECIDADE: String(dadosEmpresasDetalhe[0]?.ECIDADE),
             SGUF: String(dadosEmpresasDetalhe[0]?.SGUF),
             NUUF: Number(dadosEmpresasDetalhe[0]?.NUUF === 'DF' ? 53 : 52),
             NUCEP: String(dadosEmpresasDetalhe[0]?.NUCEP),
@@ -107,19 +110,20 @@ export const useEditarEmpresa = ({dadosEmpresasDetalhe, handleClose}) => {
         try {
 
             const response = await put('/empresas/:id', putData)
-           
+
             const textDados = JSON.stringify(putData);
             let textoFuncao = 'GERENCIA / EDIÇÃO DA EMPRESA';
-        
+            const ipUsuario = await getIPUsuario()
+
             const createData = {
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || "INDISPONIVEL",
             };
-        
+
             const responsePost = await post('/log-web', createData)
-         
+
             Swal.fire({
                 title: 'Sucesso!',
                 text: 'Empresa atualizada com sucesso!',
@@ -133,17 +137,19 @@ export const useEditarEmpresa = ({dadosEmpresasDetalhe, handleClose}) => {
             handleClose()
             return responsePost.data
         } catch (error) {
+            const textDados = JSON.stringify(putData);
             let textoFuncao = 'GERENCIA /ERRO NA EDIÇÃO DA EMPRESA';
-        
+            const ipUsuario = await getIPUsuario()
+            
             const createData = {
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
-                DADOS: '',
-                IP: ipUsuario
+                DADOS: textDados,
+                IP: ipUsuario || "INDISPONIVEL",
             };
-        
+
             const responsePost = await post('/log-web', createData)
-         
+
 
             Swal.fire({
                 title: 'Erro!',

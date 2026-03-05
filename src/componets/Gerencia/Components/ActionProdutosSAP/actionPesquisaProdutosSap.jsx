@@ -10,7 +10,7 @@ import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
 import { InputSelectAction } from "../../../Inputs/InputSelectAction";
 
-export const ActionPesquisaProdutosSap = ({ID, optionsEmpresas, usuarioLogado }) => {
+export const ActionPesquisaProdutosSap = ({ ID, optionsEmpresas, usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [descricaoProduto, setDescricaoProduto] = useState('')
   const [currentPage, setCurrentPage] = useState(1);
@@ -24,22 +24,22 @@ export const ActionPesquisaProdutosSap = ({ID, optionsEmpresas, usuarioLogado })
       setMenuFilhoAtual(menuParsed);
     }
   }, []);
-  
+
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
     ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
       const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
-     
+
       return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
   );
 
   const fetchProdutoSap = async () => {
     const idEmpresa = empresaSelecionada == '' ? usuarioLogado?.IDEMPRESA : empresaSelecionada;
     const urlBase = `/produtoSap?descricaoProduto=${descricaoProduto}&idEmpresaLogin=${idEmpresa}&idListaLoja=${usuarioLogado.ID_LISTA_LOJA}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
-    urlApi = urlApi.replace('&page=1', '').replace('page=1', ''); 
+    urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
       animacaoCarregamento('Carregando dados...', true);
 
@@ -61,7 +61,7 @@ export const ActionPesquisaProdutosSap = ({ID, optionsEmpresas, usuarioLogado })
       }
 
       return allData
-  
+
     } catch (error) {
       console.error('Error fetching data:', error);
       throw error;
@@ -73,7 +73,7 @@ export const ActionPesquisaProdutosSap = ({ID, optionsEmpresas, usuarioLogado })
   const { data: dadosProdutos = [], error: erroQuality, isLoading: isLoadingQuality, refetch: refetchProdutoSap } = useQuery(
     'produtoQuality',
     () => fetchProdutoSap(),
-    { enabled: false, staleTime: 5 * 60 * 1000 }
+    { enabled: false, staleTime: 60 * 60 * 1000 }
   );
 
 
@@ -88,7 +88,6 @@ export const ActionPesquisaProdutosSap = ({ID, optionsEmpresas, usuarioLogado })
       console.log('Usuário não possui informações válidas.');
     }
   }
-
 
   return (
 
@@ -126,7 +125,9 @@ export const ActionPesquisaProdutosSap = ({ID, optionsEmpresas, usuarioLogado })
       />
 
       {tabelaVisivel &&
-        <ActionListaProdutosSap dadosProdutos={dadosProdutos} />
+        <ActionListaProdutosSap
+          dadosProdutos={dadosProdutos}
+        />
       }
     </Fragment>
   )

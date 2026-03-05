@@ -86,7 +86,7 @@ export const ActionPesquisaClientesVendas = ({ usuarioLogado, optionsEmpresas })
   const { data: dadosClientes = [], error: erroQuality, isLoading: isLoadingQuality, refetch: refetchListaVendasClientes } = useQuery(
     'venda-ativa',
     () => fetchListaVendasClientes(dataPesquisaInicio, dataPesquisaFim, currentPage, pageSize),
-    { enabled:false, staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    { enabled:false, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
   );
 
 
@@ -143,8 +143,7 @@ export const ActionPesquisaClientesVendas = ({ usuarioLogado, optionsEmpresas })
         IconSearch={AiOutlineSearch}
         corSearch={"primary"}
 
-
-
+        
       />
       {tabelaVisivel && (
         <ActionListaClientesVendas

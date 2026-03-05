@@ -22,7 +22,7 @@ export const useEditarStatusVoucher = ({
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
             usuarioIP = ipWhoisData?.ip;
         } catch (error) {
             console.error("Erro ao buscar IP via ipwho.is:", error);
@@ -108,13 +108,13 @@ export const useEditarStatusVoucher = ({
 
             const textDados = JSON.stringify(putData)
             let textoFuncao = 'GERENCIA/ATUALIZAÇÃO DE VOUCHER';
-            await getIPUsuario();
+            const ipUsuario = await getIPUsuario();
 
             const postData = {
                 IDFUNCIONARIO: String(usuarioLogado?.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || "INDISPONÍVEL",
             }
 
             const responsePost = await post('/log-web', postData)
@@ -147,12 +147,13 @@ export const useEditarStatusVoucher = ({
             }
             const textDados = JSON.stringify(putData)
             let textoFuncao = 'GERENCIA/ERRO AO ATUALIZAR  VOUCHER';
-            await getIPUsuario();
+            const ipUsuario = await getIPUsuario();
+
             const postData = {
                 IDFUNCIONARIO: String(usuarioLogado?.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || "INDISPONÍVEL",
             }
 
             const responsePost = await post('/log-web', postData)

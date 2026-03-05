@@ -122,7 +122,7 @@ export const useCadastrarClienteCNPJ = ({ usuarioLogado, optionsModulos, handleC
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
             usuarioIP = ipWhoisData?.ip;
         } catch (error) {
             console.error("Erro ao buscar IP via ipwho.is:", error);
@@ -130,10 +130,10 @@ export const useCadastrarClienteCNPJ = ({ usuarioLogado, optionsModulos, handleC
 
         if (!usuarioIP) {
             try {
-            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-            usuarioIP = ipifyData?.ip;
+                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+                usuarioIP = ipifyData?.ip;
             } catch (error) {
-            console.error("Erro ao buscar IP via ipify.org:", error);
+                console.error("Erro ao buscar IP via ipify.org:", error);
             }
         }
         setIpUsuario(usuarioIP);
@@ -587,7 +587,7 @@ export const useCadastrarClienteCNPJ = ({ usuarioLogado, optionsModulos, handleC
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || "IP NÃO DISPONIVEL"
             }
 
             await post('/log-web', postDataLog)
@@ -616,7 +616,7 @@ export const useCadastrarClienteCNPJ = ({ usuarioLogado, optionsModulos, handleC
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: `Erro ao tentar ${isUpdate ? 'atualizar' : 'cadastrar'} o cliente ${nomeClienteRazao}`,
-                IP: ipUsuario
+                IP: ipUsuario || "IP NÃO DISPONIVEL"
             }
             const responseLog = await post('/log-web', createLog)
 

@@ -24,7 +24,7 @@ export const ActionPesquisaProdutosQuality = ({ optionsEmpresas, usuarioLogado }
       setMenuFilhoAtual(menuParsed);
     }
   }, []);
-  
+
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
     ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
@@ -32,7 +32,7 @@ export const ActionPesquisaProdutosQuality = ({ optionsEmpresas, usuarioLogado }
       console.log('Response :', response.data);
       return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
   );
 
   const fetchProdutosQuality = async () => {
@@ -72,7 +72,7 @@ export const ActionPesquisaProdutosQuality = ({ optionsEmpresas, usuarioLogado }
   const { data: dadosProdutos = [], error: erroQuality, isLoading: isLoadingQuality, refetch: refetchProdutosQuality } = useQuery(
     'produtoQuality',
     () => fetchProdutosQuality(),
-    { enabled: false, staleTime: 5 * 60 * 1000 }
+    { enabled: false, staleTime: 60 * 60 * 1000 }
   );
 
 
@@ -124,7 +124,9 @@ export const ActionPesquisaProdutosQuality = ({ optionsEmpresas, usuarioLogado }
       />
 
       {tabelaVisivel &&
-        <ActionListaProdutosQuality dadosProdutos={dadosProdutos} />
+        <ActionListaProdutosQuality
+          dadosProdutos={dadosProdutos}
+        />
       }
     </Fragment>
   )

@@ -10,13 +10,13 @@ import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
 import { useEffect } from "react";
 
-export const ActionPesquisaVoucherEmitido = ({usuarioLogado}) => {
+export const ActionPesquisaVoucherEmitido = ({ usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [numeroVoucherSelecionado, setNumeroVoucherSelecionado] = useState('');
   const [currentPage] = useState(1);
   const [pageSize] = useState(1000);
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
-  
+
   useEffect(() => {
     const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
     if (menuSalvo) {
@@ -24,15 +24,15 @@ export const ActionPesquisaVoucherEmitido = ({usuarioLogado}) => {
       setMenuFilhoAtual(menuParsed);
     }
   }, []);
-  
+
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
     ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
       const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
-      
+
       return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
   );
 
   const fetchResumoVoucher = async () => {
@@ -79,7 +79,7 @@ export const ActionPesquisaVoucherEmitido = ({usuarioLogado}) => {
   const { data: dadosVoucher = [], error: erroQuality, isLoading: isLoadingQuality, refetch: refetchResumoVoucher } = useQuery(
     'detalhe-voucher',
     () => fetchResumoVoucher(numeroVoucherSelecionado, currentPage, pageSize),
-    { enabled: false, staleTime: 5 * 60 * 1000 }
+    { enabled: false, staleTime: 60 * 60 * 1000 }
   );
 
   const handleClick = () => {
@@ -121,7 +121,9 @@ export const ActionPesquisaVoucherEmitido = ({usuarioLogado}) => {
       />
 
       {tabelaVisivel && (
-        <ActionListaVoucher dadosVoucher={dadosVoucher} />
+        <ActionListaVoucher
+          dadosVoucher={dadosVoucher}
+        />
       )}
 
     </Fragment>

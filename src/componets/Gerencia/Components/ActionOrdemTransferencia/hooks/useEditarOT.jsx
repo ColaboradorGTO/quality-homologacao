@@ -22,13 +22,12 @@ export const useEditarOT = ({
   const [observacao, setObservacao] = useState('')
   const [linhaSelecionada, setLinhaSelecionada] = useState(null)
   const [ipUsuario, setIpUsuario] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const getIPUsuario = async () => {
     let usuarioIP = null;
 
     try {
-      const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+      const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
       usuarioIP = ipWhoisData?.ip;
     } catch (error) {
       console.error("Erro ao buscar IP via ipwho.is:", error);
@@ -45,7 +44,6 @@ export const useEditarOT = ({
     setIpUsuario(usuarioIP);
     return usuarioIP;
   };
-
 
   useEffect(() => {
     const dataAtual = getDataAtual();
@@ -147,7 +145,7 @@ export const useEditarOT = ({
 
     const dadosdetalheot = dadosDetalheTransferencia.map(item => ({
       IDPRODUTO: String(item.IDPRODUTO ?? ""),
-      QTDEXPEDICAO: Number(item.QTDEXPEDICAO) || 0, 
+      QTDEXPEDICAO: Number(item.QTDEXPEDICAO) || 0,
       QTDRECEPCAO: 0,
       QTDDIFERENCA: 0,
       QTDAJUSTE: 0,
@@ -161,9 +159,9 @@ export const useEditarOT = ({
     }));
 
     const nCtTotalItens = dadosdetalheot.length;
-    const nQtdTotalItens = dadosdetalheot.reduce((acc, item) => acc + (Number(item.QTDEXPEDICAO) || 0),0);
-    const dVlrTotalVenda = dadosdetalheot.reduce((acc, item) => acc + ((Number(item.QTDEXPEDICAO) || 0) * (Number(item.VLRUNITVENDA) || 0)),0);
-    const dVlrTotalCusto = dadosdetalheot.reduce((acc, item) => acc + ((Number(item.QTDEXPEDICAO) || 0) * (Number(item.VLRUNITCUSTO) || 0)),0);
+    const nQtdTotalItens = dadosdetalheot.reduce((acc, item) => acc + (Number(item.QTDEXPEDICAO) || 0), 0);
+    const dVlrTotalVenda = dadosdetalheot.reduce((acc, item) => acc + ((Number(item.QTDEXPEDICAO) || 0) * (Number(item.VLRUNITVENDA) || 0)), 0);
+    const dVlrTotalCusto = dadosdetalheot.reduce((acc, item) => acc + ((Number(item.QTDEXPEDICAO) || 0) * (Number(item.VLRUNITCUSTO) || 0)), 0);
 
     const postData = {
       IDRESUMOOT: Number(dadosDetalheTransferencia?.[0]?.IDRESUMOOT),
@@ -218,11 +216,12 @@ export const useEditarOT = ({
       const textDados = JSON.stringify(postData);
       let textoFuncao = 'GERENCIA/EDIÇÃO OT';
       const ipUsuario = await getIPUsuario();
+      
       const createData = {
         IDFUNCIONARIO: String(usuarioLogado?.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || "INDISPONÍVEL"
       };
 
       await post('/log-web', createData)
@@ -244,7 +243,7 @@ export const useEditarOT = ({
         IDFUNCIONARIO: String(usuarioLogado?.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || "INDISPONÍVEL"
       };
 
       const responsePost = await post('/log-web', createData)

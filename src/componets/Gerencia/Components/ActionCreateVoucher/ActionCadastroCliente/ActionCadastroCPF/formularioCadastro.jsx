@@ -54,9 +54,9 @@ export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos,
     onSubmit,
     readOnlyCpf,
     setCepDigitado
-  } = useCadastrarClienteCPF({ usuarioLogado, optionsModulos, handleClose  });
+  } = useCadastrarClienteCPF({ usuarioLogado, optionsModulos, handleClose });
 
-    const fecharModal = () => {
+  const fecharModal = () => {
     handleClose();
     setIdCliente('');
     setTipo('');
@@ -98,7 +98,7 @@ export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos,
 
       await schema.validate(dadosParaValidar, { abortEarly: false });
 
-      onSubmit();
+      await onSubmit();
 
     } catch (validationError) {
       clearErrors();
@@ -307,7 +307,7 @@ export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos,
                     type="email"
                     id={"email"}
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)} 
+                    onChange={(e) => setEmail(e.target.value)}
                     errors={errors}
                     clearErrors={clearErrors}
                   />
@@ -347,7 +347,7 @@ export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos,
                     type="text"
                     id={"NuCEP"}
                     value={cep}
-                    onChange={(e) => { 
+                    onChange={(e) => {
                       setCepDigitado(true);
                       setCep(e.target.value)
                     }}
@@ -480,7 +480,7 @@ export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos,
                     errors={errors}
                     clearErrors={clearErrors}
                     readOnly={true}
-                     style={{ textTransform: 'uppercase' }}
+                    style={{ textTransform: 'uppercase' }}
                   />
                 )}
               />
@@ -512,8 +512,10 @@ export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos,
       <FooterModal
         ButtonTypeConfirmar={ButtonTypeModal}
         textButtonConfirmar={"Confirmar"}
-        onClickButtonConfirmar={handleValidatedSubmit}
+        onClickButtonConfirmar={handleSubmit(handleValidatedSubmit)}
         corConfirmar="success"
+        autoLoadingCadastrar={true}
+        loadingTextCadastrar={"Cadastrando..."}
 
         ButtonTypeFechar={ButtonTypeModal}
         onClickButtonFechar={fecharModal}

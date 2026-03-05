@@ -59,3 +59,4 @@ export const formatarDataParaBR =  (data) =>{
 
   return partes[2] + "/" + partes[1] + "/" + partes[0];
 };
+

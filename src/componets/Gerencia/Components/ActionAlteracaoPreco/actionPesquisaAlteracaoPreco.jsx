@@ -7,16 +7,17 @@ import { AiOutlineSearch } from "react-icons/ai";
 import { getDataAtual } from "../../../../utils/dataAtual";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
 import { useQuery } from "react-query";
-import  { MenuTreeSelect } from "../../../Inputs/menuDropDown";
+import { MenuTreeSelect } from "../../../Inputs/menuDropDown";
 import { InputCheckBoxAction } from "../../../Inputs/chekBoxAction";
 import { ActionAlteracaoPreco } from "../../../Actions/ActionAlteracaoPreco";
 
 
-export const ActionPesquisaAlteracaoPreco = ({usuarioLogado }) => {
+export const ActionPesquisaAlteracaoPreco = ({ usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
   const [dataPesquisaFim, setDataPesquisaFim] = useState('');
   const [codBarra, setCodBarra] = useState('');
+  const [nomeProduto, setNomeProduto] = useState('');
   const [grupoSelecionado, setGrupoSelecionado] = useState('');
   const [subGrupoSelecionado, setSubGrupoSelecionado] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -25,7 +26,7 @@ export const ActionPesquisaAlteracaoPreco = ({usuarioLogado }) => {
   const [selectedNodes, setSelectedNodes] = useState(null);
   const [estoque, setEstoque] = useState(false);
 
-  useEffect(() => { 
+  useEffect(() => {
     const dataInicio = getDataAtual();
     const dataFim = getDataAtual();
     setDataPesquisaInicio(dataInicio)
@@ -35,12 +36,12 @@ export const ActionPesquisaAlteracaoPreco = ({usuarioLogado }) => {
 
   const fetchListaAlteracaoPreco = async () => {
     const idEmpresa = empresaSelecionada == '' ? usuarioLogado?.IDEMPRESA : empresaSelecionada;
-    const urlBase = `/alteracaoPreco?idEmpresa=${usuarioLogado.IDEMPRESA}&grupo=${grupoSelecionado}&subGrupo=${subGrupoSelecionado}&descProduto=${codBarra}&estoque=${estoque}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
+    const urlBase = `/alteracaoPreco?idEmpresa=${usuarioLogado.IDEMPRESA}&grupo=${grupoSelecionado}&subGrupo=${subGrupoSelecionado}&descProduto=${nomeProduto}&codBarras=${codBarra}&estoque=${estoque}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
       animacaoCarregamento('Carregando dados...', true);
-                             
+
       const primeiraPagina = 1;
       const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
       const page = primeiraResposta.page || primeiraPagina;
@@ -66,13 +67,11 @@ export const ActionPesquisaAlteracaoPreco = ({usuarioLogado }) => {
       fecharAnimacaoCarregamento();
     }
   };
-   
+
   const { data: dadosAlteracaoPreco = [], error: errorBalanco, isLoading: isLoadingBalanco, refetch: refetchListaAlteracaoPreco } = useQuery(
     ['alteracaoPreco'],
     () => fetchListaAlteracaoPreco(),
-    {
-      enabled: false, 
-    }
+    { enabled: false, staleTime: 60 * 60 * 1000, }
   );
 
   const { data: dadosGrupos = [], error: errorGrupo, isLoading: isLoadingGrupo } = useQuery(
@@ -81,7 +80,7 @@ export const ActionPesquisaAlteracaoPreco = ({usuarioLogado }) => {
       const response = await get(`/grupo-produto`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, cacheTime: 10 * 60 * 1000 }
+    { staleTime: 60 * 60 * 1000, cacheTime: 10 * 60 * 1000 }
   );
 
   const { data: dadosSubGrupos = [], error: errorSubGrupo, isLoading: isLoadingSubGrupo } = useQuery(
@@ -90,38 +89,38 @@ export const ActionPesquisaAlteracaoPreco = ({usuarioLogado }) => {
       const response = await get(`/subgrupo-produto`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, cacheTime: 10 * 60 * 1000 }
+    { staleTime: 60 * 60 * 1000, cacheTime: 10 * 60 * 1000 }
   );
 
   useEffect(() => {
-  if (dadosSubGrupos.length) {
-    const gruposMap = new Map();
+    if (dadosSubGrupos.length) {
+      const gruposMap = new Map();
 
-    dadosSubGrupos.forEach(subgrupo => {
-      const grupoId = subgrupo.ID_GRUPO;
-      const grupoDescricao = subgrupo.DS_GRUPO;
+      dadosSubGrupos.forEach(subgrupo => {
+        const grupoId = subgrupo.ID_GRUPO;
+        const grupoDescricao = subgrupo.DS_GRUPO;
 
-      if (!gruposMap.has(grupoId)) {
-        gruposMap.set(grupoId, {
-          key: grupoId,
-          label: grupoDescricao,
-          children: [],
+        if (!gruposMap.has(grupoId)) {
+          gruposMap.set(grupoId, {
+            key: grupoId,
+            label: grupoDescricao,
+            children: [],
+          });
+        }
+
+        gruposMap.get(grupoId).children.push({
+          key: subgrupo.ID_ESTRUTURA,
+          label: subgrupo.ESTRUTURA,
         });
-      }
-
-      gruposMap.get(grupoId).children.push({
-        key: subgrupo.ID_ESTRUTURA,
-        label: subgrupo.ESTRUTURA,
       });
-    });
- 
-    const formattedTreeData = Array.from(gruposMap.values());
-    setTreeData(formattedTreeData);
 
-    setGrupoSelecionado(formattedTreeData.map(grupo => grupo.key));
-    setSubGrupoSelecionado(formattedTreeData.flatMap(grupo => grupo.children.map(child => child.key)));
-  }
-}, [dadosSubGrupos]);
+      const formattedTreeData = Array.from(gruposMap.values());
+      setTreeData(formattedTreeData);
+
+      setGrupoSelecionado(formattedTreeData.map(grupo => grupo.key));
+      setSubGrupoSelecionado(formattedTreeData.flatMap(grupo => grupo.children.map(child => child.key)));
+    }
+  }, [dadosSubGrupos]);
 
   const handleTreeSelectChange = (e) => {
     const selectedValue = e.value;
@@ -151,23 +150,31 @@ export const ActionPesquisaAlteracaoPreco = ({usuarioLogado }) => {
     if (usuarioLogado && usuarioLogado.IDEMPRESA) {
       setCurrentPage(+1);
       refetchListaAlteracaoPreco()
-      setTabelaVisivel(true);   
+      setTabelaVisivel(true);
     }
   };
 
-  
+
   return (
 
     <Fragment>
-   
+
       <ActionAlteracaoPreco
         linkComponentAnterior={["Home"]}
         linkComponent={["Alteração de Preços"]}
         title="Alteração de Preços "
         subTitle="Nome da Loja"
-        
-        
-        
+
+        InputFieldNomeProdutoComponent={InputField}
+        labelInputNomeProduto={"Nome Produto"}
+        onChangeInputFieldNomeProduto={e => setNomeProduto(e.target.value)}
+        valueInputFieldNomeProduto={nomeProduto}
+
+        InputFieldCodBarrasComponent={InputField}
+        labelInputCodBarras={"Cód.Barras"}
+        onChangeInputFieldCodBarras={e => setCodBarra(e.target.value)}
+        valueInputFieldCodBarras={codBarra}
+
         InputFieldDTInicioComponent={InputField}
         labelInputFieldDTInicio={"Data Início"}
         valueInputFieldDTInicio={dataPesquisaInicio}
@@ -177,12 +184,7 @@ export const ActionPesquisaAlteracaoPreco = ({usuarioLogado }) => {
         labelInputFieldDTFim={"Data Fim"}
         valueInputFieldDTFim={dataPesquisaFim}
         onChangeInputFieldDTFim={e => setDataPesquisaFim(e.target.value)}
-        
-        InputFieldVendedor={InputField}
-        labelInputFieldVendedor={"Cód.Barras / Nome Produto"}
-        onChangeInputFieldVendedor={e => setCodBarra(e.target.value)} 
-        valueInputFieldVendedor={codBarra}   
-        
+
         MenuTreeSelectComponent={MenuTreeSelect}
         valueTreeSelect={selectedNodes}
         onChangeTreeSelect={(e) => { handleTreeSelectChange(e); }}
@@ -202,7 +204,7 @@ export const ActionPesquisaAlteracaoPreco = ({usuarioLogado }) => {
         corSearch={"primary"}
 
       />
-      
+
       {tabelaVisivel && (
         <ActionListaAlteracaoPreco dadosAlteracaoPreco={dadosAlteracaoPreco} />
       )}

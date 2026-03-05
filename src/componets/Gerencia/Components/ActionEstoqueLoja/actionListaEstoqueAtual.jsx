@@ -67,7 +67,6 @@ export const ActionListaEstoqueAtual = ({ dadosEstoqueAtual }) => {
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Estoque Atual');
     XLSX.writeFile(workbook, 'estoque_atual.xlsx');
   };
-
   const dados = dadosEstoqueAtual.map((item, index) => {
     let contador = index + 1;
 
@@ -83,6 +82,7 @@ export const ActionListaEstoqueAtual = ({ dadosEstoqueAtual }) => {
       QTDFINAL: item.QTDFINAL,
       PRECOCUSTO: item.PRECOCUSTO,
       PRECOVENDA: item.PRECOVENDA,
+      NOFANTASIA: item.NOFANTASIA,
 
       DATAMOVIMENTO: item.DATAMOVIMENTO,
       QTDINICIO: item.QTDINICIO,
@@ -118,6 +118,12 @@ export const ActionListaEstoqueAtual = ({ dadosEstoqueAtual }) => {
       field: 'contador',
       header: 'Nº',
       body: row => <th style={{ color: 'blue' }}>{row.contador}</th>,
+      sortable: true
+    },
+    {
+      field: 'Loja',
+      header: 'Loja',
+      body: row => <th style={{ color: 'blue' }}>{row.NOFANTASIA}</th>,
       sortable: true
     },
     {

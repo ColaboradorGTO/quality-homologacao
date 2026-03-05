@@ -56,7 +56,7 @@ export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos,
     setCepDigitado
   } = useCadastrarClienteCPFVoucher({ usuarioLogado, optionsModulos, handleClose, onCpf });
 
-    const fecharModal = () => {
+  const fecharModal = () => {
     handleClose();
     setIdCliente('');
     setTipo('');
@@ -95,10 +95,10 @@ export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos,
         cidadeCliente: cidade,
         estadoCliente: estado
       }
-      
+
       await schema.validate(dadosParaValidar, { abortEarly: false });
 
-      onSubmit();
+      await onSubmit();
 
     } catch (validationError) {
       clearErrors();
@@ -106,7 +106,8 @@ export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos,
 
       if (validationError.inner && validationError.inner.length > 0) {
         validationError.inner.forEach(error => {
-          if (error.path) {S
+          if (error.path) {
+            S
             setError(error.path, {
               type: 'manual',
               message: error.message
@@ -347,7 +348,7 @@ export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos,
                     type="text"
                     id={"NuCEP"}
                     value={cep}
-                    onChange={(e) => { 
+                    onChange={(e) => {
                       setCepDigitado(true);
                       setCep(e.target.value)
                     }}
@@ -356,7 +357,7 @@ export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos,
                   />
                 )}
               />
-            
+
             </div>
             <div className="col-sm-4 cold-md-4 col-xl-4">
 
@@ -481,7 +482,7 @@ export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos,
                     errors={errors}
                     clearErrors={clearErrors}
                     readOnly={true}
-                     style={{ textTransform: 'uppercase' }}
+                    style={{ textTransform: 'uppercase' }}
                   />
                 )}
               />
@@ -513,8 +514,10 @@ export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos,
       <FooterModal
         ButtonTypeConfirmar={ButtonTypeModal}
         textButtonConfirmar={"Confirmar"}
-        onClickButtonConfirmar={handleValidatedSubmit}
+        onClickButtonConfirmar={handleSubmit(handleValidatedSubmit)}
         corConfirmar="success"
+        autoLoadingCadastrar={true}
+        loadingTextCadastrar={"Cadastrando..."}
 
         ButtonTypeFechar={ButtonTypeModal}
         onClickButtonFechar={fecharModal}

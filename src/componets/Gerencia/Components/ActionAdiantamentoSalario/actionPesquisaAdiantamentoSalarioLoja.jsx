@@ -85,7 +85,7 @@ export const ActionPesquisaAdiantamentoSalarioLoja = ({ optionsEmpresas, usuario
   const { data: dadosAdiantamentoFuncionarios = [], error: erroQuality, isLoading: isLoadingQuality, refetch: refetchAdiantamentos } = useQuery(
     'adiantamento-funcionarios',
     () => fetchAdiantamentos(),
-    { enabled: false, staleTime: 5 * 60 * 1000 }
+    { enabled: false, staleTime: 60 * 60 * 1000 }
   );
 
   const handleClick = () => {

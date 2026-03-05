@@ -30,7 +30,7 @@ export const useCadastrarDespesas = ({ handleClose, optionsModulos, usuarioLogad
     let usuarioIP = null;
 
     try {
-      const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+      const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
       usuarioIP = ipWhoisData?.ip;
     } catch (error) {
       console.error("Erro ao buscar IP via ipwho.is:", error);
@@ -54,7 +54,7 @@ export const useCadastrarDespesas = ({ handleClose, optionsModulos, usuarioLogad
       const response = await get(`/categoria-receita-despesa`);
       return response.data;
     },
-    { staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    { staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
   );
 
   const onSubmit = async () => {
@@ -100,18 +100,18 @@ export const useCadastrarDespesas = ({ handleClose, optionsModulos, usuarioLogad
 
     try {
       const response = await post('/cadastrar-despesa-loja', postData)
-      
+
       const textDados = JSON.stringify(postData)
       let textoFuncao = 'GERENCIA/CADASTRO DE DESPESA';
       const ipUsuario = await getIPUsuario();
-      
+
       const createData = {
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || "INDISPONÍVEL"
       }
-      
+
       await post('/log-web', createData)
       Swal.fire({
         title: 'Cadastro',
@@ -144,7 +144,7 @@ export const useCadastrarDespesas = ({ handleClose, optionsModulos, usuarioLogad
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || "INDISPONÍVEL"
       }
 
       const responsePost = await post('/log-web', createData)
@@ -162,7 +162,6 @@ export const useCadastrarDespesas = ({ handleClose, optionsModulos, usuarioLogad
       return responsePost.data;
     }
   }
-
 
   const Options = [
     { id: 1, value: "NFCe", label: "NFCe" },

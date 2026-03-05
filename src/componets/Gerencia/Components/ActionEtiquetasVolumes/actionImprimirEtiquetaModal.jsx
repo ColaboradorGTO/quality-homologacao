@@ -124,7 +124,7 @@ export const ActionImprimirEtiquetaModal = ({ show, handleClose, dadosAcumulador
           handleClose={handleClose}
         />
         <Modal.Body>
-          <header className="row" style={{ justifyContent: "space-between" }}>
+          <header className="row" style={{ justifyContent: "flex-start", marginLeft: "30px" }}>
             <div className="d-flex gap-2">
               <ButtonTypeModal
                 textButton={"Imprimir"}
@@ -138,9 +138,9 @@ export const ActionImprimirEtiquetaModal = ({ show, handleClose, dadosAcumulador
 
           <div ref={dataTableRef}>
             {etiquetasPorPagina.map((pagina, pageIndex) => (
-              <div key={pageIndex} className="etiqueta-page" style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap', gap: '30px', marginTop: '30px' }}>
+              <div key={pageIndex} className="etiqueta-page" style={{ display: 'block', margin: '30px' }}>
                 {pagina.map((etiqueta, etiquetaIndex) => (
-                  <div className="etiqueta-page-remanejamento" key={etiquetaIndex}>
+                  <div className="etiqueta-page-remanejamento" style={{ marginBottom: '30px' }} key={etiquetaIndex}>
                     <div className="card border-dark w-100 p-0">
                       <div className="text-center pt-1">
                         <h1 className="title-etiqueta d-inline bg-dark text-white pt-2 pl-3 pb-1 pr-3 fw-900">

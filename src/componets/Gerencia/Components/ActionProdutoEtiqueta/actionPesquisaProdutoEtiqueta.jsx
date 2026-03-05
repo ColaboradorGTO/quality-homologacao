@@ -12,7 +12,6 @@ import { useQuery } from "react-query"
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento"
 import Swal from "sweetalert2"
 
-
 export const ActionPesquisaProdutoEtiqueta = ({ usuarioLogado }) => {
   // const [dadosListaPrecosSap, setDadosListaPrecosSap] = useState([])
   const [descricaoProduto, setDescricaoProduto] = useState('')
@@ -83,7 +82,7 @@ export const ActionPesquisaProdutoEtiqueta = ({ usuarioLogado }) => {
   const { data: dadosListaPrecosSap = [], error: errorMalotes, isLoading: isLoadingMalotes, refetch: refetchListaPrecosSap } = useQuery(
     ['lista-produtos-etiqueta-sap',],
     () => fetchListaPrecosSap(),
-    { enabled: false, staleTime: 5 * 60 * 1000, }
+    { enabled: false, staleTime: 60 * 60 * 1000, }
   );
 
   const handleClick = () => {

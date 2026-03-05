@@ -44,7 +44,7 @@ export const FormularioCadastrar = ({ handleClose, usuarioLogado, optionsModulos
 
             await schema.validate(dadosParaValidar, { abortEarly: false });
 
-            onSubmit();
+            await onSubmit();
 
         } catch (validationError) {
             clearErrors();
@@ -62,7 +62,7 @@ export const FormularioCadastrar = ({ handleClose, usuarioLogado, optionsModulos
             }
 
             const errorMessages = validationError.errors || [validationError.message];
-            console.log(`Erro de validação:\n${errorMessages.join('\n')}`);
+            //console.log(`Erro de validação:\n${errorMessages.join('\n')}`);
         }
     }
 
@@ -196,7 +196,7 @@ export const FormularioCadastrar = ({ handleClose, usuarioLogado, optionsModulos
                                         label={"Valor do Vale Transporte "}
                                         placeholder={"0"}
                                         name="valorDespesa"
-                                        type="number"
+                                        type="text"
                                         value={vrDespesa}
                                         onChange={(e) => setVrDespesa(formatarMoeda(e.target.value))}
                                         errors={errors}
@@ -213,9 +213,11 @@ export const FormularioCadastrar = ({ handleClose, usuarioLogado, optionsModulos
 
             <FooterModal
                 ButtonTypeCadastrar={ButtonTypeModal}
-                onClickButtonCadastrar={handleValidatedSubmit}
+                onClickButtonCadastrar={handleSubmit(handleValidatedSubmit)}
                 textButtonCadastrar={"Cadastrar"}
                 corCadastrar="success"
+                autoLoadingCadastrar={true}
+                loadingTextCadastrar={"Cadastrando..."}
 
                 ButtonTypeFechar={ButtonTypeModal}
                 textButtonFechar={"Fechar"}

@@ -256,12 +256,16 @@ export const ActionListaEmpresas = ({ dadosEmpresas, usuarioLogado, optionsModul
         show={modalDetalheEmpresa}
         handleClose={() => setModalDetalheEmpresa(false)}
         dadosEmpresasDetalhe={dadosEmpresasDetalhe}
+        optionsModulos={optionsModulos}
+        usuarioLogado={usuarioLogado}
       />
 
       <ActionEditarEmpresaModal 
         show={modalEditarEmpresa}
         handleClose={() => setModalEditarEmpresa(false)}
         dadosEmpresasDetalhe={dadosEmpresasDetalhe}
+        optionsModulos={optionsModulos}
+        usuarioLogado={usuarioLogado}
        
       /> 
     </Fragment>

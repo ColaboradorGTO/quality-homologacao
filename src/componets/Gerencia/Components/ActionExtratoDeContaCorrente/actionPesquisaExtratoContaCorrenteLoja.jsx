@@ -10,7 +10,7 @@ import { useQuery } from "react-query"
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento"
 import { InputSelectAction } from "../../../Inputs/InputSelectAction"
 
-export const ActionPesquisaExtratoContaCorenteLoja = ({usuarioLogado, optionsEmpresas}) => {
+export const ActionPesquisaExtratoContaCorenteLoja = ({ usuarioLogado, optionsEmpresas }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
   const [dataPesquisaFim, setDataPesquisaFim] = useState('');;
@@ -23,10 +23,10 @@ export const ActionPesquisaExtratoContaCorenteLoja = ({usuarioLogado, optionsEmp
     const dataFinal = getDataAtual();
     setDataPesquisaInicio(dataInicial);
     setDataPesquisaFim(dataFinal);
-    
+
   }, [])
-   
-    
+
+
   useEffect(() => {
     const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
     if (menuSalvo) {
@@ -34,15 +34,15 @@ export const ActionPesquisaExtratoContaCorenteLoja = ({usuarioLogado, optionsEmp
       setMenuFilhoAtual(menuParsed);
     }
   }, []);
-  
+
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
     ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
       const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
-      
+
       return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
   );
 
   const fetchListaExtrato = async () => {
@@ -52,7 +52,7 @@ export const ActionPesquisaExtratoContaCorenteLoja = ({usuarioLogado, optionsEmp
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
       animacaoCarregamento('Carregando dados...', true);
-                             
+
       const primeiraPagina = 1;
       const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
       const page = primeiraResposta.page || primeiraPagina;
@@ -71,7 +71,7 @@ export const ActionPesquisaExtratoContaCorenteLoja = ({usuarioLogado, optionsEmp
       }
 
       return allData;
-  
+
     } catch (error) {
       console.error('Erro ao buscar dados da api:', error);
       throw error;
@@ -79,12 +79,12 @@ export const ActionPesquisaExtratoContaCorenteLoja = ({usuarioLogado, optionsEmp
       fecharAnimacaoCarregamento();
     }
   };
-   
+
   const { data: dadosExtratoLojaPeriodo = [], error: errorExtrato, isLoading: isLoadingExtrato, refetch: refetchListaExtrato } = useQuery(
     ['listaExtratoDaLojaPeriodo'],
     () => fetchListaExtrato(),
     {
-      enabled: false, 
+      enabled: false,
     }
   );
 
@@ -100,7 +100,7 @@ export const ActionPesquisaExtratoContaCorenteLoja = ({usuarioLogado, optionsEmp
         linkComponent={["Extrato de Contas Correntes das Lojas"]}
         title="Extrato de Contas Correntes das Lojas"
         subTitle="Nome da Loja"
-        
+
         InputSelectPendenciaComponent={InputSelectAction}
         labelSelectPendencia="Selecione a Empresa"
         optionsPendencia={[
@@ -108,10 +108,10 @@ export const ActionPesquisaExtratoContaCorenteLoja = ({usuarioLogado, optionsEmp
           ...optionsEmpresas?.map((empresa) => ({
             value: empresa.IDEMPRESA,
             label: empresa.NOFANTASIA,
-      
+
           }))
         ]}
-        onChangeSelectPendencia={(e) =>  setEmpresaSelecionada(e.value) }
+        onChangeSelectPendencia={(e) => setEmpresaSelecionada(e.value)}
         valueSelectPendencia={empresaSelecionada}
         stylePendencia={optionsModulos[0]?.ADMINISTRADOR == "True"}
 
@@ -119,7 +119,7 @@ export const ActionPesquisaExtratoContaCorenteLoja = ({usuarioLogado, optionsEmp
         valueInputFieldDTInicioA={dataPesquisaInicio}
         labelInputDTInicioA={"Data Início"}
         onChangeInputFieldDTInicioA={(e) => setDataPesquisaInicio(e.target.value)}
-        
+
         InputFieldDTFimAComponent={InputField}
         labelInputDTFimA={"Data Fim"}
         valueInputFieldDTFimA={dataPesquisaFim}
@@ -134,7 +134,9 @@ export const ActionPesquisaExtratoContaCorenteLoja = ({usuarioLogado, optionsEmp
 
       {tabelaVisivel && (
         <div className="card">
-         <ActionListaExtratoContaCorrenteLoja dadosExtratoLojaPeriodo={dadosExtratoLojaPeriodo} />
+          <ActionListaExtratoContaCorrenteLoja
+            dadosExtratoLojaPeriodo={dadosExtratoLojaPeriodo}
+          />
         </div>
       )}
     </Fragment>

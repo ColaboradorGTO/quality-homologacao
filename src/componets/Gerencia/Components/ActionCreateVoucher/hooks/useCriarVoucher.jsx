@@ -6,7 +6,7 @@ import { mascaraCPF, validarCPF } from "../../../../../utils/formatCPF";
 
 export const useCriarVoucher = ({
     usuarioLogado,
-    dadosVisualizarProdutos, 
+    dadosVisualizarProdutos,
     quantidadesProdutos,
     setModalCadastroClienteCPFVoucher,
     setModalCadastroClienteCNPJVoucher,
@@ -25,7 +25,7 @@ export const useCriarVoucher = ({
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
             usuarioIP = ipWhoisData?.ip;
         } catch (error) {
             console.error("Erro ao buscar IP via ipwho.is:", error);
@@ -202,21 +202,21 @@ export const useCriarVoucher = ({
             didOpen: () => {
                 const swalContainer = Swal.getPopup();
                 const cpfInput = document.getElementById('cpf');
-                
+
                 // Se CPF estiver vazio, focar no input para facilitar digitação
                 if (!cpfVenda || cpfVenda === '') {
                     cpfInput.focus();
                 }
-                
+
                 // Aplicar máscara de CPF em tempo real E verificar cliente automaticamente
                 cpfInput.addEventListener('input', async (e) => {
                     e.target.value = e.target.value.replace(/[^0-9]/g, '').substring(0, 18);
-                    
+
                     const cpfDigitado = e.target.value;
                     if (cpfDigitado.length == 11 || cpfDigitado.length == 14) {
                         try {
                             const response = await get(`/cliente-todos?numeroCpfCnpj=${cpfDigitado}`)
-                            
+
                             if (response && response.data && response.data.length > 0) {
                                 // Cliente existe - pode prosseguir
                                 const confirmButton = swalContainer.querySelector('.swal2-confirm');
@@ -227,7 +227,7 @@ export const useCriarVoucher = ({
                             } else {
                                 // Cliente não existe - fechar SweetAlert e abrir modal automaticamente
                                 Swal.close();
-                                
+
                                 // Mostrar mensagem de cliente não encontrado
                                 await Swal.fire({
                                     title: 'Cliente não encontrado',
@@ -240,7 +240,7 @@ export const useCriarVoucher = ({
                                         container: 'custom-swal',
                                     }
                                 });
-                                
+
                                 setCpfCliente(cpfDigitado);
                                 if (cpfDigitado.length >= 14) {
                                     setModalCadastroClienteCNPJVoucher(true);
@@ -252,7 +252,7 @@ export const useCriarVoucher = ({
                         } catch (error) {
                             // Em caso de erro, também redirecionar automaticamente
                             Swal.close();
-                            
+
                             // Mostrar mensagem de cliente não encontrado
                             await Swal.fire({
                                 title: 'Cliente não encontrado',
@@ -265,7 +265,7 @@ export const useCriarVoucher = ({
                                     container: 'custom-swal',
                                 }
                             });
-                            
+
                             setCpfCliente(cpfDigitado);
                             if (cpfDigitado.length >= 14) {
                                 setModalCadastroClienteCNPJVoucher(true);
@@ -283,7 +283,7 @@ export const useCriarVoucher = ({
                         }
                     }
                 });
-                
+
                 swalContainer.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter') {
                         Swal.clickConfirm();
@@ -294,11 +294,11 @@ export const useCriarVoucher = ({
                 const valorOriginal = document.getElementById('cpf').value;
 
                 const cpf = valorOriginal.replace(/\D/g, '');
-                
+
                 if (!cpf || cpf.length === 0) {
                     return Swal.showValidationMessage('CPF/CNPJ é obrigatório');
                 }
-                
+
                 if (cpf.length !== 11 && cpf.length !== 14) {
                     return Swal.showValidationMessage('CPF deve ter 11 dígitos ou CNPJ deve ter 14 dígitos');
                 }
@@ -316,7 +316,7 @@ export const useCriarVoucher = ({
                     if (clienteData && clienteData.length > 0) {
                         // Unificar dados do cliente em uma única fonte
                         const dadosCliente = clienteData[0];
-                        
+
                         setUsuarioAutorizado(prev => ({
                             ...prev,
                             cpf: cpfConfirmado,
@@ -325,8 +325,8 @@ export const useCriarVoucher = ({
                         setCpfCliente(cpfConfirmado);
                         setOptionsCPF(clienteData); // Atualiza optionsCPF com os dados da API
                         await onSubmitVoucher(dadosCliente); // Passa os dados diretamente
-                 
-                    } else {                        
+
+                    } else {
                         // Mostrar mensagem de cliente não encontrado
                         await Swal.fire({
                             title: 'Cliente não encontrado',
@@ -339,7 +339,7 @@ export const useCriarVoucher = ({
                                 container: 'custom-swal',
                             }
                         });
-                        
+
                         setCpfCliente(cpfConfirmado);
                         if (cpfConfirmado.length >= 14) {
                             setModalCadastroClienteCNPJVoucher(true);
@@ -351,7 +351,7 @@ export const useCriarVoucher = ({
                     console.log('❌ Resposta da API inválida (sem response.data)');
                     throw new Error('Erro ao buscar dados do cliente');
                 }
-            } catch (error) {                
+            } catch (error) {
                 // Mostrar mensagem de cliente não encontrado
                 await Swal.fire({
                     title: 'Cliente não encontrado',
@@ -364,7 +364,7 @@ export const useCriarVoucher = ({
                         container: 'custom-swal',
                     }
                 });
-                
+
                 setCpfCliente(cpfConfirmado);
                 if (cpfConfirmado.length >= 14) {
                     setModalCadastroClienteCNPJVoucher(true);
@@ -385,7 +385,7 @@ export const useCriarVoucher = ({
         if (!dadosCliente) {
             throw new Error('Dados do cliente não encontrados');
         }
-        
+
         // Função para obter quantidade modificada ou original
         const getQuantidadeFinal = (contadorIndex, quantidadeOriginal) => {
             return quantidadesProdutos?.[contadorIndex] || quantidadeOriginal;
@@ -398,7 +398,7 @@ export const useCriarVoucher = ({
             const quantidadeFinal = getQuantidadeFinal(contadorIndex, item.det.QTD);
             const valorUnitario = Number(parseFloat(item.det.VUNTRIB).toFixed(2));
             const valorTotalItem = valorUnitario * quantidadeFinal;
-            
+
             valorTotalVoucher += valorTotalItem;
 
             return {
@@ -451,11 +451,11 @@ export const useCriarVoucher = ({
             if (!putData.IDCLIENTE) {
                 throw new Error('ID do cliente não foi encontrado');
             }
-            
+
             if (!putData.NUCPF) {
                 throw new Error('CPF do cliente não foi encontrado');
             }
-            
+
             if (!putData.MOTIVOTROCA) {
                 throw new Error('Motivo da troca não foi informado');
             }
@@ -465,12 +465,12 @@ export const useCriarVoucher = ({
             const textDados = JSON.stringify(putData)
             let textoFuncao = 'VOUCHER /CADASTRO DE CLIENTE';
             const ipUsuario = await getIPUsuario();
-            
+
             const postData = {
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || "INDISPONÍVEL"
             }
 
             await post('/log-web', postData)
@@ -486,14 +486,15 @@ export const useCriarVoucher = ({
             return response.data;
 
         } catch (error) {
-            
+            const textDados = JSON.stringify(putData)
             let textoFuncao = 'VOUCHER /ERRO AO CRIAR VOUCHER';
             const ipUsuario = await getIPUsuario();
+
             const postData = {
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
-                DADOS: '',
-                IP: ipUsuario
+                DADOS: textDados,
+                IP: ipUsuario || "INDISPONÍVEL"
             }
             await post('/log-web', postData);
 
@@ -508,7 +509,6 @@ export const useCriarVoucher = ({
             return;
         }
     }
-
 
     return {
         onSubmitVoucher,

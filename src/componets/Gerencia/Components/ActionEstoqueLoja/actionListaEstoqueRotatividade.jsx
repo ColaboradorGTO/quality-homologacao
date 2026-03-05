@@ -16,12 +16,12 @@ export const ActionListaEstoqueRotatividade = ({ dadosEstoqueRotatividade }) => 
   const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(10);
   const dataTableRef = useRef();
-  
+
   const onPageChange = (event) => {
     setFirst(event.first);
     setRows(event.rows);
   };
-  
+
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
   };
@@ -90,7 +90,8 @@ export const ActionListaEstoqueRotatividade = ({ dadosEstoqueRotatividade }) => 
       NUCODBARRAS: item.NUCODBARRAS,
       PRECOCUSTO: item.PRECOCUSTO,
       PRECOVENDA: item.PRECOVENDA,
-      IDPRODUTO: item.IDPRODUTO
+      IDPRODUTO: item.IDPRODUTO,
+      NOFANTASIA: item.NOFANTASIA
     }
   });
 
@@ -101,42 +102,42 @@ export const ActionListaEstoqueRotatividade = ({ dadosEstoqueRotatividade }) => 
   const calcularTotal = (field) => {
     const firstIndex = first * rows;
     const lastIndex = firstIndex + rows;
-    const dataPaginada = dados.slice(firstIndex, lastIndex); 
+    const dataPaginada = dados.slice(firstIndex, lastIndex);
     return dataPaginada.reduce((total, item) => total + toFloat(item[field] || 0), 0);
   };
 
   const calcularQtdEntrada = () => {
     const totalPagina = calcularTotal('QTDENTRADA');
-    const total = calcularTotalPagina('QTDENTRADA' );
+    const total = calcularTotalPagina('QTDENTRADA');
     return `${totalPagina}   (${total} total)`;
   };
   const calcularQtdEntradaVoucher = () => {
     const totalPagina = calcularTotal('QTDENTRADAVOUCHER');
-    const total = calcularTotalPagina('QTDENTRADAVOUCHER' );
+    const total = calcularTotalPagina('QTDENTRADAVOUCHER');
     return `${totalPagina}   (${total} total)`;
   };
   const calcularQtdSaida = () => {
     const totalPagina = calcularTotal('QTDSAIDA');
-    const total = calcularTotalPagina('QTDSAIDA' );
+    const total = calcularTotalPagina('QTDSAIDA');
     return `${totalPagina}   (${total} total)`;
   };
   const calcularQtdSaidaTransferencia = () => {
     const totalPagina = calcularTotal('QTDSAIDATRANSFERENCIA');
-    const total = calcularTotalPagina('QTDSAIDATRANSFERENCIA' );
+    const total = calcularTotalPagina('QTDSAIDATRANSFERENCIA');
     return `${totalPagina}   (${total} total)`;
   };
   const calcularQtdRetornoAjustePedido = () => {
     const totalPagina = calcularTotal('QTDRETORNOAJUSTEPEDIDO');
-    const total = calcularTotalPagina('QTDRETORNOAJUSTEPEDIDO' );
+    const total = calcularTotalPagina('QTDRETORNOAJUSTEPEDIDO');
     return `${totalPagina}   (${total} total)`;
   };
-  
+
   const calcularQtdAjusteBalanco = () => {
     const totalPagina = calcularTotal('QTDAJUSTEBALANCO');
-    const total = calcularTotalPagina('QTDAJUSTEBALANCO' );
+    const total = calcularTotalPagina('QTDAJUSTEBALANCO');
     return `${totalPagina}   (${total} total)`;
   };
-  
+
 
   const colunasEstoqueRotatividade = [
 
@@ -144,6 +145,12 @@ export const ActionListaEstoqueRotatividade = ({ dadosEstoqueRotatividade }) => 
       field: 'DATAMOVIMENTO',
       header: 'Data Movimento',
       body: row => <th style={{ color: 'blue' }}>{row.DATAMOVIMENTO}</th>,
+      sortable: true
+    },
+    {
+      field: 'Loja',
+      header: 'Loja',
+      body: row => <th style={{ color: 'blue' }}>{row.NOFANTASIA}</th>,
       sortable: true
     },
     {
@@ -201,7 +208,7 @@ export const ActionListaEstoqueRotatividade = ({ dadosEstoqueRotatividade }) => 
   const HeaderTemplate = (rowData) => {
     return (
       <div className="flex align-items-center gap-2" style={{ alignContent: 'center' }}>
-        <span className="font-bold" style={{fontWeight: 600}}>
+        <span className="font-bold" style={{ fontWeight: 600 }}>
           {`${rowData.NUCODBARRAS} - ${rowData.DSPRODUTO} / Custo R$ ${formatMoeda(rowData.PRECOCUSTO)}  - Venda R$ ${formatMoeda(rowData.PRECOVENDA)}`}
         </span>
       </div>

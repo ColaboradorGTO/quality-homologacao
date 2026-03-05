@@ -30,14 +30,14 @@ export const useCadastrarValeTransporte = ({ handleClose, usuarioLogado, options
       const response = await get(`/todos-funcionario?idEmpresa=${usuarioLogado.IDEMPRESA}`);
       return response.data;
     },
-    { enabled: true, staleTime: 5 * 60 * 1000, cacheTime: 10 * 60 * 1000 }
+    { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
   );
 
   const getIPUsuario = async () => {
     let usuarioIP = null;
 
     try {
-      const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+      const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
       usuarioIP = ipWhoisData?.ip;
     } catch (error) {
       console.error("Erro ao buscar IP via ipwho.is:", error);
@@ -54,7 +54,6 @@ export const useCadastrarValeTransporte = ({ handleClose, usuarioLogado, options
     setIpUsuario(usuarioIP);
     return usuarioIP;
   };
-
 
   const onSubmit = async (data) => {
     if (optionsModulos[0]?.CRIAR == 'False') {
@@ -96,7 +95,7 @@ export const useCadastrarValeTransporte = ({ handleClose, usuarioLogado, options
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || "INDISPONÍVEL"
       }
 
       await post('/log-web', createData)
@@ -123,7 +122,7 @@ export const useCadastrarValeTransporte = ({ handleClose, usuarioLogado, options
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || "INDISPONÍVEL"
       }
 
       const responsePost = await post('/log-web', createData)
