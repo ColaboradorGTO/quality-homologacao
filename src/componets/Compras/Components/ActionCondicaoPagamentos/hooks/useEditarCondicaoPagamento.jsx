@@ -5,8 +5,16 @@ import { post, put } from "../../../../../api/funcRequest"
 import { toFloat } from "../../../../../utils/toFloat"
 import { getDataHoraAtual } from "../../../../../utils/dataAtual"
 import { useQuery } from "react-query"
+import { situacao, optionsParcelado } from "../../../../../../parceiro.json"
 
-export const useEditarCondicaoPagamento = ({dadosDetalheCondPagamento,handleClose, usuarioLogado, optionsModulos, handleClick}) => {
+
+export const useEditarCondicaoPagamento = ({
+    dadosDetalheCondPagamento, 
+    handleClose, 
+    usuarioLogado, 
+    optionsModulos, 
+    handleClick
+}) => {
     const [statusSelecionado, setStatusSelecionado] = useState('')
     const [descricao, setDescricao] = useState('')
     const [parceladoSelecionado, setParceladoSelecionado] = useState('')
@@ -27,16 +35,6 @@ export const useEditarCondicaoPagamento = ({dadosDetalheCondPagamento,handleClos
         },
         { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000, }
     );
- 
-    const optionsStatus = [
-        { value: 'True', label: 'ATIVO' },
-        { value: 'False', label: 'INATIVO' }
-    ]
-
-    const optionsParcelado = [
-        { value: 'True', label: 'SIM' },
-        { value: 'False', label: 'NÃO' }
-    ]
 
     useEffect(() => {
         const dataAtual = getDataHoraAtual();
@@ -143,7 +141,7 @@ export const useEditarCondicaoPagamento = ({dadosDetalheCondPagamento,handleClos
             const response = await put('/condicaoPagamento/:id', postData)
  
             const textDados = JSON.stringify(postData)
-            let textFuncao = 'COMPRAS/EDITAR CATEGORIA DE PEDIDO';
+            let textFuncao = 'COMPRAS/EDITAR CONDIÇÃO DE PAGAMENTO';
             const ipUsuario = await getIPUsuario();
             const createtLog = {
                 IDFUNCIONARIO: String(usuarioLogado.id),
@@ -165,11 +163,12 @@ export const useEditarCondicaoPagamento = ({dadosDetalheCondPagamento,handleClos
                     container: 'custom-swal',
                 }
             })
-
+            handleClick();
+            handleClose();
             return response.data;
         } catch (error) {
             const textDados = JSON.stringify(postData)
-            let textFuncao = 'COMPRAS/EDITAR CATEGORIA DE PEDIDO';
+            let textFuncao = 'COMPRAS/EDITAR CONDIÇÃO DE PAGAMENTO';
             const ipUsuario = await getIPUsuario();
             const createtLog = {
                 IDFUNCIONARIO: String(usuarioLogado.id),
@@ -184,12 +183,13 @@ export const useEditarCondicaoPagamento = ({dadosDetalheCondPagamento,handleClos
                 icon: 'error',
                 title: 'Ocorreu um erro ao enviar o formulário. Por favor, tente novamente.',
                 showConfirmButton: false,
-                timer: 3000,
+                timer: 5000,
                 customClass: {
                     container: 'custom-swal',
                 },
             });
-            console.error('Erro ao criar categoria pedido:', error);
+            console.error('Erro ao Editar Condição de Pagamento:', error);
+            return responseLog.data;
         }
     }
 
@@ -210,7 +210,7 @@ export const useEditarCondicaoPagamento = ({dadosDetalheCondPagamento,handleClos
         setTipoDocumentoSelecionado,
         condPagamento,
         setCondPagamento,
-        optionsStatus,
+        situacao,
         optionsParcelado,
         dadosTipoDocumentos,
         onSubmit

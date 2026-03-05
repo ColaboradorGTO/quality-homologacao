@@ -36,10 +36,10 @@ export const FormularioEditar = ({
         setTipoDocumentoSelecionado,
         condPagamento,
         setCondPagamento,
-        optionsStatus,
+        situacao,
         optionsParcelado,
         dadosTipoDocumentos,
-        handleEditar
+        onSubmit
     } = useEditarCondicaoPagamento({dadosDetalheCondPagamento, handleClose, usuarioLogado, optionsModulos, handleClick});
  
  
@@ -224,7 +224,7 @@ export const FormularioEditar = ({
                                 className="basic-single"
                                 classNamePrefix="select"
                                 name="situacaoPagamento"
-                                options={optionsStatus.map((item) => {
+                                options={situacao.map((item) => {
                                     return {
                                         value: item.value,
                                         label: item.label
