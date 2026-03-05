@@ -5,7 +5,7 @@ import { get, post } from "../../../../../api/funcRequest"
 import { getDataAtual } from "../../../../../utils/dataAtual"
 import { useQuery } from "react-query"
 import { toFloat } from "../../../../../utils/toFloat"
-
+import { situacao, optionsParcelado } from "../../../../../../parceiro.json"
 
 export const useCadastrarCondicaoPagamento = ({handleClose, usuarioLogado, optionsModulos, handleClick}) => {
     const [statusSelecionado, setStatusSelecionado] = useState('')
@@ -15,7 +15,6 @@ export const useCadastrarCondicaoPagamento = ({handleClose, usuarioLogado, optio
     const [dias1Pagamento, setDias1Pagamento] = useState('')
     const [qtdDiasPagamento, setQtdDiasPagamento] = useState('')
     const [tipoDocumentoSelecionado, setTipoDocumentoSelecionado] = useState('')
-    const [condPagamento, setCondPagamento] = useState('')
     const [dataUltimaAlteracao, setDataUltimaAlteracao] = useState('')
     const [ipUsuario, setIpUsuario] = useState('');
    
@@ -30,63 +29,45 @@ export const useCadastrarCondicaoPagamento = ({handleClose, usuarioLogado, optio
         { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000, }
     );
 
-    const optionsStatus = [
-        { value: 'True', label: 'ATIVO' },
-        { value: 'False', label: 'INATIVO' }
-    ]
-    const optionsParcelado = [
-        { value: 'True', label: 'SIM' },
-        { value: 'False', label: 'NAO' }
-    ]
-
     useEffect(() => {
         const dataAtual = getDataAtual();
         setDataUltimaAlteracao(dataAtual);
     })
 
-     const getIPUsuario = async () => {
+    const getIPUsuario = async () => {
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
             usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP via ipwho.is:", error);
+            console.error("Erro ao buscar IP via ifconfig.me:", error);
         }
 
         if (!usuarioIP) {
-            try {
-                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-                usuarioIP = ipifyData?.ip;
-            } catch (error) {
-                console.error("Erro ao buscar IP via ipify.org:", error);
-            }
+        try {
+            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+            usuarioIP = ipifyData?.ip;
+        } catch (error) {
+            console.error("Erro ao buscar IP via ipify.org:", error);
+        }
         }
         setIpUsuario(usuarioIP);
         return usuarioIP;
     };
     
-    const cadastrar = async () => {
+    const onSubmit = async () => {
         if(optionsModulos[0]?.CRIAR == 'False') {
             Swal.fire({
-                title: 'Erro!',
-                text: `${usuarioLogado?.NOFUNCIONARIO},\nVocê não tem permissão para criar uma Condição de Pagamento!`,
                 icon: 'error',
+                title: 'Acesso Negado!',
+                html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para criar uma Condição de Pagamento!`,
                 customClass: {
                     container: 'custom-swal',
                 },
-            })
-            return;
-        }
-
-        if (descricao == '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'O campo descrição é obrigatório.',
+                timer: 5000,
                 showConfirmButton: false,
-                timer: 1500
-            });
+            })
             return;
         }
 
@@ -133,12 +114,11 @@ export const useCadastrarCondicaoPagamento = ({handleClose, usuarioLogado, optio
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'Indisponível'
             }
             
-            const responseLog = await post('/log-web', createtLog)
-            handleClick();
-            handleClose();
+            await post('/log-web', createtLog)
+            
             Swal.fire({
                 position: 'center',
                 icon: 'success',
@@ -149,7 +129,10 @@ export const useCadastrarCondicaoPagamento = ({handleClose, usuarioLogado, optio
                     container: 'custom-swal',
                 }
             })
-            return responseLog.data;
+
+            handleClick();
+            handleClose();
+            return response.data;
         } catch (error) {
             const textDados = JSON.stringify(postData)
             let textFuncao = 'COMPRAS/ERRO AO CADASTRAR CONDIÇÕES DE PAGAMENTO';
@@ -158,12 +141,11 @@ export const useCadastrarCondicaoPagamento = ({handleClose, usuarioLogado, optio
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'Indisponível'
             }
 
             const responseLog = await post('/log-web', createtLog)
-            handleClick();
-            handleClose();
+         
             Swal.fire({
                 position: 'top-end',
                 icon: 'error',
@@ -175,6 +157,7 @@ export const useCadastrarCondicaoPagamento = ({handleClose, usuarioLogado, optio
                 },
             });
             console.error('Erro ao criar categoria pedido:', error);
+            return responseLog.data;
         }
     }
 
@@ -193,13 +176,9 @@ export const useCadastrarCondicaoPagamento = ({handleClose, usuarioLogado, optio
         setQtdDiasPagamento,
         tipoDocumentoSelecionado,
         setTipoDocumentoSelecionado,
-        condPagamento,
-        setCondPagamento,
-        usuarioLogado,
-        ipUsuario,
-        optionsStatus,
+        situacao,
         optionsParcelado,
         dadosTipoDocumentos,
-        cadastrar,
+        onSubmit
     }
 }
