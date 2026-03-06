@@ -6,6 +6,7 @@ import { useForm, Controller } from "react-hook-form";
 import { useEditarFornecedor } from "../hooks/useEditarFornecedor";
 import { schema } from "./schema/useEditarSchema";
 import FormField from "../../../../Formularios/FormField";
+import { AlertError } from "../../../../Inputs/alertError";
 
 export const FormularioEditar = ({
     handleClose,
@@ -72,9 +73,9 @@ export const FormularioEditar = ({
         setTransportadora,
         tipoFrete,
         setTipoFrete,
-        optionsSituacao,
-        optionsFrete,
-        optionsPedido,
+        situacao, 
+        optionsTipoFrete, 
+        optionsTipoCategoria, 
         optionsEnviar,
         optionsFiscal,
         dadosTransportadora,
@@ -106,11 +107,18 @@ export const FormularioEditar = ({
                 telefone3Fornecedor: telefone3,
                 vendedorFornecedor: vendedor,
                 emailVendedorFornecedor: emailVendedor,
+                situacaoFornecedor: situacaoSelecionada,
+                fiscalFornecedor: fiscal,
+                enviarFornecedor: enviar,
+                condicaoPagamentoFornecedor: condicaoPagamento,
+                tipoPedidoFornecedor: tipoPedido,
+                transportadoraFornecedor: transportadora,
+                tipoFreteFornecedor: tipoFrete,
             }
 
             await schema.validate(dadosParaValidar, { abortEarly: false });
 
-            onSubmit();
+            await onSubmit();
 
         } catch (validationError) {
             clearErrors();
@@ -156,7 +164,7 @@ export const FormularioEditar = ({
                             />
                         </div>
                         <div className="col-sm-4 col-xl-4">
-                            <Controller
+                            <Controller 
                                 name="inscricaoEstadualFornecedor"
                                 control={control}
                                 render={({ field }) => (
@@ -173,7 +181,7 @@ export const FormularioEditar = ({
                             />
                         </div>
                         <div className="col-sm-4 col-xl-4">
-                            <Controller
+                            <Controller 
                                 name="inscricaoMunicipalFornecedor"
                                 control={control}
                                 render={({ field }) => (
@@ -188,7 +196,7 @@ export const FormularioEditar = ({
                                     />
                                 )}
                             />
-
+                   
                         </div>
                     </div>
                 </div>
@@ -234,7 +242,7 @@ export const FormularioEditar = ({
                 <div className="form-group">
                     <div className="row">
                         <div className="col-sm-3 col-xl-2">
-                            <Controller
+                            <Controller 
                                 name="cepFornecedor"
                                 control={control}
                                 render={({ field }) => (
@@ -249,7 +257,7 @@ export const FormularioEditar = ({
                                     />
                                 )}
                             />
-
+                    
                         </div>
                         <div className="col-sm-3 col-xl-5">
                             <Controller
@@ -324,7 +332,7 @@ export const FormularioEditar = ({
                             />
                         </div>
                         <div className="col-sm-3 col-xl-4">
-                            <Controller
+                            <Controller 
                                 name="cidadeFornecedor"
                                 control={control}
                                 render={({ field }) => (
@@ -374,7 +382,7 @@ export const FormularioEditar = ({
                                     />
                                 )}
                             />
-
+  
                         </div>
                     </div>
                 </div>
@@ -396,7 +404,7 @@ export const FormularioEditar = ({
                                     />
                                 )}
                             />
-
+            
                         </div>
                         <div className="col-sm-6 col-xl-6">
                             <Controller
@@ -473,15 +481,28 @@ export const FormularioEditar = ({
                         <div className="col-sm-3 col-xl-3">
                             <label className="form-label" htmlFor="fornst">Situação *</label>
                             <Select
-                                options={optionsSituacao.map((item) => {
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="situacaoFornecedor"
+                                options={situacao.map((item) => {
                                     return {
                                         value: item.value,
                                         label: item.label
                                     }
                                 })}
                                 value={situacaoSelecionada}
-                                onChange={(e) => setSituacaoSelecionada(e)}
+                                onChange={(e) => {
+                                    setSituacaoSelecionada(e)
+                                    clearErrors("situacaoFornecedor")
+                                }}
                             />
+                            {errors.situacaoFornecedor && (
+                                <AlertError
+                                    error={errors.situacaoFornecedor}
+                                    onClose={clearErrors}
+                                    fieldName="situacaoFornecedor"
+                                />
+                            )}
                         </div>
                     </div>
                 </div>
@@ -496,6 +517,9 @@ export const FormularioEditar = ({
 
                             <label htmlFor="">Fiscal</label>
                             <Select
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="fiscalFornecedor"
                                 options={optionsFiscal.map((item) => {
                                     return {
                                         value: item.value,
@@ -503,13 +527,25 @@ export const FormularioEditar = ({
                                     }
                                 })}
                                 value={fiscal}
-                                onChange={(e) => setFiscal(e)}
-
+                                onChange={(e) => {
+                                    setFiscal(e)
+                                    clearErrors("fiscalFornecedor")
+                                }}
                             />
+                            {errors.fiscalFornecedor && (
+                                <AlertError
+                                    error={errors.fiscalFornecedor}
+                                    onClose={clearErrors}
+                                    fieldName="fiscalFornecedor"
+                                />
+                            )}
                         </div>
                         <div className="col-sm-4 col-xl-4">
                             <label htmlFor="">Enviar</label>
                             <Select
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="enviarFornecedor"
                                 options={optionsEnviar.map((item) => {
                                     return {
                                         value: item.value,
@@ -517,14 +553,26 @@ export const FormularioEditar = ({
                                     }
                                 })}
                                 value={enviar}
-                                onChange={(e) => setEnviar(e)}
-
+                                onChange={(e) => {
+                                    setEnviar(e)
+                                    clearErrors("enviarFornecedor")
+                                }}
                             />
+                            {errors.enviarFornecedor && (
+                                <AlertError
+                                    error={errors.enviarFornecedor}
+                                    onClose={clearErrors}
+                                    fieldName="enviarFornecedor"
+                                />
+                            )}
                         </div>
                         <div className="col-sm-4 col-xl-4">
                             <label>Condições de Pagamento</label>
 
                             <Select
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="condicaoPagamentoFornecedor"
                                 options={
                                     dadosCondicoesPagamento.map((item) => {
                                         return {
@@ -534,9 +582,18 @@ export const FormularioEditar = ({
                                     })
                                 }
                                 value={condicaoPagamento}
-                                onChange={(e) => setCondicaoPagamento(e)}
-
+                                onChange={(e) => {
+                                    setCondicaoPagamento(e)
+                                    clearErrors("condicaoPagamentoFornecedor")
+                                }}
                             />
+                            {errors.condicaoPagamentoFornecedor && (
+                                <AlertError
+                                    error={errors.condicaoPagamentoFornecedor}
+                                    onClose={clearErrors}
+                                    fieldName="condicaoPagamentoFornecedor"
+                                />
+                            )}
                         </div>
                     </div>
                 </div>
@@ -546,16 +603,29 @@ export const FormularioEditar = ({
                             <label>Tipo Pedido</label>
 
                             <Select
-                                options={optionsPedido.map((item) => {
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="tipoPedidoFornecedor"
+                                options={optionsTipoCategoria.map((item) => {
                                     return {
                                         value: item.value,
                                         label: item.label
                                     }
                                 })}
                                 value={tipoPedido}
-                                onChange={(e) => setTipoPedido(e)}
+                                onChange={(e) => {
+                                    setTipoPedido(e)
+                                    clearErrors("tipoPedidoFornecedor")
+                                }}
 
                             />
+                            {errors.tipoPedidoFornecedor && (
+                                <AlertError
+                                    error={errors.tipoPedidoFornecedor}
+                                    onClose={clearErrors}
+                                    fieldName="tipoPedidoFornecedor"
+                                />
+                            )}
                         </div>
                         <div className="col-sm-4 col-xl-3">
                             <Controller
@@ -590,16 +660,19 @@ export const FormularioEditar = ({
                                     />
                                 )}
                             />
-
+                            
                         </div>
 
                     </div>
                 </div>
-                <div className="form-group">
+                <div className="form-group" style={{marginBottom: '5rem'}}>
                     <div className="row">
                         <div className="col-sm-8 col-xl-8">
                             <label htmlFor="">Transportadora</label>
                             <Select
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="transportadoraFornecedor"
                                 options={[
                                     { value: '', label: 'Selecione' },
                                     ...dadosTransportadora.map((item) => {
@@ -610,21 +683,44 @@ export const FormularioEditar = ({
                                     })
                                 ]}
                                 value={transportadora}
-                                onChange={(e) => setTransportadora(e)}
+                                onChange={(e) => {
+                                    setTransportadora(e)
+                                    clearErrors("transportadoraFornecedor")
+                                }}
                             />
+                            {errors.transportadoraFornecedor && (
+                                <AlertError
+                                    error={errors.transportadoraFornecedor}
+                                    onClose={clearErrors}
+                                    fieldName="transportadoraFornecedor"
+                                />
+                            )}
                         </div>
                         <div className="col-sm-4 col-xl-4">
                             <label htmlFor="">Tipo Frete</label>
                             <Select
-                                options={optionsFrete.map((item) => {
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="tipoFreteFornecedor"
+                                options={optionsTipoFrete.map((item) => {
                                     return {
                                         value: item.value,
                                         label: item.label
                                     }
                                 })}
                                 value={tipoFrete}
-                                onChange={(e) => setTipoFrete(e)}
+                                onChange={(e) => {
+                                    setTipoFrete(e)
+                                    clearErrors("tipoFreteFornecedor")
+                                }}
                             />
+                            {errors.tipoFreteFornecedor && (
+                                <AlertError
+                                    error={errors.tipoFreteFornecedor}
+                                    onClose={clearErrors}
+                                    fieldName="tipoFreteFornecedor"
+                                />
+                            )}
                         </div>
                     </div>
                 </div>
@@ -635,7 +731,7 @@ export const FormularioEditar = ({
                     corFechar={"secondary"}
 
                     ButtonTypeCadastrar={ButtonTypeModal}
-                    onClickButtonCadastrar
+                    onClickButtonCadastrar={handleSubmit(handleValidatedSubmit)}
                     tipoBtnCadastrar={"submit"}
                     textButtonCadastrar={"Salvar"}
                     corCadastrar={"success"}

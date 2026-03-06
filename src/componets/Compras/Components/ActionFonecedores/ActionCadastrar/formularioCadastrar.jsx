@@ -138,7 +138,7 @@ export const FormularioCadastrar = ({handleClose, usuarioLogado, optionsModulos,
     }
     return (
         <Fragment>
-             <form onSubmit={handleSubmit(handleValidatedSubmit)}>
+            <form onSubmit={handleSubmit(handleValidatedSubmit)}>
                 <div className="form-group">
                     <div className="row">
                         <div className="col-sm-4 col-xl-4">

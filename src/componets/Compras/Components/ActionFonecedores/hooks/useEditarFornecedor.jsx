@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
 import axios from "axios"
 import Swal from 'sweetalert2'
 import { getDataHoraAtual } from "../../../../../utils/dataAtual"
 import { post, put } from "../../../../../api/funcRequest"
 import { useFetchData } from "../../../../../hooks/useFetchData"
 import { validarCNPJ } from "../../../../../utils/mascaraCNPJ"
+import { situacao, optionsTipoFrete, optionsTipoCategoria, optionsEnviar, optionsFiscal } from "../../../../../../parceiro.json"
 
 
 export const useEditarFornecedor = ({dadosDetalheFornecedor, handleClose, usuarioLogado, optionsModulos, handleClick}) => {
@@ -39,60 +39,30 @@ export const useEditarFornecedor = ({dadosDetalheFornecedor, handleClose, usuari
     const [data, setData] = useState('')
     const [ipUsuario, setIpUsuario] = useState('');
 
-    const navigate = useNavigate();
-        useEffect(() => {
+   
+    useEffect(() => {
         const dataAtual = getDataHoraAtual()
         setData(dataAtual)
     },[])
 
     
-    const optionsSituacao = [
-        { value: 'True', label: 'Ativo' },
-        { value: 'False', label: 'Inativo' },
-      ]
-    
-      const optionsFrete = [
-        { value: 'PAGO', label: 'PAGO - CIF' },
-        { value: 'APAGAR', label: 'A PAGAR - FOB' },
-      ]
-    
-      const optionsPedido = [
-        { value: 'VESTUARIO', label: 'VESTUARIO' },
-        { value: 'CALCADOS', label: 'CALÇADOS' },
-        { value: 'ARTIGOS', label: 'ARTIGOS' },
-      ]
-    
-      const optionsEnviar = [
-        {value: 'NE', label: 'NÃO ENVIAR'},
-        {value: 'ET', label: 'ETIQUETA'},
-        {value: 'AR', label: 'ARQUIVO'},
-      ]
-    
-      const optionsFiscal = [
-        {value: 'S', label: 'Simples Nacional'},
-        {value: 'N', label: 'Lucro Presumido'},
-        {value: 'R', label: 'Lucro Real'},
-      ]
-
-
-
     const getIPUsuario = async () => {
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
             usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP via ipwho.is:", error);
+            console.error("Erro ao buscar IP via ifconfig.me:", error);
         }
 
         if (!usuarioIP) {
-            try {
-                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-                usuarioIP = ipifyData?.ip;
-            } catch (error) {
-                console.error("Erro ao buscar IP via ipify.org:", error);
-            }
+        try {
+            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+            usuarioIP = ipifyData?.ip;
+        } catch (error) {
+            console.error("Erro ao buscar IP via ipify.org:", error);
+        }
         }
         setIpUsuario(usuarioIP);
         return usuarioIP;
@@ -359,196 +329,12 @@ export const useEditarFornecedor = ({dadosDetalheFornecedor, handleClose, usuari
     const onSubmit = async () => {
         if(optionsModulos[0]?.ALTERAR == 'False') {
             Swal.fire({
-                title: 'Erro!',
-                text: `${usuarioLogado?.NOFUNCIONARIO},\nVocê não tem permissão para editar um Fornecedor!`,
                 icon: 'error',
+                title: 'Acesso Negado!',
+                html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para editar um Fornecedor!`,
                 customClass: {
                     container: 'custom-swal',
                 },
-            });
-            return;
-        }
-
-        if (cnpj == '' || cnpj.length < 11 || cnpj.length !== 14) {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: `CNPJ ou CPF Incompleto, Faltam ${cnpj.length > 11 ? "${14 - cnpj.length}" : "${11 - cnpj.length}"} Dígito(s)!`,
-                text: `Favor Verificar o CNPJ!`,
-                type: 'warning',
-                showConfirmButton: false,
-                timer: 1500,
-                customClass: {
-                    container: 'custom-swal',
-                }
-            });
-            return;
-        }
-
-        if(razaoSocial == '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'Informe a Razão Social do Fornecedor.',
-                showConfirmButton: false,
-                timer: 1500,
-                customClass: {
-                    container: 'custom-swal',
-                }
-            });
-            return;
-        }
-
-        if(nomeFantasia == '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'Informe o Nome Fantasia do Fornecedor.',
-                showConfirmButton: false,
-                timer: 1500,
-                customClass: {
-                    container: 'custom-swal',
-                }
-            });
-            return;
-        }
-
-        if(endereco == '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'Informe o Endereço do Fornecedor.',
-                showConfirmButton: false,
-                timer: 1500,
-                customClass: {
-                    container: 'custom-swal',
-                }
-            });
-            return;
-        }
-
-        if(numero == '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'Informe o Número do Endereço do Fornecedor.',
-                showConfirmButton: false,
-                timer: 1500,
-                customClass: {
-                    container: 'custom-swal',
-                }
-            });
-            return;
-        }
-
-        if(bairro == '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'Informe o Bairro do Fornecedor.',
-                showConfirmButton: false,
-                timer: 1500,
-                customClass: {
-                    container: 'custom-swal',
-                }
-            });
-            return;
-        }
-
-        if(cidade == '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'Informe a Cidade do Fornecedor.',
-                showConfirmButton: false,
-                timer: 1500,
-                customClass: {
-                    container: 'custom-swal',
-                }
-            });
-            return;
-        }
-
-        if(uf == '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'Informe a UF do Fornecedor.',
-                showConfirmButton: false,
-                timer: 1500,
-                customClass: {
-                    container: 'custom-swal',
-                }
-            });
-            return;
-        }
-
-        if(cep == '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'Informe o CEP do Fornecedor.',
-                showConfirmButton: false,
-                timer: 1500,
-                customClass: {
-                    container: 'custom-swal',
-                }
-            });
-            return;
-        }
-
-        if(condicaoPagamento == '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'Informe a Condição de Pagamento do Fornecedor.',
-                showConfirmButton: false,
-                timer: 1500,
-                customClass: {
-                    container: 'custom-swal',
-                }
-            });
-            return;
-        }
-
-        if(transportadora == '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'Informe a Transportadora do Fornecedor.',
-                showConfirmButton: false,
-                timer: 1500,
-                customClass: {
-                    container: 'custom-swal',
-                }
-            });
-            return;
-        }
-
-        if(nomeRepresentante == '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'Informe o Nome do Representante deste Fornecedor.',
-                showConfirmButton: false,
-                timer: 1500,
-                customClass: {
-                    container: 'custom-swal',
-                }
-            });
-            return;
-        }
-
-        if(telefone1 == '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'Informe o Telefone do Representante deste Fornecedor.',
-                showConfirmButton: false,
-                timer: 1500,
-                customClass: {
-                    container: 'custom-swal',
-                }
             });
             return;
         }
@@ -600,7 +386,7 @@ export const useEditarFornecedor = ({dadosDetalheFornecedor, handleClose, usuari
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'Indisponível'
             }
             
             Swal.fire({
@@ -625,7 +411,7 @@ export const useEditarFornecedor = ({dadosDetalheFornecedor, handleClose, usuari
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'Indisponível'
             }
             await post('/log-web', createtLog)
             Swal.fire({
@@ -697,10 +483,10 @@ export const useEditarFornecedor = ({dadosDetalheFornecedor, handleClose, usuari
         setTransportadora,
         tipoFrete,
         setTipoFrete,
-        optionsSituacao,
-        optionsFrete,
-        optionsPedido,
-        optionsEnviar,
+        situacao, 
+        optionsTipoFrete, 
+        optionsTipoCategoria, 
+        optionsEnviar, 
         optionsFiscal,
         dadosTransportadora,
         dadosCondicoesPagamento,
