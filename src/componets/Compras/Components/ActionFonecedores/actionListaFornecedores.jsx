@@ -202,93 +202,184 @@ export const ActionListaFornecedores = ({
       field: 'IDFABRICANTEFORN',
       header: 'Opções',
       body: (row) => {
-        if (row.IDFABRICANTE > 0) {
-          return (
-            <div className="p-1 "
-              style={{ justifyContent: "space-between", width: "150px", display: "flex" }}
-            >
-              <div className="p-1">
-                <ButtonTable
-                  Icon={CiEdit}
-                  cor={"info"}
-                  iconColor={"white"}
-                  onClickButton={() => clickEditarFonecedor(row)}
-                  titleButton={"Editar Fornecedor"}
-                  iconSize={25}
-                  width="30px"
-                  height="30px"
-                />
+        if(row.STMIGRADOSAP == 'True'){
+          if (row.IDFABRICANTE > 0) {
+            return (
+              <div className="p-1 "
+                style={{ justifyContent: "space-between", width: "150px", display: "flex" }}
+              >
+                <div className="p-1">
+                  <ButtonTable
+                    Icon={CiEdit}
+                    cor={"info"}
+                    iconColor={"white"}
+                    onClickButton={() => clickEditarFonecedor(row)}
+                    titleButton={"Editar Fornecedor"}
+                    iconSize={25}
+                    width="30px"
+                    height="30px"
+                  />
+                </div>
+                <div className="p-1">
+                  <ButtonTable
+                    Icon={CiEdit}
+                    cor={"warning"}
+                    iconColor={"white"}
+                    onClickButton={() => clickVinculoFonecedorFabricante(row)}
+                    titleButton={"Editar Vínculo Fornecedor/Fabricante"}
+                    iconSize={25}
+                    width="30px"
+                    height="30px"
+                  />
+                </div>
+                <div className="p-1">
+                  <ButtonTable
+                    Icon={AiOutlineDelete}
+                    cor={"danger"}
+                    iconColor={"white"}
+                    onClickButton={() => handleExcluir(row.IDFABRICANTEFORN)}
+                    titleButton={"Excluir Vínculo Fabricante/Fornecedor"}
+                    iconSize={25}
+                    width="30px"
+                    height="30px"
+                  />
+                </div>
+                <div className="p-1">
+                  <ButtonTable
+                    Icon={GrView}
+                    cor={"success"}
+                    iconColor={"white"}
+                    onClickButton={() => hanldeClickVisualizarFornecedorSap(row)}
+                    titleButton={"Consultar Fornecedor SAP"}
+                    iconSize={25}
+                    width="30px"
+                    height="30px"
+                  />
+                </div>
               </div>
-              <div className="p-1">
-                <ButtonTable
-                  Icon={CiEdit}
-                  cor={"warning"}
-                  iconColor={"white"}
-                  onClickButton={() => clickVinculoFonecedorFabricante(row)}
-                  titleButton={"Editar Vínculo Fornecedor/Fabricante"}
-                  iconSize={25}
-                  width="30px"
-                  height="30px"
-                />
-              </div>
-              <div className="p-1">
-                <ButtonTable
-                  Icon={AiOutlineDelete}
-                  cor={"danger"}
-                  iconColor={"white"}
-                  onClickButton={() => handleExcluir(row.IDFABRICANTEFORN)}
-                  titleButton={"Excluir Vínculo Fabricante/Fornecedor"}
-                  iconSize={25}
-                  width="30px"
-                  height="30px"
-                />
-              </div>
-              <div className="p-1">
-                <ButtonTable
-                  Icon={GrView}
-                  cor={"success"}
-                  iconColor={"white"}
-                  onClickButton={() => hanldeClickVisualizarFornecedorSap(row)}
-                  titleButton={"Consultar Fornecedor SAP"}
-                  iconSize={25}
-                  width="30px"
-                  height="30px"
-                />
-              </div>
-            </div>
-          )
+            )
 
+          } else {
+            return (
+              <div style={{ display: "flex" }}>
+                <div className="p-1">
+                  <ButtonTable
+                    Icon={CiEdit}
+                    cor={"info"}
+                    iconColor={"white"}
+                    onClickButton={() => clickEditarFonecedor(row)}
+                    titleButton={"Editar Fornecedor"}
+                    iconSize={25}
+                    width="30px"
+                    height="30px"
+                  />
+                </div>
+
+                <div className="p-1">
+                  <ButtonTable
+                    Icon={GrView}
+                    cor={"success"}
+                    iconColor={"white"}
+                    onClickButton={() => hanldeClickVisualizarFornecedorSap(row)}
+                    titleButton={"Consultar Fornecedor SAP"}
+                    iconSize={25}
+                    width="30px"
+                    height="30px"
+                  />
+                </div>
+              </div>
+
+            )
+          }
         } else {
-          return (
-            <div style={{ display: "flex" }}>
-              <div className="p-1">
-                <ButtonTable
-                  Icon={CiEdit}
-                  cor={"info"}
-                  iconColor={"white"}
-                  onClickButton={() => clickEditarFonecedor(row)}
-                  titleButton={"Editar Fornecedor"}
-                  iconSize={25}
-                  width="30px"
-                  height="30px"
-                />
+          if (row.IDFABRICANTE > 0) {
+            return (
+              <div className="p-1 "
+                style={{ justifyContent: "space-between", width: "150px", display: "flex" }}
+              >
+                <div className="p-1">
+                  <ButtonTable
+                    Icon={CiEdit}
+                    cor={"info"}
+                    iconColor={"white"}
+                    onClickButton={() => clickEditarFonecedor(row)}
+                    titleButton={"Editar Fornecedor"}
+                    iconSize={25}
+                    width="30px"
+                    height="30px"
+                  />
+                </div>
+                <div className="p-1">
+                  <ButtonTable
+                    Icon={CiEdit}
+                    cor={"warning"}
+                    iconColor={"white"}
+                    onClickButton={() => clickVinculoFonecedorFabricante(row)}
+                    titleButton={"Editar Vínculo Fornecedor/Fabricante"}
+                    iconSize={25}
+                    width="30px"
+                    height="30px"
+                  />
+                </div>
+                <div className="p-1">
+                  <ButtonTable
+                    Icon={AiOutlineDelete}
+                    cor={"danger"}
+                    iconColor={"white"}
+                    onClickButton={() => handleExcluir(row.IDFABRICANTEFORN)}
+                    titleButton={"Excluir Vínculo Fabricante/Fornecedor"}
+                    iconSize={25}
+                    width="30px"
+                    height="30px"
+                  />
+                </div>
+                <div className="p-1">
+                  <ButtonTable
+                    Icon={GrView}
+                    cor={"success"}
+                    iconColor={"white"}
+                    onClickButton={() => hanldeClickVisualizarFornecedorSap(row)}
+                    titleButton={"Consultar Fornecedor SAP"}
+                    iconSize={25}
+                    width="30px"
+                    height="30px"
+                  />
+                </div>
+              </div>
+            )
+
+          } else {
+            return (
+              <div style={{ display: "flex" }}>
+                <div className="p-1">
+                  <ButtonTable
+                    Icon={CiEdit}
+                    cor={"info"}
+                    iconColor={"white"}
+                    onClickButton={() => clickEditarFonecedor(row)}
+                    titleButton={"Editar Fornecedor"}
+                    iconSize={25}
+                    width="30px"
+                    height="30px"
+                  />
+                </div>
+
+                <div className="p-1">
+                  <ButtonTable
+                    Icon={GrView}
+                    cor={"success"}
+                    iconColor={"white"}
+                    onClickButton={() => hanldeClickVisualizarFornecedorSap(row)}
+                    titleButton={"Consultar Fornecedor SAP"}
+                    iconSize={25}
+                    width="30px"
+                    height="30px"
+                  />
+                </div>
               </div>
 
-              <div className="p-1">
-                <ButtonTable
-                  Icon={GrView}
-                  cor={"success"}
-                  iconColor={"white"}
-                  onClickButton={() => hanldeClickVisualizarFornecedorSap(row)}
-                  titleButton={"Consultar Fornecedor SAP"}
-                  iconSize={25}
-                  width="30px"
-                  height="30px"
-                />
-              </div>
-            </div>
-
-          )
+            )
+          }
         }
       }
     }

@@ -295,7 +295,7 @@ export const useEditarFornecedor = ({dadosDetalheFornecedor, handleClose, usuari
 
     }, [dadosDetalheFornecedor, cnpj]);
 
-        const handleFechar = () => {
+    const handleFechar = () => {
         setCnpj('');
         setInscricaoEstadual('');
         setInscricaoMunicipal('');
@@ -365,8 +365,8 @@ export const useEditarFornecedor = ({dadosDetalheFornecedor, handleClose, usuari
             DTCADASTRO: data,
             DTULTATUALIZACAO: data,
             STATIVO: situacaoSelecionada.value,
-            IDCONDPAGPADRAO: condicaoPagamento.value,
-            IDTRANSPORTADORAPADRAO: transportadora.value,
+            IDCONDPAGPADRAO: parseInt(condicaoPagamento.value),
+            IDTRANSPORTADORA: parseInt(transportadora.value),
             TPPEDIDOPADRAO: tipoPedido.value,
             NOVENDEDORPADRAO: vendedor,
             TPFRETEPADRAO: tipoFrete.value,

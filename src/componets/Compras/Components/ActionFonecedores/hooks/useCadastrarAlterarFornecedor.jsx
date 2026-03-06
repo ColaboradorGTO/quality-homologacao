@@ -83,10 +83,12 @@ export const useCadastrarAlterarFornecedor = ({ handleClose, usuarioLogado, opti
         async () => {
             const response = await get(`/fornecedores?CNPJFornecedor=${cnpj}`);
             setFornecedorExistente(response.data);
+            console.log(cnpj, 'cnpj')
             return response.data;
         },
-        { enabled: cnpj.length >= 14, staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+        { enabled: cnpj.length > 13  }
     );
+    console.log(cnpj, 'cnpj fora')
 
     async function getDadosEnderecoViaCep_API_redundancia(cep) {
         const URL_VIA_CEP = 'https://viacep.com.br/ws/{CEP}/json/';
@@ -371,7 +373,7 @@ export const useCadastrarAlterarFornecedor = ({ handleClose, usuarioLogado, opti
             NUCNPJ: cnpj,
             NUINSCESTADUAL: inscricaoEstadual,
             NUINSCMUNICIPAL: inscricaoMunicipal,
-            NUIBGE: numeroIBGE,
+            NUIBGE: String(numeroIBGE),
             EENDERECO: endereco,
             ENUMERO: numero,
             ECOMPLEMENTO: complemento,
@@ -520,3 +522,4 @@ export const useCadastrarAlterarFornecedor = ({ handleClose, usuarioLogado, opti
         onSubmit,
     }
 }
+
