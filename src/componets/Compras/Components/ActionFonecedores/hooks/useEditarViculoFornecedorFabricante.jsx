@@ -99,7 +99,8 @@ export const useEditarVinculoFornecedorFabricante = ({ handleClose, dadosDetalhe
                     container: 'custom-swal',
                 }
             })
-
+            handleClick();
+            handleClose();
             return response.data;
         } catch (error) {
             const textDados = JSON.stringify(postData)

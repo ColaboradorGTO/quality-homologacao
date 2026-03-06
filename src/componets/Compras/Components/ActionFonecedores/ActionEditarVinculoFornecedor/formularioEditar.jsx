@@ -1,5 +1,4 @@
 import { Fragment } from "react"
-import { InputFieldModal } from "../../../../Buttons/InputFieldModal"
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal"
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal"
 import { useForm, Controller } from "react-hook-form";
@@ -7,6 +6,7 @@ import Select from 'react-select';
 import { useEditarVinculoFornecedorFabricante } from "../hooks/useEditarViculoFornecedorFabricante";
 import FormField from "../../../../Formularios/FormField";
 import { AlertError } from "../../../../Inputs/alertError";
+import { schema } from "./schema/useEditarSchema";
 
 export const FormularioEditar = ({
   handleClose,
@@ -33,8 +33,9 @@ export const FormularioEditar = ({
   const handleValidatedSubmit = async () => {
     try {
       const dadosParaValidar = {
-        cnpjFornecedor: cnpj,
-
+        nomeFornecedor: fabricante,
+        fornecedor: fornecedorSelecionado,
+        situacaoFornecedor: statusSelecionado
       }
 
       await schema.validate(dadosParaValidar, { abortEarly: false });
@@ -79,6 +80,7 @@ export const FormularioEditar = ({
                     onChange={(e) => setFabricante(e.target.value)}
                     errors={errors}
                     clearErrors={clearErrors}
+                    readOnly={true}
                   />
                 )}
               />
