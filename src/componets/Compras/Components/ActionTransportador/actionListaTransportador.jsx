@@ -158,7 +158,7 @@ export const ActionListaTransportador = ({
       }
     } else {
       Swal.fire({
-        title: 'Erro!',
+        title: 'Acesso Negado!',
         html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para alterar o Transportador!`,
         icon: 'error',
         customClass: {

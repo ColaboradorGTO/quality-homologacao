@@ -41,7 +41,7 @@ export const ActionPesquisaFabricante = ({ usuarioLogado }) => {
     { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
   );
 
-  const { data: dadosFornecedores = [], error: errorFornecedor, isLoading: isLoadingFornecedor, refetch: refetchFornecdor } = useQuery(
+  const { data: dadosFornecedores = [], error: errorFabricantes, isLoading: isLoadingFabricantes, refetch: refetchFabricante } = useQuery(
     'fornecedores',
     async () => {
       const response = await get(`/fornecedores`);
@@ -50,18 +50,50 @@ export const ActionPesquisaFabricante = ({ usuarioLogado }) => {
     },
     { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000}
   );
-  
-  const { data: dadosFabricantes = [], error: errorFabricantes, isLoading: isLoadingFabricantes, refetch: refetchFabricante } = useQuery(
-    'fabricante-fornecedor',
-    async () => {
-      const response = await get(`/fabricante-fornecedor`);
 
-      return response.data;
-    },
-    { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000}
+  const fetchListaFornecedores = async () => {
+    const urlBase = `/fabricantes`;
+    let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
+    urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+    try {
+
+      animacaoCarregamento('Carregando dados...', true);
+
+      const primeiraPagina = 1;
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      console.log('Primeira resposta:', primeiraResposta);
+      const page = primeiraResposta.page || primeiraPagina;
+      const pageSize = primeiraResposta.pageSize || 1000;
+      const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
+      const totalPages = Math.ceil(totalRows / pageSize);
+
+      let allData = [...(primeiraResposta.data || [])];
+
+      if (totalPages > 1) {
+        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          allData.push(...(responsePage.data || []));
+        }
+      }
+
+      return allData;
+    } catch (error) {
+      console.error('Erro ao buscar dados da api:', error);
+      throw error;
+    } finally {
+      fecharAnimacaoCarregamento();
+    }
+  };
+
+  const { data: dadosFabricantes = [], error: errorFornecedor, isLoading: isLoadingFornecedor, refetch } = useQuery(
+    ['fabricantes'],
+    async () => fetchListaFornecedores(),
+    { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000}
   );
 
-  const fetchListaFabricante = async () => {
+
+  const fetchListaFabricanteFornecedor = async () => {
     const urlBase = `/fabricante-fornecedor?idFabricante=${fabricanteSelecionado}&descricaoFabricante=${nomeFabricante}&idFornecedor=${fornecedorSelecionado}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
@@ -95,9 +127,9 @@ export const ActionPesquisaFabricante = ({ usuarioLogado }) => {
     }
   };
 
-  const { data: dadosFabricantesFornecedor = [], error: errorFabricanteFornecedor, isLoading: isLoadingFabricanteFornecedor, refetch: refetchListaFabricante } = useQuery(
+  const { data: dadosFabricantesFornecedor = [], error: errorFabricanteFornecedor, isLoading: isLoadingFabricanteFornecedor, refetch: refetchListaFabricanteFornecedor } = useQuery(
     ['fabricante-fornecedor'],
-    () => fetchListaFabricante(),
+    () => fetchListaFabricanteFornecedor(),
     { enabled: false, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
   )
 
@@ -112,7 +144,7 @@ export const ActionPesquisaFabricante = ({ usuarioLogado }) => {
   );
 
   const handleClick = () => {
-    refetchListaFabricante();
+    refetchListaFabricanteFornecedor();
     setTabelaVisivel(false)
   }
 
@@ -194,6 +226,7 @@ export const ActionPesquisaFabricante = ({ usuarioLogado }) => {
 
       <ActionListaFabricantes
         dadosFabricantesFornecedo={dadosFabricantesFornecedor}
+        dadosFornecedores={dadosFornecedores}
         usuarioLogado={usuarioLogado}
         optionsModulos={optionsModulos}
         handleClick={handleClick}

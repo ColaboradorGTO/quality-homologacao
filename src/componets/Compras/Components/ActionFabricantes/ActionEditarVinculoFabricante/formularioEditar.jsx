@@ -1,5 +1,4 @@
 import { Fragment } from "react"
-import { InputFieldModal } from "../../../../Buttons/InputFieldModal"
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal"
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal"
 import { useForm, Controller } from "react-hook-form";
@@ -12,6 +11,7 @@ import { schema } from "./schema/useEditarSchema";
 export const FormularioEditar = ({
   handleClose,
   dadosDetalheFornecedorFabricante,
+  dadosFornecedores,
   usuarioLogado,
   optionsModulos,
   handleClick
@@ -20,16 +20,15 @@ export const FormularioEditar = ({
     mode: "onChange"
   });
   const {
-    statusSelecionado,
+    setFabricante,
     fabricante,
     fornecedorSelecionado,
     setFornecedorSelecionado,
     situacao,
+    statusSelecionado,
     setStatusSelecionado,
-    setFabricante,
-    dadosFabricantes,
     onSubmit
-  } = useEditarVinculoFornecedorFabricante({ handleClose, dadosDetalheFornecedorFabricante, usuarioLogado, optionsModulos, handleClick })
+  } = useEditarVinculoFornecedorFabricante({ handleClose, dadosDetalheFornecedorFabricante, dadosFornecedores, usuarioLogado, optionsModulos, handleClick })
 
   const handleValidatedSubmit = async () => {
     try {
@@ -65,27 +64,17 @@ export const FormularioEditar = ({
   return (
 
     <Fragment>
-      <form>
+      <form onSubmit={handleSubmit(handleValidatedSubmit)}>
         <div className="form-group" style={{ marginBottom: '5rem' }}>
           <div className="row">
 
             <div className="col-sm-6 col-xl-4">
-
-              <InputFieldModal
-                label={"Fornecedor *"}
-                type={"text"}
-                nome={"nomeFabricante"}
-                readOnly={true}
-                value={dadosDetalheFornecedorFabricante[0]?.DSFORNECEDOR}
-                onChange={(e) => setFabricante(e.target.value)}
-                required={true}
-              />
               <Controller
                 name="fabricanteVinculo"
                 control={control}
                 render={({ field }) => (
                   <FormField
-                    label={"Telefone 2"}
+                    label={"Fabricante *"}
                     name="fabricanteVinculo"
                     type="text"
                     value={fabricante}
@@ -104,10 +93,10 @@ export const FormularioEditar = ({
                 classNamePrefix="select"
                 name="fabricanteVinculo"
                 value={fornecedorSelecionado}
-                options={dadosFabricantes.map((item) => {
+                options={dadosFornecedores.map((item) => {
                   return {
                     value: item.IDFORNECEDOR,
-                    label: `${item.IDFABRICANTE} - ${item.DSFABRICANTE}`
+                    label: `${item.IDFORNECEDOR} - ${item.NOFANTASIA} - ${item.NUCNPJ} - ${item.NORAZAOSOCIAL}`
                   }
                 })}
                 onChange={(e) => {
@@ -161,7 +150,7 @@ export const FormularioEditar = ({
         corFechar={"secondary"}
 
         ButtonTypeCadastrar={ButtonTypeModal}
-        onClickButtonCadastrar={handleSubmit(onSubmit)}
+        onClickButtonCadastrar={handleSubmit(handleValidatedSubmit)}
         textButtonCadastrar={"Salvar"}
         corCadastrar={"success"}
         loadingTextCadastrar={"Atualizando..."}

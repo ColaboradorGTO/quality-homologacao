@@ -6,6 +6,7 @@ import Select from 'react-select';
 import { useForm, Controller } from "react-hook-form";
 import FormField from "../../../../Formularios/FormField"
 import { schema } from "./schema/useCadastrarSchema"
+import { AlertError } from "../../../../Inputs/alertError";
 
 export const FormularioCadastrar = ({handleClose, usuarioLogado, optionsModulos, handleClick }) => {
     const { register, handleSubmit, formState: { errors }, clearErrors, setError, control } = useForm({
@@ -67,9 +68,9 @@ export const FormularioCadastrar = ({handleClose, usuarioLogado, optionsModulos,
         setTransportadora,
         tipoFrete,
         setTipoFrete,
-        optionsSituacao,
-        optionsFrete,
-        optionsPedido,
+        situacao, 
+        optionsTipoFrete, 
+        optionsTipoCategoria, 
         optionsEnviar,
         optionsFiscal,
         dadosTransportadora,
@@ -102,11 +103,19 @@ export const FormularioCadastrar = ({handleClose, usuarioLogado, optionsModulos,
                 telefone3Fornecedor: telefone3,
                 vendedorFornecedor: vendedor,
                 emailVendedorFornecedor: emailVendedor,
+                situacaoFornecedor: situacaoSelecionada,
+                fiscalFornecedor: fiscal,
+                enviarFornecedor: enviar,
+                condicaoPagamentoFornecedor: condicaoPagamento,
+                tipoPedidoFornecedor: tipoPedido,
+                transportadoraFornecedor: transportadora,
+                tipoFreteFornecedor: tipoFrete,
+
             }
 
             await schema.validate(dadosParaValidar, { abortEarly: false });
 
-            onSubmit();
+            await onSubmit();
 
         } catch (validationError) {
             clearErrors();
@@ -468,15 +477,28 @@ export const FormularioCadastrar = ({handleClose, usuarioLogado, optionsModulos,
                         <div className="col-sm-3 col-xl-3">
                             <label className="form-label" htmlFor="fornst">Situação *</label>
                             <Select
-                                options={optionsSituacao.map((item) => {
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="situacaoFornecedor"
+                                options={situacao.map((item) => {
                                     return {
                                         value: item.value,
                                         label: item.label
                                     }
                                 })}
                                 value={situacaoSelecionada}
-                                onChange={(e) => setSituacaoSelecionada(e)}
+                                onChange={(e) => {
+                                    setSituacaoSelecionada(e)
+                                    clearErrors("situacaoFornecedor")
+                                }}
                             />
+                            {errors.situacaoFornecedor && (
+                                <AlertError
+                                    error={errors.situacaoFornecedor}
+                                    onClose={clearErrors}
+                                    fieldName="situacaoFornecedor"
+                                />
+                            )}
                         </div>
                     </div>
                 </div>
@@ -491,6 +513,9 @@ export const FormularioCadastrar = ({handleClose, usuarioLogado, optionsModulos,
 
                             <label htmlFor="">Fiscal</label>
                             <Select
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="fiscalFornecedor"
                                 options={optionsFiscal.map((item) => {
                                     return {
                                         value: item.value,
@@ -498,13 +523,25 @@ export const FormularioCadastrar = ({handleClose, usuarioLogado, optionsModulos,
                                     }
                                 })}
                                 value={fiscal}
-                                onChange={(e) => setFiscal(e)}
-
+                                onChange={(e) => {
+                                    setFiscal(e)
+                                    clearErrors("fiscalFornecedor")
+                                }}
                             />
+                            {errors.fiscalFornecedor && (
+                                <AlertError
+                                    error={errors.fiscalFornecedor}
+                                    onClose={clearErrors}
+                                    fieldName="fiscalFornecedor"
+                                />
+                            )}
                         </div>
                         <div className="col-sm-4 col-xl-4">
                             <label htmlFor="">Enviar</label>
                             <Select
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="enviarFornecedor"
                                 options={optionsEnviar.map((item) => {
                                     return {
                                         value: item.value,
@@ -512,14 +549,26 @@ export const FormularioCadastrar = ({handleClose, usuarioLogado, optionsModulos,
                                     }
                                 })}
                                 value={enviar}
-                                onChange={(e) => setEnviar(e)}
-
+                                onChange={(e) => {
+                                    setEnviar(e)
+                                    clearErrors("enviarFornecedor")
+                                }}
                             />
+                            {errors.enviarFornecedor && (
+                                <AlertError
+                                    error={errors.enviarFornecedor}
+                                    onClose={clearErrors}
+                                    fieldName="enviarFornecedor"
+                                />
+                            )}
                         </div>
                         <div className="col-sm-4 col-xl-4">
                             <label>Condições de Pagamento</label>
 
                             <Select
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="condicaoPagamentoFornecedor"
                                 options={
                                     dadosCondicoesPagamento.map((item) => {
                                         return {
@@ -529,9 +578,18 @@ export const FormularioCadastrar = ({handleClose, usuarioLogado, optionsModulos,
                                     })
                                 }
                                 value={condicaoPagamento}
-                                onChange={(e) => setCondicaoPagamento(e)}
-
+                                onChange={(e) => {
+                                    setCondicaoPagamento(e)
+                                    clearErrors("condicaoPagamentoFornecedor")
+                                }}
                             />
+                            {errors.condicaoPagamentoFornecedor && (
+                                <AlertError
+                                    error={errors.condicaoPagamentoFornecedor}
+                                    onClose={clearErrors}
+                                    fieldName="condicaoPagamentoFornecedor"
+                                />
+                            )}
                         </div>
                     </div>
                 </div>
@@ -541,16 +599,29 @@ export const FormularioCadastrar = ({handleClose, usuarioLogado, optionsModulos,
                             <label>Tipo Pedido</label>
 
                             <Select
-                                options={optionsPedido.map((item) => {
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="tipoPedidoFornecedor"
+                                options={optionsTipoCategoria.map((item) => {
                                     return {
                                         value: item.value,
                                         label: item.label
                                     }
                                 })}
                                 value={tipoPedido}
-                                onChange={(e) => setTipoPedido(e)}
+                                onChange={(e) => {
+                                    setTipoPedido(e)
+                                    clearErrors("tipoPedidoFornecedor")
+                                }}
 
                             />
+                            {errors.tipoPedidoFornecedor && (
+                                <AlertError
+                                    error={errors.tipoPedidoFornecedor}
+                                    onClose={clearErrors}
+                                    fieldName="tipoPedidoFornecedor"
+                                />
+                            )}
                         </div>
                         <div className="col-sm-4 col-xl-3">
                             <Controller
@@ -590,11 +661,14 @@ export const FormularioCadastrar = ({handleClose, usuarioLogado, optionsModulos,
 
                     </div>
                 </div>
-                <div className="form-group">
+                <div className="form-group" style={{marginBottom: '5rem'}}>
                     <div className="row">
                         <div className="col-sm-8 col-xl-8">
                             <label htmlFor="">Transportadora</label>
                             <Select
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="transportadoraFornecedor"
                                 options={[
                                     { value: '', label: 'Selecione' },
                                     ...dadosTransportadora.map((item) => {
@@ -605,21 +679,44 @@ export const FormularioCadastrar = ({handleClose, usuarioLogado, optionsModulos,
                                     })
                                 ]}
                                 value={transportadora}
-                                onChange={(e) => setTransportadora(e)}
+                                onChange={(e) => {
+                                    setTransportadora(e)
+                                    clearErrors("transportadoraFornecedor")
+                                }}
                             />
+                            {errors.transportadoraFornecedor && (
+                                <AlertError
+                                    error={errors.transportadoraFornecedor}
+                                    onClose={clearErrors}
+                                    fieldName="transportadoraFornecedor"
+                                />
+                            )}
                         </div>
                         <div className="col-sm-4 col-xl-4">
                             <label htmlFor="">Tipo Frete</label>
                             <Select
-                                options={optionsFrete.map((item) => {
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="tipoFreteFornecedor"
+                                options={optionsTipoFrete.map((item) => {
                                     return {
                                         value: item.value,
                                         label: item.label
                                     }
                                 })}
                                 value={tipoFrete}
-                                onChange={(e) => setTipoFrete(e)}
+                                onChange={(e) => {
+                                    setTipoFrete(e)
+                                    clearErrors("tipoFreteFornecedor")
+                                }}
                             />
+                            {errors.tipoFreteFornecedor && (
+                                <AlertError
+                                    error={errors.tipoFreteFornecedor}
+                                    onClose={clearErrors}
+                                    fieldName="tipoFreteFornecedor"
+                                />
+                            )}
                         </div>
                     </div>
                 </div>
@@ -630,7 +727,7 @@ export const FormularioCadastrar = ({handleClose, usuarioLogado, optionsModulos,
                     corFechar={"secondary"}
 
                     ButtonTypeCadastrar={ButtonTypeModal}
-                    onClickButtonCadastrar
+                    onClickButtonCadastrar={handleSubmit(handleValidatedSubmit)}
                     tipoBtnCadastrar={"submit"}
                     textButtonCadastrar={"Salvar"}
                     corCadastrar={"success"}

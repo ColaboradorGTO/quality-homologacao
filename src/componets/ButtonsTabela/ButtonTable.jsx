@@ -76,7 +76,7 @@ export const ButtonTable = ({
         onClick={onClickButton}
         title={titleButton}
         id={id}
-        lineHeight={lineHeight}
+        // lineHeight={lineHeight}
         flexDirection={flexDirection}
       >
         <div style={{ alignItems: "center",  display: 'flex', flexDirection: flexDirection || 'column', justifyContent: 'center', gap: '2px', width: '100%' }}>

@@ -16,7 +16,7 @@ import * as XLSX from 'xlsx';
 import { useMigrarFabricanteSap } from "./hooks/useMigrarFabricanteSap";
 import Swal from "sweetalert2";
 
-export const ActionListaFabricantes = ({ dadosFabricantesFornecedo, usuarioLogado, optionsModulos, handleClick }) => {
+export const ActionListaFabricantes = ({ dadosFabricantesFornecedo, dadosFornecedores, usuarioLogado, optionsModulos, handleClick }) => {
   const [dadosDetalheFornecedorFabricante, setDadosDetalheFornecedorFabricante] = useState([]);
   const [dadosDetalheFabricante, setDadosDetalheFabricante] = useState([]);
   const [modalEditarFabricante, setModalEditarFabricante] = useState(false);
@@ -72,10 +72,10 @@ export const ActionListaFabricantes = ({ dadosFabricantesFornecedo, usuarioLogad
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Relatório Fabricantes');
     XLSX.writeFile(workbook, 'relatorio_fabricantes.xlsx');
   };
-
+  
+  
   const dadosListaFornecedoresFabricantes = dadosFabricantesFornecedo.map((item, index) => {
     let contador = index + 1;
-
     return {
       contador,
       DSFABRICANTE: item.DSFABRICANTE,
@@ -92,9 +92,9 @@ export const ActionListaFabricantes = ({ dadosFabricantesFornecedo, usuarioLogad
 
   const colunasFornecedores = [
     {
-      field: 'contador',
+      field: 'IDFABRICANTE',
       header: 'Nº',
-      body: row => <th>{row.contador}</th>,
+      body: row => <th>{row.IDFABRICANTE}</th>,
       sortable: true
     },
     {
@@ -254,7 +254,7 @@ export const ActionListaFabricantes = ({ dadosFabricantesFornecedo, usuarioLogad
 
   const editarVinculoFornecedorFabricante = async (IDFABRICANTEFORN) => {
     try {
-      const response = await get(`/vincularFabricanteFornecedor?idFornecedorFabricante=${IDFABRICANTEFORN}`);
+      const response = await get(`/vincularFabricanteFornecedor?idFabricanteFornecedor=${IDFABRICANTEFORN}`);
 
       if (response.data && response.data.length > 0) {
         setDadosDetalheFornecedorFabricante(response.data)
@@ -352,6 +352,7 @@ export const ActionListaFabricantes = ({ dadosFabricantesFornecedo, usuarioLogad
         show={modalEditarVinculo}
         handleClose={() => setModalEditarVinculo(false)}
         dadosDetalheFornecedorFabricante={dadosDetalheFornecedorFabricante}
+        dadosFornecedores={dadosFornecedores}
         usuarioLogado={usuarioLogado}
         optionsModulos={optionsModulos}
         handleClick={handleClick} 

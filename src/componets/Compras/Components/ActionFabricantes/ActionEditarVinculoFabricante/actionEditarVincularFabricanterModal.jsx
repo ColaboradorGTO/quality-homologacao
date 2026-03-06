@@ -7,6 +7,7 @@ export const ActionVincularFabricanteFornecedorModal = ({
   show, 
   handleClose, 
   dadosDetalheFornecedorFabricante,
+  dadosFornecedores,
   usuarioLogado,
   optionsModulos,
   handleClick 
@@ -32,6 +33,7 @@ export const ActionVincularFabricanteFornecedorModal = ({
           <FormularioEditar 
             handleClose={handleClose} 
             dadosDetalheFornecedorFabricante={dadosDetalheFornecedorFabricante} 
+            dadosFornecedores={dadosFornecedores}
             usuarioLogado={usuarioLogado}
             optionsModulos={optionsModulos}
             handleClick={handleClick}

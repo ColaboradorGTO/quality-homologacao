@@ -20,4 +20,15 @@ export const schema = yup.object({
     telefone3Fornecedor: yup.string(),
     vendedorFornecedor: yup.string(),
     emailVendedorFornecedor: yup.string(),
+
+    situacaoFornecedor: yup.object()
+    .nullable()
+    .required('Situação é obrigatória')
+    .typeError('Situação é obrigatória'),
+
+    fiscalFornecedor: yup.object()
+    .nullable()
+    .required('Fiscal é obrigatório')
+    .typeError('Fiscal é obrigatório'),
+
 });  

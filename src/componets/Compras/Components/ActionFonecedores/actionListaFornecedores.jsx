@@ -35,6 +35,7 @@ export const ActionListaFornecedores = ({
   const [modalEditarFornecedor, setModalEditarFornecedor] = useState(false);
   const [modalEditarVinculo, setModalEditarVinculo] = useState(false);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
   const { handleExcluir } = useExcluirVinculoFabricanteFornecedor({usuarioLogado, optionsModulos, handleClick});
 
@@ -319,7 +320,7 @@ export const ActionListaFornecedores = ({
       const cnpjFormatado = formatarCNPJ(NUCNPJFORN);
       const response = await get(`/consulta-fornecedor-sap?nomeFornecedor=${NORAZAOFORN}&cnpjFinal=${cnpjFormatado}&cnpjFornecedorSemFormatar=${NUCNPJFORN}`);
 
-      if (response.data) {
+      if (response.data && response.data.length > 0) {
         setDadosFornecedorSap(response.data)
         Swal.fire({
           icon: 'success',
@@ -354,6 +355,16 @@ export const ActionListaFornecedores = ({
         setDadosDetalheFornecedorFabricante(response.data)
         setModalEditarVinculo(true);
 
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: 'erro ao buscar dados detalhe',
+          customClass: {
+            container: 'custom-swal',
+          }
+        })
+        return;
       }
     } catch (error) {
       console.error('Erro ao buscar detalhes da despesa: ', error);
@@ -365,8 +376,6 @@ export const ActionListaFornecedores = ({
       editarVinculoFornecedorFabricante(row.IDFABRICANTEFORN);
     }
   };
-
-
 
 
   return (
@@ -393,6 +402,9 @@ export const ActionListaFornecedores = ({
             size="small"
             value={dados}
             globalFilter={globalFilterValue}
+            selectionMode="single"
+            selection={rowSelection}
+            onSelectionChange={(e) => setRowSelection(e.value)}
             sortOrder={-1}
             paginator={true}
             rows={10}

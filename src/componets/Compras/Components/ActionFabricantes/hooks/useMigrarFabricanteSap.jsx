@@ -3,29 +3,27 @@ import Swal from "sweetalert2";
 import { post } from "../../../../../api/funcRequest";
 import axios from "axios";
 
-
 export const useMigrarFabricanteSap = ({usuarioLogado, optionsModulos, handleClick}) => {
     const [loading, setLoading] = useState(false);
     const [ipUsuario, setIpUsuario] = useState("");
-
 
     const getIPUsuario = async () => {
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
             usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP via ipwho.is:", error);
+            console.error("Erro ao buscar IP via ifconfig.me:", error);
         }
 
         if (!usuarioIP) {
-            try {
-                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-                usuarioIP = ipifyData?.ip;
-            } catch (error) {
-                console.error("Erro ao buscar IP via ipify.org:", error);
-            }
+        try {
+            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+            usuarioIP = ipifyData?.ip;
+        } catch (error) {
+            console.error("Erro ao buscar IP via ipify.org:", error);
+        }
         }
         setIpUsuario(usuarioIP);
         return usuarioIP;
@@ -34,8 +32,12 @@ export const useMigrarFabricanteSap = ({usuarioLogado, optionsModulos, handleCli
     const migrarFabricanteSap = async (row) => {
         if(optionsModulos[0]?.CRIAR == 'False') {
             Swal.fire({
-                title: 'Erro!',
-                text: `${usuarioLogado?.NOFUNCIONARIO},\nVocê não tem permissão para migrar o Fabricante!`,
+                icon: 'error',
+                title: 'Acesso Negado!',
+                html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para migrar o Fabricante!`,
+                customClass: {
+                    container: 'custom-swal'
+                }
             });
             return;
         }
@@ -66,7 +68,7 @@ export const useMigrarFabricanteSap = ({usuarioLogado, optionsModulos, handleCli
                 IDFUNCIONARIO: String(usuarioLogado?.id), 
                 PATHFUNCAO: "COMPRAS/MIGRAR FABRICANTE SAP",
                 DADOS: JSON.stringify(dados),
-                IP: ipUsuario
+                IP: ipUsuario || 'Indisponível'
             }
     
             await post("/log-web", postData);
@@ -91,7 +93,7 @@ export const useMigrarFabricanteSap = ({usuarioLogado, optionsModulos, handleCli
                 IDFUNCIONARIO: String(usuarioLogado?.id), 
                 PATHFUNCAO: "COMPRAS/ERRO AO MIGRAR FABRICANTE SAP",
                 DADOS: JSON.stringify(dados),
-                IP: ipUsuario
+                IP: ipUsuario || 'Indisponível'
             }
             const response = await post("/log-web", postData);
             Swal.fire({
