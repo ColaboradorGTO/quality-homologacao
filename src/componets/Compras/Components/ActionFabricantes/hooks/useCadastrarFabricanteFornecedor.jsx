@@ -3,6 +3,7 @@ import { post } from "../../../../../api/funcRequest";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { getDataHoraAtual } from "../../../../../utils/dataAtual";
+import { situacao } from "../../../../../../parceiro.json"
 
 export const useCadastrarFabricanteFornecedor = ({handleClose, usuarioLogado, optionsModulos, handleClick }) => {
     const [statusSelecionado, setStatusSelecionado] = useState(null)
@@ -15,39 +16,34 @@ export const useCadastrarFabricanteFornecedor = ({handleClose, usuarioLogado, op
         setData(dataAtual)
     },[])
 
-    
-    const optionsStatus = [
-        { value: 'True', label: 'ATIVO' },
-        { value: 'False', label: 'INATIVO' }
-    ]
-
     const getIPUsuario = async () => {
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
             usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP via ipwho.is:", error);
+            console.error("Erro ao buscar IP via ifconfig.me:", error);
         }
 
         if (!usuarioIP) {
-            try {
-                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-                usuarioIP = ipifyData?.ip;
-            } catch (error) {
-                console.error("Erro ao buscar IP via ipify.org:", error);
-            }
+        try {
+            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+            usuarioIP = ipifyData?.ip;
+        } catch (error) {
+            console.error("Erro ao buscar IP via ipify.org:", error);
+        }
         }
         setIpUsuario(usuarioIP);
         return usuarioIP;
     };
 
+
     const onSubmit = async () => {
         if(optionsModulos[0]?.CRIAR == 'False') {
             Swal.fire({
                 title: 'Erro!',
-                text: `${usuarioLogado?.NOFUNCIONARIO},\nVocê não tem permissão para alterar o Fabricante!`,
+                html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para alterar o Fabricante!`,
                 icon: 'error',
                 customClass: {
                     container: 'custom-swal',
@@ -55,19 +51,6 @@ export const useCadastrarFabricanteFornecedor = ({handleClose, usuarioLogado, op
             })
             return; 
         }
-
-        if (fabricante === '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: `Informe o NOME do Fabricante.`,
-                type: 'warning',
-                showConfirmButton: false,
-                timer: 3000
-            });
-            return;
-        }
-
 
         const postData = {
             DSFABRICANTE: fabricante,
@@ -88,7 +71,7 @@ export const useCadastrarFabricanteFornecedor = ({handleClose, usuarioLogado, op
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'Indisponível'
             }
             
             await post('/log-web', createtLog)
@@ -114,7 +97,7 @@ export const useCadastrarFabricanteFornecedor = ({handleClose, usuarioLogado, op
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'Indisponível'
             }
 
             await post('/log-web', createtLog)
@@ -136,7 +119,7 @@ export const useCadastrarFabricanteFornecedor = ({handleClose, usuarioLogado, op
         statusSelecionado,
         fabricante,
         data,
-        optionsStatus,
+        situacao,
         setStatusSelecionado,
         setFabricante,
         onSubmit,

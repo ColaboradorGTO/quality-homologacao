@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react"
+import { Fragment, useState, useEffect } from "react"
 import { ActionMain } from "../../../Actions/actionMain"
 import { InputField } from "../../../Buttons/Input"
 import { InputSelectAction } from "../../../Inputs/InputSelectAction"
@@ -13,23 +13,32 @@ import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../ut
 import { useCadastrarVinculoFabricanteFornecedor } from "../ActionVincularFabricanteFornecedor/hooks/useCadastrarViculoFabricanteFornecedor"
 
 
-export const ActionPesquisaFabricante = ({ usuarioLogado, ID }) => {
+export const ActionPesquisaFabricante = ({ usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [modalVisivel, setModalVisivel] = useState(false);
   const [modalCadastrarFabricante, setModalCadastrarFabricante] = useState(false);
   const [nomeFabricante, setNomeFabricante] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
   const [fabricanteSelecionado, setFabricanteSelecionado] = useState('')
   const [fornecedorSelecionado, setFornecedorSelecionado] = useState('')
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
+
+  useEffect(() => {
+    const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
+    if (menuSalvo) {
+      const menuParsed = JSON.parse(menuSalvo);
+      setMenuFilhoAtual(menuParsed);
+    }
+  }, []);
+  
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
-    'menus-usuario-excecao',
+    ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
-      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${ID}`);
+      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
       
       return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
   );
 
   const { data: dadosFornecedores = [], error: errorFornecedor, isLoading: isLoadingFornecedor, refetch: refetchFornecdor } = useQuery(
@@ -89,7 +98,7 @@ export const ActionPesquisaFabricante = ({ usuarioLogado, ID }) => {
   const { data: dadosFabricantesFornecedor = [], error: errorFabricanteFornecedor, isLoading: isLoadingFabricanteFornecedor, refetch: refetchListaFabricante } = useQuery(
     ['fabricante-fornecedor'],
     () => fetchListaFabricante(),
-    { enabled: false, staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    { enabled: false, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
   )
 
   const { data: dadosVinculosFornecedores = [], error: errorVinculos, isLoading: isLoadingVinculos, refetch: refetchVinculos } = useQuery(
@@ -99,11 +108,10 @@ export const ActionPesquisaFabricante = ({ usuarioLogado, ID }) => {
 
       return response.data;
     },
-    { enabled: Boolean(fabricanteSelecionado && fornecedorSelecionado), staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000}
+    { enabled: Boolean(fabricanteSelecionado && fornecedorSelecionado), staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000}
   );
 
   const handleClick = () => {
-    setCurrentPage(prevPage => prevPage + 1);
     refetchListaFabricante();
     setTabelaVisivel(false)
   }

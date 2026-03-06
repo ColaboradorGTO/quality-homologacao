@@ -6,6 +6,7 @@ import { useEditarFabricanteFornecedor } from "../hooks/useEditarFabricanteForne
 import { useForm, Controller } from "react-hook-form";
 import FormField from "../../../../Formularios/FormField";
 import { schema } from "./schema/useEditarSchema";
+import { AlertError } from "../../../../Inputs/alertError";
 
 export const FormularioEditar = ({ handleClose, dadosDetalheFabricante, usuarioLogado, optionsModulos, handleClick }) => {
     const { register, handleSubmit, formState: { errors }, clearErrors, setError, control } = useForm({
@@ -17,7 +18,7 @@ export const FormularioEditar = ({ handleClose, dadosDetalheFabricante, usuarioL
         setStatusSelecionado,
         fabricante,
         setFabricante,
-        optionsStatus,
+        situacao,
         onSubmit
     } = useEditarFabricanteFornecedor({ handleClose, dadosDetalheFabricante, usuarioLogado, optionsModulos, handleClick })
 
@@ -25,12 +26,12 @@ export const FormularioEditar = ({ handleClose, dadosDetalheFabricante, usuarioL
         try {
             const dadosParaValidar = {
                 fabricanteFornecedor: fabricante,
-
+                situacao: statusSelecionado
             }
 
             await schema.validate(dadosParaValidar, { abortEarly: false });
 
-            onSubmit();
+            await onSubmit();
 
         } catch (validationError) {
             clearErrors();
@@ -78,17 +79,29 @@ export const FormularioEditar = ({ handleClose, dadosDetalheFabricante, usuarioL
                     <div className="col-sm-6 col-xl-3">
                         <label>Situação *</label>
                         <Select
-                            id={"stativoFabricanteFornecedor"}
+                            className="basic-single"
+                            classNamePrefix="select"
+                            name="situacao"
                             readOnly={false}
-                            options={optionsStatus.map((item) => {
+                            options={situacao.map((item) => {
                                 return {
                                     value: item.value,
                                     label: item.label
                                 }
                             })}
                             value={statusSelecionado}
-                            onChange={(e) => setStatusSelecionado(e)}
+                            onChange={(e) => {
+                                setStatusSelecionado(e)
+                                clearErrors("situacao")
+                            }}
                         />
+                        {errors.situacao && (
+                            <AlertError
+                                error={errors.situacao}
+                                onClose={clearErrors}
+                                fieldName="situacao"
+                            />
+                        )}
                     </div>
                 </div>
 
@@ -103,11 +116,11 @@ export const FormularioEditar = ({ handleClose, dadosDetalheFabricante, usuarioL
                     corFechar={"secondary"}
 
                     ButtonTypeCadastrar={ButtonTypeModal}
-                    onClickButtonCadastrar
+                    onClickButtonCadastrar={handleSubmit(handleValidatedSubmit)}
                     tipoBtnCadastrar={"submit"}
                     textButtonCadastrar={"Salvar"}
                     corCadastrar={"success"}
-                    loadingTextCadastrar={"Cadastrando..."}
+                    loadingTextCadastrar={"Atualizando..."}
                     autoLoadingCadastrar={true}
                 />
 

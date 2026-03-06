@@ -2,9 +2,12 @@ import { Fragment } from "react"
 import { InputFieldModal } from "../../../../Buttons/InputFieldModal"
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal"
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal"
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import Select from 'react-select';
 import { useEditarVinculoFornecedorFabricante } from "../hooks/useEditarViculoFornecedorFabricante";
+import { AlertError } from "../../../../Inputs/alertError";
+import FormField from "../../../../Formularios/FormField";
+import { schema } from "./schema/useEditarSchema";
 
 export const FormularioEditar = ({
   handleClose,
@@ -13,23 +16,57 @@ export const FormularioEditar = ({
   optionsModulos,
   handleClick
 }) => {
-  const { register, handleSubmit, errors } = useForm();
+  const { register, handleSubmit, formState: { errors }, clearErrors, setError, control } = useForm({
+    mode: "onChange"
+  });
   const {
     statusSelecionado,
     fabricante,
     fornecedorSelecionado,
     setFornecedorSelecionado,
-    optionsStatus,
+    situacao,
     setStatusSelecionado,
     setFabricante,
     dadosFabricantes,
     onSubmit
-  } = useEditarVinculoFornecedorFabricante({ handleClose, dadosDetalheFornecedorFabricante, usuarioLogado, optionsModulos, handleClick})
+  } = useEditarVinculoFornecedorFabricante({ handleClose, dadosDetalheFornecedorFabricante, usuarioLogado, optionsModulos, handleClick })
+
+  const handleValidatedSubmit = async () => {
+    try {
+      const dadosParaValidar = {
+        fabricanteVinculo: fabricante,
+        situacaoVinculo: statusSelecionado
+      }
+
+      await schema.validate(dadosParaValidar, { abortEarly: false });
+
+      await onSubmit();
+
+    } catch (validationError) {
+      clearErrors();
+
+
+      if (validationError.inner && validationError.inner.length > 0) {
+        validationError.inner.forEach(error => {
+          if (error.path) {
+            setError(error.path, {
+              type: 'manual',
+              message: error.message
+            });
+          }
+        });
+      }
+
+      const errorMessages = validationError.errors || [validationError.message];
+      console.log(`Erro de validação:\n${errorMessages.join('\n')}`);
+    }
+  }
+
   return (
 
     <Fragment>
       <form>
-        <div className="form-group">
+        <div className="form-group" style={{ marginBottom: '5rem' }}>
           <div className="row">
 
             <div className="col-sm-6 col-xl-4">
@@ -43,13 +80,29 @@ export const FormularioEditar = ({
                 onChange={(e) => setFabricante(e.target.value)}
                 required={true}
               />
-      
+              <Controller
+                name="fabricanteVinculo"
+                control={control}
+                render={({ field }) => (
+                  <FormField
+                    label={"Telefone 2"}
+                    name="fabricanteVinculo"
+                    type="text"
+                    value={fabricante}
+                    onChange={(e) => setFabricante(e.target.value)}
+                    errors={errors}
+                    clearErrors={clearErrors}
+                    readOnly={true}
+                  />
+                )}
+              />
             </div>
-            <div className="col-sm-6 col-xl-6">
+            <div className="col-sm-6 col-xl-4">
               <label htmlFor="fornecedor">Nome Fabricante *</label>
               <Select
                 className="basic-single"
                 classNamePrefix="select"
+                name="fabricanteVinculo"
                 value={fornecedorSelecionado}
                 options={dadosFabricantes.map((item) => {
                   return {
@@ -57,21 +110,44 @@ export const FormularioEditar = ({
                     label: `${item.IDFABRICANTE} - ${item.DSFABRICANTE}`
                   }
                 })}
-                onChange={(e) => setFornecedorSelecionado(e)}
+                onChange={(e) => {
+                  setFornecedorSelecionado(e)
+                  clearErrors("fabricanteVinculo")
+                }}
               />
+              {errors.fabricanteVinculo && (
+                <AlertError
+                  error={errors.fabricanteVinculo}
+                  onClose={clearErrors}
+                  fieldName="fabricanteVinculo"
+                />
+              )}
             </div>
-            <div className="col-sm-6 col-xl-2">
+            <div className="col-sm-6 col-xl-4">
               <label htmlFor="situacao">Situação *</label>
               <Select
-                value={statusSelecionado}
-                options={optionsStatus.map((item) => {
+                className="basic-single"
+                classNamePrefix="select"
+                name="situacaoVinculo"
+                options={situacao.map((item) => {
                   return {
                     value: item.value,
                     label: item.label
                   }
                 })}
-                onChange={(e) => setStatusSelecionado(e)}
+                value={statusSelecionado}
+                onChange={(e) => {
+                  setStatusSelecionado(e)
+                  clearErrors("situacaoVinculo")
+                }}
               />
+              {errors.situacaoVinculo && (
+                <AlertError
+                  error={errors.situacaoVinculo}
+                  onClose={clearErrors}
+                  fieldName="situacaoVinculo"
+                />
+              )}
             </div>
           </div>
         </div>
@@ -88,7 +164,7 @@ export const FormularioEditar = ({
         onClickButtonCadastrar={handleSubmit(onSubmit)}
         textButtonCadastrar={"Salvar"}
         corCadastrar={"success"}
-        loadingTextCadastrar={"Cadastrando..."}
+        loadingTextCadastrar={"Atualizando..."}
         autoLoadingCadastrar={true}
       />
     </Fragment>

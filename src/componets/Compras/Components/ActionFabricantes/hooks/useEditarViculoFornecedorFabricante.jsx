@@ -3,6 +3,7 @@ import { post, put } from "../../../../../api/funcRequest";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useQuery } from "react-query";
+import { situacao } from "../../../../../../parceiro.json"
 
 export const useEditarVinculoFornecedorFabricante = ({ handleClose, dadosDetalheFornecedorFabricante, usuarioLogado, optionsModulos, handleClick}) => {
     const [statusSelecionado, setStatusSelecionado] = useState(null)
@@ -11,35 +12,28 @@ export const useEditarVinculoFornecedorFabricante = ({ handleClose, dadosDetalhe
     const [fornecedorSelecionado, setFornecedorSelecionado] = useState('')
     const [ipUsuario, setIpUsuario] = useState('');
 
-
-    const optionsStatus = [
-        { value: 'True', label: 'ATIVO' },
-        { value: 'False', label: 'INATIVO' }
-    ]
-
     const getIPUsuario = async () => {
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
             usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP via ipwho.is:", error);
+            console.error("Erro ao buscar IP via ifconfig.me:", error);
         }
 
         if (!usuarioIP) {
-            try {
-                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-                usuarioIP = ipifyData?.ip;
-            } catch (error) {
-                console.error("Erro ao buscar IP via ipify.org:", error);
-            }
+        try {
+            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+            usuarioIP = ipifyData?.ip;
+        } catch (error) {
+            console.error("Erro ao buscar IP via ipify.org:", error);
+        }
         }
         setIpUsuario(usuarioIP);
         return usuarioIP;
     };
 
-    
     const { data: dadosFabricantes = [], error: errorFabricantes, isLoading: isLoadingFabricantes, refetch: refetchFabricantes } = useQuery(
     'fabricantes',
     async () => {
@@ -112,7 +106,7 @@ export const useEditarVinculoFornecedorFabricante = ({ handleClose, dadosDetalhe
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'Indisponível'
             }
             
             await post('/log-web', createtLog)
@@ -138,7 +132,7 @@ export const useEditarVinculoFornecedorFabricante = ({ handleClose, dadosDetalhe
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'Indisponível'
             }
             
             const response = await post('/log-web', createtLog)
@@ -163,7 +157,7 @@ export const useEditarVinculoFornecedorFabricante = ({ handleClose, dadosDetalhe
         fabricante,
         fornecedorSelecionado,
         setFornecedorSelecionado,
-        optionsStatus,
+        situacao,
         setStatusSelecionado,
         setFabricante,
         dadosFabricantes,

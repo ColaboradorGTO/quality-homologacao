@@ -14,6 +14,7 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { useMigrarFabricanteSap } from "./hooks/useMigrarFabricanteSap";
+import Swal from "sweetalert2";
 
 export const ActionListaFabricantes = ({ dadosFabricantesFornecedo, usuarioLogado, optionsModulos, handleClick }) => {
   const [dadosDetalheFornecedorFabricante, setDadosDetalheFornecedorFabricante] = useState([]);
@@ -21,6 +22,7 @@ export const ActionListaFabricantes = ({ dadosFabricantesFornecedo, usuarioLogad
   const [modalEditarFabricante, setModalEditarFabricante] = useState(false);
   const [modalEditarVinculo, setModalEditarVinculo] = useState(false);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
 
   const {
@@ -79,7 +81,7 @@ export const ActionListaFabricantes = ({ dadosFabricantesFornecedo, usuarioLogad
       DSFABRICANTE: item.DSFABRICANTE,
       IDFABSAP: item.IDFABSAP,
       NOFANTFORN: item.NOFANTFORN,
-      STATIVO: item.STATIVO,
+      STATIVO: item.STATIVO == 'True' ? 'ATIVO' : 'INATIVO',
 
       IDFORNECEDOR: item.IDFORNECEDOR,
       IDFABRICANTE: item.IDFABRICANTE,
@@ -107,13 +109,7 @@ export const ActionListaFabricantes = ({ dadosFabricantesFornecedo, usuarioLogad
       body: (row) => {
         return (
           <div>
-            <p 
-              style={{ 
-                fontWeight: 700, 
-                color: !row.IDFABSAP ? '#fd3995' : '#2196F3' 
-                }}
-                title={row.LOGFABSAP || `Motivo: ${row.LOGFABSAP}` }
-              >
+            <p style={{ fontWeight: 700,  color: !row.IDFABSAP ? '#fd3995' : '#2196F3'  }} title={row.LOGFABSAP || `Motivo: ${row.LOGFABSAP}` } >
               {!row.IDFABSAP ? 'NÃO MIGRADO' : 'MIGRADO'}
             </p>
           </div>
@@ -125,10 +121,7 @@ export const ActionListaFabricantes = ({ dadosFabricantesFornecedo, usuarioLogad
       header: 'Fornecedor Vinculado',
       body: row => {
         return (
-          <p style={{ 
-            fontWeight: 700, 
-            color: row.NOFANTFORN ? '' : '#fd3995'
-          }}>
+          <p style={{ fontWeight: 700,   color: row.NOFANTFORN ? '' : '#fd3995'}}>
             {row.NOFANTFORN || <span style={{color: 'red'}}>SEM VINCULO</span>}
           </p>
         )
@@ -140,7 +133,7 @@ export const ActionListaFabricantes = ({ dadosFabricantesFornecedo, usuarioLogad
       header: 'Situação',
       body: (row) => {
         return (
-          <p style={{ color: row.STATIVO == 'True' ? '#2196F3' : '#fd3995', fontWeight: 700 }}>{row.STATIVO == 'True' ? 'ATIVO' : 'INATIVO'}</p>
+          <p style={{ color: row.STATIVO == 'ATIVO' ? '#2196F3' : '#fd3995', fontWeight: 700 }}>{row.STATIVO}</p>
         )
       },
       sortable: true
@@ -232,10 +225,20 @@ export const ActionListaFabricantes = ({ dadosFabricantesFornecedo, usuarioLogad
     try {
       const response = await get(`/fabricantes?idFabricante=${IDFABRICANTE}`);
 
-      if (response.data) {
+      if (response.data && response.data.length > 0) {
         setDadosDetalheFabricante(response.data)
         setModalEditarFabricante(true);
-        console.log(response.data)
+       
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: 'Detalhes do fabricante não encontrados.',
+          customClass: {
+            container: 'custom-swal',
+          }
+        })
+        return;
       }
     } catch (error) {
       console.error('Erro ao buscar detalhes da despesa: ', error);
@@ -257,6 +260,16 @@ export const ActionListaFabricantes = ({ dadosFabricantesFornecedo, usuarioLogad
         setDadosDetalheFornecedorFabricante(response.data)
         setModalEditarVinculo(true);
 
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: 'Detalhes do vínculo fabricante/fornecedor não encontrados.',
+          customClass: {
+            container: 'custom-swal',
+          }
+        })
+        return;
       }
     } catch (error) {
       console.error('Erro ao buscar detalhes da despesa: ', error);
@@ -292,7 +305,10 @@ export const ActionListaFabricantes = ({ dadosFabricantesFornecedo, usuarioLogad
             title="Vendas por Loja"
             value={dadosListaFornecedoresFabricantes}
             globalFilter={globalFilterValue}
-            sortField="VRTOTALPAGO"
+            size="small"
+            selectionMode="single"
+            selection={rowSelection}
+            onSelectionChange={(e) => setRowSelection(e.value)}
             sortOrder={-1}
             paginator={true}
             rows={10}
