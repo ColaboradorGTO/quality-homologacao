@@ -366,7 +366,7 @@ export const useEditarFornecedor = ({dadosDetalheFornecedor, handleClose, usuari
             DTULTATUALIZACAO: data,
             STATIVO: situacaoSelecionada.value,
             IDCONDPAGPADRAO: parseInt(condicaoPagamento.value),
-            IDTRANSPORTADORA: parseInt(transportadora.value),
+            IDTRANSPORTADORAPADRAO: parseInt(transportadora.value),
             TPPEDIDOPADRAO: tipoPedido.value,
             NOVENDEDORPADRAO: vendedor,
             TPFRETEPADRAO: tipoFrete.value,
@@ -376,7 +376,7 @@ export const useEditarFornecedor = ({dadosDetalheFornecedor, handleClose, usuari
         }
         try {
 
-            const response = await put('/transportador/:id', postData)
+            const response = await put('/fornecedor/:id', postData)
 
             
             const textDados = JSON.stringify(postData)

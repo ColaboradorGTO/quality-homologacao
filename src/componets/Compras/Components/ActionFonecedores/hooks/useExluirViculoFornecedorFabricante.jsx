@@ -4,7 +4,7 @@ import { useState } from "react";
 import axios from "axios";
 
 
-export const useExcluirVinculoFabricanteFornecedor = ({usuarioLogado, optionsModulos, handleClick}) => {
+export const useExcluirVinculoFornecedorFabricante = ({usuarioLogado, optionsModulos, handleClick}) => {
     const [ipUsuario, setIpUsuario] = useState('');
 
     const getIPUsuario = async () => {
@@ -18,12 +18,12 @@ export const useExcluirVinculoFabricanteFornecedor = ({usuarioLogado, optionsMod
         }
 
         if (!usuarioIP) {
-        try {
-            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-            usuarioIP = ipifyData?.ip;
-        } catch (error) {
-            console.error("Erro ao buscar IP via ipify.org:", error);
-        }
+            try {
+                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+                usuarioIP = ipifyData?.ip;
+            } catch (error) {
+                console.error("Erro ao buscar IP via ipify.org:", error);
+            }
         }
         setIpUsuario(usuarioIP);
         return usuarioIP;
@@ -64,7 +64,7 @@ export const useExcluirVinculoFabricanteFornecedor = ({usuarioLogado, optionsMod
                 }
                 const response = await put(`/excluir-vinculo-fornecedor?IDFABRICANTEFORNOCEDOR=${IDFABRICANTEFORN}`, putData)
                 const textDados = JSON.stringify(putData)
-                let textoFuncao = 'COMPRAS/EXCLUSÃO VINCULO FABRICANTE-FORNECEDOR'
+                let textoFuncao = 'COMPRAS/EXCLUSÃO VINCULO FORNECEDOR-FABRICANTE'
                 const ipUsuario = await getIPUsuario();
                 const postData = {
                     IDFUNCIONARIO: String(usuarioLogado.id),
@@ -88,7 +88,7 @@ export const useExcluirVinculoFabricanteFornecedor = ({usuarioLogado, optionsMod
                 }
                
                 const textDados = JSON.stringify(putData)
-                let textoFuncao = 'COMPRAS/ERRO AO EXCLUIR VINCULO FABRICANTE-FORNECEDOR'
+                let textoFuncao = 'COMPRAS/ERRO AO EXCLUIR VINCULO FORNECEDOR-FABRICANTE'
                 const ipUsuario = await getIPUsuario();
                 const postData = {
                     IDFUNCIONARIO: String(usuarioLogado.id),

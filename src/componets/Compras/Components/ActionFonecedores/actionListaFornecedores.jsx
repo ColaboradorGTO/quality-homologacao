@@ -6,17 +6,17 @@ import { ButtonTable } from '../../../ButtonsTabela/ButtonTable';
 import { CiEdit } from 'react-icons/ci';
 import { AiOutlineDelete } from 'react-icons/ai';
 import { get } from '../../../../api/funcRequest';
-
-import { ActionEditarFornecedorModal} from './ActionEditar/actionEditarFornecedorModal';
 import HeaderTable from '../../../Tables/headerTable';
 import { useReactToPrint } from "react-to-print";
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+import { ActionEditarFornecedorModal} from './ActionEditar/actionEditarFornecedorModal';
 import { ActionEditarVinculoFornecedorFabricanteModal } from './ActionEditarVinculoFornecedor/actionEditarVincularFabricanterModal';
-import { useExcluirVinculoFabricanteFornecedor } from '../ActionVincularFabricanteFornecedor/hooks/useExluirViculoFabricanteFornecedor';
+import { useExcluirVinculoFabricanteFornecedor } from './hooks/useExluirViculoFornecedorFabricante';
 import { mascaraCNPJ } from '../../../../utils/mascaraCNPJ';
 import Swal from 'sweetalert2';
+import { useMigrarFornecedorSAP } from './hooks/useMigrarFornecedorSap';
 
 const formatarCNPJ = (cnpj) => {
   const x = cnpj.replace(/\D/g, '').match(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/);
@@ -38,6 +38,7 @@ export const ActionListaFornecedores = ({
   const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
   const { handleExcluir } = useExcluirVinculoFabricanteFornecedor({usuarioLogado, optionsModulos, handleClick});
+  const { handleMigrarSAP } = useMigrarFornecedorSAP({usuarioLogado, optionsModulos, handleClick});
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -147,7 +148,7 @@ export const ActionListaFornecedores = ({
         if (row.IDFABRICANTE > 0) {
           return (
             <div>
-              <th>{row.DSFABRICANTE?.toUpperCase()}</th>
+              <th style={{textTransform: 'uppercase'}} >{row.DSFABRICANTE}</th>
             </div>
           )
 
@@ -192,7 +193,9 @@ export const ActionListaFornecedores = ({
       body: (row) => {
         return (
 
-          <th style={{ color: row.STMIGRADOSAP == 'MIGRADO COM SUCESSO' ? '#2196F3' : '#fd3995', fontWeight: 700 }}>{row.STMIGRADOSAP}</th>
+          <th style={{ color: row.STMIGRADOSAP == 'MIGRADO COM SUCESSO' ? '#2196F3' : '#fd3995', fontWeight: 700 }}>
+            {row.STMIGRADOSAP}
+          </th>
 
         )
       },
@@ -338,8 +341,8 @@ export const ActionListaFornecedores = ({
                     Icon={GrView}
                     cor={"success"}
                     iconColor={"white"}
-                    onClickButton={() => hanldeClickVisualizarFornecedorSap(row)}
-                    titleButton={"Consultar Fornecedor SAP"}
+                    onClickButton={() => handleMigrarSAP(row.IDFORNECEDOR)}
+                    titleButton={"Migrar Fornecedor SAP"}
                     iconSize={25}
                     width="30px"
                     height="30px"
@@ -389,10 +392,20 @@ export const ActionListaFornecedores = ({
     try {
       const response = await get(`/fornecedores?idFornecedor=${IDFORNECEDOR}`);
 
-      if (response.data) {
+      if (response.data && response.data.length > 0) {
         setDadosDetalheFornecedor(response.data)
         setModalEditarFornecedor(true);
    
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: 'erro ao buscar dados detalhe',
+          customClass: {
+            container: 'custom-swal',
+          }
+        })
+        return;
       }
     } catch (error) {
       console.error('Erro ao buscar detalhes da despesa: ', error);
@@ -417,6 +430,9 @@ export const ActionListaFornecedores = ({
           icon: 'success',
           title: `ID Fornecedor no SAP - ${response.data[0]?.CardCode || ''}`,
           showConfirmButton: true,
+          customClass: {
+            container: 'custom-swal',
+          }
         })
         return response.data;
       } else {
@@ -424,6 +440,9 @@ export const ActionListaFornecedores = ({
           icon: 'error',
           title: `Fornecedor não Cadastrado no SAP`,
           showConfirmButton: true,
+          customClass: {
+            container: 'custom-swal',
+          }
         })
       }
     } catch (error) {

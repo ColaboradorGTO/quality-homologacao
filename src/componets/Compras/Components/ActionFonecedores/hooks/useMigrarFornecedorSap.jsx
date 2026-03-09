@@ -4,7 +4,7 @@ import { useState } from "react";
 import axios from "axios";
 
 
-export const useExcluirVinculoFabricanteFornecedor = ({usuarioLogado, optionsModulos, handleClick}) => {
+export const useMigrarFornecedorSAP = ({usuarioLogado, optionsModulos, handleClick}) => {
     const [ipUsuario, setIpUsuario] = useState('');
 
     const getIPUsuario = async () => {
@@ -28,22 +28,24 @@ export const useExcluirVinculoFabricanteFornecedor = ({usuarioLogado, optionsMod
         setIpUsuario(usuarioIP);
         return usuarioIP;
     };
+     
 
-    const handleExcluir = async (IDFABRICANTEFORN) => {
+    const handleMigrarSAP = async (IDFORNECEDOR) => {
         if(optionsModulos[0]?.ALTERAR == 'False') {
             Swal.fire({
-                title: 'Acesso Negado!',
-                html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para excluir vínculos de Fornecedor-Fabricante.`,
                 icon: 'warning',
+                title: 'Acesso Negado!',
+                text: `${usuarioLogado?.NOFUNCIONARIO} Você não tem permissão para migrar fornecedores SAP.`,
                 customClass: {
                     container: 'custom-swal',
-                }
+                },
             });
             return;
+
         }
 
         Swal.fire({
-            title: `Certeza que Deseja Excluir o Vínculo do Fornecedor?`,
+            title: `Certeza que Deseja Migrar esse Fornecedor?`,
             text: 'Você não poderá reverter a ação!',
             icon: 'warning',
             showCancelButton: true,
@@ -59,13 +61,16 @@ export const useExcluirVinculoFabricanteFornecedor = ({usuarioLogado, optionsMod
         }).then(async (result) => {
         if (result.isConfirmed) {
             try {
+                
                 const putData = {
-                    IDFABRICANTEFORN: IDFABRICANTEFORN,
+                    IDFORNECEDOR: IDFORNECEDOR,
                 }
-                const response = await put(`/excluir-vinculo-fornecedor?IDFABRICANTEFORNOCEDOR=${IDFABRICANTEFORN}`, putData)
+
+                const response = await put(`/migrar-fornecedor-sap?IDFORNECEDOR=${IDFORNECEDOR}`, putData)
                 const textDados = JSON.stringify(putData)
-                let textoFuncao = 'COMPRAS/EXCLUSÃO VINCULO FABRICANTE-FORNECEDOR'
+                let textoFuncao = 'COMPRAS/MIGRAR FORNECEDOR SAP'
                 const ipUsuario = await getIPUsuario();
+
                 const postData = {
                     IDFUNCIONARIO: String(usuarioLogado.id),
                     PATHFUNCAO: textoFuncao,
@@ -74,21 +79,25 @@ export const useExcluirVinculoFabricanteFornecedor = ({usuarioLogado, optionsMod
                 }
         
                 await post('/log-web', postData)
+                
                 Swal.fire({
+                    icon: 'success',
                     title: 'Sucesso!',
-                    text: `Vínculo do Fornecedor excluído com sucesso.`,
-                    icon: 'success'
-
+                    text: `Fornecedor migrado com sucesso.`,
+                    customClass: {
+                        container: 'custom-swal',
+                    },
                 })
+
                 handleClick();
                 return response.data;
             } catch (error) {
                 const putData = {
-                    IDFABRICANTEFORN: IDFABRICANTEFORN,
+                    IDFORNECEDOR: IDFORNECEDOR,
                 }
                
                 const textDados = JSON.stringify(putData)
-                let textoFuncao = 'COMPRAS/ERRO AO EXCLUIR VINCULO FABRICANTE-FORNECEDOR'
+                let textoFuncao = 'COMPRAS/ERRO AO MIGRAR FORNECEDOR SAP'
                 const ipUsuario = await getIPUsuario();
                 const postData = {
                     IDFUNCIONARIO: String(usuarioLogado.id),
@@ -98,10 +107,14 @@ export const useExcluirVinculoFabricanteFornecedor = ({usuarioLogado, optionsMod
                 }
         
                 await post('/log-web', postData)
+
                 Swal.fire({
+                    icon: 'error',
                     title: 'Erro!',
-                    text: `Erro ao excluir o Vínculo do Fornecedor: ${error}`,
-                    icon: 'error'
+                    text: `Erro ao migrar o Fornecedor: ${error}`,
+                    customClass: {
+                        container: 'custom-swal',
+                    },
                 });
             }
         }
@@ -110,6 +123,6 @@ export const useExcluirVinculoFabricanteFornecedor = ({usuarioLogado, optionsMod
     
 
     return {
-        handleExcluir
+        handleMigrarSAP
     }
 }
