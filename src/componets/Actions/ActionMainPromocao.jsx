@@ -79,8 +79,9 @@ export const ActionMainPromocao = ({
   InputSelectAplicacaoDestino,
   InputSelectTipoDesconto,
   InputSelectEmpresaComponentAync,
+  InputSelectSubGrupoComponentAync,
   InputSelectStatus,
-
+  InputGrupoEstrutura,
 
   labelSelectCategoria,
   labelSelectMarcas,
@@ -90,8 +91,9 @@ export const ActionMainPromocao = ({
   labelSelectAplicacaoDestino,
   labelSelectTipoDesconto,
   labelSelectEmpresaAsync,
+  labelSelectSubGrupoAsync,
   labelSelectStatus,
-
+  labelInputGrupoEstrutura,
   optionsCategorias,
   optionsMarcas,
   optionsFornecedores,
@@ -100,6 +102,7 @@ export const ActionMainPromocao = ({
   optionsAplicacaoDestino,
   optionsTipoDesconto,
   optionsEmpresasAsync,
+  optionsSubGrupoAsync,
   optionsStatus,
 
   valueSelectMarca,
@@ -109,8 +112,10 @@ export const ActionMainPromocao = ({
   valueSelectAplicacaoDestino,
   valueSelectTipoDesconto,
   valueSelectEmpresaAsync,
+  valueSelectSubGrupoAsync,
   valueSelectCategoria,
   valueSelectStatus,
+  valueInputGrupoEstrutura,
 
   onChangeSelectCategoria,
   onChangeSelectMarcas,
@@ -120,7 +125,9 @@ export const ActionMainPromocao = ({
   onChangeSelectAplicacaoDestino,
   onChangeSelectTipoDesconto,
   onChangeSelectEmpresaAsync,
-  onChangeSelectStatus,
+  onChangeSelectSubGrupoAsync,
+  onChangeSelectStatus, 
+  onChangeInputGrupoEstrutura,
 
   acceptFileProdutoOigem,
   acceptFileProdutoDestino,
@@ -209,7 +216,7 @@ export const ActionMainPromocao = ({
   readOnlySalvarMecanica,
   readOnlyEditarMecanica,
   readOnlyStatus,
-
+  readOnlyGrupoEstrutura,
   loadOptionsEmpresasAsync,
 
   defaultValueSelectCategoria,
@@ -231,6 +238,8 @@ export const ActionMainPromocao = ({
   tituloPromocao,
   styleMecanica,
   styleDescription,
+  styleEstrutura,
+  styleProduto
 }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -592,129 +601,169 @@ export const ActionMainPromocao = ({
                      
                   </div>
 
+                  <div style={styleEstrutura}>
 
-                  <hr style={{ borderColor: 'black', width: '100%', height: '10px' }} />
+                    <hr style={{ borderColor: 'black', width: '100%', height: '10px' }} />
 
-                  {/* INICIO PRODUTO ORIGEM */}
-                    <h2>Produto Origem</h2>
-                  <div className="row mt-3">
+                    <h2 style={{paddingLeft: '1rem'}} >Promoção Por Estrutura Mercadlógica</h2>
+                    <div className="row mt-3"  >
 
-                    <div className="col-sm-6 col-md-6 col-xl-6 ">
-                      {InputFieldProdutoOigem && (
-                        <InputFieldProdutoOigem
-                          label={labelInputFieldProdutoOigem}
-                          type="text"
-                          value={valueInputFieldProdutoOigem}
-                          onChange={onChangeInputFieldProdutoOigem}
-                          readOnly={readOnlyProdutoOigem}
-                        />
-                      )}
+                      <div className="col-sm-6 col-md-6 col-xl-6">
+                          {InputSelectSubGrupoComponentAync && (
+                            <InputSelectSubGrupoComponentAync
+                            label={labelSelectSubGrupoAsync}
+                            // defaultValue={defaultOptionsSubGrupoAsync}
+                            value={valueSelectSubGrupoAsync}
+                            optionsMultSelect={optionsSubGrupoAsync}
+                            onChange={onChangeSelectSubGrupoAsync}
+                    
+                            isMulti={true}
+                            />
+                          )}
 
-                      {ButtonTypeProdutoPesquisadoOrigem && (
-                        <ButtonTypeProdutoPesquisadoOrigem
-                          textButton={linkNomeProdutoPesquisadoOrigem}
-                          onClickButtonType={onButtonClickProdutoPesquisadoOrigem}
-                          cor={corProdutoPesquisadoOrigem}
-                          tipo="button"
-                          Icon={IconProdutoPesquisadoOrigem}
-                          iconColor="#fff"
-                          iconSize={16}
-                        />
+                      </div>
 
-                      )}
-
-                     
+                      <div className="col-sm-6 col-md-6 col-xl-6">
+                          {InputGrupoEstrutura && (
+                            <InputGrupoEstrutura 
+                              label={labelInputGrupoEstrutura}
+                              type="checkbox"
+                              className=""
+                              isChecked={valueInputGrupoEstrutura}
+                              onChange={onChangeInputGrupoEstrutura}
+                              readOnly={readOnlyGrupoEstrutura}
+                            
+                            />
+                          )}
+                      </div>
                     </div>
-                    <div className="col-sm-6 col-md-6 col-xl-6">
-                      {InputFileProdutoOigem && (
-                        <InputFileProdutoOigem
-                          label={labelInputFileProdutoOigem}
-                          type="file"
-                          accpet={acceptFileProdutoOigem}
-                          value={valueInputFileProdutoOigem}
-                          onChange={onChangeInputFileProdutoOigem}
-                          readOnly={readOnlyFileProdutoOigem}
-                          disabled={readOnlyFileProdutoOigem}
-                        />
-                      )}
-
-                      {ButtonTypeCancelar && (
-                        <ButtonTypeCancelar
-                          textButton={linkCancelar}
-                          onClickButtonType={onButtonClickCancelar}
-                          cor={corCancelar}
-                          tipo="button"
-                          Icon={IconCancelar}
-                          iconColor="#fff"
-                          iconSize={16}
-                        />
-                      )}
-                    </div>
-
                   </div>
-                  <hr style={{ borderColor: 'black', width: '100%', height: '10px' }} />
 
-                  {/* FIM PRODUTO ORIGEM */}
+                  <div style={styleProduto}>
 
-                  {/* INICIO PRODUTO DESTINO  */}
-                  <h2>Produto Destino</h2>
-                  <div className="row mt-3">
-                    <div className="col-sm-6 col-md-6 col-xl-6 ">
+                    <hr style={{ borderColor: 'black', width: '100%', height: '10px' }} />
 
-                      {InputFieldProdutoDestino && (
-                        <InputFieldProdutoDestino
-                          label={labelInputFieldProdutoDestino}
-                          type="text"
-                          value={valueInputFieldProdutoDestino}
-                          onChange={onChangeInputFieldProdutoDestino}
-                          readOnly={readOnlyProdutoDestino}
-                        />
-                      )}
+                    {/* INICIO PRODUTO ORIGEM */}
+                      <h2>Produto Origem</h2>
+                    <div className="row mt-3">
 
-                       {ButtonTypeProdutoPesquisadoDestino && (
-                        <ButtonTypeProdutoPesquisadoDestino
-                          textButton={linkNomeProdutoPesquisadoDestino}
-                          onClickButtonType={onButtonClickProdutoPesquisadoDestino}
-                          cor={corProdutoPesquisadoDestino}
-                          tipo="button"
-                          Icon={IconProdutoPesquisadoDestino}
-                          iconColor="#fff"
-                          iconSize={16}
-                        />
-                      )}
+                      <div className="col-sm-6 col-md-6 col-xl-6 ">
+                        {InputFieldProdutoOigem && (
+                          <InputFieldProdutoOigem
+                            label={labelInputFieldProdutoOigem}
+                            type="text"
+                            value={valueInputFieldProdutoOigem}
+                            onChange={onChangeInputFieldProdutoOigem}
+                            readOnly={readOnlyProdutoOigem}
+                          />
+                        )}
 
-                  
-                    </div>
+                        {ButtonTypeProdutoPesquisadoOrigem && (
+                          <ButtonTypeProdutoPesquisadoOrigem
+                            textButton={linkNomeProdutoPesquisadoOrigem}
+                            onClickButtonType={onButtonClickProdutoPesquisadoOrigem}
+                            cor={corProdutoPesquisadoOrigem}
+                            tipo="button"
+                            Icon={IconProdutoPesquisadoOrigem}
+                            iconColor="#fff"
+                            iconSize={16}
+                          />
 
-                    <div className="col-sm-6 col-md-6 col-xl-6 ">
-                      {InputFileProdutoDestino && (
-                        <InputFileProdutoDestino
-                          label={labelInputFileProdutoDestino}
-                          type="file"
-                          accpet={acceptFileProdutoDestino}
-                          value={valueInputFileProdutoDestino}
-                          onChange={onChangeInputFileProdutoDestino}
-                          readOnly={readOnlyFileProdutoDestino}
-                          disabled={readOnlyFileProdutoDestino}
-                        />
-                      )}
+                        )}
 
-                      {ButtonTypeCadastro && (
-                        <ButtonTypeCadastro
-                          textButton={linkNome}
-                          onClickButtonType={onButtonClickCadastro}
-                          cor={corCadastro}
-                          tipo="button"
-                          Icon={IconCadastro}
-                          iconColor="#fff"
-                          iconSize={16}
-                        />
-                      )} 
                       
-                    </div>
+                      </div>
+                      <div className="col-sm-6 col-md-6 col-xl-6">
+                        {InputFileProdutoOigem && (
+                          <InputFileProdutoOigem
+                            label={labelInputFileProdutoOigem}
+                            type="file"
+                            accpet={acceptFileProdutoOigem}
+                            value={valueInputFileProdutoOigem}
+                            onChange={onChangeInputFileProdutoOigem}
+                            readOnly={readOnlyFileProdutoOigem}
+                            disabled={readOnlyFileProdutoOigem}
+                          />
+                        )}
 
+                        {ButtonTypeCancelar && (
+                          <ButtonTypeCancelar
+                            textButton={linkCancelar}
+                            onClickButtonType={onButtonClickCancelar}
+                            cor={corCancelar}
+                            tipo="button"
+                            Icon={IconCancelar}
+                            iconColor="#fff"
+                            iconSize={16}
+                          />
+                        )}
+                      </div>
+
+                    </div>
+                    <hr style={{ borderColor: 'black', width: '100%', height: '10px' }} />
+
+                    {/* FIM PRODUTO ORIGEM */}
+
+                    {/* INICIO PRODUTO DESTINO  */}
+                    <h2>Produto Destino</h2>
+                    <div className="row mt-3">
+                      <div className="col-sm-6 col-md-6 col-xl-6 ">
+
+                        {InputFieldProdutoDestino && (
+                          <InputFieldProdutoDestino
+                            label={labelInputFieldProdutoDestino}
+                            type="text"
+                            value={valueInputFieldProdutoDestino}
+                            onChange={onChangeInputFieldProdutoDestino}
+                            readOnly={readOnlyProdutoDestino}
+                          />
+                        )}
+
+                        {ButtonTypeProdutoPesquisadoDestino && (
+                          <ButtonTypeProdutoPesquisadoDestino
+                            textButton={linkNomeProdutoPesquisadoDestino}
+                            onClickButtonType={onButtonClickProdutoPesquisadoDestino}
+                            cor={corProdutoPesquisadoDestino}
+                            tipo="button"
+                            Icon={IconProdutoPesquisadoDestino}
+                            iconColor="#fff"
+                            iconSize={16}
+                          />
+                        )}
+
+                    
+                      </div>
+
+                      <div className="col-sm-6 col-md-6 col-xl-6 ">
+                        {InputFileProdutoDestino && (
+                          <InputFileProdutoDestino
+                            label={labelInputFileProdutoDestino}
+                            type="file"
+                            accpet={acceptFileProdutoDestino}
+                            value={valueInputFileProdutoDestino}
+                            onChange={onChangeInputFileProdutoDestino}
+                            readOnly={readOnlyFileProdutoDestino}
+                            disabled={readOnlyFileProdutoDestino}
+                          />
+                        )}
+
+                        {ButtonTypeCadastro && (
+                          <ButtonTypeCadastro
+                            textButton={linkNome}
+                            onClickButtonType={onButtonClickCadastro}
+                            cor={corCadastro}
+                            tipo="button"
+                            Icon={IconCadastro}
+                            iconColor="#fff"
+                            iconSize={16}
+                          />
+                        )} 
+                        
+                      </div>
+
+                    </div>
+                    {/* FIM PRODUTO DESTINO */}
                   </div>
-                  {/* FIM PRODUTO DESTINO */}
 
                   <hr style={{ borderColor: 'black', width: '100%', height: '10px' }} />
 

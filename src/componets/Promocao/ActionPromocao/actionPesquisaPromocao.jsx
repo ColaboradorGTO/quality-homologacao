@@ -415,6 +415,17 @@ export const ActionPesquisaPromocao = ({ }) => {
             }))
         }
 
+        InputSelectSubGrupoComponentAync={InputSelectActionPromocao}
+        labelSelectSubGrupoAsync={"Sub Grupo"}
+        optionsSubGrupoAsync
+        valueSelectSubGrupoAsync
+        onChangeSelectSubGrupoAsync
+
+        InputGrupoEstrutura={InputFieldAction}
+        labelInputGrupoEstrutura={"Promoção Estrutura Mercadológica"}
+        valueInputGrupoEstrutura
+        onChangeInputGrupoEstrutura
+
         InputFieldProdutoOigem={InputFieldAction}
         labelInputFieldProdutoOigem={"Produto Origem"}
         valueInputFieldProdutoOigem={produtoOrigem}
