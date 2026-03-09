@@ -124,7 +124,7 @@ export const useEditarAlvara = ({
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || "INDISPONÍVEL"
             }
 
             await post('/log-web', postData)
@@ -155,7 +155,7 @@ export const useEditarAlvara = ({
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || "INDISPONÍVEL"
             }
 
             const responsPost = await post('/log-web', postData)

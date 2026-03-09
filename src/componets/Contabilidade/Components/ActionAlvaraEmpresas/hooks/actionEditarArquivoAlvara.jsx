@@ -45,6 +45,25 @@ export const useEditarArquivoAlvara = ({
             return;
         }
 
+        for (const arquivo of arquivos) {
+
+            const isPDF =
+                arquivo.TIPOARQUIVO === "application/pdf" ||
+                arquivo.NOMEARQUIVO?.toLowerCase().endsWith(".pdf");
+
+            if (!isPDF) {
+                Swal.fire({
+                    title: 'Arquivo inválido',
+                    text: 'Somente arquivos PDF são permitidos.',
+                    icon: 'warning',
+                    customClass: {
+                        container: 'custom-swal',
+                    }
+                });
+                return;
+            }
+        }
+
         const confirmacao = await Swal.fire({
             title: 'Tem certeza?',
             text: `Certeza que deseja substituir ou adicionar o anexo?`,
@@ -79,7 +98,7 @@ export const useEditarArquivoAlvara = ({
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'INDISPONÍVEL'
             }
 
             await post('/log-web', postData)
@@ -118,7 +137,7 @@ export const useEditarArquivoAlvara = ({
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'INDISPONÍVEL'
             }
 
             const responsPost = await post('/log-web', postData)
