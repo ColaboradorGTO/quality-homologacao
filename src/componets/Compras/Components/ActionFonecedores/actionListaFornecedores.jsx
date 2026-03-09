@@ -12,10 +12,10 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { ActionEditarFornecedorModal} from './ActionEditar/actionEditarFornecedorModal';
-import { ActionEditarVinculoFornecedorFabricanteModal } from './ActionEditarVinculoFornecedor/actionEditarVincularFabricanterModal';
-import { useExcluirVinculoFabricanteFornecedor } from './hooks/useExluirViculoFornecedorFabricante';
 import { mascaraCNPJ } from '../../../../utils/mascaraCNPJ';
 import Swal from 'sweetalert2';
+import { ActionEditarVinculoFornecedorFabricanteModal } from './ActionEditarVinculoFornecedor/actionEditarVincularFabricanterModal';
+import { useExcluirVinculoFornecedorFabricante } from './hooks/useExluirViculoFornecedorFabricante';
 import { useMigrarFornecedorSAP } from './hooks/useMigrarFornecedorSap';
 
 const formatarCNPJ = (cnpj) => {
@@ -37,7 +37,7 @@ export const ActionListaFornecedores = ({
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
-  const { handleExcluir } = useExcluirVinculoFabricanteFornecedor({usuarioLogado, optionsModulos, handleClick});
+  const { handleExcluir } = useExcluirVinculoFornecedorFabricante({usuarioLogado, optionsModulos, handleClick});
   const { handleMigrarSAP } = useMigrarFornecedorSAP({usuarioLogado, optionsModulos, handleClick});
 
   const onGlobalFilterChange = (e) => {
@@ -205,7 +205,8 @@ export const ActionListaFornecedores = ({
       field: 'IDFABRICANTEFORN',
       header: 'Opções',
       body: (row) => {
-        if(row.STMIGRADOSAP == 'True'){
+       
+        if(row.STMIGRADOSAP == 'MIGRADO COM SUCESSO'){
           if (row.IDFABRICANTE > 0) {
             return (
               <div className="p-1 "

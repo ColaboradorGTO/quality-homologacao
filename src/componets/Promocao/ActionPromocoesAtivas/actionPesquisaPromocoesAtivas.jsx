@@ -1,20 +1,10 @@
-import React, { Fragment, useEffect, useState } from "react"
-import { ActionMain } from "../../Actions/actionMain";
-import { InputField } from "../../Buttons/Input";
+import React, { Fragment, useEffect, useState,useRef } from "react"
 import { ButtonType } from "../../Buttons/ButtonType";
 import { AiOutlineSearch } from "react-icons/ai";
 import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../utils/animationCarregamento";
 import { get } from "../../../api/funcRequest";
-import { InputSelectAction } from "../../Inputs/InputSelectAction";
 import { ActionEditarPromocaoAtiva } from "./actionEditarPromocaoAtiva";
-import { formatMoeda } from "../../../utils/formatMoeda";
-import { dataHoraFormatada } from "../../../utils/dataFormatada";
-import { useRef } from "react";
-import { useReactToPrint } from "react-to-print";
-import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
-import * as XLSX from 'xlsx';
 import { ActionListaPromocoesAtivas } from "./actionListaPromocaoAtivas";
 import { ActionListaPesquisaProdutosDestino } from "./actionListaPesquisaProdutosDestino";
 import { ActionListaPesquisaProdutosOrigem } from "./actionListaPesquisaProdutosOrigem";

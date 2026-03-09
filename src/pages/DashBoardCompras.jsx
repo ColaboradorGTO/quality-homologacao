@@ -13,6 +13,7 @@ const ActionPDFPedidoResumido = lazy(() => import("../componets/Compras/Componen
 const ActionPDFPedidoDetalhado = lazy(() => import("../componets/Compras/Components/ActionHome/comprasActionPDFPedidoDetalhado").then(module => ({ default: module.ActionPDFPedidoDetalhado })));
 const ActionPesquisaProduto = lazy(() => import("../componets/Compras/Components/ActionImagemProduto/ActionPesquisaProduto").then(module => ({ default: module.ActionPesquisaProduto })));
 const ActionPesquisaNovoPedido = lazy(() => import("../componets/Compras/Components/ActionNovoPedido/actionPesquisaNovoPedido").then(module => ({ default: module.ActionPesquisaNovoPedido })));
+/*Voltar na tabela e validar a visualização dos buttons em  ActionPesquisaFornecedor */
 const ActionPesquisaFornecedor = lazy(() => import("../componets/Compras/Components/ActionFonecedores/actionPesquisaFornecedor").then(module => ({ default: module.ActionPesquisaFornecedor })));
 const ActionPesquisaFabricante = lazy(() => import("../componets/Compras/Components/ActionFabricantes/actionPesquisaFabricante").then(module => ({ default: module.ActionPesquisaFabricante })));
 const ActionPesquisaTransportador = lazy(() => import("../componets/Compras/Components/ActionTransportador/actionPesquisaTransportador").then(module => ({ default: module.ActionPesquisaTransportador })));
