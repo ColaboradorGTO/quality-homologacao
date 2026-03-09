@@ -7,6 +7,7 @@ export const useCancelarArquivoAlvara = ({
     usuarioLogado,
     optionsModulos,
     refetchVinculoAlvara
+    
 }) => {
 
     const [ipUsuario, setIpUsuario] = useState('')

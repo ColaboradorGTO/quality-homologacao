@@ -22,6 +22,8 @@ export const useCriarAlvara = ({
     const [statusAndamento, setStatusAndamento] = useState('')
     const [statusAlvara, setStatusAlvara] = useState('')
     const [metragemLoja, setMetragemLoja] = useState('')
+    const [projetoAprovado, setProjetoAprovado] = useState('')
+
     const [ipUsuario, setIpUsuario] = useState('')
 
     const getIPUsuario = async () => {
@@ -101,6 +103,7 @@ export const useCriarAlvara = ({
             IDSTATUSANDAMENTO: Number(statusAndamento?.value),
             DESCRICAODETALHEANDAMENTO: descricaoDetalheAndamento,
             METRAGEMEMPRESA: Number(metragemLoja),
+            NUMEROPROJETOAPROVADO: projetoAprovado,
             IDFUNCIONARIO: Number(usuarioLogado.id),
             ARQUIVOSALVARA: arquivosConvertidos,
         }
@@ -191,6 +194,8 @@ export const useCriarAlvara = ({
         setStatusAlvara,
         metragemLoja,
         setMetragemLoja,
+        projetoAprovado,
+        setProjetoAprovado,
         onSubmit
     }
 

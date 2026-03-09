@@ -12,7 +12,9 @@ export const ActionEditarDetalhesAlvaraModal = ({
     refetchAlvaraEmpresa,
     handleClose,
     refetchAlvaraSelecionado,
-    refetchVinculoAlvara
+    refetchVinculoAlvara,
+    
+
 }) => {
 
     return (

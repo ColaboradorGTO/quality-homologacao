@@ -21,7 +21,7 @@ export const ActionEditarListaArquivosAnexados = ({
     dadosAlvaraSelecionado,
     optionsModulos,
     usuarioLogado,
-    refetchVinculoAlvara
+    refetchVinculoAlvara,
 }) => {
 
     const [globalFilterValue, setGlobalFilterValue] = useState('');
@@ -30,14 +30,14 @@ export const ActionEditarListaArquivosAnexados = ({
     const [modoArquivo, setModoArquivo] = useState(null);
     const fileInputRef = useRef(null);
     const dataTableRef = useRef();
-
     const {
         onSubmit
 
     } = useCancelarArquivoAlvara({
         usuarioLogado,
         optionsModulos,
-        refetchVinculoAlvara
+        refetchVinculoAlvara,
+        
     });
 
     const {

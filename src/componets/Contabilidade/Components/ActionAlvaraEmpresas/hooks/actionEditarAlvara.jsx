@@ -21,6 +21,7 @@ export const useEditarAlvara = ({
     const [statusAndamento, setStatusAndamento] = useState('')
     const [statusAlvara, setStatusAlvara] = useState('')
     const [metragemLoja, setMetragemLoja] = useState('')
+    const [projetoAprovado, setProjetoAprovado] = useState('')
     const [ipUsuario, setIpUsuario] = useState('')
 
     const getIPUsuario = async () => {
@@ -53,7 +54,6 @@ export const useEditarAlvara = ({
         { enabled: true, staleTime: 60 * 60 * 1000, }
     );
 
-
     useEffect(() => {
         setStatusAlvara({ value: dadosAlvaraSelecionado?.[0]?.STATIVO, label: dadosAlvaraSelecionado?.[0]?.STATIVO == 'True' ? 'Ativo' : 'Inativo' })
         setDataIncioCompetencia(dadosAlvaraSelecionado?.[0]?.DTINICIOCOMPETENCIAALVARA)
@@ -62,6 +62,7 @@ export const useEditarAlvara = ({
         setMetragemLoja(dadosAlvaraSelecionado?.[0]?.METRAGEMEMPRESA)
         setDescricaoDetalheAndamento(dadosAlvaraSelecionado?.[0]?.DESCRICAODETALHEANDAMENTO)
         setArquivoAlvara(dadosAlvaraSelecionado?.[0]?.ARQUIVOSALVARAS)
+        setProjetoAprovado(dadosAlvaraSelecionado?.[0]?.NUMEROPROJETOAPROVADO)
     }, [dadosAlvaraSelecionado])
 
 
@@ -108,6 +109,7 @@ export const useEditarAlvara = ({
             IDSTATUSANDAMENTO: Number(statusAndamento?.value),
             DESCRICAODETALHEANDAMENTO: descricaoDetalheAndamento,
             METRAGEMEMPRESA: Number(metragemLoja),
+            NUMEROPROJETOAPROVADO: projetoAprovado,
             IDFUNCIONARIO: Number(usuarioLogado.id),
             ARQUIVOSALVARA: [],
         }
@@ -188,6 +190,8 @@ export const useEditarAlvara = ({
         setStatusAlvara,
         metragemLoja,
         setMetragemLoja,
+        projetoAprovado,
+        setProjetoAprovado,
         onSubmit
     }
 }
