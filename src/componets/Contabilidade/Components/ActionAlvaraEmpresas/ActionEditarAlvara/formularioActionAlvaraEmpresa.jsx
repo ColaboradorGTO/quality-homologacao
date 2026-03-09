@@ -29,8 +29,20 @@ export const FormularioActionAlvaraEmpresa = ({
     });
 
     const grupoEmpresarial = [
-        { value: "0", label: "Todas" },
+        { IDGRUPOEMPRESARIAL: "1", DSGRUPOEMPRESARIAL: "TO-TESOURA DE OURO" },
+        { IDGRUPOEMPRESARIAL: "2", DSGRUPOEMPRESARIAL: "MG-MAGAZINE" },
+        { IDGRUPOEMPRESARIAL: "3", DSGRUPOEMPRESARIAL: "YO-YORUS" },
+        { IDGRUPOEMPRESARIAL: "4", DSGRUPOEMPRESARIAL: "FC-FREE CENTER" },
+        { IDGRUPOEMPRESARIAL: "5", DSGRUPOEMPRESARIAL: "OT-OUTLET" },
     ]
+
+    const getGrupoNome = (id) => {
+        const grupo = grupoEmpresarial.find(
+            item => String(item.IDGRUPOEMPRESARIAL) === String(id)
+        );
+
+        return grupo ? grupo.DSGRUPOEMPRESARIAL : "";
+    };
 
     return (
         <Fragment>
@@ -80,18 +92,20 @@ export const FormularioActionAlvaraEmpresa = ({
 
                         </div>
                         <div class="col-sm-6 col-xl-3">
-                            <label className="form-label" htmlFor={""}>Grupo Empresarial</label>
-
-                            <Select
-                                label={"Despesa"}
-                                options={grupoEmpresarial.map((item) => ({
-                                    value: item.value,
-                                    label: item.label
-                                }))}
-                                value={grupoEmpresarial.find(opt => opt.value === "1")}
-                                defaultInputValue={"Todos"}
-                                isSearchable={true}
-                                menuIsOpen={false}
+                            <Controller
+                                name="Grupo Empresarial"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        label={"Grupo Empresarial"}
+                                        name="Grupo Empresarial"
+                                        type="text"
+                                        readOnly={true}
+                                        value={getGrupoNome(dadosAlvaraEmpresaSelecionada[0]?.IDGRUPOEMPRESARIAL)}
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                    />
+                                )}
                             />
                         </div>
 
@@ -102,7 +116,7 @@ export const FormularioActionAlvaraEmpresa = ({
                                 render={({ field }) => (
                                     <FormField
                                         label={"Insc. Estadual"}
-                                        name="IInsc. Estadual"
+                                        name="Insc. Estadual"
                                         type="text"
                                         readOnly={true}
                                         value={dadosAlvaraEmpresaSelecionada[0]?.NUINSCESTADUAL}

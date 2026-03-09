@@ -40,7 +40,7 @@ export const ActionPesquisaVendasMarca = () => {
   const fetchListaVendasMarca = async () => {
     try {
 
-      const urlApi = `/vendasProdutos?idMarca=${marcaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
+      const urlApi = `/vendasProdutos?idGrupoEmpresarial=${marcaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
       const response = await get(urlApi);
 
       if (response.data.length && response.data.length === pageSize) {

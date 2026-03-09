@@ -38,7 +38,7 @@ export const ActionPesquisaAlvaraEmpresa = ({ usuarioLogado }) => {
         
         return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 5 * 60 * 1000,}
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
     );
 
     const { data: marcas = [], error: errorMarcas, isLoading: isLoadingMarcas }
@@ -52,7 +52,7 @@ export const ActionPesquisaAlvaraEmpresa = ({ usuarioLogado }) => {
 
             return response.data;
         },
-        { staleTime: 5 * 60 * 1000 }
+        { staleTime: 60 * 60 * 1000 }
     );
 
     const { data: empresasLista = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas
@@ -65,7 +65,7 @@ export const ActionPesquisaAlvaraEmpresa = ({ usuarioLogado }) => {
 
             return response.data;
         },
-        { staleTime: 5 * 60 * 1000 }
+        { staleTime: 60 * 60 * 1000 }
     );
 
     const fetchListaAlvaraEmpresa = async () => {
@@ -111,7 +111,7 @@ export const ActionPesquisaAlvaraEmpresa = ({ usuarioLogado }) => {
     const { data: dadosAlvaraEmpresa = [], error: errorAlvaraEmpresa, isLoading: isLoadingAlvaraEmpresa, refetch: refetchAlvaraEmpresa } = useQuery(
         ['fetchListaAlvaraEmpresa'],
         fetchListaAlvaraEmpresa,
-        { enabled: true, staleTime: 5 * 60 * 1000 },
+        { enabled: true, staleTime: 60 * 60 * 1000 },
     );
 
     const { data: dadosAlvaraEmpresaSelecionada = [], refetch: refetchAlvaraSelecionado, isLoading: isLoadingAlvaraSelecionado } = useQuery(

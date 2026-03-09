@@ -113,8 +113,7 @@ export const ActionListaVendasPeriodoSaldo = ({ dadosVendasSaldo }) => {
     },
 
   ]
-
-
+  
   return (
 
     <Fragment>

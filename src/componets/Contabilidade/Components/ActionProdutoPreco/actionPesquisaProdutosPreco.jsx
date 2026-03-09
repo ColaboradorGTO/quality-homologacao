@@ -15,7 +15,7 @@ export const ActionPesquisaProductoPreco = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(1000);
 
-  const fetchListaProdutos = async () => {
+    const fetchListaProdutos = async () => {
     try {
 
       const urlApi = `/buscar-produtos?descProd=${produto}`;
@@ -55,16 +55,15 @@ export const ActionPesquisaProductoPreco = () => {
     }
   };
 
-
   const { data: dadosProdutos = [], error: errorProdutos, isLoading: isLoadingProdutos, refetch: refetchListaProdutos } = useQuery(
     ['buscar-produtos', produto, currentPage, pageSize],
     fetchListaProdutos,
-    { enabled: Boolean(produto.length > 5), staleTime: 60 * 60 * 1000 },
+    { enabled: Boolean(produto.length > 4), staleTime: 60 * 60 * 1000 },
   );
 
 
   const handleClick = () => {
-    if (produto.length > 5) {
+    if (produto.length > 4) {
       setCurrentPage(prevPage => prevPage + 1)
       refetchListaProdutos()
       setTabelaVisivel(true);

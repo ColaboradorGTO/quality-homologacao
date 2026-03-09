@@ -22,6 +22,8 @@ export const useCriarAlvara = ({
     const [statusAndamento, setStatusAndamento] = useState('')
     const [statusAlvara, setStatusAlvara] = useState('')
     const [metragemLoja, setMetragemLoja] = useState('')
+    const [projetoAprovado, setProjetoAprovado] = useState('')
+
     const [ipUsuario, setIpUsuario] = useState('')
 
     const getIPUsuario = async () => {
@@ -74,6 +76,27 @@ export const useCriarAlvara = ({
             return;
         }
 
+        const arquivosArray = Array.from(arquivoAlvara);
+
+        for (const arquivo of arquivosArray) {
+
+            const isPDF =
+                arquivo.type === "application/pdf" ||
+                arquivo.name.toLowerCase().endsWith(".pdf");
+
+            if (!isPDF) {
+                Swal.fire({
+                    title: 'Arquivo inválido',
+                    text: 'Somente arquivos PDF são permitidos.',
+                    icon: 'warning',
+                    customClass: {
+                        container: 'custom-swal',
+                    }
+                });
+                return;
+            }
+        }
+        
         const confirmacao = await Swal.fire({
             title: 'Tem certeza?',
             text: `Certeza que deseja salvar os dados do Alvará?`,
@@ -101,6 +124,7 @@ export const useCriarAlvara = ({
             IDSTATUSANDAMENTO: Number(statusAndamento?.value),
             DESCRICAODETALHEANDAMENTO: descricaoDetalheAndamento,
             METRAGEMEMPRESA: Number(metragemLoja),
+            NUMEROPROJETOAPROVADO: projetoAprovado,
             IDFUNCIONARIO: Number(usuarioLogado.id),
             ARQUIVOSALVARA: arquivosConvertidos,
         }
@@ -115,7 +139,7 @@ export const useCriarAlvara = ({
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || "INDISPONÍVEL"
             }
 
             await post('/log-web', CreateLog)
@@ -156,7 +180,7 @@ export const useCriarAlvara = ({
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || "INDISPONÍVEL"
             }
 
             const responsPost = await post('/log-web', CreateLog)
@@ -191,6 +215,8 @@ export const useCriarAlvara = ({
         setStatusAlvara,
         metragemLoja,
         setMetragemLoja,
+        projetoAprovado,
+        setProjetoAprovado,
         onSubmit
     }
 

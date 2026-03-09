@@ -7,6 +7,7 @@ export const useCancelarArquivoAlvara = ({
     usuarioLogado,
     optionsModulos,
     refetchVinculoAlvara
+    
 }) => {
 
     const [ipUsuario, setIpUsuario] = useState('')
@@ -78,7 +79,7 @@ export const useCancelarArquivoAlvara = ({
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || "INDISPONÍVEL"
             }
 
             await post('/log-web', postData)
@@ -107,7 +108,7 @@ export const useCancelarArquivoAlvara = ({
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || "INDISPONÍVEL"
             }
 
             const responsPost = await post('/log-web', postData)

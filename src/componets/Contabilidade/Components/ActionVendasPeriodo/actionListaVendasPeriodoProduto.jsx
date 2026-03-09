@@ -130,9 +130,7 @@ export const ActionListaVendasPeriodoProduto = ({dadosVendasConsolidadas}) => {
   return (
 
     <Fragment>
-
-
-
+      
           <div className="card">
             <DataTable
               title="Vendas por Loja"
