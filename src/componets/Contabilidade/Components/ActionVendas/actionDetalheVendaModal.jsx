@@ -17,6 +17,7 @@ import { toFloat } from "../../../../utils/toFloat";
 export const ActionDetalheVendaModal = ({ show, handleClose, dadosDetalheVendas, dadosDetalhePagamento }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const dataTableRef = useRef();
+  const [rowSelection, setRowSelection] = useState(null);
   const [size, setSize] = useState('small')
 
   const onGlobalFilterChange = (e) => {
@@ -284,6 +285,8 @@ export const ActionDetalheVendaModal = ({ show, handleClose, dadosDetalheVendas,
                   globalFilter={globalFilterValue}
                   sortOrder={-1}
                   paginator={true}
+                  selectionMode={'single'}
+                  selection={rowSelection}
                   rows={10}
                   // rowsPerPageOptions={[5, 10, 20, 50]}
                   showGridlines
@@ -334,6 +337,8 @@ export const ActionDetalheVendaModal = ({ show, handleClose, dadosDetalheVendas,
                   globalFilter={globalFilterValue}
                   sortOrder={-1}
                   paginator={true}
+                  selectionMode={'single'}
+                  selection={rowSelection}
                   rows={10}
                   // rowsPerPageOptions={[5, 10, 20, 50]}
                   showGridlines
