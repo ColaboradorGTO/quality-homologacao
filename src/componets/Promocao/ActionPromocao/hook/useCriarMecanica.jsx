@@ -9,25 +9,25 @@ export const useCriarMecanica = ({usuarioLogado, optionsModulos, handleClick}) =
 
     const getIPUsuario = async () => {
         let usuarioIP = null;
-    
+
         try {
-          const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
-          usuarioIP = ipWhoisData?.ip;
+        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+        usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-          console.error("Erro ao buscar IP via ipwho.is:", error);
+        console.error("Erro ao buscar IP via ifconfig.me:", error);
         }
-    
+
         if (!usuarioIP) {
-          try {
+        try {
             const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
             usuarioIP = ipifyData?.ip;
-          } catch (error) {
+        } catch (error) {
             console.error("Erro ao buscar IP via ipify.org:", error);
-          }
+        }
         }
         setIpUsuario(usuarioIP);
         return usuarioIP;
-      };
+    };
 
     const handleCancelar = async (IDQUEBRACAIXA, status) => {
         if(optionsModulos[0]?.ALTERAR == 'False') {
