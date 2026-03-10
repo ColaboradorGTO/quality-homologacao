@@ -13,6 +13,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
   const [aplicacaoDestinoSelecionada, setAplicacaoDestinoSelecionada] = useState('')
   const [tipoDescontoSelecionado, setTipoDescontoSelecionado] = useState(0)
   const [fornecedorSelecionado, setFornecedorSelecionado] = useState(-1)
+  const [subGrupo, setSubGrupo] = useState([])
   const [subGrupoSelecionado, setSubGrupoSelecionado] = useState(-1)
   const [grupoSelecionado, setGrupoSelecionado] = useState(-1)
   const [marcaSelecionada, setMarcaSelecionada] = useState(-1)
@@ -58,6 +59,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
   const [modalDocumentacao, setModalDocumentacao] = useState(false);
   const [modalPodutoSelecionadoDestinoCSV, setModalPodutoSelecionadoDestinoCSV] = useState(false);
   const [modalPodutoSelecionadoOrigemCSV, setModalPodutoSelecionadoOrigemCSV] = useState(false);
+  const [isChecked, setIsChecked] = useState(false)
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -129,7 +131,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
       const response = await get(`/subGrupoEstrutura`);
       return response.data;
     },
-    { staleTime: 1000 * 60 * 60, cacheTime: 1000 * 60 * 60, }
+    {enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000, }
   );
 
   const { data: optionsMarcas = [], error: errorMarcas, isLoading: isLoadingMarcas, refetch: refetchMarcas } = useQuery(
@@ -885,6 +887,137 @@ export const useCreatePromocaoAtiva = ({ }) => {
     }
   };
 
+    console.log(parseFloat(subGrupo), 'subGrupo');
+  const onSubmitEstrutura = async (data) => {
+  
+    try {
+      if (!mecanicaSelecionada) {
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: 'Selecione uma mecânica!',
+          customClass: {
+            container: 'custom-swal',
+          },
+          showConfirmButton: false,
+          timer: 3000,
+        })
+        return;
+      }
+
+      if (!empresaSelecionada || empresaSelecionada.length == 0) {
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: 'Selecione uma empresa!',
+          customClass: {
+            container: 'custom-swal',
+          },
+          showConfirmButton: false,
+          timer: 3000,
+        })
+        return;
+      }
+
+      if (descricao.length > 80) {
+          Swal.fire({
+            position: 'center',
+            icon: 'error',
+            title: 'Descrição deve ter no máximo 80 caracteres!',
+            customClass: {
+              container: 'custom-swal',
+            },
+            showConfirmButton: false,
+            timer: 3000,
+          })
+          return;
+      }
+
+
+      const postData = {
+        TPAPARTIRDE: aplicacaoDestinoSelecionada,
+        TPAPLICADOA: mecanicaSelecionada,
+        TPFATORPROMO: tipoDescontoSelecionado,
+        APARTIRDEQTD: Number(qtdInicio),
+        APARTIRDOVLR: valorInicio,
+        FATORPROMOVLR: vrDesconto,
+        FATORPROMOPERC: porcentoDesconto,
+        VLPRECOPRODUTO: Number(precoProduto),
+        DTHORAINICIO: dataInicio,
+        DTHORAFIM: dataFim + ' 23:59:59',
+        DSPROMOCAOMARKETING: descricao.toUpperCase(),
+        IDEMPRESA: empresaSelecionada,
+        STATIVO: "True",
+        STEMPRESAPROMO: "True",
+        STDETPROMOORIGEM: "True",
+        STDETPROMODESTINO: "True",
+        IDGRUPOEMDESTINO: grupoSelecionado,
+        IDSUBGRUPOEMDESTINO: parseFloat(subGrupo),
+        IDMARCAEMDESTINO: marcaDestino,
+        IDFORNECEDOREMDESTINO: fornecedorSelecionado,
+        IDGRUPOEMORIGEM: grupoSelecionado,
+        IDSUBGRUPOEMORIGEM: parseFloat(subGrupo),
+        IDMARCAEMORIGEM: marcaOrigem,
+        IDFORNECEDOREMORIGEM: fornecedorSelecionado,
+        IDPRODUTO: null,
+        IDPRODUTODESTINO: null,
+        IDPRODUTOORIGEM: null,
+  
+      };
+
+      let timerInterval;
+      Swal.fire({
+        title: 'Processando sua promoção...',
+        html: 'Aguarde enquanto enviamos os dados <b></b>',
+        timerProgressBar: true,
+        timer: 30000,
+        didOpen: () => {
+          Swal.showLoading();
+          timerInterval = setInterval(() => {
+            const content = Swal.getHtmlContainer();
+            if (content) {
+              const b = content.querySelector('b');
+              if (b) {
+                b.textContent = `${Math.floor(Swal.getTimerLeft() / 1000)}s`;
+              }
+            }
+          }, 100);
+        },
+        willClose: () => {
+          clearInterval(timerInterval);
+        }
+      });
+
+      const response = await post('/criar-promocoes-ativas-subGrupo', postData);
+
+      Swal.fire({
+        position: 'center',
+        icon: 'success',
+        title: 'Cadastro realizado com sucesso!',
+        customClass: {
+          container: 'custom-swal',
+        },
+        showConfirmButton: false,
+        timer: 1500,
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao cadastrar promoção:', error);
+      Swal.fire({
+        position: 'top-end',
+        icon: 'error',
+        title: 'Erro ao Cadastrar Promoção!',
+        text: error.message || 'Ocorreu um erro durante o cadastro',
+        customClass: {
+          container: 'custom-swal',
+        },
+        showConfirmButton: false,
+        timer: 3000,
+      });
+      return null;
+    }
+  };
 
   const handleSalvarMecanica = async () => {
     // if(optionsModulos[0]?.ALTERAR == 'False') {
@@ -1064,6 +1197,11 @@ export const useCreatePromocaoAtiva = ({ }) => {
 
     modalPodutoSelecionadoDestinoCSV, setModalPodutoSelecionadoDestinoCSV,
     modalPodutoSelecionadoOrigemCSV, setModalPodutoSelecionadoOrigemCSV,
-    setModalDocumentacao
+    setModalDocumentacao,
+    isChecked, 
+    setIsChecked,
+    subGrupo,
+    setSubGrupo,
+    onSubmitEstrutura
   }
 }

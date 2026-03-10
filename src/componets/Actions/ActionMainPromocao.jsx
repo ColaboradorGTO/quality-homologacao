@@ -239,7 +239,9 @@ export const ActionMainPromocao = ({
   styleMecanica,
   styleDescription,
   styleEstrutura,
-  styleProduto
+  styleProduto,
+  styleButtonSearch,
+  disabledBTBPedido
 }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -629,7 +631,7 @@ export const ActionMainPromocao = ({
                               label={labelInputGrupoEstrutura}
                               type="checkbox"
                               className=""
-                              isChecked={valueInputGrupoEstrutura}
+                              checked={valueInputGrupoEstrutura}
                               onChange={onChangeInputGrupoEstrutura}
                               readOnly={readOnlyGrupoEstrutura}
                             
@@ -794,6 +796,7 @@ export const ActionMainPromocao = ({
                         Icon={IconSearch}
                         iconColor="#fff"
                         iconSize={25}
+                        disabledBTN={styleButtonSearch}
                       />
                     )}
 
@@ -809,6 +812,7 @@ export const ActionMainPromocao = ({
                         Icon={IconPedido}
                         iconColor="#fff"
                         iconSize={25}
+                        disabledBTN={disabledBTBPedido}
                       />
                     )}
                     {ButtonTypeTXT && (

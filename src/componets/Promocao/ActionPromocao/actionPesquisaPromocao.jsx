@@ -15,6 +15,7 @@ import { ActionProdutoModalPromocaoSelecionadoDestino } from "../ActionPromocoes
 import { ActionDocumentacaoAtualizar } from "../ActionPromocoesAtivas/ActionDocumentacao/documentacaoAtualizar";
 import { ActionProdutoModalPromocaoSelecionadoCSVOrigem } from "../ActionPromocoesAtivas/ActionProdutosDaPromocaoSelecionado/actionProdutoModalPromocaoSelecionadoCSVOrigem";
 import { ActionDocumentacaoCriar } from "../ActionPromocoesAtivas/ActionDocumentacao/documentacaoCriar";
+import { InputFieldActionCheckBox } from "../../Buttons/InputActionCheckBox";
 
 
 
@@ -123,7 +124,12 @@ export const ActionPesquisaPromocao = ({ }) => {
     setModalDocumentacao,
     modalPodutoSelecionadoDestinoCSV, setModalPodutoSelecionadoDestinoCSV,
     modalPodutoSelecionadoOrigemCSV, setModalPodutoSelecionadoOrigemCSV,
-    onSubmit
+    isChecked, 
+    setIsChecked,
+    subGrupo,
+    setSubGrupo,
+    onSubmit,
+    onSubmitEstrutura
 
   } = useCreatePromocaoAtiva({});
 
@@ -143,6 +149,11 @@ export const ActionPesquisaPromocao = ({ }) => {
     const values = selectedOptions.map((option) => option.value);
     setEmpresaSelecionada(values);
   }, [setEmpresaSelecionada]);
+
+  const handleChangeSubGrupo = useCallback((selectedOptions) => {
+    const values = selectedOptions.map((option) => String(option.value));
+    setSubGrupo(values);
+  }, [setSubGrupo]);
 
   const handleChangeMecanica = useCallback((selectedValue) => {
 
@@ -194,6 +205,10 @@ export const ActionPesquisaPromocao = ({ }) => {
     onSubmit();
   }
 
+  const handleCadastrarEstrutura = () => {
+    onSubmitEstrutura();
+  }
+
   const empresasFiltradas = useMemo(() => {
     const empresasArray = Array.isArray(optionsEmpresas) ? optionsEmpresas : [];
     if (!marcaSelecionada || marcaSelecionada == "all") return empresasArray;
@@ -217,6 +232,8 @@ export const ActionPesquisaPromocao = ({ }) => {
   const mostrarDocumentacao = useCallback(() => {
     setModalDocumentacao(true);
   }, []);
+
+  console.log(subGrupo, 'subGrupo')
 
   return (
     <Fragment>
@@ -415,16 +432,43 @@ export const ActionPesquisaPromocao = ({ }) => {
             }))
         }
 
-        InputSelectSubGrupoComponentAync={InputSelectActionPromocao}
+        InputSelectSubGrupoComponentAync={MultSelectAction}
         labelSelectSubGrupoAsync={"Sub Grupo"}
-        optionsSubGrupoAsync
-        valueSelectSubGrupoAsync
-        onChangeSelectSubGrupoAsync
+        optionsSubGrupoAsync={[
+          { value: "all", label: "Selecionar Todas" },
+          ...(dadosGrupo?.map((item) => ({
+            value: item.IDSUBGRUPOESTRUTURA,
+            label:  `${item.IDSUBGRUPOESTRUTURA} - ${item.DSGRUPOESTRUTURA} - ${item.TPSECAO} `
+          })) || [])
+        ]}
 
-        InputGrupoEstrutura={InputFieldAction}
+        valueSelectSubGrupoAsync={
+          Array.isArray(subGrupo) && Array.isArray(dadosGrupo)
+            ? dadosGrupo
+                .filter(item => subGrupo.includes(String(item.IDSUBGRUPOESTRUTURA)))
+                .map(item => ({
+                  value: item.IDSUBGRUPOESTRUTURA,
+                  label: `${item.IDSUBGRUPOESTRUTURA} - ${item.DSGRUPOESTRUTURA} - ${item.TPSECAO} `
+                }))
+            : []
+        }
+        onChangeSelectSubGrupoAsync={(e) => {
+          if (e.some((option) => option.value === "all")) {
+            const allValues = dadosGrupo.map((grupo) => String(grupo.IDSUBGRUPOESTRUTURA));
+            setSubGrupo(allValues);
+          } else {            
+            handleChangeSubGrupo(e);
+          }
+        }}
+        /* 
+          Voltar daqui pois o meu select não esta exibindo os values selecionado.
+        */
+        InputGrupoEstrutura={InputFieldActionCheckBox}
         labelInputGrupoEstrutura={"Promoção Estrutura Mercadológica"}
-        valueInputGrupoEstrutura
-        onChangeInputGrupoEstrutura
+        valueInputGrupoEstrutura={isChecked}
+        onChangeInputGrupoEstrutura={(e) => setIsChecked(e.checked)}
+
+        styleProduto={{ display: isChecked ? 'none' : 'block' }}
 
         InputFieldProdutoOigem={InputFieldAction}
         labelInputFieldProdutoOigem={"Produto Origem"}
@@ -501,12 +545,14 @@ export const ActionPesquisaPromocao = ({ }) => {
         onButtonClickSearch={handleCadastrar}
         corSearch={"primary"}
         IconSearch={IoIosSend}
+        styleButtonSearch={isChecked ? true : false}
 
         ButtonTypePedido={ButtonType}
         linkPedido={"Cadastrar Promoção Mercadologica"}
-        onButtonClickPedido
+        onButtonClickPedido={handleCadastrarEstrutura}
         corPedido={"info"}
         IconPedido={IoIosSend}
+        disabledBTBPedido={isChecked ? false : true}
 
         ButtonTypeTXT={ButtonType}
         linkTXT={"Documentação"}
