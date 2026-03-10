@@ -99,7 +99,7 @@ export const FormularioEditarDetalhesAlvara = ({
             };
 
             await schema.validate(dadosParaValidar, { abortEarly: false });
-            onSubmit();
+            await onSubmit();
 
         } catch (validationError) {
             console.error('❌ Erro de validação:', validationError);
@@ -322,6 +322,8 @@ export const FormularioEditarDetalhesAlvara = ({
                 tipoBtnCadastrar={"submit"}
                 textButtonCadastrar={"Salvar Alterações"}
                 corCadastrar="success"
+                autoLoadingCadastrar={true}
+                loadingTextCadastrar={"Cadastrando..."}
 
                 ButtonTypeFechar={ButtonTypeModal}
                 textButtonFechar={"Fechar"}
