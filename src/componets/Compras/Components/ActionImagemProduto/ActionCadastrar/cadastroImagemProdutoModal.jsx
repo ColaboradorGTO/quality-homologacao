@@ -11,6 +11,7 @@ export const ActionCadastroImagemProdutoModal = ({
   optionsModulos,
   handleClick
 }) => {
+  
   return (
     <Fragment>
       <Modal

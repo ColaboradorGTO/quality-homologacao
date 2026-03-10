@@ -41,7 +41,7 @@ export const ActionPesquisaProduto = ({ usuarioLogado }) => {
   );
 
   const fetchListaProdutos = async () => {
-    const urlBase = `/imagemProdutos?nuRefImagemProduto=${referencia}&idFabricante=${fabricanteSelecionado}&idSubGrupoEstrutura=${estruturaSelecionada}&idPedido=${pedido}`;
+    const urlBase = `/imagemProdutos?numeroRefProduto=${referencia}&idFabricante=${fabricanteSelecionado}&idSubEstrutura=${estruturaSelecionada}&idPedido=${pedido}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
@@ -161,7 +161,7 @@ export const ActionPesquisaProduto = ({ usuarioLogado }) => {
         optionsModulos={optionsModulos}
         handleClick={handleClick}  
       />
-     
+
       <ActionCadastroImagemProdutoModal 
         show={modalCadastro}
         handleClose={() => setModalCadastro(false)}
@@ -169,6 +169,7 @@ export const ActionPesquisaProduto = ({ usuarioLogado }) => {
         optionsModulos={optionsModulos}
         handleClick={handleClick}
       />
+   
     </Fragment>
   )
 }

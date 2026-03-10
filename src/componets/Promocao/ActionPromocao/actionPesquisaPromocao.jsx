@@ -16,6 +16,7 @@ import { ActionDocumentacaoAtualizar } from "../ActionPromocoesAtivas/ActionDocu
 import { ActionProdutoModalPromocaoSelecionadoCSVOrigem } from "../ActionPromocoesAtivas/ActionProdutosDaPromocaoSelecionado/actionProdutoModalPromocaoSelecionadoCSVOrigem";
 import { ActionDocumentacaoCriar } from "../ActionPromocoesAtivas/ActionDocumentacao/documentacaoCriar";
 import { InputFieldActionCheckBox } from "../../Buttons/InputActionCheckBox";
+import { ButtonTypeModal } from "../../Buttons/ButtonTypeModal";
 
 
 
@@ -512,7 +513,7 @@ export const ActionPesquisaPromocao = ({ }) => {
         }}
       
         InputProduto={InputFieldActionCheckBox}
-        labelInputProduto={" Por Produtos"}
+        labelInputProduto={"Por Produtos"}
         valueInputProduto={isCheckedProduto}
         onChangeInputProduto={(e) => {
           if (e.checked) {

@@ -7,32 +7,34 @@ import axios from "axios";
 export const useEditarProdutoImagem = ({usuarioLogado, optionsModulos, handleClick}) => {
     const [ipUsuario, setIpUsuario] = useState('');
 
+    
     const getIPUsuario = async () => {
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
             usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP via ipwho.is:", error);
+            console.error("Erro ao buscar IP via ifconfig.me:", error);
         }
 
         if (!usuarioIP) {
-            try {
-                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-                usuarioIP = ipifyData?.ip;
-            } catch (error) {
-                console.error("Erro ao buscar IP via ipify.org:", error);
-            }
+        try {
+            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+            usuarioIP = ipifyData?.ip;
+        } catch (error) {
+            console.error("Erro ao buscar IP via ipify.org:", error);
+        }
         }
         setIpUsuario(usuarioIP);
         return usuarioIP;
     };
+
     const handleExcluir = async (IDIMAGEM, STATIVO) => {
         if(optionsModulos[0]?.ALTERAR == 'False') {
             Swal.fire({
                 title: 'Erro!',
-                text: `${usuarioLogado?.NOFUNCIONARIO},\nVocê não tem permissão para alterar um Produto Imagem!`,
+                html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para alterar um Produto Imagem!`,
                 icon: 'error',
                 customClass: {
                     container: 'custom-swal',
@@ -72,7 +74,7 @@ export const useEditarProdutoImagem = ({usuarioLogado, optionsModulos, handleCli
                     IDFUNCIONARIO: String(usuarioLogado.id),
                     PATHFUNCAO: textoFuncao,
                     DADOS: textDados,
-                    IP: ipUsuario
+                    IP: ipUsuario || 'Indisponível'
                 }
         
                 await post('/log-web', postData)
@@ -98,7 +100,7 @@ export const useEditarProdutoImagem = ({usuarioLogado, optionsModulos, handleCli
                     IDFUNCIONARIO: String(usuarioLogado.id),
                     PATHFUNCAO: textoFuncao,
                     DADOS: textDados,
-                    IP: ipUsuario
+                    IP: ipUsuario || 'Indisponível'
                 }
         
                 const responsePost = await post('/log-web', postData)

@@ -19,7 +19,7 @@ export const ActionEditarProdutoImagemModal = ({ show, handleClose, dadosDetalhe
     const [globalFilterValue, setGlobalFilterValue] = useState('');
     const dataTableRef = useRef();
     const { handleExcluir } = useEditarProdutoImagem({usuarioLogado, optionsModulos, handleClick});
-  
+
   
     const onGlobalFilterChange = (e) => {
       setGlobalFilterValue(e.target.value);

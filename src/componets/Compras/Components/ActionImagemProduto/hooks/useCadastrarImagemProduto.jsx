@@ -27,19 +27,19 @@ export const useCadastrarImagemProduto = ({usuarioLogado, optionsModulos}) => {
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
             usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP via ipwho.is:", error);
+            console.error("Erro ao buscar IP via ifconfig.me:", error);
         }
 
         if (!usuarioIP) {
-            try {
-                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-                usuarioIP = ipifyData?.ip;
-            } catch (error) {
-                console.error("Erro ao buscar IP via ipify.org:", error);
-            }
+        try {
+            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+            usuarioIP = ipifyData?.ip;
+        } catch (error) {
+            console.error("Erro ao buscar IP via ipify.org:", error);
+        }
         }
         setIpUsuario(usuarioIP);
         return usuarioIP;
@@ -49,7 +49,7 @@ export const useCadastrarImagemProduto = ({usuarioLogado, optionsModulos}) => {
         if (optionsModulos[0]?.ALTERAR == 'False') {
             Swal.fire({
                 title: 'Erro!',
-                text: `${usuarioLogado?.NOFUNCIONARIO},\nVocê não tem permissão para editar um Fornecedor!`,
+                html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para editar um Fornecedor!`,
                 icon: 'error',
                 customClass: {
                     container: 'custom-swal',
@@ -110,7 +110,7 @@ export const useCadastrarImagemProduto = ({usuarioLogado, optionsModulos}) => {
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'Indisponível'
             }
 
             Swal.fire({
@@ -135,7 +135,7 @@ export const useCadastrarImagemProduto = ({usuarioLogado, optionsModulos}) => {
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'Indisponível' 
             }
             await post('/log-web', createtLog)
             Swal.fire({

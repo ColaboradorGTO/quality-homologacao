@@ -14,6 +14,7 @@ export const ButtonType = ({
   visibilityBTN,
   style
 }) => {
+  
   let btnClasses = "btn waves-effect waves-themed";
 
   if(cor === "primary") {

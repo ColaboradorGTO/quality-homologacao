@@ -14,11 +14,14 @@ export const ActionListaProdutoImagem = ({
   handleClose, 
   dadosDetalheProdutos, 
   novoProduto, 
-  setNovoProduto
+  setNovoProduto,
+  usuarioLogado,
+  optionsModulos,
+  handleClick
  }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const dataTableRef = useRef();
-  const { handleExcluir } = useEditarProdutoImagem();
+  const { handleExcluir } = useEditarProdutoImagem({usuarioLogado, optionsModulos, handleClick});
 
   const handleCheckboxChangeDestino = (id) => {
     const produtoSelecionado = dados.find(item => String(item.IDPRODUTO) === String(id));
