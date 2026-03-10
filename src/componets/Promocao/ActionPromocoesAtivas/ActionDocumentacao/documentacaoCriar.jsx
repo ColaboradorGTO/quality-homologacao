@@ -136,6 +136,17 @@ export const ActionDocumentacaoCriar = ({ show, handleClose }) => {
 
                     </ul>
 
+                    <ul>
+                        <h2 style={{ color: "#7453A6", fontWeight: "bold" }}> 8. Promoção por Estrutura Mercadológica  </h2>
+                        <li style={{ color: "#000", fontWeight: "600" }}>
+                            Ao criar uma promoção por estrutura não pode adicionar produtos.
+                        </li>
+                        <li style={{ color: "#000", fontWeight: "600" }}>
+                            Toda estrutura de produtos será bloqueada para pesquisa e cadastro da promoção.
+                        </li>
+        
+                    </ul>
+
                 </Modal.Body>
 
                 <FooterModal
