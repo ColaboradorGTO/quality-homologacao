@@ -2,11 +2,11 @@ import { Fragment } from "react"
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal"
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal"
 import { ActionCarregaImagem } from "../actionCarregaImagem"
-import { InputFieldModal } from "../../../../Buttons/InputFieldModal"
 import { useCadastrarImagemProduto } from "../hooks/useCadastrarImagemProduto"
 import { ActionListaProdutoImagem } from "./actionListaProdutoImagem"
 import { useForm, Controller } from "react-hook-form";
 import FormField from "../../../../Formularios/FormField"
+import { schema } from "./schema/useCadastrarSchema"
 
 export const FormularioCadastrar = ({handleClose, usuarioLogado, optionsModulos, handleClick }) => {
     const { register, handleSubmit, formState: { errors }, clearErrors, setError, control } = useForm({
@@ -62,16 +62,9 @@ export const FormularioCadastrar = ({handleClose, usuarioLogado, optionsModulos,
 
     return (
         <Fragment>
-            <form>
+            <form  onSubmit={handleSubmit(handleValidatedSubmit)}>
                 <div className="row">
                     <div className="col-sm-6 col-xl-3">
-                        {/* <InputFieldModal
-                            label={"Referência *"}
-                            type={"text"}
-                            id={"refimagemprod"}
-                            value={referencia}
-                            onChangeModal={(e) => setReferencia(e.target.value)}
-                        /> */}
                         <Controller
                             name="referenciaImagem"
                             control={control}
@@ -90,13 +83,6 @@ export const FormularioCadastrar = ({handleClose, usuarioLogado, optionsModulos,
                         />
                     </div>
                     <div className="col-sm-6 col-xl-3">
-                        {/* <InputFieldModal
-                            label={"Nº Pedido *"}
-                            type={"text"}
-                            id={"numpedimagemprod"}
-                            value={numeroPedido}
-                            onChangeModal={(e) => setNumeroPedido(e.target.value)}
-                        /> */}
                         <Controller
                             name="numeroPedidoImagem"
                             control={control}
@@ -144,7 +130,7 @@ export const FormularioCadastrar = ({handleClose, usuarioLogado, optionsModulos,
                     corFechar={"secondary"}
 
                     ButtonTypeCadastrar={ButtonTypeModal}
-                    onClickButtonCadastrar={handleSubmit(onSubmit)}
+                    onClickButtonCadastrar={handleSubmit(handleValidatedSubmit)}
                     textButtonCadastrar={"Salvar"}
                     corCadastrar={"success"}
                     loadingTextCadastrar={"Cadastrando..."}

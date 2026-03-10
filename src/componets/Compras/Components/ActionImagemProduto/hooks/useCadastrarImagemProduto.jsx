@@ -4,7 +4,6 @@ import axios from "axios";
 import { useState } from "react";
 import { useQuery } from "react-query";
 
-
 export const useCadastrarImagemProduto = ({usuarioLogado, optionsModulos}) => {
     const [ipUsuario, setIpUsuario] = useState(null);
     const [referencia, setReferencia] = useState('');
@@ -51,34 +50,6 @@ export const useCadastrarImagemProduto = ({usuarioLogado, optionsModulos}) => {
                 title: 'Erro!',
                 html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para editar um Fornecedor!`,
                 icon: 'error',
-                customClass: {
-                    container: 'custom-swal',
-                },
-            });
-            return;
-        }
-
-        if(numeroPedido == '' ) {
-            Swal.fire({
-                position: 'center',
-                icon: 'warning',
-                title: 'Informe o Nº Pedido e tente novamente!',
-                showConfirmButton: false,
-                timer: 3000,
-                customClass: {
-                    container: 'custom-swal',
-                },
-            });
-            return;
-        }
-
-        if(referencia == '' )  {
-            Swal.fire({
-                position: 'center',
-                icon: 'warning',
-                title: 'Informe a Referência e tente novamente!',
-                showConfirmButton: false,
-                timer: 3000,
                 customClass: {
                     container: 'custom-swal',
                 },
