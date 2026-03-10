@@ -13,7 +13,8 @@ export const useCreatePromocaoAtiva = ({ }) => {
   const [aplicacaoDestinoSelecionada, setAplicacaoDestinoSelecionada] = useState('')
   const [tipoDescontoSelecionado, setTipoDescontoSelecionado] = useState(0)
   const [fornecedorSelecionado, setFornecedorSelecionado] = useState(-1)
-  const [subGrupo, setSubGrupo] = useState([])
+  const [subGrupoDestino, setSubGrupoDestino] = useState([])
+  const [subGrupoOrigem, setSubGrupoOrigem] = useState([])
   const [subGrupoSelecionado, setSubGrupoSelecionado] = useState(-1)
   const [grupoSelecionado, setGrupoSelecionado] = useState(-1)
   const [marcaSelecionada, setMarcaSelecionada] = useState(-1)
@@ -59,7 +60,8 @@ export const useCreatePromocaoAtiva = ({ }) => {
   const [modalDocumentacao, setModalDocumentacao] = useState(false);
   const [modalPodutoSelecionadoDestinoCSV, setModalPodutoSelecionadoDestinoCSV] = useState(false);
   const [modalPodutoSelecionadoOrigemCSV, setModalPodutoSelecionadoOrigemCSV] = useState(false);
-  const [isChecked, setIsChecked] = useState(false)
+  const [isCheckedGrupo, setIsCheckedGrupo] = useState(false)
+  const [isCheckedProduto, setIsCheckedProduto] = useState(false)
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -887,7 +889,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
     }
   };
 
-    console.log(parseFloat(subGrupo), 'subGrupo');
+    
   const onSubmitEstrutura = async (data) => {
   
     try {
@@ -915,6 +917,20 @@ export const useCreatePromocaoAtiva = ({ }) => {
           },
           showConfirmButton: false,
           timer: 3000,
+        })
+        return;
+      }
+
+      if(!subGrupoDestino && !subGrupoOrigem) {
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: 'Selecione um subgrupo para origem e destino!',
+          customClass: {
+            container: 'custom-swal',
+          },
+          showConfirmButton: false,
+          timer: 5000,
         })
         return;
       }
@@ -952,11 +968,11 @@ export const useCreatePromocaoAtiva = ({ }) => {
         STDETPROMOORIGEM: "True",
         STDETPROMODESTINO: "True",
         IDGRUPOEMDESTINO: grupoSelecionado,
-        IDSUBGRUPOEMDESTINO: parseFloat(subGrupo),
+        IDSUBGRUPOEMDESTINO: parseFloat(subGrupoDestino),
         IDMARCAEMDESTINO: marcaDestino,
         IDFORNECEDOREMDESTINO: fornecedorSelecionado,
         IDGRUPOEMORIGEM: grupoSelecionado,
-        IDSUBGRUPOEMORIGEM: parseFloat(subGrupo),
+        IDSUBGRUPOEMORIGEM: parseFloat(subGrupoOrigem),
         IDMARCAEMORIGEM: marcaOrigem,
         IDFORNECEDOREMORIGEM: fornecedorSelecionado,
         IDPRODUTO: null,
@@ -1198,10 +1214,14 @@ export const useCreatePromocaoAtiva = ({ }) => {
     modalPodutoSelecionadoDestinoCSV, setModalPodutoSelecionadoDestinoCSV,
     modalPodutoSelecionadoOrigemCSV, setModalPodutoSelecionadoOrigemCSV,
     setModalDocumentacao,
-    isChecked, 
-    setIsChecked,
-    subGrupo,
-    setSubGrupo,
+    isCheckedGrupo, 
+    setIsCheckedGrupo,
+    isCheckedProduto,
+    setIsCheckedProduto,
+    subGrupoDestino,
+    setSubGrupoDestino,
+    subGrupoOrigem,
+    setSubGrupoOrigem,
     onSubmitEstrutura
   }
 }

@@ -124,10 +124,14 @@ export const ActionPesquisaPromocao = ({ }) => {
     setModalDocumentacao,
     modalPodutoSelecionadoDestinoCSV, setModalPodutoSelecionadoDestinoCSV,
     modalPodutoSelecionadoOrigemCSV, setModalPodutoSelecionadoOrigemCSV,
-    isChecked, 
-    setIsChecked,
-    subGrupo,
-    setSubGrupo,
+    isCheckedGrupo, 
+    setIsCheckedGrupo,
+    isCheckedProduto,
+    setIsCheckedProduto,
+    subGrupoDestino,
+    setSubGrupoDestino,
+    subGrupoOrigem,
+    setSubGrupoOrigem,
     onSubmit,
     onSubmitEstrutura
 
@@ -150,10 +154,15 @@ export const ActionPesquisaPromocao = ({ }) => {
     setEmpresaSelecionada(values);
   }, [setEmpresaSelecionada]);
 
-  const handleChangeSubGrupo = useCallback((selectedOptions) => {
+  const handleChangeSubGrupoDestino = useCallback((selectedOptions) => {
     const values = selectedOptions.map((option) => String(option.value));
-    setSubGrupo(values);
-  }, [setSubGrupo]);
+    setSubGrupoDestino(values);
+  }, [setSubGrupoDestino]);
+
+  const handleChangeSubGrupoOrigem = useCallback((selectedOptions) => {
+    const values = selectedOptions.map((option) => String(option.value));
+    setSubGrupoOrigem(values);
+  }, [setSubGrupoOrigem]);
 
   const handleChangeMecanica = useCallback((selectedValue) => {
 
@@ -233,7 +242,7 @@ export const ActionPesquisaPromocao = ({ }) => {
     setModalDocumentacao(true);
   }, []);
 
-  console.log(subGrupo, 'subGrupo')
+
 
   return (
     <Fragment>
@@ -432,9 +441,9 @@ export const ActionPesquisaPromocao = ({ }) => {
             }))
         }
 
-        InputSelectSubGrupoComponentAync={MultSelectAction}
-        labelSelectSubGrupoAsync={"Sub Grupo"}
-        optionsSubGrupoAsync={[
+        InputSelectSubGrupoOrigemComponentAync={MultSelectAction}
+        labelSelectSubGrupoOrigemAsync={"Sub Grupo Origem"}
+        optionsSubGrupoOrigemAsync={[
           { value: "all", label: "Selecionar Todas" },
           ...(dadosGrupo?.map((item) => ({
             value: item.IDSUBGRUPOESTRUTURA,
@@ -442,33 +451,81 @@ export const ActionPesquisaPromocao = ({ }) => {
           })) || [])
         ]}
 
-        valueSelectSubGrupoAsync={
-          Array.isArray(subGrupo) && Array.isArray(dadosGrupo)
+        valueSelectSubGrupoOrigemAsync={
+          Array.isArray(subGrupoOrigem) && Array.isArray(dadosGrupo)
             ? dadosGrupo
-                .filter(item => subGrupo.includes(String(item.IDSUBGRUPOESTRUTURA)))
+                .filter(item => subGrupoOrigem.includes(String(item.IDSUBGRUPOESTRUTURA)))
                 .map(item => ({
                   value: item.IDSUBGRUPOESTRUTURA,
                   label: `${item.IDSUBGRUPOESTRUTURA} - ${item.DSGRUPOESTRUTURA} - ${item.TPSECAO} `
                 }))
             : []
         }
-        onChangeSelectSubGrupoAsync={(e) => {
+        onChangeSelectSubGrupoOrigemAsync={(e) => {
           if (e.some((option) => option.value === "all")) {
             const allValues = dadosGrupo.map((grupo) => String(grupo.IDSUBGRUPOESTRUTURA));
-            setSubGrupo(allValues);
+            setSubGrupoOrigem(allValues);
           } else {            
-            handleChangeSubGrupo(e);
+            handleChangeSubGrupoOrigem(e);
           }
         }}
-        /* 
-          Voltar daqui pois o meu select não esta exibindo os values selecionado.
-        */
-        InputGrupoEstrutura={InputFieldActionCheckBox}
-        labelInputGrupoEstrutura={"Promoção Estrutura Mercadológica"}
-        valueInputGrupoEstrutura={isChecked}
-        onChangeInputGrupoEstrutura={(e) => setIsChecked(e.checked)}
 
-        styleProduto={{ display: isChecked ? 'none' : 'block' }}
+        InputSelectSubGrupoDestinoComponentAync={MultSelectAction}
+        labelSelectSubGrupoDestinoAsync={"Sub Grupo Destino"}
+        optionsSubGrupoDestinoAsync={[
+          { value: "all", label: "Selecionar Todas" },
+          ...(dadosGrupo?.map((item) => ({
+            value: item.IDSUBGRUPOESTRUTURA,
+            label:  `${item.IDSUBGRUPOESTRUTURA} - ${item.DSGRUPOESTRUTURA} - ${item.TPSECAO} `
+          })) || [])
+        ]}
+
+        valueSelectSubGrupoDestinoAsync={
+          Array.isArray(subGrupoDestino) && Array.isArray(dadosGrupo)
+            ? dadosGrupo
+                .filter(item => subGrupoDestino.includes(String(item.IDSUBGRUPOESTRUTURA)))
+                .map(item => ({
+                  value: item.IDSUBGRUPOESTRUTURA,
+                  label: `${item.IDSUBGRUPOESTRUTURA} - ${item.DSGRUPOESTRUTURA} - ${item.TPSECAO} `
+                }))
+            : []
+        }
+        onChangeSelectSubGrupoDestinoAsync={(e) => {
+          if (e.some((option) => option.value === "all")) {
+            const allValues = dadosGrupo.map((grupo) => String(grupo.IDSUBGRUPOESTRUTURA));
+            setSubGrupoDestino(allValues);
+          } else {            
+            handleChangeSubGrupoDestino(e);
+          }
+        }}
+     
+        InputGrupoEstrutura={InputFieldActionCheckBox}
+        labelInputGrupoEstrutura={"Estrutura Mercadológica"}
+        valueInputGrupoEstrutura={isCheckedGrupo}
+        onChangeInputGrupoEstrutura={(e) => {
+          if (e.checked) {
+            setIsCheckedGrupo(true);
+            setIsCheckedProduto(false); // Desmarca o outro
+          } else {
+            setIsCheckedGrupo(false);
+          }
+        }}
+      
+        InputProduto={InputFieldActionCheckBox}
+        labelInputProduto={" Por Produtos"}
+        valueInputProduto={isCheckedProduto}
+        onChangeInputProduto={(e) => {
+          if (e.checked) {
+            setIsCheckedProduto(true);
+            setIsCheckedGrupo(false); // Desmarca o outro
+          } else {
+            setIsCheckedProduto(false);
+          }
+        }}
+
+
+        styleProduto={{ display: isCheckedGrupo ? 'none' : 'block' }}
+        styleEstrutura={{ display: isCheckedProduto ? 'none' : 'block' }}
 
         InputFieldProdutoOigem={InputFieldAction}
         labelInputFieldProdutoOigem={"Produto Origem"}
@@ -545,14 +602,14 @@ export const ActionPesquisaPromocao = ({ }) => {
         onButtonClickSearch={handleCadastrar}
         corSearch={"primary"}
         IconSearch={IoIosSend}
-        styleButtonSearch={isChecked ? true : false}
+        styleButtonSearch={isCheckedProduto ? false : true}
 
         ButtonTypePedido={ButtonType}
         linkPedido={"Cadastrar Promoção Mercadologica"}
         onButtonClickPedido={handleCadastrarEstrutura}
         corPedido={"info"}
         IconPedido={IoIosSend}
-        disabledBTBPedido={isChecked ? false : true}
+        disabledBTBPedido={isCheckedGrupo ? false : true}
 
         ButtonTypeTXT={ButtonType}
         linkTXT={"Documentação"}

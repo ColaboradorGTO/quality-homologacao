@@ -16,31 +16,31 @@ export const InputFieldActionCheckBox = ({
 }) => {
   return (
     <Fragment>
-      <div style={style}>
+      <div className="form-check" style={{ display: 'flex', alignItems: 'center',  }}>
 
-        <label className="form-label" htmlFor={id}>
-          {label}
-        </label>
-        <div className="input-group" >
-          {/* <input
-            className="form-control"
-            id={id}
-            type={type}
-            name={nome}
-            value={value}
-            readOnly={readOnly}
-            placeHolder={placeHolder}
-            onChange={onChange}
-            disabled={disabled}
-            style={style}
-          /> */}
-          <Checkbox 
-            inputId={id} 
-            name={nome} 
-            value={value} 
-            onChange={onChange} 
-            checked={checked} 
-          />
+        <div className="row" >
+            <label className="form-check-label" htmlFor={id} style={{marginRight: '0.5rem', fontSize: '1rem', fontWeight: '700'}}>
+              {label}
+            </label>
+            <Checkbox 
+              inputId={id} 
+              name={nome} 
+              value={value} 
+              onChange={onChange} 
+              checked={checked} 
+              />
+            {/* <input
+              className="form-check-input"
+              id={id}
+              type={type}
+              name={nome}
+              value={value}
+              readOnly={readOnly}
+              placeHolder={placeHolder}
+              onChange={onChange}
+              disabled={disabled}
+              style={style}
+              /> */}
         </div>
       </div>
     </Fragment>

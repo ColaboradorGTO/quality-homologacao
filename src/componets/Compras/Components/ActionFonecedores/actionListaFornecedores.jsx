@@ -105,7 +105,7 @@ export const ActionListaFornecedores = ({
       CIDADEFORN: item.CIDADEFORN,
       UFFORN: item.UFFORN,
       IDFORNECEDORSAP: item.IDFORNECEDORSAP,
-      STMIGRADOSAP: item.STMIGRADOSAP == 'True' ? 'MIGRADO COM SUCESSO' : 'NÃO MIGRADO SAP',
+      STMIGRADOSAP: item.STMIGRADOSAP,
       IDFABRICANTE: item.IDFABRICANTE,
 
 
@@ -193,8 +193,8 @@ export const ActionListaFornecedores = ({
       body: (row) => {
         return (
 
-          <th style={{ color: row.STMIGRADOSAP == 'MIGRADO COM SUCESSO' ? '#2196F3' : '#fd3995', fontWeight: 700 }}>
-            {row.STMIGRADOSAP}
+          <th style={{ color: row.STMIGRADOSAP == 'True' ? '#2196F3' : '#fd3995', fontWeight: 700 }}>
+            {row.STMIGRADOSAP == 'True' ? 'MIGRADO COM SUCESSO' : 'NÃO MIGRADO SAP'}
           </th>
 
         )
@@ -202,12 +202,13 @@ export const ActionListaFornecedores = ({
       sortable: true
     },
     {
-      field: 'IDFABRICANTEFORN',
+      field: 'IDFABRICANTE',
       header: 'Opções',
       body: (row) => {
-       
-        if(row.STMIGRADOSAP == 'MIGRADO COM SUCESSO'){
-          if (row.IDFABRICANTE > 0) {
+       const migradoSAP = row.STMIGRADOSAP == 'True';
+       const temVinculo = row.IDFABRICANTE > 0;
+        if(migradoSAP){
+          if (temVinculo) {
             return (
               <div className="p-1 "
                 style={{ justifyContent: "space-between", width: "150px", display: "flex" }}
@@ -215,7 +216,7 @@ export const ActionListaFornecedores = ({
                 <div className="p-1">
                   <ButtonTable
                     Icon={CiEdit}
-                    cor={"info"}
+                    cor={"success"}
                     iconColor={"white"}
                     onClickButton={() => clickEditarFonecedor(row)}
                     titleButton={"Editar Fornecedor"}
@@ -251,7 +252,7 @@ export const ActionListaFornecedores = ({
                 <div className="p-1">
                   <ButtonTable
                     Icon={GrView}
-                    cor={"success"}
+                    cor={"primary"}
                     iconColor={"white"}
                     onClickButton={() => hanldeClickVisualizarFornecedorSap(row)}
                     titleButton={"Consultar Fornecedor SAP"}
@@ -269,7 +270,7 @@ export const ActionListaFornecedores = ({
                 <div className="p-1">
                   <ButtonTable
                     Icon={CiEdit}
-                    cor={"info"}
+                    cor={"success"}
                     iconColor={"white"}
                     onClickButton={() => clickEditarFonecedor(row)}
                     titleButton={"Editar Fornecedor"}
@@ -282,7 +283,7 @@ export const ActionListaFornecedores = ({
                 <div className="p-1">
                   <ButtonTable
                     Icon={GrView}
-                    cor={"success"}
+                    cor={"primary"}
                     iconColor={"white"}
                     onClickButton={() => hanldeClickVisualizarFornecedorSap(row)}
                     titleButton={"Consultar Fornecedor SAP"}
@@ -296,7 +297,7 @@ export const ActionListaFornecedores = ({
             )
           }
         } else {
-          if (row.IDFABRICANTE > 0) {
+          if (temVinculo) {
             return (
               <div className="p-1 "
                 style={{ justifyContent: "space-between", width: "150px", display: "flex" }}
@@ -304,7 +305,7 @@ export const ActionListaFornecedores = ({
                 <div className="p-1">
                   <ButtonTable
                     Icon={CiEdit}
-                    cor={"info"}
+                    cor={"success"}
                     iconColor={"white"}
                     onClickButton={() => clickEditarFonecedor(row)}
                     titleButton={"Editar Fornecedor"}
@@ -340,7 +341,7 @@ export const ActionListaFornecedores = ({
                 <div className="p-1">
                   <ButtonTable
                     Icon={GrView}
-                    cor={"success"}
+                    cor={"primary"}
                     iconColor={"white"}
                     onClickButton={() => handleMigrarSAP(row.IDFORNECEDOR)}
                     titleButton={"Migrar Fornecedor SAP"}
@@ -358,7 +359,7 @@ export const ActionListaFornecedores = ({
                 <div className="p-1">
                   <ButtonTable
                     Icon={CiEdit}
-                    cor={"info"}
+                    cor={"success"}
                     iconColor={"white"}
                     onClickButton={() => clickEditarFonecedor(row)}
                     titleButton={"Editar Fornecedor"}
@@ -371,7 +372,7 @@ export const ActionListaFornecedores = ({
                 <div className="p-1">
                   <ButtonTable
                     Icon={GrView}
-                    cor={"success"}
+                    cor={"primary"}
                     iconColor={"white"}
                     onClickButton={() => hanldeClickVisualizarFornecedorSap(row)}
                     titleButton={"Consultar Fornecedor SAP"}
