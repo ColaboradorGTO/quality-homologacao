@@ -19,7 +19,8 @@ export const FormularioEditarDetalhesAlvara = ({
     optionsModulos,
     refetchAlvaraEmpresa,
     refetchAlvaraSelecionado,
-    refetchVinculoAlvara
+    refetchVinculoAlvara,
+    idAlvaraSelecionado
 }) => {
 
     const { handleSubmit, formState: { errors }, clearErrors, control, setError, register } = useForm({
@@ -43,6 +44,8 @@ export const FormularioEditarDetalhesAlvara = ({
         setStatusAlvara,
         metragemLoja,
         setMetragemLoja,
+        projetoAprovado,
+        setProjetoAprovado,
         onSubmit
 
     } = useEditarAlvara({
@@ -124,7 +127,7 @@ export const FormularioEditarDetalhesAlvara = ({
                 <span class="d-flex align-items-center">
                     <AiOutlineFileText size={25} />
                     <h4 class="font-weight-bold" style={{ margin: 0, marginLeft: "10px" }}>
-                         BOMBEIRO (CERTIFICADO DE CONFORMIDADE - CERCON)
+                        BOMBEIRO (CERTIFICADO DE CONFORMIDADE - CERCON)
                     </h4>
                 </span>
 
@@ -177,7 +180,7 @@ export const FormularioEditarDetalhesAlvara = ({
                                 )}
                             />
                         </div>
-                        
+
                         <div class="col-sm-6 col-xl-6">
                             <Controller
                                 name="dataFimCompetenciaSelecionada"
@@ -239,6 +242,26 @@ export const FormularioEditarDetalhesAlvara = ({
                                         inputMode="numeric"
                                         value={metragemLoja}
                                         onChange={(e) => setMetragemLoja(e.target.value)}
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                    />
+                                )}
+                            />
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-sm-6 col-xl-6">
+                            <Controller
+                                name="projetoAprovadoDigitado"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        {...field}
+                                        label={"Projeto Aprovado:"}
+                                        name="projetoAprovadoDigitado"
+                                        type="text"
+                                        value={projetoAprovado}
+                                        onChange={(e) => setProjetoAprovado(e.target.value)}
                                         errors={errors}
                                         clearErrors={clearErrors}
                                     />

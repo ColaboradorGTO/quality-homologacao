@@ -176,7 +176,17 @@ export const ActionListaAlvaras = ({
         if (status === "Concluído") return "bg-success";
         return "bg-info";
     };
+    const isStatusNegacao = (status, dtFim) => {
+        const negacao = ["Indeferido", "Cancelado", "Vencido", "Inativo"];
+        const hoje = new Date();
 
+        if (dtFim) {
+            const dataFim = new Date(`${dtFim}T00:00:00`);
+            if (!isNaN(dataFim) && dataFim < hoje) return true;
+        }
+
+        return negacao.includes(status);
+    };
 
     const dados = dadosAlvaraEmpresa?.map((item) => {
         const bombeiro = item?.LISTA_ALVARAS?.find(a => a.IDALVARA === 1);
@@ -218,7 +228,6 @@ export const ActionListaAlvaras = ({
             ARQUIVOALVARA: prefeitura?.ARQUIVOALVARA,
         };
     });
-
     const colunasEmpresasAlvaras = [
         {
             field: 'IDEMPRESA',
@@ -280,7 +289,9 @@ export const ActionListaAlvaras = ({
             {
                 field: 'DTFIMALVARABOMBEIRO',
                 header: 'Dt.Fim Bombeiro',
-                body: row => <th>{formatarDataParaBR(row.DTFIMALVARABOMBEIRO)}</th>,
+                body: row => <th className={isStatusNegacao(row.STATIVOBOMBEIRO, row.DTFIMALVARABOMBEIRO) ? "text-danger" : ""}>
+                    {formatarDataParaBR(row.DTFIMALVARABOMBEIRO)}
+                </th>,
                 sortable: true,
             },
         ] : []),
@@ -296,7 +307,8 @@ export const ActionListaAlvaras = ({
             {
                 field: 'DTFIMALVARAMEIOAMBIENTE',
                 header: 'St.Fim Meio Ambiente',
-                body: row => <th>{formatarDataParaBR(row.DTFIMALVARAMEIOAMBIENTE)}</th>,
+                body: row => <th className={isStatusNegacao(row.STATIVOMEIOAMBIENTE, row.DTFIMALVARAMEIOAMBIENTE) ? "text-danger" : ""}>
+                    {formatarDataParaBR(row.DTFIMALVARAMEIOAMBIENTE)}</th>,
                 sortable: true,
             },
         ] : []),
@@ -312,7 +324,8 @@ export const ActionListaAlvaras = ({
             {
                 field: 'DTFIMALVARAVIGILANCIASANITARIA',
                 header: 'Dt.Fim Vigilância Sanitaria',
-                body: row => <th>{formatarDataParaBR(row.DTFIMALVARAVIGILANCIASANITARIA)}</th>,
+                body: row => <th className={isStatusNegacao(row.STATIVOVIGILANCIASANITARIA, row.DTFIMALVARAVIGILANCIASANITARIA) ? "text-danger" : ""}>
+                    {formatarDataParaBR(row.DTFIMALVARAVIGILANCIASANITARIA)}</th>,
                 sortable: true,
             },
         ] : []),
@@ -328,7 +341,8 @@ export const ActionListaAlvaras = ({
             {
                 field: 'DTFIMALVARAPREFEITURA',
                 header: 'Dt.Fim Prefeitura',
-                body: row => <th>{formatarDataParaBR(row.DTFIMALVARAPREFEITURA)}</th>,
+                body: row => <th className={isStatusNegacao(row.STATIVOPREFEITURA, row.DTFIMALVARAPREFEITURA) ? "text-danger" : ""}>
+                    {formatarDataParaBR(row.DTFIMALVARAPREFEITURA)}</th>,
                 sortable: true,
             },
         ] : []),

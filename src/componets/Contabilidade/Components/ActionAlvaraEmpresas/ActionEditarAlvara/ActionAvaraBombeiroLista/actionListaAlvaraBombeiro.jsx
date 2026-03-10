@@ -113,7 +113,7 @@ export const ActionListaAlvaraBombeiro = ({
     const dados = dadosAlvaraEmpresaSelecionada
         .flatMap((empresa) => {
             return empresa.LISTA_ALVARAS
-                .filter(alvara => alvara.IDALVARA === 1) 
+                .filter(alvara => alvara.IDALVARA === 1)
                 .flatMap(alvara =>
                     alvara.ITEMS.map(item => ({
                         IDVINCULO: item.IDVINCULO,
@@ -340,6 +340,8 @@ export const ActionListaAlvaraBombeiro = ({
                 refetchAlvaraEmpresa={refetchAlvaraEmpresa}
                 refetchAlvaraSelecionado={refetchAlvaraSelecionado}
                 refetchVinculoAlvara={refetchVinculoAlvara}
+                idAlvaraSelecionado={1}
+
             />
 
         </Fragment>

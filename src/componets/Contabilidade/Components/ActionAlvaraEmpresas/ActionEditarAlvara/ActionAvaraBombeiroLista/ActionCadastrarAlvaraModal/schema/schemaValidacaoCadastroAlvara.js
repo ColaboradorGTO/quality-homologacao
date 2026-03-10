@@ -25,3 +25,4 @@ export const schema = yup.object({
         .string()
         .required("Detalhe de andamento é obrigatório")
 });
+                
