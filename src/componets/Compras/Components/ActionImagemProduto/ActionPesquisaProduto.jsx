@@ -19,7 +19,6 @@ export const ActionPesquisaProduto = ({ usuarioLogado }) => {
   const [estruturaSelecionada, setEstruturaSelecionada] = useState('');
   const [pedido, setPedido] = useState('');
   const [modalCadastro, setModalCadastro] = useState(false)
-  const [currentPage, setCurrentPage] = useState(1);
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
     
   useEffect(() => {
@@ -83,15 +82,6 @@ export const ActionPesquisaProduto = ({ usuarioLogado }) => {
   const { data: dadosMercadoria = [], error: errorFornecedor, isLoading: isLoadingFornecedor } = useFetchData('subGrupoEstrutura', '/subGrupoEstrutura');
   const { data: dadosFabricantes = [], error: errorFabricantes, isLoading: isLoadingFabricantes } = useFetchData('fabricantes', '/fabricantes');
   
-
-  const handleSelectFabricante = (e) => {
-    setFabricanteSelecionado(e.value);
-  }
-
-  const handleSelectStrutura = (e) => {
-    setEstruturaSelecionada(e.value);
-  }
-
   const handleClick = () => {
     refetchListaProdutos()
   }
@@ -128,7 +118,7 @@ export const ActionPesquisaProduto = ({ usuarioLogado }) => {
         ]}
         labelSelectFornecedor={"Por Estrutura"}
         valueSelectFornecedor={estruturaSelecionada}
-        onChangeSelectFornecedor={handleSelectStrutura}
+        onChangeSelectFornecedor={(e) => setEstruturaSelecionada(e.value)}
 
         InputSelectFabricanteComponent={InputSelectAction}
         optionsFabricantes={[
@@ -140,7 +130,7 @@ export const ActionPesquisaProduto = ({ usuarioLogado }) => {
         ]}
         labelSelectFabricantes={"Por Fabricante"}
         valueSelectFabricante={fabricanteSelecionado}
-        onChangeSelectFabricante={handleSelectFabricante}
+        onChangeSelectFabricante={(e) => setFabricanteSelecionado(e.value)}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}

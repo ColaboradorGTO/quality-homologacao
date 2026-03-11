@@ -115,7 +115,7 @@ export const ActionPesquisaQuebraCaixaLoja = ({usuarioLogado }) => {
   );
    
   const fetchQuebraPositiva = async () => {
-    const urlBase = `/quebra-caixa-loja?idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&quebra=1&idMarca=${marcaSelecionada}&cpfOperadorQuebra=${cpfOperadorQuebra}`;
+    const urlBase = `/quebra-caixa-loja?idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&quebra=Positiva&idMarca=${marcaSelecionada}&cpfOperadorQuebra=${cpfOperadorQuebra}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
@@ -149,7 +149,7 @@ export const ActionPesquisaQuebraCaixaLoja = ({usuarioLogado }) => {
   };
 
   const fetchQuebraNegativa = async () => {
-    const urlBase = `/quebra-caixa-loja?idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&quebra=2&idMarca=${marcaSelecionada}&cpfOperadorQuebra=${cpfOperadorQuebra}`;
+    const urlBase = `/quebra-caixa-loja?idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&quebra=Negativa&idMarca=${marcaSelecionada}&cpfOperadorQuebra=${cpfOperadorQuebra}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {

@@ -169,10 +169,18 @@ export const ActionListaProduto = ({
 
   const handleDetalhe = async (IDIMAGEM) => {
     try {
+      Swal.fire({
+        title: 'Carregando...',
+        html: 'Carregando dados do produtos',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
       const response = await get(`/listaProdutosImagem?idImagem=${IDIMAGEM}`);
       if(response.data && response.data.length > 0) {
+        Swal.close();
         setDadosDetalheProdutos(response.data);
         setModalDetalhe(true);
+        return response.data;
       } else {
         Swal.fire({
           icon: 'error',
@@ -214,7 +222,7 @@ export const ActionListaProduto = ({
             size="small"
             selectionMode="single"
             selection={rowSelection}
-            onSelectionChange={(e) =>     (e.value)}
+            onSelectionChange={(e) =>  setRowSelection(e.value)}
             sortOrder={-1}
             paginator={true}
             rows={10}
