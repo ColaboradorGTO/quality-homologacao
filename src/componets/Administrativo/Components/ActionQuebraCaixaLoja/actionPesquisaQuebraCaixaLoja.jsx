@@ -11,7 +11,7 @@ import { ActionListaQuebraCaixaLojaNegativa } from "./actionListaQuebraCaixaLoja
 import { ActionListaQuebraCaixaLojaPositiva } from "./actionListaQuebraCaixaLojaPositiva";
 import { useQuery } from 'react-query';
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
-import {optionsUF, optionsQuebraDeCaixaADM } from "../../../../../parceiro.json"
+import {optionsUF, optionsQuebraDeCaixa } from "../../../../../parceiro.json"
 
 export const ActionPesquisaQuebraCaixaLoja = ({usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
@@ -214,14 +214,15 @@ export const ActionPesquisaQuebraCaixaLoja = ({usuarioLogado }) => {
 
   const handleClick = async () => {
     setClickContador(prevContador => prevContador + 1);
-    if (quebraSelecionada === "1") {
+    console.log("Contador de cliques:", clickContador + 1);
+    if (quebraSelecionada === "Positiva") {
       setTabelaVisivelPositiva(true)
       setTabelaVisivelNegativa(false)
       setTabelaVisivel(false)
       setCurrentPage(prevPage => prevPage + 1)
       await refetchQuebraPositiva(quebraSelecionada);
       
-    } else if (quebraSelecionada === "2") {
+    } else if (quebraSelecionada === "Negativa") {
       setTabelaVisivelNegativa(true)
       setTabelaVisivelPositiva(false)
       setTabelaVisivel(false)
@@ -229,7 +230,7 @@ export const ActionPesquisaQuebraCaixaLoja = ({usuarioLogado }) => {
       setCurrentPage(prevPage => prevPage + 1)
       await refetchQuebraNegativa(quebraSelecionada);
       
-    } else if (quebraSelecionada === "0") {
+    } else if (quebraSelecionada === "") {
       setTabelaVisivel(true)
       setTabelaVisivelNegativa(false)
       setTabelaVisivelPositiva(false)
@@ -293,7 +294,7 @@ export const ActionPesquisaQuebraCaixaLoja = ({usuarioLogado }) => {
         labelSelectQuebra={"Quebra"}
         optionsQuebra={[
 
-          ...optionsQuebraDeCaixaADM?.map((empresa) => ({
+          ...optionsQuebraDeCaixa?.map((empresa) => ({
             value: empresa.value,
             label: empresa.label,
           }))
