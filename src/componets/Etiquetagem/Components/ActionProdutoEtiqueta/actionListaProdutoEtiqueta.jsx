@@ -1,26 +1,53 @@
-import { Fragment, useEffect, useRef, useState } from "react"
+import { Fragment, useEffect, useRef, useState } from "react";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { InputNumber } from 'primereact/inputnumber';
-import { TriStateCheckbox } from 'primereact/tristatecheckbox';
 import { formatMoeda } from "../../../../utils/formatMoeda";
-
-import { useReactToPrint } from "react-to-print";
-import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
-import * as XLSX from 'xlsx';
 import HeaderTable from "../../../Tables/headerTable";
+import Swal from "sweetalert2";
+import { useReactToPrint } from "react-to-print";
+import jsPDF from "jspdf";
+import * as XLSX from 'xlsx';
+import { isValidEAN13 } from "../../../../utils/isValidEAN13";
+import { ActionDetalharProdutosEtiquetaModal } from "./actionDetalharProdutosEtiquetaModal";
 
-// 1070561136301
+export const ActionListaProdutoEtiqueta = ({
+  dadosListaPrecosSap,
+  setBtnVisivel,
+  modalImprimir,
+  setModalImprimir,
+  produtosSelecionados,
+  setProdutosSelecionados,
+  dadosAcumuladorEtiquetas,
+  setDadosAcumuladorEtiquetas,
+  setSelectAll,
+  selectedIds,
+  setSelectedIds,
+  copia,
+  setCopia
+}) => {
 
-export const ActionListaProdutoEtiqueta = ({ dadosListaPrecosSap }) => {
-  const [qtdProduto, setQtdProduto] = useState(1);
-  const [produtoSelecionado, setProdutoSelecionado] = useState(null);
-  const [rowClick, setRowClick] = useState(true);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
-  const [selectAll, setSelectAll] = useState(false);
-  const [selectedIds, setSelectedIds] = useState([]);
+  const [selectAllChecked, setSelectAllChecked] = useState(false);
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [first, setFirst] = useState(0);
+  const [rows, setRows] = useState(10);
   const dataTableRef = useRef();
+
+  const setQtdProduto = (idProduto, novaQuantidade) => {
+    setProdutosSelecionados((prevProdutos) => {
+      const produtoExiste = prevProdutos.some((produto) => produto.IDPRODUTO === idProduto);
+
+      if (!produtoExiste) {
+        return [...prevProdutos, { IDPRODUTO: idProduto, quantidade: Number(novaQuantidade) }];
+      }
+
+      return prevProdutos.map((produto) =>
+        produto.IDPRODUTO === idProduto
+          ? { ...produto, quantidade: Number(novaQuantidade) }
+          : produto
+      );
+    });
+  };
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -34,20 +61,17 @@ export const ActionListaProdutoEtiqueta = ({ dadosListaPrecosSap }) => {
   const exportToPDF = () => {
     const doc = new jsPDF();
     doc.autoTable({
-      head: [['Nº', 'Cod Barras', 'Produto', 'Tamanho', 'PR. Venda', 'Grupo', 'Estilo', 'Marca']],
+      head: [['Nº', 'Cod Barras', 'Produto', 'Tamanho', 'Quantidade', 'PR. Venda', 'Grupo', 'Estilo', 'Marca']],
       body: dados.map(item => [
-        item.NOFANTASIA,
-        item.IDVENDA,
-        dataFormatada(item.DATAVENDA),
-        formatMoeda(item.VRRECDINHEIRO),
-        formatMoeda(item.VRRECCARTAO),
-        formatMoeda(item.VRRECPOS),
-        formatMoeda(item.VRRECVOUCHER),
-        formatMoeda(item.VRRECCONVENIO),
-        item.DSPAG,
-        item.NOTEF,
-        item.NUAUTORIZACAO,
-        item.NPARCELAS,
+        item.contador,
+        item.NUCODBARRAS,
+        item.DSNOME,
+        item.TAMANHO,
+        item.quantidade,
+        formatMoeda(item.PRECOVENDA),
+        item.DSLISTAPRECO,
+        item.DSESTILO,
+        item.MARCA
       ]),
       horizontalPageBreak: true,
       horizontalPageBreakBehaviour: 'immediately'
@@ -58,15 +82,16 @@ export const ActionListaProdutoEtiqueta = ({ dadosListaPrecosSap }) => {
   const exportToExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(dados);
     const workbook = XLSX.utils.book_new();
-    const header = ['Nº', 'Cod Barras', 'Produto', 'Tamanho', 'PR. Venda', 'Grupo', 'Estilo', 'Marca'];
+    const header = ['Nº', 'Cod Barras', 'Produto', 'Tamanho', 'Quantidade', 'PR. Venda', 'Grupo', 'Estilo', 'Marca'];
     worksheet['!cols'] = [
       { wpx: 70, caption: 'Nº' },
-      { wpx: 100, caption: 'Cod Barras'},
-      { wpx: 100, caption: 'Produto' },
-      { wpx: 100, caption: 'Tamanho' },
+      { wpx: 100, caption: 'Cod Barras' },
+      { wpx: 200, caption: 'Produto' },
+      { wpx: 70, caption: 'Tamanho' },
+      { wpx: 50, caption: 'Quantidade' },
       { wpx: 100, caption: 'PR. Venda' },
-      { wpx: 100, caption: 'Grupo' },
-      { wpx: 100, caption: 'Estilo' },
+      { wpx: 200, caption: 'Grupo' },
+      { wpx: 200, caption: 'Estilo' },
       { wpx: 100, caption: 'Marca' },
     ];
     XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
@@ -74,180 +99,296 @@ export const ActionListaProdutoEtiqueta = ({ dadosListaPrecosSap }) => {
     XLSX.writeFile(workbook, 'lista_produtos.xlsx');
   };
 
+  const onPageChange = (event) => {
+    setFirst(event.first);
+    setRows(event.rows);
+  };
+
   const dados = dadosListaPrecosSap.map((item, index) => {
     let contador = index + 1;
-    if(!item.STCANCELADO) {
-      nuCodBarras = item.NUCODBARRAS;
-      descProduto = item.DSNOME;
-      TAMANHO = (item.TAMANHO.split(' ').pop()).toUpperCase().replace(/[^\w\s]/gi, '')
-      precoVenda = item.PRECOVENDA;
-      grupo = item.DSLISTAPRECO;
-      estilo = item.DSESTILO;
+    let quantidade = 1;
+    const arrayGrupos = [
+      'Todos',
+      'Tesoura',
+      'Magazine',
+      'Yorus',
+      'Free Center'
+    ];
+    let grupo = item.DSLISTAPRECO || arrayGrupos[item.IDSUBGRUPOEMPRESARIAL] || 'Todos';
+    let estilo = item.DSESTILO || '';
+    if (item.STTRANSFORMADO === 'True') {
+      let subgrupo = item.SUBGRUPO ? item.SUBGRUPO.split('-') : [];
+
+      if (subgrupo.length > 0) {
+        subgrupo = subgrupo.pop()?.split(' ')?.join(' - ') || '';
+      }
+
+      grupo = arrayGrupos[item.IDSUBGRUPOEMPRESARIAL] || grupo;
+
+      if (estilo.length > 0) {
+        estilo = subgrupo.length > 0 ? `${subgrupo} - ${estilo}` : estilo;
+      } else {
+        estilo = subgrupo;
+      }
     }
-    
+
+    // Ajuste para TAMANHO conforme solicitado
+    let dsProd = item.DSNOME || '';
+    let tamanho = (item.TAMANHO || item.DSTAMANHO || ((dsProd.split(' ')).pop()).replace(/[^\w\s]/gi, ''))?.toUpperCase();
+    let codBarras = item.NUCODBARRAS || item.CODBARRAS;
+    let stCodBarrasValid = isValidEAN13(codBarras) ? 'True' : 'False';
+    let stDisabled = item.STATIVO !== 'True' || stCodBarrasValid !== 'True' ? 'disabled' : '';
+    let subGrupo = item.SUBGRUPO ? (item.SUBGRUPO).split('-') : '';
     return {
       contador,
-      IDPRODUTO: item.IDPRODUTO,
-      NUCODBARRAS: item.NUCODBARRAS,
+      NUCODBARRAS: codBarras,
       DSNOME: item.DSNOME,
-      TAMANHO: item.TAMANHO,
+      TAMANHO: tamanho,
+      stCodBarrasValid,
+      stDisabled,
+      quantidade,
+      subGrupo,
       PRECOVENDA: item.PRECOVENDA,
-      DSLISTAPRECO: item.DSLISTAPRECO,
-    
-  
-      // TAMANHO: item.TAMANHO,  (dsProd.split(' ')).pop()).toUpperCase().replace(/[^\w\s]/gi, '')
-
-
-
-      
-      IDGRUPOEMPRESARIAL: item.IDGRUPOEMPRESARIAL,
-      IDEMPRESA: item.IDEMPRESA,
-      NOFANTASIA: item.NOFANTASIA,
-     
-
-      // ----------------------
-      
-      CODBARRAS: item.CODBARRAS,
-      DSPRODUTO: item.DSPRODUTO,
-      DSTAMANHO: item.DSTAMANHO,
-      VRUNITLIQDETALHEPEDIDO: item.VRUNITLIQDETALHEPEDIDO,
-
-      MARCA: item.MARCA,
-      SUBGRUPO: item.SUBGRUPO,
-      DSESTILO: item.DSESTILO,
-      IDSUBGRUPOEMPRESARIAL: item.IDSUBGRUPOEMPRESARIAL,
+      DSESTILO: item.DSESTILO ? item.DSESTILO : item.SUBGRUPO,
+      MARCA: item.MARCA || '',
+      IDPRODUTO: item.IDPRODUTO,
+      STRANSFRMADO: item.STTRANSFORMADO,
+      DSLISTAPRECO: item.DSLISTAPRECO || item.IDSUBGRUPOEMPRESARIAL || 0,
       DSLOCALEXPOSICAO: item.DSLOCALEXPOSICAO,
-    }
+      STATIVO: item.STATIVO === 'True' ? 'Ativo' : 'Inativo',
+      arrayGrupos,
+    };
+
   });
 
+  useEffect(() => {
+    const itensSelecionaveis = dados.filter(item => item.stDisabled !== 'disabled');
+
+    const dadosPaginaAtual = dados.slice(first, first + rows);
+    const itensSelecionaveisPaginaAtual = dadosPaginaAtual.filter(item => item.stDisabled !== 'disabled');
+
+    if (selectedItems.length === 0) {
+      setSelectAllChecked(false);
+    } else if (
+      selectedItems.length === itensSelecionaveis.length ||
+      (selectedItems.length === itensSelecionaveisPaginaAtual.length &&
+        itensSelecionaveisPaginaAtual.length > 0 &&
+        itensSelecionaveisPaginaAtual.every(item =>
+          selectedItems.some(selected => selected.IDPRODUTO === item.IDPRODUTO)
+        ))
+    ) {
+      setSelectAllChecked(true);
+    } else {
+      setSelectAllChecked(false);
+    }
+
+  }, [selectedItems, dados, first, rows]);
+
+  const onSelectAllChange = (checked) => {
+    if (checked) {
+      Swal.fire({
+        icon: 'question',
+        title: 'Selecione o modo de seleção',
+        text: 'Deseja selecionar todos da tabela ou somente o que está em tela?',
+        showConfirmButton: true,
+        showCancelButton: true,
+        showCloseButton: true,
+        customClass: { container: 'custom-class' },
+        confirmButtonText: 'Todos os registros',
+        cancelButtonText: 'Apenas o que está tela',
+        cancelButtonColor: '#2196F3',
+        allowOutsideClick: false,
+      }).then((result) => {
+
+        if (result.isConfirmed) {
+          const itensSelecionaveis = dados.filter(item => item.stDisabled !== 'disabled');
+          setBtnVisivel(true);
+          setSelectedItems([...itensSelecionaveis]);
+          setSelectedIds(itensSelecionaveis.map(item => item.IDPRODUTO));
+          setProdutosSelecionados(itensSelecionaveis.map(item => ({ ...item, quantidade: 1 })));
+          setSelectAll(true);
+
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+          const itensSelecionaveisPaginaAtual = dados.slice(first, first + rows).filter(item => item.stDisabled !== 'disabled');
+          setBtnVisivel(true);
+          setSelectedItems([...itensSelecionaveisPaginaAtual]);
+          setSelectedIds(itensSelecionaveisPaginaAtual.map(item => item.IDPRODUTO));
+          setProdutosSelecionados(itensSelecionaveisPaginaAtual.map(item => ({ ...item, quantidade: 1 })));
+          setSelectAll(true);
+
+        } else {
+          setBtnVisivel(false);
+          setSelectedItems([]);
+          setSelectedIds([]);
+          setProdutosSelecionados([]);
+          setSelectAll(false);
+        }
+      });
+    } else {
+      setBtnVisivel(false);
+      setSelectedItems([]);
+      setSelectedIds([]);
+      setProdutosSelecionados([]);
+      setSelectAll(false);
+    }
+  }
+
   const colunasListaProdEtiquetas = [
-    {
-      field: 'contador',
-      header: 'Nº',
-      body: (row) => <th>{row.contador}</th>,
-      sortable: true
-    },
     {
       field: 'IDPRODUTO',
       header: (
         <div>
-          <label>{selectAll ? 'Desmarcar Todos' : 'Marcar Todos'}</label>
+          <label>{selectAllChecked ? 'Desmarcar Todos' : 'Marcar Todos'}</label>
           <input
             type="checkbox"
-            checked={selectAll}
-            onChange={(e) => handleSelectAll(e.target.checked)}
-            selectionMode="multiple"
-            />
+            checked={selectAllChecked}
+            onChange={(e) => onSelectAllChange(e.target.checked)}
+          />
         </div>
       ),
-      selectionMode: "single",
       body: (rowData) => {
         return (
-          <div style={{ background: '', }}>
-              <input
-                type="checkbox"
-                checked={selectedIds.includes(rowData.IDPRODUTO)}
-                onChange={(e) => {
-                  const updatedSelectedIds = e.target.checked
-                    ? [...selectedIds, rowData.IDPRODUTO]
-                    : selectedIds.filter(id => id !== rowData.IDPRODUTO);
-          
-                  setSelectedIds(updatedSelectedIds);
-                  setSelectAll(updatedSelectedIds.length === dados.length);
-                }}
-                selectionMode="multiple"
-              />
-          </div>
-        )
-      }
-    },
-    {
-      field: 'IDPRODUTO',
-      header: 'Quantidade',
-      body: (row) => {
-        return (
-          <div style={{ background: '', width: '100%' }}>
+          <div>
             <input
-              type="number"
-              value={qtdProduto}
-              onValueChange={(e) => row.IDPRODUTO.editorCallback(e.value)}
-              style={{ width: '100%' }}
+              type="checkbox"
+              checked={selectedIds.includes(rowData.IDPRODUTO)}
+              onChange={(e) => {
+                const isChecked = e.target.checked
+                const updatedSelectedIds = e.target.checked
+                  ? [...selectedIds, rowData.IDPRODUTO]
+                  : selectedIds.filter(id => id !== rowData.IDPRODUTO);
+                setSelectedIds(updatedSelectedIds);
+                setQtdProduto(rowData.IDPRODUTO, isChecked)
+                setSelectAll(updatedSelectedIds.length === dados.length);
+                setProdutosSelecionados(isChecked ? [...produtosSelecionados, rowData] : produtosSelecionados.filter(item => item.IDPRODUTO !== rowData.IDPRODUTO));
+                if (isChecked) {
+                  setBtnVisivel(true);
+
+                } else {
+                  setBtnVisivel(false);
+
+                }
+              }}
+              disabled={rowData.stDisabled === 'disabled'}
             />
           </div>
-        )
+        );
       }
     },
     {
-      field: 'CODBARRAS',
-      header: 'Código de Barras',
-      body: row => <th>{row.CODBARRAS}</th>,
+      field: 'contador',
+      header: 'Nº',
+      body: (row) => <th style={{ color: row.stDisabled === 'disabled' ? 'red' : 'blue' }}>{row.contador}</th>,
+      sortable: true
+    },
+    {
+      field: 'NUCODBARRAS',
+      header: 'Cód Barras',
+      body: row => <th style={{ color: row.stDisabled === 'disabled' ? 'red' : 'blue' }}>{row.NUCODBARRAS}</th>,
       sortable: true
     },
     {
       field: 'DSNOME',
       header: 'Produto',
-      body: row => <th>{row.DSNOME}</th>,
+      body: row => <th style={{ color: row.stDisabled === 'disabled' ? 'red' : 'blue' }}>{row.DSNOME}</th>,
       sortable: true
     },
     {
       field: 'TAMANHO',
       header: 'Tamanho',
-      body: row => <th>{row.TAMANHO}</th>,
+      body: row => <th style={{ color: row.stDisabled === 'disabled' ? 'red' : 'blue' }}>{row.TAMANHO}</th>,
       sortable: true
+    },
+    {
+      field: 'quantidade',
+      header: 'Quantidade',
+      body: (row) => {
+        return (
+          <div style={{ background: '', width: '50%' }}>
+            <input
+              type="number"
+              value={produtosSelecionados.find(p => p.IDPRODUTO === row.IDPRODUTO)?.quantidade || 1}
+              onChange={(e) => {
+                const novaQuantidade = parseInt(e.target.value, 10) || 1;
+                setProdutosSelecionados(prevProdutos =>
+                  prevProdutos.map(prod =>
+                    prod.IDPRODUTO === row.IDPRODUTO
+                      ? { ...prod, quantidade: novaQuantidade }
+                      : prod
+                  )
+                );
+              }}
+              style={{ width: '100%' }}
+            />
+
+          </div>
+        );
+      }
     },
     {
       field: 'PRECOVENDA',
       header: 'PR. Venda',
-      body: row => <th>{formatMoeda(row.PRECOVENDA)}</th>,
+      body: row => <th style={{ color: row.stDisabled === 'disabled' ? 'red' : 'blue' }}>{formatMoeda(row.PRECOVENDA)}</th>,
       sortable: true
     },
     {
       field: 'DSLISTAPRECO',
       header: 'Grupo',
-      body: row => <th>{row.DSLISTAPRECO}</th>,
+      body: row => <th style={{ color: row.stDisabled === 'disabled' ? 'red' : 'blue' }}>{row.DSLISTAPRECO}</th>,
       sortable: true
     },
     {
       field: 'DSESTILO',
       header: 'Estilo',
-      body: row => <th>{row.DSESTILO}</th>,
+      body: row => <th style={{ color: row.stDisabled === 'disabled' ? 'red' : 'blue' }}>{row.DSESTILO}</th>,
       sortable: true
     },
     {
       field: 'MARCA',
       header: 'Marca',
-      body: row => <th>{row.MARCA}</th>,
+      body: row => <th style={{ color: row.stDisabled === 'disabled' ? 'red' : 'blue' }}>{row.MARCA}</th>,
       sortable: true
     },
+    {
+      field: 'STATIVO',
+      header: 'Status',
+      body: row => <th style={{ color: row.STATIVO === 'Ativo' ? 'blue' : 'red' }}>{row.STATIVO}</th>,
+      sortable: true
+    },
+  ];
 
-  ]
+  useEffect(() => {
+    if (selectedIds.length > 0) {
+      setBtnVisivel(true);
+    } else {
+      setBtnVisivel(false);
+    }
+  }, [selectedIds, setBtnVisivel]);
 
-  // useEffect(() => {
-  //   if (selectedIds.length > 0) {
-  //     handleDetalhar(selectedIds, 'True');
-  //   }
-  // }, [selectedIds]);
-
-
-  const handleSelectAll = (isChecked) => {
-    setSelectAll(isChecked);
-
-    const updatedSelectedIds = isChecked ? dados.map(item => item.IDPRODUTO) : [];
-    setSelectedIds(updatedSelectedIds);
-
-    // if (updatedSelectedIds.length > 0) {
-    //   handleDetalhar(updatedSelectedIds, 'True');
-    // }
-  };
 
   return (
-
     <Fragment>
       <div className="panel">
+
         <div className="panel-hdr">
           <h2>Lista de Produtos </h2>
         </div>
+
+        <div style={{ background: '', width: '15%', display: 'flex', alignItems: 'center', gap: '1rem', marginLeft: '1rem' }}>
+          <span style={{ fontWeight: 'bold', textWrap: 'nowrap' }}>QTD CÓPIAS:</span>
+          <input
+            type="number"
+            defaultValue={1}
+            value={copia}
+            min={1}
+            onChange={(e) => setCopia(e.target.value)}
+            style={{ width: '50%' }}
+          />
+
+        </div>
+
         <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
+
           <HeaderTable
             globalFilterValue={globalFilterValue}
             onGlobalFilterChange={onGlobalFilterChange}
@@ -255,43 +396,51 @@ export const ActionListaProdutoEtiqueta = ({ dadosListaPrecosSap }) => {
             exportToExcel={exportToExcel}
             exportToPDF={exportToPDF}
           />
-
         </div>
-        <div className="card" ref={dataTableRef}>
+
+        <div className="card" ref={dataTableRef} style={{ marginTop: "1rem" }}>
           <DataTable
-            title="Lista de Produtos"
             value={dados}
-            globalFilterValue={globalFilterValue}
+            globalFilter={globalFilterValue}
             size="small"
             selectionMode={'single'}
             sortOrder={-1}
             paginator={true}
-            rows={10}
+            rows={rows}
+            first={first}
+            onPage={onPageChange}
             rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+            filterDisplay="menu"
             showGridlines
             stripedRows
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado </div>}
           >
-
             {colunasListaProdEtiquetas.map(coluna => (
               <Column
                 key={coluna.field}
                 field={coluna.field}
                 header={coluna.header}
                 body={coluna.body}
-                footer={coluna.footer}
                 sortable={coluna.sortable}
                 headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
-                footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
                 bodyStyle={{ fontSize: '0.8rem' }}
-
               />
             ))}
           </DataTable>
         </div>
       </div>
 
+      <ActionDetalharProdutosEtiquetaModal
+        show={modalImprimir}
+        handleClose={() => setModalImprimir(false)}
+        produtosSelecionados={produtosSelecionados}
+        setProdutosSelecionados={setProdutosSelecionados}
+        dadosAcumuladorEtiquetas={dadosAcumuladorEtiquetas}
+        setDadosAcumuladorEtiquetas={setDadosAcumuladorEtiquetas}
+      />
 
     </Fragment>
-  )
-}
+  );
+};

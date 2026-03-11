@@ -525,6 +525,8 @@ export const ActionMain = ({
   linkNomeLoja,
   linkNomeSaldo,
   linkNomeBalanco,
+  linkSalvar,
+
   labelSelectPagamento,
   labelSelectUsoPrinicipal,
   labelSelectFrete,
@@ -595,6 +597,7 @@ export const ActionMain = ({
   IconSearch,
   iconTypeSaldo,
   iconSizeCadastro,
+  IconSalvar,
 
   corCadastro,
   corCancelar,
@@ -1961,13 +1964,14 @@ export const ActionMain = ({
                     {ButtonTypeSalvar && (
                       <ButtonTypeSalvar
                         // nome="Vendas por Produto"
-                        textButton={linkNome}
+                        textButton={linkSalvar}
                         onClickButtonType={onButtonClickSalvar}
-                        cor="info"
+                        cor={corSalvar || 'info'}
                         tipo="button"
-                        Icon={AiOutlineSave}
+                        Icon={IconSalvar || AiOutlineSave}
                         iconColor="#fff"
                         iconSize={16}
+                        style={styleSalvar}
                       />
                     )}
 
