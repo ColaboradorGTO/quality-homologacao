@@ -19,7 +19,7 @@ export const useCadastrarImagemProduto = ({usuarioLogado, optionsModulos}) => {
             const response = await get(`/produtos-imagens?numeroRefProduto=${referencia}`);
             return response.data;
         },
-        { enabled: Boolean(referencia.length > 4), staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+        { enabled: Boolean(referencia.length > 4), staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
     );
 
     const getIPUsuario = async () => {
@@ -44,6 +44,7 @@ export const useCadastrarImagemProduto = ({usuarioLogado, optionsModulos}) => {
         return usuarioIP;
     };
 
+    console.log(novoProduto, 'novoProduto')
     const onSubmit = async () => {
         if (optionsModulos[0]?.ALTERAR == 'False') {
             Swal.fire({
@@ -57,18 +58,32 @@ export const useCadastrarImagemProduto = ({usuarioLogado, optionsModulos}) => {
             return;
         }
 
+        if(novoProduto.length === 0){ 
+            Swal.fire({
+                title: 'Erro!',
+                html: `Nenhum produto selecionado para cadastrar a imagem!`,
+                icon: 'error',
+                customClass: {
+                    container: 'custom-swal',
+                },
+
+            })
+            return;
+        }
+
         const postData = {
-            IDRESUMOPEDIDO: numeroPedido,
+            IDRESUMOPEDIDO: parseInt(numeroPedido),
             NUREF: referencia,
             IMAGEM: codImgProd,
             STATIVO: 'True',
-            IDPRODIMAGEM: [{
-                IDPRODUTO: novoProduto.map(item => item.IDPRODUTO).join(','),
-                IDSUBGRUPOESTRUTURA: novoProduto.map(item => item.IDSUBGRUPOESTRUTURA).join(','),
-                IDFABRICANTE: novoProduto.map(item => item.IDFABRICANTE).join(','),
-                IDFORNECEDOR: novoProduto.map(item => item.IDFORNECEDOR).join(','),
-            }],
+            IDPRODIMAGEM: novoProduto.map(item => ({
+                IDProduto: String(item.IDPRODUTO),
+                IDForProduto: parseInt(item.IDFORNECEDOR),
+                IDFabProduto: parseInt(item.IDFABRICANTE),
+                IDSubEstrutProduto: parseInt(item.IDSUBGRUPO),
+            }))
         }
+        /* VOLTAR DAQUI E VERIFICAR O OBJETO COMO É ENVIADO NO POSTMAN IDPROIMAGEM ESTA DIFERENTE OS CAMPOS ENVIADOS */
         try {
 
             const response = await post('/cadastrar-imagem-produto', postData)

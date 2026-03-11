@@ -80,12 +80,11 @@ export const ActionListaProdutoImagem = ({
     return {
       contador,
       DSNOME: item.DSNOME,
-      IDFABRICANTE: item.IDFABRICANTE,
-      IDFORNECEDOR: item.IDFORNECEDOR,
+      IDFABRICANTE: parseInt(item.IDFABRICANTE),
+      IDFORNECEDOR: parseInt(item.IDFORNECEDOR),
       IDPRODUTO: item.IDPRODUTO,
-      IDSUBGRUPO: item.IDSUBGRUPO,
+      IDSUBGRUPO: parseInt(item.IDSUBGRUPO),
       NUCODBARRAS: item.NUCODBARRAS,
-
     }
   })
 
@@ -159,7 +158,8 @@ export const ActionListaProdutoImagem = ({
               size="small"
               globalFilter={globalFilterValue}
               sortOrder={-1}
-              rows={true}
+              rows={10}
+               paginator={true}
               rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
               paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
               currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
