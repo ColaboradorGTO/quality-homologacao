@@ -17,6 +17,8 @@ export const useCreatePromocaoAtiva = ({ }) => {
   const [subGrupoOrigem, setSubGrupoOrigem] = useState([])
   const [subGrupoSelecionado, setSubGrupoSelecionado] = useState(-1)
   const [grupoSelecionado, setGrupoSelecionado] = useState(-1)
+  const [grupoSelecionadoDestino, setGrupoSelecionadoDestino] = useState(-1)
+  const [grupoSelecionadoOrigem, setGrupoSelecionadoOrigem] = useState(-1)
   const [marcaSelecionada, setMarcaSelecionada] = useState(-1)
   const [empresaSelecionada, setEmpresaSelecionada] = useState([])
   const [dataInicio, setDataInicio] = useState('')
@@ -128,6 +130,15 @@ export const useCreatePromocaoAtiva = ({ }) => {
   );
 
   const { data: dadosGrupo = [], error: errorGrupo, isLoading: isLoadingGrupo, refetch: refetchGrupo } = useQuery(
+    'grupoEstrutura',
+    async () => {
+      const response = await get(`/grupoEstrutura`);
+      return response.data;
+    },
+    {enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000, }
+  );
+
+  const { data: dadosSubGrupo = [], error: errorSubGrupo, isLoading: isLoadingSubGrupo, refetch: refetchSubGrupo } = useQuery(
     'subGrupoEstrutura',
     async () => {
       const response = await get(`/subGrupoEstrutura`);
@@ -809,11 +820,11 @@ export const useCreatePromocaoAtiva = ({ }) => {
         STEMPRESAPROMO: "True",
         STDETPROMOORIGEM: "True",
         STDETPROMODESTINO: "True",
-        IDGRUPOEMDESTINO: grupoSelecionado,
+        IDGRUPOEMDESTINO: grupoSelecionadoDestino,
         IDSUBGRUPOEMDESTINO: subGrupoSelecionado,
         IDMARCAEMDESTINO: marcaDestino,
         IDFORNECEDOREMDESTINO: fornecedorSelecionado,
-        IDGRUPOEMORIGEM: grupoSelecionado,
+        IDGRUPOEMORIGEM: grupoSelecionadoOrigem,
         IDSUBGRUPOEMORIGEM: subGrupoSelecionado,
         IDMARCAEMORIGEM: marcaOrigem,
         IDFORNECEDOREMORIGEM: fornecedorSelecionado,
@@ -889,7 +900,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
     }
   };
 
-    
+
   const onSubmitEstrutura = async (data) => {
   
     try {
@@ -967,12 +978,12 @@ export const useCreatePromocaoAtiva = ({ }) => {
         STEMPRESAPROMO: "True",
         STDETPROMOORIGEM: "True",
         STDETPROMODESTINO: "True",
-        IDGRUPOEMDESTINO: grupoSelecionado,
-        IDSUBGRUPOEMDESTINO: parseFloat(subGrupoDestino),
+        IDGRUPOEMDESTINO: grupoSelecionadoDestino,
+        IDSUBGRUPOEMDESTINO: subGrupoDestino,
         IDMARCAEMDESTINO: marcaDestino,
         IDFORNECEDOREMDESTINO: fornecedorSelecionado,
-        IDGRUPOEMORIGEM: grupoSelecionado,
-        IDSUBGRUPOEMORIGEM: parseFloat(subGrupoOrigem),
+        IDGRUPOEMORIGEM: grupoSelecionadoOrigem,
+        IDSUBGRUPOEMORIGEM: subGrupoOrigem,
         IDMARCAEMORIGEM: marcaOrigem,
         IDFORNECEDOREMORIGEM: fornecedorSelecionado,
         IDPRODUTO: null,
@@ -1157,6 +1168,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
     setPrecoProduto,
     dadosFornecedorProduto,
     dadosGrupo,
+    dadosSubGrupo,
     optionsMarcas,
     optionsEmpresas,
     optionsMecanica,

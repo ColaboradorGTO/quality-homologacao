@@ -17,6 +17,8 @@ import { ActionProdutoModalPromocaoSelecionadoCSVOrigem } from "../ActionPromoco
 import { ActionDocumentacaoCriar } from "../ActionPromocoesAtivas/ActionDocumentacao/documentacaoCriar";
 import { InputFieldActionCheckBox } from "../../Buttons/InputActionCheckBox";
 import { ButtonTypeModal } from "../../Buttons/ButtonTypeModal";
+import { MenuTreeSelect } from "../../Inputs/menuTreeSelect";
+import { useState } from "react";
 
 
 
@@ -69,6 +71,7 @@ export const ActionPesquisaPromocao = ({ }) => {
     setPrecoProduto,
     dadosFornecedorProduto,
     dadosGrupo,
+    dadosSubGrupo,
     optionsMarcas,
     optionsEmpresas,
     optionsMecanica,
@@ -243,7 +246,144 @@ export const ActionPesquisaPromocao = ({ }) => {
     setModalDocumentacao(true);
   }, []);
 
+  const [treeData, setTreeData] = useState([]);
+  const [selectedNodesOrigem, setSelectedNodesOrigem] = useState({});
+  const [selectedNodesDestino, setSelectedNodesDestino] = useState({});
 
+  // useEffect(() => {
+  //   if (dadosGrupo.length) {
+  //     const gruposMap = new Map();
+
+  //     dadosGrupo.forEach(subgrupo => {
+  //       const grupoId = subgrupo.IDSUBGRUPOESTRUTURA;
+  //       const grupoDescricao = subgrupo.DSGRUPOESTRUTURA;
+
+  //       if (!gruposMap.has(grupoId)) {
+  //         gruposMap.set(grupoId, {
+  //           key: grupoId,
+  //           label: grupoDescricao,
+  //           children: [],
+  //         });
+  //       }
+
+  //       gruposMap.get(grupoId).children.push({
+  //         key: subgrupo.IDSUBGRUPOESTRUTURA,
+  //         label: subgrupo.DSSUBGRUPOESTRUTURA,
+  //       });
+  //     });
+  //     // Atualiza o estado de treeData
+  //     const formattedTreeData = Array.from(gruposMap.values());
+  //     setTreeData(formattedTreeData);
+
+  //     // Atualiza os grupos e subgrupos selecionados
+  //     setGrupoSelecionado(formattedTreeData.map(grupo => grupo.key));
+  //     setSubGrupoDestino(formattedTreeData.flatMap(grupo => grupo.children.map(child => child.key)));
+  //   }
+  // }, [dadosGrupo]);
+
+  useEffect(() => {
+  if (dadosSubGrupo.length) {
+    // 1. Agrupar subgrupos por IDGRUPOESTRUTURA
+    const gruposMap = new Map();
+    
+    dadosSubGrupo.forEach(subgrupo => {
+      const grupoId = subgrupo.IDGRUPOESTRUTURA; // ID do grupo (não do subgrupo)
+      const grupoDescricao = subgrupo.DSGRUPOESTRUTURA; // Nome do grupo
+      
+      // Se o grupo ainda não existe no Map, criar
+      if (!gruposMap.has(grupoId)) {
+        gruposMap.set(grupoId, {
+          key: `grupo_${grupoId}`, // Chave única para o grupo com prefixo
+          label: grupoDescricao,    // Nome do grupo
+          children: [],             // Array dos subgrupos
+        });
+      }
+      
+      // Adicionar o subgrupo como filho do grupo
+      gruposMap.get(grupoId).children.push({
+        key: `subgrupo_${subgrupo.IDSUBGRUPOESTRUTURA}`, // Chave do subgrupo com prefixo
+        label: subgrupo.DSSUBGRUPOESTRUTURA,              // Nome do subgrupo
+        data: subgrupo // Opcional: dados completos do subgrupo
+      });
+    });
+    
+    // 2. Converter o Map em array para o TreeSelect
+    const formattedTreeData = Array.from(gruposMap.values());
+    setTreeData(formattedTreeData);
+    
+  }
+}, [dadosSubGrupo]);
+
+  // UseEffect para inicializar seleções baseado nos dados existentes
+  useEffect(() => {
+    if (treeData.length && (grupoSelecionado.length || subGrupoDestino.length)) {
+      const initialSelection = {};
+      
+      // Marcar grupos selecionados
+      grupoSelecionado.forEach(grupoId => {
+        const chaveGrupo = `grupo_${grupoId}`;
+        initialSelection[chaveGrupo] = true;
+      });
+      
+      // Marcar subgrupos selecionados
+      subGrupoDestino.forEach(subgrupoId => {
+        const chaveSubgrupo = `subgrupo_${subgrupoId}`;
+        initialSelection[chaveSubgrupo] = true;
+      });
+      
+      setSelectedNodesOrigem(initialSelection);
+      setSelectedNodesDestino(initialSelection);
+      
+    }
+  }, [treeData]);
+
+  const handleTreeSelectOrigemChange = (e) => {
+    const selectedValue = e.value;
+    setSelectedNodesOrigem(selectedValue);
+
+    const selectedGrupo = [];
+    const selectedSubGrupo = [];
+
+    // Processar as chaves selecionadas
+    Object.keys(selectedValue).forEach(key => {
+      if (key.startsWith('grupo_')) {
+        // Extrair o ID do grupo (remove o prefixo 'grupo_')
+        const grupoId = key.replace('grupo_', '');
+        selectedGrupo.push(grupoId);
+      } else if (key.startsWith('subgrupo_')) {
+        // Extrair o ID do subgrupo (remove o prefixo 'subgrupo_')
+        const subgrupoId = Number(key.replace('subgrupo_', ''));
+        selectedSubGrupo.push(subgrupoId);
+      }
+    });
+
+    setGrupoSelecionado(selectedGrupo);
+    setSubGrupoOrigem(selectedSubGrupo);
+  };
+
+  const handleTreeSelectDestinoChange = (e) => {
+    const selectedValue = e.value;
+    setSelectedNodesDestino(selectedValue);
+
+    const selectedGrupo = [];
+    const selectedSubGrupo = [];
+
+    // Processar as chaves selecionadas
+    Object.keys(selectedValue).forEach(key => {
+      if (key.startsWith('grupo_')) {
+        // Extrair o ID do grupo (remove o prefixo 'grupo_')
+        const grupoId = key.replace('grupo_', '');
+        selectedGrupo.push(grupoId);
+      } else if (key.startsWith('subgrupo_')) {
+        // Extrair o ID do subgrupo (remove o prefixo 'subgrupo_')
+        const subgrupoId = Number(key.replace('subgrupo_', ''));
+        selectedSubGrupo.push(subgrupoId);
+      }
+    });
+
+    setGrupoSelecionado(selectedGrupo);
+    setSubGrupoDestino(selectedSubGrupo);
+  };
 
   return (
     <Fragment>
@@ -471,6 +611,12 @@ export const ActionPesquisaPromocao = ({ }) => {
           }
         }}
 
+        MenuTreeSelectOrigemComponent={MenuTreeSelect}
+        valueTreeSelectOrigem={selectedNodesOrigem}
+        onChangeTreeSelectOrigem={handleTreeSelectOrigemChange}
+        optionsTreeSelectOrigem={treeData}
+        placeholderTreeSelectOrigem={"Selecione"}
+
         InputSelectSubGrupoDestinoComponentAync={MultSelectAction}
         labelSelectSubGrupoDestinoAsync={"Sub Grupo Destino"}
         optionsSubGrupoDestinoAsync={[
@@ -499,6 +645,13 @@ export const ActionPesquisaPromocao = ({ }) => {
             handleChangeSubGrupoDestino(e);
           }
         }}
+
+        MenuTreeSelectDestinoComponent={MenuTreeSelect}
+        valueTreeSelectDestino={selectedNodesDestino}
+        onChangeTreeSelectDestino={handleTreeSelectDestinoChange}
+        optionsTreeSelectDestino={treeData}
+        placeholderTreeSelectDestino={"Selecione"}
+    
      
         InputGrupoEstrutura={InputFieldActionCheckBox}
         labelInputGrupoEstrutura={"Estrutura Mercadológica"}

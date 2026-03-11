@@ -239,6 +239,22 @@ export const ActionMainPromocao = ({
   defaultOptionsEmpresasAsync,
   defaultValueSelectStatus,
 
+  MenuTreeSelectOrigemComponent,
+  valueTreeSelectOrigem,
+  onChangeTreeSelectOrigem,
+  optionsTreeSelectOrigem,
+  placeholderTreeSelectOrigem,
+  onNodeTreeSelectOrigem,
+  onNodeTreeUnselectOrigem,
+
+  MenuTreeSelectDestinoComponent,
+  valueTreeSelectDestino,
+  onChangeTreeSelectDestino,
+  optionsTreeSelectDestino,
+  placeholderTreeSelectDestino,
+  onNodeTreeSelectDestino,
+  onNodeTreeUnselectDestino,
+
   styleQTDInicio,
   styleQTDFim,
   styleDesconto1,
@@ -657,10 +673,10 @@ export const ActionMainPromocao = ({
 
                     <h2 style={{paddingLeft: '1rem'}} >Promoção Por Estrutura Mercadológica</h2>
                     
-                    <div className="row mt-3"  >
+                    <div className="row mt-3 "  >
 
                       <div className="col-sm-6 col-md-6 col-xl-6">
-                          {InputSelectSubGrupoOrigemComponentAync && (
+                          {/* {InputSelectSubGrupoOrigemComponentAync && (
                             <InputSelectSubGrupoOrigemComponentAync
                             label={labelSelectSubGrupoOrigemAsync}
                             // defaultValue={defaultOptionsSubGrupoAsync}
@@ -670,13 +686,23 @@ export const ActionMainPromocao = ({
                     
                             isMulti={true}
                             />
-                          )}
-
+                          )} */}
+                        {MenuTreeSelectOrigemComponent && (
+                          <MenuTreeSelectOrigemComponent
+                            valueMenuSelect={valueTreeSelectOrigem}
+                            onChangeMenuSelect={onChangeTreeSelectOrigem}
+                            optionsMenuSelect={optionsTreeSelectOrigem}
+                            placeholderMenuSelect={placeholderTreeSelectOrigem}
+                            onNodeMenuSelect={onNodeTreeSelectOrigem}
+                            onNodeMenuUnselect={onNodeTreeUnselectOrigem}
+                            label={labelSelectSubGrupoOrigemAsync}
+                          />
+                        )}
 
                       </div>
 
                       <div className="col-sm-6 col-md-6 col-xl-6">
-                          {InputSelectSubGrupoDestinoComponentAync && (
+                          {/* {InputSelectSubGrupoDestinoComponentAync && (
                             <InputSelectSubGrupoDestinoComponentAync
                             label={labelSelectSubGrupoDestinoAsync}
                             // defaultValue={defaultOptionsSubGrupoAsync}
@@ -686,9 +712,20 @@ export const ActionMainPromocao = ({
                     
                             isMulti={true}
                             />
-                          )}
+                          )} */}
                           
-                  
+                          {/* <p htmlFor="">Sub Grupo Destino</p> */}
+                        {MenuTreeSelectDestinoComponent && (
+                          <MenuTreeSelectDestinoComponent
+                            valueMenuSelect={valueTreeSelectDestino}
+                            onChangeMenuSelect={onChangeTreeSelectDestino}
+                            optionsMenuSelect={optionsTreeSelectDestino}
+                            placeholderMenuSelect={placeholderTreeSelectDestino}
+                            onNodeMenuSelect={onNodeTreeSelectDestino}
+                            onNodeMenuUnselect={onNodeTreeUnselectDestino}
+                            label={labelSelectSubGrupoDestinoAsync}
+                          />
+                        )}
                       </div>
                     </div>
                   </div>
