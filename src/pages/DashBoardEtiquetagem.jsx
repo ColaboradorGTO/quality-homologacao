@@ -55,7 +55,7 @@ export const DashBoardEtiquetagem = () => {
 
   switch (componentToShow) {
     case "/etiquetagem/ActionPesquisaProdutoEtiqueta":
-      component = <ActionPesquisaProdutoEtiqueta />;
+      component = <ActionPesquisaProdutoEtiqueta usuarioLogado={usuarioLogado} />;
       break;
     default:
       component = null;
@@ -82,7 +82,7 @@ export const DashBoardEtiquetagem = () => {
                         <div className="panel-container show">
                           <div className="panel-content">
                             <Suspense fallback={<div>Loading...</div>}>
-                              <ActionPesquisaProdutoEtiqueta />
+                              <ActionPesquisaProdutoEtiqueta usuarioLogado={usuarioLogado} />
                               {componentToShow && component}
                             </Suspense>
                           </div>
