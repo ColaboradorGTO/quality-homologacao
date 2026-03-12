@@ -1,15 +1,14 @@
+import './styles.css';
 import { Fragment, useRef } from "react";
 import Modal from 'react-bootstrap/Modal';
 import { HeaderModal } from "../../../Modais/HeaderModal/HeaderModal";
-import './styles.css';
 import { formatMoeda } from "../../../../utils/formatMoeda";
 import { ButtonTypeModal } from "../../../Buttons/ButtonTypeModal";
 import { FooterModal } from "../../../Modais/FooterModal/footerModal";
 import { useReactToPrint } from "react-to-print";
 
-
 const chunkArray = (array, size) => {
-  const expandedArray = array.flatMap(item => 
+  const expandedArray = array.flatMap(item =>
     Array(item.quantidade).fill({ ...item })
   );
 
@@ -20,8 +19,13 @@ const chunkArray = (array, size) => {
   return chunks;
 };
 
+export const ActionImprimirAcumuladorEtiquetaModal = ({
+  show,
+  handleClose,
+  dadosAcumuladorEtiquetas,
+  copias
+}) => {
 
-export const ActionImprimirAcumuladorEtiquetaModal = ({ show, handleClose,  dadosAcumuladorEtiquetas, copias }) => {
   const dataTableRef = useRef();
 
   const handlePrint = useReactToPrint({
@@ -29,7 +33,7 @@ export const ActionImprimirAcumuladorEtiquetaModal = ({ show, handleClose,  dado
     documentTitle: "Lista de Etiquetas",
   });
 
-  const etiquetas =  dadosAcumuladorEtiquetas.map((item) => ({
+  const etiquetas = dadosAcumuladorEtiquetas.map((item) => ({
     idEtiqueta: item.idEtiqueta,
     quantidade: item.quantidade,
     valor: item.valor,

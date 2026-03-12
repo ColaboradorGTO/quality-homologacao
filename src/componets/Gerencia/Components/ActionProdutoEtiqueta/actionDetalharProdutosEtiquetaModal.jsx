@@ -1,7 +1,6 @@
 import { Fragment, useRef, useState } from "react";
 import Modal from 'react-bootstrap/Modal';
 import { HeaderModal } from "../../../Modais/HeaderModal/HeaderModal";
-// import './styles.css';
 import { formatMoeda } from "../../../../utils/formatMoeda";
 import { ButtonTypeModal } from "../../../Buttons/ButtonTypeModal";
 import { FooterModal } from "../../../Modais/FooterModal/footerModal";
@@ -24,13 +23,12 @@ export const ActionDetalharProdutosEtiquetaModal = ({
   dadosAcumuladorEtiquetas,
   setDadosAcumuladorEtiquetas,
   setProdutosSelecionados,
-  setSelectedIds
 }) => {
+
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [imprimirProduto, setImprimirProduto] = useState(false)
   const [tabelaVisivel, setTabelaVisivel] = useState(true)
-  const [quantidadeEtiquetas, setQuantidadeEtiquetas] = useState(1);
-
+  
   const dataTableRef = useRef();
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -40,8 +38,6 @@ export const ActionDetalharProdutosEtiquetaModal = ({
     content: () => dataTableRef.current,
     documentTitle: "Lista de Etiquetas",
   });
-
-
 
   const exportToPDF = () => {
     const doc = new jsPDF();
@@ -84,9 +80,14 @@ export const ActionDetalharProdutosEtiquetaModal = ({
     XLSX.writeFile(workbook, 'lista_produtos_selecionado.xlsx');
   };
 
-  const produtosSalvos = JSON.parse(localStorage.getItem("produtosSelecionados"));
+  const listaBase =
+    dadosAcumuladorEtiquetas?.length
+      ? dadosAcumuladorEtiquetas
+      : produtosSelecionados?.length
+        ? produtosSelecionados
+        : [];
 
-  const dados = Array.isArray(produtosSelecionados) ? produtosSelecionados.map((item, index) => {
+  const dados = listaBase.flatMap((item, index) => {
     return {
       idEtiqueta: `${item.IDPRODUTO}-${item.NUCODBARRAS}-${item.TAMANHO}-${index}`,
       contador: index + 1,
@@ -98,9 +99,10 @@ export const ActionDetalharProdutosEtiquetaModal = ({
       DSESTILO: item.DSESTILO,
       DSLISTAPRECO: item.DSLISTAPRECO,
       MARCA: item.MARCA,
+      DSLOCALEXPOSICAO: item.DSLOCALEXPOSICAO,
       IDPRODUTO: item.IDPRODUTO,
     }
-  }) : [];
+  });
 
   const colunasListaProdEtiquetas = [
     {
@@ -161,7 +163,7 @@ export const ActionDetalharProdutosEtiquetaModal = ({
       field: "rowIndex",
       header: "Excluir",
       body: (row) => (
-        produtosSelecionados?.length > 1 ? (
+        produtosSelecionados?.length || dadosAcumuladorEtiquetas?.length > 1 ? (
           <ButtonTable
             titleButton="Excluir"
             onClickButton={() => handleExcluirEtiqueta(row)}
@@ -176,27 +178,11 @@ export const ActionDetalharProdutosEtiquetaModal = ({
       ),
       sortable: true,
     }
-
-
   ];
 
   const handleAcumuladorEtiquetas = async () => {
-    if (parseFloat(quantidadeEtiquetas) > 0) {
+    if (produtosSelecionados.length || dadosAcumuladorEtiquetas.length > 0) {
       try {
-        const novasEtiquetas = produtosSelecionados.flatMap((produto) =>
-          Array.from({ length: produto.quantidade }, () => ({
-            quantidade: 1,
-            NUCODBARRAS: produto.NUCODBARRAS,
-            DSNOME: produto.DSNOME,
-            TAMANHO: produto.TAMANHO,
-            PRECOVENDA: produto.PRECOVENDA,
-            DSESTILO: produto.DSESTILO,
-            DSLISTAPRECO: produto.DSLISTAPRECO,
-            IDPRODUTO: produto.IDPRODUTO,
-            MARCA: produto.MARCA,
-          }))
-        );
-        setDadosAcumuladorEtiquetas(novasEtiquetas);
         setImprimirProduto(true);
         setTabelaVisivel(false);
       } catch (error) {
@@ -211,6 +197,12 @@ export const ActionDetalharProdutosEtiquetaModal = ({
 
   const handleExcluirEtiqueta = (row) => {
     setProdutosSelecionados((prev) =>
+      prev.filter((item, index) => {
+        const id = `${item.IDPRODUTO}-${item.NUCODBARRAS}-${item.TAMANHO}-${index}`;
+        return id !== row.idEtiqueta;
+      })
+    );
+    setDadosAcumuladorEtiquetas((prev) =>
       prev.filter((item, index) => {
         const id = `${item.IDPRODUTO}-${item.NUCODBARRAS}-${item.TAMANHO}-${index}`;
         return id !== row.idEtiqueta;
@@ -245,7 +237,6 @@ export const ActionDetalharProdutosEtiquetaModal = ({
                 <div className="panel-hdr">
                   <h2>LISTA DE PRODUTOS PARA IMPRIMIR</h2>
                 </div>
-
 
                 <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
                   <HeaderTable
@@ -306,9 +297,7 @@ export const ActionDetalharProdutosEtiquetaModal = ({
             </Fragment>
           }
 
-
           {imprimirProduto &&
-
             <ActionImprimirEtiquetaModal
               setTabelaVisivel={setTabelaVisivel}
               dadosAcumuladorEtiquetas={dadosAcumuladorEtiquetas}

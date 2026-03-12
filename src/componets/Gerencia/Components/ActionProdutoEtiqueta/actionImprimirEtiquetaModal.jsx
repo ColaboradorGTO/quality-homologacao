@@ -1,5 +1,5 @@
-import { Fragment, useRef } from "react";
 import './styles.css';
+import { Fragment, useRef } from "react";
 import { formatMoeda } from "../../../../utils/formatMoeda";
 import { ReactBarcode } from 'react-jsbarcode';
 import { ButtonTypeModal } from "../../../Buttons/ButtonTypeModal";
@@ -16,7 +16,11 @@ const chunkArray = (array, size) => {
   return chunks;
 };
 
-export const ActionImprimirEtiquetaModal = ({ copias, produtosSelecionados, dadosAcumuladorEtiquetas }) => {
+export const ActionImprimirEtiquetaModal = ({
+  produtosSelecionados,
+  dadosAcumuladorEtiquetas
+}) => {
+
   const dataTableRef = useRef();
 
 
@@ -37,16 +41,16 @@ export const ActionImprimirEtiquetaModal = ({ copias, produtosSelecionados, dado
 
       // Processa cada etiqueta do acumulador
       for (let i = 0; i < etiquetas.length; i++) {
-        let { 
-          DSNOME: descricaoProd, 
-          DSESTILO: estiloProd, 
-          TAMANHO: tamanhoProd, 
-          PRECOVENDA: precoVenda, 
-          NUCODBARRAS: codBarras, 
-          quantidade: qtdEtiqueta, 
-          DSLOCALEXPOSICAO: localExpProd, 
-          DSLISTAPRECO: listaPreco, 
-          MARCA: marcaProd 
+        let {
+          DSNOME: descricaoProd,
+          DSESTILO: estiloProd,
+          TAMANHO: tamanhoProd,
+          PRECOVENDA: precoVenda,
+          NUCODBARRAS: codBarras,
+          quantidade: qtdEtiqueta,
+          DSLOCALEXPOSICAO: localExpProd,
+          DSLISTAPRECO: listaPreco,
+          MARCA: marcaProd
         } = etiquetas[i];
 
         // Limpa e converte dados para ZPL (remove acentos e caracteres especiais)
@@ -132,7 +136,7 @@ export const ActionImprimirEtiquetaModal = ({ copias, produtosSelecionados, dado
 
     } catch (error) {
       console.error('❌ Erro ao gerar/imprimir comandos ZPL:', error);
-      
+
       Swal.fire({
         icon: 'error',
         title: 'Erro na Impressão ZPL',
@@ -142,37 +146,44 @@ export const ActionImprimirEtiquetaModal = ({ copias, produtosSelecionados, dado
     }
   }
 
-  const etiquetas = Array.isArray(dadosAcumuladorEtiquetas) ? dadosAcumuladorEtiquetas.map((item, index) => {
-    let contador = index + 1;
-    return {
-      contador,
+  const listaBase =
+    dadosAcumuladorEtiquetas?.length
+      ? dadosAcumuladorEtiquetas
+      : produtosSelecionados?.length
+        ? produtosSelecionados
+        : [];
+
+  const etiquetas = listaBase.flatMap((item) => {
+    const total = (item.quantidade || 1) * (1);
+
+    return Array.from({ length: total }, (_, index) => ({
+      contador: index + 1,
       NUCODBARRAS: item.NUCODBARRAS,
       DSNOME: item.DSNOME,
       TAMANHO: item.TAMANHO,
       PRECOVENDA: item.PRECOVENDA,
       DSESTILO: item.DSESTILO,
-      DSLISTAPRECO: item.DSLISTAPRECO, 
+      DSLISTAPRECO: item.DSLISTAPRECO,
       IDPRODUTO: item.IDPRODUTO,
       MARCA: item.MARCA,
       DSLOCALEXPOSICAO: item.DSLOCALEXPOSICAO,
-      quantidade: item.quantidade || 1 
-    }
-  }) : [];
+      quantidade: 1
+    }));
+  })
 
   const etiquetasPorPagina = chunkArray(etiquetas, 3);
   const totalPaginas = etiquetasPorPagina.length;
-
 
   return (
     <Fragment>
       <header className="row" style={{ justifyContent: "space-between" }}>
         <div className="ml-3">
-          <p style={{margin: '0px'}}>Qtd: Páginas <b>{totalPaginas + ' ' + 'Páginas'}</b></p>
+          <p style={{ margin: '0px' }}>Qtd: Páginas <b>{totalPaginas + ' ' + 'Páginas'}</b></p>
           <p >Qtd Etiquetas: <b>{dadosAcumuladorEtiquetas.length + ' ' + 'unidades'} </b></p>
         </div>
 
         <div className="d-flex gap-2">
-          
+
           <ButtonTypeModal
             textButton={"Imprimir"}
             onClickButtonType={handlePrintZPL}
@@ -185,12 +196,12 @@ export const ActionImprimirEtiquetaModal = ({ copias, produtosSelecionados, dado
 
       <div ref={dataTableRef}>
         {etiquetasPorPagina.map((pagina, pageIndex) => (
-          <div key={pageIndex} className="etiqueta-page" style={{ }}>
+          <div key={pageIndex} className="etiqueta-page" style={{}}>
             {pagina.map((etiqueta, etiquetaIndex) => (
-              <div className="etiqueta-card" key={etiquetaIndex} style={{ padding: "15px 0 0",  }}>
+              <div className="etiqueta-card" key={etiquetaIndex} style={{ padding: "15px 0 0", }}>
                 <div className="dsProd" style={{ justifyContent: 'center', maxWidth: '100%' }}>
-                  <h2 
-                    style={{ lineHeight: '1.3em', fontWeight: 400, fontSize: '1.375rem' }}
+                  <h2
+                    style={{ lineHeight: '1.3em', fontWeight: 400, fontSize: '1.200rem' }}
                   >
                     {etiqueta?.DSNOME}
                   </h2>
@@ -216,26 +227,25 @@ export const ActionImprimirEtiquetaModal = ({ copias, produtosSelecionados, dado
                 </div>
                 <div id="codBarrasEtiqueta">
                   {isValidEAN13(`${etiqueta?.NUCODBARRAS}`) ? (
-                  <ReactBarcode
-                    value={etiqueta?.NUCODBARRAS}
-                    options={{ 
-                      format: "EAN13", 
-                      textAlign: "center", 
-                      margin: 0, 
-                    }}
-                    renderer="svg"
-                    className="svgEtiqueta"
-                    format="EAN13"
-                    width={3}
-                    height={80}
-                
-                  />
+                    <ReactBarcode
+                      value={etiqueta?.NUCODBARRAS}
+                      options={{
+                        format: "EAN13",
+                        textAlign: "center",
+                        margin: 0,
+                      }}
+                      renderer="svg"
+                      className="svgEtiqueta"
+                      format="EAN13"
+                      width={3}
+                      height={80}
+                    />
                   ) : (
                     <p style={{ color: 'red', fontWeight: 'bold' }}>
                       Código de barras inválido: {etiqueta?.NUCODBARRAS}
                     </p>
                   )}
-                  
+
                 </div>
               </div>
             ))}
