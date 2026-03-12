@@ -3,7 +3,6 @@ import { Modal } from "react-bootstrap"
 import { HeaderModal } from "../../../../Modais/HeaderModal/HeaderModal"
 import { FormularioCadastrar } from "./formularioCadastrar"
 
-
 export const ActionCadastroImagemProdutoModal = ({ 
   show, 
   handleClose,
@@ -21,7 +20,6 @@ export const ActionCadastroImagemProdutoModal = ({
         size="xl"
         centered
       >
-
         <HeaderModal
           title={"Imagens"}
           subTitle={"Lista de Produtos Vinculados a Imagem"}

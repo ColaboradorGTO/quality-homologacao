@@ -12,7 +12,6 @@ import { useFetchData } from "../../../../hooks/useFetchData"
 import { useQuery } from "react-query"
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento"
 
-
 export const ActionPesquisaProduto = ({ usuarioLogado }) => {
   const [referencia, setReferencia] = useState('');
   const [fabricanteSelecionado, setFabricanteSelecionado] = useState('');
@@ -85,7 +84,6 @@ export const ActionPesquisaProduto = ({ usuarioLogado }) => {
   const handleClick = () => {
     refetchListaProdutos()
   }
-
 
   return (
     <Fragment>

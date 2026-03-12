@@ -17,13 +17,13 @@ const Permissoes = lazy(() => import("../pages/Permissoes").then(module => ({ de
 const DashBoardContabilidade = lazy(() => import("../pages/DashBoardContabilidade").then(module => ({ default: module.DashBoardContabilidade })));
 const DashBoardMarketing = lazy(() => import("../pages/DashBoardMarketing").then(module => ({ default: module.DashBoardMarketing })));
 const DashBoardGerencia = lazy(() => import("../pages/DashBoardGerencia").then(module => ({ default: module.DashBoardGerencia })));
+const DashBoardEtiquetagem = lazy(() => import("../pages/DashBoardEtiquetagem").then(module => ({ default: module.DashBoardEtiquetagem })));
 
 
 const DashBoardCompras = lazy(() => import("../pages/DashBoardCompras").then(module => ({ default: module.DashBoardCompras })));
-const DashBoardEtiquetagem = lazy(() => import("../pages/DashBoardEtiquetagem").then(module => ({ default: module.DashBoardEtiquetagem })));
+const DashBoardConferenciaCega = lazy(() => import("../pages/DashBoardConferenciaCega").then(module => ({ default: module.DashBoardConferenciaCega })));
 
 const DashBoardCadastro = lazy(() => import("../pages/DashBoardCadastro").then(module => ({ default: module.DashBoardCadastro })));
-const DashBoardConferenciaCega = lazy(() => import("../pages/DashBoardConferenciaCega").then(module => ({ default: module.DashBoardConferenciaCega })));
 const DashBoardExpedicao = lazy(() => import("../pages/DashBoardExpedicao").then(module => ({ default: module.DashBoardExpedicao })));
 const DashBoardComprasDM = lazy(() => import("../pages/DashBoardComprasDm").then(module => ({ default: module.DashBoardComprasDM })));
 const DashBoardMenus = lazy(() => import("../pages/DashBoardMenus").then(module => ({ default: module.DashBoardMenus })));

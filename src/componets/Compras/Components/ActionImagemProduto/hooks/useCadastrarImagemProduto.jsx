@@ -44,7 +44,7 @@ export const useCadastrarImagemProduto = ({usuarioLogado, optionsModulos}) => {
         return usuarioIP;
     };
 
-    console.log(novoProduto, 'novoProduto')
+  
     const onSubmit = async () => {
         if (optionsModulos[0]?.ALTERAR == 'False') {
             Swal.fire({
@@ -83,7 +83,7 @@ export const useCadastrarImagemProduto = ({usuarioLogado, optionsModulos}) => {
                 IDSubEstrutProduto: parseInt(item.IDSUBGRUPO),
             }))
         }
-        /* VOLTAR DAQUI E VERIFICAR O OBJETO COMO É ENVIADO NO POSTMAN IDPROIMAGEM ESTA DIFERENTE OS CAMPOS ENVIADOS */
+
         try {
 
             const response = await post('/cadastrar-imagem-produto', postData)
