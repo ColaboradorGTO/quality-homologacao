@@ -9,11 +9,10 @@ import { MdOutlineLocalPrintshop } from "react-icons/md"
 import { GoDownload } from "react-icons/go"
 import { BsTrash3 } from "react-icons/bs"
 import { useQuery } from "react-query"
-import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento"
 import Swal from "sweetalert2"
+import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento"
 
 export const ActionPesquisaProdutoEtiqueta = ({ usuarioLogado }) => {
-  // const [dadosListaPrecosSap, setDadosListaPrecosSap] = useState([])
   const [descricaoProduto, setDescricaoProduto] = useState('')
   const [codBarrasProduto, setCodBarrasProduto] = useState('')
   const [idProduto, setIDProduto] = useState('')
@@ -129,19 +128,49 @@ export const ActionPesquisaProdutoEtiqueta = ({ usuarioLogado }) => {
       timer: 1500
     })
   }
+
   const handleImprimir = () => {
     setModalImprimir(true);
   }
 
   const handleAcumuladorEtiquetas = async () => {
-    if (parseFloat(produtosSelecionados.length) > 0) {
+    if (produtosSelecionados.length > 0) {
       try {
-        setDadosAcumuladorEtiquetas(produtosSelecionados);
+        setDadosAcumuladorEtiquetas((prev) => {
+          let listaAtualizada = [...prev];
+
+          produtosSelecionados.forEach((produto) => {
+            const indexExistente = listaAtualizada.findIndex(
+              (item) => item.IDPRODUTO === produto.IDPRODUTO
+            );
+
+            if (indexExistente !== -1) {
+              listaAtualizada[indexExistente].quantidade += produto.quantidade;
+            } else {
+              listaAtualizada.push({
+                quantidade: produto.quantidade,
+                NUCODBARRAS: produto.NUCODBARRAS,
+                DSNOME: produto.DSNOME,
+                TAMANHO: produto.TAMANHO,
+                PRECOVENDA: produto.PRECOVENDA,
+                DSESTILO: produto.DSESTILO,
+                DSLISTAPRECO: produto.DSLISTAPRECO,
+                DSLOCALEXPOSICAO: produto.DSLOCALEXPOSICAO,
+                IDPRODUTO: produto.IDPRODUTO,
+                MARCA: produto.MARCA,
+              });
+            }
+          });
+
+          return listaAtualizada;
+        });
+
         Swal.fire({
           icon: "success",
           title: "Dados Salvos",
-          text: "Os dados foram salvos com sucesso!",
-        })
+          text: "Os dados foram adicionados à lista!",
+        });
+
       } catch (error) {
         Swal.fire({
           icon: "error",
@@ -155,7 +184,6 @@ export const ActionPesquisaProdutoEtiqueta = ({ usuarioLogado }) => {
   return (
 
     <Fragment>
-
       <ActionMain
         linkComponentAnterior={["Home"]}
         linkComponent={[""]}
@@ -203,7 +231,7 @@ export const ActionPesquisaProdutoEtiqueta = ({ usuarioLogado }) => {
         linkCancelar={"Imprimir"}
         corCancelar={"info"}
         IconCancelar={MdOutlineLocalPrintshop}
-        styleCancelar={{ display: btnVisivel ? 'block' : 'none' }}
+        styleCancelar={{ display: btnVisivel || dadosAcumuladorEtiquetas.length > 0 ? 'block' : 'none' }}
 
         ButtonTypeVendasEstrutura={ButtonType}
         onButtonClickVendasEstrutura={handleCancelar}
@@ -211,9 +239,7 @@ export const ActionPesquisaProdutoEtiqueta = ({ usuarioLogado }) => {
         corVendasEstrutura={"danger"}
         iconVendasEstrutura={BsTrash3}
         styleVendasEstrutura={{ display: dadosAcumuladorEtiquetas.length > 0 ? 'block' : 'none' }}
-
       />
-
 
       <ActionListaProdutoEtiqueta
         dadosListaPrecosSap={dadosListaPrecosSap}
@@ -224,7 +250,7 @@ export const ActionPesquisaProdutoEtiqueta = ({ usuarioLogado }) => {
         produtosSelecionados={produtosSelecionados}
         setProdutosSelecionados={setProdutosSelecionados}
         dadosAcumuladorEtiquetas={dadosAcumuladorEtiquetas}
-      
+
         setDadosAcumuladorEtiquetas={setDadosAcumuladorEtiquetas}
         selectAll={selectAll}
         setSelectAll={setSelectAll}

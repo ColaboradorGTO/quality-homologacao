@@ -3,17 +3,15 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { formatMoeda } from "../../../../utils/formatMoeda";
 import HeaderTable from "../../../Tables/headerTable";
-import { ActionDetalharProdutosEtiquetaModal } from "./actionDetalharProdutosEtiquetaModal";
 import Swal from "sweetalert2";
 import { useReactToPrint } from "react-to-print";
 import jsPDF from "jspdf";
 import * as XLSX from 'xlsx';
 import { isValidEAN13 } from "../../../../utils/isValidEAN13";
-
+import { ActionDetalharProdutosEtiquetaModal } from "./actionDetalharProdutosEtiquetaModal";
 
 export const ActionListaProdutoEtiqueta = ({
   dadosListaPrecosSap,
-  btnVisivel,
   setBtnVisivel,
   modalImprimir,
   setModalImprimir,
@@ -21,12 +19,11 @@ export const ActionListaProdutoEtiqueta = ({
   setProdutosSelecionados,
   dadosAcumuladorEtiquetas,
   setDadosAcumuladorEtiquetas,
-  selectAll,
   setSelectAll,
   selectedIds,
-  setSelectedIds
-
+  setSelectedIds,
 }) => {
+
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [selectAllChecked, setSelectAllChecked] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
@@ -98,6 +95,11 @@ export const ActionListaProdutoEtiqueta = ({
     XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Lista de Produtos');
     XLSX.writeFile(workbook, 'lista_produtos.xlsx');
+  };
+
+  const onPageChange = (event) => {
+    setFirst(event.first);
+    setRows(event.rows);
   };
 
   const dados = dadosListaPrecosSap.map((item, index) => {
@@ -195,6 +197,7 @@ export const ActionListaProdutoEtiqueta = ({
         cancelButtonColor: '#2196F3',
         allowOutsideClick: false,
       }).then((result) => {
+
         if (result.isConfirmed) {
           const itensSelecionaveis = dados.filter(item => item.stDisabled !== 'disabled');
           setBtnVisivel(true);
@@ -202,6 +205,7 @@ export const ActionListaProdutoEtiqueta = ({
           setSelectedIds(itensSelecionaveis.map(item => item.IDPRODUTO));
           setProdutosSelecionados(itensSelecionaveis.map(item => ({ ...item, quantidade: 1 })));
           setSelectAll(true);
+
         } else if (result.dismiss === Swal.DismissReason.cancel) {
           const itensSelecionaveisPaginaAtual = dados.slice(first, first + rows).filter(item => item.stDisabled !== 'disabled');
           setBtnVisivel(true);
@@ -209,6 +213,7 @@ export const ActionListaProdutoEtiqueta = ({
           setSelectedIds(itensSelecionaveisPaginaAtual.map(item => item.IDPRODUTO));
           setProdutosSelecionados(itensSelecionaveisPaginaAtual.map(item => ({ ...item, quantidade: 1 })));
           setSelectAll(true);
+
         } else {
           setBtnVisivel(false);
           setSelectedItems([]);
@@ -226,7 +231,6 @@ export const ActionListaProdutoEtiqueta = ({
     }
   }
 
-
   const colunasListaProdEtiquetas = [
     {
       field: 'IDPRODUTO',
@@ -237,7 +241,6 @@ export const ActionListaProdutoEtiqueta = ({
             type="checkbox"
             checked={selectAllChecked}
             onChange={(e) => onSelectAllChange(e.target.checked)}
-          // onChange={(e) => handleSelectAll(e.target.checked)}
           />
         </div>
       ),
@@ -314,8 +317,8 @@ export const ActionListaProdutoEtiqueta = ({
                 );
               }}
               style={{ width: '100%' }}
-              />
-          
+            />
+
           </div>
         );
       }
@@ -352,14 +355,6 @@ export const ActionListaProdutoEtiqueta = ({
     },
   ];
 
-
-  const handleSelectAll = (isChecked) => {
-    setSelectAll(isChecked);
-    const updatedSelectedIds = isChecked ? dados.map(item => item.IDPRODUTO) : [];
-    setSelectedIds(updatedSelectedIds);
-    setProdutosSelecionados(isChecked ? dados.map(item => ({ ...item, quantidade: qtdProduto })) : []);
-  };
-
   useEffect(() => {
     if (selectedIds.length > 0) {
       setBtnVisivel(true);
@@ -368,52 +363,17 @@ export const ActionListaProdutoEtiqueta = ({
     }
   }, [selectedIds, setBtnVisivel]);
 
-  const handleCancelar = (isChecked) => {
-    setSelectAll(isChecked);
-    const updatedSelectedIds = isChecked ? [] : [];
-    setSelectedIds(updatedSelectedIds);
-    setProdutosSelecionados([]);
-    Swal.fire({
-      icon: 'success',
-      title: 'Cancelado com sucesso',
-      showConfirmButton: false,
-      timer: 1500
-    })
-  }
-
-
-  // salvar o produto selecionado no dadosAcumuladorEtiquetas envia para a imprimir
-  const handleAcumuladorEtiquetas = async () => {
-    if (parseFloat(produtosSelecionados.length) > 0) {
-      try {
-        setDadosAcumuladorEtiquetas(produtosSelecionados);
-        Swal.fire({
-          icon: "success",
-          title: "Dados Salvos",
-          text: "Os dados foram salvos com sucesso!",
-        })
-      } catch (error) {
-        Swal.fire({
-          icon: "error",
-          title: "Valor Inválido",
-          text: "O valor deve ser maior que 0 para imprimir etiquetas!",
-        });
-      }
-    }
-  };
-  const handleImprimir = () => {
-    setModalImprimir(true);
-  }
 
   return (
     <Fragment>
-
       <div className="panel">
 
         <div className="panel-hdr">
           <h2>Lista de Produtos </h2>
         </div>
+
         <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
+
           <HeaderTable
             globalFilterValue={globalFilterValue}
             onGlobalFilterChange={onGlobalFilterChange}
@@ -423,31 +383,6 @@ export const ActionListaProdutoEtiqueta = ({
           />
         </div>
 
-        {/* <div style={{ width: "100%", display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-
-          <div className="custom-control custom-checkbox">
-            <Checkbox
-              checked={selectAllChecked}
-              onChange={onSelectAllChange}
-            />
-            <span>
-              {selectAllChecked ? "Desmarcar Todos" : "Marcar Todos"}
-            </span>
-          </div>
-
-          <div>
-            <ButtonType
-              onClickButtonType={handleClickIntegrarTodos}
-              textButton={"Integrar Todos"}
-              cor={"success"}
-              Icon={BsCloudUpload}
-              iconSize={25}
-              style={{ display: btnVisivel ? 'block' : 'none' }}
-            />
-          </div>
-
-        </div> */}
-
         <div className="card" ref={dataTableRef} style={{ marginTop: "1rem" }}>
           <DataTable
             value={dados}
@@ -456,7 +391,9 @@ export const ActionListaProdutoEtiqueta = ({
             selectionMode={'single'}
             sortOrder={-1}
             paginator={true}
-            rows={10}
+            rows={rows}
+            first={first}
+            onPage={onPageChange}
             rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
