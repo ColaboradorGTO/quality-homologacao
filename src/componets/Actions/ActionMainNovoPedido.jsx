@@ -129,6 +129,7 @@ export const ActionMainNovoPedido = ({
   valueCheckBoxPedido,
   onChangeCheckBoxPedido,
   readOnlyCheckBoxTipoPedido,
+  disabledCheckBoxTipoPedido,
 
   ButtonSearchComponent,
   ButtonTypeCadastro,
@@ -190,7 +191,10 @@ export const ActionMainNovoPedido = ({
   defaultValueSelectTipoPedido,
   defaultValueSelectTransportadora,
   defaultValueSelectFrete,
- 
+  Alerta,
+  typeAlerta,
+  messageAlerta,
+  indiceAlerta
 
 }) => {
   const handleSubmit = (e) => {
@@ -218,6 +222,7 @@ export const ActionMainNovoPedido = ({
                       <InputCheckBoxPedido 
                         label={labelCheckBoxPedido}
                         readOnly={readOnlyCheckBoxTipoPedido}
+                        disabledChecked={disabledCheckBoxTipoPedido}
                         checkedCheckBoxPedido={checkedCheckBoxPedido}
                         valueCheckBoxPedido={valueCheckBoxPedido}
                         onChangeCheckBoxPedido={onChangeCheckBoxPedido}
@@ -556,6 +561,15 @@ export const ActionMainNovoPedido = ({
                       )}
                     </div>
 
+                  </div>
+                  <div className="row">
+                    {Alerta && (
+                      <Alerta
+                        messageAlerta={messageAlerta}
+                        type={typeAlerta}
+                        text={typeAlerta}
+                      />
+                    )}
                   </div>
 
                   <div className="row " style={{marginTop: '5rem'}}>

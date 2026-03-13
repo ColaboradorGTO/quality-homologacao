@@ -5,7 +5,7 @@ import { get, post, put } from "../../../../../api/funcRequest";
 import { getDataAtual } from "../../../../../utils/dataAtual";
 import { useQuery } from "react-query";
 import { toFloat } from "../../../../../utils/toFloat";
-import { set } from "date-fns";
+
 
 export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
     const [dataPesquisaInicio, setDataPesquisaInicio] = useState('')
@@ -42,7 +42,9 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
     const [idResumoPedido, setIdResumoPedido] = useState('');
     const [stRascunho, setStRascunho] = useState('');
     const [checked, setChecked] = useState(false);
-    const [fornecedorExiste, setFornecedorExiste] = useState(false);
+    const [disabledChecked, setDisabledChecked] = useState(true);
+    const [idAndamento, setIdAndamento] = useState(null);
+    const [pendenciasFornecedor, setPendenciasFornecedor] = useState([]);
     const [modalIncluirProdutoPedido, setModalIncluirProdutoPedido] = useState(false);
 
     useEffect(() => {
@@ -151,22 +153,35 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
 
             const fornecedorAtivo = fornecedor?.STATIVOSAP == 'Y' ? 'Fornecedor Ativo' : 'Fornecedor Inativo No SAP'
             const vinculoFabricante = !fornecedor?.VINCFABRICANTE ? 'Fornecedor Sem Fabricante Vinculado' : 'True'
-            const titleOption = (fornecedorAtivo?.STATIVOSAP == 'Y' && !fornecedorAtivo?.VINCFABRICANTE) ? vinculoFabricante : null;
-            let stFornecedor = titleOption !== 'Fornecedor Inativo No SAP' ? 'True' : 'False';
+            let titleOption = (fornecedorAtivo?.STATIVOSAP == 'Y' ? 'Fornecedor Ativo' : 'Fornecedor Inativo No SAP') ;
+            let stFornecedor = titleOption !== 'Fornecedor Inativo No SAP' ? true : false;
             let idVinculoFornecedor = vinculoFabricante == 'True' ? true : false;
             let msgPendencias = [];
 
-            if (!stFornecedor || idVinculoFornecedor) {
+            // Corrigir lógica: deve verificar se fornecedor está inativo OU não tem vínculo
+            if (!stFornecedor || !idVinculoFornecedor) {
                 !stFornecedor && msgPendencias.push('Fornecedor selecionado está inativo ou não está cadastrado no SAP');
                 !idVinculoFornecedor && msgPendencias.push('Fornecedor selecionado está sem vinculo com Fabricante');
             }
 
+       
             if (stCarregarDados) {
                 await carregarDadosDoFornecedorOuDoUltimoPedidoDoFornecedor();
             }
 
             if (msgPendencias.length > 0) {
+                console.log(msgPendencias, 'msgPendencias')
                 await exibirPendenciasFornecedor(msgPendencias);
+                
+                // Definir as pendências no estado com índices para serem exibidas no componente
+                const pendenciasComIndices = msgPendencias.map((pendencia, index) => 
+                    `${index + 1} - ${pendencia}`
+                );
+                
+                setPendenciasFornecedor(pendenciasComIndices);
+            } else {
+                // Limpar pendências se não houver nenhuma
+                setPendenciasFornecedor([]);
             }
         } catch (error) {
             console.error('❌ Erro ao verificar fornecedor:', error);
@@ -195,14 +210,14 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
             }
 
             // 2. Iniciar loading (equivalente à verificação $('.animacaoLoading'))
-            Swal.fire({
-                title: 'Carregando dados do fornecedor selecionado, aguarde...',
-                didOpen: () => {
-                    Swal.showLoading();
-                },
-                allowOutsideClick: false,
-                showConfirmButton: false
-            });
+            // Swal.fire({
+            //     title: 'Carregando dados do fornecedor selecionado, aguarde...',
+            //     didOpen: () => {
+            //         Swal.showLoading();
+            //     },
+            //     allowOutsideClick: false,
+            //     showConfirmButton: false
+            // });
 
             // 3. Buscar lista de pedidos do fornecedor
             const dadosPedidos = await get(`/lista-pedidos?idFornecedor=${idFornPedido}`);
@@ -227,14 +242,14 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
                 respQuestion = result.isConfirmed;
 
                 // Reabrir loading
-                Swal.fire({
-                    title: 'Processando dados...',
-                    didOpen: () => {
-                        Swal.showLoading();
-                    },
-                    allowOutsideClick: false,
-                    showConfirmButton: false
-                });
+                // Swal.fire({
+                //     title: 'Processando dados...',
+                //     didOpen: () => {
+                //         Swal.showLoading();
+                //     },
+                //     allowOutsideClick: false,
+                //     showConfirmButton: false
+                // });
             }
 
             // 5. Se não tem pedidos ou usuário escolheu não, buscar dados do fornecedor
@@ -245,7 +260,7 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
             // 6. Preencher dados do fornecedor no pedido
             await retornoDadosDoFonecedoNoPedido(dadosFornParaPreencher);
 
-            Swal.close(); // Fechar loading de sucesso
+            // Swal.close(); // Fechar loading de sucesso
 
         } catch (error) {
             Swal.close();
@@ -262,44 +277,21 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
 
     }
 
-    const exibirPendenciasFornecedor = async (pendencias) => {
-        const msgFormatada = pendencias.join(', ');
-
-        // Verifica o andamento do pedido (você pode ajustar conforme sua lógica)
-        const idAndamento = 1; // ou pegar de algum state
-
-        if (idAndamento === 1 || idAndamento === 15) {
-            await Swal.fire({
-                icon: 'warning',
-                title: 'Pendências Encontradas',
-                html: `
-                    <div style="text-align: left;">
-                        <p><strong>Este pedido só poderá ser salvo como rascunho devido às pendências:</strong></p>
-                        <ul>
-                            ${pendencias.map((pendencia, index) => `<li>${index + 1} - ${pendencia}</li>`).join('')}
-                        </ul>
-                    </div>
-                `,
-                confirmButtonColor: '#3085d6',
-                confirmButtonText: 'OK'
-            });
-        }
-    };
-
     const retornoDadosDoFonecedoNoPedido = async (dadosFornecedor) => {
         try {
             const dados = dadosFornecedor?.data?.[0] || dadosFornecedor?.[0];
             const NUCNPJ = dados?.CNPJFORN;
-
+          
             if (!dados) return;
             // Preencher os estados com os dados recebidos
+            setIdAndamento(dados?.IDANDAMENTO || '');
             setDataPesquisaInicio(dados?.DTPEDIDOFORMATADA || '');
             setDataPesquisaFim(dados?.DTPREVENTREGAFORMATADA || '');
             
             setCompradorSelecionado({value: dados.IDCOMPRADOR,  label: dados.NOMECOMPRADOR });
     
     
-            setMarcaSelecionada(dados?.NOFANTASIA || '');
+            // setMarcaSelecionada(dados?.NOFANTASIA || '');
             setObsFornecedor(dados?.OBSPEDIDO || '');
             setObsInterna(dados?.OBSPEDIDO2 || '');
             setVendedor(dados?.NOREPRESETANTE || dados?.NOVENDEDOR || '');
@@ -307,8 +299,7 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
             setEmailVendedor(dados?.EEMAIL || dados?.EEMAILVENDEDOR || dados?.EMAILFORN || '');
             // setTransportadoraSelecionada({value: dados?.IDTRANSPORTADORA, label: `${dados?.NOFANTASIA} - ${NUCNPJ}  `}) 
             setTransportadoraSelecionada({value: dados?.IDTRANSPORTADORA, label: `${NUCNPJ} - ${dados?.NOMETRANSPORTADORA}  `}) 
-            console.log(transportadoraSelecionada, 'transportadoraSelecionada')
-            console.log(dados, 'dados do fornecedor selecionado')
+     
             setCondicoesPagamentosSelecionado({
             value: dados.IDCONDICAOPAGAMENTO, 
             label: dados.DSCONDICAOPAG
@@ -316,32 +307,99 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
             
             // Configurar envio
             if (dados?.TPARQUIVO) {
-            setEnviarSelecionado({
-                value: dados.TPARQUIVO, 
-                label: dados.TPARQUIVO === 'NE' ? 'NÃO ENVIAR' : 
-                    dados.TPARQUIVO === 'ET' ? 'ETIQUETA' : 'ARQUIVO'
-            });
+                setEnviarSelecionado({
+                    value: dados.TPARQUIVO, 
+                    label: dados.TPARQUIVO === 'NE' ? 'NÃO ENVIAR' : 
+                        dados.TPARQUIVO === 'ET' ? 'ETIQUETA' : 'ARQUIVO'
+                });
             } else if (dados?.TPARQUIVOPADRAO) {
-            setEnviarSelecionado({
-                value: dados.TPARQUIVOPADRAO, 
-                label: dados.TPARQUIVOPADRAO === 'NE' ? 'NÃO ENVIAR' : 
-                    dados.TPARQUIVOPADRAO === 'ET' ? 'ETIQUETA' : 'ARQUIVO'
-            });
+                setEnviarSelecionado({
+                    value: dados.TPARQUIVOPADRAO, 
+                    label: dados.TPARQUIVOPADRAO === 'NE' ? 'NÃO ENVIAR' : 
+                        dados.TPARQUIVOPADRAO === 'ET' ? 'ETIQUETA' : 'ARQUIVO'
+                });
             }
             
             setTipoPedidoSelecionado({
-            value: dados?.TPPEDIDOPADRAO || dados?.MODPEDIDO, 
-            label: dados?.MODPEDIDO || dados?.TPPEDIDOPADRAO
+                value: dados?.TPPEDIDOPADRAO || dados?.MODPEDIDO, 
+                label: dados?.MODPEDIDO || dados?.TPPEDIDOPADRAO
+            });
+            if(dados?.TPFISCAL){
+                setFiscalSelecionado({
+                    value: dados?.TPFISCAL,
+                    label: dados?.TPFISCAL == 'S' ? 'Simples Nacional' : dados?.TPFISCAL == 'N' ? 'Lucro Presumido' : 'Lucro Real'
+                })
+                
+            } else if(dados?.TPFISCALPADRAO) {
+                setFiscalSelecionado({
+                    value: dados?.TPFISCALPADRAO,
+                    label: dados?.TPFISCALPADRAO == 'S' ? 'Simples Nacional' : dados?.TPFISCALPADRAO == 'N' ? 'Lucro Presumido' : 'Lucro Real'
+                })
+            }
+
+            if(dados?.TPFRETEPADRAO) {
+                setFreteSelecionado({
+                    value: dados?.TPFRETEPADRAO,
+                    label: dados?.TPFRETEPADRAO == 'PAGO' ? 'PAGO - CIF' : 'A PAGAR - FOB'
+                })
+            } else if(dados?.TPFRETE) {
+                setFreteSelecionado({
+                    value: dados?.TPFRETE,
+                    label: dados?.TPFRETE == 'PAGO' ? 'PAGO - CIF' : 'A PAGAR - FOB'
+                })
+            }
+
+            if(dados?.IDPEDIDOPRIMARIO > 0 || dados?.STPEDIDOPRIMARIO == 'True' || dados?.STMIGRADOSAP == 'True') {
+                setDisabledChecked(true); 
+            } else if(dados?.IDPEDIDOPRIMARIO > 0 || dados?.STPEDIDOPRIMARIO == 'True') {
+                setDisabledChecked(false);
+                setChecked(false);  
+            }
+
+        } catch (error) {
+            console.error('Erro ao preencher dados do fornecedor:', error);
+            Swal.fire({
+            icon: 'error',
+            text: 'Erro ao processar dados do fornecedor'
+            });
+        }
+    }
+
+    const exibirPendenciasFornecedor = async (pendencias) => {
+        
+        let indice = 0;
+        let msgFormatada = '';
+        
+        // Setando como rascunho (equivalente ao $('#stRascunho').val('True'))
+        setStRascunho('True');
+
+        // Formatando as mensagens como no jQuery
+        for (let msg of pendencias) {
+            msgFormatada += `${msg}, `;
+            indice++;
+        }
+
+        // Condição para exibir SweetAlert baseada no andamento
+        const andamentoNum = Number(idAndamento);
+        const deveExibirSwal = andamentoNum == 1 || andamentoNum == 15 || !idAndamento;
+
+        
+        if (deveExibirSwal) {
+     
+            await Swal.fire({
+                icon: 'warning',
+                title: 'Este Pedido só poderá ser salvo como rascunho devido as pendências apresentadas',
+                text: `PENDÊNCIAS: ${msgFormatada}`,
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK',
+                showConfirmButton: true,
             });
 
-  } catch (error) {
-    console.error('Erro ao preencher dados do fornecedor:', error);
-    Swal.fire({
-      icon: 'error',
-      text: 'Erro ao processar dados do fornecedor'
-    });
-  }
-    }
+        }
+
+        return pendencias; // Retorna as pendências para serem usadas no componente
+    };
+
 
     const onIncluirProdutoPedido = async () => {
         if (optionsModulos[0]?.CRIAR == 'False') {
@@ -355,136 +413,149 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
             return;
         }
 
+        if (fornecedorSelecionado == '') {
+            Swal.fire({
+                position: 'center',
+                icon: 'error',
+                title: 'O campo fornecedor é obrigatório.',
+                showConfirmButton: false,
+                timer: 1500
+            });
+            return;
+        }  
+        
+        if (!compradorSelecionado) {
+            Swal.fire({
+                position: 'center',
+                icon: 'error',
+                title: 'Selecione o Comprador do Pedido.',
+                showConfirmButton: false,
+                timer: 1500
+            });
+            return;
+        } 
+        
+        if (marcaSelecionada) {
+            Swal.fire({
+                position: 'center',
+                icon: 'error',
+                title: 'Selecione uma Marca.',
+                showConfirmButton: false,
+                timer: 1500
+            });
+            return;
+        } 
+        
+        if (!tipoPedidoSelecionado) {
+            Swal.fire({
+                position: 'center',
+                icon: 'error',
+                title: 'Selecione o Tipo Fiscal do Fornecedor.',
+                showConfirmButton: false,
+                timer: 1500
+            });
+            return;
+        }
+
+        if (!vendedor) {
+            Swal.fire({
+                position: 'center',
+                icon: 'error',
+                title: 'Adicione o Nome do Vendedor.',
+                showConfirmButton: false,
+                timer: 1500
+            });
+            return;
+        }
+
+        if (!transportadoraSelecionada) {
+            Swal.fire({
+                position: 'center',
+                icon: 'error',
+                title: 'Selecione a Transportadora.',
+                showConfirmButton: false,
+                timer: 1500
+            });
+            return;
+        } 
+        
+        if (!freteSelecionado) {
+            Swal.fire({
+                position: 'center',
+                icon: 'error',
+                title: 'Selecione o Tipo de Frete.',
+                showConfirmButton: false,
+                timer: 1500
+            });
+            return;
+        } 
+        
         try {
 
 
-            if (fornecedorSelecionado == '') {
-                Swal.fire({
-                    position: 'center',
-                    icon: 'error',
-                    title: 'O campo fornecedor é obrigatório.',
-                    showConfirmButton: false,
-                    timer: 1500
-                });
-                return;
-            } else if (!compradorSelecionado) {
-                Swal.fire({
-                    position: 'center',
-                    icon: 'error',
-                    title: 'Selecione o Comprador do Pedido.',
-                    showConfirmButton: false,
-                    timer: 1500
-                });
-                return;
-            } else if (marcaSelecionada) {
-                Swal.fire({
-                    position: 'center',
-                    icon: 'error',
-                    title: 'Selecione uma Marca.',
-                    showConfirmButton: false,
-                    timer: 1500
-                });
-                return;
-            } else if (!tipoPedidoSelecionado) {
-                Swal.fire({
-                    position: 'center',
-                    icon: 'error',
-                    title: 'Selecione o Tipo Fiscal do Fornecedor.',
-                    showConfirmButton: false,
-                    timer: 1500
-                });
-                return;
-            } else if (!vendedor) {
-                Swal.fire({
-                    position: 'center',
-                    icon: 'error',
-                    title: 'Adicione o Nome do Vendedor.',
-                    showConfirmButton: false,
-                    timer: 1500
-                });
-                return;
-            } else if (!transportadoraSelecionada) {
-                Swal.fire({
-                    position: 'center',
-                    icon: 'error',
-                    title: 'Selecione a Transportadora.',
-                    showConfirmButton: false,
-                    timer: 1500
-                });
-                return;
-            } else if (!freteSelecionado) {
-                Swal.fire({
-                    position: 'center',
-                    icon: 'error',
-                    title: 'Selecione o Tipo de Frete.',
-                    showConfirmButton: false,
-                    timer: 1500
-                });
-                return;
-            } else {
-
-                const isUpdate = idResumoPedido.length > 0 && idResumoPedido;
-                const data = {
-                    ...(isUpdate && { IDRESUMOPEDIDO: idResumoPedido }),
-                    IDGRUPOEMPRESARIAL: '',
-                    IDSUBGRUPOEMPRESARIAL: '',
-                    IDCOMPRADOR: compradorSelecionado?.value,
-                    IDCONDICAOPAGAMENTO: condicoesPagamentosSelecionado?.value,
-                    IDFORNECEDOR: fornecedorSelecionado?.value,
-                    IDTRANSPORTADORA: transportadoraSelecionada?.value,
-                    IDANDAMENTO: '',
-                    MODPEDIDO: tipoPedidoSelecionado?.value,
-                    NOVENDEDOR: vendedor,
-                    EEMAILVENDEDOR: emailVendedor,
-                    DTPEDIDO: dataPedido,
-                    DTPREVENTREGA: dataPrevisaoEntrega,
-                    TPFRETE: freteSelecionado?.value,
-                    DESCPERC01: desconto1,
-                    DESCPERC02: desconto2,
-                    DESCPERC03: desconto3,
-                    PERCCOMISSAO: comissao,
-                    VRTOTALLIQUIDO: totalLiq,
-                    OBSPEDIDO: obsInterna,
-                    OBSPEDIDO2: obsFornecedor,
-                    DTFECHAMENTOPEDIDO: dataAtual,
-                    DTCADASTRO: dataAtual,
-                    TPARQUIVO: enviarSelecionado?.value,
-                    STDISTRIBUIDO: 'False',
-                    STAGRUPAPRODUTO: 'False',
-                    STCANCELADO: 'False',
-                    TPFISCAL: fiscalSelecionado?.value,
-                    STRASCUNHO: stRascunho || 'False'
-                }
-
-                const response = isUpdate ? await put('/atualizar-pedido/:id', data) : await post('/pedido', data);
-
-                const textDados = JSON.stringify(data);
-                let textFuncao = isUpdate ? 'COMPRAS / ATUALIZAR PEDIDO' : 'COMPRAS / INCLUIR PEDIDO';
-                const ipUsuario = await getIPUsuario();
-
-                const createtLog = {
-                    IDFUNCIONARIO: String(usuarioLogado.id),
-                    PATHFUNCAO: textFuncao,
-                    DADOS: textDados,
-                    IP: ipUsuario || 'Indisponível'
-                }
-
-                await post('/log-web', createtLog)
-
-                Swal.fire({
-                    position: 'center',
-                    icon: 'success',
-                    title: isUpdate ? 'Atualizado!' : 'Cadastrado!',
-                    text: isUpdate ? 'Pedido atualizado com sucesso.' : 'Pedido cadastrado com sucesso.',
-                    showConfirmButton: false,
-                    timer: 3000,
-                    customClass: {
-                        container: 'custom-swal',
-                    }
-                })
+            const isUpdate = idResumoPedido.length > 0 && idResumoPedido;
+            const data = {
+                ...(isUpdate && { IDRESUMOPEDIDO: idResumoPedido }),
+                IDGRUPOEMPRESARIAL: '',
+                IDSUBGRUPOEMPRESARIAL: '',
+                IDCOMPRADOR: compradorSelecionado?.value,
+                IDCONDICAOPAGAMENTO: condicoesPagamentosSelecionado?.value,
+                IDFORNECEDOR: fornecedorSelecionado?.value,
+                IDTRANSPORTADORA: transportadoraSelecionada?.value,
+                IDANDAMENTO: '',
+                MODPEDIDO: tipoPedidoSelecionado?.value,
+                NOVENDEDOR: vendedor,
+                EEMAILVENDEDOR: emailVendedor,
+                DTPEDIDO: dataPedido,
+                DTPREVENTREGA: dataPrevisaoEntrega,
+                TPFRETE: freteSelecionado?.value,
+                DESCPERC01: desconto1,
+                DESCPERC02: desconto2,
+                DESCPERC03: desconto3,
+                PERCCOMISSAO: comissao,
+                VRTOTALLIQUIDO: totalLiq,
+                OBSPEDIDO: obsInterna,
+                OBSPEDIDO2: obsFornecedor,
+                DTFECHAMENTOPEDIDO: dataAtual,
+                DTCADASTRO: dataAtual,
+                TPARQUIVO: enviarSelecionado?.value,
+                STDISTRIBUIDO: 'False',
+                STAGRUPAPRODUTO: 'False',
+                STCANCELADO: 'False',
+                TPFISCAL: fiscalSelecionado?.value,
+                STRASCUNHO: stRascunho || 'False',
+                STPEDIDOPORINTEMEDIARIO: checked ? 'True' : 'False'
             }
+
+            const response = isUpdate ? await put('/atualizar-pedido/:id', data) : await post('/pedido', data);
+
+            const textDados = JSON.stringify(data);
+            let textFuncao = isUpdate ? 'COMPRAS / ATUALIZAR PEDIDO' : 'COMPRAS / INCLUIR PEDIDO';
+            const ipUsuario = await getIPUsuario();
+
+            const createtLog = {
+                IDFUNCIONARIO: String(usuarioLogado.id),
+                PATHFUNCAO: textFuncao,
+                DADOS: textDados,
+                IP: ipUsuario || 'Indisponível'
+            }
+
+            await post('/log-web', createtLog)
+
+            Swal.fire({
+                position: 'center',
+                icon: 'success',
+                title: isUpdate ? 'Atualizado!' : 'Cadastrado!',
+                text: isUpdate ? 'Pedido atualizado com sucesso.' : 'Pedido cadastrado com sucesso.',
+                showConfirmButton: false,
+                timer: 3000,
+                customClass: {
+                    container: 'custom-swal',
+                }
+            })
+            return response.data;
         } catch (error) {
-            const textDados = JSON.stringify(data)
+            const textDados = JSON.stringify('')
             let textFuncao = isUpdate ? 'COMPRAS / ATUALIZAR PEDIDO' : 'COMPRAS / INCLUIR PEDIDO';
             const ipUsuario = await getIPUsuario();
             const createtLog = {
@@ -567,6 +638,8 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
         setIdResumoPedido,
         checked,
         setChecked,
+        disabledChecked,
+        setDisabledChecked,
         modalIncluirProdutoPedido,
         setModalIncluirProdutoPedido,
         dadosFornecedores,
@@ -578,6 +651,8 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
         dadosDetalhesPedidos,
         dadosProdutosPedidos,
         verificaDadosDoFornecedorSelecionado,
+        pendenciasFornecedor,
         onIncluirProdutoPedido
     }
 }
+

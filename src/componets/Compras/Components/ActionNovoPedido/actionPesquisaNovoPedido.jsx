@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react"
+import { Fragment, useEffect, useState, useRef } from "react"
 
 import { ButtonType } from "../../../Buttons/ButtonType";
 import { useQuery } from "react-query";
@@ -19,6 +19,8 @@ import { ActionIncluirProdutoPedidoModal } from "./IncluirProdutoPedido/actionIn
 import { InputFieldCheckBox } from "../../../Inputs/InputChekBox";
 import { useIncluirProutoPedido } from "./hooks/useIncluirProdutoPedido";
 import { optionsTipoFrete, optionsTipoPedido, optionsEnviar, optionsFiscal } from "../../../../../parceiro.json"
+import { Alert } from "../../../Inputs/alert";
+import { set } from "date-fns";
 
 export const ActionPesquisaNovoPedido = ({
   usuarioLogado,
@@ -26,6 +28,7 @@ export const ActionPesquisaNovoPedido = ({
   dadosVisualizarPedido, 
   dadosDetalhePedido
 }) => {
+  
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
       'menus-usuario-excecao',
       async () => {
@@ -95,13 +98,13 @@ export const ActionPesquisaNovoPedido = ({
     setIdResumoPedido,
     checked,
     setChecked,
+    disabledChecked, 
+    setDisabledChecked,
     modalIncluirProdutoPedido,
     setModalIncluirProdutoPedido,
     onIncluirProdutoPedido,
     verificaDadosDoFornecedorSelecionado,
     pendenciasFornecedor,
-    isLoadingVerificacao,
-    stRascunho,
     dadosFornecedores,
     dadosComprador,
     dadosMarcas,
@@ -268,6 +271,24 @@ export const ActionPesquisaNovoPedido = ({
   }
 
   const handleIncluir = () => {
+    if(marcaSelecionada == '') {
+      Swal.fire({
+        icon: "warning",
+        title: `Selecione uma Marca para Incluir os Produtos`,
+        showConfirmButton: false,
+        timer: 5000
+      })
+      return;
+    }
+    if(compradorSelecionado == '') {
+      Swal.fire({
+        icon: "warning",
+        title: `Selecione um Comprador para Incluir os Produtos`,
+        showConfirmButton: false,
+        timer: 6000
+      })
+      return;
+    }
     setModalIncluirProdutoPedido(true);
   } 
 
@@ -282,15 +303,22 @@ export const ActionPesquisaNovoPedido = ({
 };
 
   useEffect(() => {
-      if (fornecedorSelecionado?.value) {
-        verificaDadosDoFornecedorSelecionado ();
-      }
+    if (fornecedorSelecionado?.value) {
+      verificaDadosDoFornecedorSelecionado ();
+    }
   }, [fornecedorSelecionado]);
 
-  console.log(dadosTransportador, 'dadosTransportador')
+  // if(dados?.IDPEDIDOPRIMARIO > 0 || dados?.STPEDIDOPRIMARIO == 'True' || dados?.STMIGRADOSAP == 'True') {
+  //   setDisabledChecked(true); 
+  // } else if(dados?.IDPEDIDOPRIMARIO > 0 || dados?.STPEDIDOPRIMARIO == 'True') {
+  //   setDisabledChecked(false);
+  //   setChecked(false);  
+  // }
+
   return (
 
     <Fragment>
+     
       <ResultadoResumo
         cardVendas={true}
         valorVendas={calcularTotalDetalhe()}
@@ -321,6 +349,7 @@ export const ActionPesquisaNovoPedido = ({
         checkedCheckBoxPedido={checked}
         valueCheckBoxPedido={checked}
         onChangeCheckBoxPedido={(e) => setChecked(e.target.checked)}
+        disabledCheckBoxTipoPedido={disabledChecked}
         
 
         InputSelectFornecedorComponent={InputSelectActionPedido}
@@ -482,6 +511,11 @@ export const ActionPesquisaNovoPedido = ({
         valueSelectFrete={freteSelecionado}
         onChangeSelectFrete={(e) => setFreteSelecionado(e.value)}
 
+        Alerta={Alert}
+        messageAlerta={pendenciasFornecedor}
+        text
+        indiceAlerta
+
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Incluir Itens"}
         onButtonClickSearch={handleIncluir}
@@ -513,7 +547,7 @@ export const ActionPesquisaNovoPedido = ({
         // IconTXT={GrDocumentTxt}
       />
 
-
+        {/* {console.log(pendenciasFornecedor, 'len')} */}
 
       <div id="resultadoListaPdido"
         style={{ backgroundColor: "#fff", padding: "15px" }}
