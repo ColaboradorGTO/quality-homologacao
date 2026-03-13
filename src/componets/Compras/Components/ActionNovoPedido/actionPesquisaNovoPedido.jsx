@@ -20,7 +20,7 @@ import { InputFieldCheckBox } from "../../../Inputs/InputChekBox";
 import { useIncluirProutoPedido } from "./hooks/useIncluirProdutoPedido";
 import { optionsTipoFrete, optionsTipoPedido, optionsEnviar, optionsFiscal } from "../../../../../parceiro.json"
 import { Alert } from "../../../Inputs/alert";
-import { set } from "date-fns";
+import { AiOutlineSave } from "react-icons/ai";
 
 export const ActionPesquisaNovoPedido = ({
   usuarioLogado,
@@ -114,7 +114,8 @@ export const ActionPesquisaNovoPedido = ({
     dadosDetalhesPedidos,
     dadosProdutosPedidos,
     clonarCabecalho,
-    handleIncluir
+    handleIncluir,
+    handleSalvarPedido,
   } = useIncluirProutoPedido({ usuarioLogado, optionsModulos });
 
   const calcularTotal = (field) => {
@@ -517,11 +518,11 @@ export const ActionPesquisaNovoPedido = ({
         corPedido={"warning"}
         IconPedido={MdOutlinePictureAsPdf}
 
-        // ButtonTypeTXT={ButtonType}
-        // linkTXT={"Pedido de Compra TXT"}
-        // onButtonClickTXT={() => handleClickPedidoTXT()}
-        // corTXT={"warning"}
-        // IconTXT={GrDocumentTxt}
+        ButtonTypeTXT={ButtonType}
+        linkTXT={"Salvar Cabeçalho Pedido"}
+        onButtonClickTXT={() => handleSalvarPedido()}
+        corTXT={"info"}
+        IconTXT={AiOutlineSave}
       />
 
         {/* {console.log(pendenciasFornecedor, 'len')} */}

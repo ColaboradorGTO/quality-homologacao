@@ -47,6 +47,7 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
     const [pendenciasFornecedor, setPendenciasFornecedor] = useState([]);
     const [modalIncluirProdutoPedido, setModalIncluirProdutoPedido] = useState(false);
     const [dadosCabecalhoClonado, setDadosCabecalhoClonado] = useState([])
+    const [dadosUltimosPedidos, setDadosUltimosPedidos] = useState([])
 
     useEffect(() => {
         const data = getDataAtual();
@@ -703,8 +704,11 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
                 DADOS: textDados,
                 IP: ipUsuario || 'Indisponível'
             }
-
+            const ultimoPedidoResponse = await get(`/ultimo-pedido?idcomprador=${idCompradorPedidoAtual}&idPedido=${idResumoPedidoAtual}`);
+            setDadosUltimosPedidos(ultimoPedidoResponse.data)
             setModalIncluirProdutoPedido(true);
+
+            Swal.close();
 
             await post('/log-web', createtLog)
 
@@ -720,11 +724,6 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
                 }
             })
 
-            if(response.data && response.data.length > 0) {
-                const idResumoPedidoAtual = response.data[0].IDRESUMOPEDIDO;
-                const dadosPedidos = await get(`/lista-pedidos?idPedido=${idResumoPedidoAtual}`);
-                setDadosCabecalhoClonado(dadosPedidos?.data)
-            }
 
             return response.data;
         } catch (error) {
@@ -810,6 +809,172 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
         setModalIncluirProdutoPedido(true);
     } 
 
+    const handleSalvarPedido = async () => {
+        let idResumoAtual = Number(idResumoPedido || 0);
+        let idResumoPedidoPrimario = Number(1 || 0); // Ajuste conforme sua lógica
+        let stPedidoPorIntermediario = checked;
+    
+        if(!marcaSelecionada || marcaSelecionada == '') {
+          Swal.fire({
+            icon: "warning",
+            title: `Selecione uma Marca para Incluir os Produtos`,
+            showConfirmButton: false,
+            timer: 5000
+          })
+          return;
+        }
+
+        if (!compradorSelecionado || compradorSelecionado === '') {
+            Swal.fire({
+                icon: "warning",
+                title: `Selecione um Comprador para Salvar o Pedido`,
+                showConfirmButton: false,
+                timer: 6000
+            });
+            return;
+        }
+
+        let msgPergunta = 'Deseja realmente salvar?';
+        let txtObs = '';
+        
+        if (idResumoPedidoPrimario == 0 && stPedidoPorIntermediario) {
+            msgPergunta = 'Deseja realmente salvar e efetuar este pedido pelo Atacadista RN?';
+            txtObs = 'Esta ação não poderá ser desfeita!';
+        }
+    
+        const confirmacao = Swal.fire({
+            icon: 'warning',
+            title: msgPergunta,
+            text: txtObs,
+            showCancelButton: true,
+            showConfirmButton: true,
+            confirmButtonText: 'Salvar',
+            cancelButtonText: 'Cancelar',
+    
+        })
+    
+        if (!confirmacao.isConfirmed) {
+            return;
+        }
+    
+        Swal.fire({
+            title: 'Carregando dados, aguarde...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        
+        const data = {
+             IDRESUMOPEDIDO: idResumoAtual,
+            IDGRUPOEMPRESARIAL: marcaSelecionada?.value,
+            IDSUBGRUPOEMPRESARIAL: marcaSelecionada?.value,
+            IDCOMPRADOR: compradorSelecionado?.value,
+            IDCONDICAOPAGAMENTO: condicoesPagamentosSelecionado?.value,
+            IDFORNECEDOR: fornecedorSelecionado?.value,
+            IDTRANSPORTADORA: transportadoraSelecionada?.value,
+            IDANDAMENTO: idAndamento,
+            MODPEDIDO: tipoPedidoSelecionado?.value,
+            NOVENDEDOR: vendedor,
+            EEMAILVENDEDOR: emailVendedor,
+            DTPEDIDO: dataPedido,
+            DTPREVENTREGA: dataPrevisaoEntrega,
+            TPFRETE: freteSelecionado?.value,
+            DESCPERC01: desconto1,
+            DESCPERC02: desconto2,
+            DESCPERC03: desconto3,
+            PERCCOMISSAO: comissao,
+            VRTOTALLIQUIDO: totalLiq,
+            OBSPEDIDO: obsInterna,
+            OBSPEDIDO2: obsFornecedor,
+            DTFECHAMENTOPEDIDO: dataAtual,
+            DTCADASTRO: dataAtual,
+            TPARQUIVO: enviarSelecionado?.value,
+            STDISTRIBUIDO: 'False',
+            STAGRUPAPRODUTO: 'False',
+            STCANCELADO: 'False',
+            TPFISCAL: fiscalSelecionado?.value,
+            STRASCUNHO: stRascunho || 'False',
+            STPEDIDOPORINTEMEDIARIO: checked ? 'True' : 'False'
+        }
+
+        try {
+            let response;
+            let idResumoPedidoAtual;
+            if(idResumoAtual == 0)  {
+                response =  await post('/lista-pedidos', data);
+                
+                if(response.data && response.data.length > 0) {
+                    idResumoPedidoAtual = response.data[0].IDRESUMOPEDIDO;
+                }
+
+            } else {
+                response =  await put('/lista-pedidos', data);
+                idResumoPedidoAtual = idResumoAtual;
+            }
+
+            const textDados = JSON.stringify(data);
+            let textFuncao =  'COMPRAS / SALVAR CABEÇALHO DO PEDIDO';
+            const ipUsuario = await getIPUsuario();
+
+            const createtLog = {
+                IDFUNCIONARIO: String(usuarioLogado.id),
+                PATHFUNCAO: textFuncao,
+                DADOS: textDados,
+                IP: ipUsuario || 'Indisponível'
+            }
+
+            await post('/log-web', createtLog)
+            Swal.close();
+
+
+            Swal.fire({
+                position: 'center',
+                icon: 'success',
+                title: 'Cadastrado!',
+                text: 'Pedido cadastrado com sucesso.',
+                showConfirmButton: false,
+                timer: 5000,
+                customClass: {
+                    container: 'custom-swal',
+                }
+            })
+
+            if (idResumoPedidoAtual) {
+                const dadosPedidos = await get(`/lista-pedidos?idPedido=${idResumoPedidoAtual}`);
+                setDadosCabecalhoClonado(dadosPedidos?.data);
+                
+                // Atualiza o ID do pedido atual
+                setIdResumoPedido(idResumoPedidoAtual);
+            }
+
+            return response.data;
+        } catch (error) {
+            const textDados = JSON.stringify(data)
+            let textFuncao = 'COMPRAS / ERRO AO SALVAR CABEÇALHO DO PEDIDO';
+            const ipUsuario = await getIPUsuario();
+            const createtLog = {
+                IDFUNCIONARIO: String(usuarioLogado.id),
+                PATHFUNCAO: textFuncao,
+                DADOS: textDados,
+                IP: ipUsuario || 'Indisponível'
+            }
+            await post('/log-web', createtLog)
+
+            Swal.fire({
+                position: 'center',
+                icon: 'error',
+                title: 'Erro ao tentar Salvar o cabeçalho do pedido, recarregue e tente novamente!',
+                showConfirmButton: false,
+                timer: 3000,
+                customClass: {
+                    container: 'custom-swal',
+                }
+            });
+        }
+    }
+
     return {
         tabelaVisivel,
         setTabelaVisivel,
@@ -885,7 +1050,10 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
         pendenciasFornecedor,
         onIncluirProdutoPedido,
         clonarCabecalho,
-        handleIncluir
+        handleIncluir,
+        handleSalvarPedido,
+        dadosUltimosPedidos,
+        dadosCabecalhoClonado
     }
 }
 
