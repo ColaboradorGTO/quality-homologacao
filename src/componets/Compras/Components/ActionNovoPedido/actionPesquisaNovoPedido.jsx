@@ -112,7 +112,9 @@ export const ActionPesquisaNovoPedido = ({
     dadosTransportador,
     dadosDetalhe, 
     dadosDetalhesPedidos,
-    dadosProdutosPedidos
+    dadosProdutosPedidos,
+    clonarCabecalho,
+    handleIncluir
   } = useIncluirProutoPedido({ usuarioLogado, optionsModulos });
 
   const calcularTotal = (field) => {
@@ -270,28 +272,6 @@ export const ActionPesquisaNovoPedido = ({
     }
   }
 
-  const handleIncluir = () => {
-    if(marcaSelecionada == '') {
-      Swal.fire({
-        icon: "warning",
-        title: `Selecione uma Marca para Incluir os Produtos`,
-        showConfirmButton: false,
-        timer: 5000
-      })
-      return;
-    }
-    if(compradorSelecionado == '') {
-      Swal.fire({
-        icon: "warning",
-        title: `Selecione um Comprador para Incluir os Produtos`,
-        showConfirmButton: false,
-        timer: 6000
-      })
-      return;
-    }
-    setModalIncluirProdutoPedido(true);
-  } 
-
   
  const handleVerificar = async () => {
     const existe = await verificaDadosDoFornecedorSelecionado ();
@@ -308,12 +288,9 @@ export const ActionPesquisaNovoPedido = ({
     }
   }, [fornecedorSelecionado]);
 
-  // if(dados?.IDPEDIDOPRIMARIO > 0 || dados?.STPEDIDOPRIMARIO == 'True' || dados?.STMIGRADOSAP == 'True') {
-  //   setDisabledChecked(true); 
-  // } else if(dados?.IDPEDIDOPRIMARIO > 0 || dados?.STPEDIDOPRIMARIO == 'True') {
-  //   setDisabledChecked(false);
-  //   setChecked(false);  
-  // }
+  const handleClickClonarCabecalho = async () => {
+
+  }
 
   return (
 
@@ -536,7 +513,7 @@ export const ActionPesquisaNovoPedido = ({
 
         ButtonTypePedido={ButtonType}
         linkPedido={"Clonar Peidido"}
-        onButtonClickPedido={() => handleClickCadstroPedidoPDF()}
+        onButtonClickPedido={() => handleClickClonarCabecalho()}
         corPedido={"warning"}
         IconPedido={MdOutlinePictureAsPdf}
 
