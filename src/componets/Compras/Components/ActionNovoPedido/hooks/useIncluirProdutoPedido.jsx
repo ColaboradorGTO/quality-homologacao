@@ -683,7 +683,8 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
                 response =  await post('/lista-pedidos', data);
                 
                 if(response.data && response.data.length > 0) {
-                    const idResumoPedidoAtual = response.data[0].IDRESUMOPEDIDO;
+                    idResumoPedidoAtual = response.data[0].IDRESUMOPEDIDO;
+                   
                     const dadosPedidos = await get(`/lista-pedidos?idPedido=${idResumoPedidoAtual}`);
                     setDadosCabecalhoClonado(dadosPedidos?.data)
                 }
