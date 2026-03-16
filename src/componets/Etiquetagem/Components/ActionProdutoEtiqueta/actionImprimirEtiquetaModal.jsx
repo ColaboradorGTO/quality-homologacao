@@ -1,5 +1,6 @@
-import './styles.css';
 import { Fragment, useRef } from "react";
+import Modal from 'react-bootstrap/Modal';
+import './styles.css';
 import { formatMoeda } from "../../../../utils/formatMoeda";
 import { ReactBarcode } from 'react-jsbarcode';
 import { ButtonTypeModal } from "../../../Buttons/ButtonTypeModal";
@@ -7,6 +8,8 @@ import { MdOutlineLocalPrintshop } from "react-icons/md";
 import { isValidEAN13 } from "../../../../utils/isValidEAN13";
 import { enviarZPLParaImpressora } from "../../../../utils/labelPrinterService";
 import Swal from "sweetalert2";
+import { HeaderModal } from "../../../Modais/HeaderModal/HeaderModal";
+import { FooterModal } from "../../../Modais/FooterModal/footerModal";
 
 const chunkArray = (array, size) => {
   const chunks = [];
@@ -17,13 +20,15 @@ const chunkArray = (array, size) => {
 };
 
 export const ActionImprimirEtiquetaModal = ({
+  show,
+  handleClose,
   produtosSelecionados,
-  dadosAcumuladorEtiquetas
+  dadosAcumuladorEtiquetas,
+  copia
 }) => {
 
+  
   const dataTableRef = useRef();
-
-
   const handlePrintZPL = async () => {
     try {
       // Início da página ZPL
@@ -141,7 +146,10 @@ export const ActionImprimirEtiquetaModal = ({
         icon: 'error',
         title: 'Erro na Impressão ZPL',
         text: error.message || 'Erro desconhecido ao processar etiquetas',
-        confirmButtonText: 'OK'
+        confirmButtonText: 'OK',
+        customClass: {
+          container: 'custom-swal',
+        }
       });
     }
   }
@@ -154,7 +162,7 @@ export const ActionImprimirEtiquetaModal = ({
         : [];
 
   const etiquetas = listaBase.flatMap((item) => {
-    const total = (item.quantidade || 1) * (1);
+    const total = (item.quantidade || 1) * (copia || 1);
 
     return Array.from({ length: total }, (_, index) => ({
       contador: index + 1,
@@ -169,89 +177,114 @@ export const ActionImprimirEtiquetaModal = ({
       DSLOCALEXPOSICAO: item.DSLOCALEXPOSICAO,
       quantidade: 1
     }));
-  })
+  });
 
   const etiquetasPorPagina = chunkArray(etiquetas, 3);
   const totalPaginas = etiquetasPorPagina.length;
 
   return (
     <Fragment>
-      <header className="row" style={{ justifyContent: "space-between" }}>
-        <div className="ml-3">
-          <p style={{ margin: '0px' }}>Qtd: Páginas <b>{totalPaginas + ' ' + 'Páginas'}</b></p>
-          <p >Qtd Etiquetas: <b>{dadosAcumuladorEtiquetas.length + ' ' + 'unidades'} </b></p>
-        </div>
-
-        <div className="d-flex gap-2">
-
-          <ButtonTypeModal
-            textButton={"Imprimir"}
-            onClickButtonType={handlePrintZPL}
-            cor={"info"}
-            Icon={MdOutlineLocalPrintshop}
-            iconSize={20}
-          />
-        </div>
-      </header>
-
-      <div ref={dataTableRef}>
-        {etiquetasPorPagina.map((pagina, pageIndex) => (
-          <div key={pageIndex} className="etiqueta-page" style={{}}>
-            {pagina.map((etiqueta, etiquetaIndex) => (
-              <div className="etiqueta-card" key={etiquetaIndex} style={{ padding: "15px 0 0", }}>
-                <div className="dsProd" style={{ justifyContent: 'center', maxWidth: '100%' }}>
-                  <h2
-                    style={{ lineHeight: '1.3em', fontWeight: 400, fontSize: '1.200rem' }}
-                  >
-                    {etiqueta?.DSNOME}
-                  </h2>
-                  <p>{etiqueta?.DSESTILO}</p>
-                  <p>{etiqueta?.DSLOCALEXPOSICAO}</p>
-                </div>
-
-                <div className="divTamanho" style={{ display: "flex", justifyContent: "space-between" }}>
-                  <div className="tamanhoDesc">
-                    <label>TAM</label>
-                    <div className="tamanho">
-                      <h2>{etiqueta?.TAMANHO}</h2>
-                    </div>
-                  </div>
-
-                  <div className="preco">
-                    <h2
-                      style={{ lineHeight: '1.3em', fontWeight: 400, fontSize: '1.375rem' }}
-                    >
-                      {formatMoeda(etiqueta?.PRECOVENDA)}
-                    </h2>
-                  </div>
-                </div>
-                <div id="codBarrasEtiqueta">
-                  {isValidEAN13(`${etiqueta?.NUCODBARRAS}`) ? (
-                    <ReactBarcode
-                      value={etiqueta?.NUCODBARRAS}
-                      options={{
-                        format: "EAN13",
-                        textAlign: "center",
-                        margin: 0,
-                      }}
-                      renderer="svg"
-                      className="svgEtiqueta"
-                      format="EAN13"
-                      width={3}
-                      height={80}
-                    />
-                  ) : (
-                    <p style={{ color: 'red', fontWeight: 'bold' }}>
-                      Código de barras inválido: {etiqueta?.NUCODBARRAS}
-                    </p>
-                  )}
-
-                </div>
+      <Modal
+        show={show}
+        onHide={handleClose}
+        size="xl"
+        className="modal fade"
+        role="dialog"
+      >
+        <HeaderModal
+          title={"Etiquetas"}
+          subTitle={"Etiquetas"}
+          handleClose={handleClose}
+        />
+        <Modal.Body>
+          <Fragment>
+            <header className="row" style={{ justifyContent: "space-between" }}>
+              <div className="ml-3">
+                <p style={{ margin: '0px' }}>Qtd: Páginas <b>{totalPaginas + ' ' + 'Páginas'}</b></p>
+                <p>Qtd Etiquetas: <b>{etiquetas.length} unidades</b></p>
               </div>
-            ))}
-          </div>
-        ))}
-      </div>
+
+              <div className="d-flex gap-2">
+
+                <ButtonTypeModal
+                  textButton={"Imprimir"}
+                  onClickButtonType={handlePrintZPL}
+                  cor={"info"}
+                  Icon={MdOutlineLocalPrintshop}
+                  iconSize={20}
+                />
+              </div>
+            </header>
+
+            <div ref={dataTableRef}>
+              {etiquetasPorPagina.map((pagina, pageIndex) => (
+                <div key={pageIndex} className="etiqueta-page" style={{}}>
+                  {pagina.map((etiqueta, etiquetaIndex) => (
+                    <div className="etiqueta-card" key={etiquetaIndex} style={{ padding: "15px 0 0", }}>
+                      <div className="dsProd" style={{ justifyContent: 'center', maxWidth: '100%' }}>
+                        <h2
+                          style={{ lineHeight: '1.2em', fontWeight: 400, fontSize: '1.200rem' }}
+                        >
+                          {etiqueta?.DSNOME}
+                        </h2>
+                        <p>{etiqueta?.DSESTILO}</p>
+                        <p>{etiqueta?.DSLOCALEXPOSICAO}</p>
+                      </div>
+
+                      <div className="divTamanho" style={{ display: "flex", justifyContent: "space-between" }}>
+                        <div className="tamanhoDesc">
+                          <label>TAM</label>
+                          <div className="tamanho">
+                            <h2>{etiqueta?.TAMANHO}</h2>
+                          </div>
+                        </div>
+
+                        <div className="preco">
+                          <h2
+                            style={{ lineHeight: '1.3em', fontWeight: 400, fontSize: '1.375rem' }}
+                          >
+                            {formatMoeda(etiqueta?.PRECOVENDA)}
+                          </h2>
+                        </div>
+                      </div>
+                      <div id="codBarrasEtiqueta">
+                        {isValidEAN13(`${etiqueta?.NUCODBARRAS}`) ? (
+                          <ReactBarcode
+                            value={etiqueta?.NUCODBARRAS}
+                            options={{
+                              format: "EAN13",
+                              textAlign: "center",
+                              margin: 0,
+                            }}
+                            renderer="svg"
+                            className="svgEtiqueta"
+                            format="EAN13"
+                            width={3}
+                            height={80}
+
+                          />
+                        ) : (
+                          <p style={{ color: 'red', fontWeight: 'bold' }}>
+                            Código de barras inválido: {etiqueta?.NUCODBARRAS}
+                          </p>
+                        )}
+
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+
+            <FooterModal
+              ButtonTypeFechar={ButtonTypeModal}
+              textButtonFechar={"Fechar"}
+              onClickButtonFechar={handleClose}
+              corFechar="secondary"
+            />
+          </Fragment>
+        </Modal.Body>
+      </Modal>
     </Fragment>
   );
 };

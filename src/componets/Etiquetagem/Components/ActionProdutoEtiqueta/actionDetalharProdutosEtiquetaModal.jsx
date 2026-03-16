@@ -13,22 +13,18 @@ import { useReactToPrint } from "react-to-print";
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 import * as XLSX from "xlsx";
-import { ActionImprimirEtiquetaModal } from "./actionImprimirEtiquetaModal";
-import Swal from "sweetalert2";
-import { MdOutlineLocalPrintshop } from "react-icons/md";
+
 export const ActionDetalharProdutosEtiquetaModal = ({
   show,
   handleClose,
-  produtosSelecionados,
   dadosAcumuladorEtiquetas,
   setDadosAcumuladorEtiquetas,
-  setProdutosSelecionados,
 }) => {
 
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [imprimirProduto, setImprimirProduto] = useState(false)
   const [tabelaVisivel, setTabelaVisivel] = useState(true)
-  
+
   const dataTableRef = useRef();
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -80,14 +76,7 @@ export const ActionDetalharProdutosEtiquetaModal = ({
     XLSX.writeFile(workbook, 'lista_produtos_selecionado.xlsx');
   };
 
-  const listaBase =
-    dadosAcumuladorEtiquetas?.length
-      ? dadosAcumuladorEtiquetas
-      : produtosSelecionados?.length
-        ? produtosSelecionados
-        : [];
-
-  const dados = listaBase.flatMap((item, index) => {
+  const dados = Array.isArray(dadosAcumuladorEtiquetas) ? dadosAcumuladorEtiquetas.map((item, index) => {
     return {
       idEtiqueta: `${item.IDPRODUTO}-${item.NUCODBARRAS}-${item.TAMANHO}-${index}`,
       contador: index + 1,
@@ -99,10 +88,9 @@ export const ActionDetalharProdutosEtiquetaModal = ({
       DSESTILO: item.DSESTILO,
       DSLISTAPRECO: item.DSLISTAPRECO,
       MARCA: item.MARCA,
-      DSLOCALEXPOSICAO: item.DSLOCALEXPOSICAO,
       IDPRODUTO: item.IDPRODUTO,
     }
-  });
+  }) : [];
 
   const colunasListaProdEtiquetas = [
     {
@@ -163,45 +151,23 @@ export const ActionDetalharProdutosEtiquetaModal = ({
       field: "rowIndex",
       header: "Excluir",
       body: (row) => (
-        produtosSelecionados?.length || dadosAcumuladorEtiquetas?.length > 1 ? (
-          <ButtonTable
-            titleButton="Excluir"
-            onClickButton={() => handleExcluirEtiqueta(row)}
-            Icon={BsTrash3}
-            iconSize={20}
-            width="35px"
-            height="35px"
-            iconColor="#fff"
-            cor="danger"
-          />
-        ) : null
+
+        <ButtonTable
+          titleButton="Excluir"
+          onClickButton={() => handleExcluirEtiqueta(row)}
+          Icon={BsTrash3}
+          iconSize={20}
+          width="35px"
+          height="35px"
+          iconColor="#fff"
+          cor="danger"
+        />
       ),
-      sortable: true,
     }
   ];
 
-  const handleAcumuladorEtiquetas = async () => {
-    if (produtosSelecionados.length || dadosAcumuladorEtiquetas.length > 0) {
-      try {
-        setImprimirProduto(true);
-        setTabelaVisivel(false);
-      } catch (error) {
-        Swal.fire({
-          icon: "error",
-          title: "Valor Inválido",
-          text: "O valor deve ser maior que 0 para imprimir etiquetas!",
-        });
-      }
-    }
-  };
 
   const handleExcluirEtiqueta = (row) => {
-    setProdutosSelecionados((prev) =>
-      prev.filter((item, index) => {
-        const id = `${item.IDPRODUTO}-${item.NUCODBARRAS}-${item.TAMANHO}-${index}`;
-        return id !== row.idEtiqueta;
-      })
-    );
     setDadosAcumuladorEtiquetas((prev) =>
       prev.filter((item, index) => {
         const id = `${item.IDPRODUTO}-${item.NUCODBARRAS}-${item.TAMANHO}-${index}`;
@@ -209,6 +175,7 @@ export const ActionDetalharProdutosEtiquetaModal = ({
       })
     );
   }
+
   const handleFecharModal = () => {
     handleClose();
     setTabelaVisivel(true)
@@ -237,6 +204,7 @@ export const ActionDetalharProdutosEtiquetaModal = ({
                 <div className="panel-hdr">
                   <h2>LISTA DE PRODUTOS PARA IMPRIMIR</h2>
                 </div>
+
 
                 <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
                   <HeaderTable
@@ -282,27 +250,12 @@ export const ActionDetalharProdutosEtiquetaModal = ({
                 </div>
               </div>
               <FooterModal
-                ButtonTypeCadastrar={ButtonTypeModal}
-                textButtonCadastrar={"Imprimir Etiqueta"}
-                onClickButtonCadastrar={handleAcumuladorEtiquetas}
-                corCadastrar={"primary"}
-                iconCadastrar={MdOutlineLocalPrintshop}
-                iconSizeCadastrar={20}
-
                 ButtonTypeFechar={ButtonTypeModal}
                 textButtonFechar={"Fechar"}
                 onClickButtonFechar={handleFecharModal}
                 corFechar="secondary"
               />
             </Fragment>
-          }
-
-          {imprimirProduto &&
-            <ActionImprimirEtiquetaModal
-              setTabelaVisivel={setTabelaVisivel}
-              dadosAcumuladorEtiquetas={dadosAcumuladorEtiquetas}
-              produtosSelecionados={produtosSelecionados}
-            />
           }
         </Modal.Body>
       </Modal>
