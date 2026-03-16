@@ -254,5 +254,13 @@
   "optionsParcelado": [
     { "value": "True", "label": "SIM" },
     { "value": "False", "label": "NÃO" }
+  ],
+  "optionsReposicao": [
+    { "value": "True", "label": "SIM" },
+    { "value": "False", "label": "NÃO" }
+  ],
+  "optionsTipoCadastro": [
+    { "value": "True", "label": "POR REFERÊNCIA" },
+    { "value": "False", "label": "NORMAL" }
   ]
 }

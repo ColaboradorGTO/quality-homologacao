@@ -8,10 +8,10 @@ export const ActionIncluirProdutoPedidoModal = ({
   handleClose,
   usuarioLogado,
   optionsModulos,
-  fornecedorSelecionado,
   tipoPedidoSelecionado,
   marcaSelecionada,
-  idResumoPedido
+  idResumoPedido,
+  dadosUltimosPedidos
 }) => {
 
   return (
@@ -37,10 +37,10 @@ export const ActionIncluirProdutoPedidoModal = ({
             handleClose={handleClose}
             usuarioLogado={usuarioLogado}
             optionsModulos={optionsModulos}
-            fornecedorSelecionado={fornecedorSelecionado}
             tipoPedidoSelecionado={tipoPedidoSelecionado}
             marcaSelecionada={marcaSelecionada}
             idResumoPedido={idResumoPedido}
+            dadosUltimosPedidos={dadosUltimosPedidos}
          />
           
         </Modal.Body>

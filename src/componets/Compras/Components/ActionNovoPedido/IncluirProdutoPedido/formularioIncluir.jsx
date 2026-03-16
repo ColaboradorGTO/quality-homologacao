@@ -6,16 +6,17 @@ import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal";
 import { useForm, Controller } from "react-hook-form";
 import { schema } from "./schema/useProdutoSchema";
 import FormField from "../../../../Formularios/FormField";
+import { SelectList } from "../../../../Buttons/menuList";
 
 
 export const FormularioIncluirProdutoPedido = ({
     usuarioLogado,
     optionsModulos,
     handleClose,
-    fornecedorSelecionado,
     tipoPedidoSelecionado,
     marcaSelecionada,
-    idResumoPedido
+    idResumoPedido,
+    dadosUltimosPedidos
 }) => {
     const { register, handleSubmit, formState: { errors }, clearErrors, setError, control } = useForm({
         mode: "onChange"
@@ -29,6 +30,8 @@ export const FormularioIncluirProdutoPedido = ({
         setProdutoSelecionado,
         reposicaoSelecionado,
         setReposicaoSelecionado,
+        tipoCadastroSelecionado, 
+        setTipoCadastroSelecionado,
         descricaoProduto,
         setDescricaoProduto,
         vrCusto,
@@ -89,7 +92,7 @@ export const FormularioIncluirProdutoPedido = ({
         dadosLocalExposicao,
         dadosGrade,
         dadosProdutosPedidos,
-        optionsStatus,
+        optionsTipoCadastro,
         optionsReposicao,
         atualiza_valor_QtdUnit,
         vrSugerigoFixo,
@@ -97,7 +100,14 @@ export const FormularioIncluirProdutoPedido = ({
         formatarNumero,
         converterParaNumero,
         onSubmit,
-    } = useIncluirProduto({ usuarioLogado, optionsModulos, handleClose, fornecedorSelecionado, tipoPedidoSelecionado, marcaSelecionada });
+    } = useIncluirProduto({ 
+        usuarioLogado, 
+        optionsModulos, 
+        handleClose, 
+        tipoPedidoSelecionado, 
+        marcaSelecionada,
+        dadosUltimosPedidos 
+    });
 
 
     const handleValidatedSubmit = async () => {
@@ -146,6 +156,56 @@ export const FormularioIncluirProdutoPedido = ({
             console.log(`Erro de validação:\n${errorMessages.join('\n')}`);
         }
     }
+
+    const menuHeaderStyle = {
+        padding: "8px 12px",
+        background: "#7a59ad",
+        color: "#ffffff",
+        fontSize: "14px",
+    };
+
+    const formatSelectGroup = (data) => {
+        const grupos = {};
+
+        data.forEach((item) => {
+            if (!grupos[item.DS_GRUPO]) {
+            grupos[item.DS_GRUPO] = {
+                label: item.DS_GRUPO,
+                options: []
+            };
+            }
+
+            grupos[item.DS_GRUPO].options.push({
+            value: item.ID_ESTRUTURA,
+            label: item.ESTRUTURA,
+            original: item
+            });
+        });
+
+        return Object.values(grupos);
+    };
+
+    const formatSelectCor = (data) => {
+        const grupos = {};
+
+        data.forEach((item) => {
+            if (!grupos[item.DS_GRUPOCOR]) {
+            grupos[item.DS_GRUPOCOR] = {
+                label: item.DS_GRUPOCOR,
+                options: []
+            };
+            }
+
+            grupos[item.DS_GRUPOCOR].options.push({
+            value: item.ID_COR,
+            label: item.DS_COR,
+            original: item
+            });
+        });
+
+        return Object.values(grupos);
+    };
+
     return (
         <Fragment>
             <form onSubmit={handleSubmit(handleValidatedSubmit)}>
@@ -180,13 +240,13 @@ export const FormularioIncluirProdutoPedido = ({
                             <label className="form-label" htmlFor="strep">Reposição</label>
                             <Select
                                 id={"stReposicao"}
-                                value={reposicaoSelecionado}
                                 options={optionsReposicao.map((item) => {
                                     return {
                                         value: item.value,
                                         label: item.label
                                     }
                                 })}
+                                value={reposicaoSelecionado}
                                 onChange={(e) => setReposicaoSelecionado(e)}
                             />
                         </div>
@@ -194,14 +254,14 @@ export const FormularioIncluirProdutoPedido = ({
                             <label className="form-label" htmlFor="strep">Tipo de Cadastro</label>
                             <Select
                                 id={"stReposicao"}
-                                value={reposicaoSelecionado}
-                                options={optionsReposicao.map((item) => {
+                                options={optionsTipoCadastro.map((item) => {
                                     return {
                                         value: item.value,
                                         label: item.label
                                     }
                                 })}
-                                onChange={(e) => setReposicaoSelecionado(e)}
+                                value={tipoCadastroSelecionado}
+                                onChange={(e) => setTipoCadastroSelecionado(e)}
                             />
                         </div>
                     </div>
@@ -217,6 +277,7 @@ export const FormularioIncluirProdutoPedido = ({
                                         label={"Pesquisar Referencia/Produto"}
                                         name="referenciaProdutoPedido"
                                         type="text"
+                                        placeholder={"Digite a Descrição..."}
                                         value={referenciaProduto}
                                         onChange={(e) => setReferenciaProduto(e.target.value)}
                                         errors={errors}
@@ -239,6 +300,7 @@ export const FormularioIncluirProdutoPedido = ({
                                 })}
                                 onChange={(e) => setProdutoSelecionado(e)}
                             />
+                            
                         </div>
                     </div>
                 </div>
@@ -254,6 +316,7 @@ export const FormularioIncluirProdutoPedido = ({
                                     <FormField
                                         label={"Descrição Produto"}
                                         name="descricaoProdutoPedido"
+                                        placeholder={"Digite a Descrição..."}
                                         type="text"
                                         value={descricaoProduto}
                                         onChange={(e) => setDescricaoProduto(e.target.value)}
@@ -393,7 +456,7 @@ export const FormularioIncluirProdutoPedido = ({
                         </div>
                         <div className="col-sm-4 col-xl-4">
                             <label className="form-label" htmlFor="tpcor">Cor</label>
-                            <Select
+                            {/* <Select
                                 id={"corProduto"}
                                 value={corSelecionada}
                                 options={dadosCores.map((item) => {
@@ -403,6 +466,15 @@ export const FormularioIncluirProdutoPedido = ({
                                     }
                                 })}
                                 onChange={(e) => setCorSelecionada(e)}
+                            /> */}
+                            <SelectList
+                                id={"corProduto"}
+                                value={corSelecionada}
+                                options={formatSelectCor(dadosCores)}
+                                menuHeaderTitle={"Selecione"}
+                                menuHeaderStyle={menuHeaderStyle}
+                                onChange={(e) => setCorSelecionada(e)}
+                                
                             />
                         </div>
                         <div className="col-sm-4 col-xl-4">
@@ -410,7 +482,7 @@ export const FormularioIncluirProdutoPedido = ({
                             <Select
                                 id={"tpTecidoProduto"}
                                 value={tipoTecidoSelecionado}
-                                options={optionsReposicao.map((item) => {
+                                options={dadosTipoTecidos?.map((item) => {
                                     return {
                                         value: item.IDTPTECIDO,
                                         label: item.DSTIPOTECIDO
@@ -438,21 +510,18 @@ export const FormularioIncluirProdutoPedido = ({
                             />
                         </div>
                         <div className="col-sm-4 col-xl-4">
-                            <Controller 
-                                name="estrututraProduto"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormField
-                                        label={"Estrutura"}
-                                        name="estrututraProduto"
-                                        type="text"
-                                        value={estruturaSelecionada}
-                                        onChange={(e) => setEstruturaSelecionada(e.target.value)}
-                                        errors={errors}
-                                        clearErrors={clearErrors}
-                                    />
-                                )}
+                        
+                            <label className="form-label" htmlFor="tpcat">Estrutura</label>
+                            <SelectList
+                                id={"categoriaProduto"}
+                                value={estruturaSelecionada}
+                                options={formatSelectGroup(dadosSubGrupoProduto)}
+                                menuHeaderTitle={"Selecione"}
+                                menuHeaderStyle={menuHeaderStyle}
+                                onChange={(e) => setEstruturaSelecionada(e)}
+                                
                             />
+                     
                         </div>
                         <div className="col-sm-4 col-xl-4">
                             <Controller 
@@ -705,24 +774,44 @@ export const FormularioIncluirProdutoPedido = ({
                     </div>
                 </div>
                 <div className="form-group">
-                    <div className="row">
-                        <div className="col-sm-12 col-xl-12">
-                            <label className="form-label" htmlFor="vrtotalunit">QTD/TAMANHOS</label>
-                        </div>
-                    </div>
+                   
                     <div className="row" id="resultadoqtdtamanhos">
-                        <div class="col-sm-1 col-xl-1">
-                            <label  className="form-label" for="">DSTAMANHO</label>
-                            <div class="input-group">
-                                <input 
-                                    type="text" 
-                                    id="" 
-                                    name="" 
-                                    value="" 
-                                    title="" 
-                                    className="form-control class_grade" 
-                                    disabled 
-                                />
+                        <div className="col-sm-12 col-xl-12">
+                             <label className="form-label" htmlFor="vrtotalunit">QTD/TAMANHOS</label>
+                            <div className="d-flex flex-wrap gap-2" style={{ maxWidth: "100%" }}>
+                                {dadosGrade?.map((item) => {
+                                    const stDiversos = item.DSTAMANHO?.toUpperCase() === 'DIVERSOS' || item.DSTAMANHO?.toUpperCase() === 'U-DIVERSOS';
+                                    const valueGrade = stDiversos ? 1 : 0;
+                                    const titleGrade = stDiversos ? 'A Grade Diversos Possuí Gradeamento Único!' : '';
+                                    const stDisabled = stDiversos ? true : false;
+                                    return (
+                                        <input 
+                                            key={item.IDTAMANHO}
+                                            type="text"
+                                            id={`${item.IDTAMANHO}`}
+                                            name={`${item.IDTAMANHO}`}
+                                            value={valueGrade}
+                                            title={titleGrade}
+                                            className="form-control class_grade"
+                                            style={{ 
+                                                width: "60px", 
+                                                minWidth: "50px",
+                                                maxWidth: "80px",
+                                                flex: "0 0 auto"
+                                            }}
+                                            disabled={stDisabled}
+                                            // onChange={(e) => {
+                                            //     const valor = e.target.value;
+                                            //     // Atualiza o estado do componente para armazenar a quantidade por tamanho
+                                            //     setQuantidadePorTamanho(prevState => ({
+                                            //         ...prevState,
+                                            //         [item.IDVINCULO_TAMANHO_CATEGORIA]: valor
+                                            //     }));
+                                            // }}
+                                        />
+                                    );
+                                })}
+                               
                             </div>
                         </div>
                     </div>

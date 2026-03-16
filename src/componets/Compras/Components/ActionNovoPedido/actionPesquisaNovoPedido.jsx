@@ -113,9 +113,13 @@ export const ActionPesquisaNovoPedido = ({
     dadosDetalhe, 
     dadosDetalhesPedidos,
     dadosProdutosPedidos,
+    dadosUltimosPedidos,
     clonarCabecalho,
     handleIncluir,
     handleSalvarPedido,
+    refetchListaDetalhePedidos,
+    refetchListaCadastroProdutoPedidos,
+    refetchListaProdutoPedidos,
   } = useIncluirProutoPedido({ usuarioLogado, optionsModulos });
 
   const calcularTotal = (field) => {
@@ -496,7 +500,7 @@ export const ActionPesquisaNovoPedido = ({
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Incluir Itens"}
-        onButtonClickSearch={handleIncluir}
+        onButtonClickSearch={clonarCabecalho}
         corSearch={"primary"}
         IconSearch={MdMenu}
 
@@ -559,11 +563,12 @@ export const ActionPesquisaNovoPedido = ({
         handleClose={() => setModalIncluirProdutoPedido(false)}
         usuarioLogado={usuarioLogado}
         optionsModulos={optionsModulos}
-        fornecedorSelecionado={fornecedorSelecionado}
         tipoPedidoSelecionado={tipoPedidoSelecionado}
         marcaSelecionada={marcaSelecionada}
         idResumoPedido={idResumoPedido}
+        dadosUltimosPedidos={dadosUltimosPedidos}
       />
+      
 
     </Fragment>
   )

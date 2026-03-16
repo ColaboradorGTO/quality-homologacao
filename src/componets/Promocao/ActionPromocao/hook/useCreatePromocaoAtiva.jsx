@@ -63,7 +63,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
   const [modalPodutoSelecionadoDestinoCSV, setModalPodutoSelecionadoDestinoCSV] = useState(false);
   const [modalPodutoSelecionadoOrigemCSV, setModalPodutoSelecionadoOrigemCSV] = useState(false);
   const [isCheckedGrupo, setIsCheckedGrupo] = useState(false)
-  const [isCheckedProduto, setIsCheckedProduto] = useState(false)
+  const [isCheckedProduto, setIsCheckedProduto] = useState(true)
   const navigate = useNavigate();
 
   useEffect(() => {

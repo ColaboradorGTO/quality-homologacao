@@ -636,6 +636,21 @@ export const ActionMainPromocao = ({
                     <h2 style={{paddingLeft: '1rem'}} >Criar Promoção Por </h2>
                     <div className="row">
                         <div className="col-sm-6 col-md-4 col-xl-4">
+                          {InputProduto && (
+                            <InputProduto
+                              label={labelInputProduto}
+                              // type="radio"
+                              className="form-check-input"
+                              checked={valueInputProduto}
+                              onChange={onChangeInputProduto}
+                              readOnly={readOnlyProduto}
+                            
+                            />
+                          )}
+
+                        </div>
+                        
+                        <div className="col-sm-6 col-md-4 col-xl-4">
 
                           {InputGrupoEstrutura && (
                             <InputGrupoEstrutura 
@@ -651,20 +666,6 @@ export const ActionMainPromocao = ({
 
                         </div>
                         
-                        <div className="col-sm-6 col-md-4 col-xl-4">
-                          {InputProduto && (
-                            <InputProduto
-                              label={labelInputProduto}
-                              // type="radio"
-                              className="form-check-input"
-                              checked={valueInputProduto}
-                              onChange={onChangeInputProduto}
-                              readOnly={readOnlyProduto}
-                            
-                            />
-                          )}
-
-                        </div>
                     </div>
                   </div>
                   <div style={styleEstrutura}>

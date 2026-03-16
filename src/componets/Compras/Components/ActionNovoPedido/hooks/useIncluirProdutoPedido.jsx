@@ -282,6 +282,7 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
     const retornoDadosDoFonecedoNoPedido = async (dadosFornecedor) => {
         try {
             const dados = dadosFornecedor?.data?.[0] || dadosFornecedor?.[0];
+
             const NUCNPJ = dados?.CNPJFORN;
           
             if (!dados) return;
@@ -622,9 +623,9 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
         
             })
         
-            if (confirmacao?.dismiss == 'close' || !confirmacao.isConfirmed) {
-                return;
-            }
+            // if (confirmacao?.dismiss == 'close' || !confirmacao.isConfirmed) {
+            //     return;
+            // }
 
             if(confirmacao.isConfirmed) {
                 setChecked(true);
@@ -633,15 +634,16 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
                 setChecked(false);
                 stPedidoPorIntermediario = 'False';
             }
+            console.log(confirmacao.isConfirmed, 'confirmacao.isConfirmed')
         }
     
-        Swal.fire({
-            title: 'Carregando dados, aguarde...',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
+        // Swal.fire({
+        //     title: 'Carregando dados, aguarde...',
+        //     allowOutsideClick: false,
+        //     didOpen: () => {
+        //         Swal.showLoading();
+        //     }
+        // });
 
         
         const data = {
@@ -681,7 +683,7 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
             let response;
             let idResumoPedidoAtual;
             if(idResumoAtual == 0)  {
-                response =  await post('/lista-pedidos', data);
+                response =  await post('/pedido', data);
                 
                 if(response.data && response.data.length > 0) {
                     idResumoPedidoAtual = response.data[0].IDRESUMOPEDIDO;
@@ -690,7 +692,7 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
                     setDadosCabecalhoClonado(dadosPedidos?.data)
                 }
             } else {
-                response =  await put('/lista-pedidos', data);
+                response =  await put('/atualizar-pedido/:id', data);
                 idResumoPedidoAtual = idResumoAtual;
             }
 
@@ -1052,6 +1054,9 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
         clonarCabecalho,
         handleIncluir,
         handleSalvarPedido,
+        refetchListaDetalhePedidos,
+        refetchListaCadastroProdutoPedidos,
+        refetchListaProdutoPedidos,
         dadosUltimosPedidos,
         dadosCabecalhoClonado
     }

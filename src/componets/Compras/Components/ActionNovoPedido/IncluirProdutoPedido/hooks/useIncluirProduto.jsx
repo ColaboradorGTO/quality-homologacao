@@ -2,25 +2,27 @@ import { useState } from "react";
 import { get } from "../../../../../../api/funcRequest";
 import { useQuery } from "react-query";
 import axios from "axios";
-
+import {optionsReposicao, optionsTipoCadastro} from "../../../../../../../parceiro.json"
+import { useEffect } from "react";
 
 export const useIncluirProduto = ({ 
     usuarioLogado, 
     optionsModulos,
-    fornecedorSelecionado,
     tipoPedidoSelecionado,
-    marcaSelecionada 
+    marcaSelecionada,
+    dadosUltimosPedidos 
 }) => {
     const [ipUsuario, setIpUsuario] = useState('');
     const [nomeMarca, setNomeMarca] = useState('')
     const [referenciaProduto, setReferenciaProduto] = useState('')
     const [produtoSelecionado, setProdutoSelecionado] = useState('')
     const [reposicaoSelecionado, setReposicaoSelecionado] = useState('')
+    const [tipoCadastroSelecionado, setTipoCadastroSelecionado] = useState('')
     const [descricaoProduto, setDescricaoProduto] = useState('')
-    const [vrCusto, setVrCusto] = useState('')
-    const [vrVenda, setVrVenda] = useState('')
-    const [quantidade, setQuantidade] = useState('')
-    const [quantidadeCaixa, setQuantidadeCaixa] = useState('')
+    const [vrCusto, setVrCusto] = useState(0)
+    const [vrVenda, setVrVenda] = useState(0)
+    const [quantidade, setQuantidade] = useState(0)
+    const [quantidadeCaixa, setQuantidadeCaixa] = useState(0)
     const [referencia, setReferencia] = useState('')
     const [fabricanteSelecionado, setFabricanteSelecionado] = useState('')
     const [unidadeSelecionada, setUnidadeSelecionada] = useState('')
@@ -33,18 +35,24 @@ export const useIncluirProduto = ({
     const [localExposicaoSelecionado, setLocalExposicaoSelecionado] = useState('')
     const [ecommerceSelecionado, setEcommerceSelecionado] = useState('')
     const [redeSocialSelecionada, setRedeSocialSelecionada] = useState('')
-    const [vrBruto, setVrBruto] = useState('')
-    const [percDescontoI, setPercDescontoI] = useState('')
-    const [percDescontoII, setPercDescontoII] = useState('')
-    const [percDescontoIII, setPercDescontoIII] = useState('')
-    const [vrLiquido, setVrLiquido] = useState('')
-    const [vrSugerido, setVrSugerido] = useState('')
+    const [vrBruto, setVrBruto] = useState(0)
+    const [percDescontoI, setPercDescontoI] = useState(0)
+    const [percDescontoII, setPercDescontoII] = useState(0)
+    const [percDescontoIII, setPercDescontoIII] = useState(0)
+    const [vrLiquido, setVrLiquido] = useState(0)
+    const [vrSugerido, setVrSugerido] = useState(0)
     const [vrSugerigoFixo, setVrSugerigoFixo] = useState('')
-    const [vrTotal, setVrTotal] = useState('')
+    const [vrTotal, setVrTotal] = useState(0)
     const [observacao, setObservacao] = useState('')
     const [idResumoPedido, setIdResumoPedido] = useState('')
     const [stPedidoPorIntermediario, setStPedidoPorIntermediario] = useState('')
-
+    const [fornecedorSelecionado, setFornecedorSelecionado] = useState('')
+    useEffect(() => {
+        if(dadosUltimosPedidos && dadosUltimosPedidos.length > 0) {
+            setFornecedorSelecionado(dadosUltimosPedidos[0]?.MODPEDIDO)
+        }
+    }, [])
+    console.log(dadosUltimosPedidos, 'dadosUltimosPedidos')
     const { data: dadosCores = [], error: errorCores, isLoading: isLoadingCores, refetch: refetchCores } = useQuery(
         'listaCores',
         async () => { const response = await get(`/listaCores`); return response.data },
@@ -83,24 +91,34 @@ export const useIncluirProduto = ({
 
     const { data: dadosFabricantePedido  = [], error: errorFabricantePedido, isLoading: isLoadingFabricantePedido, refetch: refetchFabricantePedido } = useQuery(
         'vincularFabricanteFornecedor',
-        async () => { const response = await get(`/vincularFabricanteFornecedor?idFornecedorPedido=${fornecedorSelecionado?.value}`);  return response.data},
-        { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+        async () => {
+            const response = await get(`/vincularFabricanteFornecedor?idFornecedorPedido=${fornecedorSelecionado?.value}`);  
+            return response.data
+        },
+        { enabled: true, staleTime: 60 * 60 * 1000 }
     );
+    
     const { data: dadosLocalExposicao  = [], error: errorLocalExposicao, isLoading: isLoadingLocalExposicao, refetch: refetchLocalExposicao } = useQuery(
         'localExposicao',
         async () => { const response = await get(`/localExposicao`);  return response.data},
         { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
     );
+
     const { data: dadosGrade  = [], error: errorGrade, isLoading: isLoadingGrade, refetch: refetchGrade } = useQuery(
         'vinculo-tamanho-categoria',
-        async () => { const response = await get(`/vinculo-tamanho-categoria`);  return response.data},
-        { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+        async () => { const response = await get(`/vinculo-tamanho-categoria?idCategoriaPedido=${categoriaSelecionada?.value}`);  
+            return response.data
+        },
+        { enabled: true, staleTime: 60 * 60 * 1000 }
     );
 
     const { data: dadosProdutosPedidos  = [], error: errorProdutosPedidos, isLoading: isLoadingProdutosPedidos, refetch: refetchProdutosPedidos } = useQuery(
         'produtos-pedido',
-        async () => { const response = await get(`/produtos-pedido?referenciaProduto=${referenciaProduto}&fornecedorPedido=`);  return response.data},
-        { enabled: referenciaProduto.length > 4, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+        async () => { 
+            const response = await get(`/produtos-pedido?referenciaProduto=${referenciaProduto}`);  
+            return response.data
+        },
+        { enabled: referenciaProduto.length > 4, staleTime: 60 * 60 * 1000}
     );
 
     const getIPUsuario = async () => {
@@ -125,15 +143,6 @@ export const useIncluirProduto = ({
         return usuarioIP;
     };
 
-    const optionsStatus = [
-        { value: 'True', label: 'ATIVO' },
-        { value: 'False', label: 'INATIVO' }
-    ]
-    
-    const optionsReposicao = [
-        { value: 'True', label: 'SIM' },
-        { value: 'False', label: 'NÃO' }
-    ]
 
     // Função utilitária para formatar números
     const formatarNumero = (valor, decimais = 2) => {
@@ -257,6 +266,8 @@ export const useIncluirProduto = ({
         setProdutoSelecionado,
         reposicaoSelecionado,
         setReposicaoSelecionado,
+        tipoCadastroSelecionado, 
+        setTipoCadastroSelecionado,
         descricaoProduto,
         setDescricaoProduto,
         vrCusto,
@@ -317,7 +328,7 @@ export const useIncluirProduto = ({
         dadosLocalExposicao,
         dadosGrade,
         dadosProdutosPedidos,
-        optionsStatus,
+        optionsTipoCadastro,
         optionsReposicao,
         atualiza_valor_QtdUnit,
         vrSugerigoFixo,
