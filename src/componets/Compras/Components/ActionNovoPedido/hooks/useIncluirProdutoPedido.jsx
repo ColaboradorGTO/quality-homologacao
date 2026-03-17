@@ -88,8 +88,8 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
     const { data: dadosComprador = [], error: errorComprador, isLoading: isLoadingComprador, refetch: refetchComprador } = useQuery(
         'compradores',
         async () => {
-        const response = await get(`/compradores`);
-        return response.data;
+            const response = await get(`/compradores`);
+            return response.data;
         },
         { staleTime: 60 * 60 * 1000, enabled: true, cacheTime: 60 * 60 * 1000 }
     );
@@ -97,8 +97,8 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
     const { data: dadosMarcas = [], error: errorMarcas, isLoading: isLoadingMarcas, refetch: refetchMarcas } = useQuery(
         'marcasLista',
         async () => {
-        const response = await get(`/marcasLista`);
-        return response.data;
+            const response = await get(`/marcasLista`);
+            return response.data;
         },
         { staleTime: 60 * 60 * 1000, enabled: true, cacheTime: 60 * 60 * 1000 }
     );
@@ -106,8 +106,8 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
     const { data: dadosPagamentos = [], error: errorPagamentos, isLoading: isLoadingPagamentos, refetch: refetchPagamentos } = useQuery(
         'condicaoPagamento',
         async () => {
-        const response = await get(`/condicaoPagamento`);
-        return response.data;
+            const response = await get(`/condicaoPagamento`);
+            return response.data;
         },
         { staleTime: 60 * 60 * 1000, enabled: true, cacheTime: 60 * 60 * 1000 }
     );
@@ -115,8 +115,8 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
     const { data: dadosTransportador = [], error: errorTransportador, isLoading: isLoadingTransportador, refetch: refetchTransportador } = useQuery(
         'listaTransportador',
         async () => {
-        const response = await get(`/listaTransportador`);
-        return response.data;
+            const response = await get(`/listaTransportador`);
+            return response.data;
         },
         { staleTime: 60 * 60 * 1000, enabled: true, cacheTime: 60 * 60 * 1000 }
     );
@@ -124,8 +124,8 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
     const { data: dadosDetalhe = [], error: errorDetalhes, isLoading: isLoadingDetalhes, refetch: refetchListaProdutoPedidos } = useQuery(
         'lista-detalhe-pedidos',
         async () => {
-        const response = await get(`/lista-detalhe-pedidos?idPedido=${dadosVisualizarPedido[0]?.IDPEDIDO}`);
-        return response.data;
+            const response = await get(`/lista-detalhe-pedidos?idPedido=${dadosVisualizarPedido[0]?.IDPEDIDO}`);
+            return response.data;
         },
         { staleTime: 5 * 60 * 1000, enabled: false }
     );
@@ -133,8 +133,8 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
     const { data: dadosDetalhesPedidos = [], error: errorDetalhePedido, isLoading: isLoadingDetalhePedido, refetch: refetchListaDetalhePedidos } = useQuery(
         'lista-detalhe-pedidos',
         async () => {
-        const response = await get(`/lista-detalhe-pedidos?idPedido=${dadosVisualizarPedido[0]?.IDPEDIDO}&stTransformado=False`);
-        return response.data;
+            const response = await get(`/lista-detalhe-pedidos?idPedido=${dadosVisualizarPedido[0]?.IDPEDIDO}&stTransformado=False`);
+            return response.data;
         },
         { staleTime: 5 * 60 * 1000, enabled: false }
     );
@@ -143,12 +143,12 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
     const { data: dadosProdutosPedidos = [], error: errorProdutosPedido, isLoading: isLoadingProdutosPedidos, refetch: refetchListaCadastroProdutoPedidos } = useQuery(
         'cadastrar-produto-Pedido',
         async () => {
-        const response = await get(`/cadastrar-produto-Pedido?idResumoPedido=${dadosVisualizarPedido[0]?.IDPEDIDO}`);
-        return response.data;
+            const response = await get(`/cadastrar-produto-Pedido?idResumoPedido=${dadosVisualizarPedido[0]?.IDPEDIDO}`);
+            return response.data;
         },
         { staleTime: 5 * 60 * 1000, enabled: false }
     );
-    // console.log(fornecedorExiste, 'fornecedorExiste fora')
+    
     const verificaDadosDoFornecedorSelecionado = async (stCarregarDados = true) => {
         try {
             const fornecedor = dadosFornecedores.find(f => f.IDFORNECEDOR == fornecedorSelecionado.value);
@@ -172,7 +172,7 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
             }
 
             if (msgPendencias.length > 0) {
-                console.log(msgPendencias, 'msgPendencias')
+                
                 await exibirPendenciasFornecedor(msgPendencias);
                 
                 // Definir as pendências no estado com índices para serem exibidas no componente
@@ -282,11 +282,12 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
     const retornoDadosDoFonecedoNoPedido = async (dadosFornecedor) => {
         try {
             const dados = dadosFornecedor?.data?.[0] || dadosFornecedor?.[0];
-
+            
             const NUCNPJ = dados?.CNPJFORN;
           
             if (!dados) return;
             // Preencher os estados com os dados recebidos
+            setIdResumoPedido(dados?.IDRESUMOPEDIDO || '');
             setIdAndamento(dados?.IDANDAMENTO || '');
             setDataPesquisaInicio(dados?.DTPEDIDOFORMATADA || '');
             setDataPesquisaFim(dados?.DTPREVENTREGAFORMATADA || '');
@@ -588,7 +589,7 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
         let idResumoPedidoPrimario = 1 || 0;
         let stPedidoPorIntermediario = checked ? 'True' : 'False';
         let stPedidoPrimario = 'False';
-    
+       console.log(idResumoPedido, 'idResumoPedido')
         if(!marcaSelecionada || marcaSelecionada == '') {
           Swal.fire({
             icon: "warning",
@@ -634,36 +635,36 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
                 setChecked(false);
                 stPedidoPorIntermediario = 'False';
             }
-            console.log(confirmacao.isConfirmed, 'confirmacao.isConfirmed')
+           
         }
     
-        // Swal.fire({
-        //     title: 'Carregando dados, aguarde...',
-        //     allowOutsideClick: false,
-        //     didOpen: () => {
-        //         Swal.showLoading();
-        //     }
-        // });
+        Swal.fire({
+            title: 'Carregando dados, aguarde...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
 
         
         const data = {
             IDRESUMOPEDIDO: idResumoAtual,
-            IDGRUPOEMPRESARIAL: marcaSelecionada?.value,
-            IDSUBGRUPOEMPRESARIAL: marcaSelecionada?.value,
-            IDCOMPRADOR: compradorSelecionado?.value,
-            IDCONDICAOPAGAMENTO: condicoesPagamentosSelecionado?.value,
+            IDGRUPOEMPRESARIAL: parseFloat(marcaSelecionada?.value),
+            IDSUBGRUPOEMPRESARIAL: parseFloat(marcaSelecionada?.value),
+            IDCOMPRADOR: parseFloat(compradorSelecionado?.value),
+            IDCONDICAOPAGAMENTO: parseFloat(condicoesPagamentosSelecionado?.value),
             IDFORNECEDOR: fornecedorSelecionado?.value,
-            IDTRANSPORTADORA: transportadoraSelecionada?.value,
-            IDANDAMENTO: idAndamento,
+            IDTRANSPORTADORA: parseFloat(transportadoraSelecionada?.value),
+            IDANDAMENTO: parseFloat(idAndamento),
             MODPEDIDO: tipoPedidoSelecionado?.value,
             NOVENDEDOR: vendedor,
             EEMAILVENDEDOR: emailVendedor,
             DTPEDIDO: dataPedido,
             DTPREVENTREGA: dataPrevisaoEntrega,
             TPFRETE: freteSelecionado?.value,
-            DESCPERC01: desconto1,
-            DESCPERC02: desconto2,
-            DESCPERC03: desconto3,
+            DESCPERC01: parseFloat(desconto1 || 0),
+            DESCPERC02: parseFloat(desconto2 || 0),
+            DESCPERC03: parseFloat(desconto3 || 0),
             PERCCOMISSAO: comissao,
             VRTOTALLIQUIDO: totalLiq,
             OBSPEDIDO: obsInterna,
@@ -681,13 +682,14 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
 
         try {
             let response;
-            let idResumoPedidoAtual;
+            let idResumoPedidoAtual = idResumoAtual || 0;
+
             if(idResumoAtual == 0)  {
                 response =  await post('/pedido', data);
-                
-                if(response.data && response.data.length > 0) {
-                    idResumoPedidoAtual = response.data[0].IDRESUMOPEDIDO;
-                   
+              
+                if(response && response.length > 0) {
+                    idResumoPedidoAtual = response[0]?.IDRESUMOPEDIDO;             
+               
                     const dadosPedidos = await get(`/lista-pedidos?idPedido=${idResumoPedidoAtual}`);
                     setDadosCabecalhoClonado(dadosPedidos?.data)
                 }
@@ -706,6 +708,7 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
                 DADOS: textDados,
                 IP: ipUsuario || 'Indisponível'
             }
+    
             const ultimoPedidoResponse = await get(`/ultimo-pedido?idcomprador=${idCompradorPedidoAtual}&idPedido=${idResumoPedidoAtual}`);
             setDadosUltimosPedidos(ultimoPedidoResponse.data)
             setModalIncluirProdutoPedido(true);
@@ -869,25 +872,25 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
 
         
         const data = {
-             IDRESUMOPEDIDO: idResumoAtual,
-            IDGRUPOEMPRESARIAL: marcaSelecionada?.value,
-            IDSUBGRUPOEMPRESARIAL: marcaSelecionada?.value,
-            IDCOMPRADOR: compradorSelecionado?.value,
-            IDCONDICAOPAGAMENTO: condicoesPagamentosSelecionado?.value,
-            IDFORNECEDOR: fornecedorSelecionado?.value,
-            IDTRANSPORTADORA: transportadoraSelecionada?.value,
-            IDANDAMENTO: idAndamento,
+            IDRESUMOPEDIDO: idResumoAtual,
+            IDGRUPOEMPRESARIAL: parseFloat(marcaSelecionada?.value),
+            IDSUBGRUPOEMPRESARIAL: parseFloat(marcaSelecionada?.value),
+            IDCOMPRADOR: parseFloat(compradorSelecionado?.value),
+            IDCONDICAOPAGAMENTO: parseFloat(condicoesPagamentosSelecionado?.value),
+            IDFORNECEDOR: parseFloat(fornecedorSelecionado?.value),
+            IDTRANSPORTADORA: parseFloat(transportadoraSelecionada?.value),
+            IDANDAMENTO: parseFloat(idAndamento),
             MODPEDIDO: tipoPedidoSelecionado?.value,
             NOVENDEDOR: vendedor,
             EEMAILVENDEDOR: emailVendedor,
             DTPEDIDO: dataPedido,
             DTPREVENTREGA: dataPrevisaoEntrega,
             TPFRETE: freteSelecionado?.value,
-            DESCPERC01: desconto1,
-            DESCPERC02: desconto2,
-            DESCPERC03: desconto3,
-            PERCCOMISSAO: comissao,
-            VRTOTALLIQUIDO: totalLiq,
+            DESCPERC01: parseFloat(desconto1),
+            DESCPERC02: parseFloat(desconto2),
+            DESCPERC03: parseFloat(desconto3),
+            PERCCOMISSAO: parseFloat(comissao),
+            VRTOTALLIQUIDO: parseFloat(totalLiq),
             OBSPEDIDO: obsInterna,
             OBSPEDIDO2: obsFornecedor,
             DTFECHAMENTOPEDIDO: dataAtual,
