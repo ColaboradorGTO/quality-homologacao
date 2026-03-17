@@ -11,15 +11,16 @@ export const ActionNotaPDFSemPreco = ({ dadosPedidoSemPreco, dadosDetalhePedido 
         section: { marginBottom: 10 },
         title: { fontSize: 18, marginBottom: 10 },
     });
-
-
+    
+    
     const dados = dadosPedidoSemPreco.map((item, index) => {
         let dsTipoFretePedido = '';
         let dsTipoFiscalPedido = '';
         let dsTipoArquivoPedido = '';
         let dsTipoEnviar = '';
         let logoPedido = '';
-
+        
+        
         if (item.IDSUBGRUPOPEDIDO == 1) {
             logoPedido = '../img/tesoura.png'
         } else if (item.IDSUBGRUPOPEDIDO == 2) {
@@ -132,7 +133,6 @@ export const ActionNotaPDFSemPreco = ({ dadosPedidoSemPreco, dadosDetalhePedido 
         }
     })
 
-
     return (
         <Fragment>
             <div style={styles.page}>
@@ -163,7 +163,7 @@ export const ActionNotaPDFSemPreco = ({ dadosPedidoSemPreco, dadosDetalhePedido 
                 <table width="100%" className="bordasimples">
                     <tbody>
                         <tr>
-                            <td rowspan="2" width="400" style={{ fontSize: '0.563rem' }}>
+                            <td rowspan="2" width="400" style={{ fontSize: '10px', fontWeight: 400, color: '#666' }}>
                                 Calçados: andre.compras@grupotesouradeouro.com.br - (61) 99697-2844 <br />
                                 Faturamento: {dados[0]?.EEMAILFATURAMENTO} - {dados[0]?.NUTELFATURAMENTO}<br />
                                 Cobrança: {dados[0]?.EEMAILCOBRANCA} - {dados[0]?.NUTELCOBRANCA}<br />
@@ -294,7 +294,7 @@ export const ActionNotaPDFSemPreco = ({ dadosPedidoSemPreco, dadosDetalhePedido 
                     </tbody>
                 </table>
 
-                <ActionListaDetalheSempreco dadosDetalhePedido={dadosDetalhePedido} />
+                {/* <ActionListaDetalheSempreco dadosDetalhePedido={dadosDetalhePedido} /> */}
             </div>
         </Fragment>
     )

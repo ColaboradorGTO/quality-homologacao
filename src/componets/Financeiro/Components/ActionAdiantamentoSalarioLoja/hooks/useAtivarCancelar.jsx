@@ -64,7 +64,7 @@ export const useAtivarCancelar = ({ usuarioLogado, handleClick, status }) => {
                         IDFUNCIONARIO: String(usuarioLogado.id),
                         PATHFUNCAO: textoFuncao,
                         DADOS: textDados,
-                        IP: ipUsuario || 'IP não disponível'
+                        IP: ipUsuario || 'Indisponível'
                     }
                     
                     await post('/log-web', postData)
@@ -89,7 +89,7 @@ export const useAtivarCancelar = ({ usuarioLogado, handleClick, status }) => {
                         IDFUNCIONARIO: String(usuarioLogado.id),
                         PATHFUNCAO: textoFuncao,
                         DADOS: textDados,
-                        IP: ipUsuario || 'IP não disponível'
+                        IP: ipUsuario || 'Indisponível'
                     }
  
                     const responsePost = await post('/log-web', postData)

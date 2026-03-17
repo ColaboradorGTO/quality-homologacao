@@ -1,9 +1,9 @@
-import { Fragment, useEffect, useState } from "react"
+import { Fragment } from "react"
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { GrDocumentPdf } from "react-icons/gr";
 import { formatMoeda } from "../../../../utils/formatMoeda";
 import { ButtonSearch } from "../../../Buttons/ButtonSearch";
+import { toFloat } from "../../../../utils/toFloat";
 
 
 export const ActionPDFPedidoDetalhado = ({ dadosPedidosDetalhados }) => {
@@ -31,19 +31,35 @@ export const ActionPDFPedidoDetalhado = ({ dadosPedidosDetalhados }) => {
   })
 
   const calcularTotalContador = () => {
-    let total = 0;
-    for (let dados of dadosListaPedidosResumidos) {
-      total += parseFloat(dados.contador);
-    }
-    //  console.log(total, 'contador')
-    return total;
+    return dadosListaPedidosResumidos.length;
   }
-  const calcularTotalPedido = () => {
-    let total = 0;
-    for (let dados of dadosListaPedidosResumidos) {
-      total += parseFloat(dados.VRTOTALLIQUIDO);
-    }
-    return total;
+  const calcularTotalProduto = () => {
+    return dadosListaPedidosResumidos.reduce((total, dados) => {
+      return total + parseFloat(dados.QTDPRODTOTAL);
+    }, 0);
+  }
+  const calcularTotalCompra = () => {
+    return dadosListaPedidosResumidos.reduce((total, dados) => {
+      return total + parseFloat(dados.VRTOTALCUSTO);
+    }, 0);
+  }
+  const calcularTotalVenda = () => {
+    return dadosListaPedidosResumidos.reduce((total, dados) => {
+      return total + parseFloat(dados.VRTOTALVENDA);
+    }, 0);
+  }
+
+  const calcularTotalLucro = () => {
+    return dadosListaPedidosResumidos.reduce((total, dados) => {
+      return total + parseFloat(dados.VRTOTALLUCRO);
+    }, 0);
+  }
+  
+  const calcularTotalPercentualLucro = () => {
+    const totalVenda = calcularTotalVenda();
+    const totalCompra = calcularTotalCompra();
+    
+    return ((totalVenda * 100) / totalCompra) - 100;
   }
 
   
@@ -152,7 +168,7 @@ export const ActionPDFPedidoDetalhado = ({ dadosPedidosDetalhados }) => {
           
           <h2>RELAÇÃO DE PEDIDOS DETALHADOS</h2>
       </div>
-      <div className="card">
+      <div className="">
         <DataTable
           title="Vendas por Loja"
           value={dadosListaPedidosResumidos}
@@ -184,16 +200,39 @@ export const ActionPDFPedidoDetalhado = ({ dadosPedidosDetalhados }) => {
             />
           ))}
         </DataTable>
+        <div className="mt-6">
 
-        <div>
-          {dadosListaPedidosResumidos && dadosListaPedidosResumidos.length > 0 && (
+          <table className="semborda">
+            <tr>
+              {dadosListaPedidosResumidos && dadosListaPedidosResumidos.length > 0 && (
+                <>
+                  <th style={{ textAlign: 'left', fontSize: '14px' }}>Quantidade de Pedidos: </th>
+                  <th style={{ textAlign: 'right', fontSize: '14px' }}> <b>{calcularTotalContador()}</b> </th>
+                </>
+              )}
+            </tr>
+            <tr>
+              <th style={{ textAlign: 'left', fontSize: '14px' }}>QTD Produtos: </th>
+              <th style={{ textAlign: 'right', fontSize: '14px' }}><b>{calcularTotalProduto()}</b></th>
+            </tr>
+            <tr>
+              <th style={{ textAlign: 'left', fontSize: '14px' }}>Valor Total Compra:</th>
+              <th style={{ textAlign: 'right', fontSize: '14px' }}><b>{formatMoeda(calcularTotalCompra())}</b></th>
+            </tr>
+            <tr>
+              <th style={{ textAlign: 'left', fontSize: '14px' }}>Valor Total Venda:</th>
+              <th style={{ textAlign: 'right', fontSize: '14px' }}><b>{formatMoeda(calcularTotalVenda())}</b></th>
+            </tr>
+            <tr>
+              <th style={{ textAlign: 'left', fontSize: '14px' }}>Valor Total Lucro:</th>
+              <th style={{ textAlign: 'right', fontSize: '14px' }}><b>{formatMoeda(calcularTotalLucro())}</b></th>
+            </tr>
+            <tr>
+              <th style={{ textAlign: 'left', fontSize: '14px' }}>% Total Lucro:</th>
+              <th style={{ textAlign: 'right', fontSize: '14px' }}><b>{calcularTotalPercentualLucro().toFixed(2)}</b></th>
+            </tr>
 
-            <p>Quantidade de Pedidos: <b>{calcularTotalContador()}</b></p>
-          )}
-        </div>
-        <div>
-          <p>Total de Pedidos: <b>{formatMoeda(calcularTotalPedido())}</b></p>
-
+          </table>
         </div>
       </div>
 
