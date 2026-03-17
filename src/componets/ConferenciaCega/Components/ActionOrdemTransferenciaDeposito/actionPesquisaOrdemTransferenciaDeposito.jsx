@@ -165,7 +165,8 @@ export const ActionPesquisaOrdemTransferenciaDeposito = () => {
 
 
       {tabelaVisivel && (
-        <ActionListaOrdemTransferencia dadosConferencia={dadosConferencia} />
+        <ActionListaOrdemTransferencia
+         dadosConferencia={dadosConferencia} />
       )}
 
       <ActionIncluirOTModal

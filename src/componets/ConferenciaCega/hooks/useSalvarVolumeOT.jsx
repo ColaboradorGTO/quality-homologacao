@@ -5,7 +5,7 @@ import { getDataAtual } from "../../../utils/dataAtual";
 import { post, put } from "../../../api/funcRequest";
 import axios from "axios";
 
-export const useSalvarVolumeOT = (dadosSalvarVolume) => {
+export const useSalvarVolumeOT = ({ dadosSalvarVolume }) => {
   const [descricao, setDescricao] = useState('')
   const [qtdVolume, setQtdVolume] = useState('')
   const [conferirItens, setConferirItens] = useState('')
@@ -52,28 +52,28 @@ export const useSalvarVolumeOT = (dadosSalvarVolume) => {
 
 
   const onSalvarVolume = async () => {
-    if(qtdVolume === '' || qtdVolume <= 0) {
+    if (qtdVolume === '' || qtdVolume <= 0) {
       Swal.fire({
-          icon: 'error',
-          title:'Erro!',
-          text: 'Necessário preencher a Quantidade!',
-          customClass: {
-              container: 'custom-swal',
-          },
-          timer: 3000,
+        icon: 'error',
+        title: 'Erro!',
+        text: 'Necessário preencher a Quantidade!',
+        customClass: {
+          container: 'custom-swal',
+        },
+        timer: 3000,
       })
       return;
     }
 
-    if(descricao === '') {
+    if (descricao === '') {
       Swal.fire({
-          icon: 'error',
-          title:'Erro!',
-          text: 'Necessário preencher a Descrição!',
-          customClass: {
-              container: 'custom-swal',
-          },
-          timer: 3000,
+        icon: 'error',
+        title: 'Erro!',
+        text: 'Necessário preencher a Descrição!',
+        customClass: {
+          container: 'custom-swal',
+        },
+        timer: 3000,
       })
       return;
     }
@@ -86,7 +86,7 @@ export const useSalvarVolumeOT = (dadosSalvarVolume) => {
       TPVOLUME: descricao,
       NOTAFISCAL: parseInt(0),
     };
-    
+
     Swal.fire({
       icon: 'question',
       title: `Deseja Finalizar a OT?`,
@@ -104,8 +104,7 @@ export const useSalvarVolumeOT = (dadosSalvarVolume) => {
         try {
 
           const response = await put('/listaOrdemTransferenciaConferenciaCega/:id', putData);
-          
-          
+
           const textDados = JSON.stringify(putData);
           let textoFuncao = 'CONFERENCIA CEGA / FINALIZAR OT';
 
@@ -117,14 +116,14 @@ export const useSalvarVolumeOT = (dadosSalvarVolume) => {
           };
 
           const responsePost = await post('/log-web', createData)
-            
+
           Swal.fire({
             title: 'Sucesso!',
             text: 'OT Finalizada com sucesso.',
             icon: 'success'
           });
-          
-        
+
+
           return responsePost.data;
 
         } catch (error) {

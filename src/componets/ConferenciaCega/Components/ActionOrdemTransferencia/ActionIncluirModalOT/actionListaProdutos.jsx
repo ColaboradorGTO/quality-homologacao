@@ -1,15 +1,20 @@
-import { Fragment, useRef, useState } from "react"
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
-import { useReactToPrint } from "react-to-print";
-import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+import { jsPDF } from 'jspdf';
+import Swal from "sweetalert2";
+import { Column } from 'primereact/column';
+import { DataTable } from 'primereact/datatable';
+import { useReactToPrint } from "react-to-print";
+import { Fragment, useRef, useState } from "react";
 import HeaderTable from "../../../../Tables/headerTable";
 import { FaMinus, FaRegTrashAlt } from "react-icons/fa";
 import { ButtonTable } from "../../../../ButtonsTabela/ButtonTable";
 
-export const ActionListaProdutos = ({ dadosProdutos }) => {
+export const ActionListaProdutos = ({
+  dadosProdutosTabela,
+  setDadosProdutosTabela,
+}) => {
+
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [size] = useState('small')
   const dataTableRef = useRef();
@@ -49,7 +54,6 @@ export const ActionListaProdutos = ({ dadosProdutos }) => {
         item.DSNOME,
         item.PRECOVENDA,
         item.PRECOCUSTO,
-
       ]),
       horizontalPageBreak: true,
       horizontalPageBreakBehaviour: 'immediately'
@@ -57,7 +61,7 @@ export const ActionListaProdutos = ({ dadosProdutos }) => {
     doc.save('produtos_controle_transferencia.pdf');
   };
 
-  const dados = dadosProdutos.map((item, index) => {
+  const dados = dadosProdutosTabela.map((item, index) => {
     let contador = index + 1;
     return {
       IDPRODUTO: item.IDPRODUTO,
@@ -65,6 +69,7 @@ export const ActionListaProdutos = ({ dadosProdutos }) => {
       DSNOME: item.DSNOME,
       PRECOVENDA: item.PRECOVENDA,
       PRECOCUSTO: item.PRECOCUSTO,
+      QUANTIDADE: item.QUANTIDADE,
       contador
     }
   });
@@ -101,6 +106,12 @@ export const ActionListaProdutos = ({ dadosProdutos }) => {
       sortable: true,
     },
     {
+      field: 'QTD',
+      header: 'QTD',
+      body: row => <th>{row.QUANTIDADE}</th>,
+      sortable: true,
+    },
+    {
       field: 'NUCODBARRAS',
       header: 'Opções',
       body: (row) => {
@@ -109,26 +120,30 @@ export const ActionListaProdutos = ({ dadosProdutos }) => {
           <div
             style={{
               display: "flex",
-              justifyContent: "space-around",
               alignItems: "center",
-              width: "150px",
-
+              justifyContent: "center",
+              width: "80px",
+              gap: "15px",
             }}
           >
             <ButtonTable
               titleButton={"Diminuir Quantidade"}
-              onClickButton={() => handleClickDetalhar(row)}
+              onClickButton={() => handleRemoverProduto(row)}
               Icon={FaMinus}
               iconSize={16}
+              width="30px"
+              height="30px"
               iconColor={"#fff"}
               cor={"warning"}
               disabledBTN={[1, 2].indexOf(row.IDSTATUSOT) >= 0}
             />
             <ButtonTable
               titleButton={"Excluir Produto"}
-              onClickButton={() => handleClickDetalhar(row)}
+              onClickButton={() => handleExcluirProduto(row)}
               Icon={FaRegTrashAlt}
               iconSize={16}
+              width="30px"
+              height="30px"
               iconColor={"#fff"}
               cor={"danger"}
               disabledBTN={row.IDSTATUSOT === 1}
@@ -138,6 +153,51 @@ export const ActionListaProdutos = ({ dadosProdutos }) => {
       }
     }
   ]
+
+  const handleExcluirProduto = (produto) => {
+    setDadosProdutosTabela(prev =>
+      prev.filter(item => item.IDPRODUTO !== produto.IDPRODUTO)
+    );
+  };
+
+  const handleRemoverProduto = (produto) => {
+    const itemAtual = dadosProdutosTabela.find(
+      item => item.IDPRODUTO === produto.IDPRODUTO
+    );
+
+    if (!itemAtual) return;
+
+    if (itemAtual.QUANTIDADE === 1) {
+      const modalElement = document.querySelector('.modal.show');
+
+      Swal.fire({
+        title: 'Atenção',
+        text: 'Essa ação irá excluir o produto da O.T. Deseja prosseguir?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Sim, remover',
+        cancelButtonText: 'Cancelar',
+        target: modalElement,
+        customClass: {
+          popup: 'custom-swal'
+        }
+      }).then(result => {
+        if (result.isConfirmed) {
+          setDadosProdutosTabela(prev =>
+            prev.filter(item => item.IDPRODUTO !== produto.IDPRODUTO)
+          );
+        }
+      });
+      return;
+    }
+    setDadosProdutosTabela(prev =>
+      prev.map(item =>
+        item.IDPRODUTO === produto.IDPRODUTO
+          ? { ...item, QUANTIDADE: item.QUANTIDADE - 1 }
+          : item
+      )
+    );
+  };
 
   return (
     <Fragment>

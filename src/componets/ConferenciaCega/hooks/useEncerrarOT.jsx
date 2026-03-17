@@ -1,96 +1,143 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import Swal from "sweetalert2";
-import { post, put } from "../../../api/funcRequest";
 import axios from "axios";
+import Swal from "sweetalert2";
+import { useQuery } from "react-query";
+import { useState, useEffect } from "react";
+import { get, post, put } from "../../../api/funcRequest";
 
-export const useEncerrarOT = (dadosEncerrarOT) => {
+export const useEncerrarOT = ({
+  dadosEncerrarOT,
+  refetchListaConferencia,
+  optionsModulos,
+  usuarioLogado,
+  handleClose,
+
+}) => {
   const [observacao, setObservacao] = useState('')
   const [statusDivergencia, setStatusDivergencia] = useState('')
-  const [idResumoOT, setIdResumoOT] = useState(dadosEncerrarOT.dadosEncerrarOT.IDRESUMOOT)
-  const [usuarioLogado, setUsuarioLogado] = useState(null);
+  const [idResumoOT, setIdResumoOT] = useState(null)
   const [ipUsuario, setIpUsuario] = useState('');
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const usuarioArmazenado = localStorage.getItem('usuario');
-
-    if (usuarioArmazenado) {
-      try {
-        const parsedUsuario = JSON.parse(usuarioArmazenado);
-        setUsuarioLogado(parsedUsuario);
-      } catch (error) {
-        console.error('Erro ao parsear o usuário do localStorage:', error);
-      }
-    } else {
-      navigate('/');
-    }
-  }, [navigate]);
-
-  useEffect(() => {
-    getIPUsuario();
-  }, [usuarioLogado]);
 
   const getIPUsuario = async () => {
-    const response = await axios.get('http://ipwho.is/');
-    if (response.data) {
-      setIpUsuario(response.data.ip);
+    let usuarioIP = null;
+
+    try {
+      const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+      usuarioIP = ipWhoisData?.ip;
+    } catch (error) {
+      console.error("Erro ao buscar IP via ipwho.is:", error);
     }
-    return response.data;
+
+    if (!usuarioIP) {
+      try {
+        const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+        usuarioIP = ipifyData?.ip;
+      } catch (error) {
+        console.error("Erro ao buscar IP via ipify.org:", error);
+      }
+    }
+    setIpUsuario(usuarioIP);
+    return usuarioIP;
   };
 
-  const onSubmitEncerrar = async () => {
-    if(statusDivergencia === 0) {
+
+  const { data: dadosStatus = [], error: errorStatus, isLoading: isLoadingStatus } = useQuery(
+    'status-divergencia',
+    async () => {
+      const response = await get(`/status-divergencia`);
+      return response.data;
+    },
+
+    { staleTime: 5 * 60 * 1000 }
+  );
+
+  useEffect(() => {
+    setIdResumoOT(dadosEncerrarOT.IDRESUMOOT)
+  }, [dadosEncerrarOT])
+
+
+  const onSubmit = async () => {
+    if (optionsModulos[0]?.ALTERAR !== 'True') {
       Swal.fire({
+        icon: 'error',
         title: 'Atenção!',
-        type: 'warning',
-        text: 'Necessário preencher o Motivo!',
-        icon: 'warning'
+        text: 'Você não tem permissão para cancelar este arquivo.',
+        confirmButtonColor: '#7352A5',
       });
       return;
     }
 
-    if(statusDivergencia === 1 && observacao === '') {
-      Swal.fire({
-        title: 'Atenção!',
-        type: 'warning',
-        text: 'Necessário preencher a Observação!',
-        icon: 'warning'
-      });
-      return;
-    }
-    
-    const postData = {
-      IDSTDIVERGENCIA: statusDivergencia,
+    const putData = {
+      IDSTDIVERGENCIA: Number(statusDivergencia.value),
       OBSDIVERGENCIA: observacao,
       IDUSRAJUSTE: usuarioLogado.id,
       IDSTATUSOT: parseInt(8),
       IDRESUMOOT: parseInt(idResumoOT)
     };
-    const response = await put('/resumo-ordem-transferencia-cega/:id', postData);
+    try {
+      const response = await put('/resumo-ordem-transferencia-cega/:id', putData);
 
-    const textDados = JSON.stringify(postData);
-    let textoFuncao = 'CONFERNCIA CEGA / ENCERRAR OT';
+      const textDados = JSON.stringify(putData);
+      let textoFuncao = 'CONFERNCIA CEGA / SUCESSO AO ENCERRAR OT';
+      const ipUsuario = await getIPUsuario();
 
-    const createData = {
-      IDFUNCIONARIO: usuarioLogado.id,
-      PATHFUNCAO: textoFuncao,
-      DADOS: textDados,
-      IP: ipUsuario
-    };
+      const createData = {
+        IDFUNCIONARIO: String(usuarioLogado.id),
+        PATHFUNCAO: textoFuncao,
+        DADOS: textDados,
+        IP: ipUsuario || "INDISPONIVEL"
+      };
 
-    const responsePost = await post('/log-web', createData)
-    handleClose();
-    return responsePost.data;
+      await post('/log-web', createData)
+
+      Swal.fire({
+        title: 'Sucesso!',
+        text: 'OT encerrada com sucesso.',
+        icon: 'success',
+        customClass: {
+          container: 'custom-swal'
+        }
+      });
+
+      handleClose();
+      refetchListaConferencia()
+
+      return response.data;
+    }
+    catch (error) {
+      console.error('Erro ao encerrar OT:', error);
+
+      const textDados = JSON.stringify(putData);
+      let textoFuncao = 'CONFERENCIA CEGA/ERRO AO ENCERRAR OT';
+      const ipUsuario = await getIPUsuario();
+
+      const createData = {
+        IDFUNCIONARIO: String(usuarioLogado?.id),
+        PATHFUNCAO: textoFuncao,
+        DADOS: textDados,
+        IP: ipUsuario || "INDISPONÍVEL"
+      };
+
+      const responsePost = await post('/log-web', createData)
+
+      Swal.fire({
+        title: 'Erro!',
+        text: 'Erro ao encerrar produto.',
+        icon: 'error',
+        customClass: {
+          container: 'custom-swal'
+        }
+      });
+
+      return responsePost.data;
+    }
   };
 
   return {
     observacao,
     setObservacao,
-    usuarioLogado,
-    setUsuarioLogado,
     statusDivergencia,
     setStatusDivergencia,
-    onSubmitEncerrar
+    onSubmit,
+    dadosStatus
   };
 };

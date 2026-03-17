@@ -4,7 +4,12 @@ import Swal from "sweetalert2";
 import { post, put } from "../../../api/funcRequest";
 import axios from "axios";
 
-export const useInserirDivergencia = (dadosStatusDivergencia, handleClose) => {
+export const useInserirDivergencia = ({
+  dadosStatusDivergencia,
+  handleClose
+
+}) => {
+  
   const [descricao, setDescricao] = useState('')
   const [statusDivergencia, setStatusDivergencia] = useState('')
   const [descricaoSelecionada, setDescricaoSelecionada] = useState('')
@@ -41,36 +46,36 @@ export const useInserirDivergencia = (dadosStatusDivergencia, handleClose) => {
   };
 
   const onSubmitInserir = async () => {
-    if(statusDivergencia === '') {
+    if (statusDivergencia === '') {
       Swal.fire({
         title: 'Atenção!',
         type: 'warning',
         text: 'Necessário preencher o Motivo!',
         icon: 'warning',
         customClass: {
-            container: 'custom-swal', 
+          container: 'custom-swal',
         }
       });
       return;
     }
 
-    if(descricao === '') {
+    if (descricao === '') {
       Swal.fire({
         title: 'Atenção!',
         type: 'warning',
         text: 'Necessário preencher a Observação!',
         icon: 'warning',
         customClass: {
-            container: 'custom-swal', 
+          container: 'custom-swal',
         }
       });
       return;
     }
-    
+
     const postData = {
-        DESCRICAODIVERGENCIA: descricao,
-        IDUSRCRIACAO: usuarioLogado.id,
-        STATIVO: statusDivergencia
+      DESCRICAODIVERGENCIA: descricao,
+      IDUSRCRIACAO: usuarioLogado.id,
+      STATIVO: statusDivergencia
     };
     const response = await post('/inserir-status-divergencia', postData);
 
@@ -90,7 +95,7 @@ export const useInserirDivergencia = (dadosStatusDivergencia, handleClose) => {
       text: 'Divergência inserida com sucesso!',
       icon: 'success',
       customClass: {
-        container: 'custom-swal', 
+        container: 'custom-swal',
       }
     });
     handleClose();
@@ -98,45 +103,45 @@ export const useInserirDivergencia = (dadosStatusDivergencia, handleClose) => {
   };
 
   useEffect(() => {
-    if(dadosStatusDivergencia) {
+    if (dadosStatusDivergencia) {
       setDescricaoSelecionada(dadosStatusDivergencia?.DESCRICAODIVERGENCIA);
       setStatusSelecionado(dadosStatusDivergencia?.STATIVO);
     }
-  
+
   }, [dadosStatusDivergencia])
   const onSubmitAlterar = async () => {
-    if(statusSelecionado === '') {
+    if (statusSelecionado === '') {
       Swal.fire({
         title: 'Atenção!',
         type: 'warning',
         text: 'Necessário preencher o Motivo!',
         icon: 'warning',
         customClass: {
-            container: 'custom-swal', 
+          container: 'custom-swal',
         },
         timer: 3000,
       });
       return;
     }
 
-    if(descricaoSelecionada === '') {
+    if (descricaoSelecionada === '') {
       Swal.fire({
         title: 'Atenção!',
         type: 'warning',
         text: 'Necessário preencher a Observação!',
         icon: 'warning',
         customClass: {
-            container: 'custom-swal', 
+          container: 'custom-swal',
         },
         timer: 3000,
       });
       return;
     }
-    
+
     const postData = {
-        DESCRICAODIVERGENCIA: descricaoSelecionada,
-        IDUSRCRIACAO: usuarioLogado.id,
-        STATIVO: statusSelecionado
+      DESCRICAODIVERGENCIA: descricaoSelecionada,
+      IDUSRCRIACAO: usuarioLogado.id,
+      STATIVO: statusSelecionado
     };
     const response = await put('/status-divergencia/:id', postData);
 
@@ -156,7 +161,7 @@ export const useInserirDivergencia = (dadosStatusDivergencia, handleClose) => {
       text: 'Divergência alterada com sucesso!',
       icon: 'success',
       customClass: {
-        container: 'custom-swal', 
+        container: 'custom-swal',
       },
       timer: 3000,
     });

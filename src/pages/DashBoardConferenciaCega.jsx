@@ -60,16 +60,16 @@ export const DashBoardConferenciaCega = () => {
 
   switch (componentToShow) {
     case "/conferenciaCega/ActionPesquisaOrdemTransferencia":
-      component = <ActionPesquisaOrdemTransferencia />;
+      component = <ActionPesquisaOrdemTransferencia usuarioLogado={usuarioLogado} />;
       break;
     case "/conferenciaCega/ActionPesquisaFaturamentoOT":
-      component = <ActionPesquisaFaturamentoOT />
+      component = <ActionPesquisaFaturamentoOT usuarioLogado={usuarioLogado} />
       break;
     case "/conferenciaCega/ActionPesquisaStatusDivergencia":
-      component = <ActionPesquisaStatusDivergencia />
+      component = <ActionPesquisaStatusDivergencia usuarioLogado={usuarioLogado}/>
       break;
     case "/conferenciaCega/ActionPesquisaOrdemTransferenciaDeposito":
-      component = <ActionPesquisaOrdemTransferenciaDeposito />
+      component = <ActionPesquisaOrdemTransferenciaDeposito usuarioLogado={usuarioLogado} />
       break;
     default:
       break;
@@ -98,7 +98,7 @@ export const DashBoardConferenciaCega = () => {
                           <div className="panel-content">
                             <Suspense fallback={<div>Loading...</div>}>
                               {resumoVisivel && !componentToShow && (
-                                <ActionPesquisaOrdemTransferencia />
+                                <ActionPesquisaOrdemTransferencia  usuarioLogado={usuarioLogado}/>
                             
                               )}
                               {componentToShow && component}

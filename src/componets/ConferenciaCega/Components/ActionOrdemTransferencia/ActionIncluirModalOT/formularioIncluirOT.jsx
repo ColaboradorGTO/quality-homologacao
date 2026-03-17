@@ -1,123 +1,149 @@
-import { Fragment, useEffect } from "react"
-import { useQuery } from "react-query";
-import Swal from "sweetalert2";
-import { useSalvarOT } from "../../../hooks/useSalvarOT";
-import { useForm } from "react-hook-form";
-import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal";
-import { FaRegSave } from "react-icons/fa";
-import { InputFieldModal } from "../../../../Buttons/InputFieldModal";
+import { Fragment } from "react"
 import Select from 'react-select';
+import { FaRegSave } from "react-icons/fa";
+import { Controller, useForm } from "react-hook-form";
+import { useSalvarOT } from "../../../hooks/useSalvarOT";
+import FormField from "../../../../Formularios/FormField";
+import { AlertError } from "../../../../Inputs/alertError";
 import { ActionListaProdutos } from "./actionListaProdutos";
+import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal";
 
-export const FormularioIncuirOT = () => {
-    const { register, handleSubmit, errors } = useForm();
-    const {
-      empresaOrigem,
-      setEmpresaOrigem,
-      empresaDestino,
-      setEmpresaDestino,
-      produto,
-      setProduto,
-      onSubmit,
-    } = useSalvarOT();
+export const FormularioIncuirOT = ({
+  handleClose,
+  refetchListaConferencia,
+  optionsModulos,
+  usuarioLogado
 
-    const { data: dadosEmpresa = [], error: errorMarcas, isLoading: isLoadingMarcas } = useQuery(
-        'empresas',
-        async () => {
-          const response = await get(`/empresas`);
-          return response.data;
-        },
-        { staleTime: 5 * 60 * 1000 }
-      );
+}) => {
+  const { handleSubmit, formState: { errors }, clearErrors, control, setError } = useForm({
+    mode: "onChange"
+  });
 
-    const { data: dadosProdutos = [], error: errorCPF, isLoading: isLoadingCPF } = useQuery(
-        ['funcionarios-loja', produto],
-        async () => {
-          const response = await get(`/listaProdutos?idEmpresa=${empresaOrigem}&dsProduto=${produto} `);
-          return response.data;
-        },
-        { enabled: produto.length === 8, staleTime: 5 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
-      );
-    
-      useEffect(() => {
-        if (dadosProdutos && dadosProdutos.length > 0) {
-          Swal.fire({
-            title: 'Produto já cadastrado!',
-            icon: 'warning',
-            confirmButtonText: 'Ok',
-            customClass: {
-              container: 'custom-swal',
-            }
-          });
-        }
-      }, [dadosProdutos]);
-      
-    return (
-        <Fragment>
-            <form onSubmit={''}>
-              <div className="row" data-select2-id="736">
-                <div className="col-sm-6 col-xl-6">
-                  <label className="form-label" htmlFor={""}>Loja Origem</label>
-                  <Select
-                    closeMenuOnSelect={false}
-                    options={dadosEmpresa?.map((item) => ({
-                      value: item.IDEMPRESA,
-                      label: item.NOFANTASIA
-                    }
-                    ))}
-                    value={dadosEmpresa?.find(option => option.value === empresaOrigem)}
-                    onChange={(e) => setEmpresaOrigem(e.value)}
-                  />
-                </div>
-                <div className="col-sm-6 col-xl-6" data-select2-id="735">
-                  <label className="form-label" htmlFor={""}>Loja Destino</label>
-                  <Select
-                    closeMenuOnSelect={false}
-                    options={dadosEmpresa?.map((item) => ({
-                      value: item.IDEMPRESA,
-                      label: item.NOFANTASIA
-                    }
-                    ))}
-                    value={dadosEmpresa?.find(option => option.value === empresaDestino)}
-                    onChange={(e) => setEmpresaDestino(e.value)}
-                  />
-                </div>
-              </div>
+  const {
+    empresaOrigem,
+    setEmpresaOrigem,
+    empresaDestino,
+    setEmpresaDestino,
+    produto,
+    setProduto,
+    dadosEmpresa,
+    dadosProdutosTabela,
+    setDadosProdutosTabela,
+    produtoSalvo,
+    setProdutoSalvo,
+    onSubmit,
+
+  } = useSalvarOT({
+    handleClose,
+    refetchListaConferencia,
+    optionsModulos,
+    usuarioLogado
+  });
+
+  return (
+    <Fragment>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="row" data-select2-id="736">
+          <div className="col-sm-6 col-xl-6">
+            <label className="form-label" htmlFor={""}>Loja Origem</label>
+
+            <Select
+              label={"Loja Origem"}
+              options={dadosEmpresa.map((item) => ({
+                value: item.IDEMPRESA,
+                label: item.NOFANTASIA,
+              }))}
+
+              value={empresaOrigem}
+              onChange={(e) => setEmpresaOrigem(e)}
+            />
+
+            {errors.empresaDestino && (
+              <AlertError
+                error={errors.empresaDestino}
+                onClose={clearErrors}
+                fieldName="empresaDestino"
+              />
+            )}
+          </div>
+          <div className="col-sm-6 col-xl-6" data-select2-id="735">
+            <label className="form-label" htmlFor={""}>Loja Destino</label>
+
+            <Select
+              label={"Loja Destino"}
+              options={dadosEmpresa.map((item) => ({
+                value: item.IDEMPRESA,
+                label: item.NOFANTASIA,
+                isDisabled: item.IDEMPRESA === empresaOrigem.value
+
+              }))}
+
+              value={empresaDestino}
+              onChange={(e) => {
+                if (e?.value === empresaOrigem) return;
+                setEmpresaDestino(e);
+              }}
+
+            />
+            {errors.empresaDestino && (
+              <AlertError
+                error={errors.empresaDestino}
+                onClose={clearErrors}
+                fieldName="empresaDestino"
+              />
+            )}
+          </div>
+        </div>
 
 
-              <div className="row mt-4">
-                <div className="col-sm-6 col-xl-6">
-                  <InputFieldModal
-                    label={"Produto"}
-                    type="text"
-                    value={produto}
-                    onChangeModal={(e) => setProduto(e.target.value)}
-                    placeholder={"Digite o Produto"}
-                  />
-                </div>
-          
-              </div>
-              
+        <div className="row mt-4">
+          <div className="col-sm-6 col-xl-6">
 
-              <div className="row mt-4">
-                <div className="col-sm-8 col-xl-8">
+            <Controller
+              name="produtoIncluir"
+              control={control}
+              render={({ field }) => (
+                <FormField
+                  name="produtoIncluir"
+                  label={"Produto"}
+                  type="text"
+                  value={produto}
+                  onChange={(e) => setProduto(e.target.value)}
+                  errors={errors}
+                  clearErrors={clearErrors}
+                />
+              )}
+            />
+          </div>
+        </div>
 
-                  <ButtonTypeModal
-                    Icon={FaRegSave}
-                    textButton={"Salvar"}
-                    cor={"info"}
-                    className={"mr-4"}
-                    onClickButtonType={handleSubmit(onSubmit)}
+        <div className="row mt-4">
+          <div className="col-sm-8 col-xl-8">
 
-                  />
-                </div>
-                <div className="col-sm-8 col-xl-8 mt-4">
-                  <label className="form-label" style={{ color: "red" }}>Para confirmar as Alterações e Inclusões dos Produtos, favor clicar no botão Salvar!</label>
-                </div>
-              </div>
-            </form>
+            <ButtonTypeModal
+              Icon={FaRegSave}
+              textButton={"Salvar"}
+              cor={"info"}
+              className={"mr-4"}
+              tipoBtnCadastrar={"submit"}
 
-            <ActionListaProdutos dadosProdutos={dadosProdutos} />
-        </Fragment>
-    )
+            />
+
+          </div>
+          <div className="col-sm-8 col-xl-8 mt-4">
+            <label
+              className="form-label" style={{ color: "red" }}>Para confirmar as Alterações e Inclusões dos Produtos, favor clicar no botão Salvar!
+            </label>
+          </div>
+        </div>
+      </form>
+
+      <ActionListaProdutos
+        dadosProdutosTabela={dadosProdutosTabela}
+        setDadosProdutosTabela={setDadosProdutosTabela}
+        produtoSalvo={produtoSalvo}
+        setProdutoSalvo={setProdutoSalvo}
+      />
+    </Fragment>
+  )
 }
