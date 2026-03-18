@@ -978,6 +978,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
         STEMPRESAPROMO: "True",
         STDETPROMOORIGEM: "True",
         STDETPROMODESTINO: "True",
+        STDETPROMODESTINO: "True",
         IDGRUPOEMDESTINO: grupoSelecionadoDestino,
         IDSUBGRUPOEMDESTINO: subGrupoDestino,
         IDMARCAEMDESTINO: marcaDestino,

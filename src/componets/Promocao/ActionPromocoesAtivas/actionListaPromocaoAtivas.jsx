@@ -96,6 +96,7 @@ export const ActionListaPromocoesAtivas = ({
       STDETPROMOORIGEM: item.STDETPROMOORIGEM,
       STDETPROMODESTINO: item.STDETPROMODESTINO,
       STATIVO: item.STATIVO === 'True' ? 'ATIVO' : 'INATIVO',
+      STPRODUTO: item.STPRODUTO,
     }
   });
 

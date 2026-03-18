@@ -1,7 +1,7 @@
 import { Fragment } from "react";
 import { RadioButton } from "primereact/radiobutton";
 
-export const InputFieldActionCheckBox = ({ 
+export const InputFieldActionRadio = ({ 
   label, 
   type, 
   id, 
@@ -28,6 +28,7 @@ export const InputFieldActionCheckBox = ({
               value={value} 
               onChange={onChange} 
               checked={checked} 
+              disabled={readOnly}
             />
         </div>
       </div>

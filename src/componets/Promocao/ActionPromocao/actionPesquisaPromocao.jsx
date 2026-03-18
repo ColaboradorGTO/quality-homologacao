@@ -15,10 +15,9 @@ import { ActionProdutoModalPromocaoSelecionadoDestino } from "../ActionPromocoes
 import { ActionDocumentacaoAtualizar } from "../ActionPromocoesAtivas/ActionDocumentacao/documentacaoAtualizar";
 import { ActionProdutoModalPromocaoSelecionadoCSVOrigem } from "../ActionPromocoesAtivas/ActionProdutosDaPromocaoSelecionado/actionProdutoModalPromocaoSelecionadoCSVOrigem";
 import { ActionDocumentacaoCriar } from "../ActionPromocoesAtivas/ActionDocumentacao/documentacaoCriar";
-import { InputFieldActionCheckBox } from "../../Buttons/InputActionCheckBox";
-import { ButtonTypeModal } from "../../Buttons/ButtonTypeModal";
 import { MenuTreeSelect } from "../../Inputs/menuTreeSelect";
 import { useState } from "react";
+import { InputFieldActionRadio } from "../../Buttons/InputActionRadio";
 
 
 
@@ -249,37 +248,6 @@ export const ActionPesquisaPromocao = ({ }) => {
   const [treeData, setTreeData] = useState([]);
   const [selectedNodesOrigem, setSelectedNodesOrigem] = useState({});
   const [selectedNodesDestino, setSelectedNodesDestino] = useState({});
-
-  // useEffect(() => {
-  //   if (dadosGrupo.length) {
-  //     const gruposMap = new Map();
-
-  //     dadosGrupo.forEach(subgrupo => {
-  //       const grupoId = subgrupo.IDSUBGRUPOESTRUTURA;
-  //       const grupoDescricao = subgrupo.DSGRUPOESTRUTURA;
-
-  //       if (!gruposMap.has(grupoId)) {
-  //         gruposMap.set(grupoId, {
-  //           key: grupoId,
-  //           label: grupoDescricao,
-  //           children: [],
-  //         });
-  //       }
-
-  //       gruposMap.get(grupoId).children.push({
-  //         key: subgrupo.IDSUBGRUPOESTRUTURA,
-  //         label: subgrupo.DSSUBGRUPOESTRUTURA,
-  //       });
-  //     });
-  //     // Atualiza o estado de treeData
-  //     const formattedTreeData = Array.from(gruposMap.values());
-  //     setTreeData(formattedTreeData);
-
-  //     // Atualiza os grupos e subgrupos selecionados
-  //     setGrupoSelecionado(formattedTreeData.map(grupo => grupo.key));
-  //     setSubGrupoDestino(formattedTreeData.flatMap(grupo => grupo.children.map(child => child.key)));
-  //   }
-  // }, [dadosGrupo]);
 
   useEffect(() => {
   if (dadosSubGrupo.length) {
@@ -653,7 +621,7 @@ export const ActionPesquisaPromocao = ({ }) => {
         placeholderTreeSelectDestino={"Selecione"}
     
      
-        InputGrupoEstrutura={InputFieldActionCheckBox}
+        InputGrupoEstrutura={InputFieldActionRadio}
         labelInputGrupoEstrutura={"Estrutura Mercadológica"}
         valueInputGrupoEstrutura={isCheckedGrupo}
         onChangeInputGrupoEstrutura={(e) => {
@@ -665,7 +633,7 @@ export const ActionPesquisaPromocao = ({ }) => {
           }
         }}
       
-        InputProduto={InputFieldActionCheckBox}
+        InputProduto={InputFieldActionRadio}
         labelInputProduto={"Por Produtos"}
         valueInputProduto={isCheckedProduto}
         onChangeInputProduto={(e) => {

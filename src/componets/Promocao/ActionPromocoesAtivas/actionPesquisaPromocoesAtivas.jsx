@@ -219,6 +219,8 @@ export const ActionPesquisaPromocoesAtivas = ({ usuarioLogado }) => {
     { value: 'True', label: 'Ativa' },
     { value: 'False', label: 'Inativa' },
   ]
+
+  
   return (
 
       <Fragment>
