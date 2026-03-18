@@ -332,7 +332,7 @@ export const ActionPesquisaHome = ({ usuarioLogado }) => {
         </Fragment>
       )}
 
-      {/* preciso que ActionPDFPedidoResumido esteja visivel as outras não esteja visivel quando for clicado no button resumo relatorio */}
+      
       {actionPedidoResumido && (
         <ActionPDFPedidoResumido dadosPedidos={dadosPedidos} />
       )}

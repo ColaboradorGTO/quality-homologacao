@@ -260,7 +260,7 @@ export const ActionNotaPDF = ({ dadosPedido, dadosDetalhePedido }) => {
                     </tbody>
                 </table>
 
-                 <ActionListaDetalhe dadosDetalhePedido={dadosDetalhePedido} />
+                 {/* <ActionListaDetalhe dadosDetalhePedido={dadosDetalhePedido} /> */}
             </div>
         </Fragment>
     )

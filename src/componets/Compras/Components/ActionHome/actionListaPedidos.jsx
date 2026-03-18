@@ -657,7 +657,10 @@ export const ActionListaPedidos = ({
       const response = await get(`/lista-pedidos?idPedido=${IDPEDIDO}`)
       const responseDetlhe = await get(`/lista-detalhe-pedidos-grade?idPedido=${IDPEDIDO}`)
       if (response.data && responseDetlhe.data) {
-        setDadosPedidoSemPreco(response.data, stOutlet)
+        setDadosPedidoSemPreco({
+          ...response.data,
+          STOUTLET: stOutlet ? 'True' : 'False' 
+        })
         setDadosDetalhePedido(responseDetlhe.data)
         setModalPedidoNotaSemPreco(true)
       } else {

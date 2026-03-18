@@ -20,9 +20,11 @@ export const ActionPDFPedidoSemPreco = ({ show, handleClose, dadosPedidoSemPreco
       <Modal
         show={show}
         onHide={handleClose}
-        class="modal-content"
+        // className="modal-content"
         size="xl"
         centered
+        fullscreen={true}
+       
       >
 
         <HeaderModal
@@ -34,7 +36,7 @@ export const ActionPDFPedidoSemPreco = ({ show, handleClose, dadosPedidoSemPreco
 
         <Modal.Body>
 
-          <div ref={dataTableRef} style={{ marginTop: "1rem" }}>
+          <div ref={dataTableRef} style={{ marginTop: "1rem",}}>
 
             <ActionNotaPDFSemPreco dadosPedidoSemPreco={dadosPedidoSemPreco} dadosDetalhePedido={dadosDetalhePedido} />
            
