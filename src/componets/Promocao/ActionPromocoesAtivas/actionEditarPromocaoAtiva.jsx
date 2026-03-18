@@ -765,9 +765,9 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
         ButtonTypeProdutoPesquisadoDestino={ButtonType}
         linkNomeProdutoPesquisadoDestino={"Visualizar Produto Pesquisado Destino"}
         onButtonClickProdutoPesquisadoDestino={handlePesquisarProdutoDestino}
-
         corProdutoPesquisadoDestino={"secondary"}
         IconProdutoPesquisadoDestino={GrView}
+       
 
         InputFileProdutoDestino={InputFieldAction}
         labelInputFileProdutoDestino={"Produto Destino"}
@@ -812,6 +812,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
         }}
         corVisualizarProduto={"info"}
         IconVisualizarProduto={GrView}
+        readOnlyVisualizarProduto={isCheckedGrupo ? true : false}
 
         // ButtonTypePedido={ButtonType}
         // linkPedido={"Voltar para Pesquisa"}

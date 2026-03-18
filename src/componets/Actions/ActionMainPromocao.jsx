@@ -228,6 +228,8 @@ export const ActionMainPromocao = ({
   readOnlyStatus,
   readOnlyGrupoEstrutura,
   readOnlyProduto,
+  readOnlyButtonProdutoPesquisadoDestino,
+  readOnlyVisualizarProduto,
 
   defaultValueSelectCategoria,
   defaultValueSelectMarca,
@@ -820,6 +822,7 @@ export const ActionMainPromocao = ({
                             Icon={IconProdutoPesquisadoDestino}
                             iconColor="#fff"
                             iconSize={16}
+                            disabledBTN={readOnlyButtonProdutoPesquisadoDestino}
                           />
                         )}
 
@@ -869,6 +872,7 @@ export const ActionMainPromocao = ({
                         Icon={IconVisualizarProduto}
                         iconColor="#fff"
                         iconSize={25}
+                        disabledBTN={readOnlyVisualizarProduto}
                       />
                     )}
                   </div>
