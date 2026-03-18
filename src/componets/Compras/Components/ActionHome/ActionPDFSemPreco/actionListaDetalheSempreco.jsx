@@ -12,7 +12,8 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
 
   const dados = dadosDetalhePedido.map((item, index) => {
     let contador = index + 1;
-
+    let txtCxTec = item.detpedido?.DSTIPOTECIDO == 'CALCADOS' ? 'Caixas' : 'Tecido';
+    let DadosCxTecido = item.detpedido?.DSTIPOTECIDO == 'CALCADOS' ? item.detpedido?.NUCAIXA : item.detpedido?.DSTIPOTECIDO
     return {
       QTDTOTAL: item.detpedido?.QTDTOTAL,
       DSSIGLA: item.detpedido?.DSSIGLA,
@@ -32,9 +33,13 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
       DSCATEGORIAPEDIDO: item.detpedido?.DSCATEGORIAPEDIDO,
       DSSUBGRUPOESTRUTURA: item.detpedido?.DSSUBGRUPOESTRUTURA,
       DSGRUPOESTRUTURA: item.detpedido?.DSGRUPOESTRUTURA,
-
+      DSTIPOTECIDO: item.detpedido?.DSTIPOTECIDO,
+      NUCAIXA: item.detpedido?.NUCAIXA,
       DSTAMANHO: item.detalheGrade?.DSTAMANHO,
       INDICETAMANHO: item.detalheGrade?.INDICETAMANHO,
+
+      txtCxTec,
+      DadosCxTecido,
       contador
     }
   });
@@ -53,6 +58,9 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
     const total = calcularTotal('QTDTOTAL');
     return total;
   }
+
+  // Determinar o header baseado no primeiro item dos dados
+  const headerCxTecido = dados.length > 0 ? dados[0].txtCxTec : 'Caixa/Tecido';
 
   const colunasPedidos = [
 
@@ -88,6 +96,13 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
       sortable: true,
     },
     {
+      field: 'txtCxTec',
+      header: headerCxTecido,
+      body: row => <th>{row.DadosCxTecido}</th>,
+      footer: 'Total ',
+      sortable: true,
+    },
+    {
       field: 'DSCOR',
       header: 'Cor',
       body: row => <th>{row.DSCOR}</th>,
@@ -116,12 +131,6 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
        
         )
       },
-      sortable: true,
-    },
-    {
-      field: 'STREDESOCIAL',
-      header: 'Ecomm.',
-      body: row => <th > {row.STREDESOCIAL == 'True' ? 'SIM' : 'NÃO'}</th>,
       sortable: true,
     },
     {
@@ -158,7 +167,8 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
 
   const HeaderTemplate = (rowData) => {
     return (
-      <tr className="font-bold" style={{ fontWeight: 600, fontSize: '12px', color: 'blue', margin: '1px', padding: '0px' }}>
+      <tr className="font-bold" 
+        style={{ fontWeight: 600, fontSize: '12px', color: 'blue', margin: '1px', padding: '0px', }}>
         {rowData.DSSUBGRUPOESTRUTURA}
       </tr>
     );

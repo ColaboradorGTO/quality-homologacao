@@ -309,7 +309,8 @@ export const ActionNotaPDFSemPreco = ({ dadosPedidoSemPreco, dadosDetalhePedido 
                     </tbody>
                 </table>
 
-                {/* <ActionListaDetalheSempreco dadosDetalhePedido={dadosDetalhePedido} /> */}
+                <ActionListaDetalheSempreco dadosDetalhePedido={dadosDetalhePedido} />
+           
             </div>
         </Fragment>
     )

@@ -612,7 +612,7 @@ export const ActionListaPedidos = ({
   const handleImprimir = async (IDPEDIDO) => {
     try {
       const response = await get(`/lista-pedidos?idPedido=${IDPEDIDO}`)
-      const responseDetlhe = await get(`/lista-detalhe-pedidos-grade?idPedido=${IDPEDIDO}`)
+      const responseDetlhe = await get(`/listaDetalhePedidos?idPedido=${IDPEDIDO}`)
       if (response.data && responseDetlhe.data) {
         setDadosPedido(response.data)
         setDadosDetalhePedido(responseDetlhe.data)
@@ -655,7 +655,8 @@ export const ActionListaPedidos = ({
 
     try {
       const response = await get(`/lista-pedidos?idPedido=${IDPEDIDO}`)
-      const responseDetlhe = await get(`/lista-detalhe-pedidos-grade?idPedido=${IDPEDIDO}`)
+      // const responseDetlhe = await get(`/lista-detalhe-pedidos-grade?idPedido=${IDPEDIDO}`)
+      const responseDetlhe = await get(`/listaDetalhePedidos?idPedido=${IDPEDIDO}`)
       if (response.data && responseDetlhe.data) {
         setDadosPedidoSemPreco({
           ...response.data,
