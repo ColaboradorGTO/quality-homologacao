@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import { Checkbox } from "primereact/checkbox";
+import { RadioButton } from "primereact/radiobutton";
 
 export const InputFieldActionCheckBox = ({ 
   label, 
@@ -22,25 +22,13 @@ export const InputFieldActionCheckBox = ({
             <label className="form-check-label" htmlFor={id} style={{marginRight: '0.5rem', fontSize: '1rem', fontWeight: '700'}}>
               {label}
             </label>
-            <Checkbox 
+            <RadioButton 
               inputId={id} 
               name={nome} 
               value={value} 
               onChange={onChange} 
               checked={checked} 
-              />
-            {/* <input
-              className="form-check-input"
-              id={id}
-              type={type}
-              name={nome}
-              value={value}
-              readOnly={readOnly}
-              placeHolder={placeHolder}
-              onChange={onChange}
-              disabled={disabled}
-              style={style}
-              /> */}
+            />
         </div>
       </div>
     </Fragment>
