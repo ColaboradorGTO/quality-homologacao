@@ -96,6 +96,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
     setModalVisivel,
     handleSalvarMecanica,
     onSubmit,
+    optionsProdutosPromocoes,
     optionsEmpresasPromocoes,
     optionsStatus,
     mostrarProdutosPromocao,
@@ -134,7 +135,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
     mostrarProdutosSelecionadosDestino,
     refetchEmpresasPromocoes,
     refetchEmpresasPromocoess,
-    isCheckedGrupo, 
+    isCheckedGrupo,
     setIsCheckedGrupo,
     isCheckedProduto,
     setIsCheckedProduto,
@@ -320,7 +321,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
         isFixed: true
       }));
       setEmpresasSelecionadas(defaults);
-      
+
     } else {
       setEmpresasSelecionadas([]);
     }
@@ -339,107 +340,100 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
   const [selectedNodesDestino, setSelectedNodesDestino] = useState({});
 
   useEffect(() => {
-  if (dadosSubGrupo.length) {
-    // 1. Agrupar subgrupos por IDGRUPOESTRUTURA
+    if (!dadosSubGrupo?.length) return;
+
     const gruposMap = new Map();
-    
+
     dadosSubGrupo.forEach(subgrupo => {
-      const grupoId = subgrupo.IDGRUPOESTRUTURA; // ID do grupo (não do subgrupo)
-      const grupoDescricao = subgrupo.DSGRUPOESTRUTURA; // Nome do grupo
-      
-      // Se o grupo ainda não existe no Map, criar
+      const grupoId = subgrupo.IDGRUPOESTRUTURA;
+
       if (!gruposMap.has(grupoId)) {
         gruposMap.set(grupoId, {
-          key: `grupo_${grupoId}`, // Chave única para o grupo com prefixo
-          label: grupoDescricao,    // Nome do grupo
-          children: [],             // Array dos subgrupos
+          key: `grupo_${grupoId}`,
+          label: subgrupo.DSGRUPOESTRUTURA,
+          children: [],
         });
       }
-      
-      // Adicionar o subgrupo como filho do grupo
+
       gruposMap.get(grupoId).children.push({
-        key: `subgrupo_${subgrupo.IDSUBGRUPOESTRUTURA}`, // Chave do subgrupo com prefixo
-        label: subgrupo.DSSUBGRUPOESTRUTURA,              // Nome do subgrupo
-        data: subgrupo // Opcional: dados completos do subgrupo
+        key: `subgrupo_${subgrupo.IDSUBGRUPOESTRUTURA}`,
+        label: subgrupo.DSSUBGRUPOESTRUTURA,
+        data: subgrupo
       });
     });
-    
-    // 2. Converter o Map em array para o TreeSelect
-    const formattedTreeData = Array.from(gruposMap.values());
-    setTreeData(formattedTreeData);
-    
-  }
-}, [dadosSubGrupo]);
 
-  // UseEffect para inicializar seleções baseado nos dados existentes
-  useEffect(() => {
-    if (treeData.length && (grupoSelecionado.length || subGrupoDestino.length)) {
-      const initialSelection = {};
-      
-      // Marcar grupos selecionados
-      grupoSelecionado.forEach(grupoId => {
-        const chaveGrupo = `grupo_${grupoId}`;
-        initialSelection[chaveGrupo] = true;
+    setTreeData(Array.from(gruposMap.values()));
+
+  }, [dadosSubGrupo]);
+
+
+  const mapearIdsParaTree = (idsApi) => {
+    if (!idsApi?.length || !dadosSubGrupo?.length) return [];
+
+    return idsApi.map(idApi => {
+      const encontrado = dadosSubGrupo.find(item => {
+
+        return Number(item.IDSUBGRUPOESTRUTURA) === Number(idApi);
       });
-      
-      // Marcar subgrupos selecionados
-      subGrupoDestino.forEach(subgrupoId => {
-        const chaveSubgrupo = `subgrupo_${subgrupoId}`;
-        initialSelection[chaveSubgrupo] = true;
-      });
-      
-      setSelectedNodesOrigem(initialSelection);
-      setSelectedNodesDestino(initialSelection);
-      
-    }
-  }, [treeData]);
 
-  const handleTreeSelectOrigemChange = (e) => {
-    const selectedValue = e.value;
-    setSelectedNodesOrigem(selectedValue);
-
-    const selectedGrupo = [];
-    const selectedSubGrupo = [];
-
-    // Processar as chaves selecionadas
-    Object.keys(selectedValue).forEach(key => {
-      if (key.startsWith('grupo_')) {
-        // Extrair o ID do grupo (remove o prefixo 'grupo_')
-        const grupoId = key.replace('grupo_', '');
-        selectedGrupo.push(grupoId);
-      } else if (key.startsWith('subgrupo_')) {
-        // Extrair o ID do subgrupo (remove o prefixo 'subgrupo_')
-        const subgrupoId = Number(key.replace('subgrupo_', ''));
-        selectedSubGrupo.push(subgrupoId);
-      }
-    });
-
-    setGrupoSelecionado(selectedGrupo);
-    setSubGrupoOrigem(selectedSubGrupo);
+      return encontrado?.IDSUBGRUPOESTRUTURA;
+    }).filter(Boolean);
   };
 
-  const handleTreeSelectDestinoChange = (e) => {
-    const selectedValue = e.value;
-    setSelectedNodesDestino(selectedValue);
 
-    const selectedGrupo = [];
-    const selectedSubGrupo = [];
+  useEffect(() => {
+    if (!optionsProdutosPromocoes?.length) return;
 
-    // Processar as chaves selecionadas
-    Object.keys(selectedValue).forEach(key => {
-      if (key.startsWith('grupo_')) {
-        // Extrair o ID do grupo (remove o prefixo 'grupo_')
-        const grupoId = key.replace('grupo_', '');
-        selectedGrupo.push(grupoId);
-      } else if (key.startsWith('subgrupo_')) {
-        // Extrair o ID do subgrupo (remove o prefixo 'subgrupo_')
-        const subgrupoId = Number(key.replace('subgrupo_', ''));
-        selectedSubGrupo.push(subgrupoId);
-      }
+    const dados = optionsProdutosPromocoes[0];
+
+    const destinoApi = dados?.empresaPromocaoDestino
+      ?.map(item => Number(item?.det?.IDSUBGRUPOEMDESTINO))
+      ?.filter(Boolean) || [];
+
+    const origemApi = dados?.empresaPromocaoOrigem
+      ?.map(item => Number(item?.det?.IDSUBGRUPOEMORIGEM))
+      ?.filter(Boolean) || [];
+
+
+    const destinoConvertido = mapearIdsParaTree(destinoApi);
+    const origemConvertido = mapearIdsParaTree(origemApi);
+
+    setSubGrupoDestino(destinoConvertido);
+    setSubGrupoOrigem(origemConvertido)
+
+  }, [optionsProdutosPromocoes, dadosSubGrupo]);
+
+
+  useEffect(() => {
+    if (!treeData.length) return;
+
+    const selectionDestino = {};
+    const selectionOrigem = {};
+
+    subGrupoDestino.forEach(id => {
+      selectionDestino[`subgrupo_${id}`] = {
+        checked: true
+      };
     });
 
-    setGrupoSelecionado(selectedGrupo);
-    setSubGrupoDestino(selectedSubGrupo);
+    subGrupoOrigem.forEach(id => {
+      selectionOrigem[`subgrupo_${id}`] = {
+        checked: true
+      };
+    });
+
+    setSelectedNodesDestino(selectionDestino);
+    setSelectedNodesOrigem(selectionOrigem);
+
+  }, [treeData, subGrupoDestino, subGrupoOrigem]);
+
+
+  const handleTreeSelectDestinoChange = (e) => {
+    setSelectedNodesDestino(e.value);
+  };
+
+  const handleTreeSelectOrigemChange = (e) => {
+    setSelectedNodesOrigem(e.value);
   };
 
   return (
@@ -610,77 +604,21 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
         corEmpresa={"primary"}
         IconEmpresa={GrView}
 
-        InputSelectSubGrupoOrigemComponentAync={MultSelectAction}
         labelSelectSubGrupoOrigemAsync={"Sub Grupo Origem"}
-        optionsSubGrupoOrigemAsync={[
-          { value: "all", label: "Selecionar Todas" },
-          ...(dadosGrupo?.map((item) => ({
-            value: item.IDSUBGRUPOESTRUTURA,
-            label:  `${item.IDSUBGRUPOESTRUTURA} - ${item.DSGRUPOESTRUTURA} - ${item.TPSECAO} `
-          })) || [])
-        ]}
-
-        valueSelectSubGrupoOrigemAsync={
-          Array.isArray(subGrupoOrigem) && Array.isArray(dadosGrupo)
-            ? dadosGrupo
-                .filter(item => subGrupoOrigem.includes(String(item.IDSUBGRUPOESTRUTURA)))
-                .map(item => ({
-                  value: item.IDSUBGRUPOESTRUTURA,
-                  label: `${item.IDSUBGRUPOESTRUTURA} - ${item.DSGRUPOESTRUTURA} - ${item.TPSECAO} `
-                }))
-            : []
-        }
-        onChangeSelectSubGrupoOrigemAsync={(e) => {
-          if (e.some((option) => option.value === "all")) {
-            const allValues = dadosGrupo.map((grupo) => String(grupo.IDSUBGRUPOESTRUTURA));
-            setSubGrupoOrigem(allValues);
-          } else {            
-            handleChangeSubGrupoOrigem(e);
-          }
-        }}
-
         MenuTreeSelectOrigemComponent={MenuTreeSelect}
         valueTreeSelectOrigem={selectedNodesOrigem}
         onChangeTreeSelectOrigem={handleTreeSelectOrigemChange}
         optionsTreeSelectOrigem={treeData}
         placeholderTreeSelectOrigem={"Selecione"}
 
-        InputSelectSubGrupoDestinoComponentAync={MultSelectAction}
         labelSelectSubGrupoDestinoAsync={"Sub Grupo Destino"}
-        optionsSubGrupoDestinoAsync={[
-          { value: "all", label: "Selecionar Todas" },
-          ...(dadosGrupo?.map((item) => ({
-            value: item.IDSUBGRUPOESTRUTURA,
-            label:  `${item.IDSUBGRUPOESTRUTURA} - ${item.DSGRUPOESTRUTURA} - ${item.TPSECAO} `
-          })) || [])
-        ]}
-
-        valueSelectSubGrupoDestinoAsync={
-          Array.isArray(subGrupoDestino) && Array.isArray(dadosGrupo)
-            ? dadosGrupo
-                .filter(item => subGrupoDestino.includes(String(item.IDSUBGRUPOESTRUTURA)))
-                .map(item => ({
-                  value: item.IDSUBGRUPOESTRUTURA,
-                  label: `${item.IDSUBGRUPOESTRUTURA} - ${item.DSGRUPOESTRUTURA} - ${item.TPSECAO} `
-                }))
-            : []
-        }
-        onChangeSelectSubGrupoDestinoAsync={(e) => {
-          if (e.some((option) => option.value === "all")) {
-            const allValues = dadosGrupo.map((grupo) => String(grupo.IDSUBGRUPOESTRUTURA));
-            setSubGrupoDestino(allValues);
-          } else {            
-            handleChangeSubGrupoDestino(e);
-          }
-        }}
-
         MenuTreeSelectDestinoComponent={MenuTreeSelect}
         valueTreeSelectDestino={selectedNodesDestino}
         onChangeTreeSelectDestino={handleTreeSelectDestinoChange}
         optionsTreeSelectDestino={treeData}
         placeholderTreeSelectDestino={"Selecione"}
-    
-     
+
+
         InputGrupoEstrutura={InputFieldActionRadio}
         labelInputGrupoEstrutura={"Estrutura Mercadológica"}
         valueInputGrupoEstrutura={isCheckedGrupo}
@@ -693,7 +631,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
           }
         }}
         readOnlyGrupoEstrutura={isCheckedGrupo ? false : true}
-      
+
         InputProduto={InputFieldActionRadio}
         labelInputProduto={"Por Produtos"}
         valueInputProduto={isCheckedProduto}
@@ -767,7 +705,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
         onButtonClickProdutoPesquisadoDestino={handlePesquisarProdutoDestino}
         corProdutoPesquisadoDestino={"secondary"}
         IconProdutoPesquisadoDestino={GrView}
-       
+
 
         InputFileProdutoDestino={InputFieldAction}
         labelInputFileProdutoDestino={"Produto Destino"}
@@ -890,7 +828,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
         fileProdutoDestino={fileProdutoDestino}
         setFileProdutoDestino={setFileProdutoDestino}
       />
-  
+
     </Fragment>
   )
 }

@@ -237,6 +237,7 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
     { enabled: Boolean(idResumoPromocao), staleTime: 1000 * 60 * 60 }
   );
 
+
   const { data: dadosEmpresasPromocoes = [], error: errorEmpresasPromocoess, isLoading: isLoadingEmpresasPromocoess, refetch: refetchEmpresasPromocoess } = useQuery(
     ['empresa-promocoes-ativas', idResumoPromocao],
     async () => {
@@ -1204,7 +1205,7 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
           }
         });
   
-        const response = await put('/criar-promocoes-ativas-subGrupo/:id', postData);
+        const response = await put('/promocoes-ativas-subGrupo/:id', postData);
   
         Swal.fire({
           position: 'center',
@@ -1423,6 +1424,7 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
     refetchEmpresasPromocoes,
     refetchEmpresasPromocoess,
     onSubmit,
+    optionsProdutosPromocoes,
     isCheckedGrupo, 
     setIsCheckedGrupo,
     isCheckedProduto,
