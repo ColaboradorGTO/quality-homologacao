@@ -62,6 +62,8 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
   const [isCheckedProduto, setIsCheckedProduto] = useState(false)
   const [subGrupoDestino, setSubGrupoDestino] = useState([])
   const [subGrupoOrigem, setSubGrupoOrigem] = useState([])
+  const [grupoSelecionadoOrigem, setGrupoSelecionadoOrigem] = useState([])
+  const [grupoSelecionadoDestino, setGrupoSelecionadoDestino] = useState([])
 
   const navigate = useNavigate();
 
@@ -1091,8 +1093,10 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
     }
   };
 
+  console.log(subGrupoDestino, "subGrupoDestino")
+  console.log(subGrupoOrigem, "subGrupoOrigem")
+  // console.log(empresasSelecionadasValues, "empresaSelecionada")
   const onSubmitEstrutura = async (data) => {
-    
       try {
         if (!mecanicaSelecionada) {
           Swal.fire({
@@ -1108,19 +1112,19 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
           return;
         }
   
-        if (!empresaSelecionada || empresaSelecionada.length == 0) {
-          Swal.fire({
-            position: 'center',
-            icon: 'error',
-            title: 'Selecione uma empresa!',
-            customClass: {
-              container: 'custom-swal',
-            },
-            showConfirmButton: false,
-            timer: 3000,
-          })
-          return;
-        }
+        // if (!empresaSelecionada || empresaSelecionada.length == 0) {
+        //   Swal.fire({
+        //     position: 'center',
+        //     icon: 'error',
+        //     title: 'Selecione uma empresa!',
+        //     customClass: {
+        //       container: 'custom-swal',
+        //     },
+        //     showConfirmButton: false,
+        //     timer: 3000,
+        //   })
+        //   return;
+        // }
   
         if(!subGrupoDestino && !subGrupoOrigem) {
           Swal.fire({
@@ -1152,6 +1156,8 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
   
   
         const postData = {
+          IDRESUMOPROMOCAOMARKETING: dadosPromocao[0]?.IDRESUMOPROMOCAOMARKETING,
+          IDMECANICARESUMOPROMOCAOMARKETING: dadosPromocao[0]?.IDMECANICARESUMOPROMOCAOMARKETING,
           TPAPARTIRDE: aplicacaoDestinoSelecionada,
           TPAPLICADOA: mecanicaSelecionada,
           TPFATORPROMO: tipoDescontoSelecionado,
@@ -1163,23 +1169,13 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
           DTHORAINICIO: dataInicio,
           DTHORAFIM: dataFim + ' 23:59:59',
           DSPROMOCAOMARKETING: descricao.toUpperCase(),
-          IDEMPRESA: empresaSelecionada,
+          IDEMPRESA: empresasSelecionadasValues,
           STATIVO: "True",
           STEMPRESAPROMO: "True",
           STDETPROMOORIGEM: "True",
           STDETPROMODESTINO: "True",
-          IDGRUPOEMDESTINO: grupoSelecionadoDestino,
           IDSUBGRUPOEMDESTINO: subGrupoDestino,
-          IDMARCAEMDESTINO: marcaDestino,
-          IDFORNECEDOREMDESTINO: fornecedorSelecionado,
-          IDGRUPOEMORIGEM: grupoSelecionadoOrigem,
-          IDSUBGRUPOEMORIGEM: subGrupoOrigem,
-          IDMARCAEMORIGEM: marcaOrigem,
-          IDFORNECEDOREMORIGEM: fornecedorSelecionado,
-          IDPRODUTO: null,
-          IDPRODUTODESTINO: null,
-          IDPRODUTOORIGEM: null,
-    
+          IDSUBGRUPOEMORIGEM: subGrupoOrigem,    
         };
   
         let timerInterval;
@@ -1433,6 +1429,10 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
     setSubGrupoDestino,
     subGrupoOrigem,
     setSubGrupoOrigem,
+    grupoSelecionadoOrigem, 
+    setGrupoSelecionadoOrigem,
+    grupoSelecionadoDestino,
+    setGrupoSelecionadoDestino,
     onSubmitEstrutura
   }
 }

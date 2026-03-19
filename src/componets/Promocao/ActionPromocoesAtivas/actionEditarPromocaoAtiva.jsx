@@ -143,6 +143,10 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
     setSubGrupoDestino,
     subGrupoOrigem,
     setSubGrupoOrigem,
+    grupoSelecionadoOrigem, 
+    setGrupoSelecionadoOrigem,
+    grupoSelecionadoDestino,
+    setGrupoSelecionadoDestino,
     onSubmitEstrutura
   } = useUpdatePromocaoAtiva({ dadosPromocao });
 
@@ -156,12 +160,6 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
       color: state.data.color,
     }),
   };
-
-  // const handleEmpresaChange = useCallback((selectedOptions) => {
-  //   const values = selectedOptions.map((option) => option.value);
-  //   setEmpresaSelecionada(values);
-  // }, [setEmpresaSelecionada]);
-
 
   const handleChangeMecanica = useCallback((selectedValue) => {
 
@@ -338,6 +336,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
   const [treeData, setTreeData] = useState([]);
   const [selectedNodesOrigem, setSelectedNodesOrigem] = useState({});
   const [selectedNodesDestino, setSelectedNodesDestino] = useState({});
+  const [carregouInicial, setCarregouInicial] = useState(false);
 
   useEffect(() => {
     if (!dadosSubGrupo?.length) return;
@@ -382,7 +381,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
 
 
   useEffect(() => {
-    if (!optionsProdutosPromocoes?.length) return;
+    if (!optionsProdutosPromocoes?.length || carregouInicial) return;
 
     const dados = optionsProdutosPromocoes[0];
 
@@ -394,14 +393,16 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
       ?.map(item => Number(item?.det?.IDSUBGRUPOEMORIGEM))
       ?.filter(Boolean) || [];
 
-
-    const destinoConvertido = mapearIdsParaTree(destinoApi);
-    const origemConvertido = mapearIdsParaTree(origemApi);
+    const destinoConvertido = destinoApi.map(String);
+    const origemConvertido = origemApi.map(String);
 
     setSubGrupoDestino(destinoConvertido);
-    setSubGrupoOrigem(origemConvertido)
+    setSubGrupoOrigem(origemConvertido);
+    console.log(destinoConvertido, "destinoConvertido")
+    console.log(origemConvertido, "origemConvertido")
+    setCarregouInicial(true); // 🔥 trava o useEffect
 
-  }, [optionsProdutosPromocoes, dadosSubGrupo]);
+  }, [optionsProdutosPromocoes, dadosSubGrupo, carregouInicial]);
 
 
   useEffect(() => {
@@ -430,10 +431,19 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
 
   const handleTreeSelectDestinoChange = (e) => {
     setSelectedNodesDestino(e.value);
+
+    const subgrupos = Object.keys(e.value)
+      .filter(key => key.startsWith("subgrupo_"))
+      .map(key => key.replace("subgrupo_", ""));
+
+    setSubGrupoDestino(subgrupos); // 🔥 ESSENCIAL
   };
 
   const handleTreeSelectOrigemChange = (e) => {
     setSelectedNodesOrigem(e.value);
+    const subgrupos = Object.keys(e.value)
+      .filter(key => key.startsWith("subgrupo_"))      .map(key => key.replace("subgrupo_", ""));
+    setSubGrupoOrigem(subgrupos); // 🔥 ESSENCIAL
   };
 
   return (
