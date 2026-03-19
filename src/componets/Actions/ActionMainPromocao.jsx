@@ -153,6 +153,7 @@ export const ActionMainPromocao = ({
   ButtonTypeVisualizarProduto,
   ButtonTypeProdutoPesquisadoOrigem,
   ButtonTypeProdutoPesquisadoDestino,
+  ButtonTypeRetornar,
 
   linkNomeSearch,
   linkNome,
@@ -165,6 +166,7 @@ export const ActionMainPromocao = ({
   linkNomeVisualizarProduto,
   linkNomeProdutoPesquisadoOrigem,
   linkNomeProdutoPesquisadoDestino,
+  linkRetornar,
 
   onButtonClickSearch,
   onButtonClickCadastro,
@@ -177,6 +179,7 @@ export const ActionMainPromocao = ({
   onButtonClickVisualizarProduto,
   onButtonClickProdutoPesquisadoOrigem,
   onButtonClickProdutoPesquisadoDestino,
+  onButtonClickRetornar,
 
   corSearch,
   corCadastro,
@@ -189,6 +192,7 @@ export const ActionMainPromocao = ({
   corVisualizarProduto,
   corProdutoPesquisadoOrigem,
   corProdutoPesquisadoDestino,
+  corRetornar,
 
   IconSearch,
   IconCadastro,
@@ -201,6 +205,7 @@ export const ActionMainPromocao = ({
   IconVisualizarProduto,
   IconProdutoPesquisadoOrigem,
   IconProdutoPesquisadoDestino,
+  IconRetornar,
 
   readOnlyDTInicio,
   readOnlyDTFim,
@@ -917,6 +922,20 @@ export const ActionMainPromocao = ({
                         cor={corTXT}
                         tipo="button"
                         Icon={IconTXT}
+                        iconColor="#000"
+                        iconSize={25}
+                        style={{ color: 'white' }}
+                      />
+                    )}
+
+                    {ButtonTypeRetornar && (
+                      <ButtonTypeRetornar
+                        textButton={linkRetornar}
+                        onClickButtonType={onButtonClickRetornar}
+                        // cor="danger"
+                        cor={corRetornar}
+                        tipo="button"
+                        Icon={IconRetornar}
                         iconColor="#000"
                         iconSize={25}
                         style={{ color: 'white' }}

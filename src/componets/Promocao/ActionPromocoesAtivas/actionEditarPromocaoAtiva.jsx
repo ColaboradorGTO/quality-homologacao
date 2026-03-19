@@ -746,7 +746,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
         styleButtonSearch={isCheckedProduto ? false : true}
 
         ButtonTypePedido={ButtonType}
-        linkPedido={"Cadastrar Promoção Mercadologica"}
+        linkPedido={"Atualizar Promoção Mercadologica"}
         onButtonClickPedido={handleCadastrarEstrutura}
         corPedido={"info"}
         IconPedido={IoIosSend}
@@ -761,17 +761,18 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
         IconVisualizarProduto={GrView}
         readOnlyVisualizarProduto={isCheckedGrupo ? true : false}
 
-        // ButtonTypePedido={ButtonType}
-        // linkPedido={"Voltar para Pesquisa"}
-        // corPedido={"danger"}
-        // onButtonClickPedido={handleClickIncluir}
-        // IconPedido={AiFillBackward}
-
+        
         ButtonTypeTXT={ButtonType}
         linkTXT={"Documentação"}
         onButtonClickTXT={mostrarDocumentacao}
         corTXT={"success"}
         IconTXT={GrFormView}
+
+       ButtonTypeRetornar={ButtonType}
+        linkRetornar={"Voltar para Pesquisa"}
+        corRetornar={"danger"}
+        onButtonClickRetornar={handleClickIncluir}
+        IconRetornar={AiFillBackward}
       />
 
       <ActionProdutoDestinoModal
