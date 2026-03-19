@@ -198,14 +198,14 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
 
    }
 
-   if(dadosPromocao[0]?.STPRODUTO == "False") {
+   if(dadosPromocao[0]?.STPRODUTO === "False") {
     setIsCheckedProduto(false)
     setIsCheckedGrupo(true)
    } else {
     setIsCheckedProduto(true)
     setIsCheckedGrupo(false)
    }
-   
+   console.log(dadosPromocao[0]?.STPRODUTO, 'dadosPromocao')
     if (dadosPromocao && dadosPromocao[0]?.FATORPROMOPERC !== undefined) {
       const valor = parseFloat(dadosPromocao[0].FATORPROMOPERC);
       if (!isNaN(valor)) {
@@ -1142,9 +1142,9 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
         const postData = {
           IDRESUMOPROMOCAOMARKETING: dadosPromocao[0]?.IDRESUMOPROMOCAOMARKETING,
           IDMECANICARESUMOPROMOCAOMARKETING: dadosPromocao[0]?.IDMECANICARESUMOPROMOCAOMARKETING,
-          TPAPARTIRDE: aplicacaoDestinoSelecionada,
-          TPAPLICADOA: mecanicaSelecionada,
-          TPFATORPROMO: tipoDescontoSelecionado,
+          TPAPARTIRDE: dadosPromocao[0]?.TPAPARTIRDE,
+          TPAPLICADOA: dadosPromocao[0]?.TPAPLICADOA,
+          TPFATORPROMO: dadosPromocao[0]?.TPFATORPROMO,
           APARTIRDEQTD: Number(qtdInicio),
           APARTIRDOVLR: valorInicio,
           FATORPROMOVLR: vrDesconto,

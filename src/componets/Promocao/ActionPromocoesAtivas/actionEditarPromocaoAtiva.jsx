@@ -6,16 +6,12 @@ import { InputSelectActionPromocao } from "../../Inputs/InputSelectActionPromoca
 import { MultSelectAction } from "../../Select/MultSelectAction";
 import { GrDocumentCsv, GrFormView, GrView } from "react-icons/gr";
 import { IoIosSend } from "react-icons/io";
-import { ButtonTypeModal } from "../../Buttons/ButtonTypeModal";
 import { useUpdatePromocaoAtiva } from "./hook/useUpdatePromocao";
-import { dataFormatada } from "../../../utils/dataFormatada";
 import { ActionProdutoDestinoModal } from "./ActionProdutosDestino/actionProdutoDestinoModal";
 import { ActionProdutoOrigemModal } from "./ActionProdutosOrigem/actionProdutoOrigemModal";
 import { AiFillBackward } from "react-icons/ai";
-import { FaRegFileExcel } from "react-icons/fa";
 import { ActionDocumentacaoAtualizar } from "./ActionDocumentacao/documentacaoAtualizar";
 import { ActionProdutoModalPromocao } from "./ActionProdutosDaPromocao/actionProdutoModalPromocao";
-import { use } from "react";
 import { ActionEmpresasModalPromocao } from "./ActionEmpresasDaPromocao/actionEmpresasModalPromocao";
 import { ActionProdutoModalPromocaoSelecionado } from "./ActionProdutosDaPromocaoSelecionado/actionProdutoModalPromocaoSelecionado";
 import { ActionProdutoModalPromocaoSelecionadoDestino } from "./ActionProdutosDaPromocaoSelecionado/actionProdutoModalPromocaoSelecionaDestino";
@@ -210,15 +206,17 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
     if (dadosPromocao && dadosPromocao[0] && optionsMecanica.length > 0) {
       const promocao = dadosPromocao[0];
       const mecanicaEncontrada = optionsMecanica.find(mecanica =>
-        mecanica.aplicacaoDestino === promocao.TPAPARTIRDE &&
-        mecanica.mecanica === promocao.TPAPLICADOA &&
-        mecanica.tipoDesconto === promocao.TPFATORPROMO
+        mecanica.aplicacaoDestino == promocao.TPAPARTIRDE &&
+        mecanica.mecanica == promocao.TPAPLICADOA &&
+        mecanica.tipoDesconto == promocao.TPFATORPROMO
       );
 
       return mecanicaEncontrada ? mecanicaEncontrada.value : null;
     }
     return null;
   }, [dadosPromocao]);
+
+
 
   const mecanicaCorrespondente = useMemo(() => {
     if (mecanicaInicial && dadosMecanicas.length > 0) {
