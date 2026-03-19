@@ -198,7 +198,7 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
 
    }
 
-   if(dadosPromocao[0]?.STPRODUTO == "True") {
+   if(dadosPromocao[0]?.STPRODUTO == "False") {
     setIsCheckedProduto(false)
     setIsCheckedGrupo(true)
    } else {
@@ -1093,9 +1093,6 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
     }
   };
 
-  console.log(subGrupoDestino, "subGrupoDestino")
-  console.log(subGrupoOrigem, "subGrupoOrigem")
-  // console.log(empresasSelecionadasValues, "empresaSelecionada")
   const onSubmitEstrutura = async (data) => {
       try {
         if (!mecanicaSelecionada) {
@@ -1111,20 +1108,7 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
           })
           return;
         }
-  
-        // if (!empresaSelecionada || empresaSelecionada.length == 0) {
-        //   Swal.fire({
-        //     position: 'center',
-        //     icon: 'error',
-        //     title: 'Selecione uma empresa!',
-        //     customClass: {
-        //       container: 'custom-swal',
-        //     },
-        //     showConfirmButton: false,
-        //     timer: 3000,
-        //   })
-        //   return;
-        // }
+
   
         if(!subGrupoDestino && !subGrupoOrigem) {
           Swal.fire({
@@ -1170,12 +1154,13 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
           DTHORAFIM: dataFim + ' 23:59:59',
           DSPROMOCAOMARKETING: descricao.toUpperCase(),
           IDEMPRESA: empresasSelecionadasValues,
-          STATIVO: "True",
+          STATIVO: statusSelecionado,
           STEMPRESAPROMO: "True",
           STDETPROMOORIGEM: "True",
           STDETPROMODESTINO: "True",
           IDSUBGRUPOEMDESTINO: subGrupoDestino,
           IDSUBGRUPOEMORIGEM: subGrupoOrigem,    
+         
         };
   
         let timerInterval;

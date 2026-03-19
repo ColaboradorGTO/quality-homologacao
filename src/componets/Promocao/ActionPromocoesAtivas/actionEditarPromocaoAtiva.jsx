@@ -398,8 +398,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
 
     setSubGrupoDestino(destinoConvertido);
     setSubGrupoOrigem(origemConvertido);
-    console.log(destinoConvertido, "destinoConvertido")
-    console.log(origemConvertido, "origemConvertido")
+
     setCarregouInicial(true); // 🔥 trava o useEffect
 
   }, [optionsProdutosPromocoes, dadosSubGrupo, carregouInicial]);
