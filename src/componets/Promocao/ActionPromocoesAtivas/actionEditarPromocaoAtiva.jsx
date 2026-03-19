@@ -217,7 +217,6 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
   }, [dadosPromocao]);
 
 
-
   const mecanicaCorrespondente = useMemo(() => {
     if (mecanicaInicial && dadosMecanicas.length > 0) {
       const mecanica = dadosMecanicas.find(m => {
