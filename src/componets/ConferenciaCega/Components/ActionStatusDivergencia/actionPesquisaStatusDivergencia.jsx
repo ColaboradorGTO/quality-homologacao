@@ -10,7 +10,7 @@ import { AiOutlineSearch } from "react-icons/ai";
 import { MdAdd } from "react-icons/md";
 import { useQuery } from "react-query";
 import { getDataAtual } from "../../../../utils/dataAtual";
-import { ActionCadastrarStatusModal } from "./actionCadastrarStatusModal";
+import { ActionCadastrarStatusModal } from "./ActionCadastrarStatusModal/actionCadastrarStatusModal";
 
 export const ActionPesquisaStatusDivergencia = ({ usuarioLogado }) => {
   const { register, handleSubmit, errors } = useForm();

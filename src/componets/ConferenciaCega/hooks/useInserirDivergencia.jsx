@@ -70,22 +70,25 @@ export const useInserirDivergencia = ({
     const postData = {
       DESCRICAODIVERGENCIA: descricao,
       IDUSRCRIACAO: usuarioLogado.id,
-      STATIVO: statusDivergencia
+      STATIVO: statusDivergencia.value
     };
+
     try {
       const response = await post('/inserir-status-divergencia', postData);
 
       const textDados = JSON.stringify(postData);
       let textoFuncao = 'CONFERNCIA CEGA / INSERIR DIVERGENCIA OT';
+      const ipUsuario = await getIPUsuario();
 
       const createData = {
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || "INDISPONIVEL"
       };
 
-      const responsePost = await post('/log-web', createData)
+      await post('/log-web', createData)
+
       Swal.fire({
         title: 'Sucesso!',
         text: 'Divergência inserida com sucesso!',
@@ -94,11 +97,41 @@ export const useInserirDivergencia = ({
           container: 'custom-swal',
         }
       });
+
       handleClose();
       refetchStatus();
-      return responsePost.data;
+
+      return response.data;
+
     } catch (error) {
       console.error(error);
+
+      const textDados = JSON.stringify(postData);
+      let textoFuncao = 'CONFERNCIA CEGA / INSERIR DIVERGENCIA OT';
+      const ipUsuario = await getIPUsuario();
+
+      const createData = {
+        IDFUNCIONARIO: String(usuarioLogado.id),
+        PATHFUNCAO: textoFuncao,
+        DADOS: textDados,
+        IP: ipUsuario || "INDISPONIVEL"
+      };
+
+      const responsePost = await post('/log-web', createData)
+
+      Swal.fire({
+        title: 'Erro',
+        text: 'erro ao inserir divergência',
+        icon: 'error',
+        customClass: {
+          container: 'custom-swal',
+        }
+      });
+
+      handleClose();
+      refetchStatus();
+
+      return responsePost.data;
 
     }
   };

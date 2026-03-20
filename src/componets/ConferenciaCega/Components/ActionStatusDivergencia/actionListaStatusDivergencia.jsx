@@ -122,7 +122,9 @@ export const ActionListaStatusDivergencia = ({
             titleButton={"Alterar"}
             onClickButton={() => handleEdit(row)}
             Icon={CiEdit}
-            iconSize={22}
+            iconSize={16}
+            width="32px"
+            height="32px"
             iconColor={"#fff"}
             cor={"primary"}
 
