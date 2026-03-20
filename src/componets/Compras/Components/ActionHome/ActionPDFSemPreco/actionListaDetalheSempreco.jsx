@@ -1,259 +1,266 @@
-import { Fragment } from "react"
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
+import { Fragment, useMemo } from "react"
 import { toFloat } from "../../../../../utils/toFloat";
 import { formatMoeda } from "../../../../../utils/formatMoeda";
-import { ColumnGroup } from "primereact/columngroup";
-import { Row } from "primereact/row";
-
 
 export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
 
-
-  const dados = dadosDetalhePedido.map((item, index) => {
-    let contador = index + 1;
-    let txtCxTec = item.detpedido?.DSTIPOTECIDO == 'CALCADOS' ? 'Caixas' : 'Tecido';
-    let DadosCxTecido = item.detpedido?.DSTIPOTECIDO == 'CALCADOS' ? item.detpedido?.NUCAIXA : item.detpedido?.DSTIPOTECIDO
-    console.log(item.detalhegrade, 'item.detalhegrade?.DSTAMANHO')
-    return {
-      QTDTOTAL: item.detpedido?.QTDTOTAL,
-      DSSIGLA: item.detpedido?.DSSIGLA,
-      NUREF: item.detpedido?.NUREF,
-      DSPRODUTO: item.detpedido?.DSPRODUTO,
-      DSCOR: item.detpedido?.DSCOR,
-      DSLOCALEXPOSICAO: item.detpedido?.DSLOCALEXPOSICAO,
-      DSESTILO: item.detpedido?.DSESTILO,
-      STECOMMERCE: item.detpedido?.STECOMMERCE,
-      STREDESOCIAL: item.detpedido?.STREDESOCIAL,
-      OBSPRODUTO: item.detpedido?.OBSPRODUTO,
-      VRUNITLIQDETALHEPEDIDO: item.detpedido?.VRUNITLIQDETALHEPEDIDO,
-      VRVENDADETALHEPEDIDO: item.detpedido?.VRVENDADETALHEPEDIDO,
-      VRTOTALDETALHEPEDIDO: toFloat(item.detpedido?.VRTOTALDETALHEPEDIDO),
-      IDPEDIDO: item.detpedido?.IDPEDIDO,
-      IDDETPEDIDO: item.detpedido?.IDDETPEDIDO,
-      DSCATEGORIAPEDIDO: item.detpedido?.DSCATEGORIAPEDIDO,
-      DSSUBGRUPOESTRUTURA: item.detpedido?.DSSUBGRUPOESTRUTURA,
-      DSGRUPOESTRUTURA: item.detpedido?.DSGRUPOESTRUTURA,
-      DSTIPOTECIDO: item.detpedido?.DSTIPOTECIDO,
-      NUCAIXA: item.detpedido?.NUCAIXA,
-      DSTAMANHO: item.detalhegrade[0]?.DSTAMANHO,
-      INDICETAMANHO: item.detalhegrade[0]?.INDICETAMANHO,
-
-      txtCxTec,
-      DadosCxTecido,
-      contador
-    }
-  });
-
-  const calcularTotal = (field) => {
-    return dados.reduce((total, item) => total + toFloat(item[field]), 0);
+  // Função para processar todos os tamanhos da grade
+  const processarGradeCompleta = (detalhegrade) => {
+    if (!detalhegrade || !Array.isArray(detalhegrade)) return '';
+    
+    const tablegrade = detalhegrade.map(({ DSTAMANHO, INDICETAMANHO }) => 
+      `<div style="display: inline-block; text-align: center; margin: 0 2px; font-size: 8px; width: 4.5%; font-family: 'Verdana, sans-serif';">
+        ${DSTAMANHO}<br/><b>${INDICETAMANHO}</b>
+      </div>`
+    ).join('');
+    
+    return tablegrade;
   };
 
-  const calcularTotalVrDetalhePedido = () => {
-    const total = calcularTotal('VRTOTALDETALHEPEDIDO');
-  
-    return total;
-  }
+  // Processar e agrupar dados
+  const { dadosAgrupados, totalGeral } = useMemo(() => {
+    const grupos = {};
+    let totalVrGeral = 0;
+    let totalQtdGeral = 0;
+    let contadorGeral = 0;
 
-  const calcularQtdTotalPedido = () => {
-    const total = calcularTotal('QTDTOTAL');
-    return total;
-  }
-
-  // Determinar o header baseado no primeiro item dos dados
-  const headerCxTecido = dados.length > 0 ? dados[0].txtCxTec : 'Caixa/Tecido';
-
-  const colunasPedidos = [
-
-    {
-      field: 'contador',
-      header: '#',
-      body: row => <th 
-        style={{ 
-          textAlign: 'center', 
-          padding: '1px', 
-          margin: '0px',
-          height: '20px',
-          width: '20px',
-        }}>
-        {row.contador}
-        </th>,
-      sortable: true,
-    },
-    {
-      field: 'QTDTOTAL',
-      header: 'Qtd',
-      body: row => <th>{row.QTDTOTAL}</th>,
-      sortable: true,
-    },
-    {
-      field: 'DSSIGLA',
-      header: 'Unid',
-      body: row => <th>{row.DSSIGLA}</th>,
-      sortable: true,
-    },
-    {
-      field: 'NUREF',
-      header: 'Referência',
-      body: row => <th>{row.NUREF}</th>,
-      sortable: true,
-    },
-    {
-      field: 'DSPRODUTO',
-      header: 'Descrição',
-      body: row => <th>{row.DSPRODUTO}</th>,
-      footer: 'Total ',
-      sortable: true,
-    },
-    {
-      field: 'txtCxTec',
-      header: headerCxTecido,
-      body: row => <th>{row.DadosCxTecido}</th>,
-      footer: 'Total ',
-      sortable: true,
-    },
-    {
-      field: 'DSCOR',
-      header: 'Cor',
-      body: row => <th>{row.DSCOR}</th>,
-
-      sortable: true,
-    },
-    {
-      field: 'DSLOCALEXPOSICAO',
-      header: 'Local Exp',
-      body: row => <th>{row.DSLOCALEXPOSICAO}</th>,
-      sortable: true,
-    },
-    {
-      field: 'DSESTILO',
-      header: 'Estilo',
-      body: row => <th>{row.DSESTILO}</th>,
-      sortable: true,
-    },
-    {
-      field: 'STECOMMERCE',
-      header: 'R.Social',
-      body: row => {
-        return (
+    dadosDetalhePedido.forEach((item) => {
+      const detpedido = item.detpedido;
+      const detalhegrade = item.detalhegrade;
       
-            <th style={{alignContent: 'center'}} >{row.STECOMMERCE == 'True' ? 'SIM' : 'NÃO'}</th>
-       
-        )
-      },
-      sortable: true,
-    },
-    {
-      field: 'OBSPRODUTO',
-      header: 'Obs',
-      body: row => <th >{row.OBSPRODUTO} </th>,
-      sortable: true,
-    },
-    {
-      field: 'DSTAMANHO',
-      header: 'Grade',
-      body: row => <th >{row.DSTAMANHO}  <br/> {row.INDICETAMANHO}</th>,
-      sortable: true,
-    },
-    {
-      field: 'VRUNITLIQDETALHEPEDIDO',
-      header: 'Vr Unit',
-      body: row => <th >{formatMoeda(row.VRUNITLIQDETALHEPEDIDO)}</th>,
-      sortable: true,
-    },
-    {
-      field: 'VRVENDADETALHEPEDIDO',
-      header: 'Vr Venda',
-      body: row => <th >{formatMoeda(row.VRVENDADETALHEPEDIDO)}</th>,
-      sortable: true,
-    },
-    {
-      field: 'VRTOTALDETALHEPEDIDO',
-      header: 'Total',
-      body: row => <th >{formatMoeda(row.VRTOTALDETALHEPEDIDO)} </th>,
-      sortable: true,
-    },
-  ]
+      // Criar chave do grupo (igual ao jQuery)
+      const grupoChave = `${detpedido?.DSGRUPOESTRUTURA} / ${detpedido?.DSSUBGRUPOESTRUTURA}`;
+      
+      // Determinar tipo de tecido/caixa (igual ao jQuery)
+      const TpModPedido = detpedido?.DSCATEGORIAPEDIDO; // ou usar um valor fixo como no jQuery
+      const txtCxTec = TpModPedido === 'CALCADOS' ? 'Caixas' : 'Tecido';
+      const DadosCxTecido = TpModPedido === 'CALCADOS' ? 
+        Math.round(detpedido?.NUCAIXA || 0) : 
+        detpedido?.DSTIPOTECIDO;
 
-  const HeaderTemplate = (rowData) => {
-    return (
-      <div style={{ }}>
+      contadorGeral++;
+      const vrTotal = toFloat(detpedido?.VRTOTALDETALHEPEDIDO);
+      const qtdTotal = toFloat(detpedido?.QTDTOTAL);
 
-        <tr className="font-bold" style={{ fontWeight: 600, fontSize: '12px', color: 'blue', margin: '1px', padding: '0px'}}>
-          {rowData.DSGRUPOESTRUTURA} / {rowData.DSSUBGRUPOESTRUTURA}
-        </tr>
-      </div>
-    );
-  };
+      // Acumular totais gerais
+      totalVrGeral += vrTotal;
+      totalQtdGeral += qtdTotal;
 
+      // Inicializar grupo se não existir
+      if (!grupos[grupoChave]) {
+        grupos[grupoChave] = {
+          nome: grupoChave,
+          itens: [],
+          subtotalVr: 0,
+          subtotalQtd: 0
+        };
+      }
 
-  const footerGroup = (
-    <ColumnGroup>
+      // Adicionar item ao grupo
+      const itemProcessado = {
+        contador: contadorGeral,
+        QTDTOTAL: qtdTotal,
+        DSSIGLA: detpedido?.DSSIGLA,
+        NUREF: detpedido?.NUREF,
+        DSPRODUTO: detpedido?.DSPRODUTO,
+        DSCOR: detpedido?.DSCOR,
+        DSLOCALEXPOSICAO: detpedido?.DSLOCALEXPOSICAO,
+        DSESTILO: detpedido?.DSESTILO,
+        STREDESOCIAL: detpedido?.STREDESOCIAL === 'True' ? 'SIM' : 'NÃO', // CORRIGIDO: usar STREDESOCIAL
+        OBSPRODUTO: detpedido?.OBSPRODUTO,
+        VRUNITLIQDETALHEPEDIDO: toFloat(detpedido?.VRUNITLIQDETALHEPEDIDO),
+        VRTOTALDETALHEPEDIDO: vrTotal,
+        DadosCxTecido,
+        txtCxTec,
+        gradeCompleta: processarGradeCompleta(detalhegrade), // CORRIGIDO: processar toda a grade
+        grupoChave
+      };
 
-      <Row style={{marginTop: '1rem', background: 'red'}}>
-        <Column footer="Qtd Total" colSpan={1} footerStyle={{ color: '#212529', border: '1px solid #000', fontSize: '0.625rem', textAlign: 'initial', margin: '0px', padding: '0px' }} />
-        <Column footer={calcularQtdTotalPedido()} colSpan={1} footerStyle={{ color: '#212529', border: '1px solid #000', fontSize: '0.8rem' }} />
-        <Column footer={"Valor Total"} colSpan={12} footerStyle={{ color: '#212529', border: '1px solid #000', fontSize: '0.8rem', textAlign: 'end' }} />
-        <Column footer={formatMoeda(calcularTotalVrDetalhePedido())} colSpan={1} footerStyle={{ color: '#212529', border: '1px solid #000', fontSize: '0.8rem' }} />
+      grupos[grupoChave].itens.push(itemProcessado);
+      grupos[grupoChave].subtotalVr += vrTotal;
+      grupos[grupoChave].subtotalQtd += qtdTotal;
+    });
 
-      </Row>
-    </ColumnGroup>
-  )
+    return {
+      dadosAgrupados: Object.values(grupos),
+      totalGeral: { totalVrGeral, totalQtdGeral }
+    };
+  }, [dadosDetalhePedido]);
 
   return (
     <Fragment>
-
-      <div className="card mt-4">
-
-        <DataTable
-          title="Vendas por Loja"
-          value={dados}
-          size="small"
-          sortOrder={-1}
-          rowGroupMode="subheader"
-          groupRowsBy="DSSUBGRUPOESTRUTURA"
-          sortMode="single"
-          scrollable
-          rowGroupHeaderTemplate={HeaderTemplate}
-          footerColumnGroup={footerGroup}
-          rows={10}
-          rowsPerPageOptions={[5, 10, 20, 50]}
-          showGridlines
-          stripedRows
-          emptyMessage={<div className="dataTables_empty" style={{border: '1px solid #000'}}></div>}
+      <div className="mt-4" style={{ fontFamily: 'Verdana, sans-serif' }}>
+        <table
+          id="dt-basic-detalhe-pedido-grade"
+          className="bordasimples tbprint dataTable no-footer"
+          role="grid"
+          style={{ width: "100%", fontFamily: 'Verdana, sans-serif' }}
         >
-          {colunasPedidos.map(coluna => (
-            <Column
-              key={coluna.field}
-              field={coluna.field}
-              header={coluna.header}
-              body={coluna.body}
-              footer={coluna.footer}
-              headerStyle={{
-                textAlign: 'center', 
-                fontWeight: '700',
-                color: '#666', 
-                backgroundColor: 'white', 
-                border: '1px solid #000', 
-                fontSize: '0.75rem', 
-                margin: '0px'
-                
-              }}
-              footerStyle={{ color: 'white', backgroundColor: 'white', border: '1px solid #000', fontSize: '0.625rem' }}
-              bodyStyle={{  
-                fontSize: '11px', 
-                backgroundColor: 'white', 
-                border: '1px solid #000', 
-                textAlign: 'center', 
-                alignContent: 'center', 
-                alignItems: 'center',
-                padding: '1px',
-                margin: '0px'
-              }}
+          <thead>
+            <tr role="row">
+              <th className="sorting_disabled text-center" style={{ border: "solid 1px #000", width: "0px", textAlign: "center", fontSize: "12px", fontWeight: 700, color: "#666", lineHeight: "18px", fontFamily: 'Verdana, sans-serif' }} rowSpan="1" colSpan="1">
+                #
+              </th>
+              <th className="sorting_disabled text-center" style={{ border: "solid 1px #000", width: "0px", textAlign: "center", fontSize: "12px", fontWeight: 700, color: "#666", lineHeight: "18px", fontFamily: 'Verdana, sans-serif' }} rowSpan="1" colSpan="1">
+                <b>Qtd</b>
+              </th>
+              <th className="sorting_disabled text-center" style={{ border: "solid 1px #000", width: "0px", textAlign: "center", fontSize: "12px", fontWeight: 700, color: "#666", lineHeight: "18px", fontFamily: 'Verdana, sans-serif' }} rowSpan="1" colSpan="1">
+                <b>Unid</b>
+              </th>
+              <th className="sorting_disabled text-center" style={{ border: "solid 1px #000", width: "0px", textAlign: "center", fontSize: "12px", fontWeight: 700, color: "#666", lineHeight: "18px", fontFamily: 'Verdana, sans-serif' }} rowSpan="1" colSpan="1">
+                <b>Referência</b>
+              </th>
+              <th className="sorting_disabled text-center" style={{ border: "solid 1px #000", width: "0px", textAlign: "center", fontSize: "12px", fontWeight: 700, color: "#666", lineHeight: "18px", fontFamily: 'Verdana, sans-serif' }} rowSpan="1" colSpan="1">
+                <b>Descrição</b>
+              </th>
+              <th className="sorting_disabled text-center" style={{ border: "solid 1px #000", width: "0px", textAlign: "center", fontSize: "12px", fontWeight: 700, color: "#666", lineHeight: "18px", fontFamily: 'Verdana, sans-serif' }} rowSpan="1" colSpan="1">
+                <b>Tecido</b>
+              </th>
+              <th className="sorting_disabled text-center" style={{ border: "solid 1px #000", width: "0px", textAlign: "center", fontSize: "12px", fontWeight: 700, color: "#666", lineHeight: "18px", fontFamily: 'Verdana, sans-serif' }} rowSpan="1" colSpan="1">
+                <b>Cor</b>
+              </th>
+              <th className="sorting_disabled text-center" style={{ border: "solid 1px #000", width: "0px", textAlign: "center", fontSize: "12px", fontWeight: 700, color: "#666", lineHeight: "18px", fontFamily: 'Verdana, sans-serif' }} rowSpan="1" colSpan="1">
+                <b>Local Exp</b>
+              </th>
+              <th className="sorting_disabled text-center" style={{ border: "solid 1px #000", width: "0px", textAlign: "center", fontSize: "12px", fontWeight: 700, color: "#666", lineHeight: "18px", fontFamily: 'Verdana, sans-serif' }} rowSpan="1" colSpan="1">
+                <b>Estilo</b>
+              </th>
+              <th className="sorting_disabled text-center" style={{ border: "solid 1px #000", width: "0px", textAlign: "center", fontSize: "12px", fontWeight: 700, color: "#666", lineHeight: "18px" }} rowSpan="1" colSpan="1">
+                <b>R. Social</b>
+              </th>
+              <th className="sorting_disabled text-center" style={{ border: "solid 1px #000", width: "0px", textAlign: "center", fontSize: "12px", fontWeight: 700, color: "#666", lineHeight: "18px" }} rowSpan="1" colSpan="1">
+                <b>Obs</b>
+              </th>
+              <th className="sorting_disabled text-center" style={{ border: "solid 1px #000", width: "0px", textAlign: "center", fontSize: "12px", fontWeight: 700, color: "#666", lineHeight: "18px" }} rowSpan="1" colSpan="1">
+                <b>Grade</b>
+              </th>
+              <th className="sorting_disabled text-center" style={{ border: "solid 1px #000", width: "0px", textAlign: "center", fontSize: "12px", fontWeight: 700, color: "#666", lineHeight: "18px" }} rowSpan="1" colSpan="1">
+                <b>Vr Unit</b>
+              </th>
+              <th className="sorting_disabled text-center" style={{ border: "solid 1px #000", width: "0px", textAlign: "center", fontSize: "12px", fontWeight: 700, color: "#666", lineHeight: "18px" }} rowSpan="1" colSpan="1">
+                <b>Total</b>
+              </th>
+            </tr>
+          </thead>
 
-            />
-          ))}
-        </DataTable>
+          <tbody style={{}}>
+            {dadosAgrupados.map((grupo, grupoIndex) => (
+              <Fragment key={grupoIndex}>
+                {/* Header do Grupo */}
+                <tr className="group">
+                  <td colSpan="14" style={{ textAlign: "left", backgroundColor: "#f8f9fa", fontFamily: 'Verdana, sans-serif' }}>
+                    <label style={{ color: "blue", fontSize: "12px", lineHeight: "18px", fontWeight: 500, fontFamily: 'Verdana, sans-serif' }}>
+                      <strong>{grupo.nome}</strong>
+                    </label>
+                  </td>
+                </tr>
+
+                {/* Itens do Grupo */}
+                {grupo.itens.map((item, itemIndex) => (
+                  <tr 
+                    key={itemIndex} 
+                    role="row" 
+                    className={itemIndex % 2 === 0 ? "even" : "odd"}
+                  >
+                    <td className="text-center" style={{ border: "solid 1px #000", fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif' }}>{item.contador}</td>
+                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif'  }}>{item.QTDTOTAL}</td>
+                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif'  }}>{item.DSSIGLA}</td>
+                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif'  }}>{item.NUREF}</td>
+                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif'  }}>{item.DSPRODUTO}</td>
+                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif'  }}>{item.DadosCxTecido}</td>
+                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif'  }}>{item.DSCOR}</td>
+                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif'  }}>{item.DSLOCALEXPOSICAO}</td>
+                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif'  }}>{item.DSESTILO}</td>
+                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif'  }}>{item.STREDESOCIAL}</td>
+                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif'  }}>{item.OBSPRODUTO}</td>
+                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif'  }}>
+                      <div dangerouslySetInnerHTML={{ __html: item.gradeCompleta }} />
+                    </td>
+                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif'  }}>{formatMoeda(item.VRUNITLIQDETALHEPEDIDO)}</td>
+                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif'  }}>{formatMoeda(item.VRTOTALDETALHEPEDIDO)}</td>
+                  </tr>
+                ))}
+
+                {/* Subtotal do Grupo */}
+                {/* <tr className="group">
+                  <td colSpan="14" style={{ textAlign: "right", backgroundColor: "#e9ecef" }}>
+                    <label style={{ color: "blue", fontSize: "12px" }}>
+                      <strong>{formatMoeda(grupo.subtotalVr)}</strong>
+                    </label>
+                  </td>
+                </tr> */}
+              </Fragment>
+            ))}
+          </tbody>
+
+          {/* Total Geral */}
+          <tbody >
+            <tr >
+              <td 
+                className="pr-2" 
+                align="center" 
+                style={{
+                  fontWeight: 700, 
+                  color: "#666", 
+                  border: "solid 1px #000", 
+                  textAlign: "end", 
+                  fontSize: "10px",
+                  lineHeight: "15px",
+                  fontFamily: 'Verdana, sans-serif'
+                }}
+                colSpan={1}
+              >
+                Qtd Total 
+              </td>
+              <td 
+                align="center" 
+                style={{
+                  fontWeight: 700, 
+                  color: "#666", 
+                  border: "solid 1px #000", 
+                  textAlign: "end", 
+                  fontSize: "10px",
+                  lineHeight: "15px",
+                  fontFamily: 'Verdana, sans-serif'
+                }}
+                colSpan={2}
+              >
+                <b>{Math.round(totalGeral.totalQtdGeral)}</b>
+              </td>
+              <td 
+                className="pr-2" 
+                align="center"
+                style={{
+                  fontWeight: 700, 
+                  color: "#666", 
+                  border: "solid 1px #000", 
+                  textAlign: "end", 
+                  fontSize: "10px",
+                  lineHeight: "15px",
+                  fontFamily: 'Verdana, sans-serif'
+                }}
+                colSpan={10}
+              >
+                <p><b>Valor Total </b></p>
+              </td>
+              <td 
+                align="center" 
+                style={{
+                  fontWeight: 700, 
+                  color: "#666", 
+                  border: "solid 1px #000", 
+                  textAlign: "end", 
+                  fontSize: "10px",
+                  lineHeight: "15px",
+                  fontFamily: 'Verdana, sans-serif'
+                }}
+                colSpan={1}
+              >
+                {formatMoeda(totalGeral.totalVrGeral)}
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </Fragment>
   )

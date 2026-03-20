@@ -198,14 +198,14 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
 
    }
 
-   if(dadosPromocao[0]?.STPRODUTO === "False") {
+   if(dadosPromocao[0]?.STPRODUTO == "False") {
     setIsCheckedProduto(false)
     setIsCheckedGrupo(true)
    } else {
     setIsCheckedProduto(true)
     setIsCheckedGrupo(false)
    }
-   console.log(dadosPromocao[0]?.STPRODUTO, 'dadosPromocao')
+
     if (dadosPromocao && dadosPromocao[0]?.FATORPROMOPERC !== undefined) {
       const valor = parseFloat(dadosPromocao[0].FATORPROMOPERC);
       if (!isNaN(valor)) {
@@ -226,7 +226,7 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
 
       return response.data;
     },
-    { enabled: Boolean(idResumoPromocao), staleTime: 1000 * 60 * 60 }
+    { enabled: Boolean(idResumoPromocao), staleTime: 5 * 60 * 60 }
   );
 
   const { data: optionsProdutosPromocoes = [], error: errorProdutosPromocoes, isLoading: isLoadingProdutosPromocoes, refetch: refetchProdutosPromocoes } = useQuery(
@@ -236,7 +236,7 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
 
       return response.data;
     },
-    { enabled: Boolean(idResumoPromocao), staleTime: 1000 * 60 * 60 }
+    { enabled: Boolean(idResumoPromocao), staleTime: 5 * 60 * 60 }
   );
 
 
@@ -246,7 +246,7 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
       const response = await get(`/empresa-promocoes-ativas?idResumoPromocao=${idResumoPromocao}`);
       return response.data;
     },
-    { enabled: Boolean(idResumoPromocao), staleTime: 1000 * 60 * 60 }
+    { enabled: Boolean(idResumoPromocao), staleTime: 5 * 60 * 60 }
   );
 
   useEffect(() => {

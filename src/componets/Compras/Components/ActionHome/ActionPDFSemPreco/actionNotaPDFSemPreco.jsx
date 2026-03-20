@@ -13,7 +13,11 @@ export const ActionNotaPDFSemPreco = ({ dadosPedidoSemPreco, dadosDetalhePedido 
             // backgroundColor: '#fff', 
         },
         section: { marginBottom: 10 },
-        title: { fontSize: 18, marginBottom: 10 },
+        title: {
+            fontFamily: 'Verdana, sans-serif', 
+            fontSize: 18,
+             marginBottom: 10 
+        },
     });
     
 
@@ -137,7 +141,7 @@ export const ActionNotaPDFSemPreco = ({ dadosPedidoSemPreco, dadosDetalhePedido 
         }
     })
 
-
+    console.log("Dados processados para o PDF:", dados[0]);
     if (!dados || dados.length === 0) {
         return (
             <Fragment>
@@ -159,17 +163,115 @@ export const ActionNotaPDFSemPreco = ({ dadosPedidoSemPreco, dadosDetalhePedido 
                                 <img src={dadoPrincipal?.logoPedido} style={{ width: '200px', height: '100px', border: 'none' }} />
                             </td>
                             <td rowspan="2" width="200" align="center" >
-                                <p style={{ fontSize: '1rem', margin: '0px', padding: '0px' }}> PEDIDO DE COMPRAS<br />{dadoPrincipal?.MODPEDIDO}</p>
-                                <p style={{ fontSize: '1rem', margin: '0px' }}>Nº: <b>{dadoPrincipal?.IDPEDIDO}</b></p></td>
-                            <td align="center" style={{ fontSize: '0.563rem' }}>
+                                <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '1rem', padding: '0px' }}> PEDIDO DE COMPRAS<br />{dadoPrincipal?.MODPEDIDO}</p>
+                                <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '1rem',  }}>Nº: <b>{dadoPrincipal?.IDPEDIDO}</b></p></td>
+                            <td align="center" style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px' }}>
                                 Fabricante: <br />
-                                <b><p style={{ fontSize: '0.813rem', margin: '0px' }}>{dadoPrincipal?.FABRICANTE}</p></b>
+                                <b><p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px',  }}>{dadoPrincipal?.FABRICANTE}</p></b>
                             </td>
                         </tr>
                         <tr>
-                            <td style={{ fontSize: '0.563rem' }}>
+                            <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px' }}>
                                 Razão Social Fornecedor: <br />
-                                <p style={{ fontSize: '0.813rem', margin: '0px' }}>{dadoPrincipal?.NOFORNECEDOR}</p>
+                                <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px',  }}>{dadoPrincipal?.NOFORNECEDOR}</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <table width="100%" className="bordasimples">
+                    <tbody>
+                        <tr
+                        
+                        >
+                            <td rowspan="2" width="400" 
+                                style={{
+                                    fontFamily: 'Verdana, sans-serif', 
+                                    fontSize: '9px', 
+                                    fontWeight: 400, 
+                                    color: '#666',
+                                    padding: '0px',
+                                    margin: '0px', 
+                                    backgroundColor: '#f0f0f0',
+                                    
+                                }}
+                            >
+                                <p style={{margin: '0px', padding: '0px' }}>
+
+                                    Calçados: andre.compras@grupotesouradeouro.com.br - (61) 99697-2844 
+                                </p>
+                                <p style={{margin: '0px', padding: '0px' }}>
+
+                                    Faturamento: {dadoPrincipal?.EEMAILFATURAMENTO} - {dadoPrincipal?.NUTELFATURAMENTO}
+                                </p>
+                                <p style={{margin: '0px', padding: '0px' }}>
+
+                                    Cobrança: {dadoPrincipal?.EEMAILCOBRANCA} - {dadoPrincipal?.NUTELCOBRANCA}<br />
+                                </p>
+                                <p style={{margin: '0px', padding: '0px' }}>
+
+                                    Financeiro: {dadoPrincipal?.EEMAILFINANCEIRO} - {dadoPrincipal?.NUTELFINANCEIRO}<br />
+                                </p>
+                                <p style={{margin: '0px', padding: '0px' }}>
+
+                                    Compras: {dadoPrincipal?.EEMAILCOMPRAS} - {dadoPrincipal?.NUTELCOMPRAS}<br />
+                                </p>
+                                <p style={{margin: '0px', padding: '0px' }}>
+
+                                    Cadastro: {dadoPrincipal?.EEMAILCADASTRO} - {dadoPrincipal?.NUTELCADASTRO}<br />
+                                </p>
+                            </td>
+                            <td width="200" style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px' }}>CNPJ: <br />
+                                <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.CNPJFORN}</p>
+                            </td>
+                            <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>Email: <br />
+                                <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.EMAILFORN}</p>
+                            </td>
+                            <td width="100" style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px' }}>Tel: <br />
+                                <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.FONEFORN}</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" width="200" style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>INSC EST: <br />
+                                <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.INSCESTFORN}</p>
+                            </td>
+                            <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>Cel: <br />
+                                <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.FONEFORN}</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+
+                <table width="100%" className="bordasimples">
+                    <tbody>
+                        <tr>
+                            <td width="200" style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>Data do Pedido: <br />
+                                <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.DTPEDIDO}</p>
+                            </td>
+                            <td width="200" style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>Data da Entrega: <br />
+                                <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.DTENTREGAFORMATADA2}</p>
+                            </td>
+                            <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>Endereço: <br /><p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.ENDFORN}</p> </td>
+                            <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>Complemento: <br /><p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.COMPFORN}</p> <strong></strong> </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <table width="100%" className="bordasimples">
+                    <tbody>
+                        <tr>
+                            <td width="400" style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>
+                                Comprador: <br /><p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.NOMECOMPRADOR}</p>
+                            </td>
+                            <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>N°: <br />
+                                <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.NUMEROFORN}</p>
+                            </td>
+                            <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>
+                                Bairro: <br /><p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.BAIRROFORN}</p>
+                            </td>
+                            <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>
+                                Transportadora/Telefone: <br /><p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.NOMETRANSPORTADORA} - </p>
                             </td>
                         </tr>
                     </tbody>
@@ -178,88 +280,21 @@ export const ActionNotaPDFSemPreco = ({ dadosPedidoSemPreco, dadosDetalhePedido 
                 <table width="100%" className="bordasimples">
                     <tbody>
                         <tr>
-                            <td rowspan="2" width="400" style={{ fontSize: '10px', fontWeight: 400, color: '#666' }}>
-                                Calçados: andre.compras@grupotesouradeouro.com.br - (61) 99697-2844 <br />
-                                Faturamento: {dadoPrincipal?.EEMAILFATURAMENTO} - {dadoPrincipal?.NUTELFATURAMENTO}<br />
-                                Cobrança: {dadoPrincipal?.EEMAILCOBRANCA} - {dadoPrincipal?.NUTELCOBRANCA}<br />
-                                Financeiro: {dadoPrincipal?.EEMAILFINANCEIRO} - {dadoPrincipal?.NUTELFINANCEIRO}<br />
-                                Compras: {dadoPrincipal?.EEMAILCOMPRAS} - {dadoPrincipal?.NUTELCOMPRAS}<br />
-                                Cadastro: {dadoPrincipal?.EEMAILCADASTRO} - {dadoPrincipal?.NUTELCADASTRO}<br />
-                            </td>
-                            <td width="200" style={{ fontSize: '0.563rem' }}>CNPJ: <br />
-                                <p style={{ fontSize: '0.813rem', margin: '0px' }}>{dadoPrincipal?.CNPJFORN}</p>
-                            </td>
-                            <td style={{ fontSize: '0.563rem' }}>Email: <br />
-                                <p style={{ fontSize: '0.813rem', margin: '0px' }}>{dadoPrincipal?.EMAILFORN}</p>
-                            </td>
-                            <td width="100" style={{ fontSize: '0.563rem' }}>Tel: <br />
-                                <p style={{ fontSize: '0.813rem', margin: '0px' }}>{dadoPrincipal?.FONEFORN}</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="2" width="200" >INSC EST: <br />
-                                <p style={{ fontSize: '0.813rem', margin: '0px' }}>{dadoPrincipal?.INSCESTFORN}</p>
-                            </td>
-                            <td style={{ fontSize: '0.563rem' }}>Cel: <br />
-                                <p style={{ fontSize: '0.813rem', margin: '0px' }}>{dadoPrincipal?.FONEFORN}</p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-
-
-                <table width="100%" className="bordasimples">
-                    <tbody>
-                        <tr>
-                            <td width="200" style={{ fontSize: '0.563rem' }}>Data do Pedido: <br />
-                                <p style={{ fontSize: '0.813rem', margin: '0px' }}>{dadoPrincipal?.DTPEDIDO}</p>
-                            </td>
-                            <td width="200" style={{ fontSize: '0.563rem' }}>Data da Entrega: <br />
-                                <p style={{ fontSize: '0.813rem', margin: '0px' }}>{dadoPrincipal?.DTPREVENTREGAFORMATADA}</p>
-                            </td>
-                            <td style={{ fontSize: '0.563rem' }}>Endereço: <br /><p style={{ fontSize: '0.813rem', margin: '0px' }}>{dadoPrincipal?.ENDFORN}</p> </td>
-                            <td style={{ fontSize: '0.563rem' }}>Complemento: <br /><p style={{ fontSize: '0.813rem', margin: '0px' }}>{dadoPrincipal?.COMPFORN}</p> <strong></strong> </td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <table width="100%" className="bordasimples">
-                    <tbody>
-                        <tr>
-                            <td width="400" style={{ fontSize: '0.563rem' }}>
-                                Comprador: <br /><p style={{ fontSize: '0.813rem', margin: '0px' }}>{dadoPrincipal?.NOMECOMPRADOR}</p>
-                            </td>
-                            <td style={{ fontSize: '0.563rem' }}>N°: <br />
-                                <p style={{ fontSize: '0.813rem', margin: '0px' }}>{dadoPrincipal?.NUMEROFORN}</p>
-                            </td>
-                            <td style={{ fontSize: '0.563rem' }}>
-                                Bairro: <br /><p style={{ fontSize: '0.813rem', margin: '0px' }}>{dadoPrincipal?.BAIRROFORN}</p>
-                            </td>
-                            <td style={{ fontSize: '0.563rem' }}>
-                                Transportadora/Telefone: <br /><p style={{ fontSize: '0.813rem', margin: '0px' }}>{dadoPrincipal?.NOMETRANSPORTADORA} - </p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <table width="100%" className="bordasimples">
-                    <tbody>
-                        <tr>
-                            <td width="400" style={{ fontSize: '0.563rem' }}>
-                                Vendedor: <br /><p style={{ fontSize: '0.813rem', margin: '0px' }}>{dadoPrincipal?.NOVENDEDOR}</p>
+                            <td width="400" style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>
+                                Vendedor: <br /><p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.NOVENDEDOR}</p>
                             </td>
 
-                            <td width="400" style={{ fontSize: '0.563rem' }}>
-                                Cidade: <br /><p style={{ fontSize: '0.813rem', margin: '0px' }}>{dadoPrincipal?.CIDADEFORN}</p>
+                            <td width="400" style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>
+                                Cidade: <br /><p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.CIDADEFORN}</p>
                             </td>
-                            <td style={{ fontSize: '0.563rem' }}>
-                                Desc. I (%): <br /><p style={{ fontSize: '0.813rem', margin: '0px' }}>{formatMoeda(toFloat(dadoPrincipal?.DESCPERC01))}</p>
+                            <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>
+                                Desc. I (%): <br /><p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{formatMoeda(toFloat(dadoPrincipal?.DESCPERC01))}</p>
                             </td>
-                            <td style={{ fontSize: '0.563rem' }}>
-                                Desc. II(%): <br /><p style={{ fontSize: '0.813rem', margin: '0px' }}>{formatMoeda(toFloat(dadoPrincipal?.DESCPERC02))}</p>
+                            <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>
+                                Desc. II(%): <br /><p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{formatMoeda(toFloat(dadoPrincipal?.DESCPERC02))}</p>
                             </td>
-                            <td style={{ fontSize: '0.563rem' }}>
-                                Desc. III(%): <br /><p style={{ fontSize: '0.813rem', margin: '0px' }}>{formatMoeda(toFloat(dadoPrincipal?.DESCPERC03))}</p>
+                            <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>
+                                Desc. III(%): <br /><p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{formatMoeda(toFloat(dadoPrincipal?.DESCPERC03))}</p>
                             </td>
                         </tr>
                     </tbody>
@@ -267,19 +302,19 @@ export const ActionNotaPDFSemPreco = ({ dadosPedidoSemPreco, dadosDetalhePedido 
 
                 <table width="100%" className="bordasimples">
                     <tbody><tr>
-                        <td width="400" style={{ fontSize: '0.563rem' }}>
-                            Cond. Pagamento: <br /><p style={{ fontSize: '0.813rem', margin: '0px' }}>{dadoPrincipal?.DSCONDICAOPAG}</p>
+                        <td width="400" style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>
+                            Cond. Pagamento: <br /><p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.DSCONDICAOPAG}</p>
                         </td>
 
-                        <td style={{ fontSize: '0.563rem' }}>
-                            CEP: <br /><p style={{ fontSize: '0.813rem', margin: '0px' }}>{dadoPrincipal?.CEPFORN}</p>
+                        <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>
+                            CEP: <br /><p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.CEPFORN}</p>
                         </td>
-                        <td style={{ fontSize: '0.563rem' }}>
-                            UF: <br /><p style={{ fontSize: '0.813rem', margin: '0px' }}>{dadoPrincipal?.UFFORN}</p>
+                        <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>
+                            UF: <br /><p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.UFFORN}</p>
                         </td>
-                        <td style={{ fontSize: '0.563rem' }}>
+                        <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>
                             Frete: <br />
-                            <p style={{ fontSize: '0.813rem', margin: '0px' }}>
+                            <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>
                                 {dadoPrincipal?.dsTipoFretePedido}
                             </p>
                         </td>
@@ -290,20 +325,20 @@ export const ActionNotaPDFSemPreco = ({ dadosPedidoSemPreco, dadosDetalhePedido 
                 <table width="100%" className="bordasimples">
                     <tbody>
                         <tr>
-                            <td width="400" style={{ fontSize: '0.563rem' }}>
-                                Observações: <br /><p style={{ fontSize: '0.563rem' }}>{dadoPrincipal?.OBSPEDIDO} - {dadoPrincipal?.OBSPEDIDO2} </p>
+                            <td width="400" style={{fontFamily: 'Verdana, sans-serif', fontSize: '9px', margin: '0px', padding: '0px'}}>
+                                Observações: <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '9px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.OBSPEDIDO} - {dadoPrincipal?.OBSPEDIDO2} </p>
                             </td>
-                            <td style={{ fontSize: '0.563rem' }}>
-                                Fiscal: <br /><p style={{ fontSize: '0.813rem', margin: '0px' }}>{dadoPrincipal?.dsTipoFiscalPedido}</p>
+                            <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '9px', margin: '0px', padding: '0px'}}>
+                                Fiscal: <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '9px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.dsTipoFiscalPedido}</p>
                             </td>
-                            <td style={{ fontSize: '0.563rem' }}>
-                                Enviar: <br /><p style={{ fontSize: '0.813rem', margin: '0px' }}>{dadoPrincipal?.dsTipoEnviar} </p>
+                            <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '9px', margin: '0px', padding: '0px'}}>
+                                Enviar: <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '9px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.dsTipoEnviar} </p>
                             </td>
-                            <td style={{ fontSize: '0.563rem' }}>
-                                Tipo: <br /><p style={{ fontSize: '0.813rem', margin: '0px' }}>{dadoPrincipal?.MODPEDIDO} </p>
+                            <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '9px', margin: '0px', padding: '0px'}}>
+                                Tipo: <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '9px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.MODPEDIDO} </p>
                             </td>
-                            <td style={{ fontSize: '0.563rem' }}>
-                                Comissão: <br /><p style={{ fontSize: '0.813rem', margin: '0px' }}>{formatMoeda(toFloat(dadoPrincipal?.PERCCOMISSAO))} </p>
+                            <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '9px', margin: '0px', padding: '0px'}}>
+                                Comissão: <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '9px', margin: '0px', padding: '0px'}}>{formatMoeda(toFloat(dadoPrincipal?.PERCCOMISSAO))} </p>
                             </td>
                         </tr>
                     </tbody>
