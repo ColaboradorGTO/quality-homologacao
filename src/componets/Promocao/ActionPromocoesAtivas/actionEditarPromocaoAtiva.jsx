@@ -158,8 +158,6 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
   };
 
   const handleChangeMecanica = useCallback((selectedValue) => {
-
-
     const selectedOption = dadosMecanicas.find(option => option.ID == selectedValue);
 
     if (selectedOption) {
@@ -167,8 +165,6 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
       setMecanicaSelecionadaEdicao(selectedOption.DESCRICAO)
       setAplicacaoDestinoSelecionada(selectedOption.APLICAODESTINO);
       setTipoDescontoSelecionado(selectedOption.TIPODESCONTO);
-
-
     } else {
       console.log('Nenhuma opção encontrada para o valor:', selectedValue);
     }
@@ -362,21 +358,6 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
 
   }, [dadosSubGrupo]);
 
-
-  const mapearIdsParaTree = (idsApi) => {
-    if (!idsApi?.length || !dadosSubGrupo?.length) return [];
-
-    return idsApi.map(idApi => {
-      const encontrado = dadosSubGrupo.find(item => {
-
-        return Number(item.IDSUBGRUPOESTRUTURA) === Number(idApi);
-      });
-
-      return encontrado?.IDSUBGRUPOESTRUTURA;
-    }).filter(Boolean);
-  };
-
-
   useEffect(() => {
     if (!optionsProdutosPromocoes?.length || carregouInicial) return;
 
@@ -399,22 +380,57 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
     setCarregouInicial(true); // 🔥 trava o useEffect
 
   }, [optionsProdutosPromocoes, dadosSubGrupo, carregouInicial]);
-
-
+  console.log(dadosSubGrupo, "dadosSubGrupo")
   useEffect(() => {
     if (!treeData.length) return;
 
     const selectionDestino = {};
     const selectionOrigem = {};
 
+    // Função para encontrar o grupo pai de um subgrupo
+    const encontrarGrupoPai = (subgrupoId) => {
+      const subgrupo = dadosSubGrupo?.find(sg => String(sg.IDSUBGRUPOESTRUTURA) === String(subgrupoId));
+      return subgrupo?.IDGRUPOESTRUTURA;
+    };
+
+    // Set para armazenar grupos únicos que devem ser selecionados
+    const gruposDestinoParaSelecionar = new Set();
+    const gruposOrigemParaSelecionar = new Set();
+
+    // Selecionar subgrupos e identificar grupos pais para DESTINO
     subGrupoDestino.forEach(id => {
       selectionDestino[`subgrupo_${id}`] = {
         checked: true
       };
+      
+      const grupoPai = encontrarGrupoPai(id);
+      if (grupoPai) {
+        gruposDestinoParaSelecionar.add(grupoPai);
+      }
     });
 
+    // Selecionar subgrupos e identificar grupos pais para ORIGEM
     subGrupoOrigem.forEach(id => {
       selectionOrigem[`subgrupo_${id}`] = {
+        checked: true
+      };
+      
+      const grupoPai = encontrarGrupoPai(id);
+      if (grupoPai) {
+        gruposOrigemParaSelecionar.add(grupoPai);
+      }
+    });
+
+    // Selecionar os grupos pais identificados para DESTINO
+    gruposDestinoParaSelecionar.forEach(grupoId => {
+      selectionDestino[`grupo_${grupoId}`] = {
+        checked: true
+      };
+    });
+
+    // Selecionar os grupos pais identificados para ORIGEM
+    gruposOrigemParaSelecionar.forEach(grupoId => {
+      selectionOrigem[`grupo_${grupoId}`] = {
         checked: true
       };
     });
@@ -422,8 +438,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
     setSelectedNodesDestino(selectionDestino);
     setSelectedNodesOrigem(selectionOrigem);
 
-  }, [treeData, subGrupoDestino, subGrupoOrigem]);
-
+  }, [treeData, subGrupoDestino, subGrupoOrigem, dadosSubGrupo]);
 
   const handleTreeSelectDestinoChange = (e) => {
     setSelectedNodesDestino(e.value);

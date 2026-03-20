@@ -14,6 +14,7 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
     let contador = index + 1;
     let txtCxTec = item.detpedido?.DSTIPOTECIDO == 'CALCADOS' ? 'Caixas' : 'Tecido';
     let DadosCxTecido = item.detpedido?.DSTIPOTECIDO == 'CALCADOS' ? item.detpedido?.NUCAIXA : item.detpedido?.DSTIPOTECIDO
+    console.log(item.detalhegrade, 'item.detalhegrade?.DSTAMANHO')
     return {
       QTDTOTAL: item.detpedido?.QTDTOTAL,
       DSSIGLA: item.detpedido?.DSSIGLA,
@@ -35,8 +36,8 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
       DSGRUPOESTRUTURA: item.detpedido?.DSGRUPOESTRUTURA,
       DSTIPOTECIDO: item.detpedido?.DSTIPOTECIDO,
       NUCAIXA: item.detpedido?.NUCAIXA,
-      DSTAMANHO: item.detalheGrade?.DSTAMANHO,
-      INDICETAMANHO: item.detalheGrade?.INDICETAMANHO,
+      DSTAMANHO: item.detalhegrade[0]?.DSTAMANHO,
+      INDICETAMANHO: item.detalhegrade[0]?.INDICETAMANHO,
 
       txtCxTec,
       DadosCxTecido,
@@ -50,7 +51,7 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
 
   const calcularTotalVrDetalhePedido = () => {
     const total = calcularTotal('VRTOTALDETALHEPEDIDO');
-    console.log(total, 'total')
+  
     return total;
   }
 
@@ -67,7 +68,16 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
     {
       field: 'contador',
       header: '#',
-      body: row => <th style={{width: '10px'}}>{row.contador}</th>,
+      body: row => <th 
+        style={{ 
+          textAlign: 'center', 
+          padding: '1px', 
+          margin: '0px',
+          height: '20px',
+          width: '20px',
+        }}>
+        {row.contador}
+        </th>,
       sortable: true,
     },
     {
@@ -142,7 +152,7 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
     {
       field: 'DSTAMANHO',
       header: 'Grade',
-      body: row => <th >{row.DSTAMANHO} - {row.INDICETAMANHO}</th>,
+      body: row => <th >{row.DSTAMANHO}  <br/> {row.INDICETAMANHO}</th>,
       sortable: true,
     },
     {
@@ -167,10 +177,12 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
 
   const HeaderTemplate = (rowData) => {
     return (
-      <tr className="font-bold" 
-        style={{ fontWeight: 600, fontSize: '12px', color: 'blue', margin: '1px', padding: '0px', }}>
-        {rowData.DSSUBGRUPOESTRUTURA}
-      </tr>
+      <div style={{ }}>
+
+        <tr className="font-bold" style={{ fontWeight: 600, fontSize: '12px', color: 'blue', margin: '1px', padding: '0px'}}>
+          {rowData.DSGRUPOESTRUTURA} / {rowData.DSSUBGRUPOESTRUTURA}
+        </tr>
+      </div>
     );
   };
 
@@ -178,7 +190,7 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
   const footerGroup = (
     <ColumnGroup>
 
-      <Row>
+      <Row style={{marginTop: '1rem', background: 'red'}}>
         <Column footer="Qtd Total" colSpan={1} footerStyle={{ color: '#212529', border: '1px solid #000', fontSize: '0.625rem', textAlign: 'initial', margin: '0px', padding: '0px' }} />
         <Column footer={calcularQtdTotalPedido()} colSpan={1} footerStyle={{ color: '#212529', border: '1px solid #000', fontSize: '0.8rem' }} />
         <Column footer={"Valor Total"} colSpan={12} footerStyle={{ color: '#212529', border: '1px solid #000', fontSize: '0.8rem', textAlign: 'end' }} />
@@ -208,7 +220,7 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
           rowsPerPageOptions={[5, 10, 20, 50]}
           showGridlines
           stripedRows
-          emptyMessage={<div className="" style={{border: '1px solid #000'}}></div>}
+          emptyMessage={<div className="dataTables_empty" style={{border: '1px solid #000'}}></div>}
         >
           {colunasPedidos.map(coluna => (
             <Column
@@ -224,11 +236,20 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
                 backgroundColor: 'white', 
                 border: '1px solid #000', 
                 fontSize: '0.75rem', 
-                margin: '0px', 
+                margin: '0px'
                 
               }}
               footerStyle={{ color: 'white', backgroundColor: 'white', border: '1px solid #000', fontSize: '0.625rem' }}
-              bodyStyle={{  fontSize: '9px', backgroundColor: 'white', border: '1px solid #000', textAlign: 'center', alignContent: 'center', alignItems: 'center' }}
+              bodyStyle={{  
+                fontSize: '11px', 
+                backgroundColor: 'white', 
+                border: '1px solid #000', 
+                textAlign: 'center', 
+                alignContent: 'center', 
+                alignItems: 'center',
+                padding: '1px',
+                margin: '0px'
+              }}
 
             />
           ))}

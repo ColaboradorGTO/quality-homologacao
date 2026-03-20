@@ -12,54 +12,54 @@ export const ActionNotaPDF = ({ dadosPedido, dadosDetalhePedido }) => {
         title: { fontSize: 18, marginBottom: 10 },
     });
 
+    const stOutlet = dadosPedido?.STOUTLET === "True";
+    
+    const dadosArray = Array.isArray(dadosPedido) 
+        ? dadosPedido 
+        : [dadosPedido[0] || dadosPedido];
+    
+    const logosEmpresas = [
+        '../img/tesoura.png',      
+        '../img/magazine.png',     
+        '../img/yorus.png',        
+        '../img/freecenter.png', 
+        '../img/outlet.png'        
+    ];
 
-    const dados = dadosPedido.map((item, index) => {
+    const dados = dadosArray.map((item, index) => {
         let dsTipoFretePedido = '';
         let dsTipoFiscalPedido = '';
         let dsTipoArquivoPedido = '';
         let dsTipoEnviar = '';
         let logoPedido = '';
 
-        if(item.IDSUBGRUPOPEDIDO == 1) {
-            logoPedido = '../img/tesoura.png'
-        } else if(item.IDSUBGRUPOPEDIDO == 2) {
-            logoPedido = '../img/magazine.png'
-        } else if(item.IDSUBGRUPOPEDIDO == 3) {
-            logoPedido = '../img/freecenter.png'
-        } else {
-            logoPedido = '../img/yorus.png'
+        if (index === 0) {
+            if (stOutlet) {
+                logoPedido = logosEmpresas[4]; // logoOutlet
+            } else {
+                logoPedido = logosEmpresas[item.IDSUBGRUPOPEDIDO - 1];
+            }
         }
 
-        if(item.TPARQUIVO == 'NE') {
-            dsTipoArquivoPedido = 'NÃO ENVIAR';
-        } else if(item.TPARQUIVO == 'ET') {
-           dsTipoArquivoPedido = 'ETIQUETA'; 
-        } else if(item.TPARQUIVO == 'AR') {
-            dsTipoArquivoPedido = 'ARQUIVO';
-        } 
+        const objTpFrete = {
+            'PAGO': 'PAGO - CIF',
+            'APAGAR': 'APAGAR - FOB'
+        };
 
-        if(item.TPFRETE == 'PAGO') {
-            dsTipoFretePedido = 'PAGO A CIF';
-        } else if(item.TPFRETE == 'APAGAR') {
-            dsTipoFretePedido = 'A PAGAR - FOB';
-        }
+        const objTpFiscal = {
+            'N': 'Lucro Presumido',
+            'S': 'Simples Nacional'
+        };
 
+        const objTpEnviar = {
+            'NE': 'NÃO ENVIAR',
+            'ET': 'ETIQUETA',
+            'AR': 'ARQUIVO'
+        };
 
-        if(item.TPFISCAL == 'N') {
-            dsTipoFiscalPedido = 'Lucro Presumido';
-        } else if(item.TPFISCAL == 'S') {
-            dsTipoFiscalPedido = 'Simples Nacional';
-        } else {
-            dsTipoFiscalPedido = 'Lucro Real';
-        }
-
-        if(item.TPARQUIVO == 'NE') {
-            dsTipoEnviar = 'NÃO ENVIAR';
-        } else if(item.TPARQUIVO == 'ET') {
-           dsTipoEnviar = 'ETIQUETA'; 
-        } else {
-            dsTipoEnviar = 'ARQUIVO';
-        } 
+        dsTipoFretePedido = objTpFrete[item.TPFRETE] || item.TPFRETE;
+        dsTipoFiscalPedido = objTpFiscal[item.TPFISCAL] || 'Lucro Real';  
+        dsTipoEnviar = objTpEnviar[item.TPARQUIVO] || item.TPARQUIVO;
 
         return {
             IDPEDIDO: item.IDPEDIDO,
@@ -134,7 +134,16 @@ export const ActionNotaPDF = ({ dadosPedido, dadosDetalhePedido }) => {
     })
 
 
-    
+    if (!dados || dados.length === 0) {
+        return (
+            <Fragment>
+                <div>Nenhum dado encontrado para exibir o pedido.</div>
+            </Fragment>
+        );
+    }
+
+    const dadoPrincipal = dados[0]; 
+
     return (
         <Fragment>
             <div style={styles.page}>
@@ -143,20 +152,20 @@ export const ActionNotaPDF = ({ dadosPedido, dadosDetalhePedido }) => {
                     <tbody>
                         <tr>
                             <td rowspan="2" width="200" align="center" id="marcapedido">
-                                <img src={dados[0]?.logoPedido} style={{width: '200px', height: '100px', border: 'none'}} />
+                                <img src={dadoPrincipal?.logoPedido} style={{width: '200px', height: '100px', border: 'none'}} />
                             </td>
                             <td rowspan="2" width="200" align="center" id="tipopedido">
-                                <p style={{fontSize: '1rem', margin: '0px', padding: '0px'}}> PEDIDO DE COMPRAS<br />{dados[0]?.MODPEDIDO}</p>
-                                <p style={{fontSize: '1rem', margin: '0px'}}>Nº: <b>{dados[0]?.IDPEDIDO}</b></p></td>
+                                <p style={{fontSize: '1rem', margin: '0px', padding: '0px'}}> PEDIDO DE COMPRAS<br />{dadoPrincipal?.MODPEDIDO}</p>
+                                <p style={{fontSize: '1rem', margin: '0px'}}>Nº: <b>{dadoPrincipal?.IDPEDIDO}</b></p></td>
                             <td align="center" id="fornecedorpedidoImprimir" style={{fontSize: '0.563rem'}}>
                                 Fabricante: <br />
-                                <b><p style={{fontSize: '0.813rem', margin: '0px'}}>{dados[0]?.FABRICANTE}</p></b>
+                                <b><p style={{fontSize: '0.813rem', margin: '0px'}}>{dadoPrincipal?.FABRICANTE}</p></b>
                             </td>
                         </tr>
                         <tr>
                             <td id="razaofornecedorpedidoImprimir" style={{fontSize: '0.563rem'}}>
                                 Razão Social Fornecedor: <br />
-                                <p style={{fontSize: '0.813rem', margin: '0px'}}>{dados[0]?.NOFORNECEDOR}</p>
+                                <p style={{fontSize: '0.813rem', margin: '0px'}}>{dadoPrincipal?.NOFORNECEDOR}</p>
                             </td>
                         </tr>
                     </tbody>
@@ -166,28 +175,28 @@ export const ActionNotaPDF = ({ dadosPedido, dadosDetalhePedido }) => {
                     <tbody>
                         <tr>
                             <td id="infoContatoImprimir" rowspan="2" width="400" style={{fontSize: '0.563rem'}}>
-                                Calçados: andre.compras@grupotesouradeouro.com.br - (61) 99697-2844 <br />Faturamento: {dados[0]?.EEMAILFATURAMENTO} - {dados[0]?.NUTELFATURAMENTO}<br />
-                                Cobrança: {dados[0]?.EEMAILCOBRANCA} - {dados[0]?.NUTELCOBRANCA}<br />
-                                Financeiro: {dados[0]?.EEMAILFINANCEIRO} - {dados[0]?.NUTELFINANCEIRO}<br />
-                                Compras: {dados[0]?.EEMAILCOMPRAS} - {dados[0]?.NUTELCOMPRAS}<br />
-                                Cadastro: {dados[0]?.EEMAILCADASTRO} - {dados[0]?.NUTELCADASTRO}<br />
+                                Calçados: andre.compras@grupotesouradeouro.com.br - (61) 99697-2844 <br />Faturamento: {dadoPrincipal?.EEMAILFATURAMENTO} - {dadoPrincipal?.NUTELFATURAMENTO}<br />
+                                Cobrança: {dadoPrincipal?.EEMAILCOBRANCA} - {dadoPrincipal?.NUTELCOBRANCA}<br />
+                                Financeiro: {dadoPrincipal?.EEMAILFINANCEIRO} - {dadoPrincipal?.NUTELFINANCEIRO}<br />
+                                Compras: {dadoPrincipal?.EEMAILCOMPRAS} - {dadoPrincipal?.NUTELCOMPRAS}<br />
+                                Cadastro: {dadoPrincipal?.EEMAILCADASTRO} - {dadoPrincipal?.NUTELCADASTRO}<br />
                             </td>
                             <td id="cnpjpedidoImprimir" width="200" style={{fontSize: '0.563rem'}}>CNPJ: <br />
-                                <p style={{fontSize: '0.813rem', margin: '0px'}}>{dados[0]?.CNPJFORN}</p>
+                                <p style={{fontSize: '0.813rem', margin: '0px'}}>{dadoPrincipal?.CNPJFORN}</p>
                             </td>
                             <td id="emailforncpedidoImprimir" style={{fontSize: '0.563rem'}}>Email: <br />
-                                <p style={{fontSize: '0.813rem', margin: '0px'}}>{dados[0]?.EMAILFORN}</p>
+                                <p style={{fontSize: '0.813rem', margin: '0px'}}>{dadoPrincipal?.EMAILFORN}</p>
                             </td>
                             <td id="foneforncpedidoImprimir" width="100" style={{fontSize: '0.563rem'}}>Tel: <br />
-                                <p style={{fontSize: '0.813rem', margin: '0px'}}>{dados[0]?.FONEFORN}</p>
+                                <p style={{fontSize: '0.813rem', margin: '0px'}}>{dadoPrincipal?.FONEFORN}</p>
                             </td>
                         </tr>
                         <tr>
                             <td colspan="2" width="200" id="iepedidoImprimir">INSC EST: <br />
-                                <p style={{fontSize: '0.813rem', margin: '0px'}}>{dados[0]?.INSCESTFORN}</p>
+                                <p style={{fontSize: '0.813rem', margin: '0px'}}>{dadoPrincipal?.INSCESTFORN}</p>
                             </td>
                             <td id="fonecelularforncpedidoImprimir" style={{fontSize: '0.563rem'}}>Cel: <br />
-                                <p style={{fontSize: '0.813rem', margin: '0px'}}>{dados[0]?.FONEFORN}</p>
+                                <p style={{fontSize: '0.813rem', margin: '0px'}}>{dadoPrincipal?.FONEFORN}</p>
                             </td>
                         </tr>
                     </tbody>
@@ -198,13 +207,13 @@ export const ActionNotaPDF = ({ dadosPedido, dadosDetalhePedido }) => {
                     <tbody>
                         <tr>
                             <td width="200" id="datapedidoImprimir" style={{fontSize: '0.563rem'}}>Data do Pedido: <br />
-                                <p style={{fontSize: '0.813rem', margin: '0px'}}>{dados[0]?.DTPEDIDO}</p>
+                                <p style={{fontSize: '0.813rem', margin: '0px'}}>{dadoPrincipal?.DTPEDIDO}</p>
                             </td>
                             <td width="200" id="dataentregapedidoImprimir" style={{fontSize: '0.563rem'}}>Data da Entrega: <br />
-                                <p style={{fontSize: '0.813rem', margin: '0px'}}>{dados[0]?.DTPREVENTREGAFORMATADA}</p>
+                                <p style={{fontSize: '0.813rem', margin: '0px'}}>{dadoPrincipal?.DTPREVENTREGAFORMATADA}</p>
                             </td>
-                            <td id="endforncpedidoImprimir" style={{fontSize: '0.563rem'}}>Endereço: <br /><p style={{fontSize: '0.813rem', margin: '0px'}}>{dados[0]?.ENDFORN}</p> </td>
-                            <td id="complforncpedidoImprimir" style={{fontSize: '0.563rem'}}>Complemento: <br /><p style={{fontSize: '0.813rem', margin: '0px'}}>{dados[0]?.COMPFORN}</p> <strong></strong> </td>
+                            <td id="endforncpedidoImprimir" style={{fontSize: '0.563rem'}}>Endereço: <br /><p style={{fontSize: '0.813rem', margin: '0px'}}>{dadoPrincipal?.ENDFORN}</p> </td>
+                            <td id="complforncpedidoImprimir" style={{fontSize: '0.563rem'}}>Complemento: <br /><p style={{fontSize: '0.813rem', margin: '0px'}}>{dadoPrincipal?.COMPFORN}</p> <strong></strong> </td>
                         </tr>
                     </tbody>
                 </table>
@@ -212,10 +221,10 @@ export const ActionNotaPDF = ({ dadosPedido, dadosDetalhePedido }) => {
                 <table width="100%" className="bordasimples">
                     <tbody>
                         <tr>
-                            <td width="400" id="compradorpedidoImprimir" style={{fontSize: '0.563rem'}}>Comprador: <br /><p style={{fontSize: '0.813rem', margin: '0px'}}>{dados[0]?.NOMECOMPRADOR}</p> </td>
-                            <td id="numeroforncpedidoImprimir" style={{fontSize: '0.563rem'}}>N°: <br /><p style={{fontSize: '0.813rem', margin: '0px'}}>{dados[0]?.NUMEROFORN}</p> </td>
-                            <td id="bairroforncpedidoImprimir" style={{fontSize: '0.563rem'}}>Bairro: <br /><p style={{fontSize: '0.813rem', margin: '0px'}}>{dados[0]?.BAIRROFORN}</p> </td>
-                            <td id="transpforncpedidoImprimir" style={{fontSize: '0.563rem'}}>Transportadora/Telefone: <br /><p style={{fontSize: '0.813rem', margin: '0px'}}>{dados[0]?.NOMETRANSPORTADORA} - </p> </td>
+                            <td width="400" id="compradorpedidoImprimir" style={{fontSize: '0.563rem'}}>Comprador: <br /><p style={{fontSize: '0.813rem', margin: '0px'}}>{dadoPrincipal?.NOMECOMPRADOR}</p> </td>
+                            <td id="numeroforncpedidoImprimir" style={{fontSize: '0.563rem'}}>N°: <br /><p style={{fontSize: '0.813rem', margin: '0px'}}>{dadoPrincipal?.NUMEROFORN}</p> </td>
+                            <td id="bairroforncpedidoImprimir" style={{fontSize: '0.563rem'}}>Bairro: <br /><p style={{fontSize: '0.813rem', margin: '0px'}}>{dadoPrincipal?.BAIRROFORN}</p> </td>
+                            <td id="transpforncpedidoImprimir" style={{fontSize: '0.563rem'}}>Transportadora/Telefone: <br /><p style={{fontSize: '0.813rem', margin: '0px'}}>{dadoPrincipal?.NOMETRANSPORTADORA} - </p> </td>
                         </tr>
                     </tbody>
                 </table>
@@ -223,25 +232,25 @@ export const ActionNotaPDF = ({ dadosPedido, dadosDetalhePedido }) => {
                 <table width="100%" className="bordasimples">
                     <tbody>
                         <tr>
-                            <td width="400" id="vendedorpedidoImprimir" style={{fontSize: '0.563rem'}}>Vendedor: <br /><p style={{fontSize: '0.813rem', margin: '0px'}}>{dados[0]?.NOVENDEDOR}</p> </td>
+                            <td width="400" id="vendedorpedidoImprimir" style={{fontSize: '0.563rem'}}>Vendedor: <br /><p style={{fontSize: '0.813rem', margin: '0px'}}>{dadoPrincipal?.NOVENDEDOR}</p> </td>
 
-                            <td width="400" id="cidadeforncpedidoImprimir" style={{fontSize: '0.563rem'}}>Cidade: <br /><p style={{fontSize: '0.813rem', margin: '0px'}}>{dados[0]?.CIDADEFORN}s</p> </td>
-                            <td id="desc1pedidoImprimir" style={{fontSize: '0.563rem'}}>Desc. I (%): <br /><p style={{fontSize: '0.813rem', margin: '0px'}}>{formatMoeda(toFloat(dados[0]?.DESCPERC01))}</p> </td>
-                            <td id="desc2pedidoImprimir" style={{fontSize: '0.563rem'}}>Desc. II(%): <br /><p style={{fontSize: '0.813rem', margin: '0px'}}>{formatMoeda(toFloat(dados[0]?.DESCPERC02))}</p> </td>
-                            <td id="desc3pedidoImprimir" style={{fontSize: '0.563rem'}}>Desc. III(%): <br /><p style={{fontSize: '0.813rem', margin: '0px'}}>{formatMoeda(toFloat(dados[0]?.DESCPERC03))}</p> </td>
+                            <td width="400" id="cidadeforncpedidoImprimir" style={{fontSize: '0.563rem'}}>Cidade: <br /><p style={{fontSize: '0.813rem', margin: '0px'}}>{dadoPrincipal?.CIDADEFORN}s</p> </td>
+                            <td id="desc1pedidoImprimir" style={{fontSize: '0.563rem'}}>Desc. I (%): <br /><p style={{fontSize: '0.813rem', margin: '0px'}}>{formatMoeda(toFloat(dadoPrincipal?.DESCPERC01))}</p> </td>
+                            <td id="desc2pedidoImprimir" style={{fontSize: '0.563rem'}}>Desc. II(%): <br /><p style={{fontSize: '0.813rem', margin: '0px'}}>{formatMoeda(toFloat(dadoPrincipal?.DESCPERC02))}</p> </td>
+                            <td id="desc3pedidoImprimir" style={{fontSize: '0.563rem'}}>Desc. III(%): <br /><p style={{fontSize: '0.813rem', margin: '0px'}}>{formatMoeda(toFloat(dadoPrincipal?.DESCPERC03))}</p> </td>
                         </tr>
                     </tbody>
                 </table>
 
                 <table width="100%" className="bordasimples">
                     <tbody><tr>
-                        <td width="400" id="condpagpedidoImprimir" style={{fontSize: '0.563rem'}}>Cond. Pagamento: <br /><p style={{fontSize: '0.813rem', margin: '0px'}}>{dados[0]?.DSCONDICAOPAG}</p> </td>
+                        <td width="400" id="condpagpedidoImprimir" style={{fontSize: '0.563rem'}}>Cond. Pagamento: <br /><p style={{fontSize: '0.813rem', margin: '0px'}}>{dadoPrincipal?.DSCONDICAOPAG}</p> </td>
 
-                        <td id="cepforncpedidoImprimir" style={{fontSize: '0.563rem'}}>CEP: <br /><p style={{fontSize: '0.813rem', margin: '0px'}}>{dados[0]?.CEPFORN}</p> </td>
-                        <td id="ufforncpedidoImprimir" style={{fontSize: '0.563rem'}}>UF: <br /><p style={{fontSize: '0.813rem', margin: '0px'}}>{dados[0]?.UFFORN}</p> </td>
+                        <td id="cepforncpedidoImprimir" style={{fontSize: '0.563rem'}}>CEP: <br /><p style={{fontSize: '0.813rem', margin: '0px'}}>{dadoPrincipal?.CEPFORN}</p> </td>
+                        <td id="ufforncpedidoImprimir" style={{fontSize: '0.563rem'}}>UF: <br /><p style={{fontSize: '0.813rem', margin: '0px'}}>{dadoPrincipal?.UFFORN}</p> </td>
                         <td id="freteforncpedidoImprimir" style={{fontSize: '0.563rem'}}>Frete: <br />
                             <p style={{fontSize: '0.813rem', margin: '0px'}}>
-                                {dados[0]?.dsTipoFretePedido}
+                                {dadoPrincipal?.dsTipoFretePedido}
                             </p> 
                         </td>
                     </tr>
@@ -251,11 +260,11 @@ export const ActionNotaPDF = ({ dadosPedido, dadosDetalhePedido }) => {
                 <table width="100%" className="bordasimples">
                     <tbody>
                             <tr>    
-                                <td width="400" id="obs1pedidoImprimir" style={{fontSize: '0.563rem'}}>Observações: <br/><p style={{fontSize: '0.563rem'}}>{dados[0]?.OBSPEDIDO} - {dados[0]?.OBSPEDIDO2} </p> </td>
-                                <td id="fiscalpedidoImprimir" style={{fontSize: '0.563rem'}}>Fiscal: <br/><p style={{fontSize: '0.813rem', margin: '0px'}}>{dados[0]?.dsTipoFiscalPedido}</p> </td>
-                                <td id="enviarpedidoImprimir" style={{fontSize: '0.563rem'}}>Enviar: <br/><p style={{fontSize: '0.813rem', margin: '0px'}}>{dados[0]?.dsTipoEnviar} </p> </td>               
-                                <td id="tipopedidoImprimir" style={{fontSize: '0.563rem'}}>Tipo: <br/><p style={{fontSize: '0.813rem', margin: '0px'}}>{dados[0]?.MODPEDIDO} </p> </td>          
-                                <td id="comissaopedidoImprimir" style={{fontSize: '0.563rem'}}>Comissão: <br/><p style={{fontSize: '0.813rem', margin: '0px'}}>{formatMoeda(toFloat(dados[0]?.PERCCOMISSAO))} </p> </td>
+                                <td width="400" id="obs1pedidoImprimir" style={{fontSize: '0.563rem'}}>Observações: <br/><p style={{fontSize: '0.563rem'}}>{dadoPrincipal?.OBSPEDIDO} - {dadoPrincipal?.OBSPEDIDO2} </p> </td>
+                                <td id="fiscalpedidoImprimir" style={{fontSize: '0.563rem'}}>Fiscal: <br/><p style={{fontSize: '0.813rem', margin: '0px'}}>{dadoPrincipal?.dsTipoFiscalPedido}</p> </td>
+                                <td id="enviarpedidoImprimir" style={{fontSize: '0.563rem'}}>Enviar: <br/><p style={{fontSize: '0.813rem', margin: '0px'}}>{dadoPrincipal?.dsTipoEnviar} </p> </td>               
+                                <td id="tipopedidoImprimir" style={{fontSize: '0.563rem'}}>Tipo: <br/><p style={{fontSize: '0.813rem', margin: '0px'}}>{dadoPrincipal?.MODPEDIDO} </p> </td>          
+                                <td id="comissaopedidoImprimir" style={{fontSize: '0.563rem'}}>Comissão: <br/><p style={{fontSize: '0.813rem', margin: '0px'}}>{formatMoeda(toFloat(dadoPrincipal?.PERCCOMISSAO))} </p> </td>
                             </tr>
                     </tbody>
                 </table>

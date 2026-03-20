@@ -182,6 +182,7 @@ export const ActionPesquisaHome = ({ usuarioLogado }) => {
     setActionListaPedidos(true);
     refetchListaPedidos();
   }
+  
   const handleClickRelatorioResumido = () => {
     setActionPedidoResumido(true);
     setActionListaPedidos(false);

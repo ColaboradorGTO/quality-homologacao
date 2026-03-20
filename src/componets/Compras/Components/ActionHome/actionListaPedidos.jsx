@@ -17,7 +17,6 @@ import { get } from '../../../../api/funcRequest';
 import { ActionPDFPedidoSemPreco } from './ActionPDFSemPreco/actionPDFPedidoSemPreco';
 import { ActionPDFPedido } from './ActionPDF/actionPDFPedido';
 import { toFloat } from '../../../../utils/toFloat';
-import { ActionPesquisaNovoPedido } from '../ActionNovoPedido/actionPesquisaNovoPedido';
 import Swal from 'sweetalert2';
 import { useAtivarCancelar } from './hook/useAtivaCancelar';
 
@@ -610,17 +609,40 @@ export const ActionListaPedidos = ({
     };
 
   const handleImprimir = async (IDPEDIDO) => {
+    const confirmacao = await Swal.fire({
+      icon: 'question',
+      title: '',
+      text: 'Este pedido é para o Outlet Família?',
+      showCancelButton: true,
+      confirmButtonText: 'Sim',
+      cancelButtonText: 'Não',
+    })
+
+    const stImprimir = confirmacao.value === true || confirmacao.dismiss === 'cancel';
+    const stOutlet = confirmacao.value === true;
+
+    if (!stImprimir) {
+      return; // Sai se usuário não quer imprimir
+    }
+
     try {
       const response = await get(`/lista-pedidos?idPedido=${IDPEDIDO}`)
       const responseDetlhe = await get(`/listaDetalhePedidos?idPedido=${IDPEDIDO}`)
       if (response.data && responseDetlhe.data) {
-        setDadosPedido(response.data)
+        setDadosPedido({
+          ...response.data,
+          STOUTLET: stOutlet ? 'True' : 'False' // Adiciona a propriedade STOUTLET com base na escolha do usuário
+        })
         setDadosDetalhePedido(responseDetlhe.data)
+        setModalPedidoNota(true)
       } else {
         Swal.fire({
           icon: 'error',
           title: 'Erro',
           text: 'Não foi possível obter os dados do pedido para impressão.',
+          customClass: {
+            container: 'custom-swal'
+          }
         })
         return;
       }
@@ -632,7 +654,6 @@ export const ActionListaPedidos = ({
   const handleClickImprimir = async (row) => {
     if (row.IDPEDIDO) {
       handleImprimir(row.IDPEDIDO)
-      setModalPedidoNota(true)
     }
   }
 
