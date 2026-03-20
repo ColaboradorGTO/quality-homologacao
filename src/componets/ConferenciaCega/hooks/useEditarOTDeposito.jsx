@@ -3,12 +3,14 @@ import { useQuery } from "react-query";
 import { useState, useEffect } from "react";
 import { get, post, put } from "../../../api/funcRequest";
 
-export const useEditarOT = ({
+export const useEditarOTDeposito = ({
   handleClose,
   refetchListaConferencia,
   optionsModulos,
   usuarioLogado,
   dadosDetalheTransferencia,
+  setDadosDetalheTransferencia,
+
 }) => {
 
   const [empresaOrigem, setEmpresaOrigem] = useState('')
@@ -98,142 +100,51 @@ export const useEditarOT = ({
     );
   };
 
-  const handleExcluirProduto = async (produto) => {
-
-    const idOT = produto.IDRESUMOOT || idResumoOT;
-
-    if (produto.QTDEXPEDICAO === 0) {
-      const result = await Swal.fire({
-        title: 'Atenção',
-        text: 'Deseja excluir esse produto da O.T.?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Sim, excluir',
-        cancelButtonText: 'Cancelar',
-        customClass: {
-          container: 'custom-swal'
-        }
-      })
-
-      if (!result.isConfirmed) {
-        return;
-      }
-
-      const putDataExcluir = {
-        IDPRODUTO: produto.IDPRODUTO,
-        IDSTATUSOT: 5,
-        IDRESUMOOT: idOT,
-      }
-
-      try {
-        const response = await put('/resumo-ordem-transferencia-cega/:id', putDataExcluir);
-
-        setDadosProdutosTabela(prev =>
-          prev.filter(item => item.IDPRODUTO !== produto.IDPRODUTO)
-        );
-
-        const textDados = JSON.stringify(putDataExcluir);
-        let textoFuncao = 'CONFERENCIA CEGA/PRODUTO EXCLUIDO COM SUCESSO';
-        const ipUsuario = await getIPUsuario();
-
-        const createData = {
-          IDFUNCIONARIO: String(usuarioLogado?.id),
-          PATHFUNCAO: textoFuncao,
-          DADOS: textDados,
-          IP: ipUsuario || "INDISPONÍVEL"
-        };
-
-        await post('/log-web', createData)
-
-        Swal.fire({
-          title: 'Sucesso!',
-          text: 'Produto excluído com sucesso.',
-          icon: 'success',
-          customClass: { container: 'custom-swal' }
-        });
-
-        handleClose();
-        refetchListaConferencia()
-
-        return response.data;
-      } catch (error) {
-
-        console.error('Erro ao cadastrar OT:', error);
-        const textDados = JSON.stringify(putDataExcluir);
-        let textoFuncao = 'CONFERENCIA CEGA/ERRO AO EXCLUIR OT COM SUCESSO';
-        const ipUsuario = await getIPUsuario();
-
-        const createData = {
-          IDFUNCIONARIO: String(usuarioLogado?.id),
-          PATHFUNCAO: textoFuncao,
-          DADOS: textDados,
-          IP: ipUsuario || "INDISPONÍVEL"
-        };
-
-        const responsePost = await post('/log-web', createData)
-
-        Swal.fire({
-          title: 'Erro!',
-          text: 'Erro ao excluir produto.',
-          icon: 'error',
-          customClass: {
-            container: 'custom-swal'
-          }
-        });
-        return responsePost.data;
-
-      }
-
-    } else {
-      handleChangeQtdAjuste(produto.IDPRODUTO, 0);
-    }
-  };
-
-  const { data: dadosProdutos = [], isLoading: isLoadingProdutos } = useQuery(
-    ['listaProdutos', produto, empresaOrigem?.value],
+  const { data: dadosProdutosDeposito = [] } = useQuery(
+    ['listaProdutos', produto],
     async () => {
       const response = await get(
-        `/listaProdutos?idEmpresa=${empresaOrigem?.value}&idProduto=${produto}&page=1`
+        `/listaProdutos?idEmpresa=${usuarioLogado?.IDEMPRESA}&idProduto=${produto}&page=1`
       );
 
-      if (response.data?.length > 0) {
-        const novo = response.data[0];
+      setDadosDetalheTransferencia(prev => {
+        const novos = [...prev];
 
-        setDadosProdutosTabela(prev => {
-          const index = prev.findIndex(p => p.IDPRODUTO === novo.IDPRODUTO);
+        response.data.forEach(novo => {
+          const index = novos.findIndex(p => p.IDPRODUTO === novo.IDPRODUTO);
 
           if (index >= 0) {
-            const atualizado = [...prev];
-            atualizado[index] = {
-              ...atualizado[index],
-              QTDAJUSTE: (atualizado[index].QTDAJUSTE || 0) + 1
+            novos[index] = {
+              ...novos[index],
+              QTDEXPEDICAO: novos[index].QTDEXPEDICAO + 1
             };
-            return atualizado;
+          } else {
+            novos.push({
+              IDPRODUTO: novo.IDPRODUTO,
+              NUCODBARRAS: novo.NUCODBARRAS,
+              DSNOME: novo.DSNOME,
+
+              VLRUNITVENDA: Number(novo.PRECOVENDA || 0),
+              VLRUNITCUSTO: Number(novo.PRECOCUSTO || 0),
+
+              QTDEXPEDICAO: 1,
+              QTDRECEPCAO: 0,
+              QTDDIFERENCA: 0,
+              QTDAJUSTE: 0,
+
+              IDSTATUSOT: 1
+            });
           }
-
-          return [...prev, {
-            IDPRODUTO: novo.IDPRODUTO,
-            NUCODBARRAS: novo.NUCODBARRAS,
-            DSNOME: novo.DSNOME,
-            VLRUNITCUSTO: parseFloat(novo.PRECOCUSTO),
-            VLRUNITVENDA: parseFloat(novo.PRECOVENDA),
-            QTDEXPEDICAO: 0,
-            QTDRECEPCAO: 0,
-            QTDDIFERENCA: 0,
-            QTDAJUSTE: 1,
-          }];
         });
-      }
 
-      setProduto('');
+        return novos;
+      });
+
+      setProduto("");
       return response.data;
     },
     {
-      enabled: !!(
-
-        produto.length > 8 &&
-        empresaOrigem?.value
-      )
+      enabled: Boolean(produto && produto.length > 8)
     }
   );
 
@@ -251,7 +162,6 @@ export const useEditarOT = ({
       return;
     }
   }, [produto, empresaDestino]);
-
 
   const onSubmit = async () => {
     if (optionsModulos[0]?.CRIAR == 'False') {
@@ -282,29 +192,67 @@ export const useEditarOT = ({
       return;
     }
 
+    let nCtTotalItens = 0;
+    let nQtdTotalItens = 0;
+    let dVlrTotalVenda = 0;
+    let dVlrTotalCusto = 0;
+
     const dadosdetalheot = dadosProdutosTabela.map(item => {
-      const nQtdAjuste = parseInt(item.QTDAJUSTE || 0);
+      const nQtdProduto = parseInt(item.QTDEXPEDICAO || 0);
+      const nVlrVenda = parseFloat(item.VLRUNITVENDA || 0);
+      const nVlrCusto = parseFloat(item.VLRUNITCUSTO || 0);
+
+      nCtTotalItens++;
+      nQtdTotalItens += nQtdProduto;
+      dVlrTotalVenda += nQtdProduto * nVlrVenda;
+      dVlrTotalCusto += nQtdProduto * nVlrCusto;
 
       return {
         IDPRODUTO: item.IDPRODUTO,
-        QTDEXPEDICAO: 0,
+        QTDEXPEDICAO: nQtdProduto,
         QTDRECEPCAO: 0,
         QTDDIFERENCA: 0,
-        QTDAJUSTE: nQtdAjuste,
-        VLRUNITVENDA: item.VLRUNITVENDA,
-        VLRUNITCUSTO: item.VLRUNITCUSTO,
-        STCONFERIDO: 'True',
-        IDUSRAJUSTE: usuarioLogado?.id,
+        QTDAJUSTE: 0,
+        VLRUNITVENDA: nVlrVenda,
+        VLRUNITCUSTO: nVlrCusto,
+        STCONFERIDO: 'False',
+        IDUSRAJUSTE: 0,
         STATIVO: 'True',
-        STFALTA: nQtdAjuste > 0 ? 'True' : 'False',
-        STSOBRA: nQtdAjuste < 0 ? 'True' : 'False',
+        STFALTA: 'False',
+        STSOBRA: 'False',
       };
     });
 
     const putData = {
+      IDEMPRESAORIGEM: empresaOrigem?.value,
+      IDEMPRESADESTINO: empresaDestino?.value,
+      DATAEXPEDICAO: "",
+      IDOPERADOREXPEDICAO: usuarioLogado?.id,
+      NUTOTALITENS: nCtTotalItens,
+      QTDTOTALITENS: nQtdTotalItens,
+      QTDTOTALITENSRECEPCIONADO: 0,
+      QTDTOTALITENSDIVERGENCIA: 0,
+      NUTOTALVOLUMES: 0,
+      TPVOLUME: "",
+      VRTOTALCUSTO: dVlrTotalCusto,
+      VRTOTALVENDA: dVlrTotalVenda,
+      DTRECEPCAO: "",
+      IDOPERADORRECEPTOR: 0,
+      DSOBSERVACAO: "",
+      IDUSRCANCELAMENTO: 0,
+      DTULTALTERACAO: "",
+      IDSTDIVERGENCIA: 0,
+      OBSDIVERGENCIA: "",
+      STEMISSAONFE: "False",
+      NUMERONFE: "",
+      STENTRADAINVENTARIO: "False",
+      QTDCONFERENCIA: 0,
       dadosdetalheot,
-      IDSTATUSOT: 7,
       IDRESUMOOT: idResumoOT,
+      IDSTATUSOT: 1,
+      IDUSRAJUSTE: 0,
+      DTAJUSTE: "",
+      QTDTOTALITENSAJUSTE: 0,
     };
 
     try {
@@ -312,7 +260,7 @@ export const useEditarOT = ({
       const response = await put('/resumo-ordem-transferencia/:id', putData);
 
       const textDados = JSON.stringify(putData);
-      let textoFuncao = 'CONFERENCIA CEGA/ OT ATUALIZADA COM SUCESSO';
+      let textoFuncao = 'DEPOSITO/ OT ATUALIZADA COM SUCESSO';
       const ipUsuario = await getIPUsuario();
 
       const createData = {
@@ -325,8 +273,8 @@ export const useEditarOT = ({
       await post('/log-web', createData)
 
       Swal.fire({
-        title: 'Cadastro',
-        text: 'OT cadastrada com Sucesso',
+        title: 'Sucesso',
+        text: 'OT atualizada com Sucesso',
         icon: 'success',
         confirmButtonText: 'OK',
         customClass: {
@@ -341,9 +289,9 @@ export const useEditarOT = ({
 
     } catch (error) {
 
-      console.error('Erro ao cadastrar OT:', error);
+      console.error('Erro ao atualizar OT:', error);
       const textDados = JSON.stringify(putData);
-      let textoFuncao = 'CONFERENCIA CEGA/ERRO AO ATUALIZAR OT COM SUCESSO';
+      let textoFuncao = 'DEPOSITO/ERRO AO ATUALIZAR OT';
       const ipUsuario = await getIPUsuario();
 
       const createData = {
@@ -384,7 +332,6 @@ export const useEditarOT = ({
     quantidadeAjuste,
     setQuantidadeAjuste,
     handleChangeQtdAjuste,
-    handleExcluirProduto,
     onSubmit,
   }
 };

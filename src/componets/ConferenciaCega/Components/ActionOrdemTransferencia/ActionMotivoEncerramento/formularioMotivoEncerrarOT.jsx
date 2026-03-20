@@ -8,7 +8,6 @@ import { useEncerrarOT } from "../../../hooks/useEncerrarOT";
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal";
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal";
 
-
 export const FormularioMotivoEncerrarOT = ({
   dadosEncerrarOT,
   handleClose,
@@ -17,6 +16,7 @@ export const FormularioMotivoEncerrarOT = ({
   usuarioLogado
 
 }) => {
+
   const { handleSubmit, formState: { errors }, clearErrors, control, setError } = useForm({
     mode: "onChange"
   });
@@ -120,7 +120,7 @@ export const FormularioMotivoEncerrarOT = ({
             </div>
           </div>
         </div>
-
+        
         <div>
           <FooterModal
             ButtonTypeCadastrar={ButtonTypeModal}

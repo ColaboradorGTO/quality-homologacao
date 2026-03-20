@@ -3,17 +3,15 @@ import { ActionMain } from "../../../Actions/actionMain";
 import { InputField } from "../../../Buttons/Input";
 import { ButtonType } from "../../../Buttons/ButtonType";
 import { get } from "../../../../api/funcRequest";
-import { useNavigate } from "react-router-dom";
 import { AiOutlineSearch } from "react-icons/ai";
 import { InputSelectAction } from "../../../Inputs/InputSelectAction";
 import { ActionListaOrdemTransferencia } from "./actionListaOrdemTransferencia";
 import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
-
 import { getDataAtual } from "../../../../utils/dataAtual";
 import { ActionIncluirOTModal } from "./ActionIncluirModalOT/actionIncluirOTModal";
 
-export const ActionPesquisaOrdemTransferenciaDeposito = () => {
+export const ActionPesquisaOrdemTransferenciaDeposito = ({ usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [clickContador, setClickContador] = useState(0);
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('')
@@ -23,12 +21,12 @@ export const ActionPesquisaOrdemTransferenciaDeposito = () => {
   const [modalVisivel, setModalVisivel] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(1000);
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
   useEffect(() => {
     const dataAtual = getDataAtual();
-    // setDataPesquisaInicio(dataAtual);
-    // setDataPesquisaFim(dataAtual);
-
+    setDataPesquisaInicio(dataAtual);
+    setDataPesquisaFim(dataAtual);
   }, []);
 
   const { data: dadosEmpresa = [], error: errorMarcas, isLoading: isLoadingMarcas } = useQuery(
@@ -40,79 +38,93 @@ export const ActionPesquisaOrdemTransferenciaDeposito = () => {
     { staleTime: 5 * 60 * 1000 }
   );
 
+  useEffect(() => {
+    if (!dadosEmpresa || dadosEmpresa.length === 0) return;
+    if (!usuarioLogado?.IDEMPRESA) return;
+    const empresaEncontrada = dadosEmpresa.find(
+      e => String(e.IDEMPRESA) === String(usuarioLogado?.IDEMPRESA)
+    );
+    if (empresaEncontrada) {
+      setEmpresaSelecionadaOrigem({
+        value: empresaEncontrada.IDEMPRESA,
+        label: empresaEncontrada.NOFANTASIA
+      });
+    }
+  }, [dadosEmpresa, usuarioLogado]);
+
+  useEffect(() => {
+    const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
+    if (menuSalvo) {
+      const menuParsed = JSON.parse(menuSalvo);
+      setMenuFilhoAtual(menuParsed);
+    }
+  }, []);
+
+  const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
+    ['menus-usuario-excecao', menuFilhoAtual?.ID],
+    async () => {
+      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
+
+      return response.data;
+    },
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
+  );
+
   const fetchListaConferencia = async () => {
+    const urlBase = `/listaOrdemTransferenciaConferenciaCega?idTipoFiltro=2&idEmpresaOrigem=${empresaSelecionadaOrigem.value}&idEmpresaDestino=${empresaSelecionadaDestino.value}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
+    let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
+    urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
-      const urlApi = `/listaOrdemTransferenciaConferenciaCega?idTipoFiltro=2&idEmpresaOrigem=${empresaSelecionadaOrigem}&idEmpresaDestino=${empresaSelecionadaDestino}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
-      const response = await get(urlApi);
-      
-      if (response.data.length && response.data.length === pageSize) {
-        let allData = [...response.data];
-        animacaoCarregamento(`Carregando... Página ${currentPage} de ${response.data.length}`, true);
-  
-        async function fetchNextPage(currentPage) {
-          try {
-            currentPage++;
-            const responseNextPage = await get(`${urlApi}&page=${currentPage}`);
-            if (responseNextPage.length) {
-              allData.push(...responseNextPage.data);
-              return fetchNextPage(currentPage);
-            } else {
-              return allData;
-            }
-          } catch (error) {
-            console.error('Erro ao buscar próxima página:', error);
-            throw error;
-          }
+      animacaoCarregamento('Carregando dados...', true);
+
+      const primeiraPagina = 1;
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const page = primeiraResposta.page || primeiraPagina;
+      const pageSize = primeiraResposta.pageSize || 1000;
+      const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
+      const totalPages = Math.ceil(totalRows / pageSize);
+
+      let allData = [...(primeiraResposta.data || [])];
+
+      if (totalPages > 1) {
+        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          allData.push(...(responsePage.data || []));
         }
-  
-        await fetchNextPage(currentPage);
-        return allData;
-      } else {
-       
-        return response.data;
       }
-  
+
+      return allData;
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Erro ao buscar os dados da api:', error);
       throw error;
     } finally {
       fecharAnimacaoCarregamento();
     }
   };
-   
-  const { data: dadosConferencia = [], error: errorVouchers, isLoading: isLoadingVouchers, refetch: refetchListaConferencia } = useQuery(
-    ['listaOrdemTransferenciaConferenciaCega',  empresaSelecionadaOrigem, empresaSelecionadaDestino, dataPesquisaInicio, dataPesquisaFim,  currentPage, pageSize],
-    () => fetchListaConferencia(empresaSelecionadaOrigem, empresaSelecionadaDestino, dataPesquisaInicio, dataPesquisaFim, currentPage, pageSize),
-    {
-      enabled: Boolean(empresaSelecionadaOrigem && empresaSelecionadaDestino),
-    }
-  );
-  
 
-  const handleSelectEmpresaOrigem = (e) => {
-    const selectedId = e.value;
-    if (selectedId) {
-      setEmpresaSelecionadaOrigem(selectedId);
-    }
+  const { data: dadosConferencia = [], error: errorVouchers, isLoading: isLoadingVouchers, refetch: refetchListaConferencia } = useQuery(
+    ['resumo-ordem-transferencia'],
+    () => fetchListaConferencia(),
+    { enabled: false, }
+  );
+
+  const handleSelectEmpresaOrigem = (opt) => {
+    setEmpresaSelecionadaOrigem(opt ?? null);
   }
 
-  const handleSelectEmpresaDestino = (e) => {
-    const selectedId = e.value;
-    if (selectedId) {
-      setEmpresaSelecionadaDestino(selectedId);
-    }
+  const handleSelectEmpresaDestino = (opt) => {
+    setEmpresaSelecionadaDestino(opt ?? null);
   }
 
   const handleClick = () => {
     setCurrentPage(prevPage => prevPage + 1);
     refetchListaConferencia()
     setTabelaVisivel(true);
-    
   }
 
   return (
     <Fragment>
-
       <ActionMain
         linkComponentAnterior={["Home"]}
         linkComponent={["Ordem de Transferência"]}
@@ -131,23 +143,29 @@ export const ActionPesquisaOrdemTransferenciaDeposito = () => {
         InputSelectGrupoComponent={InputSelectAction}
         labelSelectGrupo={"Loja Origem"}
         optionsGrupos={[
-          {value: '0', label:'Selecione a Loja Origem'},
+          { value: '0', label: 'Selecione a Loja Origem' },
           ...dadosEmpresa.map((empresa) => ({
-          value: empresa.IDEMPRESA,
-          label: empresa.NOFANTASIA,
-        }))]}
-        valueSelectGrupo={empresaSelecionadaOrigem}
-        onChangeSelectGrupo={handleSelectEmpresaOrigem}
+            value: empresa.IDEMPRESA,
+            label: empresa.NOFANTASIA,
+          }))]}
+        keyGrupo={empresaSelecionadaOrigem?.value}
+        isDisabledGrupo={true}
+        defaultValueSelectGrupo={empresaSelecionadaOrigem}
+        onChangeSelectGrupo={
+          handleSelectEmpresaOrigem
+        }
 
         InputSelectEmpresaComponent={InputSelectAction}
         labelSelectEmpresa={"Loja Destino"}
         optionsEmpresas={[
-          { value: '0', label: 'Selecione a Loja Destino'},
+          { value: '0', label: 'Selecione a Loja Destino' },
           ...dadosEmpresa.map((empresa) => ({
             value: empresa.IDEMPRESA,
             label: empresa.NOFANTASIA,
-        }))]}
-        valueSelectEmpresa={empresaSelecionadaOrigem}
+            isDisabled: empresa.IDEMPRESA === empresaSelecionadaOrigem.value
+
+          }))]}
+        valueSelectEmpresa={empresaSelecionadaDestino}
         onChangeSelectEmpresa={handleSelectEmpresaDestino}
 
         ButtonSearchComponent={ButtonType}
@@ -163,16 +181,23 @@ export const ActionPesquisaOrdemTransferenciaDeposito = () => {
         IconCadastro={AiOutlineSearch}
       />
 
-
       {tabelaVisivel && (
         <ActionListaOrdemTransferencia
-         dadosConferencia={dadosConferencia} />
+          usuarioLogado={usuarioLogado}
+          optionsModulos={optionsModulos}
+          refetchListaConferencia={refetchListaConferencia}
+          dadosConferencia={dadosConferencia}
+        />
       )}
 
       <ActionIncluirOTModal
         show={modalVisivel}
         handleClose={() => setModalVisivel(false)}
-        
+        usuarioLogado={usuarioLogado}
+        refetchListaConferencia={refetchListaConferencia}
+        optionsModulos={optionsModulos}
+        empresaSelecionadaOrigem={empresaSelecionadaOrigem}
+
       />
     </Fragment>
   )

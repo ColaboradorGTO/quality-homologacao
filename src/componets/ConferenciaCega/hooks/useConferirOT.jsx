@@ -3,12 +3,13 @@ import { useQuery } from "react-query";
 import { useState, useEffect } from "react";
 import { get, post, put } from "../../../api/funcRequest";
 
-export const useEditarOT = ({
+export const useConferirOT = ({
   handleClose,
   refetchListaConferencia,
   optionsModulos,
   usuarioLogado,
   dadosDetalheTransferencia,
+
 }) => {
 
   const [empresaOrigem, setEmpresaOrigem] = useState('')
@@ -23,14 +24,12 @@ export const useEditarOT = ({
 
   const getIPUsuario = async () => {
     let usuarioIP = null;
-
     try {
       const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
       usuarioIP = ipWhoisData?.ip;
     } catch (error) {
       console.error("Erro ao buscar IP via ipwho.is:", error);
     }
-
     if (!usuarioIP) {
       try {
         const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
@@ -98,32 +97,47 @@ export const useEditarOT = ({
     );
   };
 
-  const handleExcluirProduto = async (produto) => {
+  const handleDiminuirProduto = (produto) => {
+    const itemAtual = dadosProdutosTabela.find(
+      item => item.IDPRODUTO === produto.IDPRODUTO
+    );
+    if (!itemAtual) return;
 
+    if (itemAtual.QTDRECEPCAO <= 1) {
+      if (itemAtual.QTDEXPEDICAO === 0) {
+        setDadosProdutosTabela(prev =>
+          prev.filter(item => item.IDPRODUTO !== produto.IDPRODUTO)
+        );
+      } else {
+        setDadosProdutosTabela(prev =>
+          prev.map(item =>
+            item.IDPRODUTO === produto.IDPRODUTO
+              ? { ...item, QTDRECEPCAO: 0 }
+              : item
+          )
+        );
+      }
+      return;
+    }
+
+    setDadosProdutosTabela(prev =>
+      prev.map(item =>
+        item.IDPRODUTO === produto.IDPRODUTO
+          ? { ...item, QTDRECEPCAO: item.QTDRECEPCAO - 1 }
+          : item
+      )
+    );
+  };
+
+  const handleExcluirProduto = async (produto) => {
     const idOT = produto.IDRESUMOOT || idResumoOT;
 
     if (produto.QTDEXPEDICAO === 0) {
-      const result = await Swal.fire({
-        title: 'Atenção',
-        text: 'Deseja excluir esse produto da O.T.?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Sim, excluir',
-        cancelButtonText: 'Cancelar',
-        customClass: {
-          container: 'custom-swal'
-        }
-      })
-
-      if (!result.isConfirmed) {
-        return;
-      }
-
       const putDataExcluir = {
         IDPRODUTO: produto.IDPRODUTO,
         IDSTATUSOT: 5,
         IDRESUMOOT: idOT,
-      }
+      };
 
       try {
         const response = await put('/resumo-ordem-transferencia-cega/:id', putDataExcluir);
@@ -133,7 +147,7 @@ export const useEditarOT = ({
         );
 
         const textDados = JSON.stringify(putDataExcluir);
-        let textoFuncao = 'CONFERENCIA CEGA/PRODUTO EXCLUIDO COM SUCESSO';
+        let textoFuncao = 'DEPOSITO/CONFERENCIA PRODUTO EXCLUIDO COM SUCESSO';
         const ipUsuario = await getIPUsuario();
 
         const createData = {
@@ -143,7 +157,7 @@ export const useEditarOT = ({
           IP: ipUsuario || "INDISPONÍVEL"
         };
 
-        await post('/log-web', createData)
+        await post('/log-web', createData);
 
         Swal.fire({
           title: 'Sucesso!',
@@ -152,15 +166,10 @@ export const useEditarOT = ({
           customClass: { container: 'custom-swal' }
         });
 
-        handleClose();
-        refetchListaConferencia()
-
         return response.data;
       } catch (error) {
-
-        console.error('Erro ao cadastrar OT:', error);
         const textDados = JSON.stringify(putDataExcluir);
-        let textoFuncao = 'CONFERENCIA CEGA/ERRO AO EXCLUIR OT COM SUCESSO';
+        let textoFuncao = 'DEPOSITO/CONFERENCIA ERRO AO EXCLUIR PRODUTO';
         const ipUsuario = await getIPUsuario();
 
         const createData = {
@@ -170,27 +179,31 @@ export const useEditarOT = ({
           IP: ipUsuario || "INDISPONÍVEL"
         };
 
-        const responsePost = await post('/log-web', createData)
+        const responsePost = await post('/log-web', createData);
 
         Swal.fire({
           title: 'Erro!',
           text: 'Erro ao excluir produto.',
           icon: 'error',
-          customClass: {
-            container: 'custom-swal'
-          }
+          customClass: { container: 'custom-swal' }
         });
-        return responsePost.data;
 
+        return responsePost.data;
       }
 
     } else {
-      handleChangeQtdAjuste(produto.IDPRODUTO, 0);
+      setDadosProdutosTabela(prev =>
+        prev.map(item =>
+          item.IDPRODUTO === produto.IDPRODUTO
+            ? { ...item, QTDRECEPCAO: 0 }
+            : item
+        )
+      );
     }
   };
 
   const { data: dadosProdutos = [], isLoading: isLoadingProdutos } = useQuery(
-    ['listaProdutos', produto, empresaOrigem?.value],
+    ['listaProdutosConferir', produto, empresaOrigem?.value],
     async () => {
       const response = await get(
         `/listaProdutos?idEmpresa=${empresaOrigem?.value}&idProduto=${produto}&page=1`
@@ -206,7 +219,7 @@ export const useEditarOT = ({
             const atualizado = [...prev];
             atualizado[index] = {
               ...atualizado[index],
-              QTDAJUSTE: (atualizado[index].QTDAJUSTE || 0) + 1
+              QTDRECEPCAO: (atualizado[index].QTDRECEPCAO || 0) + 1
             };
             return atualizado;
           }
@@ -218,9 +231,11 @@ export const useEditarOT = ({
             VLRUNITCUSTO: parseFloat(novo.PRECOCUSTO),
             VLRUNITVENDA: parseFloat(novo.PRECOVENDA),
             QTDEXPEDICAO: 0,
-            QTDRECEPCAO: 0,
+            QTDRECEPCAO: 1,
             QTDDIFERENCA: 0,
-            QTDAJUSTE: 1,
+            QTDAJUSTE: 0,
+            IDRESUMOOT: idResumoOT,
+            IDSTATUSOT: dadosProdutosTabela[0]?.IDSTATUSOT
           }];
         });
       }
@@ -230,7 +245,6 @@ export const useEditarOT = ({
     },
     {
       enabled: !!(
-
         produto.length > 8 &&
         empresaOrigem?.value
       )
@@ -243,15 +257,12 @@ export const useEditarOT = ({
         title: 'A Loja de Origem e Destino devem ser Preenchidas!',
         icon: 'info',
         confirmButtonText: 'Ok',
-        customClass: {
-          container: 'custom-swal',
-        }
+        customClass: { container: 'custom-swal' }
       });
       setProduto("");
       return;
     }
   }, [produto, empresaDestino]);
-
 
   const onSubmit = async () => {
     if (optionsModulos[0]?.CRIAR == 'False') {
@@ -259,9 +270,7 @@ export const useEditarOT = ({
         title: 'Erro!',
         text: `${usuarioLogado?.NOFUNCIONARIO},\nVocê não tem permissão para criar a OT!`,
         icon: 'error',
-        customClass: {
-          container: 'custom-swal',
-        }
+        customClass: { container: 'custom-swal' }
       });
       return;
     }
@@ -275,44 +284,51 @@ export const useEditarOT = ({
         title: 'Atenção!',
         text: msg,
         icon: 'warning',
-        customClass: {
-          container: 'custom-swal'
-        }
+        customClass: { container: 'custom-swal' }
       });
       return;
     }
 
+    let nQtdTotalItens = 0;
+
     const dadosdetalheot = dadosProdutosTabela.map(item => {
-      const nQtdAjuste = parseInt(item.QTDAJUSTE || 0);
+      const nQtdProduto = parseInt(item.QTDRECEPCAO || 0);
+      const nVlrVenda = parseFloat(item.VLRUNITVENDA || 0);
+      const nVlrCusto = parseFloat(item.VLRUNITCUSTO || 0);
+
+      nQtdTotalItens += nQtdProduto;
 
       return {
         IDPRODUTO: item.IDPRODUTO,
         QTDEXPEDICAO: 0,
-        QTDRECEPCAO: 0,
+        QTDRECEPCAO: nQtdProduto,
         QTDDIFERENCA: 0,
-        QTDAJUSTE: nQtdAjuste,
-        VLRUNITVENDA: item.VLRUNITVENDA,
-        VLRUNITCUSTO: item.VLRUNITCUSTO,
+        QTDAJUSTE: 0,
+        VLRUNITVENDA: nVlrVenda,
+        VLRUNITCUSTO: nVlrCusto,
         STCONFERIDO: 'True',
-        IDUSRAJUSTE: usuarioLogado?.id,
+        IDUSRAJUSTE: 0,
         STATIVO: 'True',
-        STFALTA: nQtdAjuste > 0 ? 'True' : 'False',
-        STSOBRA: nQtdAjuste < 0 ? 'True' : 'False',
+        STFALTA: 'False',
+        STSOBRA: 'False',
       };
     });
 
     const putData = {
+      QTDTOTALITENSRECEPCIONADO: nQtdTotalItens,
+      DTRECEPCAO: "",
+      IDOPERADORRECEPTOR: Number(usuarioLogado?.id),
+      DTULTALTERACAO: "",
       dadosdetalheot,
-      IDSTATUSOT: 7,
+      IDSTATUSOT: 4,
       IDRESUMOOT: idResumoOT,
     };
 
     try {
-
       const response = await put('/resumo-ordem-transferencia/:id', putData);
 
       const textDados = JSON.stringify(putData);
-      let textoFuncao = 'CONFERENCIA CEGA/ OT ATUALIZADA COM SUCESSO';
+      let textoFuncao = 'DEPOSITO/CONFERENCIA OT SALVA COM SUCESSO';
       const ipUsuario = await getIPUsuario();
 
       const createData = {
@@ -322,16 +338,14 @@ export const useEditarOT = ({
         IP: ipUsuario || "INDISPONÍVEL"
       };
 
-      await post('/log-web', createData)
+      await post('/log-web', createData);
 
       Swal.fire({
-        title: 'Cadastro',
-        text: 'OT cadastrada com Sucesso',
+        title: 'Sucesso',
+        text: 'Recepção Salva com Sucesso!',
         icon: 'success',
         confirmButtonText: 'OK',
-        customClass: {
-          container: 'custom-swal',
-        },
+        customClass: { container: 'custom-swal' },
       });
 
       handleClose();
@@ -340,10 +354,10 @@ export const useEditarOT = ({
       return response.data;
 
     } catch (error) {
+      console.error('Erro ao salvar conferência:', error);
 
-      console.error('Erro ao cadastrar OT:', error);
       const textDados = JSON.stringify(putData);
-      let textoFuncao = 'CONFERENCIA CEGA/ERRO AO ATUALIZAR OT COM SUCESSO';
+      let textoFuncao = 'DEPOSITO/ERRO AO SALVAR CONFERENCIA OT';
       const ipUsuario = await getIPUsuario();
 
       const createData = {
@@ -353,21 +367,19 @@ export const useEditarOT = ({
         IP: ipUsuario || "INDISPONÍVEL"
       };
 
-      const responsePost = await post('/log-web', createData)
+      const responsePost = await post('/log-web', createData);
 
       Swal.fire({
         title: 'Erro',
         text: 'Ocorreu um erro ao Salvar a OT.',
         icon: 'error',
         confirmButtonText: 'OK',
-        customClass: {
-          container: 'custom-swal',
-        },
+        customClass: { container: 'custom-swal' },
       });
 
       return responsePost.data;
     }
-  }
+  };
 
   return {
     empresaOrigem,
@@ -384,6 +396,7 @@ export const useEditarOT = ({
     quantidadeAjuste,
     setQuantidadeAjuste,
     handleChangeQtdAjuste,
+    handleDiminuirProduto,
     handleExcluirProduto,
     onSubmit,
   }

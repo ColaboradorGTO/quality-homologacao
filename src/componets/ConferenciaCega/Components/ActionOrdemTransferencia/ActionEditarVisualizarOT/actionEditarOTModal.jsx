@@ -1,4 +1,3 @@
-
 import { Fragment } from "react"
 import Modal from 'react-bootstrap/Modal';
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal";

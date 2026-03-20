@@ -1,24 +1,25 @@
 import { Fragment } from "react"
 import Modal from 'react-bootstrap/Modal';
 import { HeaderModal } from "../../../../Modais/HeaderModal/HeaderModal";
-import { FormularioMotivoEncerrarOT } from "./formularioMotivoEncerrarOT";
+import { FormularioConferirOT } from "./formularioConferirOT";
 
-export const ActionMotivoEncerrarOTModal = ({
+export const ActionConferirOT = ({
   show,
   handleClose,
-  dadosEncerrarOT,
-  refetchListaConferencia,
-  optionsModulos,
+  dadosDetalheTransferencia,
+  setDadosDetalheTransferencia,
   usuarioLogado,
+  optionsModulos,
+  refetchListaConferencia
+
 }) => {
 
   return (
     <Fragment>
       <Modal
         show={show}
-        centered={true}
         onHide={handleClose}
-        size="lg"
+        size="xl"
       >
         <HeaderModal
           title="Controle Ordem de Transferência"
@@ -26,12 +27,13 @@ export const ActionMotivoEncerrarOTModal = ({
           handleClose={handleClose}
         />
         <Modal.Body >
-          <FormularioMotivoEncerrarOT
-            dadosEncerrarOT={dadosEncerrarOT}
+          <FormularioConferirOT
             handleClose={handleClose}
-            refetchListaConferencia={refetchListaConferencia}
-            optionsModulos={optionsModulos}
+            dadosDetalheTransferencia={dadosDetalheTransferencia}
+            setDadosDetalheTransferencia={setDadosDetalheTransferencia}
             usuarioLogado={usuarioLogado}
+            optionsModulos={optionsModulos}
+            refetchListaConferencia={refetchListaConferencia}
           />
         </Modal.Body>
       </Modal>

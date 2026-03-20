@@ -7,8 +7,7 @@ export const useSalvarOT = ({
   handleClose,
   refetchListaConferencia,
   optionsModulos,
-  usuarioLogado
-
+  usuarioLogado,
 }) => {
 
   const [empresaOrigem, setEmpresaOrigem] = useState('')
@@ -99,6 +98,7 @@ export const useSalvarOT = ({
     }
   }, [produto, empresaDestino]);
 
+  useEffect(() => { }, [])
 
   const onSubmit = async () => {
     if (optionsModulos[0]?.CRIAR == 'False') {
@@ -192,7 +192,6 @@ export const useSalvarOT = ({
     };
 
     try {
-
       const response = await post('/criar-resumo-ordem-transferencia', postData);
 
       const textDados = JSON.stringify(postData);
@@ -224,8 +223,8 @@ export const useSalvarOT = ({
       return response.data;
 
     } catch (error) {
-
       console.error('Erro ao cadastrar OT:', error);
+
       const textDados = JSON.stringify(postData);
       let textoFuncao = 'EXPEDICAO/ERRO AO CRIAR OT COM SUCESSO';
       const ipUsuario = await getIPUsuario();

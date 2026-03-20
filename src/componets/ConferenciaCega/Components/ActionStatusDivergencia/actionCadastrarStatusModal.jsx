@@ -8,25 +8,38 @@ import { HeaderModal } from "../../../Modais/HeaderModal/HeaderModal"
 import Select from 'react-select'
 import { useInserirDivergencia } from "../../hooks/useInserirDivergencia"
 
-export const ActionCadastrarStatusModal = ({ show, handleClose }) => {
+export const ActionCadastrarStatusModal = ({
+  show,
+  handleClose,
+  refetchStatus,
+  optionsModulos,
+  usuarioLogado
+}) => {
+
   const { register, handleSubmit, formState: { errors } } = useForm();
+
   const {
     descricao,
     setDescricao,
     statusDivergencia,
     setStatusDivergencia,
     onSubmitInserir
-  } = useInserirDivergencia()
-
+    
+  } = useInserirDivergencia({
+    handleClose,
+    refetchStatus,
+    optionsModulos,
+    usuarioLogado
+  })
 
   const options = [
     { value: 'Ativo', label: 'Ativo' },
     { value: 'Inativo', label: 'Inativo' }
   ]
+
   return (
 
     <Fragment>
-
       <Modal
         show={show}
         onHide={handleClose}
@@ -37,19 +50,20 @@ export const ActionCadastrarStatusModal = ({ show, handleClose }) => {
           subTitle="Cadastrar ou Atualizar informações de Status de Divergência"
           handleClose={handleClose}
         />
-        <Modal.Body>
 
+        <Modal.Body>
           <form onSubmit >
             <div className="row" data-select2-id="736">
               <div className="col-sm-6 col-xl-6">
                 <InputFieldModal
                   label={"Descrição"}
                   type="text"
-                  value={descricao}
+                  //value={descricao}
                   onChangeModal={(e) => setDescricao(e.target.value)}
                   placeholder={"Descrição"}
                 />
               </div>
+
               <div className="col-sm-6 col-xl-6" >
                 <label htmlFor="">Status</label>
                 <Select
@@ -59,19 +73,18 @@ export const ActionCadastrarStatusModal = ({ show, handleClose }) => {
                     label: item.label
                   }
                   ))}
-                  value={options.find(option => option.value === statusDivergencia)}
+                  //value={options.find(option => option.value === statusDivergencia)}
                   onChange={(e) => setStatusDivergencia(e.value)}
                 />
               </div>
             </div>
 
           </form>
-
         </Modal.Body>
 
         <FooterModal
           ButtonTypeCadastrar={ButtonTypeModal}
-          onClickButtonCadastrar={handleSubmit(onSubmitInserir)}
+          //onClickButtonCadastrar={handleSubmit(onSubmitInserir)}
           textButtonCadastrar={"Atualizar"}
           corCadastrar={"success"}
           loadingTextCadastrar={"Cadastrando..."}
@@ -81,7 +94,6 @@ export const ActionCadastrarStatusModal = ({ show, handleClose }) => {
           onClickButtonFechar={handleClose}
           textButtonFechar={"Fechar"}
           corFechar={"secondary"}
-
         />
 
       </Modal>

@@ -2,18 +2,19 @@ import { Fragment } from "react"
 import Select from 'react-select';
 import { FaRegSave } from "react-icons/fa";
 import { Controller, useForm } from "react-hook-form";
-import { useEditarOT } from "../../../hooks/useEditarOT";
 import FormField from "../../../../Formularios/FormField";
 import { AlertError } from "../../../../Inputs/alertError";
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal";
-import { ActionListaProdutosEditarVisualizarOT } from "./actionListaEditarVisualizarOT";
+import { ActionListaEditarOT } from "./actionListaEditarOT";
+import { useEditarOTDeposito } from "../../../hooks/useEditarOTDeposito";
 
 export const FormularioEditarVisualizarOT = ({
     handleClose,
     refetchListaConferencia,
     optionsModulos,
     usuarioLogado,
-    dadosDetalheTransferencia
+    dadosDetalheTransferencia,
+    setDadosDetalheTransferencia
 }) => {
 
     const { handleSubmit, formState: { errors }, clearErrors, control, setError } = useForm({
@@ -36,12 +37,13 @@ export const FormularioEditarVisualizarOT = ({
         handleExcluirProduto,
         onSubmit,
 
-    } = useEditarOT({
+    } = useEditarOTDeposito({
         handleClose,
         refetchListaConferencia,
         optionsModulos,
         usuarioLogado,
-        dadosDetalheTransferencia
+        dadosDetalheTransferencia,
+        setDadosDetalheTransferencia
     });
 
     return (
@@ -69,6 +71,7 @@ export const FormularioEditarVisualizarOT = ({
                                 fieldName="empresaDestino"
                             />
                         )}
+
                     </div>
                     <div className="col-sm-6 col-xl-6" data-select2-id="735">
                         <label className="form-label" htmlFor={""}>Loja Destino</label>
@@ -101,7 +104,6 @@ export const FormularioEditarVisualizarOT = ({
 
                 <div className="row mt-4">
                     <div className="col-sm-6 col-xl-6">
-
                         <Controller
                             name="produtoIncluir"
                             control={control}
@@ -114,7 +116,7 @@ export const FormularioEditarVisualizarOT = ({
                                     onChange={(e) => setProduto(e.target.value)}
                                     errors={errors}
                                     clearErrors={clearErrors}
-                                    readOnly={dadosProdutosTabela[0]?.IDSTATUSOT !== 6}
+                                    readOnly={dadosProdutosTabela[0]?.IDSTATUSOT !== 1}
                                 />
                             )}
                         />
@@ -132,18 +134,16 @@ export const FormularioEditarVisualizarOT = ({
                             tipoBtnCadastrar={"submit"}
                             loading={false}
                             loadingText={"Salvando..."}
-                            disabled={dadosProdutosTabela[0]?.IDSTATUSOT !== 6}
+                            disabled={dadosProdutosTabela[0]?.IDSTATUSOT !== 1}
                         />
                     </div>
                     <div className="col-sm-8 col-xl-8 mt-4">
-                        <label className="form-label" style={{ color: "red" }}>
-                            Para confirmar as Alterações e Inclusões dos Produtos, favor clicar no botão Salvar!
-                        </label>
+                        <label className="form-label" style={{ color: "red" }}>Para confirmar as Alterações e Inclusões dos Produtos, favor clicar no botão Salvar!</label>
                     </div>
                 </div>
             </form>
 
-            <ActionListaProdutosEditarVisualizarOT
+            <ActionListaEditarOT
                 dadosProdutosTabela={dadosProdutosTabela}
                 setDadosProdutosTabela={setDadosProdutosTabela}
                 produtoSalvo={produtoSalvo}
@@ -151,6 +151,7 @@ export const FormularioEditarVisualizarOT = ({
                 dadosDetalheTransferencia={dadosDetalheTransferencia}
                 handleChangeQtdAjuste={handleChangeQtdAjuste}
                 handleExcluirProduto={handleExcluirProduto}
+                setDadosDetalheTransferencia={setDadosDetalheTransferencia}
             />
         </Fragment>
     )

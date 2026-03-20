@@ -10,8 +10,8 @@ export const useEncerrarOT = ({
   optionsModulos,
   usuarioLogado,
   handleClose,
-
 }) => {
+
   const [observacao, setObservacao] = useState('')
   const [statusDivergencia, setStatusDivergencia] = useState('')
   const [idResumoOT, setIdResumoOT] = useState(null)
@@ -39,7 +39,6 @@ export const useEncerrarOT = ({
     return usuarioIP;
   };
 
-
   const { data: dadosStatus = [], error: errorStatus, isLoading: isLoadingStatus } = useQuery(
     'status-divergencia',
     async () => {
@@ -53,7 +52,6 @@ export const useEncerrarOT = ({
   useEffect(() => {
     setIdResumoOT(dadosEncerrarOT.IDRESUMOOT)
   }, [dadosEncerrarOT])
-
 
   const onSubmit = async () => {
     if (optionsModulos[0]?.ALTERAR !== 'True') {
@@ -127,7 +125,7 @@ export const useEncerrarOT = ({
           container: 'custom-swal'
         }
       });
-
+      
       return responsePost.data;
     }
   };

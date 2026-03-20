@@ -1,7 +1,6 @@
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
-import Swal from "sweetalert2";
 import { Column } from 'primereact/column';
 import { FaRegTrashAlt } from "react-icons/fa";
 import { useReactToPrint } from "react-to-print";
@@ -12,9 +11,9 @@ import { ButtonTable } from "../../../../ButtonsTabela/ButtonTable";
 
 export const ActionListaProdutosEditarVisualizarOT = ({
     dadosProdutosTabela,
-    setDadosProdutosTabela,
     handleChangeQtdAjuste,
     handleExcluirProduto
+    
 }) => {
 
     const [globalFilterValue, setGlobalFilterValue] = useState('');

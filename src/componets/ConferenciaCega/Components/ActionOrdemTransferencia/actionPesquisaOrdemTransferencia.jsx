@@ -12,6 +12,7 @@ import { getDataAtual } from "../../../../utils/dataAtual";
 import { ActionIncluirOTModal } from "./ActionIncluirModalOT/actionIncluirOTModal";
 
 export const ActionPesquisaOrdemTransferencia = ({ usuarioLogado }) => {
+
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('')
   const [dataPesquisaFim, setDataPesquisaFim] = useState('')
@@ -95,7 +96,6 @@ export const ActionPesquisaOrdemTransferencia = ({ usuarioLogado }) => {
     { enabled: false, }
   );
 
-
   const handleSelectEmpresaOrigem = (e) => {
     const selectedId = e.value;
     if (selectedId) {
@@ -118,7 +118,6 @@ export const ActionPesquisaOrdemTransferencia = ({ usuarioLogado }) => {
 
   return (
     <Fragment>
-
       <ActionMain
         linkComponentAnterior={["Home"]}
         linkComponent={["Ordem de Transferência"]}

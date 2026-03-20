@@ -7,7 +7,6 @@ export const useCancelarOT = ({
     refetchListaConferencia,
     optionsModulos,
     usuarioLogado,
-
 }) => {
 
     const [ipUsuario, setIpUsuario] = useState('');
@@ -96,7 +95,6 @@ export const useCancelarOT = ({
                     return response.data;
                 }
                 catch (error) {
-                    console.error('Erro ao cancelar OT:', error);
 
                     const textDados = JSON.stringify(putData);
                     let textoFuncao = 'CONFERENCIA CEGA / ERRO AO CANCELAR OT';

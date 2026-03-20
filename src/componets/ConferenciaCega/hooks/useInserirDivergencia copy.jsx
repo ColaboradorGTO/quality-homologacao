@@ -72,35 +72,97 @@ export const useInserirDivergencia = ({
       IDUSRCRIACAO: usuarioLogado.id,
       STATIVO: statusDivergencia
     };
-    try {
-      const response = await post('/inserir-status-divergencia', postData);
+    const response = await post('/inserir-status-divergencia', postData);
 
-      const textDados = JSON.stringify(postData);
-      let textoFuncao = 'CONFERNCIA CEGA / INSERIR DIVERGENCIA OT';
+    const textDados = JSON.stringify(postData);
+    let textoFuncao = 'CONFERNCIA CEGA / INSERIR DIVERGENCIA OT';
 
-      const createData = {
-        IDFUNCIONARIO: String(usuarioLogado.id),
-        PATHFUNCAO: textoFuncao,
-        DADOS: textDados,
-        IP: ipUsuario
-      };
+    const createData = {
+      IDFUNCIONARIO: usuarioLogado.id,
+      PATHFUNCAO: textoFuncao,
+      DADOS: textDados,
+      IP: ipUsuario
+    };
 
-      const responsePost = await post('/log-web', createData)
+    const responsePost = await post('/log-web', createData)
+    Swal.fire({
+      title: 'Sucesso!',
+      text: 'Divergência inserida com sucesso!',
+      icon: 'success',
+      customClass: {
+        container: 'custom-swal',
+      }
+    });
+    handleClose();
+    return responsePost.data;
+  };
+
+  useEffect(() => {
+    if (dadosStatusDivergencia) {
+      setDescricaoSelecionada(dadosStatusDivergencia?.DESCRICAODIVERGENCIA);
+      setStatusSelecionado(dadosStatusDivergencia?.STATIVO);
+    }
+
+  }, [dadosStatusDivergencia])
+  
+  const onSubmitAlterar = async () => {
+    if (statusSelecionado === '') {
       Swal.fire({
-        title: 'Sucesso!',
-        text: 'Divergência inserida com sucesso!',
-        icon: 'success',
+        title: 'Atenção!',
+        type: 'warning',
+        text: 'Necessário preencher o Motivo!',
+        icon: 'warning',
         customClass: {
           container: 'custom-swal',
-        }
+        },
+        timer: 3000,
       });
-      handleClose();
-      refetchStatus();
-      return responsePost.data;
-    } catch (error) {
-      console.error(error);
-
+      return;
     }
+
+    if (descricaoSelecionada === '') {
+      Swal.fire({
+        title: 'Atenção!',
+        type: 'warning',
+        text: 'Necessário preencher a Observação!',
+        icon: 'warning',
+        customClass: {
+          container: 'custom-swal',
+        },
+        timer: 3000,
+      });
+      return;
+    }
+
+    const postData = {
+      DESCRICAODIVERGENCIA: descricaoSelecionada,
+      IDUSRCRIACAO: usuarioLogado.id,
+      STATIVO: statusSelecionado
+    };
+    const response = await put('/status-divergencia/:id', postData);
+
+    const textDados = JSON.stringify(postData);
+    let textoFuncao = 'CONFERNCIA CEGA / ALTERAR DIVERGENCIA OT';
+
+    const createData = {
+      IDFUNCIONARIO: usuarioLogado.id,
+      PATHFUNCAO: textoFuncao,
+      DADOS: textDados,
+      IP: ipUsuario
+    };
+
+    const responsePost = await post('/log-web', createData)
+    Swal.fire({
+      title: 'Sucesso!',
+      text: 'Divergência alterada com sucesso!',
+      icon: 'success',
+      customClass: {
+        container: 'custom-swal',
+      },
+      timer: 3000,
+    });
+    handleClose();
+    return responsePost.data;
   };
 
   return {
@@ -113,6 +175,7 @@ export const useInserirDivergencia = ({
     setDescricaoSelecionada,
     statusSelecionado,
     setStatusSelecionado,
-    onSubmit,
+    onSubmitInserir,
+    onSubmitAlterar
   };
 };

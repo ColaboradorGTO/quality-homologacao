@@ -21,7 +21,6 @@ export const ActionListaOrdemTransferencia = ({
   refetchListaConferencia,
   optionsModulos,
   usuarioLogado
-
 }) => {
 
   const [modalVisivel, setModalVisivel] = useState(false);
@@ -35,6 +34,7 @@ export const ActionListaOrdemTransferencia = ({
 
   const {
     onSubmit
+
   } = useCancelarOT({
     refetchListaConferencia,
     optionsModulos,
@@ -77,7 +77,6 @@ export const ActionListaOrdemTransferencia = ({
     });
     doc.save('controle_transferencia.pdf');
   };
-
 
   const dados = dadosConferencia.map((item, index) => {
     let contador = index + 1;
@@ -152,13 +151,11 @@ export const ActionListaOrdemTransferencia = ({
         };
         return (
           <div
-
             style={{
               display: "flex",
               justifyContent: "space-around",
               alignItems: "center",
               width: "150px",
-
             }}
           >
             <ButtonTable
@@ -170,8 +167,8 @@ export const ActionListaOrdemTransferencia = ({
               cor={"primary"}
               width="32px"
               height="32px"
-
             />
+
             <ButtonTable
               titleButton={"Cancelar"}
               onClickButton={() => handleCancelarOT(row)}
@@ -183,6 +180,7 @@ export const ActionListaOrdemTransferencia = ({
               height="32px"
               disabledBTN={row.IDSTATUSOT !== 1}
             />
+
             <ButtonTable
               titleButton={"Encerrar OT"}
               onClickButton={() => handleEncerrar(row)}
@@ -194,6 +192,7 @@ export const ActionListaOrdemTransferencia = ({
               height="32px"
               disabledBTN={row.IDSTATUSOT !== 6}
             />
+
             <ButtonTable
               titleButton={"Status Nota Fiscal"}
               onClickButton={() => handleClickStatusNota(row)}
@@ -205,7 +204,6 @@ export const ActionListaOrdemTransferencia = ({
               cor={corStatusNota()}
               disabledBTN={false}
             />
-
           </div>
         );
       }
@@ -229,9 +227,7 @@ export const ActionListaOrdemTransferencia = ({
       setMotivoEncerrarOTModal(true);
       setDadosEncerrarOT(IDRESUMOOT);
     }
-
   }
-
 
   const handleEdit = async (IDRESUMOOT) => {
     try {
@@ -268,15 +264,12 @@ export const ActionListaOrdemTransferencia = ({
       });
       return;
     }
-
     if (row?.IDRESUMOOT) {
       handleEdit(row.IDRESUMOOT);
     }
   };
 
-
   const handleStatusNota = async (IDRESUMOOT) => {
-
     try {
       const response = await get(`/listaOrdemTransferenciaConferenciaCega?idResumoOT=${IDRESUMOOT}&idtipofiltro=1`)
       if (response.data && response.data.length > 0) {
@@ -289,7 +282,6 @@ export const ActionListaOrdemTransferencia = ({
   };
 
   const handleClickStatusNota = (row) => {
-
     if (row && row.IDRESUMOOT) {
       handleStatusNota(row.IDRESUMOOT);
     }
@@ -307,7 +299,6 @@ export const ActionListaOrdemTransferencia = ({
         }
       });
       return
-
     } else {
       await onSubmit(row);
     }
@@ -357,7 +348,6 @@ export const ActionListaOrdemTransferencia = ({
                 headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
                 footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
                 bodyStyle={{ fontSize: '0.8rem' }}
-
               />
             ))}
           </DataTable>

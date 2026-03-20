@@ -1,22 +1,19 @@
 import { Fragment } from "react"
 import Modal from 'react-bootstrap/Modal';
 import { HeaderModal } from "../../../../Modais/HeaderModal/HeaderModal";
-import { FooterModal } from "../../../../Modais/FooterModal/footerModal";
-import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal";
 import { FormularioSalvarVolumeOT } from "./formularioSalvarVolumeOT";
-
 
 export const ActionSalvarVolumeOTModal = ({
   show,
   handleClose,
-  dadosSalvarVolume
-
+  dadosSalvarVolume,
+  refetchListaConferencia,
+  optionsModulos,
+  usuarioLogado,
 }) => {
 
   return (
-
     <Fragment>
-
       <Modal
         show={show}
         onHide={handleClose}
@@ -28,8 +25,15 @@ export const ActionSalvarVolumeOTModal = ({
           handleClose={handleClose}
         />
         <Modal.Body>
-      
-         <FormularioSalvarVolumeOT dadosSalvarVolume={dadosSalvarVolume} handleClose={handleClose}/>
+
+          <FormularioSalvarVolumeOT
+            dadosSalvarVolume={dadosSalvarVolume}
+            handleClose={handleClose}
+            refetchListaConferencia={refetchListaConferencia}
+            optionsModulos={optionsModulos}
+            usuarioLogado={usuarioLogado}
+     
+          />
         </Modal.Body>
 
       </Modal>

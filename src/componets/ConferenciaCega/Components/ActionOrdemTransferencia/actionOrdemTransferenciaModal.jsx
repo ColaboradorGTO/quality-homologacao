@@ -1,11 +1,10 @@
-import { Fragment, useEffect, useState } from "react"
+import { Fragment } from "react"
 import Modal from 'react-bootstrap/Modal';
 import { InputFieldModal } from "../../../Buttons/InputFieldModal";
 import { ButtonTypeModal } from "../../../Buttons/ButtonTypeModal";
 import { FaRegSave } from "react-icons/fa";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import Select from 'react-select';
 
 export const ActionOrdemTransferenciaModal = ({ show, handleClose, dadosConferencia }) => {
 
@@ -21,12 +20,9 @@ export const ActionOrdemTransferenciaModal = ({ show, handleClose, dadosConferen
       QTDCONFERENCIA: parseInt(item.QTDCONFERENCIA),
       IDSTATUSOT: parseInt(item.IDSTATUSOT),
       DESCRICAOOT: item.DESCRICAOOT,
-
-
       IDSAPORIGEM: item.IDSAPORIGEM,
       IDSAPDESTINO: item.IDSAPDESTINO,
       ERRORLOGSAP: item.ERRORLOGSAP,
-
       contador
     }
   });
@@ -80,7 +76,6 @@ export const ActionOrdemTransferenciaModal = ({ show, handleClose, dadosConferen
               justifyContent: "space-around",
               alignItems: "center",
               width: "150px",
-              
             }}
           >
             <ButtonTable
@@ -92,6 +87,7 @@ export const ActionOrdemTransferenciaModal = ({ show, handleClose, dadosConferen
               cor={"primary"}
               disabledBTN={[1, 2].indexOf(row.IDSTATUSOT) >= 0}
             />
+
             <ButtonTable
               titleButton={"Cancelar"}
               onClickButton={() => handleClickDetalhar(row)}
@@ -101,6 +97,7 @@ export const ActionOrdemTransferenciaModal = ({ show, handleClose, dadosConferen
               cor={"danger"}
               disabledBTN={row.IDSTATUSOT === 1}
             />
+
             <ButtonTable
               titleButton={"Encerrar OT"}
               onClickButton={() => handleClickDetalhar(row)}
@@ -110,10 +107,8 @@ export const ActionOrdemTransferenciaModal = ({ show, handleClose, dadosConferen
               cor={"info"}
               disabledBTN={row.IDSTATUSOT === 6}
             />
-          
 
             <Fragment>
-              
               { row.ERRORLOGSAP !== '' && row.ERRORLOGSAP !== null ? (
                 <Fragment>
                     <ButtonTable
@@ -136,7 +131,6 @@ export const ActionOrdemTransferenciaModal = ({ show, handleClose, dadosConferen
                       iconSize={16}
                       iconColor={"#fff"}
                       cor={"success"}
-                      
                     />
                 </Fragment>
               ) : (
@@ -148,12 +142,9 @@ export const ActionOrdemTransferenciaModal = ({ show, handleClose, dadosConferen
                       iconSize={16}
                       iconColor={"#fff"}
                       cor={"warning"}
-                      
                     />
                 </Fragment>
-
                 ) ) }
-
             </Fragment>
           </div>
         );
@@ -167,10 +158,8 @@ export const ActionOrdemTransferenciaModal = ({ show, handleClose, dadosConferen
           show={show}
           onHide={handleClose}
           size="xl"
-
         >
           <div className="modal-content">
-
             <HeaderModal
               title="Ordem de Transferência"
               subtitle="Nome da Loja"
@@ -184,9 +173,9 @@ export const ActionOrdemTransferenciaModal = ({ show, handleClose, dadosConferen
                     <InputFieldModal
                       label={"Loja Origem"}
                       type="text"
-                      
                       readOnly={true}
                     />
+                    
                   </div>
                   <div className="col-sm-6 col-xl-6" data-select2-id="735">
                     {/* <InputSelect
@@ -224,15 +213,13 @@ export const ActionOrdemTransferenciaModal = ({ show, handleClose, dadosConferen
                 <br />
                 <div className="row">
                   <div className="col-sm-8 col-xl-8">
-
                     <ButtonTypeModal
                       Icon={FaRegSave}
                       textButton={"Salvar"}
                       cor={"info"}
                       className={"mr-4"}
-                    // onClickButtonType={salvarot}
-
                     />
+
                   </div>
                   <div className="col-sm-8 col-xl-8 mt-4">
                     <label className="form-label" style={{ color: "red" }}>Para confirmar as Alterações e Inclusões dos Produtos, favor clicar no botão Salvar!</label>
@@ -265,7 +252,6 @@ export const ActionOrdemTransferenciaModal = ({ show, handleClose, dadosConferen
                     headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
                     footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
                     bodyStyle={{ fontSize: '0.8rem' }}
-
                   />
                 ))}
               </DataTable>

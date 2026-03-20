@@ -46,16 +46,22 @@ export const ActionObservacaoOT = ({
       CODIGORETORNOSEFAZ: item.CODIGORETORNOSEFAZ,
       NUMERONOTASEFAZ: item.NUMERONOTASEFAZ,
       IDSTATUSOT: item.IDSTATUSOT,
-
       DESCRICAOOT: item.DESCRICAOOT,
       Mensagem: Mensagem
     };
   });
 
-
   return (
     <Fragment>
-      <Modal show={show} onHide={handleClose} size="lg" className="modal fade" tabIndex={-1} role="dialog" aria-hidden="true">
+      <Modal
+        show={show}
+        onHide={handleClose}
+        size="lg"
+        className="modal fade"
+        tabIndex={-1}
+        role="dialog"
+        aria-hidden="true"
+      >
 
         <HeaderModal
           title={"Observação da Ordem de Transferência"}
@@ -104,7 +110,6 @@ export const ActionObservacaoOT = ({
               <th style={{ border: 'none' }} colspan="4">{dados[0]?.Mensagem}</th>
             </tr>
           </table>
-
         </Modal.Body>
 
         <FooterModal

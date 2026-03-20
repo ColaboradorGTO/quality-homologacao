@@ -8,15 +8,31 @@ import { HeaderModal } from "../../../Modais/HeaderModal/HeaderModal"
 import Select from 'react-select'
 import { useInserirDivergencia } from "../../hooks/useInserirDivergencia"
 
-export const ActionEditarStatusModal = ({ show, handleClose, dadosStatusDivergencia }) => {
+export const ActionEditarStatusModal = ({
+  show,
+  handleClose,
+  dadosStatusDivergencia,
+  refetchStatus,
+  optionsModulos,
+  usuarioLogado
+}) => {
+
   const { register, handleSubmit, formState: { errors } } = useForm();
+
   const {
     descricaoSelecionada,
     setDescricaoSelecionada,
     statusSelecionado,
     setStatusSelecionado,
     onSubmitAlterar
-  } = useInserirDivergencia(dadosStatusDivergencia, handleClose)
+
+  } = useInserirDivergencia({
+    dadosStatusDivergencia,
+    handleClose,
+    refetchStatus,
+    optionsModulos,
+    usuarioLogado
+  })
 
 
   const options = [
@@ -61,8 +77,8 @@ export const ActionEditarStatusModal = ({ show, handleClose, dadosStatusDivergen
                   ))}
                   value={options.find(option => option.value === statusSelecionado)}
                   onChange={(e) => setStatusSelecionado(e.value)}
-                  />
-                  {console.log(statusSelecionado, 'statusSelecionado')}
+                />
+                {console.log(statusSelecionado, 'statusSelecionado')}
               </div>
             </div>
 
