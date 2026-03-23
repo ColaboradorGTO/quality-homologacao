@@ -42,7 +42,7 @@ export const ButtonType = ({
 
   return (
     <Fragment>
-      <div >
+      <div style={{ display: style ? "block" : "none" }}>
 
         <button
           id={id}

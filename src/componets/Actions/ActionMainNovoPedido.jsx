@@ -136,30 +136,35 @@ export const ActionMainNovoPedido = ({
   ButtonTypeCancelar,
   ButtonTypePedido,
   ButtonTypeTXT,
+  ButtonTypeRetornar,
 
   linkNomeSearch,
   linkNome,
   linkCancelar,
   linkPedido,
   linkTXT,
+  linkRetornar,
 
   onButtonClickSearch,
   onButtonClickCadastro,
   onButtonClickCancelar,
   onButtonClickPedido,
   onButtonClickTXT,
+  onButtonClickRetornar,
 
   corSearch,
   corCadastro,
   corCancelar,
   corPedido,
   corTXT,
+  corRetornar,
 
   IconSearch,
   IconCadastro,
   IconCancelar,
   IconPedido,
   IconTXT,
+  IconRetornar,
 
   readOnlyDTInicio,
   readOnlyDTFim,
@@ -194,7 +199,13 @@ export const ActionMainNovoPedido = ({
   Alerta,
   typeAlerta,
   messageAlerta,
-  indiceAlerta
+  indiceAlerta,
+  styleSearch,
+  styleCadastro,
+  styleCancelar,
+  stylePedido,
+  styleTXT,
+  styleRetornar,
 
 }) => {
   const handleSubmit = (e) => {
@@ -583,6 +594,7 @@ export const ActionMainNovoPedido = ({
                         Icon={IconSearch}
                         iconColor="#fff"
                         iconSize={16}
+                        style={styleSearch}
                       />
                     )}
 
@@ -596,6 +608,8 @@ export const ActionMainNovoPedido = ({
                         Icon={IconCadastro}
                         iconColor="#fff"
                         iconSize={16}
+                        style={styleCadastro}
+
                       />
                     )}
 
@@ -609,6 +623,7 @@ export const ActionMainNovoPedido = ({
                         Icon={IconCancelar}
                         iconColor="#fff"
                         iconSize={16}
+                        style={styleCancelar}
                       />
                     )}
                      {ButtonTypePedido && (
@@ -621,8 +636,10 @@ export const ActionMainNovoPedido = ({
                         Icon={IconPedido}
                         iconColor="#fff"
                         iconSize={16}
+                        style={stylePedido}
                       />
                     )}
+                  
                     {ButtonTypeTXT && (
                       <ButtonType
                         textButton={linkTXT}
@@ -633,7 +650,21 @@ export const ActionMainNovoPedido = ({
                         Icon={IconTXT}
                         iconColor="#000"
                         iconSize={16}
-                        style={{color: 'white'}}
+                        style={styleTXT}
+                      />
+                    )}
+
+                    {ButtonTypeRetornar && (
+                      <ButtonTypeRetornar
+                        textButton={linkRetornar}
+                        onClickButtonType={onButtonClickRetornar}
+                        // cor="danger"
+                        cor={corRetornar}
+                        tipo="button"
+                        Icon={IconRetornar}
+                        iconColor="#000"
+                        iconSize={16}
+                        style={styleRetornar}
                       />
                     )}
 

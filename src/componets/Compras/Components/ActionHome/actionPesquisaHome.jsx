@@ -30,6 +30,7 @@ export const ActionPesquisaHome = ({ usuarioLogado }) => {
   const [dadosDetalhePedido, setDadosDetalhePedido] = useState([]);
   const [actionVisualizarPedido, setActionVisualizarPedido] = useState(false);
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
+  const [actionEditarPedido, setActionEditarPedido] = useState(false);
 
   useEffect(() => {
     const dataInicial = getDataDoisMesesAtras();
