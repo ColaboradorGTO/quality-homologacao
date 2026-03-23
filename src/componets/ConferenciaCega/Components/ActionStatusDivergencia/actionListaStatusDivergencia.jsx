@@ -3,12 +3,12 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { CiEdit } from "react-icons/ci";
 import { ButtonTable } from "../../../ButtonsTabela/ButtonTable";
-import { ActionEditarStatusModal } from "./actionEditarStatusModal";
 import { useReactToPrint } from "react-to-print";
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../../Tables/headerTable";
+import { ActionEditarStatusModal } from "./ActionEditarStatusModal/actionEditarStatusModal";
 
 export const ActionListaStatusDivergencia = ({
   dadosStatus,
@@ -104,7 +104,6 @@ export const ActionListaStatusDivergencia = ({
       ),
       sortable: true,
     },
-
     {
       header: 'Opções',
       button: true,
@@ -129,14 +128,17 @@ export const ActionListaStatusDivergencia = ({
             cor={"primary"}
 
           />
-
         </div>
       )
     }
   ]
 
-  const handleEdit = async (IDSTATUSDIVERGENCIA) => {
-    setDadosStatusDivergencia(IDSTATUSDIVERGENCIA);
+  const handleEdit = async (row) => {
+    const dadosEncontrados = dadosStatus.find(
+      (item) => item.IDSTATUSDIVERGENCIA === row.IDSTATUSDIVERGENCIA
+    );
+
+    setDadosStatusDivergencia(dadosEncontrados);
     setModalEditar(true);
   }
 
@@ -195,7 +197,7 @@ export const ActionListaStatusDivergencia = ({
       <ActionEditarStatusModal
         show={modalEditar}
         handleClose={() => setModalEditar(false)}
-        dadosStatusDivergencia={dadosStatusDivergencia}
+        dadosEncontrados={dadosStatusDivergencia}
         refetchStatus={refetchStatus}
         optionsModulos={optionsModulos}
         usuarioLogado={usuarioLogado}

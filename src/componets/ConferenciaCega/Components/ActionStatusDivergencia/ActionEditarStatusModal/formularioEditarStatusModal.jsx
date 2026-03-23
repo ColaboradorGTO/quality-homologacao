@@ -5,11 +5,12 @@ import { FooterModal } from "../../../../Modais/FooterModal/footerModal";
 import { AlertError } from "../../../../Inputs/alertError";
 import FormField from "../../../../Formularios/FormField";
 import { Controller, useForm } from "react-hook-form";
-import { schema } from "./schema/schemaValidacaoStatusDivergencia";
-import { useInserirDivergencia } from "../../../hooks/useInserirDivergencia";
+import { useEditarDivergencia } from "../../../hooks/useEditarDivergencia";
+import { schema } from "./schema/validacaoSchemaEditar";
 
-export const FormularioStatusDivergencia = ({
+export const FormularioEditarStatusDivergencia = ({
     handleClose,
+    dadosEncontrados,
     refetchStatus,
     optionsModulos,
     usuarioLogado
@@ -26,12 +27,14 @@ export const FormularioStatusDivergencia = ({
         setStatusDivergencia,
         onSubmit
 
-    } = useInserirDivergencia({
+    } = useEditarDivergencia({
         handleClose,
         refetchStatus,
         optionsModulos,
+        dadosEncontrados,
         usuarioLogado
     })
+
     const options = [
         { value: 'True', label: 'Ativo' },
         { value: 'False', label: 'Inativo' }
@@ -39,7 +42,6 @@ export const FormularioStatusDivergencia = ({
 
     const handleValidatedSubmit = async () => {
         try {
-
             const dadosParaValidar = {
                 statusDivergenciaSelecionada: statusDivergencia,
                 descricaoDivergencia: descricao,
@@ -101,7 +103,7 @@ export const FormularioStatusDivergencia = ({
                                 label: item.label,
                             }))}
 
-                            value={options.find(option => option.value === statusDivergencia)}
+                            value={statusDivergencia}
                             onChange={(opt) => {
                                 setStatusDivergencia(opt ?? null);
                                 clearErrors("statusDivergenciaSelecionada");
@@ -117,7 +119,7 @@ export const FormularioStatusDivergencia = ({
                         )}
                     </div>
                 </div>
-
+                
                 <FooterModal
                     ButtonTypeCadastrar={ButtonTypeModal}
                     onClickButtonCadastrar={handleSubmit(handleValidatedSubmit)}

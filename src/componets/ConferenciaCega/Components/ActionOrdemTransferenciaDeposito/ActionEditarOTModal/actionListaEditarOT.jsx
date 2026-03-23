@@ -166,7 +166,6 @@ export const ActionListaEditarOT = ({
                                         height="32px"
                                     />
                                 </div>
-
                                 <div>
                                     <ButtonTable
                                         titleButton={"Excluir Produto"}
@@ -209,7 +208,6 @@ export const ActionListaEditarOT = ({
             }
         })
     };
-
 
     const handleRemoverProduto = (produto) => {
         const itemAtual = dadosDetalheTransferencia.find(

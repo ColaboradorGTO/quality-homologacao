@@ -1,11 +1,12 @@
 import { Fragment } from "react"
 import { Modal } from "react-bootstrap"
 import { HeaderModal } from "../../../../Modais/HeaderModal/HeaderModal"
-import { FormularioStatusDivergencia } from "./formularioStatusDivergencia"
+import { FormularioEditarStatusDivergencia } from "./formularioEditarStatusModal"
 
-export const ActionCadastrarStatusModal = ({
+export const ActionEditarStatusModal = ({
   show,
   handleClose,
+  dadosEncontrados,
   refetchStatus,
   optionsModulos,
   usuarioLogado
@@ -21,19 +22,18 @@ export const ActionCadastrarStatusModal = ({
       >
         <HeaderModal
           title="Status de Divergência"
-          subTitle="Cadastrar informações de Status de Divergência"
+          subTitle="Atualizar informações de Status de Divergência"
           handleClose={handleClose}
         />
-
         <Modal.Body>
-          <FormularioStatusDivergencia
+          <FormularioEditarStatusDivergencia
             handleClose={handleClose}
+            dadosEncontrados={dadosEncontrados}
             refetchStatus={refetchStatus}
             optionsModulos={optionsModulos}
             usuarioLogado={usuarioLogado}
           />
         </Modal.Body>
-
       </Modal>
     </Fragment>
   )

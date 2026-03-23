@@ -167,6 +167,7 @@ export const useConferirOT = ({
         });
 
         return response.data;
+
       } catch (error) {
         const textDados = JSON.stringify(putDataExcluir);
         let textoFuncao = 'DEPOSITO/CONFERENCIA ERRO AO EXCLUIR PRODUTO';

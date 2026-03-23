@@ -19,8 +19,6 @@ export const ActionPesquisaOrdemTransferencia = ({ usuarioLogado }) => {
   const [empresaSelecionadaOrigem, setEmpresaSelecionadaOrigem] = useState('')
   const [empresaSelecionadaDestino, setEmpresaSelecionadaDestino] = useState('')
   const [modalVisivel, setModalVisivel] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(1000);
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
   useEffect(() => {

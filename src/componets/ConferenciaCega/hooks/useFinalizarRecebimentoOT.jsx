@@ -4,7 +4,7 @@ import { post, put } from "../../../api/funcRequest";
 
 export const useFinalizarRecebimentoOT = ({
     refetchListaConferencia,
-    optionsModulos, 
+    optionsModulos,
     usuarioLogado,
 }) => {
 
@@ -33,7 +33,7 @@ export const useFinalizarRecebimentoOT = ({
     };
 
     const handleFinalizarRecebimento = async (row) => {
-        if (optionsModulos[0]?.CRIAR == 'False') {
+        if (optionsModulos[0]?.ALTERAR == 'False') {
             Swal.fire({
                 title: 'Erro!',
                 text: `${usuarioLogado?.NOFUNCIONARIO},\nVocê não tem permissão para finalizar a OT!`,
@@ -58,9 +58,9 @@ export const useFinalizarRecebimentoOT = ({
 
         const putData = {
             IDOPERADORRECEPTOR: usuarioLogado?.id,
-            IDSTATUSOT: 6,                        
+            IDSTATUSOT: 6,
             IDRESUMOOT: row.IDRESUMOOT,
-            QTDCONFERENCIA: row.QTDCONFERENCIA  
+            QTDCONFERENCIA: row.QTDCONFERENCIA
         };
 
         Swal.fire({

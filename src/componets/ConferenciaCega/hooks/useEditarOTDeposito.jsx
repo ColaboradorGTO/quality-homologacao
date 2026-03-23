@@ -164,7 +164,7 @@ export const useEditarOTDeposito = ({
   }, [produto, empresaDestino]);
 
   const onSubmit = async () => {
-    if (optionsModulos[0]?.CRIAR == 'False') {
+    if (optionsModulos[0]?.ALTERAR == 'False') {
       Swal.fire({
         title: 'Erro!',
         text: `${usuarioLogado?.NOFUNCIONARIO},\nVocê não tem permissão para criar a OT!`,

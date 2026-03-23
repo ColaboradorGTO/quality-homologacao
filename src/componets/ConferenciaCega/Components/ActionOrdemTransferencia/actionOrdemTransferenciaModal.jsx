@@ -10,7 +10,7 @@ export const ActionOrdemTransferenciaModal = ({ show, handleClose, dadosConferen
 
   const dados = dadosConferencia.map((item, index) => {
     let contador = index + 1;
- 
+
     return {
       IDRESUMOOT: item.IDRESUMOOT,
       DATAEXPEDICAOFORMATADA: item.DATAEXPEDICAOFORMATADA,
@@ -109,21 +109,21 @@ export const ActionOrdemTransferenciaModal = ({ show, handleClose, dadosConferen
             />
 
             <Fragment>
-              { row.ERRORLOGSAP !== '' && row.ERRORLOGSAP !== null ? (
+              {row.ERRORLOGSAP !== '' && row.ERRORLOGSAP !== null ? (
                 <Fragment>
-                    <ButtonTable
-                      titleButton={"Status Nota Fiscal"}
-                      onClickButton={() => handleClickDetalhar(row)}
-                      Icon={FaExclamation}
-                      iconSize={16}
-                      iconColor={"#fff"}
-                      cor={"danger"}
-                      
-                    />
+                  <ButtonTable
+                    titleButton={"Status Nota Fiscal"}
+                    onClickButton={() => handleClickDetalhar(row)}
+                    Icon={FaExclamation}
+                    iconSize={16}
+                    iconColor={"#fff"}
+                    cor={"danger"}
+
+                  />
                 </Fragment>
               ) : (
                 (row.ERRORLOGSAP === '' || row.ERRORLOGSAP === null) && row.IDSAPORIGEM > 0 && row.IDSAPDESTINO > 0 ? (
-                <Fragment>
+                  <Fragment>
                     <ButtonTable
                       titleButton={"Status Nota Fiscal"}
                       onClickButton={() => handleClickDetalhar(row)}
@@ -132,9 +132,9 @@ export const ActionOrdemTransferenciaModal = ({ show, handleClose, dadosConferen
                       iconColor={"#fff"}
                       cor={"success"}
                     />
-                </Fragment>
-              ) : (
-                <Fragment>
+                  </Fragment>
+                ) : (
+                  <Fragment>
                     <ButtonTable
                       titleButton={"Status Nota Fiscal"}
                       onClickButton={() => handleClickDetalhar(row)}
@@ -143,8 +143,8 @@ export const ActionOrdemTransferenciaModal = ({ show, handleClose, dadosConferen
                       iconColor={"#fff"}
                       cor={"warning"}
                     />
-                </Fragment>
-                ) ) }
+                  </Fragment>
+                ))}
             </Fragment>
           </div>
         );
@@ -155,123 +155,108 @@ export const ActionOrdemTransferenciaModal = ({ show, handleClose, dadosConferen
   return (
     <Fragment>
       <Modal
-          show={show}
-          onHide={handleClose}
-          size="xl"
-        >
-          <div className="modal-content">
-            <HeaderModal
-              title="Ordem de Transferência"
-              subtitle="Nome da Loja"
-              handleClose={handleClose}
-            />
-            <div className="modal-body" id="resultadoot"><div id="resultadocadestrutura"></div>
+        show={show}
+        onHide={handleClose}
+        size="xl"
+      >
+        <div className="modal-content">
+          <HeaderModal
+            title="Ordem de Transferência"
+            subtitle="Nome da Loja"
+            handleClose={handleClose}
+          />
+          <div className="modal-body" id="resultadoot"><div id="resultadocadestrutura"></div>
 
-              <div className="form-group" data-select2-id="737">
-                <div className="row" data-select2-id="736">
-                  <div className="col-sm-6 col-xl-6">
-                    <InputFieldModal
-                      label={"Loja Origem"}
-                      type="text"
-                      readOnly={true}
-                    />
-                    
-                  </div>
-                  <div className="col-sm-6 col-xl-6" data-select2-id="735">
-                    {/* <InputSelect
-                      label={"Loja Destino"}
-                      type="select"
-                      // id="idlojadestinomodal"
-                      options
-                    /> */}
-                    <label htmlFor="">Loja Destino</label>
-                    {/* <Select
-                      defaultValue={usuarioSelecionado}
-                      options={[
-                        { value: '', label: 'Selecione...' },
-                        ...dadosFuncionarios.map((item) => {
-                          return {
-                            value: item.ID,
-                            label: `${item.ID} - ${item.NOFUNCIONARIO}`
-                          }
-                        })]}
-                      onChange={handleChangeUsuario}
-                    /> */}
-                  </div>
-                </div>
-                <br />
-                <div className="row">
-                  <div className="col-sm-6 col-xl-4">
-                    <InputFieldModal
-                      label={"Produto"}
-                      type="text"
-                      // id="IDContaBanco"
-                      readOnly={false}
-                    />
-                  </div>
-                </div>
-                <br />
-                <div className="row">
-                  <div className="col-sm-8 col-xl-8">
-                    <ButtonTypeModal
-                      Icon={FaRegSave}
-                      textButton={"Salvar"}
-                      cor={"info"}
-                      className={"mr-4"}
-                    />
+            <div className="form-group" data-select2-id="737">
+              <div className="row" data-select2-id="736">
+                <div className="col-sm-6 col-xl-6">
+                  <InputFieldModal
+                    label={"Loja Origem"}
+                    type="text"
+                    readOnly={true}
+                  />
 
-                  </div>
-                  <div className="col-sm-8 col-xl-8 mt-4">
-                    <label className="form-label" style={{ color: "red" }}>Para confirmar as Alterações e Inclusões dos Produtos, favor clicar no botão Salvar!</label>
-                  </div>
+                </div>
+                <div className="col-sm-6 col-xl-6" data-select2-id="735">
+                  <label htmlFor="">Loja Destino</label>
+
                 </div>
               </div>
-
-              <DataTable
-
-                title="Vendas por Loja"
-                value={dados}
-                sortField="VRTOTALPAGO"
-                sortOrder={-1}
-                paginator
-                rows={10}
-                rowsPerPageOptions={[10, 20, 30, 50, 100]}
-
-                showGridlines
-                stripedRows
-                emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
-              >
-                {colunasConferencia.map(coluna => (
-                  <Column
-                    key={coluna.field}
-                    field={coluna.field}
-                    header={coluna.header}
-                    body={coluna.body}
-                    footer={coluna.footer}
-                    sortable={coluna.sortable}
-                    headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
-                    footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
-                    bodyStyle={{ fontSize: '0.8rem' }}
+              <br />
+              <div className="row">
+                <div className="col-sm-6 col-xl-4">
+                  <InputFieldModal
+                    label={"Produto"}
+                    type="text"
+                    // id="IDContaBanco"
+                    readOnly={false}
                   />
-                ))}
-              </DataTable>
+                </div>
+              </div>
+              <br />
+              <div className="row">
+                <div className="col-sm-8 col-xl-8">
+                  <ButtonTypeModal
+                    Icon={FaRegSave}
+                    textButton={"Salvar"}
+                    cor={"info"}
+                    className={"mr-4"}
+                  />
+
+                </div>
+                <div className="col-sm-8 col-xl-8 mt-4">
+                  <label className="form-label"
+                    style={{ color: "red" }}>Para confirmar as Alterações e Inclusões dos Produtos, favor clicar no botão Salvar!
+                  </label>
+                </div>
+              </div>
             </div>
 
-            <FooterModal
-              ButtonTypeCadastrar={ButtonTypeModal}
-              onClickButtonCadastrar={""}
-              textButtonCadastrar={"Cadastrar"}
-              corCadastrar="success"
+            <DataTable
 
-              ButtonTypeFechar={ButtonTypeModal}
-              textButtonFechar={"Fechar"}
-              onClickButtonFechar={handleClose}
-              corFechar="secondary"
-              loadingTextCadastrar={"Cadastrando..."}
-              autoLoadingCadastrar={true}
-            />
+              title="Vendas por Loja"
+              value={dados}
+              sortField="VRTOTALPAGO"
+              sortOrder={-1}
+              paginator
+              rows={10}
+              rowsPerPageOptions={[10, 20, 30, 50, 100]}
+
+              showGridlines
+              stripedRows
+              emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
+            >
+              {colunasConferencia.map(coluna => (
+                <Column
+                  key={coluna.field}
+                  field={coluna.field}
+                  header={coluna.header}
+                  body={coluna.body}
+                  footer={coluna.footer}
+                  sortable={coluna.sortable}
+                  headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+                  footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
+                  bodyStyle={{ fontSize: '0.8rem' }}
+                />
+              ))}
+            </DataTable>
           </div>
-        </Modal>
+
+          <FooterModal
+            ButtonTypeCadastrar={ButtonTypeModal}
+            onClickButtonCadastrar={""}
+            textButtonCadastrar={"Cadastrar"}
+            corCadastrar="success"
+
+            ButtonTypeFechar={ButtonTypeModal}
+            textButtonFechar={"Fechar"}
+            onClickButtonFechar={handleClose}
+            corFechar="secondary"
+            loadingTextCadastrar={"Cadastrando..."}
+            autoLoadingCadastrar={true}
+          />
+        </div>
+      </Modal>
     </Fragment>
   )
 }

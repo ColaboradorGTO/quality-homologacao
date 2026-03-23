@@ -13,20 +13,11 @@ import { getDataAtual } from "../../../../utils/dataAtual";
 import { ActionCadastrarStatusModal } from "./ActionCadastrarStatusModal/actionCadastrarStatusModal";
 
 export const ActionPesquisaStatusDivergencia = ({ usuarioLogado }) => {
-  const { register, handleSubmit, errors } = useForm();
-  const [modalEditarVisivel, setModalEditarVisivel] = useState(false);
+
   const [modalCadastrarVisivel, setModalCadastrarVisivel] = useState(false);
   const [clickContador, setClickContador] = useState(0);
-  const [dadosExemplos, setDadosExemplos] = useState([]);
-  const [dadosDetalheTransferencia, setDadosDetalheTransferencia] = useState([]);
-  const [itensPorPagina, setItensPorPagina] = useState(10)
-  const [paginaAtual, setPaginaAtual] = useState(1);
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('')
   const [dataPesquisaFim, setDataPesquisaFim] = useState('')
-  const [statusSelecionada, setStatusSelecionada] = useState(null)
-  const [dadosDivergencia, setDadosDivergencia] = useState([])
-  const [descricao, setDescricao] = useState('')
-  const navigate = useNavigate();
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
   useEffect(() => {
@@ -75,7 +66,6 @@ export const ActionPesquisaStatusDivergencia = ({ usuarioLogado }) => {
     setModalCadastrarVisivel(true)
   }
   const handleClose = () => {
-    setModalEditarVisivel(false)
     setModalCadastrarVisivel(false)
   }
 

@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { post, put } from "../../../api/funcRequest";
 import axios from "axios";
 
-export const useInserirDivergencia = ({
-
+export const useEditarDivergencia = ({
+  dadosEncontrados,
   handleClose,
   refetchStatus,
   optionsModulos,
@@ -14,8 +13,6 @@ export const useInserirDivergencia = ({
 
   const [descricao, setDescricao] = useState('')
   const [statusDivergencia, setStatusDivergencia] = useState('')
-  const [descricaoSelecionada, setDescricaoSelecionada] = useState('')
-  const [statusSelecionado, setStatusSelecionado] = useState('')
   const [ipUsuario, setIpUsuario] = useState('');
 
   const getIPUsuario = async () => {
@@ -40,8 +37,22 @@ export const useInserirDivergencia = ({
     return usuarioIP;
   };
 
+  useEffect(() => {
+    if (dadosEncontrados) {
+      setDescricao(dadosEncontrados?.DESCRICAODIVERGENCIA);
+      setStatusDivergencia(
+        {
+          value: dadosEncontrados?.STATIVO === "True" ? 'True' : 'False',
+          label: dadosEncontrados?.STATIVO === "True" ? 'Ativo' : 'Inativo'
+        }
+      );
+    }
+
+  }, [dadosEncontrados])
+
+
   const onSubmit = async () => {
-    if (optionsModulos[0]?.CRIAR == 'False') {
+    if (optionsModulos[0]?.ALTERAR == 'False') {
       Swal.fire({
         title: 'Erro!',
         text: `${usuarioLogado?.NOFUNCIONARIO},\nVocê não tem permissão para finalizar a OT!`,
@@ -53,15 +64,15 @@ export const useInserirDivergencia = ({
 
     const postData = {
       DESCRICAODIVERGENCIA: descricao,
-      IDUSRCRIACAO: usuarioLogado.id,
+      IDSTATUSDIVERGENCIA: Number(dadosEncontrados.IDSTATUSDIVERGENCIA),
       STATIVO: statusDivergencia.value
     };
 
     try {
-      const response = await post('/inserir-status-divergencia', postData);
+      const response = await put('/status-divergencia/:id', postData);
 
       const textDados = JSON.stringify(postData);
-      let textoFuncao = 'CONFERNCIA CEGA / INSERIR DIVERGENCIA OT';
+      let textoFuncao = 'CONFERNCIA CEGA / ALTERAR DIVERGENCIA OT';
       const ipUsuario = await getIPUsuario();
 
       const createData = {
@@ -75,11 +86,12 @@ export const useInserirDivergencia = ({
 
       Swal.fire({
         title: 'Sucesso!',
-        text: 'Divergência inserida com sucesso!',
+        text: 'Divergência alterada com sucesso!',
         icon: 'success',
         customClass: {
           container: 'custom-swal',
-        }
+        },
+        timer: 3000,
       });
 
       handleClose();
@@ -88,11 +100,12 @@ export const useInserirDivergencia = ({
       return response.data;
 
     } catch (error) {
-      console.error(error);
+      console.log(error);
 
       const textDados = JSON.stringify(postData);
-      let textoFuncao = 'CONFERNCIA CEGA / INSERIR DIVERGENCIA OT';
+      let textoFuncao = 'CONFERNCIA CEGA / ALTERAR DIVERGENCIA OT';
       const ipUsuario = await getIPUsuario();
+
 
       const createData = {
         IDFUNCIONARIO: String(usuarioLogado.id),
@@ -105,18 +118,15 @@ export const useInserirDivergencia = ({
 
       Swal.fire({
         title: 'Erro',
-        text: 'erro ao inserir divergência',
+        text: 'Erro ao alterar divergência',
         icon: 'error',
         customClass: {
           container: 'custom-swal',
-        }
+        },
+        timer: 3000,
       });
 
-      handleClose();
-      refetchStatus();
-
       return responsePost.data;
-
     }
   };
 
@@ -126,10 +136,6 @@ export const useInserirDivergencia = ({
     usuarioLogado,
     statusDivergencia,
     setStatusDivergencia,
-    descricaoSelecionada,
-    setDescricaoSelecionada,
-    statusSelecionado,
-    setStatusSelecionado,
-    onSubmit,
+    onSubmit
   };
 };

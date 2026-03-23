@@ -1,7 +1,6 @@
 import * as yup from "yup";
 
 export const schema = yup.object({
-
     quantidade: yup
         .number()
         .required("Quantidade é obrigatória")
