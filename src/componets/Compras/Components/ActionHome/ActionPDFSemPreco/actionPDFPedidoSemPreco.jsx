@@ -17,13 +17,51 @@ export const ActionPDFPedidoSemPreco = ({ show, handleClose, dadosPedidoSemPreco
   */
    const handlePrint = useReactToPrint({
      content: () => dataTableRef.current,
-     documentTitle: 'Nota Fiscal de Pedido',
+     documentTitle: `Pedido`,
+      // onBeforePrint: () => {
+      //   const style = document.createElement('style');
+      //   style.innerHTML = `
+      //     *{
+      //       margin: 0;
+      //       padding: 0;
+
+      //     }
+      //     @page {
+      //       size: portrait;
+      //       margin: 0;
+      //       padding: 0;
+      //     }
+      //     @media print {
+      //       .print-div-table{ width: 100%; };
+      //       .hidden-print {
+      //         display: none !important;
+      //       }
+      //       #dt-basic-detalhe-pedido-grade{
+      //         text-align: center;
+      //       }
+      //       .group{text-align: left !important;}
+      //       table.bordasimples {border-collapse: collapse !important;font-size: 11px !important;}
+      //       table.bordasimples tr th {border:solid 1px #000 !important; padding:0px; margin:0px;font-size: 11px !important;}
+      //       table.bordasimples tr td {border:solid 1px #000 !important; padding:0px; margin:0px;font-size: 11px !important;}
+      //       table.semborda td {border:solid 1px #000 !important; padding:0px; margin:0px;font-size: 11px !important;}
+      //       table.bordasimples tbody tr td {border:solid 1px #000 !important; padding:0px; margin:0px;font-size: 11px; font-weight: 500 !important;}
+      //       table{
+      //         font-family: verdana;
+      //         font-size: 16px;
+      //         margin: 0;
+      //         padding: 0;
+      //       }
+      //     }
+      //   `;
+      //   document.head.appendChild(style);
+      // },
      
      pageStyle: `
        <style>
               *{
                 margin: 0;
                 padding: 0;
+                background: #000;
               }
 
               @page {
@@ -48,14 +86,14 @@ export const ActionPDFPedidoSemPreco = ({ show, handleClose, dadosPedidoSemPreco
                 
                 .group{text-align: left !important;}
                 
-              table.bordasimples {border-collapse: collapse !important;font-size: 9px !important;}
-              table.bordasimples tr th {border:solid 1px #000 !important; padding:1px; margin:0px;font-size: 9px !important;}
-              table.bordasimples tr td {border:solid 1px #000 !important; padding:1px; margin:0px;font-size: 9px !important;}
-              table.semborda td {border:solid 1px #000 !important; padding:0px; margin:0px;font-size: 9px !important;}
+              table.bordasimples {border-collapse: collapse !important;font-size: 10px !important;}
+              table.bordasimples tr th {border:solid 1px #000 !important; padding:0px; margin:0px;font-size: 10px !important;}
+              table.bordasimples tr td {border:solid 1px #000 !important; padding:0px; margin:0px;font-size: 10px !important;}
+              table.semborda td {border:solid 1px #000 !important; padding:0px; margin:0px;font-size: 10px !important;}
             
               table{
                 font-family: verdana;
-                font-size: 9px;
+                font-size: 16px;
                 margin: 0;
                 padding: 0;
             
@@ -156,14 +194,15 @@ export const ActionPDFPedidoSemPreco = ({ show, handleClose, dadosPedidoSemPreco
         modal
         fullscreen={true}
         style={{
+           backgroundColor: '#fff',
             color: "#000", 
             width: "75vw",
             height: "100vh",
-            // padding: "2rem",
+            padding: "2rem",
         }}
       >
 
-        <div ref={dataTableRef} style={{ marginTop: "1rem", width: "100%", }}>
+        <div ref={dataTableRef} style={{ padding: "10px", width: "100%", }}>
 
           <ActionNotaPDFSemPreco dadosPedidoSemPreco={dadosPedidoSemPreco} dadosDetalhePedido={dadosDetalhePedido} />
           

@@ -143,7 +143,7 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
             </tr>
           </thead>
 
-          <tbody style={{}}>
+          <tbody className="table-product" style={{}}>
             {dadosAgrupados.map((grupo, grupoIndex) => (
               <Fragment key={grupoIndex}>
                 {/* Header do Grupo */}
@@ -162,104 +162,99 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
                     role="row" 
                     className={itemIndex % 2 === 0 ? "even" : "odd"}
                   >
-                    <td className="text-center" style={{ border: "solid 1px #000", fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif' }}>{item.contador}</td>
-                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif'  }}>{item.QTDTOTAL}</td>
-                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif'  }}>{item.DSSIGLA}</td>
-                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif'  }}>{item.NUREF}</td>
-                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif'  }}>{item.DSPRODUTO}</td>
-                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif'  }}>{item.DadosCxTecido}</td>
-                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif'  }}>{item.DSCOR}</td>
-                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif'  }}>{item.DSLOCALEXPOSICAO}</td>
-                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif'  }}>{item.DSESTILO}</td>
-                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif'  }}>{item.STREDESOCIAL}</td>
-                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif'  }}>{item.OBSPRODUTO}</td>
-                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif'  }}>
+                    <td className="text-center" style={{ border: "solid 1px #000", fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif', fontWeight: 400 }}>{item.contador}</td>
+                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif', fontWeight: 400 }}>{item.QTDTOTAL}</td>
+                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif', fontWeight: 400 }}>{item.DSSIGLA}</td>
+                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif', fontWeight: 400 }}>{item.NUREF}</td>
+                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif', fontWeight: 400 }}>{item.DSPRODUTO}</td>
+                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif', fontWeight: 400 }}>{item.DadosCxTecido}</td>
+                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif', fontWeight: 400 }}>{item.DSCOR}</td>
+                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif', fontWeight: 400 }}>{item.DSLOCALEXPOSICAO}</td>
+                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif', fontWeight: 400 }}>{item.DSESTILO}</td>
+                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif', fontWeight: 400 }}>{item.STREDESOCIAL}</td>
+                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif', fontWeight: 400 }}>{item.OBSPRODUTO}</td>
+                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif', fontWeight: 400 }}>
                       <div dangerouslySetInnerHTML={{ __html: item.gradeCompleta }} />
                     </td>
-                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif'  }}>{formatMoeda(item.VRUNITLIQDETALHEPEDIDO)}</td>
-                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif'  }}>{formatMoeda(item.VRTOTALDETALHEPEDIDO)}</td>
+                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif', fontWeight: 400 }}>{formatMoeda(item.VRUNITLIQDETALHEPEDIDO)}</td>
+                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif', fontWeight: 400 }}>{formatMoeda(item.VRTOTALDETALHEPEDIDO)}</td>
                   </tr>
                 ))}
-
-                {/* Subtotal do Grupo */}
-                {/* <tr className="group">
-                  <td colSpan="14" style={{ textAlign: "right", backgroundColor: "#e9ecef" }}>
-                    <label style={{ color: "blue", fontSize: "12px" }}>
-                      <strong>{formatMoeda(grupo.subtotalVr)}</strong>
-                    </label>
-                  </td>
-                </tr> */}
               </Fragment>
             ))}
           </tbody>
 
           {/* Total Geral */}
-          <tbody >
-            <tr >
-              <td 
-                className="pr-2" 
-                align="center" 
-                style={{
-                  fontWeight: 700, 
-                  color: "#666", 
-                  border: "solid 1px #000", 
-                  textAlign: "end", 
-                  fontSize: "10px",
-                  lineHeight: "15px",
-                  fontFamily: 'Verdana, sans-serif'
-                }}
-                colSpan={1}
-              >
-                Qtd Total 
-              </td>
-              <td 
-                align="center" 
-                style={{
-                  fontWeight: 700, 
-                  color: "#666", 
-                  border: "solid 1px #000", 
-                  textAlign: "end", 
-                  fontSize: "10px",
-                  lineHeight: "15px",
-                  fontFamily: 'Verdana, sans-serif'
-                }}
-                colSpan={2}
-              >
-                <b>{Math.round(totalGeral.totalQtdGeral)}</b>
-              </td>
-              <td 
-                className="pr-2" 
-                align="center"
-                style={{
-                  fontWeight: 700, 
-                  color: "#666", 
-                  border: "solid 1px #000", 
-                  textAlign: "end", 
-                  fontSize: "10px",
-                  lineHeight: "15px",
-                  fontFamily: 'Verdana, sans-serif'
-                }}
-                colSpan={10}
-              >
-                <p><b>Valor Total </b></p>
-              </td>
-              <td 
-                align="center" 
-                style={{
-                  fontWeight: 700, 
-                  color: "#666", 
-                  border: "solid 1px #000", 
-                  textAlign: "end", 
-                  fontSize: "10px",
-                  lineHeight: "15px",
-                  fontFamily: 'Verdana, sans-serif'
-                }}
-                colSpan={1}
-              >
-                {formatMoeda(totalGeral.totalVrGeral)}
-              </td>
-            </tr>
-          </tbody>
+          <div style={{width: "100%", display: "flex", justifyContent: "flex-end", marginTop: "15px"}}>
+
+          </div>
+            <tbody style={{border: "solid 1px #000", fontFamily: 'Verdana, sans-serif'}}>
+              <tr >
+                <td 
+                  className="pr-2" 
+                  align="center" 
+                  style={{
+                    fontWeight: 700, 
+                    color: "#666", 
+                    border: "solid 1px #000", 
+                    textAlign: "left", 
+                    fontSize: "14px",
+                    lineHeight: "15px",
+                    fontFamily: 'Verdana, sans-serif'
+                  }}
+                  colSpan={1}
+                >
+                  Qtd Total 
+                </td>
+                <td 
+                  align="center" 
+                  style={{
+                    fontWeight: 700, 
+                    color: "#666", 
+                    border: "solid 1px #000", 
+                    textAlign: "center", 
+                    fontSize: "12px",
+                    lineHeight: "15px",
+                    fontFamily: 'Verdana, sans-serif'
+                  }}
+                  colSpan={2}
+                >
+                  <b>{Math.round(totalGeral.totalQtdGeral)}</b>
+                </td>
+                <td 
+                  className="pr-2 " 
+                  align="center"
+                  style={{
+                    fontWeight: 700, 
+                    color: "#666", 
+                    border: "solid 1px #000", 
+                    textAlign: "end", 
+                    fontSize: "12px",
+                    lineHeight: "15px",
+                    fontFamily: 'Verdana, sans-serif',
+                    
+                  }}
+                  colSpan={10}
+                >
+                  <p><b>Valor Total </b></p>
+                </td>
+                <td 
+                  align="center" 
+                  style={{
+                    fontWeight: 700, 
+                    color: "#666", 
+                    border: "solid 1px #000", 
+                    textAlign: "end", 
+                    fontSize: "14px",
+                    lineHeight: "15px",
+                    fontFamily: 'Verdana, sans-serif'
+                  }}
+                  colSpan={1}
+                >
+                  {formatMoeda(totalGeral.totalVrGeral)}
+                </td>
+              </tr>
+            </tbody>
         </table>
       </div>
     </Fragment>

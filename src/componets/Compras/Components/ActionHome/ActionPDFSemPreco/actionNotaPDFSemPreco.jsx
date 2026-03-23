@@ -8,15 +8,14 @@ export const ActionNotaPDFSemPreco = ({ dadosPedidoSemPreco, dadosDetalhePedido 
 
     const styles = StyleSheet.create({
         page: { 
-            padding: 30, 
-            // width: '1500px',
-            // backgroundColor: '#fff', 
+            fontSize: 16,
+            backgroundColor: '#fff',
         },
         section: { marginBottom: 10 },
         title: {
             fontFamily: 'Verdana, sans-serif', 
             fontSize: 18,
-             marginBottom: 10 
+            marginBottom: 10 
         },
     });
     
