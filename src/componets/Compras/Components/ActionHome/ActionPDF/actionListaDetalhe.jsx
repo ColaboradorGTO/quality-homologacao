@@ -1,16 +1,11 @@
 import { Fragment, useMemo } from "react"
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
 import { toFloat } from "../../../../../utils/toFloat";
 import { formatMoeda } from "../../../../../utils/formatMoeda";
-import { ColumnGroup } from "primereact/columngroup";
-import { Row } from "primereact/row";
 import "./styles.css";
 
-//  ERRO RETORNAR AQUI PARA FAZER A TABELA DA FORMA CORRETA
+
 export const ActionListaDetalhe = ({ dadosDetalhePedido }) => {
 
-  // Função para processar todos os tamanhos da grade
   const processarGradeCompleta = (detalhegrade) => {
     if (!detalhegrade || !Array.isArray(detalhegrade)) return '';
     
@@ -23,7 +18,7 @@ export const ActionListaDetalhe = ({ dadosDetalhePedido }) => {
     return tablegrade;
   };
 
-  // Processar e agrupar dados
+ 
   const { dadosAgrupados, totalGeral } = useMemo(() => {
     const grupos = {};
     let totalVrGeral = 0;
@@ -34,11 +29,11 @@ export const ActionListaDetalhe = ({ dadosDetalhePedido }) => {
       const detpedido = item.detpedido;
       const detalhegrade = item.detalhegrade;
       
-      // Criar chave do grupo (igual ao jQuery)
+    
       const grupoChave = `${detpedido?.DSGRUPOESTRUTURA} / ${detpedido?.DSSUBGRUPOESTRUTURA}`;
       
-      // Determinar tipo de tecido/caixa (igual ao jQuery)
-      const TpModPedido = detpedido?.DSCATEGORIAPEDIDO; // ou usar um valor fixo como no jQuery
+
+      const TpModPedido = detpedido?.DSCATEGORIAPEDIDO; 
       const txtCxTec = TpModPedido === 'CALCADOS' ? 'Caixas' : 'Tecido';
       const DadosCxTecido = TpModPedido === 'CALCADOS' ? 
         Math.round(detpedido?.NUCAIXA || 0) : 
@@ -48,11 +43,11 @@ export const ActionListaDetalhe = ({ dadosDetalhePedido }) => {
       const vrTotal = toFloat(detpedido?.VRTOTALDETALHEPEDIDO);
       const qtdTotal = toFloat(detpedido?.QTDTOTAL);
 
-      // Acumular totais gerais
+    
       totalVrGeral += vrTotal;
       totalQtdGeral += qtdTotal;
 
-      // Inicializar grupo se não existir
+      
       if (!grupos[grupoChave]) {
         grupos[grupoChave] = {
           nome: grupoChave,
@@ -62,7 +57,7 @@ export const ActionListaDetalhe = ({ dadosDetalhePedido }) => {
         };
       }
 
-      // Adicionar item ao grupo
+   
       const itemProcessado = {
         contador: contadorGeral,
         QTDTOTAL: qtdTotal,

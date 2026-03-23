@@ -1,10 +1,10 @@
 import { Fragment, useMemo } from "react"
 import { toFloat } from "../../../../../utils/toFloat";
 import { formatMoeda } from "../../../../../utils/formatMoeda";
+import "./styles.css";
 
 export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
 
-  // Função para processar todos os tamanhos da grade
   const processarGradeCompleta = (detalhegrade) => {
     if (!detalhegrade || !Array.isArray(detalhegrade)) return '';
     
@@ -17,7 +17,7 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
     return tablegrade;
   };
 
-  // Processar e agrupar dados
+ 
   const { dadosAgrupados, totalGeral } = useMemo(() => {
     const grupos = {};
     let totalVrGeral = 0;
@@ -28,11 +28,11 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
       const detpedido = item.detpedido;
       const detalhegrade = item.detalhegrade;
       
-      // Criar chave do grupo (igual ao jQuery)
+     
       const grupoChave = `${detpedido?.DSGRUPOESTRUTURA} / ${detpedido?.DSSUBGRUPOESTRUTURA}`;
       
-      // Determinar tipo de tecido/caixa (igual ao jQuery)
-      const TpModPedido = detpedido?.DSCATEGORIAPEDIDO; // ou usar um valor fixo como no jQuery
+   
+      const TpModPedido = detpedido?.DSCATEGORIAPEDIDO; 
       const txtCxTec = TpModPedido === 'CALCADOS' ? 'Caixas' : 'Tecido';
       const DadosCxTecido = TpModPedido === 'CALCADOS' ? 
         Math.round(detpedido?.NUCAIXA || 0) : 
@@ -42,11 +42,11 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
       const vrTotal = toFloat(detpedido?.VRTOTALDETALHEPEDIDO);
       const qtdTotal = toFloat(detpedido?.QTDTOTAL);
 
-      // Acumular totais gerais
+      
       totalVrGeral += vrTotal;
       totalQtdGeral += qtdTotal;
 
-      // Inicializar grupo se não existir
+     
       if (!grupos[grupoChave]) {
         grupos[grupoChave] = {
           nome: grupoChave,
@@ -56,7 +56,7 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
         };
       }
 
-      // Adicionar item ao grupo
+    
       const itemProcessado = {
         contador: contadorGeral,
         QTDTOTAL: qtdTotal,
@@ -98,46 +98,46 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
         >
           <thead>
             <tr role="row">
-              <th className="sorting_disabled text-center" style={{ border: "solid 1px #000", width: "0px", textAlign: "center", fontSize: "12px", fontWeight: 700, color: "#666", lineHeight: "18px", fontFamily: 'Verdana, sans-serif' }} rowSpan="1" colSpan="1">
+              <th className="thTable" rowSpan="1" colSpan="1">
                 #
               </th>
-              <th className="sorting_disabled text-center" style={{ border: "solid 1px #000", width: "0px", textAlign: "center", fontSize: "12px", fontWeight: 700, color: "#666", lineHeight: "18px", fontFamily: 'Verdana, sans-serif' }} rowSpan="1" colSpan="1">
+              <th className="thTable" rowSpan="1" colSpan="1">
                 <b>Qtd</b>
               </th>
-              <th className="sorting_disabled text-center" style={{ border: "solid 1px #000", width: "0px", textAlign: "center", fontSize: "12px", fontWeight: 700, color: "#666", lineHeight: "18px", fontFamily: 'Verdana, sans-serif' }} rowSpan="1" colSpan="1">
+              <th className="thTable" rowSpan="1" colSpan="1">
                 <b>Unid</b>
               </th>
-              <th className="sorting_disabled text-center" style={{ border: "solid 1px #000", width: "0px", textAlign: "center", fontSize: "12px", fontWeight: 700, color: "#666", lineHeight: "18px", fontFamily: 'Verdana, sans-serif' }} rowSpan="1" colSpan="1">
+              <th className="thTable" rowSpan="1" colSpan="1">
                 <b>Referência</b>
               </th>
-              <th className="sorting_disabled text-center" style={{ border: "solid 1px #000", width: "0px", textAlign: "center", fontSize: "12px", fontWeight: 700, color: "#666", lineHeight: "18px", fontFamily: 'Verdana, sans-serif' }} rowSpan="1" colSpan="1">
+              <th className="thTableDescricao" rowSpan="1" colSpan="1">
                 <b>Descrição</b>
               </th>
-              <th className="sorting_disabled text-center" style={{ border: "solid 1px #000", width: "0px", textAlign: "center", fontSize: "12px", fontWeight: 700, color: "#666", lineHeight: "18px", fontFamily: 'Verdana, sans-serif' }} rowSpan="1" colSpan="1">
+              <th className="thTable" rowSpan="1" colSpan="1">
                 <b>Tecido</b>
               </th>
-              <th className="sorting_disabled text-center" style={{ border: "solid 1px #000", width: "0px", textAlign: "center", fontSize: "12px", fontWeight: 700, color: "#666", lineHeight: "18px", fontFamily: 'Verdana, sans-serif' }} rowSpan="1" colSpan="1">
+              <th className="thTable" rowSpan="1" colSpan="1">
                 <b>Cor</b>
               </th>
-              <th className="sorting_disabled text-center" style={{ border: "solid 1px #000", width: "0px", textAlign: "center", fontSize: "12px", fontWeight: 700, color: "#666", lineHeight: "18px", fontFamily: 'Verdana, sans-serif' }} rowSpan="1" colSpan="1">
+              <th className="thTable" rowSpan="1" colSpan="1">
                 <b>Local Exp</b>
               </th>
-              <th className="sorting_disabled text-center" style={{ border: "solid 1px #000", width: "0px", textAlign: "center", fontSize: "12px", fontWeight: 700, color: "#666", lineHeight: "18px", fontFamily: 'Verdana, sans-serif' }} rowSpan="1" colSpan="1">
+              <th className="thTable" rowSpan="1" colSpan="1">
                 <b>Estilo</b>
               </th>
-              <th className="sorting_disabled text-center" style={{ border: "solid 1px #000", width: "0px", textAlign: "center", fontSize: "12px", fontWeight: 700, color: "#666", lineHeight: "18px" }} rowSpan="1" colSpan="1">
+              <th className="thTable" rowSpan="1" colSpan="1">
                 <b>R. Social</b>
               </th>
-              <th className="sorting_disabled text-center" style={{ border: "solid 1px #000", width: "0px", textAlign: "center", fontSize: "12px", fontWeight: 700, color: "#666", lineHeight: "18px" }} rowSpan="1" colSpan="1">
+              <th className="thTable" rowSpan="1" colSpan="1">
                 <b>Obs</b>
               </th>
-              <th className="sorting_disabled text-center" style={{ border: "solid 1px #000", width: "0px", textAlign: "center", fontSize: "12px", fontWeight: 700, color: "#666", lineHeight: "18px" }} rowSpan="1" colSpan="1">
+              <th className="thTable" rowSpan="1" colSpan="1">
                 <b>Grade</b>
               </th>
-              <th className="sorting_disabled text-center" style={{ border: "solid 1px #000", width: "0px", textAlign: "center", fontSize: "12px", fontWeight: 700, color: "#666", lineHeight: "18px" }} rowSpan="1" colSpan="1">
+              <th className="thTable" rowSpan="1" colSpan="1">
                 <b>Vr Unit</b>
               </th>
-              <th className="sorting_disabled text-center" style={{ border: "solid 1px #000", width: "0px", textAlign: "center", fontSize: "12px", fontWeight: 700, color: "#666", lineHeight: "18px" }} rowSpan="1" colSpan="1">
+              <th className="thTable" rowSpan="1" colSpan="1">
                 <b>Total</b>
               </th>
             </tr>
@@ -148,8 +148,8 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
               <Fragment key={grupoIndex}>
                 {/* Header do Grupo */}
                 <tr className="group">
-                  <td colSpan="14" style={{ textAlign: "left", fontFamily: 'Verdana, sans-serif' }}>
-                    <label style={{ color: "blue", fontSize: "12px", lineHeight: "18px", fontWeight: 500, fontFamily: 'Verdana, sans-serif' }}>
+                  <td colSpan="14" style={{padding: "5px" }}>
+                    <label style={{textAlign: "left", color: "blue", fontSize: "12px", lineHeight: "18px", fontWeight: 500, fontFamily: 'Verdana' }}>
                       <strong>{grupo.nome}</strong>
                     </label>
                   </td>
@@ -162,22 +162,22 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
                     role="row" 
                     className={itemIndex % 2 === 0 ? "even" : "odd"}
                   >
-                    <td className="text-center" style={{ border: "solid 1px #000", fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif', fontWeight: 400 }}>{item.contador}</td>
-                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif', fontWeight: 400 }}>{item.QTDTOTAL}</td>
-                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif', fontWeight: 400 }}>{item.DSSIGLA}</td>
-                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif', fontWeight: 400 }}>{item.NUREF}</td>
-                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif', fontWeight: 400 }}>{item.DSPRODUTO}</td>
-                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif', fontWeight: 400 }}>{item.DadosCxTecido}</td>
-                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif', fontWeight: 400 }}>{item.DSCOR}</td>
-                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif', fontWeight: 400 }}>{item.DSLOCALEXPOSICAO}</td>
-                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif', fontWeight: 400 }}>{item.DSESTILO}</td>
-                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif', fontWeight: 400 }}>{item.STREDESOCIAL}</td>
-                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif', fontWeight: 400 }}>{item.OBSPRODUTO}</td>
-                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif', fontWeight: 400 }}>
+                    <td className="tdCount">{item.contador}</td>
+                    <td className="td">{item.QTDTOTAL}</td>
+                    <td className="td">{item.DSSIGLA}</td>
+                    <td className="td">{item.NUREF}</td>
+                    <td className="td">{item.DSPRODUTO}</td>
+                    <td className="td">{item.DadosCxTecido}</td>
+                    <td className="td">{item.DSCOR}</td>
+                    <td className="td">{item.DSLOCALEXPOSICAO}</td>
+                    <td className="td">{item.DSESTILO}</td>
+                    <td className="td">{item.STREDESOCIAL}</td>
+                    <td className="td">{item.OBSPRODUTO}</td>
+                    <td className="td">
                       <div dangerouslySetInnerHTML={{ __html: item.gradeCompleta }} />
                     </td>
-                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif', fontWeight: 400 }}>{formatMoeda(item.VRUNITLIQDETALHEPEDIDO)}</td>
-                    <td className="text-center" style={{ border: "solid 1px #000",fontSize: "9px", lineHeight: "13px", color: "#666", fontFamily: 'Verdana, sans-serif', fontWeight: 400 }}>{formatMoeda(item.VRTOTALDETALHEPEDIDO)}</td>
+                    <td className="td">{formatMoeda(item.VRUNITLIQDETALHEPEDIDO)}</td>
+                    <td className="td">{formatMoeda(item.VRTOTALDETALHEPEDIDO)}</td>
                   </tr>
                 ))}
               </Fragment>
@@ -188,7 +188,7 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
           <div style={{width: "100%", display: "flex", justifyContent: "flex-end", marginTop: "15px"}}>
 
           </div>
-            <tbody style={{border: "solid 1px #000", fontFamily: 'Verdana, sans-serif'}}>
+            <tbody style={{border: "solid 1px #000", fontFamily: 'Verdana'}}>
               <tr >
                 <td 
                   className="pr-2" 
@@ -200,7 +200,7 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
                     textAlign: "left", 
                     fontSize: "14px",
                     lineHeight: "15px",
-                    fontFamily: 'Verdana, sans-serif'
+                    fontFamily: 'Verdana'
                   }}
                   colSpan={1}
                 >
@@ -215,7 +215,7 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
                     textAlign: "center", 
                     fontSize: "12px",
                     lineHeight: "15px",
-                    fontFamily: 'Verdana, sans-serif'
+                    fontFamily: 'Verdana'
                   }}
                   colSpan={2}
                 >
@@ -231,7 +231,7 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
                     textAlign: "end", 
                     fontSize: "12px",
                     lineHeight: "15px",
-                    fontFamily: 'Verdana, sans-serif',
+                    fontFamily: 'Verdana',
                     
                   }}
                   colSpan={10}
@@ -247,7 +247,7 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
                     textAlign: "end", 
                     fontSize: "14px",
                     lineHeight: "15px",
-                    fontFamily: 'Verdana, sans-serif'
+                    fontFamily: 'Verdana'
                   }}
                   colSpan={1}
                 >

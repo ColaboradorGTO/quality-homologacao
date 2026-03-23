@@ -13,7 +13,7 @@ export const ActionNotaPDFSemPreco = ({ dadosPedidoSemPreco, dadosDetalhePedido 
         },
         section: { marginBottom: 10 },
         title: {
-            fontFamily: 'Verdana, sans-serif', 
+            fontFamily: 'Verdana', 
             fontSize: 18,
             marginBottom: 10 
         },
@@ -162,17 +162,17 @@ export const ActionNotaPDFSemPreco = ({ dadosPedidoSemPreco, dadosDetalhePedido 
                                 <img src={dadoPrincipal?.logoPedido} style={{ width: '200px', height: '100px', border: 'none' }} />
                             </td>
                             <td rowspan="2" width="200" align="center" >
-                                <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '1rem', padding: '0px' }}> PEDIDO DE COMPRAS<br />{dadoPrincipal?.MODPEDIDO}</p>
-                                <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '1rem',  }}>Nº: <b>{dadoPrincipal?.IDPEDIDO}</b></p></td>
-                            <td align="center" style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px' }}>
+                                <p style={{fontFamily: 'Verdana', fontSize: '1rem', padding: '0px' }}> PEDIDO DE COMPRAS<br />{dadoPrincipal?.MODPEDIDO}</p>
+                                <p style={{fontFamily: 'Verdana', fontSize: '1rem',  }}>Nº: <b>{dadoPrincipal?.IDPEDIDO}</b></p></td>
+                            <td align="center" style={{fontFamily: 'Verdana', fontSize: '13px' }}>
                                 Fabricante: <br />
-                                <b><p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px',  }}>{dadoPrincipal?.FABRICANTE}</p></b>
+                                <b><p style={{fontFamily: 'Verdana', fontSize: '13px',  }}>{dadoPrincipal?.FABRICANTE}</p></b>
                             </td>
                         </tr>
                         <tr>
-                            <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px' }}>
+                            <td style={{fontFamily: 'Verdana', fontSize: '13px' }}>
                                 Razão Social Fornecedor: <br />
-                                <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px',  }}>{dadoPrincipal?.NOFORNECEDOR}</p>
+                                <p style={{fontFamily: 'Verdana', fontSize: '13px',  }}>{dadoPrincipal?.NOFORNECEDOR}</p>
                             </td>
                         </tr>
                     </tbody>
@@ -185,7 +185,7 @@ export const ActionNotaPDFSemPreco = ({ dadosPedidoSemPreco, dadosDetalhePedido 
                         >
                             <td rowspan="2" width="400" 
                                 style={{
-                                    fontFamily: 'Verdana, sans-serif', 
+                                    fontFamily: 'Verdana', 
                                     fontSize: '9px', 
                                     fontWeight: 400, 
                                     color: '#666',
@@ -200,22 +200,22 @@ export const ActionNotaPDFSemPreco = ({ dadosPedidoSemPreco, dadosDetalhePedido 
                                     ))}
                                 </p>
                             </td>
-                            <td width="200" style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px' }}>CNPJ: <br />
-                                <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.CNPJFORN}</p>
+                            <td width="200" className="tdPdf" >CNPJ: <br />
+                                <p className="tdPdf">{dadoPrincipal?.CNPJFORN}</p>
                             </td>
-                            <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>Email: <br />
-                                <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.EMAILFORN}</p>
+                            <td className="tdPdf" >Email: <br />
+                                <p className="tdPdf">{dadoPrincipal?.EMAILFORN}</p>
                             </td>
-                            <td width="100" style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px' }}>Tel: <br />
-                                <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.FONEFORN}</p>
+                            <td width="100" className="tdPdf" >Tel: <br />
+                                <p className="tdPdf">{dadoPrincipal?.FONEFORN}</p>
                             </td>
                         </tr>
                         <tr>
-                            <td colspan="2" width="200" style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>INSC EST: <br />
-                                <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.INSCESTFORN}</p>
+                            <td colspan="2" width="200" className="tdPdf">INSC EST: <br />
+                                <p className="tdPdf">{dadoPrincipal?.INSCESTFORN}</p>
                             </td>
-                            <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>Cel: <br />
-                                <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.FONEFORN}</p>
+                            <td className="tdPdf">Cel: <br />
+                                <p className="tdPdf">{dadoPrincipal?.FONEFORN}</p>
                             </td>
                         </tr>
                     </tbody>
@@ -225,14 +225,14 @@ export const ActionNotaPDFSemPreco = ({ dadosPedidoSemPreco, dadosDetalhePedido 
                 <table width="100%" className="bordasimples">
                     <tbody>
                         <tr>
-                            <td width="200" style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>Data do Pedido: <br />
-                                <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.DTPEDIDO}</p>
+                            <td width="200" className="tdPdf">Data do Pedido: <br />
+                                <p className="tdPdf">{dadoPrincipal?.DTPEDIDO}</p>
                             </td>
-                            <td width="200" style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>Data da Entrega: <br />
-                                <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.DTENTREGAFORMATADA2}</p>
+                            <td width="200" className="tdPdf">Data da Entrega: <br />
+                                <p className="tdPdf">{dadoPrincipal?.DTENTREGAFORMATADA2}</p>
                             </td>
-                            <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>Endereço: <br /><p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.ENDFORN}</p> </td>
-                            <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>Complemento: <br /><p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.COMPFORN}</p> <strong></strong> </td>
+                            <td className="tdPdf">Endereço: <br /><p className="tdPdf">{dadoPrincipal?.ENDFORN}</p> </td>
+                            <td className="tdPdf">Complemento: <br /><p className="tdPdf">{dadoPrincipal?.COMPFORN}</p> <strong></strong> </td>
                         </tr>
                     </tbody>
                 </table>
@@ -240,17 +240,15 @@ export const ActionNotaPDFSemPreco = ({ dadosPedidoSemPreco, dadosDetalhePedido 
                 <table width="100%" className="bordasimples">
                     <tbody>
                         <tr>
-                            <td width="400" style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>
-                                Comprador: <br /><p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.NOMECOMPRADOR}</p>
+                            <td width="400" className="tdPdf">
+                                Comprador: <br /><p className="tdPdf">{dadoPrincipal?.NOMECOMPRADOR}</p>
                             </td>
-                            <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>N°: <br />
-                                <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.NUMEROFORN}</p>
+                            <td className="tdPdf">N°: <br />
+                                <p className="tdPdf">{dadoPrincipal?.NUMEROFORN}</p>
                             </td>
-                            <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>
-                                Bairro: <br /><p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.BAIRROFORN}</p>
+                            <td className="tdPdf">Bairro: <br /><p className="tdPdf">{dadoPrincipal?.BAIRROFORN}</p>
                             </td>
-                            <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>
-                                Transportadora/Telefone: <br /><p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.NOMETRANSPORTADORA} - </p>
+                            <td className="tdPdf">Transportadora/Telefone: <br /><p className="tdPdf">{dadoPrincipal?.NOMETRANSPORTADORA} - </p>
                             </td>
                         </tr>
                     </tbody>
@@ -259,21 +257,18 @@ export const ActionNotaPDFSemPreco = ({ dadosPedidoSemPreco, dadosDetalhePedido 
                 <table width="100%" className="bordasimples">
                     <tbody>
                         <tr>
-                            <td width="400" style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>
-                                Vendedor: <br /><p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.NOVENDEDOR}</p>
+                            <td width="400" className="tdPdf">
+                                Vendedor: <br /><p className="tdPdf">{dadoPrincipal?.NOVENDEDOR}</p>
                             </td>
 
-                            <td width="400" style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>
-                                Cidade: <br /><p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.CIDADEFORN}</p>
+                            <td width="400" className="tdPdf">
+                                Cidade: <br /><p className="tdPdf">{dadoPrincipal?.CIDADEFORN}</p>
                             </td>
-                            <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>
-                                Desc. I (%): <br /><p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{formatMoeda(toFloat(dadoPrincipal?.DESCPERC01))}</p>
+                            <td className="tdPdf">Desc. I (%): <br /><p className="tdPdf">{formatMoeda(toFloat(dadoPrincipal?.DESCPERC01))}</p>
                             </td>
-                            <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>
-                                Desc. II(%): <br /><p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{formatMoeda(toFloat(dadoPrincipal?.DESCPERC02))}</p>
+                            <td className="tdPdf">Desc. II(%): <br /><p className="tdPdf">{formatMoeda(toFloat(dadoPrincipal?.DESCPERC02))}</p>
                             </td>
-                            <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>
-                                Desc. III(%): <br /><p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{formatMoeda(toFloat(dadoPrincipal?.DESCPERC03))}</p>
+                            <td className="tdPdf">Desc. III(%): <br /><p className="tdPdf">{formatMoeda(toFloat(dadoPrincipal?.DESCPERC03))}</p>
                             </td>
                         </tr>
                     </tbody>
@@ -281,19 +276,19 @@ export const ActionNotaPDFSemPreco = ({ dadosPedidoSemPreco, dadosDetalhePedido 
 
                 <table width="100%" className="bordasimples">
                     <tbody><tr>
-                        <td width="400" style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>
-                            Cond. Pagamento: <br /><p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.DSCONDICAOPAG}</p>
+                        <td width="400" className="tdPdf">
+                            Cond. Pagamento: <br /><p className="tdPdf" >{dadoPrincipal?.DSCONDICAOPAG}</p>
                         </td>
 
-                        <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>
-                            CEP: <br /><p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.CEPFORN}</p>
+                        <td className="tdPdf">
+                            CEP: <br /><p className="tdPdf">{dadoPrincipal?.CEPFORN}</p>
                         </td>
-                        <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>
-                            UF: <br /><p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.UFFORN}</p>
+                        <td className="tdPdf">
+                            UF: <br /><p className="tdPdf">{dadoPrincipal?.UFFORN}</p>
                         </td>
-                        <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>
+                        <td className="tdPdf">
                             Frete: <br />
-                            <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px'}}>
+                            <p className="tdPdf">
                                 {dadoPrincipal?.dsTipoFretePedido}
                             </p>
                         </td>
@@ -304,20 +299,20 @@ export const ActionNotaPDFSemPreco = ({ dadosPedidoSemPreco, dadosDetalhePedido 
                 <table width="100%" className="bordasimples">
                     <tbody>
                         <tr>
-                            <td width="400" style={{fontFamily: 'Verdana, sans-serif', fontSize: '9px', margin: '0px', padding: '0px'}}>
-                                Observações: <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '9px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.OBSPEDIDO} - {dadoPrincipal?.OBSPEDIDO2} </p>
+                            <td width="400" className="tdPdf" >
+                                Observações: <p style={{fontFamily: 'Verdana', fontSize: '9px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.OBSPEDIDO} - {dadoPrincipal?.OBSPEDIDO2} </p>
                             </td>
-                            <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '9px', margin: '0px', padding: '0px'}}>
-                                Fiscal: <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '9px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.dsTipoFiscalPedido}</p>
+                            <td className="tdPdf" >
+                                Fiscal: <p className="tdPdf" >{dadoPrincipal?.dsTipoFiscalPedido}</p>
                             </td>
-                            <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '9px', margin: '0px', padding: '0px'}}>
-                                Enviar: <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '9px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.dsTipoEnviar} </p>
+                            <td className="tdPdf" >
+                                Enviar: <p className="tdPdf" >{dadoPrincipal?.dsTipoEnviar} </p>
                             </td>
-                            <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '9px', margin: '0px', padding: '0px'}}>
-                                Tipo: <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '9px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.MODPEDIDO} </p>
+                            <td className="tdPdf" >
+                                Tipo: <p className="tdPdf" >{dadoPrincipal?.MODPEDIDO} </p>
                             </td>
-                            <td style={{fontFamily: 'Verdana, sans-serif', fontSize: '9px', margin: '0px', padding: '0px'}}>
-                                Comissão: <p style={{fontFamily: 'Verdana, sans-serif', fontSize: '9px', margin: '0px', padding: '0px'}}>{formatMoeda(toFloat(dadoPrincipal?.PERCCOMISSAO))} </p>
+                            <td className="tdPdf" >
+                                Comissão: <p className="tdPdf" >{formatMoeda(toFloat(dadoPrincipal?.PERCCOMISSAO))} </p>
                             </td>
                         </tr>
                     </tbody>
