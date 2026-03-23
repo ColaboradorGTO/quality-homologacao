@@ -220,7 +220,7 @@ export const ActionPesquisaPromocoesAtivas = ({ usuarioLogado }) => {
     { value: 'False', label: 'Inativa' },
   ]
 
-  
+
   return (
 
       <Fragment>

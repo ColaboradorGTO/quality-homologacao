@@ -357,5 +357,4 @@ export const ActionPesquisaHome = ({ usuarioLogado }) => {
       )}
     </Fragment>
   )
-
 }

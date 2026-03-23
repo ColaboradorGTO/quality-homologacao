@@ -1215,7 +1215,7 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
         });
         return null;
       }
-    };
+  };
 
   const handleSalvarMecanica = async () => {
       // if(optionsModulos[0]?.ALTERAR == 'False') {

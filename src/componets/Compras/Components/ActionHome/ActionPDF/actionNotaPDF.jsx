@@ -308,17 +308,17 @@ export const ActionNotaPDF = ({ dadosPedido, dadosDetalhePedido }) => {
                             <td width="400" style={{fontFamily: 'Verdana', fontSize: '9px', margin: '0px', padding: '0px'}}>
                                 Observações: <p style={{fontFamily: 'Verdana', fontSize: '9px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.OBSPEDIDO} - {dadoPrincipal?.OBSPEDIDO2} </p>
                             </td>
-                            <td style={{fontFamily: 'Verdana', fontSize: '9px', margin: '0px', padding: '0px'}}>
-                                Fiscal: <p style={{fontFamily: 'Verdana', fontSize: '9px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.dsTipoFiscalPedido}</p>
+                            <td className="tdPdf">
+                                Fiscal: <p className="tdPdf">{dadoPrincipal?.dsTipoFiscalPedido}</p>
                             </td>
-                            <td style={{fontFamily: 'Verdana', fontSize: '9px', margin: '0px', padding: '0px'}}>
-                                Enviar: <p style={{fontFamily: 'Verdana', fontSize: '9px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.dsTipoEnviar} </p>
+                            <td className="tdPdf">
+                                Enviar: <p className="tdPdf">{dadoPrincipal?.dsTipoEnviar} </p>
                             </td>
-                            <td style={{fontFamily: 'Verdana', fontSize: '9px', margin: '0px', padding: '0px'}}>
-                                Tipo: <p style={{fontFamily: 'Verdana', fontSize: '9px', margin: '0px', padding: '0px'}}>{dadoPrincipal?.MODPEDIDO} </p>
+                            <td className="tdPdf">
+                                Tipo: <p className="tdPdf">{dadoPrincipal?.MODPEDIDO} </p>
                             </td>
-                            <td style={{fontFamily: 'Verdana', fontSize: '9px', margin: '0px', padding: '0px'}}>
-                                Comissão: <p style={{fontFamily: 'Verdana', fontSize: '9px', margin: '0px', padding: '0px'}}>{formatMoeda(toFloat(dadoPrincipal?.PERCCOMISSAO))} </p>
+                            <td className="tdPdf">
+                                Comissão: <p className="tdPdf">{formatMoeda(toFloat(dadoPrincipal?.PERCCOMISSAO))} </p>
                             </td>
                         </tr>
                     </tbody>
