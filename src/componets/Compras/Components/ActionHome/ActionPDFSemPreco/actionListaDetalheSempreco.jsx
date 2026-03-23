@@ -148,7 +148,7 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
               <Fragment key={grupoIndex}>
                 {/* Header do Grupo */}
                 <tr className="group">
-                  <td colSpan="14" style={{ textAlign: "left", backgroundColor: "#f8f9fa", fontFamily: 'Verdana, sans-serif' }}>
+                  <td colSpan="14" style={{ textAlign: "left", fontFamily: 'Verdana, sans-serif' }}>
                     <label style={{ color: "blue", fontSize: "12px", lineHeight: "18px", fontWeight: 500, fontFamily: 'Verdana, sans-serif' }}>
                       <strong>{grupo.nome}</strong>
                     </label>

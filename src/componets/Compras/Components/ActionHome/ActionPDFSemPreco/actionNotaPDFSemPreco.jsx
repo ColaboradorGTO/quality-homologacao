@@ -140,7 +140,7 @@ export const ActionNotaPDFSemPreco = ({ dadosPedidoSemPreco, dadosDetalhePedido 
         }
     })
 
-    console.log("Dados processados para o PDF:", dados[0]);
+   
     if (!dados || dados.length === 0) {
         return (
             <Fragment>
@@ -190,34 +190,14 @@ export const ActionNotaPDFSemPreco = ({ dadosPedidoSemPreco, dadosDetalhePedido 
                                     fontWeight: 400, 
                                     color: '#666',
                                     padding: '0px',
-                                    margin: '0px', 
-                                    backgroundColor: '#f0f0f0',
-                                    
+                                    margin: '0px',                                     
                                 }}
                             >
-                                <p style={{margin: '0px', padding: '0px' }}>
-
-                                    Calçados: andre.compras@grupotesouradeouro.com.br - (61) 99697-2844 
-                                </p>
-                                <p style={{margin: '0px', padding: '0px' }}>
-
-                                    Faturamento: {dadoPrincipal?.EEMAILFATURAMENTO} - {dadoPrincipal?.NUTELFATURAMENTO}
-                                </p>
-                                <p style={{margin: '0px', padding: '0px' }}>
-
-                                    Cobrança: {dadoPrincipal?.EEMAILCOBRANCA} - {dadoPrincipal?.NUTELCOBRANCA}<br />
-                                </p>
-                                <p style={{margin: '0px', padding: '0px' }}>
-
-                                    Financeiro: {dadoPrincipal?.EEMAILFINANCEIRO} - {dadoPrincipal?.NUTELFINANCEIRO}<br />
-                                </p>
-                                <p style={{margin: '0px', padding: '0px' }}>
-
-                                    Compras: {dadoPrincipal?.EEMAILCOMPRAS} - {dadoPrincipal?.NUTELCOMPRAS}<br />
-                                </p>
-                                <p style={{margin: '0px', padding: '0px' }}>
-
-                                    Cadastro: {dadoPrincipal?.EEMAILCADASTRO} - {dadoPrincipal?.NUTELCADASTRO}<br />
+                                 <p style={{margin: '0px', padding: '0px' }}>
+                                    
+                                    {dadoPrincipal?.CONTATOS?.map((contato, index) => (
+                                        <span key={index}>{contato} <br /></span>
+                                    ))}
                                 </p>
                             </td>
                             <td width="200" style={{fontFamily: 'Verdana, sans-serif', fontSize: '13px', margin: '0px', padding: '0px' }}>CNPJ: <br />

@@ -1,12 +1,10 @@
 import { Fragment, useRef } from "react"
-import { Modal } from "react-bootstrap"
-import { HeaderModal } from "../../../../Modais/HeaderModal/HeaderModal";
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal";
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal";
 import { ActionNotaPDFSemPreco } from "./actionNotaPDFSemPreco";
 import { useReactToPrint } from "react-to-print";
 import { Dialog } from 'primereact/dialog';
-import { Button } from 'primereact/button';
+
 
 export const ActionPDFPedidoSemPreco = ({ show, handleClose, dadosPedidoSemPreco, dadosDetalhePedido }) => {
 
