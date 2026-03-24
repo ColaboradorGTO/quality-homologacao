@@ -56,6 +56,7 @@ export const ActionPesquisaStatusDivergencia = ({ usuarioLogado }) => {
   const handleClick = () => {
     setClickContador(prevContador => prevContador + 1);
     if (usuarioLogado && usuarioLogado.IDEMPRESA) {
+      refetchStatus();
       setTabelaVisivel(true);
     } else {
       console.log('Usuário não possui informações válidas.');
