@@ -1,12 +1,13 @@
 import React, { Fragment, Suspense, lazy, useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom";
 import { SidebarProvider } from "../componets/Sidebar/SidebarContext";
 import { MenuSidebarAdmin } from "../componets/Sidebar/sidebar";
 import { MenuButton } from "../componets/Buttons/menuButton";
 import { FooterMain } from "../componets/Footer";
 import { HeaderMain } from "../componets/Header";
+import { useNavigate } from "react-router-dom";
 import { useQuery } from "react-query";
 import { get } from "../api/funcRequest";
+
 const ActionPesquisaFaturamentoOT = lazy(() => import("../componets/Expedicao/Components/ActionFaturamentoOT/actionPesquisaFaturamentoOT").then(module => ({ default: module.ActionPesquisaFaturamentoOT })));
 const ActionPesquisaOrdemTransferencia = lazy(() => import("../componets/ConferenciaCega/Components/ActionOrdemTransferencia/actionPesquisaOrdemTransferencia").then(module => ({ default: module.ActionPesquisaOrdemTransferencia })));
 const ActionPesquisaStatusDivergencia = lazy(() => import("../componets/ConferenciaCega/Components/ActionStatusDivergencia/actionPesquisaStatusDivergencia").then(module => ({ default: module.ActionPesquisaStatusDivergencia })));
@@ -60,22 +61,21 @@ export const DashBoardConferenciaCega = () => {
 
   switch (componentToShow) {
     case "/conferenciaCega/ActionPesquisaOrdemTransferencia":
-      component = <ActionPesquisaOrdemTransferencia />;
+      component = <ActionPesquisaOrdemTransferencia usuarioLogado={usuarioLogado} />;
       break;
     case "/conferenciaCega/ActionPesquisaFaturamentoOT":
-      component = <ActionPesquisaFaturamentoOT />
+      component = <ActionPesquisaFaturamentoOT usuarioLogado={usuarioLogado} />
       break;
     case "/conferenciaCega/ActionPesquisaStatusDivergencia":
-      component = <ActionPesquisaStatusDivergencia />
+      component = <ActionPesquisaStatusDivergencia usuarioLogado={usuarioLogado}/>
       break;
-    case "/conferenciaCega/ActionPesquisaOrdemTransferenciaDeposito":
-      component = <ActionPesquisaOrdemTransferenciaDeposito />
+    case "/conferenciaCega/ListaOrdemTransferenciaDeposito":
+      component = <ActionPesquisaOrdemTransferenciaDeposito usuarioLogado={usuarioLogado} />
       break;
     default:
       break;
   }
   return (
-
 
     <Fragment>
       {usuarioLogado && (
@@ -98,7 +98,7 @@ export const DashBoardConferenciaCega = () => {
                           <div className="panel-content">
                             <Suspense fallback={<div>Loading...</div>}>
                               {resumoVisivel && !componentToShow && (
-                                <ActionPesquisaOrdemTransferencia />
+                                <ActionPesquisaOrdemTransferencia  usuarioLogado={usuarioLogado}/>
                             
                               )}
                               {componentToShow && component}

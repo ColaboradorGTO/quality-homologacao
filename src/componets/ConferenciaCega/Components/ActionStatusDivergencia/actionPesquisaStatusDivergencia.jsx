@@ -10,48 +10,41 @@ import { AiOutlineSearch } from "react-icons/ai";
 import { MdAdd } from "react-icons/md";
 import { useQuery } from "react-query";
 import { getDataAtual } from "../../../../utils/dataAtual";
-import { ActionCadastrarStatusModal } from "./actionCadastrarStatusModal";
+import { ActionCadastrarStatusModal } from "./ActionCadastrarStatusModal/actionCadastrarStatusModal";
 
-export const ActionPesquisaStatusDivergencia = () => {
-  const { register, handleSubmit, errors } = useForm();
-  const [modalEditarVisivel, setModalEditarVisivel] = useState(false);
+export const ActionPesquisaStatusDivergencia = ({ usuarioLogado }) => {
+
   const [modalCadastrarVisivel, setModalCadastrarVisivel] = useState(false);
   const [clickContador, setClickContador] = useState(0);
-  const [dadosExemplos, setDadosExemplos] = useState([]);
-  const [dadosDetalheTransferencia, setDadosDetalheTransferencia] = useState([]);
-  const [itensPorPagina, setItensPorPagina] = useState(10)
-  const [paginaAtual, setPaginaAtual] = useState(1);
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('')
   const [dataPesquisaFim, setDataPesquisaFim] = useState('')
-  const [statusSelecionada, setStatusSelecionada] = useState(null)
-  const [dadosDivergencia, setDadosDivergencia] = useState([])
-  const [usuarioLogado, setUsuarioLogado] = useState(null)
-  const [descricao, setDescricao] = useState('')
-  const navigate = useNavigate();
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
   useEffect(() => {
     const dataAtual = getDataAtual();
     setDataPesquisaInicio(dataAtual);
     setDataPesquisaFim(dataAtual);
   }, [])
+
   useEffect(() => {
-    const usuarioArmazenado = localStorage.getItem('usuario');
-
-    if (usuarioArmazenado) {
-      try {
-        const parsedUsuario = JSON.parse(usuarioArmazenado);
-        setUsuarioLogado(parsedUsuario);;
-      } catch (error) {
-        console.error('Erro ao parsear o usuário do localStorage:', error);
-      }
-    } else {
-      navigate('/');
+    const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
+    if (menuSalvo) {
+      const menuParsed = JSON.parse(menuSalvo);
+      setMenuFilhoAtual(menuParsed);
     }
-  }, [navigate]);
+  }, []);
 
+  const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
+    ['menus-usuario-excecao', menuFilhoAtual?.ID],
+    async () => {
+      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
 
+      return response.data;
+    },
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
+  );
 
-  const { data: dadosStatus = [], error: errorStatus, isLoading: isLoadingStatus } = useQuery(
+  const { data: dadosStatus = [], error: errorStatus, isLoading: isLoadingStatus, refetch: refetchStatus } = useQuery(
     'status-divergencia',
     async () => {
       const response = await get(`/status-divergencia`);
@@ -60,11 +53,10 @@ export const ActionPesquisaStatusDivergencia = () => {
     { staleTime: 5 * 60 * 1000 }
   );
 
-
-
   const handleClick = () => {
     setClickContador(prevContador => prevContador + 1);
-    if (usuarioLogado && usuarioLogado.IDEMPRESA ) {
+    if (usuarioLogado && usuarioLogado.IDEMPRESA) {
+      refetchStatus();
       setTabelaVisivel(true);
     } else {
       console.log('Usuário não possui informações válidas.');
@@ -75,12 +67,11 @@ export const ActionPesquisaStatusDivergencia = () => {
     setModalCadastrarVisivel(true)
   }
   const handleClose = () => {
-    setModalEditarVisivel(false)
     setModalCadastrarVisivel(false)
   }
 
   return (
-    <Fragment> 
+    <Fragment>
 
       <ActionMain
         linkComponentAnterior={["Home"]}
@@ -97,8 +88,6 @@ export const ActionPesquisaStatusDivergencia = () => {
         valueInputFieldDTFim={dataPesquisaFim}
         onChangeInputFieldDTFim={e => setDataPesquisaFim(e.target.value)}
 
-    
-
         ButtonSearchComponent={ButtonType}
         onButtonClickSearch={handleClick}
         linkNomeSearch={"Pesquisar"}
@@ -112,9 +101,20 @@ export const ActionPesquisaStatusDivergencia = () => {
         IconCadastro={MdAdd}
       />
 
-      <ActionListaStatusDivergencia dadosStatus={dadosStatus} />
+      <ActionListaStatusDivergencia
+        dadosStatus={dadosStatus}
+        refetchStatus={refetchStatus}
+        optionsModulos={optionsModulos}
+        usuarioLogado={usuarioLogado}
+      />
 
-      <ActionCadastrarStatusModal show={modalCadastrarVisivel} handleClose={handleClose} />
+      <ActionCadastrarStatusModal
+        show={modalCadastrarVisivel}
+        handleClose={handleClose}
+        refetchStatus={refetchStatus}
+        optionsModulos={optionsModulos}
+        usuarioLogado={usuarioLogado}
+      />
     </Fragment>
   )
 }

@@ -1,15 +1,17 @@
 import { Fragment } from "react"
 import Modal from 'react-bootstrap/Modal';
 import { HeaderModal } from "../../../../Modais/HeaderModal/HeaderModal";
-import { FormularioSalvarVolumeOT } from "./formularioSalvarVolumeOT";
+import { FormularioConferirOT } from "./formularioConferirOT";
 
-export const ActionSalvarVolumeOTModal = ({
+export const ActionConferirOT = ({
   show,
   handleClose,
-  dadosSalvarVolume,
-  refetchListaConferencia,
-  optionsModulos,
+  dadosDetalheTransferencia,
+  setDadosDetalheTransferencia,
   usuarioLogado,
+  optionsModulos,
+  refetchListaConferencia
+
 }) => {
 
   return (
@@ -17,24 +19,23 @@ export const ActionSalvarVolumeOTModal = ({
       <Modal
         show={show}
         onHide={handleClose}
-        size="lg"
+        size="xl"
       >
         <HeaderModal
           title="Controle Ordem de Transferência"
           subtitle="Nome da Loja"
           handleClose={handleClose}
         />
-        <Modal.Body>
-          <FormularioSalvarVolumeOT
-            dadosSalvarVolume={dadosSalvarVolume}
+        <Modal.Body >
+          <FormularioConferirOT
             handleClose={handleClose}
-            refetchListaConferencia={refetchListaConferencia}
-            optionsModulos={optionsModulos}
+            dadosDetalheTransferencia={dadosDetalheTransferencia}
+            setDadosDetalheTransferencia={setDadosDetalheTransferencia}
             usuarioLogado={usuarioLogado}
-     
+            optionsModulos={optionsModulos}
+            refetchListaConferencia={refetchListaConferencia}
           />
         </Modal.Body>
-
       </Modal>
     </Fragment>
   )

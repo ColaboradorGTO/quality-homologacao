@@ -3,14 +3,20 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { CiEdit } from "react-icons/ci";
 import { ButtonTable } from "../../../ButtonsTabela/ButtonTable";
-import { ActionEditarStatusModal } from "./actionEditarStatusModal";
 import { useReactToPrint } from "react-to-print";
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../../Tables/headerTable";
+import { ActionEditarStatusModal } from "./ActionEditarStatusModal/actionEditarStatusModal";
 
-export const ActionListaStatusDivergencia = ({dadosStatus}) => {
+export const ActionListaStatusDivergencia = ({
+  dadosStatus,
+  refetchStatus,
+  optionsModulos,
+  usuarioLogado
+}) => {
+
   const [modalEditar, setModalEditar] = useState(false);
   const [dadosStatusDivergencia, setDadosStatusDivergencia] = useState([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
@@ -58,14 +64,14 @@ export const ActionListaStatusDivergencia = ({dadosStatus}) => {
   };
 
   const dados = dadosStatus.map((item, index) => {
-  
+
     return {
       DATACRIACAO: item.DATACRIACAO,
       DATACRIACAOFORMATADA: item.DATACRIACAOFORMATADA,
       DESCRICAODIVERGENCIA: item.DESCRICAODIVERGENCIA,
       IDSTATUSDIVERGENCIA: item.IDSTATUSDIVERGENCIA,
       IDUSRCRIACAO: item.IDUSRCRIACAO,
-      STATIVO: item.STATIVO, 
+      STATIVO: item.STATIVO,
     }
   });
 
@@ -92,13 +98,12 @@ export const ActionListaStatusDivergencia = ({dadosStatus}) => {
       field: 'STATIVO',
       header: 'Status',
       body: (row) => (
-        <th style={{color: row.STATIVO === 'True' ? 'blue' : 'red'}}>
+        <th style={{ color: row.STATIVO === 'True' ? 'blue' : 'red' }}>
           {row.STATIVO === 'True' ? 'Ativo' : 'Inativo'}
         </th>
       ),
       sortable: true,
     },
-
     {
       header: 'Opções',
       button: true,
@@ -116,25 +121,30 @@ export const ActionListaStatusDivergencia = ({dadosStatus}) => {
             titleButton={"Alterar"}
             onClickButton={() => handleEdit(row)}
             Icon={CiEdit}
-            iconSize={22}
+            iconSize={16}
+            width="32px"
+            height="32px"
             iconColor={"#fff"}
             cor={"primary"}
 
           />
-
         </div>
       )
     }
   ]
-  
-  const handleEdit = async (IDSTATUSDIVERGENCIA) => {
-    setDadosStatusDivergencia(IDSTATUSDIVERGENCIA);
+
+  const handleEdit = async (row) => {
+    const dadosEncontrados = dadosStatus.find(
+      (item) => item.IDSTATUSDIVERGENCIA === row.IDSTATUSDIVERGENCIA
+    );
+
+    setDadosStatusDivergencia(dadosEncontrados);
     setModalEditar(true);
   }
 
   return (
     <Fragment>
-         <div className="panel">
+      <div className="panel">
         <div className="panel-hdr">
           <h2>
             Lista de Status de Divergência
@@ -184,10 +194,13 @@ export const ActionListaStatusDivergencia = ({dadosStatus}) => {
 
       </div>
 
-      <ActionEditarStatusModal 
+      <ActionEditarStatusModal
         show={modalEditar}
         handleClose={() => setModalEditar(false)}
-        dadosStatusDivergencia={dadosStatusDivergencia}
+        dadosEncontrados={dadosStatusDivergencia}
+        refetchStatus={refetchStatus}
+        optionsModulos={optionsModulos}
+        usuarioLogado={usuarioLogado}
       />
     </Fragment>
   )

@@ -1,38 +1,39 @@
 import { Fragment } from "react"
 import Modal from 'react-bootstrap/Modal';
 import { HeaderModal } from "../../../../Modais/HeaderModal/HeaderModal";
-import { FooterModal } from "../../../../Modais/FooterModal/footerModal";
-import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal";
 import { FormularioMotivoEncerrarOT } from "./formularioMotivoEncerrarOT";
 
-export const ActionMotivoEncerrarOTModal = ({ show, handleClose, dadosEncerrarOT }) => {
+export const ActionMotivoEncerrarOTModal = ({
+  show,
+  handleClose,
+  dadosEncerrarOT,
+  refetchListaConferencia,
+  optionsModulos,
+  usuarioLogado,
+}) => {
 
   return (
-
     <Fragment>
       <Modal
         show={show}
+        centered={true}
         onHide={handleClose}
-        size="xl"
+        size="lg"
       >
-
         <HeaderModal
           title="Controle Ordem de Transferência"
           subtitle="Nome da Loja"
           handleClose={handleClose}
         />
         <Modal.Body >
-          <FormularioMotivoEncerrarOT dadosEncerrarOT={dadosEncerrarOT}/>
-
+          <FormularioMotivoEncerrarOT
+            dadosEncerrarOT={dadosEncerrarOT}
+            handleClose={handleClose}
+            refetchListaConferencia={refetchListaConferencia}
+            optionsModulos={optionsModulos}
+            usuarioLogado={usuarioLogado}
+          />
         </Modal.Body>
-
-        <FooterModal
-          ButtonTypeFechar={ButtonTypeModal}
-          textButtonFechar={"Fechar"}
-          onClickButtonFechar={handleClose}
-          corFechar={"secondary"}
-        />
-
       </Modal>
     </Fragment>
   )
