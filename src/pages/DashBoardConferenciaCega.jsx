@@ -11,8 +11,6 @@ import { get } from "../api/funcRequest";
 const ActionPesquisaFaturamentoOT = lazy(() => import("../componets/Expedicao/Components/ActionFaturamentoOT/actionPesquisaFaturamentoOT").then(module => ({ default: module.ActionPesquisaFaturamentoOT })));
 const ActionPesquisaOrdemTransferencia = lazy(() => import("../componets/ConferenciaCega/Components/ActionOrdemTransferencia/actionPesquisaOrdemTransferencia").then(module => ({ default: module.ActionPesquisaOrdemTransferencia })));
 const ActionPesquisaStatusDivergencia = lazy(() => import("../componets/ConferenciaCega/Components/ActionStatusDivergencia/actionPesquisaStatusDivergencia").then(module => ({ default: module.ActionPesquisaStatusDivergencia })));
-//const ActionPesquisaOrdemTransferenciaDeposito = lazy(() => import("../componets/ConferenciaCega/Components/ActionOrdemTransferenciaDeposito/actionPesquisaOrdemTransferenciaDeposito").then(module => ({ default: module.ActionPesquisaOrdemTransferenciaDeposito })));
-//const ActionPesquisaOrdemTransferenciaDeposito = lazy(() => import("../componets/ConferenciaCega/Components/ActionOrdemTransferenciaDeposito/actionPesquisaOrdemTransferenciaDeposito").then(module => ({ default: module.ActionPesquisaOrdemTransferenciaDeposito })));
 const ActionPesquisaOrdemTransferenciaDeposito = lazy(() => import("../componets/ConferenciaCega/Components/ActionOrdemTransferenciaDeposito/actionPesquisaOrdemTransferenciaDeposito").then(module => ({ default: module.ActionPesquisaOrdemTransferenciaDeposito })));
 
 export const DashBoardConferenciaCega = () => {
