@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from "react"
 import { ButtonType } from "../../../../Buttons/ButtonType";
 import { useQuery } from "react-query";
-import { MdMenu, MdOutlineCheck, MdOutlineKeyboardReturn, MdOutlinePayment, MdOutlinePictureAsPdf, MdOutlineVisibility } from "react-icons/md";
+import { MdContentCopy, MdMenu, MdOutlineCheck, MdOutlineCopyAll, MdOutlineKeyboardReturn, MdOutlinePayment, MdOutlinePictureAsPdf, MdOutlineVisibility } from "react-icons/md";
 import { ResultadoResumo } from "../../../../ResultadoResumo/ResultadoResumo";
 import { formatMoeda } from "../../../../../utils/formatMoeda";
 import { GrDocumentTxt } from "react-icons/gr";
@@ -13,9 +13,11 @@ import { InputFieldPedido } from "../../../../Buttons/InputActionPedido";
 import { InputFieldCheckBox } from "../../.././../Inputs/InputChekBox";
 import { useIncluirProutoPedido } from "../../ActionNovoPedido/hooks/useIncluirProdutoPedido";
 import { optionsTipoFrete, optionsTipoPedido, optionsEnviar, optionsFiscal } from "../../../../../../parceiro.json"
+import { ActionListaPedidos } from "./actionListaPedidos";
 
 export const ActionEditarPedido = ({
   usuarioLogado,
+  optionsModulos,
   dadosVisualizarPedido,
   dadosDetalhePedido,
   actionVisualizarPedido,
@@ -23,6 +25,85 @@ export const ActionEditarPedido = ({
   actionHome,
   setActionHome
 }) => {
+  const {
+    marcaSelecionada,
+    setMarcaSelecionada,
+    fornecedorSelecionado,
+    setFornecedorSelecionado,
+    compradorSelecionado,
+    setCompradorSelecionado,
+    fiscalSelecionado,
+    setFiscalSelecionado,
+    enviarSelecionado,
+    setEnviarSelecionado,
+    condicoesPagamentosSelecionado,
+    setCondicoesPagamentosSelecionado,
+    obsFornecedor,
+    setObsFornecedor,
+    obsInterna,
+    setObsInterna,
+    tipoPedidoSelecionado,
+    setTipoPedidoSelecionado,
+    vendedor,
+    setVendedor,
+    emailVendedor,
+    setEmailVendedor,
+    desconto1,
+    setDesconto1,
+    desconto2,
+    setDesconto2,
+    desconto3,
+    setDesconto3,
+    totalLiq,
+    setTotalLiq,
+    comissao,
+    setComissao,
+    transportadoraSelecionada,
+    setTransportadoraSelecionada,
+    freteSelecionado,
+    setFreteSelecionado,
+    dataPesquisaFim,
+    setDataPesquisaFim,
+    dataPesquisaInicio,
+    setDataPesquisaInicio,
+    idResumoPedido,
+    setIdResumoPedido,
+    checked,
+    setChecked,
+    disabledChecked,
+    setDisabledChecked,
+    modalIncluirProdutoPedido,
+    setModalIncluirProdutoPedido,
+    setIdPedidoPrimario,
+    idPedidoPrimario,
+    setBtnIncluir,
+    btnIncluir,
+    setBtnSalvar,
+    btnSalvar,
+    setBtnFechar,
+    btnFechar,
+    setBtnClonar,
+    btnClonar,
+    setBtnClonarCabecalho,
+    btnClonarCabecalho,
+    setBtnNovoPedido,
+    dadosFornecedores,
+    dadosComprador,
+    dadosMarcas,
+    dadosPagamentos,
+    dadosTransportador,
+    dadosDetalhe, 
+    dadosDetalhesPedidos,
+    dadosProdutosPedidos,
+    verificaDadosDoFornecedorSelecionado,
+    pendenciasFornecedor,
+    onIncluirProdutoPedido,
+    clonarCabecalho,
+    handleIncluir,
+    dadosUltimosPedidos,
+    dadosCabecalhoClonado,
+    handleFecharPedido
+  } = useIncluirProutoPedido({ usuarioLogado, optionsModulos });
   const [dadosDetalheProdutoPedido, setDadosDetalheProdutoPedido] = useState([]);
   const [botoesVisiveis, setBotoesVisiveis] = useState({
     incluir: false,
@@ -39,9 +120,8 @@ export const ActionEditarPedido = ({
     disabled: false,
     checked: false
   });
-  const [idPedidoPrimario, setIdPedidoPrimario] = useState(0);
 
-   useEffect(() => {
+  useEffect(() => {
     console.log('🔍 dadosVisualizarPedido:', dadosVisualizarPedido); // DEBUG
     
     // VALIDAÇÃO MAIS ROBUSTA
@@ -160,99 +240,16 @@ export const ActionEditarPedido = ({
     
   }, [dadosVisualizarPedido]); 
 
-  const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
-    'menus-usuario-excecao',
-    async () => {
-      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${ID}`);
+  // const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
+  //   'menus-usuario-excecao',
+  //   async () => {
+  //     const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${ID}`);
 
-      return response.data;
-    },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
-  );
+  //     return response.data;
+  //   },
+  //   { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
+  // );
   
-  const {
-     tabelaVisivel,
-        setTabelaVisivel,
-        tabelaCadastroProduto,
-        setTabelaCadastroProduto,
-        marcaSelecionada,
-        setMarcaSelecionada,
-        fornecedorSelecionado,
-        setFornecedorSelecionado,
-        compradorSelecionado,
-        setCompradorSelecionado,
-        fiscalSelecionado,
-        setFiscalSelecionado,
-        enviarSelecionado,
-        setEnviarSelecionado,
-        condicoesPagamentosSelecionado,
-        setCondicoesPagamentosSelecionado,
-        obsFornecedor,
-        setObsFornecedor,
-        obsInterna,
-        setObsInterna,
-        tipoPedidoSelecionado,
-        setTipoPedidoSelecionado,
-        vendedor,
-        setVendedor,
-        emailVendedor,
-        setEmailVendedor,
-        desconto1,
-        setDesconto1,
-        desconto2,
-        setDesconto2,
-        desconto3,
-        setDesconto3,
-        totalLiq,
-        setTotalLiq,
-        comissao,
-        setComissao,
-        transportadoraSelecionada,
-        setTransportadoraSelecionada,
-        freteSelecionado,
-        setFreteSelecionado,
-        modalPedidoNota,
-        setModalPedidoNota,
-        modalPedidoNotaSemPreco,
-        setModalPedidoNotaSemPreco,
-        arquivoGerado,
-        setArquivoGerado,
-        currentPage,
-        setCurrentPage,
-        pageSize,
-        setPageSize,
-        dataPesquisaFim,
-        setDataPesquisaFim,
-        dataPesquisaInicio,
-        setDataPesquisaInicio,
-        idResumoPedido,
-        setIdResumoPedido,
-        checked,
-        setChecked,
-        disabledChecked,
-        setDisabledChecked,
-        modalIncluirProdutoPedido,
-        setModalIncluirProdutoPedido,
-        dadosFornecedores,
-        dadosComprador,
-        dadosMarcas,
-        dadosPagamentos,
-        dadosTransportador,
-        dadosDetalhe, 
-        dadosDetalhesPedidos,
-        dadosProdutosPedidos,
-        verificaDadosDoFornecedorSelecionado,
-        pendenciasFornecedor,
-        onIncluirProdutoPedido,
-        clonarCabecalho,
-        handleIncluir,
-        handleSalvarPedido,
-        refetchListaDetalhePedidos,
-        refetchListaCadastroProdutoPedidos,
-        refetchListaProdutoPedidos,
-        dadosUltimosPedidos,
-        dadosCabecalhoClonado
-  } = useIncluirProutoPedido({ usuarioLogado, optionsModulos });
 
   useEffect(() => {
     if(dadosVisualizarPedido && dadosVisualizarPedido.length > 0) {
@@ -503,44 +500,57 @@ export const ActionEditarPedido = ({
         onButtonClickSearch={handleIncluir}
         corSearch={"primary"}
         IconSearch={MdMenu}
-        styleSearch={botoesVisiveis.incluir == true}
-
+        styleSearch={{ display: botoesVisiveis.incluir ? "block" : "none" }}
+      
         ButtonTypeCadastro={ButtonType}
         linkNome={"Salvar Cabeçalho Pedido"}
         onButtonClickCadastro
         corCadastro={"info"}
         IconCadastro={MdOutlineCheck}
-        styleCadastro={botoesVisiveis.salvar == true}
-
+        styleCadastro={{ display: botoesVisiveis.salvar ? "block" : "none" }}
+        
         ButtonTypeCancelar={ButtonType}
         linkCancelar={"Fechar Pedido"}
-        onButtonClickCancelar={""}
+        onButtonClickCancelar={handleFecharPedido}
         corCancelar={"danger"}
         IconCancelar={MdOutlineVisibility}
-        styleCancelar={botoesVisiveis.fechar == true}
+        styleCancelar={{ display: botoesVisiveis.fechar ? "block" : "none" }}
 
         ButtonTypePedido={ButtonType}
         linkPedido={"Novo Pedido"}
         onButtonClickPedido
         corPedido={"success"}
         IconPedido={MdOutlinePictureAsPdf}
-        stylePedido={botoesVisiveis.novoPedido == true}
-
+        stylePedido={{ display: botoesVisiveis.novoPedido ? "block" : "none" }}
+        
         ButtonTypeTXT={ButtonType}
         linkTXT={"Clonar Cabeçalho Pedido"}
         onButtonClickTXT
         corTXT={"warning"}
-        IconTXT={GrDocumentTxt}
-        styleTXT={botoesVisiveis.clonarCabecalho == true}
+        IconTXT={MdOutlineCopyAll}
+        styleTXT={{ display: botoesVisiveis.clonarCabecalho ? "block" : "none" }}
+
+        ButtonTypeClonar={ButtonType}
+        linkClonar={"Clonar Pedido"}
+        onButtonClickClonar
+        corClonar={"secondary"}
+        IconClonar={MdContentCopy}
+        styleClonar={{ display: botoesVisiveis.clonar ? "block" : "none" }}
 
         ButtonTypeRetornar={ButtonType}
         linkRetornar={"Voltar"}
         onButtonClickRetornar={handleReturn}
         corRetornar={"danger"}
         IconRetornar={MdOutlineKeyboardReturn}
-        styleRetornar
+        // styleRetornar
       />
-      {console.log(botoesVisiveis.clonarCabecalho == true )}
+      <ActionListaPedidos 
+          dadosDetalhePedido={dadosDetalhePedido}
+          dadosVisualizarPedido={dadosVisualizarPedido}
+          setModalIncluirProdutoPedido={setModalIncluirProdutoPedido}
+          usuarioLogado={usuarioLogado}
+          optionsModulos={optionsModulos}
+      />
     </Fragment>
   )
 }

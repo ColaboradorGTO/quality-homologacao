@@ -136,6 +136,7 @@ export const ActionMainNovoPedido = ({
   ButtonTypeCancelar,
   ButtonTypePedido,
   ButtonTypeTXT,
+  ButtonTypeClonar,
   ButtonTypeRetornar,
 
   linkNomeSearch,
@@ -143,6 +144,7 @@ export const ActionMainNovoPedido = ({
   linkCancelar,
   linkPedido,
   linkTXT,
+  linkClonar,
   linkRetornar,
 
   onButtonClickSearch,
@@ -150,6 +152,7 @@ export const ActionMainNovoPedido = ({
   onButtonClickCancelar,
   onButtonClickPedido,
   onButtonClickTXT,
+  onButtonClickClonar,
   onButtonClickRetornar,
 
   corSearch,
@@ -157,6 +160,7 @@ export const ActionMainNovoPedido = ({
   corCancelar,
   corPedido,
   corTXT,
+  corClonar,
   corRetornar,
 
   IconSearch,
@@ -164,6 +168,7 @@ export const ActionMainNovoPedido = ({
   IconCancelar,
   IconPedido,
   IconTXT,
+  IconClonar,
   IconRetornar,
 
   readOnlyDTInicio,
@@ -205,6 +210,7 @@ export const ActionMainNovoPedido = ({
   styleCancelar,
   stylePedido,
   styleTXT,
+  styleClonar,
   styleRetornar,
 
 }) => {
@@ -651,6 +657,20 @@ export const ActionMainNovoPedido = ({
                         iconColor="#000"
                         iconSize={16}
                         style={styleTXT}
+                      />
+                    )}
+
+                    {ButtonTypeClonar && (
+                      <ButtonTypeClonar
+                        textButton={linkClonar}
+                        onClickButtonType={onButtonClickClonar}
+                        // cor="danger"
+                        cor={corClonar}
+                        tipo="button"
+                        Icon={IconClonar}
+                        iconColor="#000"
+                        iconSize={16}
+                        style={styleClonar}
                       />
                     )}
 

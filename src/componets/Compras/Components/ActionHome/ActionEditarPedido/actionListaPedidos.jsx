@@ -14,6 +14,7 @@ import * as XLSX from 'xlsx';
 import { toFloat } from '../../../../../utils/toFloat';
 import { ActionIncluirProdutoPedidoModal } from './IncluirProdutoPedido/actionIncluirProdutoPedidoModal';
 import { get } from '../../../../../api/funcRequest';
+import { useAtivarCancelar } from '../hook/useAtivaCancelar';
 
 
 export const ActionListaPedidos = ({ 
@@ -28,7 +29,7 @@ export const ActionListaPedidos = ({
   const [modalEditar, setModalEditar] = useState(false);
   const [dadosDetalheGradePedido, setDadosDetalheGradePedido] = useState();
   const dataTableRef = useRef();
-
+  const {handleAtivarCancelarPedido} = useAtivarCancelar({ usuarioLogado, handleClick, status })
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -332,6 +333,7 @@ export const ActionListaPedidos = ({
     }
   }
 
+
   return (
     <Fragment>
       <div className="">
@@ -356,9 +358,9 @@ export const ActionListaPedidos = ({
             paginator={true}
             rows={10}
             rowsPerPageOptions={[10, 20, 50, 100]}
-            // selectionMode="single"
-            // selection={rowSelection}
-            // onSelectionChange={(e) => setRowSelection(e.value)}
+            selectionMode="single"
+            selection={rowSelection}
+            onSelectionChange={(e) => setRowSelection(e.value)}
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
             filterDisplay="menu"

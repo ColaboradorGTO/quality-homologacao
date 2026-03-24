@@ -48,6 +48,13 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
     const [modalIncluirProdutoPedido, setModalIncluirProdutoPedido] = useState(false);
     const [dadosCabecalhoClonado, setDadosCabecalhoClonado] = useState([])
     const [dadosUltimosPedidos, setDadosUltimosPedidos] = useState([])
+    const [idPedidoPrimario, setIdPedidoPrimario] = useState(0);
+    const [btnIncluir, setBtnIncluir] = useState(false);
+    const [btnSalvar, setBtnSalvar] = useState(false);
+    const [btnFechar, setBtnFechar] = useState(false);
+    const [btnClonar, setBtnClonar] = useState(false);
+    const [btnClonarCabecalho, setBtnClonarCabecalho] = useState(false);
+    const [btnNovoPedido, setBtnNovoPedido] = useState(true); 
 
     useEffect(() => {
         const data = getDataAtual();
@@ -589,7 +596,7 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
         let idResumoPedidoPrimario = 1 || 0;
         let stPedidoPorIntermediario = checked ? 'True' : 'False';
         let stPedidoPrimario = 'False';
-       console.log(idResumoPedido, 'idResumoPedido')
+      
         if(!marcaSelecionada || marcaSelecionada == '') {
           Swal.fire({
             icon: "warning",
@@ -755,6 +762,128 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
             });
         }
     };
+
+    const handleClonarCabecalhoPedido = async () => {
+        try {
+            // ========== 1. CONFIRMAÇÃO DO USUÁRIO ==========
+            const confirmacao = await Swal.fire({
+                icon: 'question',
+                title: 'Deseja realmente clonar o cabeçalho e iniciar outro pedido?',
+                text: 'Esta ação não poderá ser revertida!',
+                showCancelButton: true,
+                showConfirmButton: true,
+                confirmButtonText: 'Sim, Clonar',
+                cancelButtonText: 'Cancelar',
+            });
+
+            if (!confirmacao.isConfirmed) {
+            return;
+            }
+
+            // ========== 2. OBTENÇÃO DA DATA ATUAL ==========
+            const hoje = new Date();
+            const dataAtualFormatada = hoje.toISOString().slice(0, 10); // YYYY-MM-DD
+            
+            // ========== 3. ATUALIZAÇÃO DO TÍTULO E INTERFACE ==========
+            setTituloSubheader('Novo Pedido');
+            
+            // Configuração dos botões para modo "Novo Pedido"
+            setBtnIncluir(true);       // Habilitar "Incluir Produtos"
+            setBtnFechar(false);       // Desabilitar "Fechar Pedido"
+            setBtnSalvar(true);
+            setBtnClonar(false);      // Desabilitar "Clonar Produto"
+            setBtnClonarCabecalho(false); // Desabilitar "Clonar Cabeçalho"
+            setBtnNovoPedido(false);  // Desabilitar "Novo Pedido"
+
+            // ========== 4. RESET DE IDs E VALORES ==========
+            setIdResumoPedido(0);               // Novo pedido = ID 0
+            setIdPedidoPrimario(0);             // Limpar pedido primário
+            setTotalLiq(0);                     // Valor líquido = 0
+            setDesconto1('0.00');               // Desconto 1 = 0
+            setDesconto2('0.00');               // Desconto 2 = 0
+            setDesconto3('0.00');               // Desconto 3 = 0
+            setComissao('0.00');                // Comissão = 0
+
+            // ========== 5. ATUALIZAÇÃO DAS DATAS ==========
+            setDataPesquisaInicio(dataAtualFormatada); // Data do pedido = hoje
+            setDataPesquisaFim('');                     // Limpar data de entrega
+
+            // ========== 6. RESET DO STATUS DO PEDIDO ==========
+            // Aqui você define os valores equivalentes ao andamento 1 (COMPRAS)
+            // Se você tem variáveis de estado para isso:
+            // setIdAndamento(1);
+            // setSetorAndamento('COMPRAS');
+            // setStRascunho('True'); // Novo pedido começa como rascunho
+
+            // ========== 7. CONFIGURAÇÃO DO CHECKBOX INTERMEDIÁRIO ==========
+            setCheckboxIntermediario({
+                disabled: true,     // Desabilitado para novo pedido
+                checked: false      // Desmarcado
+            });
+            setChecked(false);    // Estado do checkbox
+
+            // ========== 8. HABILITAÇÃO DOS CAMPOS ==========
+            setCamposHabilitados(true); // Habilitar todos os campos para edição
+
+            // ========== 9. LIMPAR LISTA DE PRODUTOS ==========
+            // Se você tem estado para lista de produtos do pedido:
+            setDadosDetalheProdutoPedido([]); // Lista vazia
+            // ou chamar refetch da lista:
+            // refetchListaDetalhePedidos?.();
+
+            // ========== 10. PRESERVAR DADOS DO CABEÇALHO ==========
+            // Os dados abaixo são MANTIDOS (clonados) do pedido anterior:
+            // - fornecedorSelecionado ✅ (mantém)
+            // - marcaSelecionada ✅ (mantém)
+            // - compradorSelecionado ✅ (mantém)
+            // - condicoesPagamentosSelecionado ✅ (mantém)
+            // - transportadoraSelecionada ✅ (mantém)
+            // - fiscalSelecionado ✅ (mantém)
+            // - freteSelecionado ✅ (mantém)
+            // - tipoPedidoSelecionado ✅ (mantém)
+            // - enviarSelecionado ✅ (mantém)
+            // - vendedor ✅ (mantém)
+            // - emailVendedor ✅ (mantém)
+            // - obsFornecedor ✅ (mantém)
+            // - obsInterna ✅ (mantém)
+
+            // ========== 11. VALIDAÇÃO DE FORNECEDOR (se necessário) ==========
+            // Equivalente a verificaDadosDoFornecedorSelecionado(false)
+            if (fornecedorSelecionado?.value) {
+                await verificaDadosDoFornecedorSelecionado?.(false);
+            }
+
+            // ========== 12. FEEDBACK DE SUCESSO ==========
+            Swal.fire({
+                position: 'center',
+                icon: 'success',
+                title: 'Novo pedido iniciado!',
+                text: 'Cabeçalho clonado com sucesso. Você pode agora incluir produtos.',
+                showConfirmButton: false,
+                timer: 3000
+            });
+
+            // ========== 13. CALLBACK OPCIONAL PARA PARENT COMPONENT ==========
+            // Se o componente pai precisar saber que um novo pedido foi iniciado:
+            onNovoPedidoIniciado?.({
+                tipo: 'clone_cabecalho',
+                dataCriacao: dataAtualFormatada,
+                fornecedor: fornecedorSelecionado,
+                marca: marcaSelecionada
+            });
+
+        } catch (error) {
+            console.error('Erro ao clonar cabeçalho:', error);
+            
+            Swal.fire({
+                position: 'center',
+                icon: 'error',
+                title: 'Erro ao clonar pedido',
+                text: 'Ocorreu um erro ao tentar clonar o cabeçalho. Tente novamente.',
+                showConfirmButton: true,
+            });
+        }
+        };
 
     const handleIncluir = () => {
         let idResumoAtual = 1;
@@ -980,6 +1109,209 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
         }
     }
 
+    const handleFecharPedido = async () => {
+        let idResumoAtual = Number(idResumoPedido || 0);
+        let stRascunhoValue = stRascunho || 'False';
+    
+        const errosCampos = [];
+
+        if (!marcaSelecionada || marcaSelecionada === '' || !marcaSelecionada.value) {
+            errosCampos.push('Selecione uma Marca para Fechar o Pedido');
+        }
+
+        if (!compradorSelecionado || compradorSelecionado === '' || !compradorSelecionado.value) {
+            errosCampos.push('Selecione um Comprador para Fechar o Pedido');
+        }
+
+        if (!fornecedorSelecionado || fornecedorSelecionado === '' || !fornecedorSelecionado.value) {
+            errosCampos.push('Selecione um Fornecedor para Fechar o Pedido');
+        }
+
+        if (!condicoesPagamentosSelecionado || !condicoesPagamentosSelecionado.value) {
+            errosCampos.push('Selecione uma Condição de Pagamento para Fechar o Pedido');
+        }
+
+        if (!dataPesquisaInicio) {
+            errosCampos.push('Digite a Data do Pedido para Fechar o Pedido');
+        }
+
+        if (!dataPesquisaFim) {
+            errosCampos.push('Digite a Data de Entrega para Fechar o Pedido');
+        }
+
+        if (errosCampos.length > 0) {
+            Swal.close();
+            Swal.fire({
+                icon: "warning",
+                title: 'Campos Obrigatórios',
+                html: errosCampos.join('<br/>'),
+                showConfirmButton: true,
+            });
+            return;
+        }
+
+        let itensValidos = false;
+        try {
+
+            const responseExistente = await get(`/lista-detalhes-pedido?idpedido=${idResumoAtual}`);
+    
+            if(!responseExistente?.data || responseExistente.data.length === 0) {
+                Swal.close();
+                Swal.fire({
+                    icon: "warning",
+                    title: 'Sem Itens Cadastrados',
+                    text: `Não existem itens cadastrados neste Pedido: ${idResumoAtual}. Inclua os itens e tente novamente!`,
+                    showConfirmButton: true,
+                });
+                return;
+            }
+            itensValidos = true;
+        } catch (error) {
+            console.error('Erro ao validar itens do pedido:', error);
+            Swal.close();
+            Swal.fire({
+                icon: "error",
+                title: 'Erro de Validação',
+                text: 'Erro ao tentar validar os Itens do pedido, recarregue e tente novamente!',
+                showConfirmButton: true,
+            });
+            return;
+        }
+
+        if (!itensValidos) {
+            return;
+        }
+
+        if (idResumoAtual == 0 || stRascunhoValue != 'False') {
+            const text = idResumoAtual == 0 
+                ? 'Não existe Pedido Iniciado' 
+                : 'Não é possivel finalizar este pedido! Solucione as pendências e tente novamente!';
+            
+            Swal.close();
+            Swal.fire({
+                icon: "warning",
+                title: 'Pedido não pode ser Fechado',
+                text: text,
+                showConfirmButton: true,
+            });
+            return;
+        }
+
+
+        Swal.close();
+        const confirmacao = Swal.fire({
+            icon: 'warning',
+            title: 'Certeza que Deseja Finalizar o Pedido?',
+            text: 'Você não poderá reverter esta ação!',
+            showCancelButton: true,
+            showConfirmButton: true,
+            confirmButtonText: 'Salvar',
+            cancelButtonText: 'Cancelar',
+    
+        })
+    
+        if (!confirmacao.isConfirmed) {
+            return;
+        }
+    
+        Swal.fire({
+            title: 'Carregando dados, aguarde...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        
+        const data = {
+            IDRESUMOPEDIDO: idResumoAtual,
+            IDGRUPOEMPRESARIAL: parseFloat(marcaSelecionada?.value),
+            IDSUBGRUPOEMPRESARIAL: parseFloat(marcaSelecionada?.value),
+            IDCOMPRADOR: parseFloat(compradorSelecionado?.value),
+            IDCONDICAOPAGAMENTO: parseFloat(condicoesPagamentosSelecionado?.value),
+            IDFORNECEDOR: parseFloat(fornecedorSelecionado?.value),
+            IDTRANSPORTADORA: parseFloat(transportadoraSelecionada?.value),
+            IDANDAMENTO: parseFloat(6),
+            MODPEDIDO: tipoPedidoSelecionado?.value,
+            NOVENDEDOR: vendedor,
+            EEMAILVENDEDOR: emailVendedor,
+            DTPEDIDO: dataPedido,
+            DTPREVENTREGA: dataPrevisaoEntrega,
+            TPFRETE: freteSelecionado?.value,
+            DESCPERC01: parseFloat(desconto1),
+            DESCPERC02: parseFloat(desconto2),
+            DESCPERC03: parseFloat(desconto3),
+            PERCCOMISSAO: parseFloat(comissao),
+            VRTOTALLIQUIDO: parseFloat(totalLiq),
+            OBSPEDIDO: obsFornecedor,
+            OBSPEDIDO2: obsInterna,
+            DTFECHAMENTOPEDIDO: dataAtual,
+            DTCADASTRO: dataAtual,
+            TPARQUIVO: enviarSelecionado?.value,
+            STDISTRIBUIDO: 'False',
+            STAGRUPAPRODUTO: 'False',
+            STCANCELADO: 'False',
+            TPFISCAL: fiscalSelecionado?.value,
+            STRASCUNHO: stRascunhoValue,
+        }
+
+        try {
+    
+            
+            const response =  await put('/finalizar-pedido/:id', data);
+            const textDados = JSON.stringify(data);
+            let textFuncao =  'COMPRAS /PEDIDO FINALIZADO';
+            const ipUsuario = await getIPUsuario();
+
+            const createtLog = {
+                IDFUNCIONARIO: String(usuarioLogado.id),
+                PATHFUNCAO: textFuncao,
+                DADOS: textDados,
+                IP: ipUsuario || 'Indisponível'
+            }
+
+            await post('/log-web', createtLog)
+            Swal.close();
+
+
+            Swal.fire({
+                position: 'center',
+                icon: 'success',
+                title: 'Pedido Fechado!',
+                text: 'Pedido Fechado com sucesso.',
+                showConfirmButton: false,
+                timer: 5000,
+                customClass: {
+                    container: 'custom-swal',
+                }
+            })
+
+            return response.data;
+        } catch (error) {
+            const textDados = JSON.stringify(data)
+            let textFuncao = 'COMPRAS / ERRO AO FECHAR PEDIDO';
+            const ipUsuario = await getIPUsuario();
+            const createtLog = {
+                IDFUNCIONARIO: String(usuarioLogado.id),
+                PATHFUNCAO: textFuncao,
+                DADOS: textDados,
+                IP: ipUsuario || 'Indisponível'
+            }
+            await post('/log-web', createtLog)
+
+            Swal.fire({
+                position: 'center',
+                icon: 'error',
+                title: 'Erro ao tentar Fechar o pedido, recarregue e tente novamente!',
+                showConfirmButton: false,
+                timer: 3000,
+                customClass: {
+                    container: 'custom-swal',
+                }
+            });
+        }
+    }
+
     return {
         tabelaVisivel,
         setTabelaVisivel,
@@ -1043,6 +1375,20 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
         setDisabledChecked,
         modalIncluirProdutoPedido,
         setModalIncluirProdutoPedido,
+        setIdPedidoPrimario,
+        idPedidoPrimario,
+        setBtnIncluir,
+        btnIncluir,
+        setBtnSalvar,
+        btnSalvar,
+        setBtnFechar,
+        btnFechar,
+        setBtnClonar,
+        btnClonar,
+        setBtnClonarCabecalho,
+        btnClonarCabecalho,
+        setBtnNovoPedido,
+        btnNovoPedido,
         dadosFornecedores,
         dadosComprador,
         dadosMarcas,
@@ -1061,7 +1407,9 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
         refetchListaCadastroProdutoPedidos,
         refetchListaProdutoPedidos,
         dadosUltimosPedidos,
-        dadosCabecalhoClonado
+        dadosCabecalhoClonado,
+        handleFecharPedido,
+        handleClonarCabecalhoPedido
     }
 }
 

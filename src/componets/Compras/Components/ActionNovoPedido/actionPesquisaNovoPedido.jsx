@@ -102,6 +102,19 @@ export const ActionPesquisaNovoPedido = ({
     setDisabledChecked,
     modalIncluirProdutoPedido,
     setModalIncluirProdutoPedido,
+    setIdPedidoPrimario,
+    idPedidoPrimario,
+    setBtnIncluir,
+    btnIncluir,
+    setBtnSalvar,
+    btnSalvar,
+    setBtnFechar,
+    btnFechar,
+    setBtnClonar,
+    btnClonar,
+    setBtnClonarCabecalho,
+    btnClonarCabecalho,
+    setBtnNovoPedido,
     onIncluirProdutoPedido,
     verificaDadosDoFornecedorSelecionado,
     pendenciasFornecedor,
@@ -120,7 +133,129 @@ export const ActionPesquisaNovoPedido = ({
     refetchListaDetalhePedidos,
     refetchListaCadastroProdutoPedidos,
     refetchListaProdutoPedidos,
+    handleFecharPedido,
+    handleClonarCabecalhoPedido
   } = useIncluirProutoPedido({ usuarioLogado, optionsModulos });
+
+  // useEffect(() => {
+  //   console.log('🔍 dadosVisualizarPedido:', dadosVisualizarPedido); // DEBUG
+    
+  //   // VALIDAÇÃO MAIS ROBUSTA
+  //   if (!dadosVisualizarPedido || !Array.isArray(dadosVisualizarPedido) || dadosVisualizarPedido.length === 0) {
+  //     console.log('❌ Dados não disponíveis ou inválidos');
+  //     return;
+  //   }
+
+  //   const dados = dadosVisualizarPedido[0];
+  //   console.log('📋 Dados do pedido:', dados); // DEBUG
+
+  //   // ========== VARIÁVEIS COM VALIDAÇÃO ==========
+  //   const IdAndamentoPedido = parseInt(dados?.IDANDAMENTO || '0', 10);
+  //   const StCancelaPedido = String(dados?.STCANCELADO || 'False').trim();
+  //   const IDPEDIDORESUMO = String(dados?.IDPEDIDO || '');
+  //   const stMigradoSap = String(dados?.STMIGRADOSAP || 'False') === 'True';
+  //   const stPedidoPorIntermediario = String(dados?.STPEDIDOPRIMARIO || 'False') === 'True';
+  //   const idPedidoPrimario = parseInt(dados?.IDPEDIDOPRIMARIO || '0', 10);
+
+  //   console.log('🎯 Variáveis processadas:', {
+  //     IdAndamentoPedido,
+  //     StCancelaPedido,
+  //     IDPEDIDORESUMO,
+  //     stMigradoSap,
+  //     stPedidoPorIntermediario,
+  //     idPedidoPrimario
+  //   }); // DEBUG
+
+  //   // ========== LÓGICA PRINCIPAL ==========
+  //   let novosBotoesVisiveis = {
+  //     incluir: false,
+  //     fechar: false,
+  //     salvar: false,
+  //     clonar: false,
+  //     clonarCabecalho: false,
+  //     novoPedido: true // SEMPRE VISÍVEL
+  //   };
+    
+  //   let camposDevemEstarHabilitados = false;
+  //   let novoTitulo = '';
+
+  //   // ========== CONDIÇÃO 1: Pedido cancelado OU em andamento (2-14) ==========
+  //   if (StCancelaPedido === 'True' || (IdAndamentoPedido >= 2 && IdAndamentoPedido < 15)) {
+  //     console.log('🚫 Condição 1: Pedido cancelado ou em andamento');
+      
+  //     // Botão clonar só aparece em condições específicas
+  //     const clonarVisivel = !(StCancelaPedido === 'True' && IdAndamentoPedido !== 2 && IdAndamentoPedido !== 5);
+      
+  //     novosBotoesVisiveis = {
+  //       ...novosBotoesVisiveis,
+  //       clonar: clonarVisivel
+  //     };
+      
+  //     camposDevemEstarHabilitados = false;
+      
+  //     if (IdAndamentoPedido >= 2 && IdAndamentoPedido < 15) {
+  //       novoTitulo = `Pedido Nº: ${IDPEDIDORESUMO}`;
+  //     }
+  //   } 
+  //   // ========== CONDIÇÃO 2: Inclusão (1) OU Alteração (15) ==========
+  //   else if (IdAndamentoPedido === 1 || IdAndamentoPedido === 15) {
+  //     console.log('✅ Condição 2: Inclusão ou Alteração');
+      
+  //     novosBotoesVisiveis = {
+  //       ...novosBotoesVisiveis,
+  //       incluir: true,
+  //       fechar: true,
+  //       salvar: true,
+  //       clonar: true,
+  //       clonarCabecalho: true
+  //     };
+      
+  //     camposDevemEstarHabilitados = true;
+      
+  //     const tipoOperacao = IdAndamentoPedido === 1 ? 'Inclusão' : 'Alteração';
+  //     novoTitulo = `${tipoOperacao} - Pedido Nº: ${IDPEDIDORESUMO}`;
+  //   }
+
+  //   // ========== CONDIÇÃO 3: Se migrado para SAP ==========
+  //   if (stMigradoSap) {
+  //     console.log('🔒 SAP: Desabilitando campos');
+  //     camposDevemEstarHabilitados = false;
+  //   }
+    
+  //   // ========== CONDIÇÃO 4: Pedido secundário ==========
+  //   if (idPedidoPrimario > 0) {
+  //     console.log('🔗 Pedido secundário: Ocultando botões');
+  //     novosBotoesVisiveis = {
+  //       incluir: false,
+  //       fechar: false,
+  //       salvar: false,
+  //       clonar: false,
+  //       clonarCabecalho: false,
+  //       novoPedido: true // SEMPRE VISÍVEL
+  //     };
+  //     camposDevemEstarHabilitados = false;
+  //   }
+
+  //   console.log('🎯 Estados finais:', {
+  //     novosBotoesVisiveis,
+  //     camposDevemEstarHabilitados,
+  //     novoTitulo
+  //   }); // DEBUG
+
+  //   // ========== APLICAR ESTADOS ==========
+  //   setBotoesVisiveis(novosBotoesVisiveis);
+  //   setCamposHabilitados(camposDevemEstarHabilitados);
+  //   setTituloSubheader(novoTitulo);
+    
+  //   setCheckboxIntermediario({
+  //     disabled: idPedidoPrimario > 0 || stPedidoPorIntermediario || stMigradoSap,
+  //     checked: idPedidoPrimario > 0 || stPedidoPorIntermediario
+  //   });
+    
+  //   setIdPedidoPrimario(idPedidoPrimario);
+    
+  // }, [dadosVisualizarPedido]); 
+
 
   const calcularTotal = (field) => {
     return dadosDetalhe.reduce((total, item) => total + toFloat(item[field]), 0);
@@ -159,6 +294,9 @@ export const ActionPesquisaNovoPedido = ({
     
   }
 
+  const handleNovoPedido = () => {
+    console.log('novo pedido')
+  }
 
   const handleClickPedidoTXT = async () => {    
     Swal.fire({
@@ -293,9 +431,7 @@ export const ActionPesquisaNovoPedido = ({
     }
   }, [fornecedorSelecionado]);
 
-  const handleClickClonarCabecalho = async () => {
 
-  }
 
   return (
 
@@ -506,19 +642,19 @@ export const ActionPesquisaNovoPedido = ({
 
         ButtonTypeCancelar={ButtonType}
         linkCancelar={"Fechar Pedido"}
-        onButtonClickCancelar={""}
+        onButtonClickCancelar={handleFecharPedido}
         corCancelar={"danger"}
         IconCancelar={MdOutlineVisibility}
 
         ButtonTypeCadastro={ButtonType}
         linkNome={"Novo Pedido"}
-        onButtonClickCadastro={() => handleClickDetalhePedido()}
+        onButtonClickCadastro={() => handleNovoPedido()}
         corCadastro={"success"}
         IconCadastro={MdOutlineCheck}
 
         ButtonTypePedido={ButtonType}
         linkPedido={"Clonar Peidido"}
-        onButtonClickPedido={() => handleClickClonarCabecalho()}
+        onButtonClickPedido={() =>  handleClonarCabecalhoPedido()}
         corPedido={"warning"}
         IconPedido={MdOutlinePictureAsPdf}
 
@@ -535,7 +671,10 @@ export const ActionPesquisaNovoPedido = ({
         style={{ backgroundColor: "#fff", padding: "15px" }}
       >
 
-        {/* <ActionListaNovoPedidos dadosVisualizarPedido={dadosVisualizarPedido} dadosDetalhe={dadosDetalhe} /> */}
+        <ActionListaNovoPedidos 
+          dadosVisualizarPedido={dadosVisualizarPedido} 
+          dadosDetalhe={dadosDetalhe} 
+        />
 
       </div>
 
