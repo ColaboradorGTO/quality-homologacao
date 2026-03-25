@@ -772,7 +772,7 @@ export const ActionListaPedidos = ({
   return (
     <Fragment>
       <div className="">
-
+       
         <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
           <HeaderTable
             globalFilterValue={globalFilterValue}
@@ -787,7 +787,8 @@ export const ActionListaPedidos = ({
           <DataTable
             title="Pedidos"
             value={dadosListaPedidos}
-            globalFilterValue={globalFilterValue}
+            globalFilter={globalFilterValue}
+            
             size="small"
             selectionMode="single"
             selection={rowSelection}

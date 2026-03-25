@@ -18,7 +18,7 @@ export const useIncluirProduto = ({
     const [nomeMarca, setNomeMarca] = useState('')
     const [referenciaProduto, setReferenciaProduto] = useState('')
     const [produtoSelecionado, setProdutoSelecionado] = useState('')
-    const [reposicaoSelecionado, setReposicaoSelecionado] = useState('')
+    const [stReposicaoSelecionado, setStReposicaoSelecionado] = useState('')
     const [descricaoProduto, setDescricaoProduto] = useState('')
     const [vrCusto, setVrCusto] = useState('')
     const [vrVenda, setVrVenda] = useState('')
@@ -53,6 +53,21 @@ export const useIncluirProduto = ({
     const [errosValidacao, setErrosValidacao] = useState([]);
     const [produtoDadosGrade, setProdutoDadosGrade] = useState([]);
     const [stReposicao, setStReposicao] = useState('False');
+    const [stRascunho, setRascunho] = useState('False');
+    const [tipoCadastro, setTipoCadastro] = useState('');
+    
+    const { data: dadosVinculoEstiloGrupo = [], error: errorVinculoEstiloGrupo, isLoading: isLoadingVinculoEstiloGrupo, refetch: refetchVinculoEstiloGrupo } = useQuery(
+        'vinculo-estilo-grupo',
+        async () => { const response = await get(`/vinculo-estilo-grupo?idVinculoEstilo=${dadosDetalhePedido[0]?.IDVINCULOESTILO}`); return response.data },
+        { enabled: true }
+    );
+
+    const { data: dadosCategorias = [], error: errorCategorias, isLoading: isLoadingCategorias, refetch: refetchCategorias } = useQuery(
+        'categoriasProdutos',
+        async () => { const response = await get(`/categoriasProdutos?idTipoPedido=${dadosDetalhePedido[0]?.TPCATEGORIAPRODPEDIDO}`); return response.data },
+        { enabled: true }
+    );
+
 
     const { data: dadosCores = [], error: errorCores, isLoading: isLoadingCores, refetch: refetchCores } = useQuery(
         'listaCores',
@@ -60,11 +75,6 @@ export const useIncluirProduto = ({
         { enabled: true }
     );
    
-    const { data: dadosVinculoEstiloGrupo = [], error: errorVinculoEstiloGrupo, isLoading: isLoadingVinculoEstiloGrupo, refetch: refetchVinculoEstiloGrupo } = useQuery(
-        'vinculo-estilo-grupo',
-        async () => { const response = await get(`/vinculo-estilo-grupo?idVinculoEstilo=${dadosDetalhePedido[0]?.IDVINCULOESTILO}`); return response.data },
-        { enabled: true }
-    );
 
     const { data: dadosUnidadeMedida = [], error: errorUnidadeMedida, isLoading: isLoadingUnidadeMedida, refetch: refetchUnidadeMedida } = useQuery(
         'unidadeMedida',
@@ -236,13 +246,13 @@ export const useIncluirProduto = ({
         
 
         setNomeMarca(dadosDetalhePedido[0]?.NOFANTASIA)
-        setReposicaoSelecionado({
-        value: dadosDetalhePedido[0]?.STREPOSICAO, 
-        label:  dadosDetalhePedido[0]?.STREPOSICAO == 'True' ? 'SIM' : 'NÃO'
+        setStReposicaoSelecionado({
+            value: dadosDetalhePedido[0]?.STREPOSICAO, 
+            label:  dadosDetalhePedido[0]?.STREPOSICAO == 'True' ? 'SIM' : 'NÃO'
         })
         setCadastroSelecionado({
-        value: dadosDetalhePedido[0]?.STREPOSICAO, 
-        label:  dadosDetalhePedido[0]?.STREPOSICAO == 'True' ? 'POR REFERÊNCIA' : 'NORMAL'
+            value: dadosDetalhePedido[0]?.STREPOSICAO, 
+            label:  dadosDetalhePedido[0]?.STREPOSICAO == 'True' ? 'POR REFERÊNCIA' : 'NORMAL'
         })
         
         setDescricaoProduto(dadosDetalhePedido[0]?.DSPRODUTO)
@@ -275,6 +285,7 @@ export const useIncluirProduto = ({
         setObservacao(dadosDetalhePedido[0]?.OBSPRODUTO)
         setStPedidoPorIntermediario(dadosDetalhePedido[0]?.STPEDIDOPORINTEMEDIARIO)
         setObsFornecedor(dadosDetalhePedido[0]?.OBSPEDIDO)
+        setRascunho(dadosDetalhePedido[0]?.STRASCUNHO)
         // setProdutoDadosGrade(dadosDetalhePedido[0]?.DETALHEGRADE.map((item) => ({
         //     IDTAMANHO: item.IDTAMANHO,
         //     DSTAMANHO: item.DSTAMANHO,
@@ -291,13 +302,13 @@ export const useIncluirProduto = ({
     // Inicializa os valores quando dadosGrade muda
     useEffect(() => {
         if (dadosGrade?.length) {
-        const valoresIniciais = {};
-        dadosGrade.forEach(item => {
-            const stDiversos = item.DSTAMANHO?.toUpperCase() === 'DIVERSOS' || 
-                            item.DSTAMANHO?.toUpperCase() === 'U-DIVERSOS';
-            valoresIniciais[item.IDTAMANHO] = stDiversos ? 1 : 0;
-        });
-        setQuantidadePorTamanho(valoresIniciais);
+            const valoresIniciais = {};
+            dadosGrade.forEach(item => {
+                const stDiversos = item.DSTAMANHO?.toUpperCase() === 'DIVERSOS' || 
+                                item.DSTAMANHO?.toUpperCase() === 'U-DIVERSOS';
+                valoresIniciais[item.IDTAMANHO] = stDiversos ? 1 : 0;
+            });
+            setQuantidadePorTamanho(valoresIniciais);
         }
     }, [dadosGrade]);
 
@@ -318,7 +329,7 @@ export const useIncluirProduto = ({
         
         if (inputsComValor.length) {
         // Valida reposição com múltiplos tamanhos
-        if (stReposicao !== 'False' && inputsComValor.length > 1) {
+        if (stReposicaoSelecionado !== 'False' && inputsComValor.length > 1) {
             erros.push("Este produto é de reposição e por isso não pode ser gradeado com mais de um tamanho.");
         } else {
             // Calcula total de índices
@@ -361,18 +372,18 @@ export const useIncluirProduto = ({
         
         // Calcula total de índices
         for (let [id, valor] of inputsComValor) {
-        totalindice += parseFloat(valor);
+            totalindice += parseFloat(valor);
         }
         
         // Monta o payload
         for (let [id, valor] of inputsComValor) {
-        const qtdgradetotal = (qtdprodpedido / totalindice) * parseFloat(valor);
+            const qtdgradetotal = (qtdprodpedido / totalindice) * parseFloat(valor);
         
-        grade.push({
-            "idgrade": parseInt(id),
-            "vlrgrade": parseInt(valor),
-            "qtdgrade": parseFloat(qtdgradetotal)
-        });
+            grade.push({
+                "idgrade": parseInt(id),
+                "vlrgrade": parseInt(valor),
+                "qtdgrade": parseFloat(qtdgradetotal)
+            });
         }
         
         return grade;
@@ -407,10 +418,10 @@ export const useIncluirProduto = ({
         
         const distribuicao = {};
         for (let [id, valor] of inputsComValor) {
-        const qtdgradetotal = (qtdprodpedido / totalindice) * parseFloat(valor);
-        distribuicao[id] = qtdgradetotal;
+            const qtdgradetotal = (qtdprodpedido / totalindice) * parseFloat(valor);
+            distribuicao[id] = qtdgradetotal;
         }
-        
+         console.log(distribuicao, 'distribuicao');
         return distribuicao;
     };
 
@@ -460,7 +471,7 @@ export const useIncluirProduto = ({
                 OBSPRODUTO: observacao,
                 STTRANSFORMADO: 'False',
                 IDCATEGORIAS: parseInt(categoriaSelecionada?.value),
-                STREPOSICAO: reposicaoSelecionado?.value,
+                STREPOSICAO: stReposicaoSelecionado?.value,
                 NUCODBARRAS: referencia,
                 IDPRODUTO: produtoSelecionado?.IDPRODUTO,
                 IDRESPCADASTRO: parseInt(usuarioLogado?.id),
@@ -479,8 +490,8 @@ export const useIncluirProduto = ({
         setReferenciaProduto,
         produtoSelecionado,
         setProdutoSelecionado,
-        reposicaoSelecionado,
-        setReposicaoSelecionado,
+        stReposicaoSelecionado,
+        setStReposicaoSelecionado,
         descricaoProduto,
         setDescricaoProduto,
         vrCusto,
@@ -531,6 +542,7 @@ export const useIncluirProduto = ({
         setVrTotal,
         observacao,
         setObservacao,
+        dadosCategorias,
         dadosCores,
         dadosUnidadeMedida,
         dadosTipoTecidos,

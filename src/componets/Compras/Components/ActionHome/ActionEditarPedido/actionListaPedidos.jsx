@@ -15,6 +15,7 @@ import { toFloat } from '../../../../../utils/toFloat';
 import { ActionIncluirProdutoPedidoModal } from './IncluirProdutoPedido/actionIncluirProdutoPedidoModal';
 import { get } from '../../../../../api/funcRequest';
 import { useProdutoPedido } from './hook/useProdutoPedido';
+import Swal from 'sweetalert2';
 
 
 export const ActionListaPedidos = ({
@@ -327,9 +328,11 @@ export const ActionListaPedidos = ({
           width="30px"
           height="30px"
           onClickButton={() =>
-            msgInfo(
-              `Item só pode ser manipulado através do Pedido Primário: ${idResumoPedidoPrimario}`
-            )
+            Swal.fire({
+              icon: 'info',
+              title: 'Atenção',
+              text: `Item só pode ser manipulado através do Pedido Primário: ${idResumoPedidoPrimario}`
+            })
           }
           titleButton={`Item só pode ser manipulado através do Pedido Primário: ${idResumoPedidoPrimario}`}
           style={{ animation: 'blink 1.5s infinite ease-in-out' }}
@@ -367,8 +370,11 @@ export const ActionListaPedidos = ({
 
   return (
     <Fragment>
-      <div className="">
+      <div className="panel">
+        <div className="panel-hdr">
 
+         <h2>LISTA DOS ITENS DO PEDIDO Nº: {dadosVisualizarPedido[0]?.IDPEDIDO}</h2>
+        </div>
         <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
           <HeaderTable
             globalFilterValue={globalFilterValue}
@@ -379,11 +385,11 @@ export const ActionListaPedidos = ({
           />
 
         </div>
-        <div className="card mb-4" ref={dataTableRef}>
+        <div className="panel-container mb-4" ref={dataTableRef}>
           <DataTable
             title="Pedidos"
             value={dadosListaPedidos}
-            globalFilterValue={globalFilterValue}
+            globalFilter={globalFilterValue}
             size="small"
             sortOrder={-1}
             paginator={true}

@@ -29,8 +29,8 @@ export const FormularioIncluirProdutoPedido = ({
         setReferenciaProduto,
         produtoSelecionado,
         setProdutoSelecionado,
-        reposicaoSelecionado,
-        setReposicaoSelecionado,
+        stReposicaoSelecionado,
+        setStReposicaoSelecionado,
         descricaoProduto,
         setDescricaoProduto,
         vrCusto,
@@ -81,6 +81,7 @@ export const FormularioIncluirProdutoPedido = ({
         setVrTotal,
         observacao,
         setObservacao,
+        dadosCategorias,
         dadosCores,
         dadosUnidadeMedida,
         dadosTipoTecidos,
@@ -245,14 +246,14 @@ export const FormularioIncluirProdutoPedido = ({
                             <label className="form-label" htmlFor="strep">Reposição</label>
                             <Select
                                 id={"stReposicao"}
-                                value={reposicaoSelecionado}
+                                value={stReposicaoSelecionado}
                                 options={optionsReposicao.map((item) => {
                                     return {
                                         value: item.value,
                                         label: item.label
                                     }
                                 })}
-                                onChange={(e) => setReposicaoSelecionado(e)}
+                                onChange={(e) => setStReposicaoSelecionado(e)}
                                 isDisabled={true}
                             />
                         </div>
@@ -260,14 +261,14 @@ export const FormularioIncluirProdutoPedido = ({
                             <label className="form-label" htmlFor="strep">Tipo de Cadastro</label>
                             <Select
                                 id={"stReposicao"}
-                                value={reposicaoSelecionado}
+                                value={stReposicaoSelecionado}
                                 options={optionsCadastro.map((item) => {
                                     return {
                                         value: item.value,
                                         label: item.label
                                     }
                                 })}
-                                onChange={(e) => setReposicaoSelecionado(e)}
+                                onChange={(e) => setStReposicaoSelecionado(e)}
                                 isDisabled={true}
                             />
                         </div>
@@ -462,17 +463,6 @@ export const FormularioIncluirProdutoPedido = ({
                         </div>
                         <div className="col-sm-4 col-xl-4">
                             <label className="form-label" htmlFor="tpcor">Cor</label>
-                            {/* <Select
-                                id={"corProduto"}
-                                value={corSelecionada}
-                                options={dadosCores.map((item) => {
-                                    return {
-                                        value: item.ID_COR,
-                                        label: item.DS_COR
-                                    }
-                                })}
-                                onChange={(e) => setCorSelecionada(e)}
-                            /> */}
                             <SelectList
                                 id={"corProduto"}
                                 value={corSelecionada}
@@ -514,7 +504,7 @@ export const FormularioIncluirProdutoPedido = ({
                                 })}
                                 onChange={(e) => setCategoriaGradeSelecionada(e)}
                             />
-                            {/* {console.log(dadosCategoriasProdutos, 'dadosCategoriasProdutos')} */}
+        
                         </div>
                         <div className="col-sm-4 col-xl-4">
                             <label className="form-label" htmlFor="estruturaProduto">Estrutura</label>
@@ -553,7 +543,7 @@ export const FormularioIncluirProdutoPedido = ({
                             <Select
                                 id={"CategoriaProduto"}
                                 value={categoriaSelecionada}
-                                options={dadosCategoriaPedidos.map((item) => {
+                                options={dadosCategorias.map((item) => {
                                     return {
                                         value: item.IDCATEGORIAS,
                                         label: `${item.IDCATEGORIAS} - ${item.DSCATEGORIAS} - ${item.TPCATEGORIAS}`
@@ -800,6 +790,12 @@ export const FormularioIncluirProdutoPedido = ({
                                     const stDisabled = stDiversos;
                                     const valorAtual = quantidadePorTamanho[idTamanho] || 0;
                                     const qtdDistribuida = distribuicao[idTamanho];
+                                    // console.log(idTamanho, 'idTamanho');
+                                    // console.log(stDiversos, 'stDiversos');
+                                    // console.log(titleGrade, 'titleGrade');
+                                    // console.log(stDisabled, 'stDisabled');
+                                    // console.log(valorAtual, 'valorAtual');
+                                   
 
                                     return (
                                         <div key={item.IDTAMANHO} className="d-flex flex-column align-items-center">
