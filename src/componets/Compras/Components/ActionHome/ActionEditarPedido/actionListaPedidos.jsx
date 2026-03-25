@@ -14,10 +14,10 @@ import * as XLSX from 'xlsx';
 import { toFloat } from '../../../../../utils/toFloat';
 import { ActionIncluirProdutoPedidoModal } from './IncluirProdutoPedido/actionIncluirProdutoPedidoModal';
 import { get } from '../../../../../api/funcRequest';
-import { useAtivarCancelar } from '../hook/useAtivaCancelar';
+import { useProdutoPedido } from './hook/useProdutoPedido';
 
 
-export const ActionListaPedidos = ({ 
+export const ActionListaPedidos = ({
   dadosDetalhePedido,
   dadosVisualizarPedido,
   setModalIncluirProdutoPedido,
@@ -27,9 +27,10 @@ export const ActionListaPedidos = ({
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowSelection, setRowSelection] = useState(null);
   const [modalEditar, setModalEditar] = useState(false);
-  const [dadosDetalheGradePedido, setDadosDetalheGradePedido] = useState();
+  const [dadosPedidosDetalhe, setDadosPedidosDetalhe] = useState([]);
+  const [dadosDetalheGradePedido, setDadosDetalheGradePedido] = useState([]);
   const dataTableRef = useRef();
-  const {handleAtivarCancelarPedido} = useAtivarCancelar({ usuarioLogado, handleClick, status })
+  const { handleAtivarCancelarProdutoPedido } = useProdutoPedido({ usuarioLogado, status })
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -102,7 +103,7 @@ export const ActionListaPedidos = ({
   const dadosListaPedidos = dadosDetalhePedido?.map((item, index) => {
     let contador = index + 1;
     let setorAndamento = 'COMPRAS';
-
+    console.log(item, "item detalhe pedido")
     return {
       contador,
       IDDETPEDIDO: item.IDDETPEDIDO,
@@ -122,11 +123,12 @@ export const ActionListaPedidos = ({
       IDANDAMENTO: item.IDANDAMENTO,
       VRTOTALDETALHEPEDIDO: toFloat(item.VRTOTALDETALHEPEDIDO),
       IDPEDIDO: item.IDPEDIDO,
+      IDDETALHEPEDIDOPRIMARIO: toFloat(item.IDDETALHEPEDIDOPRIMARIO) || 0,
       setorAndamento
     }
   });
 
-  
+
   const colunasPedidos = [
     {
       field: 'contador',
@@ -167,7 +169,7 @@ export const ActionListaPedidos = ({
     {
       field: 'DSSUBGRUPOESTRUTURA',
       header: 'Estrutura',
-      body: row => <th>{row.DSSUBGRUPOESTRUTURA}</th>, 
+      body: row => <th>{row.DSSUBGRUPOESTRUTURA}</th>,
       sortable: true,
     },
     {
@@ -213,112 +215,141 @@ export const ActionListaPedidos = ({
       sortable: true,
     },
     {
-      field: 'STTRANSFORMADO',
-      header: 'Opções',
-      body: (row) => {
-        if (row.setorAndamento == 'COMPRAS' && row.STTRANSFORMADO == 'False') {
-          return (
-            <div className="p-1 "
-            style={{ justifyContent: "space-between", width: "100%", display: "flex" }}
-            >
-             
-              <div className="p-1">
-                <ButtonTable
-                  Icon={CiEdit}
-                  cor={"warning"}
-                  iconColor={"white"}
-                  iconSize={20}
-                  width="30px"
-                  height="30px"
-                  onClickButton={() => handleClickEditarPedido(row)}
-                  titleButton={"Editar Item do Pedido"}
-                />
-              </div>
-              <div className="p-1">
-                <ButtonTable
-                  Icon={AiOutlineDelete}
-                  cor={"danger"}
-                  iconColor={"white"}
-                  iconSize={20}
-                  width="30px"
-                  height="30px"
-                  onClickButton
-                  titleButton={"Cancelar Item do Pedido"}
-                />
-              </div>
-            </div>
-          )
-        } else if (row.setorAndamento == 'COMPRAS' && row.STTRANSFORMADO == 'True') {
-          return (
-            <div className="p-1 "
-              style={{ justifyContent: "space-between", width: "150px", display: "flex" }}
-            >
-              <div className="p-1">
-                <ButtonTable
-                  Icon={CiEdit}
-                  cor={"warning"}
-                  iconColor={"white"}
-                  iconSize={20}
-                  width="30px"
-                  height="30px"
-                  onClickButton={() => handleClickEditarPedido(row)}
-                  titleButton={"Editar Item do Pedido 11"}
-                />
-              </div>
-            </div>
-          )
-        } else {
-          if(row.STTRANSFORMADO == 'True' && row.setorAndamento == 'CADASTRO') { 
-            return (
-              <div className="p-1 "
-                style={{ justifyContent: "space-between", width: "150px", display: "flex" }}
-              >
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={MdOutlineLockOpen}
-                    cor={"success"}
-                    iconColor={"white"}
-                    iconSize={20}
-                    width="30px"
-                    height="30px"
-                    onClickButton
-                    titleButton={"Item Não Pode Ser Alterado ou Cancelado, Produtos Criados!"}
-                  />
-                </div>
-              </div>
-            )
-          } else {
-            return (
-              <div className="p-1 "
-                style={{ justifyContent: "space-between", width: "150px", display: "flex" }}
-              >
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={MdOutlineLockOpen}
-                    cor={"danger"}
-                    iconColor={"white"}
-                    iconSize={20}
-                    width="30px"
-                    height="30px"
-                    onClickButton
-                    titleButton={"Item Não Pode Ser Alterado ou Cancelado"}
-                    disabledBTN={true}
-                  />
-                </div>
-              </div>
+  field: 'STTRANSFORMADO',
+  header: 'Opções',
+  body: (row) => {
+
+    // 🔹 Normalizações (CRÍTICO)
+    const tpSetorAndamento = String(dadosVisualizarPedido[0]?.DSSETOR || '')
+      .trim()
+      .toUpperCase();
+   
+    const isTransformado =
+      String(row.STTRANSFORMADO).toUpperCase() === 'TRUE';
+
+    const idDetalhePedido = row.IDDETPEDIDO;
+    const idPedidoDetalhe = row.IDPEDIDO;
+
+    const idDetalhePedidoPrimario = Number(row.IDDETALHEPEDIDOPRIMARIO || 0);
+
+    const idResumoPedidoPrimario = Number(
+      dadosVisualizarPedido[0]?.IDRESUMOPEDIDOPRIMARIO || 0
+    );
+
+    let btnOpcoes = null;
+
+    // 🔹 MESMA LÓGICA DO JQUERY
+    if (tpSetorAndamento === 'COMPRAS' && !isTransformado) {
+      btnOpcoes = (
+        <div style={{ display: "flex", gap: "5px" }}>
+          <ButtonTable
+            Icon={CiEdit}
+            cor={"warning"}
+            iconColor={"white"}
+            iconSize={20}
+            width="30px"
+            height="30px"
+            onClickButton={() => handleClickEditarPedido(row)}
+            titleButton={"Editar Item do Pedido"}
+          />
+
+          <ButtonTable
+            Icon={AiOutlineDelete}
+            cor={"danger"}
+            iconColor={"white"}
+            iconSize={20}
+            width="30px"
+            height="30px"
+            onClickButton={() =>
+              handleAtivarCancelarProdutoPedido(row, 'True')
+            }
+            titleButton={"Cancelar Item do Pedido"}
+          />
+        </div>
+      );
+    } else if (tpSetorAndamento === 'COMPRAS' && isTransformado) {
+      btnOpcoes = (
+        <div>
+          <ButtonTable
+            Icon={CiEdit}
+            cor={"warning"}
+            iconColor={"white"}
+            iconSize={20}
+            width="30px"
+            height="30px"
+            onClickButton={() => handleClickEditarPedido(row)}
+            titleButton={"Editar Item do Pedido"}
+          />
+        </div>
+      );
+    } else {
+      if (isTransformado && tpSetorAndamento === 'CADASTRO') {
+        btnOpcoes = (
+          <ButtonTable
+            Icon={MdOutlineLockOpen}
+            cor={"success"}
+            iconColor={"white"}
+            iconSize={20}
+            width="30px"
+            height="30px"
+            titleButton={
+              "Item Não Pode Ser Alterado ou Cancelado, Produtos Criados!"
+            }
+            disabledBTN={true}
+          />
+        );
+      } else {
+        btnOpcoes = (
+          <ButtonTable
+            Icon={MdOutlineLockOpen}
+            cor={"danger"}
+            iconColor={"white"}
+            iconSize={20}
+            width="30px"
+            height="30px"
+            titleButton={
+              "Item Não Pode Ser Alterado ou Cancelado"
+            }
+            disabledBTN={true}
+          />
+        );
+      }
+    }
+
+    // 🔴 OVERRIDE FINAL (igual jQuery)
+    if (idDetalhePedidoPrimario > 0) {
+      btnOpcoes = (
+        <ButtonTable
+          Icon={MdOutlineLockOpen}
+          cor={"danger"}
+          iconColor={"white"}
+          iconSize={20}
+          width="30px"
+          height="30px"
+          onClickButton={() =>
+            msgInfo(
+              `Item só pode ser manipulado através do Pedido Primário: ${idResumoPedidoPrimario}`
             )
           }
-        } 
-      },
-    },
+          titleButton={`Item só pode ser manipulado através do Pedido Primário: ${idResumoPedidoPrimario}`}
+          style={{ animation: 'blink 1.5s infinite ease-in-out' }}
+        />
+      );
+    }
+
+    return btnOpcoes;
+  },
+}
   ]
-   
+
   const handleEditarPedido = async (IDDETPEDIDO) => {
     try {
-      
-      const response = await get(`/lista-detalhe-pedidos-grade?idDetalhePedido=${IDDETPEDIDO}`)
-      if (response.data ) {
+
+      const response = await get(`/lista-detalhe-pedidos?idDetalhePedido=${IDDETPEDIDO}`)
+      const responseDetalheGrade = await get(`/lista-detalhe-pedidos-grade?idDetalhePedido=${IDDETPEDIDO}`)
+      if (response.data && responseDetalheGrade.data) {
         setDadosDetalheGradePedido(response.data)
+        setDadosPedidosDetalhe(responseDetalheGrade.data)
       }
     } catch (error) {
       console.log(error, "não foi possivel pegar os dados da tabela ")
@@ -337,7 +368,7 @@ export const ActionListaPedidos = ({
   return (
     <Fragment>
       <div className="">
-        
+
         <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
           <HeaderTable
             globalFilterValue={globalFilterValue}
@@ -387,12 +418,13 @@ export const ActionListaPedidos = ({
         </div>
       </div>
 
-      <ActionIncluirProdutoPedidoModal 
+      <ActionIncluirProdutoPedidoModal
         show={modalEditar}
         handleClose={() => setModalEditar(false)}
         usuarioLogado={usuarioLogado}
         optionsModulos={optionsModulos}
         dadosDetalheGradePedido={dadosDetalheGradePedido}
+        dadosPedidosDetalhe={dadosPedidosDetalhe}
         dadosDetalhePedido={dadosDetalhePedido}
         dadosVisualizarPedido={dadosVisualizarPedido}
       />

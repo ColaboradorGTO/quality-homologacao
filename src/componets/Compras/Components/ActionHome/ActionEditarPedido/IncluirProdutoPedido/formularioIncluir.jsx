@@ -6,6 +6,7 @@ import { ButtonTypeModal } from "../../../../../Buttons/ButtonTypeModal";
 import { useForm, Controller } from "react-hook-form";
 import { schema } from "./schema/useProdutoSchema";
 import FormField from "../../../../../Formularios/FormField";
+import { formatMoeda } from "../../../../../../utils/formatMoeda";
 
 
 export const FormularioIncluirProdutoPedido = ({
@@ -14,6 +15,7 @@ export const FormularioIncluirProdutoPedido = ({
     handleClose,
     dadosDetalhePedido,
     dadosDetalheGradePedido,
+    dadosPedidosDetalhe,
     dadosVisualizarPedido
 }) => {
     const { register, handleSubmit, formState: { errors }, clearErrors, setError, control } = useForm({
@@ -96,7 +98,7 @@ export const FormularioIncluirProdutoPedido = ({
         formatarNumero,
         converterParaNumero,
         onSubmit,
-    } = useIncluirProduto({ usuarioLogado, optionsModulos, dadosDetalhePedido, dadosDetalheGradePedido, dadosVisualizarPedido });
+    } = useIncluirProduto({ usuarioLogado, optionsModulos, dadosDetalhePedido, dadosDetalheGradePedido, dadosPedidosDetalhe, dadosVisualizarPedido });
 
 
     const handleValidatedSubmit = async () => {
@@ -187,6 +189,7 @@ export const FormularioIncluirProdutoPedido = ({
                                     }
                                 })}
                                 onChange={(e) => setReposicaoSelecionado(e)}
+                                isDisabled={true}
                             />
                         </div>
                         <div className="col-sm-6 col-xl-3">
@@ -201,6 +204,7 @@ export const FormularioIncluirProdutoPedido = ({
                                     }
                                 })}
                                 onChange={(e) => setReposicaoSelecionado(e)}
+                                isDisabled={true}
                             />
                         </div>
                     </div>
@@ -273,10 +277,11 @@ export const FormularioIncluirProdutoPedido = ({
                                         label={"VR Custo"}
                                         name="vrHojeCusto"
                                         type="text"
-                                        value={vrCusto}
+                                        value={formatMoeda(vrCusto)}
                                         onChange={(e) => setVrCusto(e.target.value)}
                                         errors={errors}
                                         clearErrors={clearErrors}
+                                        readOnly={true}
                                     />
                                 )}
                             />
@@ -290,10 +295,11 @@ export const FormularioIncluirProdutoPedido = ({
                                         label={"VR Venda"}
                                         name="vrVendaHoje"
                                         type="text"
-                                        value={vrVenda}
+                                        value={formatMoeda(vrVenda)}
                                         onChange={(e) => setVrVenda(e.target.value)}
                                         errors={errors}
                                         clearErrors={clearErrors}
+                                        readOnly={true}
                                     />
                                 )}
                             />
@@ -437,38 +443,34 @@ export const FormularioIncluirProdutoPedido = ({
                             />
                         </div>
                         <div className="col-sm-4 col-xl-4">
-                            <Controller 
-                                name="estrututraProduto"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormField
-                                        label={"Estrutura"}
-                                        name="estrututraProduto"
-                                        type="text"
-                                        value={estruturaSelecionada}
-                                        onChange={(e) => setEstruturaSelecionada(e.target.value)}
-                                        errors={errors}
-                                        clearErrors={clearErrors}
-                                    />
-                                )}
+                            <label className="form-label" htmlFor="estruturaProduto">Estrutura</label>
+                            <Select 
+                                id={"estruturaProduto"}
+                                value={estruturaSelecionada}
+                                options={dadosSubGrupoProduto.map((item) => {
+                                    return {
+                                        value: item.IDSUBGRUPOESTRUTURA,
+                                        label: item.DSSUBGRUPOESTRUTURA
+                                    }
+                                })}
+                                onChange={(e) => setEstruturaSelecionada(e)}
                             />
+                            
                         </div>
                         <div className="col-sm-4 col-xl-4">
-                            <Controller 
-                                name="estiloProduto"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormField
-                                        label={"Estilos"}
-                                        name="estiloProduto"
-                                        type="text"
-                                        value={estiloSelecionado}
-                                        onChange={(e) => setEstiloSelecionado(e.target.value)}
-                                        errors={errors}
-                                        clearErrors={clearErrors}
-                                    />
-                                )}
+                            <label className="form-label" htmlFor="estiloProduto">Estilo</label>
+                            <Select 
+                                id={"estiloProduto"}
+                                value={estiloSelecionado}
+                                options={dadosGrade.map((item) => {
+                                    return {
+                                        value: item.IDESTILO,
+                                        label: item.DSESTILO
+                                    }
+                                })}
+                                onChange={(e) => setEstiloSelecionado(e)}
                             />
+
                         </div>
                     </div>
                 </div>
@@ -546,7 +548,7 @@ export const FormularioIncluirProdutoPedido = ({
                                         label={"VR Bruto"}
                                         name="vrBrutoProduto"
                                         type="text"
-                                        value={vrBruto}
+                                        value={formatMoeda(vrBruto)}
                                         onChange={(e) => {
                                             setVrBruto(e.target.value);
                                             // Chama o cálculo após um pequeno delay para evitar conflitos
@@ -632,7 +634,7 @@ export const FormularioIncluirProdutoPedido = ({
                                         label={"VR Líquido"}
                                         name="vrUnitLiquidoProduto"
                                         type="text"
-                                        value={vrLiquido}
+                                        value={formatMoeda(vrLiquido)}
                                         onChange={(e) => setVrLiquido(e.target.value)}
                                         
                                         errors={errors}
@@ -651,7 +653,7 @@ export const FormularioIncluirProdutoPedido = ({
                                         label={"VR Sugerido"}
                                         name="vrUnitSugeridoProduto"
                                         type="text"
-                                        value={vrSugerido}
+                                        value={formatMoeda(vrSugerido)}
                                         onChange={(e) => {
                                             setVrSugerido(e.target.value);
                                             setVrSugerigoFixo(e.target.value); // Define como valor fixo quando editado manualmente
@@ -675,7 +677,7 @@ export const FormularioIncluirProdutoPedido = ({
                                         label={"VR Total"}
                                         name="vrTotalProduto"
                                         type="text"
-                                        value={vrTotal}
+                                        value={formatMoeda(vrTotal)}
                                         onChange={(e) => setVrTotal(e.target.value)}
                                         readOnly
                                         errors={errors}

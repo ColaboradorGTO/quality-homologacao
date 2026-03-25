@@ -3,6 +3,8 @@ import { get } from "../../../../../../../api/funcRequest";
 import { useQuery } from "react-query";
 import axios from "axios";
 import { toFloat } from "../../../../../../../utils/toFloat";
+import { set } from "date-fns";
+
 
 
 export const useIncluirProduto = ({ 
@@ -46,6 +48,7 @@ export const useIncluirProduto = ({
     const [idResumoPedido, setIdResumoPedido] = useState('')
     const [stPedidoPorIntermediario, setStPedidoPorIntermediario] = useState('')
     const [cadastroSelecionado, setCadastroSelecionado] = useState('')
+    const [obsFornecedor, setObsFornecedor] = useState('')
 
     const { data: dadosCores = [], error: errorCores, isLoading: isLoadingCores, refetch: refetchCores } = useQuery(
         'listaCores',
@@ -205,53 +208,52 @@ export const useIncluirProduto = ({
     };
 
       useEffect(() => {
-        if(dadosVisualizarPedido && dadosVisualizarPedido.length > 0) {
+        if(dadosDetalhePedido && dadosDetalhePedido.length > 0) {
           
-        //   setDataPesquisaInicio(dadosVisualizarPedido[0]?.DTPEDIDOFORMATADA)
-        //   setDataPesquisaFim(dadosVisualizarPedido[0]?.DTPREVENTREGAFORMATADA)
-        //   setCompradorSelecionado({
-        //     value: dadosVisualizarPedido[0]?.IDCOMPRADOR , 
-        //     label: dadosVisualizarPedido[0]?.NOMECOMPRADOR
-        //   })
-        
-          setNomeMarca(dadosVisualizarPedido[0]?.NOFANTASIA)
+          console.log(dadosDetalhePedido[0], '')
+          setNomeMarca(dadosDetalhePedido[0]?.NOFANTASIA)
           setReposicaoSelecionado({
-            value: dadosVisualizarPedido[0]?.STREPOSICAO, 
-            label:  dadosVisualizarPedido[0]?.STREPOSICAO == 'True' ? 'SIM' : 'NÃO'
+            value: dadosDetalhePedido[0]?.STREPOSICAO, 
+            label:  dadosDetalhePedido[0]?.STREPOSICAO == 'True' ? 'SIM' : 'NÃO'
           })
           setCadastroSelecionado({
-            value: dadosVisualizarPedido[0]?.STREPOSICAO, 
-            label:  dadosVisualizarPedido[0]?.STREPOSICAO == 'True' ? 'POR REFERÊNCIA' : 'NORMAL'
+            value: dadosDetalhePedido[0]?.STREPOSICAO, 
+            label:  dadosDetalhePedido[0]?.STREPOSICAO == 'True' ? 'POR REFERÊNCIA' : 'NORMAL'
           })
           
-          
-        //   setObsFornecedor(dadosVisualizarPedido[0]?.OBSPEDIDO)
-        //   setObsInterna(dadosVisualizarPedido[0]?.OBSPEDIDO2)
-        //   setVendedor(dadosVisualizarPedido[0]?.NOREPRESETANTE || dadosVisualizarPedido[0]?.NOVENDEDOR)
-        //   setTipoPedidoSelecionado(dadosVisualizarPedido[0]?.MODPEDIDO)
-        //   setEmailVendedor(dadosVisualizarPedido[0]?.EEMAIL || dadosVisualizarPedido[0]?.EEMAILVENDEDOR || dadosVisualizarPedido[0]?.EMAILFORN || '') 
-        //   setCondicoesPagamentosSelecionado({value: dadosVisualizarPedido[0]?.IDCONDICAOPAGAMENTO, label: dadosVisualizarPedido[0]?.DSCONDICAOPAG})
-        //   setEnviarSelecionado({
-        //     value: dadosVisualizarPedido[0]?.TPARQUIVO, 
-        //     label: dadosVisualizarPedido[0]?.TPARQUIVO == 'NE' ? 'NÃO ENVIAR' : dadosVisualizarPedido[0]?.TPARQUIVO == 'ET' ? 'ETIQUETA' : 'ARQUIVO'
-        //   })
-        //   setTipoPedidoSelecionado({value: dadosVisualizarPedido[0]?.TPPEDIDOPADRAO || dadosVisualizarPedido[0]?.MODPEDIDO, label: dadosVisualizarPedido[0]?.MODPEDIDO})
-        //   setTransportadoraSelecionada({value: dadosVisualizarPedido[0]?.IDTRANSPORTADORA, label: dadosVisualizarPedido[0]?.NOMETRANSPORTADORA})
-        //   setFiscalSelecionado({
-        //     value: dadosVisualizarPedido[0]?.TPFISCAL,
-        //     label: dadosVisualizarPedido[0]?.TPFISCAL == 'S' ? 'Simples Nacional' : dadosVisualizarPedido[0]?.TPFISCAL == 'N' ? 'Lucro Presumido' : 'Lucro Real'
-        //   })
-        //   setFreteSelecionado({
-        //     value: dadosVisualizarPedido[0]?.TPFRETE,
-        //     label: dadosVisualizarPedido[0]?.TPFRETE == 'PAGO' ? 'PAGO - CIF' : 'A PAGAR - FOB'
-        //   })
-        //   setDesconto1(toFloat(dadosVisualizarPedido[0]?.DESCPERC01).toFixed(2))
-        //   setDesconto2(toFloat(dadosVisualizarPedido[0]?.DESCPERC02).toFixed(2))
-        //   setDesconto3(toFloat(dadosVisualizarPedido[0]?.DESCPERC03).toFixed(2))
-        //   setTotalLiq(toFloat(dadosVisualizarPedido[0]?.VRTOTALLIQUIDO))
-        //   setIdResumoPedido(dadosVisualizarPedido[0]?.IDPEDIDIO)
+          setDescricaoProduto(dadosDetalhePedido[0]?.DSPRODUTO)
+          setVrCusto(toFloat(dadosDetalhePedido[0]?.VRCUSTOPRODATUAL))
+          setVrVenda(toFloat(dadosDetalhePedido[0]?.VRVENDAPRODATUAL))
+          setQuantidade(toFloat(dadosDetalhePedido[0]?.QTDTOTAL))
+          setQuantidadeCaixa(toFloat(dadosDetalhePedido[0]?.NUCAIXA))
+          setReferencia(dadosDetalhePedido[0]?.NUREF)
+          setFabricanteSelecionado({value: dadosDetalhePedido[0]?.IDFABRICANTE, label: ` ${dadosDetalhePedido[0]?.IDFABRICANTE} - ${dadosDetalhePedido[0]?.DSFABRICANTE}`})
+          setUnidadeSelecionada({value: dadosDetalhePedido[0]?.IDUNIDADEMEDIDA, label: dadosDetalhePedido[0]?.DSSIGLA})
+          setCorSelecionada({value: dadosDetalhePedido[0]?.IDCOR, label: dadosDetalhePedido[0]?.DSCOR})
+          setTipoTecidoSelecionado({value: dadosDetalhePedido[0]?.IDTIPOTECIDO, label: dadosDetalhePedido[0]?.DSTIPOTECIDO})
+            setCategoriaGradeSelecionada({
+                value: dadosDetalhePedido[0]?.IDCATEGORIAGRADE, 
+                label: `${dadosDetalhePedido[0]?.TPCATEGORIAPRODPEDIDO} - ${dadosDetalhePedido[0]?.DSCATEGORIAPEDIDO}`
+            })
+            setEstruturaSelecionada({value: dadosDetalhePedido[0]?.IDSUBGRUPOESTRUTURA, label: dadosDetalhePedido[0]?.DSSUBGRUPOESTRUTURA})
+            setEstiloSelecionado({value: dadosDetalhePedido[0]?.IDESTILO, label: dadosDetalhePedido[0]?.DSESTILO})
+            setCategoriaSelecionada({value: dadosDetalhePedido[0]?.IDCATEGORIAPEDIDO, label: `${dadosDetalhePedido[0]?.CATEGORIAPROD} ${dadosDetalhePedido[0]?.DSCATEGORIAPROD} - ${dadosDetalhePedido[0]?.TPCATEGORIAPROD}`})
+            setLocalExposicaoSelecionado({value: dadosDetalhePedido[0]?.IDLOCALEXPOSICAO, label: dadosDetalhePedido[0]?.DSLOCALEXPOSICAO})
+            setEcommerceSelecionado({value: dadosDetalhePedido[0]?.STECOMMERCE, label: dadosDetalhePedido[0]?.STECOMMERCE == 'True' ? 'SIM' : 'NÃO'})
+            setRedeSocialSelecionada({value: dadosDetalhePedido[0]?.STREDESOCIAL, label: dadosDetalhePedido[0]?.STREDESOCIAL == 'True' ? 'SIM' : 'NÃO'})
+            setVrBruto(toFloat(dadosDetalhePedido[0]?.VRUNITBRUTODETALHEPEDIDO))
+            setPercDescontoI(toFloat(dadosDetalhePedido[0]?.DESC01))
+            setPercDescontoII(toFloat(dadosDetalhePedido[0]?.DESC02))
+            setPercDescontoIII(toFloat(dadosDetalhePedido[0]?.DESC03))
+            setVrLiquido(toFloat(dadosDetalhePedido[0]?.VRUNITLIQDETALHEPEDIDO))
+            setVrSugerido(toFloat(dadosDetalhePedido[0]?.VRVENDADETALHEPEDIDO))
+            setVrTotal(toFloat(dadosDetalhePedido[0]?.VRTOTALDETALHEPEDIDO))
+            setObservacao(dadosDetalhePedido[0]?.OBSPRODUTO)
+            setStPedidoPorIntermediario(dadosDetalhePedido[0]?.STPEDIDOPORINTEMEDIARIO)
+            setObsFornecedor(dadosDetalhePedido[0]?.OBSPEDIDO)
+
         }
-      }, [dadosVisualizarPedido]);
+      }, [dadosDetalhePedido]);
 
     const onSubmit = async () => {
 

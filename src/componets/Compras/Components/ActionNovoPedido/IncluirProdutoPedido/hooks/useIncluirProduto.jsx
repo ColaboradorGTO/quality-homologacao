@@ -52,7 +52,7 @@ export const useIncluirProduto = ({
             setFornecedorSelecionado(dadosUltimosPedidos[0]?.MODPEDIDO)
         }
     }, [])
-    // console.log(dadosUltimosPedidos, 'dadosUltimosPedidos')
+    
     const { data: dadosCores = [], error: errorCores, isLoading: isLoadingCores, refetch: refetchCores } = useQuery(
         'listaCores',
         async () => { const response = await get(`/listaCores`); return response.data },

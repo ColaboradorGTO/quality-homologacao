@@ -10,6 +10,7 @@ export const ActionIncluirProdutoPedidoModal = ({
   optionsModulos,
   dadosDetalheGradePedido,
   dadosDetalhePedido,
+  dadosPedidosDetalhe,
   dadosVisualizarPedido
 }) => {
   
@@ -38,6 +39,7 @@ export const ActionIncluirProdutoPedidoModal = ({
             optionsModulos={optionsModulos}
             dadosDetalheGradePedido={dadosDetalheGradePedido}
             dadosDetalhePedido={dadosDetalhePedido}
+            dadosPedidosDetalhe={dadosPedidosDetalhe}
             dadosVisualizarPedido={dadosVisualizarPedido}
          />
           

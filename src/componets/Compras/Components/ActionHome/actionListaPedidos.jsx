@@ -252,7 +252,7 @@ export const ActionListaPedidos = ({
                     Icon={CiEdit}
                     cor={"info"}
                     iconColor={"white"}
-                    onClickButton={() => handleClickVisualizarPedido(row)}
+                    onClickButton={() => handleClickEditarPedido(row)}
                     titleButton={"Editar Pedido"}
                     iconSize={25}
                     width="30px"
@@ -308,7 +308,7 @@ export const ActionListaPedidos = ({
                     Icon={CiEdit}
                     cor={"info"}
                     iconColor={"white"}
-                    onClickButton={() => handleClickVisualizarPedido(row)}
+                    onClickButton={() => handleClickEditarPedido(row)}
                     titleButton={"Editar Pedido"}
                     iconSize={25}
                     width="30px"
@@ -733,7 +733,7 @@ export const ActionListaPedidos = ({
 
   const handleClickEditarPedido = async (row) => {
     if (row.IDPEDIDO) {
-      handleVisualizarPedido(row.IDPEDIDO)
+      handleEditarPedido(row.IDPEDIDO)
       setActionVisualizarPedido(true)
     }
   }
