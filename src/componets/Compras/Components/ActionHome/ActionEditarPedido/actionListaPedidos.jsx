@@ -103,7 +103,7 @@ export const ActionListaPedidos = ({
   const dadosListaPedidos = dadosDetalhePedido?.map((item, index) => {
     let contador = index + 1;
     let setorAndamento = 'COMPRAS';
-    console.log(item, "item detalhe pedido")
+  
     return {
       contador,
       IDDETPEDIDO: item.IDDETPEDIDO,
