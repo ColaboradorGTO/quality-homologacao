@@ -100,8 +100,6 @@ export const ActionListaPedidos = ({
     XLSX.writeFile(workbook, 'pedidos_periodo.xlsx');
   };
 
-
-
   const calcularTotalPedido = () => {
     let total = 0;
     for (let dados of dadosPedidos) {
@@ -567,46 +565,46 @@ export const ActionListaPedidos = ({
     }
   ]
 
-  
-    const handleClickAtivar = (row) => {
-      if (optionsModulos[0]?.ALTERAR == 'True') {
-        if (row && row.IDPEDIDO) {
-          handleAtivarCancelarPedido(row.IDPEDIDO, 'True');
-        }
-      } else {
-        Swal.fire({
-          position: 'center',
-          icon: 'error',
-          title: 'Acesso Negado!',
-          text: 'Você não tem permissão para atualizar o status deste pedido.',
-          showConfirmButton: false,
-          timer: 1500,
-          customClass: {
-            container: 'custom-swal',
-          }
-        })
+
+  const handleClickAtivar = (row) => {
+    if (optionsModulos[0]?.ALTERAR == 'True') {
+      if (row && row.IDPEDIDO) {
+        handleAtivarCancelarPedido(row.IDPEDIDO, 'True');
       }
-    };
-  
-    const handleClickCancelar = (row) => {
-      if (optionsModulos[0]?.ALTERAR == 'True') {
-        if (row && row.IDPEDIDO) {
-          handleAtivarCancelarPedido(row.IDPEDIDO, 'False');
+    } else {
+      Swal.fire({
+        position: 'center',
+        icon: 'error',
+        title: 'Acesso Negado!',
+        text: 'Você não tem permissão para atualizar o status deste pedido.',
+        showConfirmButton: false,
+        timer: 1500,
+        customClass: {
+          container: 'custom-swal',
         }
-      } else {
-        Swal.fire({
-          position: 'center',
-          icon: 'error',
-          title: 'Acesso Negado!',
-          text: 'Você não tem permissão para atualizar o status deste pedido.',
-          showConfirmButton: false,
-          timer: 1500,
-          customClass: {
-            container: 'custom-swal',
-          }
-        })
+      })
+    }
+  };
+
+  const handleClickCancelar = (row) => {
+    if (optionsModulos[0]?.ALTERAR == 'True') {
+      if (row && row.IDPEDIDO) {
+        handleAtivarCancelarPedido(row.IDPEDIDO, 'False');
       }
-    };
+    } else {
+      Swal.fire({
+        position: 'center',
+        icon: 'error',
+        title: 'Acesso Negado!',
+        text: 'Você não tem permissão para atualizar o status deste pedido.',
+        showConfirmButton: false,
+        timer: 1500,
+        customClass: {
+          container: 'custom-swal',
+        }
+      })
+    }
+  };
 
   const handleImprimir = async (IDPEDIDO) => {
     const confirmacao = await Swal.fire({
@@ -681,7 +679,7 @@ export const ActionListaPedidos = ({
       if (response.data && responseDetlhe.data) {
         setDadosPedidoSemPreco({
           ...response.data,
-          STOUTLET: stOutlet ? 'True' : 'False' 
+          STOUTLET: stOutlet ? 'True' : 'False'
         })
         setDadosDetalhePedido(responseDetlhe.data)
         setModalPedidoNotaSemPreco(true)
@@ -715,8 +713,6 @@ export const ActionListaPedidos = ({
       if (response.data && responseDetlhe.data) {
         setDadosVisualizarPedido(response.data)
         setDadosDetalhePedido(responseDetlhe.data)
-        // console.log(responseDetlhe.data, "dados detalhe pedido lista")
-        // console.log(response.data, "dados pedido lista")
         setActionVisualizarPedido(true)
         setActionHome(false)
         setActionPedidoResumido(false)
@@ -774,7 +770,7 @@ export const ActionListaPedidos = ({
   return (
     <Fragment>
       <div className="">
-       
+
         <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
           <HeaderTable
             globalFilterValue={globalFilterValue}
@@ -837,8 +833,6 @@ export const ActionListaPedidos = ({
         dadosPedidoSemPreco={dadosPedidoSemPreco}
         dadosDetalhePedido={dadosDetalhePedido}
       />
-
-
     </Fragment>
   )
 }
