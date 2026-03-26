@@ -565,7 +565,6 @@ export const ActionListaPedidos = ({
     }
   ]
 
-
   const handleClickAtivar = (row) => {
     if (optionsModulos[0]?.ALTERAR == 'True') {
       if (row && row.IDPEDIDO) {

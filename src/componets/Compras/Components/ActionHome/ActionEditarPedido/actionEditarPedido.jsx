@@ -1,11 +1,8 @@
 import { Fragment, useEffect, useState } from "react"
 import { ButtonType } from "../../../../Buttons/ButtonType";
-import { useQuery } from "react-query";
 import { MdContentCopy, MdMenu, MdOutlineCheck, MdOutlineCopyAll, MdOutlineKeyboardReturn, MdOutlinePayment, MdOutlinePictureAsPdf, MdOutlineVisibility } from "react-icons/md";
 import { ResultadoResumo } from "../../../../ResultadoResumo/ResultadoResumo";
 import { formatMoeda } from "../../../../../utils/formatMoeda";
-import { GrDocumentTxt } from "react-icons/gr";
-import { get } from "../../../../../api/funcRequest";
 import { toFloat } from "../../../../../utils/toFloat";
 import { ActionMainNovoPedido } from "../../../../Actions/ActionMainNovoPedido";
 import { InputSelectActionPedido } from "../../../../Inputs/InputSelectActionPedido";
@@ -27,6 +24,7 @@ export const ActionEditarPedido = ({
   actionHome,
   setActionHome
 }) => {
+
   const {
     marcaSelecionada,
     setMarcaSelecionada,
@@ -106,6 +104,7 @@ export const ActionEditarPedido = ({
     dadosCabecalhoClonado,
     handleFecharPedido
   } = useIncluirProutoPedido({ usuarioLogado, optionsModulos, dadosVisualizarPedido, dadosDetalhePedido });
+
   const [dadosDetalheProdutoPedido, setDadosDetalheProdutoPedido] = useState([]);
   const [botoesVisiveis, setBotoesVisiveis] = useState({
     incluir: false,
@@ -306,6 +305,7 @@ export const ActionEditarPedido = ({
   /* 
     Voltar aqui para exibição dos botões, por que não está funcionando.
   */
+
   return (
 
     <Fragment>
