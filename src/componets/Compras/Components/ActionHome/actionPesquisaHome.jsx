@@ -12,6 +12,7 @@ import { ActionPDFPedidoDetalhado } from "./comprasActionPDFPedidoDetalhado";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
 import { useQuery } from "react-query";
 import { ActionEditarPedido } from "./ActionEditarPedido/actionEditarPedido";
+import { ActionVisualizarPedido } from "./ActionVisualizar/actionVisualizarPedido";
 
 
 export const ActionPesquisaHome = ({ usuarioLogado }) => {
@@ -321,6 +322,8 @@ export const ActionPesquisaHome = ({ usuarioLogado }) => {
               dadosDetalhePedido={dadosDetalhePedido}
               setActionVisualizarPedido={setActionVisualizarPedido}
               actionVisualizarPedido={actionVisualizarPedido}
+              actionEditarPedido={actionEditarPedido}
+              setActionEditarPedido={setActionEditarPedido}
               setActionPedidoResumido={setActionPedidoResumido}
               actionHome={actionHome}
               setActionHome={setActionHome}
@@ -343,15 +346,31 @@ export const ActionPesquisaHome = ({ usuarioLogado }) => {
         <ActionPDFPedidoDetalhado dadosPedidosDetalhados={dadosPedidosDetalhados} />
       )}
 
-      {actionVisualizarPedido && (
+      {actionEditarPedido && (
 
         <ActionEditarPedido
           usuarioLogado={usuarioLogado}
           optionsModulos={optionsModulos}
           dadosVisualizarPedido={dadosVisualizarPedido}
           dadosDetalhePedido={dadosDetalhePedido}
+          actionEditarPedido={actionEditarPedido}
+          setActionEditarPedido={setActionEditarPedido}
+          setActionVisualizarPedido={setActionVisualizarPedido}
+          actionHome={actionHome}
+          setActionHome={setActionHome}
+        />
+      )}
+     
+      {actionVisualizarPedido && (
+
+        <ActionVisualizarPedido
+          usuarioLogado={usuarioLogado}
+          optionsModulos={optionsModulos}
+          dadosVisualizarPedido={dadosVisualizarPedido}
+          dadosDetalhePedido={dadosDetalhePedido}
           actionVisualizarPedido={actionVisualizarPedido}
           setActionVisualizarPedido={setActionVisualizarPedido}
+          setActionEditarPedido={setActionEditarPedido}
           actionHome={actionHome}
           setActionHome={setActionHome}
         />

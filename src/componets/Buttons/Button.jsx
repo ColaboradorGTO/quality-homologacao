@@ -11,8 +11,8 @@ export const ButtonTypeCompras = ({
   iconColor,
   iconSize,
   disabledBTN,
-  visibilityBTN,
-  style
+  visibilityBTN = true,
+  style = true,
 }) => {
   
   let btnClasses = "btn waves-effect waves-themed";
@@ -42,7 +42,7 @@ export const ButtonTypeCompras = ({
 
   return (
     <Fragment>
-      <div style={{display: style ? 'block' : 'none'}} >
+      <div style={{display: visibilityBTN ? 'block' : 'none'}} >
 
         <button
           id={id}

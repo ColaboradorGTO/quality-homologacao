@@ -32,6 +32,8 @@ export const ActionListaPedidos = ({
   actionHome,
   setActionHome,
   actionVisualizarPedido,
+  actionEditarPedido,
+  setActionEditarPedido,
   actionPedidoResumido,
   handleClick,
   usuarioLogado,
@@ -712,7 +714,8 @@ export const ActionListaPedidos = ({
       if (response.data && responseDetlhe.data) {
         setDadosVisualizarPedido(response.data)
         setDadosDetalhePedido(responseDetlhe.data)
-        setActionVisualizarPedido(true)
+        setActionEditarPedido(true)
+        setActionVisualizarPedido(false)
         setActionHome(false)
         setActionPedidoResumido(false)
       } else {
@@ -731,7 +734,7 @@ export const ActionListaPedidos = ({
   const handleClickEditarPedido = async (row) => {
     if (row.IDPEDIDO) {
       handleEditarPedido(row.IDPEDIDO)
-      setActionVisualizarPedido(true)
+      setActionEditarPedido(true)
     }
   }
 
@@ -743,6 +746,7 @@ export const ActionListaPedidos = ({
         setDadosVisualizarPedido(response.data)
         setDadosDetalhePedido(responseDetlhe.data)
         setActionVisualizarPedido(true)
+        setActionEditarPedido(false)
         setActionHome(false)
         setActionPedidoResumido(false)
       } else {

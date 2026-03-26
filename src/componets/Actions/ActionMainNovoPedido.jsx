@@ -600,7 +600,8 @@ export const ActionMainNovoPedido = ({
                         Icon={IconSearch}
                         iconColor="#fff"
                         iconSize={16}
-                        style={styleSearch}
+                        // style={styleSearch}
+                        visibilityBTN={styleSearch}
                       />
                     )}
 
@@ -614,8 +615,8 @@ export const ActionMainNovoPedido = ({
                         Icon={IconCadastro}
                         iconColor="#fff"
                         iconSize={16}
-                        style={styleCadastro}
-
+                        // style={styleCadastro}
+                        visibilityBTN={styleCadastro}
                       />
                     )}
 
@@ -629,7 +630,8 @@ export const ActionMainNovoPedido = ({
                         Icon={IconCancelar}
                         iconColor="#fff"
                         iconSize={16}
-                        style={styleCancelar}
+                        // style={styleCancelar}
+                        visibilityBTN={styleCancelar}
                       />
                     )}
                      {ButtonTypePedido && (
@@ -642,7 +644,8 @@ export const ActionMainNovoPedido = ({
                         Icon={IconPedido}
                         iconColor="#fff"
                         iconSize={16}
-                        style={stylePedido}
+                        // style={stylePedido}
+                        visibilityBTN={stylePedido}
                       />
                     )}
                   
@@ -656,7 +659,9 @@ export const ActionMainNovoPedido = ({
                         Icon={IconTXT}
                         iconColor="#000"
                         iconSize={16}
-                        style={styleTXT}
+                        // style={styleTXT}
+                        visibilityBTN={styleTXT}
+
                       />
                     )}
 
@@ -670,7 +675,8 @@ export const ActionMainNovoPedido = ({
                         Icon={IconClonar}
                         iconColor="#000"
                         iconSize={16}
-                        style={styleClonar}
+                        // style={styleClonar}
+                        visibilityBTN={styleClonar}
                       />
                     )}
 
@@ -684,7 +690,9 @@ export const ActionMainNovoPedido = ({
                         Icon={IconRetornar}
                         iconColor="#000"
                         iconSize={16}
-                        style={styleRetornar}
+                        // style={styleRetornar}
+                        visibilityBTN={styleRetornar}
+
                       />
                     )}
 

@@ -14,15 +14,14 @@ import { ActionListaPedidos } from "./actionListaPedidos";
 import { ButtonTypeCompras } from "../../../../Buttons/Button";
 import { ActionIncluirProdutoPedidoModal } from "./IncluirProdutoPedido/actionIncluirProdutoPedidoModal";
 
-export const ActionEditarPedido = ({
+export const ActionVisualizarPedido = ({
   usuarioLogado,
   optionsModulos,
   dadosVisualizarPedido,
   dadosDetalhePedido,
   actionVisualizarPedido,
-  actionEditarPedido,
-  setActionEditarPedido,
   setActionVisualizarPedido,
+  setActionEditarPedido,
   actionHome,
   setActionHome
 }) => {
@@ -181,7 +180,7 @@ export const ActionEditarPedido = ({
       camposDevemEstarHabilitados = false;
       
       if (IdAndamentoPedido >= 2 && IdAndamentoPedido < 15) {
-        novoTitulo = `Editar Pedido Nº: ${IDPEDIDORESUMO}`;
+        novoTitulo = `Visualizar Pedido Nº: ${IDPEDIDORESUMO}`;
       }
     } 
     // ========== CONDIÇÃO 2: Inclusão (1) OU Alteração (15) ==========
@@ -505,42 +504,42 @@ export const ActionEditarPedido = ({
         onButtonClickSearch={handleIncluir}
         corSearch={"primary"}
         IconSearch={MdMenu}
-        styleSearch={botoesVisiveis.incluir}
+        styleSearch={botoesVisiveis.incluir == true}
       
         ButtonTypeCadastro={ButtonTypeCompras}
         linkNome={"Salvar Cabeçalho Pedido"}
         onButtonClickCadastro
         corCadastro={"info"}
         IconCadastro={MdOutlineCheck}
-        styleCadastro={botoesVisiveis.salvar}
+        styleCadastro={botoesVisiveis.salvar == true}
         
         ButtonTypeCancelar={ButtonTypeCompras}
         linkCancelar={"Fechar Pedido"}
         onButtonClickCancelar={handleFecharPedido}
         corCancelar={"danger"}
         IconCancelar={MdOutlineVisibility}
-        styleCancelar={botoesVisiveis.fechar}
+        styleCancelar={botoesVisiveis.fechar == true}
 
         ButtonTypePedido={ButtonTypeCompras}
         linkPedido={"Novo Pedido"}
         onButtonClickPedido
         corPedido={"success"}
         IconPedido={MdOutlinePictureAsPdf}
-        stylePedido={botoesVisiveis.novoPedido}
+        stylePedido={botoesVisiveis.novoPedido == true}
         
         ButtonTypeTXT={ButtonTypeCompras}
         linkTXT={"Clonar Cabeçalho Pedido"}
         onButtonClickTXT
         corTXT={"warning"}
         IconTXT={MdOutlineCopyAll}
-        styleTXT={botoesVisiveis.clonarCabecalho}
+        styleTXT={botoesVisiveis.clonarCabecalho == true}
 
         ButtonTypeClonar={ButtonTypeCompras}
         linkClonar={"Clonar Pedido"}
         onButtonClickClonar
         corClonar={"secondary"}
         IconClonar={MdContentCopy}
-        styleClonar={botoesVisiveis.clonar}
+        styleClonar={botoesVisiveis.clonar == true}
 
         ButtonTypeRetornar={ButtonType}
         linkRetornar={"Voltar"}

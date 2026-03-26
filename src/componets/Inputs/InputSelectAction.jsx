@@ -17,7 +17,7 @@ export const InputSelectAction = ({
   styles,
   isVisible = true, // valor padrão true
 }) => {
-  // console.log(isVisible, 'isVisible')
+
   const customStyles = {
     menu: (provided) => ({
       ...provided,
