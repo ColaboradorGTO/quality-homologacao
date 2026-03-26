@@ -14,7 +14,7 @@ import { useFetchData } from "../../../../hooks/useFetchData";
 import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
 
-export const ActionComprasADMHome = () => {
+export const ActionComprasADMHome = ({usuarioLogado}) => {
   const [actionHome, setActionHome] = useState(true)
   const [actionBTN, setActionBTN] = useState(true)
   const [actionListaPedidos, setActionListaPedidos] = useState(true)
@@ -29,8 +29,11 @@ export const ActionComprasADMHome = () => {
   const [compradorSelecionado, setCompradorSelecionado] = useState('');
   const [numeroPedido, setNumeroPedido] = useState('');
   const [actionProdutosCriados, setActionProdutosCriados] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(1000);
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
+  const [dadosVisualizarPedido, setDadosVisualizarPedido] = useState([]);
+  const [dadosDetalhePedido, setDadosDetalhePedido] = useState([]);
+  const [actionVisualizarPedido, setActionVisualizarPedido] = useState(false);
+  const [actionEditarPedido, setActionEditarPedido] = useState(false);
 
   useEffect(() => {
     const dataInicial = getDataDoisMesesAtras();
@@ -40,6 +43,25 @@ export const ActionComprasADMHome = () => {
 
   }, [])
 
+   useEffect(() => {
+    const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
+    if (menuSalvo) {
+      const menuParsed = JSON.parse(menuSalvo);
+      setMenuFilhoAtual(menuParsed);
+
+    }
+  }, []);
+
+  
+  const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
+    ['menus-usuario-excecao', menuFilhoAtual?.ID],
+    async () => {
+      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
+  
+      return response.data;
+    },
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
+  );
   const { data: dadosFonecedores = [], error: errorFornecedor, isLoading: isLoadingFornecedor } = useFetchData('fornecedores', '/fornecedores');
   const { data: dadosFabricantes = [], error: errorFabricantes, isLoading: isLoadingFabricantes } = useFetchData('fabricantes', '/fabricantes');
   const { data: dadosMarcas = [], error: errorMarcas, isLoading: isLoadingMarcas } = useFetchData('marcasLista', '/marcasLista');
@@ -313,7 +335,7 @@ export const ActionComprasADMHome = () => {
         />
       )}
 
-      {actionBTN && (
+      {/* {actionBTN && (
         <div className="panel" >
           <div className="panel-hdr">
             <h2>
@@ -354,11 +376,30 @@ export const ActionComprasADMHome = () => {
 
           </div>
         </div>
-      )}
+      )} */}
 
       {!actionPedidoResumido && actionListaPedidos && actionHome && (
         <Fragment>
-          <ActionListaPedidos dadosPedidos={dadosPedidos} />
+          <ActionListaPedidos 
+            dadosPedidos={dadosPedidos}
+            dadosVisualizarPedido={dadosVisualizarPedido}
+            setDadosVisualizarPedido={setDadosVisualizarPedido}
+            setDadosDetalhePedido={setDadosDetalhePedido}
+            dadosDetalhePedido={dadosDetalhePedido}
+            setActionVisualizarPedido={setActionVisualizarPedido}
+            actionVisualizarPedido={actionVisualizarPedido}
+            actionEditarPedido={actionEditarPedido}
+            setActionEditarPedido={setActionEditarPedido}
+            setActionPedidoResumido={setActionPedidoResumido}
+            actionHome={actionHome}
+            setActionHome={setActionHome}
+            actionListaPedidos={actionListaPedidos}
+            setActionListaPedidos={setActionListaPedidos}
+            handleClick={handleClick}
+            usuarioLogado={usuarioLogado}
+            optionsModulos={optionsModulos}
+            
+          />
         </Fragment>
       )}
 

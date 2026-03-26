@@ -80,7 +80,7 @@ export const DashBoardComprasDM = () => {
 
   switch (componentToShow) {
     case "/comprasadm/ActionComprasADMHome":
-      component = <ActionComprasADMHome />
+      component = <ActionComprasADMHome usuarioLogado={usuarioLogado} />
       break;
     case "/comprasadm/ActionPesquisaDistribuicaoHistorico":
       component = <ActionPesquisaDistribuicaoHistorico />

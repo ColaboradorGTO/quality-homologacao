@@ -27,10 +27,10 @@ export const ActionPesquisaHome = ({ usuarioLogado }) => {
   const [marcaSelecionada, setMarcaSelecionada] = useState('');
   const [compradorSelecionado, setCompradorSelecionado] = useState('');
   const [numeroPedido, setNumeroPedido] = useState('');
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
   const [dadosVisualizarPedido, setDadosVisualizarPedido] = useState([]);
   const [dadosDetalhePedido, setDadosDetalhePedido] = useState([]);
   const [actionVisualizarPedido, setActionVisualizarPedido] = useState(false);
-  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
   const [actionEditarPedido, setActionEditarPedido] = useState(false);
  
   useEffect(() => {

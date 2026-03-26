@@ -2,13 +2,10 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { ButtonTable } from '../../../ButtonsTabela/ButtonTable';
 import { MdOutlineLocalPrintshop } from 'react-icons/md';
-import { GrCertificate, GrView } from 'react-icons/gr';
-import { FaCheck, FaShoppingBag } from 'react-icons/fa';
-import { AiOutlineDelete} from 'react-icons/ai';
-import { CiEdit } from 'react-icons/ci';
+import { GrView } from 'react-icons/gr';
+import { FaShoppingBag } from 'react-icons/fa';
 import { formatMoeda } from '../../../../utils/formatMoeda';
 import { Fragment, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { FiSend } from 'react-icons/fi';
 import { BsTrash3 } from 'react-icons/bs';
 import { useReactToPrint } from "react-to-print";
@@ -16,83 +13,103 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from '../../../Tables/headerTable';
+import Swal from 'sweetalert2';
+import { get } from '../../../../api/funcRequest';
 
-export const ActionListaPedidos = ({ dadosPedidos }) => {
-  const [actionListaPedidos, setActionListaPedidos] = useState(true)
-  const [actionPedidoResumido, setActionPedidoResumido] = useState(true)
-    const [globalFilterValue, setGlobalFilterValue] = useState('');
-    const dataTableRef = useRef();
-  
-  
-    const onGlobalFilterChange = (e) => {
-      setGlobalFilterValue(e.target.value);
-    };
-  
-    const handlePrint = useReactToPrint({
-      content: () => dataTableRef.current,
-      documentTitle: 'Pedidos Periodo',
+export const ActionListaPedidos = ({ 
+  dadosPedidos,
+  dadosVisualizarPedido,
+  setDadosVisualizarPedido,
+  setDadosDetalhePedido,
+  dadosDetalhePedido,
+  setActionVisualizarPedido,
+  setActionPedidoResumido,
+  actionHome,
+  setActionHome,
+  actionVisualizarPedido,
+  actionEditarPedido,
+  setActionEditarPedido,
+  actionPedidoResumido,
+  handleClick,
+  usuarioLogado,
+  optionsModulos
+}) => {
+  const [modalPedidoNota, setModalPedidoNota] = useState(false);
+  const [modalPedidoNotaSemPreco, setModalPedidoNotaSemPreco] = useState(false);
+  const [dadosPedido, setDadosPedido] = useState([]);
+  const [dadosPedidoSemPreco, setDadosPedidoSemPreco] = useState([]);
+  const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [rowSelection, setRowSelection] = useState(null);
+  const dataTableRef = useRef();
+
+
+  const onGlobalFilterChange = (e) => {
+    setGlobalFilterValue(e.target.value);
+  };
+
+  const handlePrint = useReactToPrint({
+    content: () => dataTableRef.current,
+    documentTitle: 'Pedidos Periodo',
+  });
+
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+    doc.autoTable({
+      head: [['Nº', 'Data', 'Nº Pedido', 'Marca', 'Comprador', 'Fornecedor', 'Fabricante', 'Vr Pedido', 'Setor', 'Status', 'Situação']],
+      body: dados.map(item => [
+        item.contador,
+        item.DTPEDIDOFORMATADABR,
+        item.IDPEDIDO,
+        item.NOFANTASIA,
+        item.NOMECOMPRADOR,
+        item.NOFORNECEDOR,
+        item.FABRICANTE,
+        formatMoeda(item.VRTOTALLIQUIDO),
+        item.DSSETOR == 'CADASTRO' ? 'CADASTRO' : item.DSSETOR == 'COMPRAS' ? 'COMPRAS' : item.DSSETOR == 'COMPRAS ADM' ? 'COMPRAS ADM' : '',
+        item.DSANDAMENTO == 'PRODUTOS/INCLUSÃO INICIADA' ? 'PRODUTOS/INCLUSÃO INICIADA' : item.DSANDAMENTO == 'PRODUTOS/INCLUSÃO FINALIZADA' ? 'PRODUTOS/INCLUSÃO FINALIZADA' : item.DSANDAMENTO == 'PEDIDO EM ANÁLISE' ? 'PEDIDO EM ANÁLISE' : item.DSANDAMENTO == 'PEDIDO CANCELADO' ? 'PEDIDO CANCELADO' : item.DSANDAMENTO == 'PEDIDO INICIADO' ? 'PEDIDO INICIADO' : '',
+        item.STMIGRADOSAP == null ? 'NÃO MIGRADO SAP' : 'MIGRADO SAP'
+      ]),
+      horizontalPageBreak: true,
+      horizontalPageBreakBehaviour: 'immediately'
     });
-  
-    const exportToPDF = () => {
-      const doc = new jsPDF();
-      doc.autoTable({
-        head: [['Nº', 'Data', 'Nº Pedido', 'Marca', 'Comprador', 'Fornecedor', 'Fabricante', 'Vr Pedido', 'Setor', 'Status', 'Situação']],
-        body: dados.map(item => [
-          item.contador,
-          item.DTPEDIDOFORMATADABR,
-          item.IDPEDIDO,
-          item.NOFANTASIA,
-          item.NOMECOMPRADOR,
-          item.NOFORNECEDOR,
-          item.FABRICANTE,
-          formatMoeda(item.VRTOTALLIQUIDO),
-          item.DSSETOR == 'CADASTRO' ? 'CADASTRO' : item.DSSETOR == 'COMPRAS' ? 'COMPRAS' : item.DSSETOR == 'COMPRAS ADM' ? 'COMPRAS ADM' : '',
-          item.DSANDAMENTO == 'PRODUTOS/INCLUSÃO INICIADA' ? 'PRODUTOS/INCLUSÃO INICIADA' : item.DSANDAMENTO == 'PRODUTOS/INCLUSÃO FINALIZADA' ? 'PRODUTOS/INCLUSÃO FINALIZADA' : item.DSANDAMENTO == 'PEDIDO EM ANÁLISE' ? 'PEDIDO EM ANÁLISE' : item.DSANDAMENTO == 'PEDIDO CANCELADO' ? 'PEDIDO CANCELADO' : item.DSANDAMENTO == 'PEDIDO INICIADO' ? 'PEDIDO INICIADO' : '',
-          item.STMIGRADOSAP == null ? 'NÃO MIGRADO SAP' : 'MIGRADO SAP'
-        ]),
-        horizontalPageBreak: true,
-        horizontalPageBreakBehaviour: 'immediately'
-      });
-      doc.save('pedidos_periodos.pdf');
-    };
-  
-    const exportToExcel = () => {
-      const worksheet = XLSX.utils.json_to_sheet(dados);
-      const workbook = XLSX.utils.book_new();
-      const header = ['Nº', 'Data', 'Nº Pedido', 'Marca', 'Comprador', 'Fornecedor', 'Fabricante', 'Vr Pedido', 'Setor', 'Status', 'Situação'];
-      worksheet['!cols'] = [
-        { wpx: 70, caption: 'Nº' },
-        { wpx: 70, caption: 'Data' },
-        { wpx: 70, caption: 'Nº Pedido' },
-        { wpx: 70, caption: 'Marca' },
-        { wpx: 70, caption: 'Comprador' },
-        { wpx: 70, caption: 'Fornecedor' },
-        { wpx: 70, caption: 'Fabricante' },
-        { wpx: 70, caption: 'Vr Pedido' },
-        { wpx: 70, caption: 'Setor' },
-        { wpx: 70, caption: 'Status' },
-        { wpx: 70, caption: 'Situação' },
-      ];
-      XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Pedidos Periodo');
-      XLSX.writeFile(workbook, 'pedidos_periodo.xlsx');
-    };
-  
+    doc.save('pedidos_periodos.pdf');
+  };
+
+  const exportToExcel = () => {
+    const worksheet = XLSX.utils.json_to_sheet(dados);
+    const workbook = XLSX.utils.book_new();
+    const header = ['Nº', 'Data', 'Nº Pedido', 'Marca', 'Comprador', 'Fornecedor', 'Fabricante', 'Vr Pedido', 'Setor', 'Status', 'Situação'];
+    worksheet['!cols'] = [
+      { wpx: 70, caption: 'Nº' },
+      { wpx: 70, caption: 'Data' },
+      { wpx: 70, caption: 'Nº Pedido' },
+      { wpx: 70, caption: 'Marca' },
+      { wpx: 70, caption: 'Comprador' },
+      { wpx: 70, caption: 'Fornecedor' },
+      { wpx: 70, caption: 'Fabricante' },
+      { wpx: 70, caption: 'Vr Pedido' },
+      { wpx: 70, caption: 'Setor' },
+      { wpx: 70, caption: 'Status' },
+      { wpx: 70, caption: 'Situação' },
+    ];
+    XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Pedidos Periodo');
+    XLSX.writeFile(workbook, 'pedidos_periodo.xlsx');
+  };
+
 
   const calcularTotalFabricante = () => {
     let total = 0;
     for (let dados of dadosPedidos) {
       total += parseFloat(dados.VRTOTALLIQUIDO);
     }
-    console.log(total, 'total');
     return total;
-
   }
 
   const dados = dadosPedidos.map((item, index) => {
     let contador = index + 1;
     const totalFabricante = calcularTotalFabricante();
-
+    
     return {
       IDPEDIDO: item.IDPEDIDO,
       DTPEDIDO: item.DTPEDIDO,
@@ -106,7 +123,8 @@ export const ActionListaPedidos = ({ dadosPedidos }) => {
       DSSETOR: item.DSSETOR,
       MODPEDIDO: item.MODPEDIDO,
       STMIGRADOSAP: item.STMIGRADOSAP,
-
+      IDRESUMOPEDIDOORIGEM: item.IDRESUMOPEDIDOORIGEM,
+      IDRESUMOPEDIDODESTINO: item.IDRESUMOPEDIDODESTINO,
       totalFabricante: totalFabricante,
       contador
     }
@@ -181,17 +199,41 @@ export const ActionListaPedidos = ({ dadosPedidos }) => {
       field: 'DSANDAMENTO',
       header: 'Status',
       body: row => {
+        const { DSSETOR, DSANDAMENTO, IDRESUMOPEDIDOORIGEM, IDRESUMOPEDIDODESTINO, STCANCELADO } = row;
+
+        // ✅ Lógica exata do jQuery para cores e texto
+        let colorLabel = 'blue';
+        let textoStatus = DSANDAMENTO;
+
+        if (DSSETOR === 'COMPRAS') {
+          if (DSANDAMENTO === 'PEDIDO FINALIZADO') {
+            colorLabel = 'tomato';
+          } else if (DSANDAMENTO === 'PEDIDO CANCELADO' || DSANDAMENTO === 'PEDIDO PARA SER AJUSTADO') {
+            colorLabel = 'red';
+          }
+        } else if (DSSETOR === 'COMPRASADM') {
+          if (DSANDAMENTO === 'PEDIDO PARA SER CANCELADO') {
+            colorLabel = 'red';
+          } else if (DSANDAMENTO === 'PEDIDO CANCELADO') {
+            colorLabel = 'red';
+            // ✅ Lógica do jQuery: adiciona informação do pedido destino
+            if (IDRESUMOPEDIDODESTINO) {
+              textoStatus = `PEDIDO CANCELADO -> PEDIDO ATIVO(${IDRESUMOPEDIDODESTINO})`;
+            }
+          } else {
+            // ✅ Lógica do jQuery: pedido reativado
+            if (STCANCELADO === 'False' && IDRESUMOPEDIDOORIGEM) {
+              colorLabel = 'blue';
+              textoStatus = `PEDIDO REATIVADO -> PEDIDO ORIGEM(${IDRESUMOPEDIDOORIGEM})`;
+            }
+          }
+        }
+
         return (
-          <div>
-            <th style={{ color: 
-              row.DSANDAMENTO == 'PRODUTOS/INCLUSÃO INICIADA' ? 'blue' : 
-              row.DSANDAMENTO == 'PRODUTOS/INCLUSÃO FINALIZADA' ? 'black' : 
-              row.DSANDAMENTO == 'PEDIDO EM ANÁLISE' ? 'green' : row.DSANDAMENTO == 'PEDIDO CANCELADO' ? 'red' : row.DSANDAMENTO == 'PEDIDO INICIADO' ? 'blue' : ''}}
-            >
-              {row.DSANDAMENTO}
-            </th>
-          </div>
-        )
+          <th style={{ color: colorLabel }}>
+            {textoStatus}
+          </th>
+        );
       },
       sortable: true,
     },
@@ -199,265 +241,365 @@ export const ActionListaPedidos = ({ dadosPedidos }) => {
       field: 'STMIGRADOSAP',
       header: 'Situação',
       body: (row) => {
-        if(row.DSSETOR == 'CADASTRO') {
-          if(row.DSANDAMENTO == 'PRODUTOS/INCLUSÃO INICIADA') {
-            return ( 
-              <th >{row.STMIGRADOSAP = ''}</th>
-            )
+        const { DSSETOR, STMIGRADOSAP } = row;
 
-          } else if(row.DSANDAMENTO == 'PRODUTOS/INCLUSÃO FINALIZADA') {
-            if(row.STMIGRADOSAP == null) {
-              return (
-                <th style={{ color: row.STMIGRADOSAP = '#fd3995', fontWeight: 700 }}>{row.STMIGRADOSAP =  'NÃO MIGRADO SAP'}</th>
-              )
-
-            } else {
-              return (
-                <th style={{ color: row.STMIGRADOSAP = '#2196F3', fontWeight: 700 }}>{row.STMIGRADOSAP = 'MIGRADO SAP'}</th>
-              )
-            
-            }
-          }
-        } else if(row.DSSETOR == 'COMPRAS') {
+     
+        if (STMIGRADOSAP !== 'True') {
           return (
-            <th style={{ color: row.STMIGRADOSAP = '#fd3995', fontWeight: 700 }}>{row.STMIGRADOSAP = ''}</th>
-          )
-        } else if(row.DSSETOR == 'COMPRASADM') {
+            <th style={{ color: 'red' }}>
+              NÃO MIGRADO SAP
+            </th>
+          );
+        } else {
           return (
-            <th style={{ color: row.STMIGRADOSAP = '#fd3995', fontWeight: 700 }}>{row.STMIGRADOSAP = '' }</th>
-          )
+            <th style={{ color: 'blue' }}>
+              MIGRADO SAP
+            </th>
+          );
         }
+        
+
+        // return <th></th>;
       },
       sortable: true
     },
     {
-      field: 'DSSETOR',
+      field: 'opcoes',
       header: 'Opções',
       body: (row) => {
-        if(row.DSSETOR == 'CADASTRO') {
-          return (
-            <div className="p-1 "
-              style={{ display: "flex" }}
-            >
-              
-              <div className="p-1">
-                <ButtonTable
-                  Icon={MdOutlineLocalPrintshop}
-                  cor={"warning"}
-                  iconColor={"white"}
-                  iconSize={20}
-                  onClickButton
-                  titleButton={"Imprimir Pedido Com Preço de Venda"}
-                />
-              </div>
-              <div className="p-1">
-                <ButtonTable
-                  Icon={MdOutlineLocalPrintshop}
-                  cor={"dark"}
-                  iconColor={"white"}
-                  iconSize={20}
-                  onClickButton
-                  titleButton={"Imprimir Pedido Sem Preço de Venda"}
-                />
-              </div>
-     
-            </div>
-          )
-        } else if(row.DSSETOR == 'COMPRAS') {
-          return (
-            <div className="p-1 "
-              style={{  display: "flex" }}
-            >
-            
-              <div className="p-1">
-                <ButtonTable
-                  Icon={MdOutlineLocalPrintshop}
-                  cor={"warning"}
-                  iconColor={"white"}
-                  iconSize={20}
-                  onClickButton
-                  titleButton={"Imprimir Pedido Com Preço de Venda"}
-                />
-              </div>
-              <div className="p-1">
-                <ButtonTable
-                  Icon={MdOutlineLocalPrintshop}
-                  cor={"dark"}
-                  iconColor={"white"}
-                  iconSize={20}
-                  onClickButton
-                  titleButton={"Imprimir Pedido Sem Preço de Venda"}
-                />
-              </div>
-            </div>
-          )
+        const {
+          DSSETOR,
+          DSANDAMENTO,
+          STREATIVADO,
+          IDPEDIDO
+        } = row;
 
-        } else if(row.DSSETOR == 'COMPRASADM') {
-          if(row.DSANDAMENTO == 'PEDIDO PARA SER CANCELADO') {
+        // ✅ Botões base (sempre presentes)
+        const btnBasicos = (
+          <>
+            <div className="p-1">
+              <ButtonTable
+                onClickButton={() => handleClickVisualizarPedido(row)}
+                titleButton={"Visualizar o Pedido"}
+                Icon={GrView}
+                cor={"success"}
+                iconColor={"white"}
+                iconSize={20}
+                width="30px"
+                height="30px"
+              />
+            </div>
+            <div className="p-1">
+              <ButtonTable
+                onClickButton={() => handleClickImprimir(row)}
+                titleButton={"Imprimir Pedido Com Preço de Venda"}
+                Icon={MdOutlineLocalPrintshop}
+                cor={"warning"}
+                iconColor={"white"}
+                iconSize={20}
+                width="30px"
+                height="30px"
+              />
+            </div>
+            <div className="p-1">
+              <ButtonTable
+                onClickButton={() => handleClickImprimirSempreco(row)}
+                titleButton={"Imprimir Pedido Sem Preço de Venda"}
+                Icon={MdOutlineLocalPrintshop}
+                cor={"dark"}
+                iconColor={"white"}
+                iconSize={20}
+                width="30px"
+                height="30px"
+              />
+            </div>
+            <div className="p-1">
+              <ButtonTable
+                onClickButton={() => handleClickVisualizarPedido(row)}
+                titleButton={"Detalhar Produtos da Imagem"}
+                Icon={GrView}
+                cor={"info"}
+                iconColor={"white"}
+                iconSize={20}
+                width="30px"
+                height="30px"
+              />
+            </div>
+          </>
+        );
+
+        // ✅ Lógica exata do jQuery por setor
+        if (DSSETOR === 'COMPRAS' || DSSETOR === 'CADASTRO') {
+          return (
+            <div className="p-1" style={{ display: "flex" }}>
+              {btnBasicos}
+            </div>
+          );
+        }
+
+        if (DSSETOR === 'COMPRASADM') {
+          if (DSANDAMENTO === 'PEDIDO PARA SER CANCELADO') {
             return (
-              <div className="p-1 "
-                style={{ justifyContent: "space-between",  display: "flex" }}
-              >
+              <div className="p-1" style={{ display: "flex" }}>
+                {btnBasicos}
                 <div className="p-1">
                   <ButtonTable
-                    Icon={GrView}
-                    cor={"success"}
-                    iconColor={"white"}
-                    iconSize={20}
-                    onClickButton
-                    titleButton={"Visualizar o Pedido"}
-                  />
-                </div>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={MdOutlineLocalPrintshop}
-                    cor={"warning"}
-                    iconColor={"white"}
-                    iconSize={20}
-                    onClickButton
-                    titleButton={"Imprimir Pedido Com Preço de Venda"}
-                  />
-                </div>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={MdOutlineLocalPrintshop}
-                    cor={"dark"}
-                    iconColor={"white"}
-                    iconSize={20}
-                    onClickButton
-                    titleButton={"Imprimir Pedido Sem Preço de Venda"}
-                  />
-                </div>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={MdOutlineLocalPrintshop}
-                    cor={"danger"}
-                    iconColor={"white"}
-                    iconSize={20}
-                    onClickButton
+                    onClickButton={() => handleClickCancelar(row)}
                     titleButton={"Cancelar Pedido"}
-                  />
-                </div>
-              </div>
-            )
-
-          } else if(row.DSANDAMENTO == 'PEDIDO CANCELADO') {
-            return (
-              <div className="p-1 "
-                style={{ justifyContent: "space-between",  display: "flex" }}
-              >
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={GrView}
-                    cor={"success"}
-                    iconColor={"white"}
-                    iconSize={20}
-                    onClickButton
-                    titleButton={"Visualizar o Pedido"}
-                  />
-                </div>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={MdOutlineLocalPrintshop}
-                    cor={"warning"}
-                    iconColor={"white"}
-                    iconSize={20}
-                    onClickButton
-                    titleButton={"Imprimir Pedido Com Preço de Venda"}
-                  />
-                </div>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={MdOutlineLocalPrintshop}
-                    cor={"dark"}
-                    iconColor={"white"}
-                    iconSize={20}
-                    onClickButton
-                    titleButton={"Imprimir Pedido Sem Preço de Venda"}
-                  />
-                </div>
-                
-              </div>
-            )
-          } else {
-            return (
-              <div className="p-1 "
-                style={{ justifyContent: "space-between",  display: "flex" }}
-              >
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={GrView}
-                    cor={"success"}
-                    iconColor={"white"}
-                    iconSize={20}
-                    onClickButton
-                    titleButton={"Visualizar o Pedido"}
-                  />
-                </div>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={MdOutlineLocalPrintshop}
-                    cor={"warning"}
-                    iconColor={"white"}
-                    iconSize={20}
-                    onClickButton
-                    titleButton={"Imprimir Pedido Com Preço de Venda"}
-                  />
-                </div>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={MdOutlineLocalPrintshop}
-                    cor={"dark"}
-                    iconColor={"white"}
-                    iconSize={20}
-                    onClickButton
-                    titleButton={"Imprimir Pedido Sem Preço de Venda"}
-                  />
-                </div>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={FaShoppingBag}
-                    cor={"success"}
-                    iconColor={"white"}
-                    iconSize={20}
-                    onClickButton
-                    titleButton={"Enviar Compras"}
-                  />
-                </div>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={FiSend}
-                    cor={"info"}
-                    iconColor={"white"}
-                    iconSize={20}
-                    onClickButton
-                    titleButton={"Enviar Cadastro"}
-                  />
-                </div>
-                <div className="p-1">
-                  <ButtonTable
                     Icon={BsTrash3}
                     cor={"danger"}
                     iconColor={"white"}
                     iconSize={20}
-                    onClickButton
-                    titleButton={"Cancelar Pedido"}
+                    width="30px"
+                    height="30px"
                   />
                 </div>
               </div>
-            )
+            );
           }
-        }    
-      },
-    },
-  
 
+          if (DSANDAMENTO === 'PEDIDO CANCELADO') {
+            return (
+              <div className="p-1" style={{ display: "flex" }}>
+                {btnBasicos}
+                {/* ✅ Botão reativar só se STREATIVADO != 'True' */}
+                {STREATIVADO !== 'True' && (
+                  <div className="p-1">
+                    <ButtonTable
+                      onClickButton={() => handleReativarPedido(IDPEDIDO)}
+                      titleButton={"Reativar Pedido"}
+                      Icon={GrView} // ícone de check seria melhor
+                      cor={"danger"}
+                      iconColor={"white"}
+                      iconSize={20}
+                      width="30px"
+                      height="30px"
+                    />
+                  </div>
+                )}
+              </div>
+            );
+          }
+
+          // ✅ Caso padrão COMPRASADM: todos os botões
+          return (
+            <div className="p-1" style={{ display: "flex" }}>
+              {btnBasicos}
+              <div className="p-1">
+                <ButtonTable
+                  onClickButton={() => handleEnviarCompras(IDPEDIDO, 1)}
+                  titleButton={"Enviar Compras"}
+                  Icon={FiSend}
+                  cor={"secondary"}
+                  iconColor={"white"}
+                  iconSize={20}
+                  width="30px"
+                  height="30px"
+                />
+              </div>
+              <div className="p-1">
+                <ButtonTable
+                  onClickButton={() => handleEnviarCadastro(IDPEDIDO, 4)}
+                  titleButton={"Enviar Cadastro"}
+                  Icon={FiSend}
+                  cor={"primary"}
+                  iconColor={"white"}
+                  iconSize={20}
+                  width="30px"
+                  height="30px"
+                />
+              </div>
+              <div className="p-1">
+                <ButtonTable
+                  titleButton={"Cancelar Pedido"}
+                  onClickButton={() => handleClickCancelar(row)}
+                  Icon={BsTrash3}
+                  cor={"danger"}
+                  iconColor={"white"}
+                  iconSize={20}
+                  width="30px"
+                  height="30px"
+                />
+              </div>
+            </div>
+          );
+        }
+
+        return null;
+      },
+    }
   ]
+
+  const handleImprimir = async (IDPEDIDO) => {
+    const confirmacao = await Swal.fire({
+      icon: 'question',
+      title: '',
+      text: 'Este pedido é para o Outlet Família?',
+      showCancelButton: true,
+      confirmButtonText: 'Sim',
+      cancelButtonText: 'Não',
+    })
+
+    const stImprimir = confirmacao.value === true || confirmacao.dismiss === 'cancel';
+    const stOutlet = confirmacao.value === true;
+
+    if (!stImprimir) {
+      return; // Sai se usuário não quer imprimir
+    }
+
+    try {
+      const response = await get(`/lista-pedidos?idPedido=${IDPEDIDO}`)
+      const responseDetlhe = await get(`/listaDetalhePedidos?idPedido=${IDPEDIDO}`)
+      if (response.data && responseDetlhe.data) {
+        setDadosPedido({
+          ...response.data,
+          STOUTLET: stOutlet ? 'True' : 'False' // Adiciona a propriedade STOUTLET com base na escolha do usuário
+        })
+        setDadosDetalhePedido(responseDetlhe.data)
+        setModalPedidoNota(true)
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: 'Não foi possível obter os dados do pedido para impressão.',
+          customClass: {
+            container: 'custom-swal'
+          }
+        })
+        return;
+      }
+    } catch (error) {
+      console.log(error, "não foi possivel pegar os dados da tabela ")
+    }
+  }
+
+  const handleClickImprimir = async (row) => {
+    if (row.IDPEDIDO) {
+      handleImprimir(row.IDPEDIDO)
+    }
+  }
+
+  const handleImprimirSemPreco = async (IDPEDIDO) => {
+    const confirmacao = await Swal.fire({
+      icon: 'question',
+      title: '',
+      text: 'Este pedido é para o Outlet Família?',
+      showCancelButton: true,
+      confirmButtonText: 'Sim',
+      cancelButtonText: 'Não',
+    })
+
+    const stImprimir = confirmacao.value === true || confirmacao.dismiss === 'cancel';
+    const stOutlet = confirmacao.value === true;
+
+    if (!stImprimir) {
+      return; // Sai se usuário não quer imprimir
+    }
+
+    try {
+      const response = await get(`/lista-pedidos?idPedido=${IDPEDIDO}`)
+      // const responseDetlhe = await get(`/lista-detalhe-pedidos-grade?idPedido=${IDPEDIDO}`)
+      const responseDetlhe = await get(`/listaDetalhePedidos?idPedido=${IDPEDIDO}`)
+      if (response.data && responseDetlhe.data) {
+        setDadosPedidoSemPreco({
+          ...response.data,
+          STOUTLET: stOutlet ? 'True' : 'False'
+        })
+        setDadosDetalhePedido(responseDetlhe.data)
+        setModalPedidoNotaSemPreco(true)
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: 'Não foi possível obter os dados do pedido para impressão.',
+          customClass: {
+            container: 'custom-swal'
+          }
+        })
+        return;
+      }
+    } catch (error) {
+      console.log(error, "não foi possivel pegar os dados da tabela ")
+    }
+  }
+
+  const handleClickImprimirSempreco = async (row) => {
+    if (row.IDPEDIDO) {
+      handleImprimirSemPreco(row.IDPEDIDO)
+
+    }
+  }
+
+  const handleEditarPedido = async (IDPEDIDO) => {
+    try {
+      const response = await get(`/lista-pedidos?idPedido=${IDPEDIDO}`)
+      const responseDetlhe = await get(`/lista-detalhe-pedidos?idPedido=${IDPEDIDO}`)
+      if (response.data && responseDetlhe.data) {
+        setDadosVisualizarPedido(response.data)
+        setDadosDetalhePedido(responseDetlhe.data)
+        setActionEditarPedido(true)
+        setActionVisualizarPedido(false)
+        setActionHome(false)
+        setActionPedidoResumido(false)
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: 'Não foi possível obter os dados do pedido.',
+        })
+        return;
+      }
+    } catch (error) {
+      console.log(error, "não foi possivel pegar os dados da tabela ")
+    }
+  }
+
+  const handleClickEditarPedido = async (row) => {
+    if (row.IDPEDIDO) {
+      handleEditarPedido(row.IDPEDIDO)
+      setActionEditarPedido(true)
+    }
+  }
+
+  const handleVisualizarPedido = async (IDPEDIDO) => {
+    try {
+      const response = await get(`/lista-pedidos?idPedido=${IDPEDIDO}`)
+      const responseDetlhe = await get(`/lista-detalhe-pedidos?idPedido=${IDPEDIDO}`)
+      if (response.data && responseDetlhe.data) {
+        setDadosVisualizarPedido(response.data)
+        setDadosDetalhePedido(responseDetlhe.data)
+        setActionVisualizarPedido(true)
+        setActionEditarPedido(false)
+        setActionHome(false)
+        setActionPedidoResumido(false)
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: 'Não foi possível obter os dados do pedido.',
+        })
+        return;
+      }
+    } catch (error) {
+      console.log(error, "não foi possivel pegar os dados da tabela ")
+    }
+  }
+
+  const handleClickVisualizarPedido = async (row) => {
+    if (row.IDPEDIDO) {
+      handleVisualizarPedido(row.IDPEDIDO)
+      setActionVisualizarPedido(true)
+    }
+  }
 
   return (
     <Fragment>
       <div className="panel">
-        
+        <div className="panel-hdr">
+          <h2>
+            Lista de Pedidos <span class="fw-300"><i>Por Período</i></span>
+          </h2>
+        </div>
         <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
           <HeaderTable
             globalFilterValue={globalFilterValue}
@@ -471,14 +613,20 @@ export const ActionListaPedidos = ({ dadosPedidos }) => {
         <div className="card mb-4" ref={dataTableRef}>
 
           <DataTable
-            title="Lista de Pedidos"
+            title="Pedidos"
             value={dados}
-            size='small'
             globalFilter={globalFilterValue}
+            size="small"
+            selectionMode="single"
+            selection={rowSelection}
+            onSelectionChange={(e) => setRowSelection(e.value)}
             sortOrder={-1}
             paginator={true}
             rows={10}
             rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+            filterDisplay="menu"
             showGridlines
             stripedRows
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
@@ -488,11 +636,12 @@ export const ActionListaPedidos = ({ dadosPedidos }) => {
                 key={coluna.field}
                 field={coluna.field}
                 header={coluna.header}
+
                 body={coluna.body}
                 footer={coluna.footer}
                 sortable={coluna.sortable}
                 headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
-                footerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+                footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem' }}
                 bodyStyle={{ fontSize: '0.8rem' }}
               />
             ))}
