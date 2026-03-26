@@ -14,6 +14,7 @@ import { InputFieldCheckBox } from "../../.././../Inputs/InputChekBox";
 import { useIncluirProutoPedido } from "../../ActionNovoPedido/hooks/useIncluirProdutoPedido";
 import { optionsTipoFrete, optionsTipoPedido, optionsEnviar, optionsFiscal } from "../../../../../../parceiro.json"
 import { ActionListaPedidos } from "./actionListaPedidos";
+import { ButtonTypeCompras } from "../../../../Buttons/Button";
 
 export const ActionEditarPedido = ({
   usuarioLogado,
@@ -122,7 +123,7 @@ export const ActionEditarPedido = ({
   });
 
   useEffect(() => {
-    console.log('🔍 dadosVisualizarPedido:', dadosVisualizarPedido); // DEBUG
+    // console.log('🔍 dadosVisualizarPedido:', dadosVisualizarPedido); // DEBUG
     
     // VALIDAÇÃO MAIS ROBUSTA
     if (!dadosVisualizarPedido || !Array.isArray(dadosVisualizarPedido) || dadosVisualizarPedido.length === 0) {
@@ -131,7 +132,7 @@ export const ActionEditarPedido = ({
     }
 
     const dados = dadosVisualizarPedido[0];
-    console.log('📋 Dados do pedido:', dados); // DEBUG
+    // console.log('📋 Dados do pedido:', dados); // DEBUG
 
     // ========== VARIÁVEIS COM VALIDAÇÃO ==========
     const IdAndamentoPedido = parseInt(dados?.IDANDAMENTO || '0', 10);
@@ -141,14 +142,14 @@ export const ActionEditarPedido = ({
     const stPedidoPorIntermediario = String(dados?.STPEDIDOPRIMARIO || 'False') === 'True';
     const idPedidoPrimario = parseInt(dados?.IDPEDIDOPRIMARIO || '0', 10);
 
-    console.log('🎯 Variáveis processadas:', {
-      IdAndamentoPedido,
-      StCancelaPedido,
-      IDPEDIDORESUMO,
-      stMigradoSap,
-      stPedidoPorIntermediario,
-      idPedidoPrimario
-    }); // DEBUG
+    // console.log('🎯 Variáveis processadas:', {
+    //   IdAndamentoPedido,
+    //   StCancelaPedido,
+    //   IDPEDIDORESUMO,
+    //   stMigradoSap,
+    //   stPedidoPorIntermediario,
+    //   idPedidoPrimario
+    // }); // DEBUG
 
     // ========== LÓGICA PRINCIPAL ==========
     let novosBotoesVisiveis = {
@@ -165,7 +166,7 @@ export const ActionEditarPedido = ({
 
     // ========== CONDIÇÃO 1: Pedido cancelado OU em andamento (2-14) ==========
     if (StCancelaPedido === 'True' || (IdAndamentoPedido >= 2 && IdAndamentoPedido < 15)) {
-      console.log('🚫 Condição 1: Pedido cancelado ou em andamento');
+      // console.log('🚫 Condição 1: Pedido cancelado ou em andamento');
       
       // Botão clonar só aparece em condições específicas
       const clonarVisivel = !(StCancelaPedido === 'True' && IdAndamentoPedido !== 2 && IdAndamentoPedido !== 5);
@@ -183,7 +184,7 @@ export const ActionEditarPedido = ({
     } 
     // ========== CONDIÇÃO 2: Inclusão (1) OU Alteração (15) ==========
     else if (IdAndamentoPedido === 1 || IdAndamentoPedido === 15) {
-      console.log('✅ Condição 2: Inclusão ou Alteração');
+      // console.log('✅ Condição 2: Inclusão ou Alteração');
       
       novosBotoesVisiveis = {
         ...novosBotoesVisiveis,
@@ -202,13 +203,13 @@ export const ActionEditarPedido = ({
 
     // ========== CONDIÇÃO 3: Se migrado para SAP ==========
     if (stMigradoSap) {
-      console.log('🔒 SAP: Desabilitando campos');
+      // console.log('🔒 SAP: Desabilitando campos');
       camposDevemEstarHabilitados = false;
     }
     
     // ========== CONDIÇÃO 4: Pedido secundário ==========
     if (idPedidoPrimario > 0) {
-      console.log('🔗 Pedido secundário: Ocultando botões');
+      // console.log('🔗 Pedido secundário: Ocultando botões');
       novosBotoesVisiveis = {
         incluir: false,
         fechar: false,
@@ -220,11 +221,11 @@ export const ActionEditarPedido = ({
       camposDevemEstarHabilitados = false;
     }
 
-    console.log('🎯 Estados finais:', {
-      novosBotoesVisiveis,
-      camposDevemEstarHabilitados,
-      novoTitulo
-    }); // DEBUG
+    // console.log('🎯 Estados finais:', {
+    //   novosBotoesVisiveis,
+    //   camposDevemEstarHabilitados,
+    //   novoTitulo
+    // }); // DEBUG
 
     // ========== APLICAR ESTADOS ==========
     setBotoesVisiveis(novosBotoesVisiveis);
@@ -495,47 +496,47 @@ export const ActionEditarPedido = ({
         valueSelectFrete={freteSelecionado}
         onChangeSelectFrete={(e) => setFreteSelecionado(e.value)}
 
-        ButtonSearchComponent={ButtonType}
+        ButtonSearchComponent={ButtonTypeCompras}
         linkNomeSearch={"Incluir Itens"}
         onButtonClickSearch={handleIncluir}
         corSearch={"primary"}
         IconSearch={MdMenu}
-        styleSearch={{ display: botoesVisiveis.incluir ? "block" : "none" }}
+        styleSearch={botoesVisiveis.incluir}
       
-        ButtonTypeCadastro={ButtonType}
+        ButtonTypeCadastro={ButtonTypeCompras}
         linkNome={"Salvar Cabeçalho Pedido"}
         onButtonClickCadastro
         corCadastro={"info"}
         IconCadastro={MdOutlineCheck}
-        styleCadastro={{ display: botoesVisiveis.salvar ? "block" : "none" }}
+        styleCadastro={botoesVisiveis.salvar}
         
-        ButtonTypeCancelar={ButtonType}
+        ButtonTypeCancelar={ButtonTypeCompras}
         linkCancelar={"Fechar Pedido"}
         onButtonClickCancelar={handleFecharPedido}
         corCancelar={"danger"}
         IconCancelar={MdOutlineVisibility}
-        styleCancelar={{ display: botoesVisiveis.fechar ? "block" : "none" }}
+        styleCancelar={botoesVisiveis.fechar}
 
-        ButtonTypePedido={ButtonType}
+        ButtonTypePedido={ButtonTypeCompras}
         linkPedido={"Novo Pedido"}
         onButtonClickPedido
         corPedido={"success"}
         IconPedido={MdOutlinePictureAsPdf}
-        stylePedido={{ display: botoesVisiveis.novoPedido ? "block" : "none" }}
+        stylePedido={botoesVisiveis.novoPedido}
         
-        ButtonTypeTXT={ButtonType}
+        ButtonTypeTXT={ButtonTypeCompras}
         linkTXT={"Clonar Cabeçalho Pedido"}
         onButtonClickTXT
         corTXT={"warning"}
         IconTXT={MdOutlineCopyAll}
-        styleTXT={{ display: botoesVisiveis.clonarCabecalho ? "block" : "none" }}
+        styleTXT={botoesVisiveis.clonarCabecalho}
 
-        ButtonTypeClonar={ButtonType}
+        ButtonTypeClonar={ButtonTypeCompras}
         linkClonar={"Clonar Pedido"}
         onButtonClickClonar
         corClonar={"secondary"}
         IconClonar={MdContentCopy}
-        styleClonar={{ display: botoesVisiveis.clonar ? "block" : "none" }}
+        styleClonar={botoesVisiveis.clonar}
 
         ButtonTypeRetornar={ButtonType}
         linkRetornar={"Voltar"}

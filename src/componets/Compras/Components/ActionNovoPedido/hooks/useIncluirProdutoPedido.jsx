@@ -590,6 +590,45 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
         }
     }
 
+    const validarCamposCabecalhoPedido = async () => {
+        const errors = [];
+
+        // Validações equivalentes às do jQuery
+        if (!compradorSelecionado?.value) {
+            errors.push('Selecione um comprador');
+        }
+        
+        if (!marcaSelecionada?.value) {
+            errors.push('Selecione uma marca');
+        }
+        
+        if (!tipoPedidoSelecionado?.value) {
+            errors.push('Selecione o tipo de pedido');
+        }
+        
+        if (!condicoesPagamentosSelecionado?.value) {
+            errors.push('Selecione a condição de pagamento');
+        }
+        
+        if (!fornecedorSelecionado?.value) {
+            errors.push('Selecione um fornecedor');
+        }
+
+        // Se houver erros, mostrar alerta
+        if (errors.length) {
+            await Swal.fire({
+            icon: 'warning',
+            title: 'Campos obrigatórios',
+            html: errors.map(erro => `• ${erro}`).join('<br>'),
+            confirmButtonText: 'OK'
+            });
+            
+            return false;
+        }
+
+        return true;
+    };
+
     const clonarCabecalho = async () => {
         let idResumoAtual = idResumoPedido || 0;
         let idCompradorPedidoAtual = compradorSelecionado?.value;
@@ -883,64 +922,178 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
                 showConfirmButton: true,
             });
         }
-        };
+    };
 
-    const handleIncluir = () => {
-        let idResumoAtual = 1;
-        let idResumoPedidoPrimario = 1;
-        let stPedidoPorIntermediario = 'False';
+    const handleIncluir = async () => {
+        let idResumoPedidoAtual =   Number(idResumoPedido || 0);
+        let idCompradorPedidoAtual = Number(compradorSelecionado?.value || 0);
+        let stPedidoPorIntermediario = checked ? 'True' : 'False';
+        let idResumoPedidoPrimario = Number(idPedidoPrimario || 0);
         let stPedidoPrimario = 'False';
-    
-        if(marcaSelecionada == '') {
-          Swal.fire({
-            icon: "warning",
-            title: `Selecione uma Marca para Incluir os Produtos`,
+        
+        Swal.fire({
+            title: 'Validando dados, aguarde...',
+            allowOutsideClick: false,
             showConfirmButton: false,
-            timer: 5000
-          })
-          return;
-        }
-        if(compradorSelecionado == '') {
-          Swal.fire({
-            icon: "warning",
-            title: `Selecione um Comprador para Incluir os Produtos`,
-            showConfirmButton: false,
-            timer: 6000
-          })
-          return;
-        }
-    
-        if(idResumoAtual == 0 || (idResumoPedidoPrimario == 0 && stPedidoPorIntermediario == 'True' && stPedidoPrimario == 'False')) {
-          const confirmacao = Swal.fire({
-            icon: 'warning',
-            title: 'Deseja efetuar este pedido pelo Atacadista RN?',
-            text: 'Esta ação não poderá ser desfeita!',
-            showCancelButton: true,
-            showConfirmButton: true,
-            confirmButtonText: 'Sim',
-            cancelButtonText: 'Não',
-    
-          }).then((result) => {
-            if (result.isConfirmed) {
-              clonarCabecalho();
-            } else {
-              Swal.fire({
-                icon: 'info',
-                title: 'Ação cancelada',
-                text: 'O pedido não foi clonado.',
-                showConfirmButton: false,
-                timer: 5000
-              });
+            willOpen: () => {
+                Swal.showLoading();
             }
-          })
-          if(confirmacao) {
-            setChecked(true);
-          } else {
-            setChecked(false);
-          }
+        });
+        // o idResumoAtual não está chegando aqui, o que vem da action
+        // o idResumoPedidoPrimario está chegando 0
+        console.log(idResumoPedidoAtual, 'chegoua qui 1')
+        console.log(idResumoPedidoPrimario, 'chegoua qui 2')
+        console.log(stPedidoPorIntermediario,  'chegoua qui 3')
+        console.log(stPedidoPrimario,  'chegoua qui 4')
+
+        let camposValidos = await validarCamposCabecalhoPedido();
+
+        if (!camposValidos) {
+            Swal.close();
+            return; 
         }
+
+        if(idResumoPedidoAtual == 0 || (idResumoPedidoPrimario == 0 && stPedidoPorIntermediario == 'True' && stPedidoPrimario == 'False')) {
+
+            const confirmacao = Swal.fire({
+                icon: 'question',
+                title: 'Deseja efetuar este pedido pelo Atacadista RN?',
+                text: 'Esta ação não poderá ser desfeita!',
+                showCancelButton: true,
+                showConfirmButton: true,
+                confirmButtonText: 'Sim',
+                cancelButtonText: 'Não',
+            })
+
+            if (confirmacao.dismiss) {
+                return;
+            }
+
+            if(confirmacao.isConfirmed) {
+                setChecked(true);
+                stPedidoPorIntermediario = 'True';
+            } else {
+                setChecked(false);
+                stPedidoPorIntermediario = 'False';
+            }
+        }
+        
+        Swal.fire({
+            title: 'Carregando dados, aguarde...',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            willOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        setCheckboxIntermediario(stPedidoPorIntermediario == 'True')
+        const data = {
+            IDRESUMOPEDIDO: idResumoPedidoAtual,
+            IDGRUPOEMPRESARIAL: parseFloat(marcaSelecionada?.value),
+            IDSUBGRUPOEMPRESARIAL: parseFloat(marcaSelecionada?.value),
+            IDCOMPRADOR: parseFloat(compradorSelecionado?.value),
+            IDCONDICAOPAGAMENTO: parseFloat(condicoesPagamentosSelecionado?.value),
+            IDFORNECEDOR: fornecedorSelecionado?.value,
+            IDTRANSPORTADORA: parseFloat(transportadoraSelecionada?.value),
+            IDANDAMENTO: parseFloat(idAndamento),
+            MODPEDIDO: tipoPedidoSelecionado?.value,
+            NOVENDEDOR: vendedor,
+            EEMAILVENDEDOR: emailVendedor,
+            DTPEDIDO: dataPedido,
+            DTPREVENTREGA: dataPrevisaoEntrega,
+            TPFRETE: freteSelecionado?.value,
+            DESCPERC01: parseFloat(desconto1 || 0),
+            DESCPERC02: parseFloat(desconto2 || 0),
+            DESCPERC03: parseFloat(desconto3 || 0),
+            PERCCOMISSAO: comissao,
+            VRTOTALLIQUIDO: totalLiq,
+            OBSPEDIDO: obsInterna,
+            OBSPEDIDO2: obsFornecedor,
+            DTFECHAMENTOPEDIDO: dataAtual,
+            DTCADASTRO: dataAtual,
+            TPARQUIVO: enviarSelecionado?.value,
+            STDISTRIBUIDO: 'False',
+            STAGRUPAPRODUTO: 'False',
+            STCANCELADO: 'False',
+            TPFISCAL: fiscalSelecionado?.value,
+            STRASCUNHO: stRascunho || 'False',
+            STPEDIDOPORINTEMEDIARIO: stPedidoPorIntermediario
+        }
+        
+        try {
+
+            if(idResumoPedidoAtual == 0)  {
+                let response =  await post('/pedido', data);
+              
+                if(response && response.length > 0) {
+                    idResumoPedidoAtual = response[0]?.IDRESUMOPEDIDO;             
+               
+                    const dadosPedidos = await get(`/lista-pedidos?idPedido=${idResumoPedidoAtual}`);
+                    setDadosCabecalhoClonado(dadosPedidos?.data)
+                    
+                }
+            } else {
+                await put('/atualizar-pedido/:id', data);
+            }
+
+            const textDados = JSON.stringify(data);
+            let textFuncao =  'COMPRAS / INCLUIR PRODUTO NO PEDIDO';
+            const ipUsuario = await getIPUsuario();
+
+            const createtLog = {
+                IDFUNCIONARIO: String(usuarioLogado.id),
+                PATHFUNCAO: textFuncao,
+                DADOS: textDados,
+                IP: ipUsuario || 'Indisponível'
+            }
     
-        setModalIncluirProdutoPedido(true);
+
+            const ultimoPedidoResponse = await get(`/ultimo-pedido?idcomprador=${idCompradorPedidoAtual}&idPedido=${idResumoPedidoAtual}`);
+            setDadosUltimosPedidos(ultimoPedidoResponse.data)
+            setModalIncluirProdutoPedido(true);
+
+            Swal.close();
+
+            await post('/log-web', createtLog)
+
+            Swal.fire({
+                position: 'center',
+                icon: 'success',
+                title: 'Cadastrado!',
+                text: 'Pedido cadastrado com sucesso.',
+                showConfirmButton: false,
+                timer: 3000,
+                customClass: {
+                    container: 'custom-swal',
+                }
+            })
+
+
+            return response.data;
+        } catch (error) {
+            const textDados = JSON.stringify(data)
+            let textFuncao = 'COMPRAS / ERRO AO CLONAR CABEÇALHO DO PEDIDO';
+            const ipUsuario = await getIPUsuario();
+            const createtLog = {
+                IDFUNCIONARIO: String(usuarioLogado.id),
+                PATHFUNCAO: textFuncao,
+                DADOS: textDados,
+                IP: ipUsuario || 'Indisponível'
+            }
+            await post('/log-web', createtLog)
+
+            Swal.fire({
+                position: 'center',
+                icon: 'error',
+                title: 'Erro ao tentar clonar o cabeçalho do pedido, recarregue e tente novamente!',
+                showConfirmButton: false,
+                timer: 3000,
+                customClass: {
+                    container: 'custom-swal',
+                }
+            });
+        }
     } 
 
     const handleSalvarPedido = async () => {

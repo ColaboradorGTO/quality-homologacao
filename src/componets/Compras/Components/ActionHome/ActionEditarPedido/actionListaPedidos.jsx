@@ -385,7 +385,7 @@ export const ActionListaPedidos = ({
           />
 
         </div>
-        <div className="panel-container mb-4" ref={dataTableRef}>
+        <div className="panel-container" ref={dataTableRef}>
           <DataTable
             title="Pedidos"
             value={dadosListaPedidos}
