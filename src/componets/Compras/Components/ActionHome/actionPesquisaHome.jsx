@@ -31,7 +31,7 @@ export const ActionPesquisaHome = ({ usuarioLogado }) => {
   const [actionVisualizarPedido, setActionVisualizarPedido] = useState(false);
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
   const [actionEditarPedido, setActionEditarPedido] = useState(false);
-
+ 
   useEffect(() => {
     const dataInicial = getDataDoisMesesAtras();
     const dataFinal = getDataAtual();
@@ -136,7 +136,7 @@ export const ActionPesquisaHome = ({ usuarioLogado }) => {
   const { data: dadosPedidos = [], error: errorPedidos, isLoading: isLoadingPedidos, refetch: refetchListaPedidos } = useQuery(
     ['lista-pedidos', ],
     () => fetchListaPedidos(),
-    { enabled: false, staleTime: 60 * 60 * 1000 }
+    { enabled: true, staleTime: 60 * 60 * 1000 }
   )
 
   const fetchListaPedidosDetalhados = async () => {

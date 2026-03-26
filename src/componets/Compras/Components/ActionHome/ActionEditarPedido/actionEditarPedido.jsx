@@ -15,6 +15,7 @@ import { useIncluirProutoPedido } from "../../ActionNovoPedido/hooks/useIncluirP
 import { optionsTipoFrete, optionsTipoPedido, optionsEnviar, optionsFiscal } from "../../../../../../parceiro.json"
 import { ActionListaPedidos } from "./actionListaPedidos";
 import { ButtonTypeCompras } from "../../../../Buttons/Button";
+import { ActionIncluirProdutoPedidoModal } from "./IncluirProdutoPedido/actionIncluirProdutoPedidoModal";
 
 export const ActionEditarPedido = ({
   usuarioLogado,
@@ -104,7 +105,7 @@ export const ActionEditarPedido = ({
     dadosUltimosPedidos,
     dadosCabecalhoClonado,
     handleFecharPedido
-  } = useIncluirProutoPedido({ usuarioLogado, optionsModulos });
+  } = useIncluirProutoPedido({ usuarioLogado, optionsModulos, dadosVisualizarPedido, dadosDetalhePedido });
   const [dadosDetalheProdutoPedido, setDadosDetalheProdutoPedido] = useState([]);
   const [botoesVisiveis, setBotoesVisiveis] = useState({
     incluir: false,
@@ -552,6 +553,19 @@ export const ActionEditarPedido = ({
           usuarioLogado={usuarioLogado}
           optionsModulos={optionsModulos}
       />
+    
+      <ActionIncluirProdutoPedidoModal
+          show={modalIncluirProdutoPedido}
+          handleClose={() => setModalIncluirProdutoPedido(false)}
+          usuarioLogado={usuarioLogado}
+          optionsModulos={optionsModulos}
+          dadosDetalhePedido={dadosDetalhePedido}
+          dadosVisualizarPedido={dadosVisualizarPedido}
+          tipoPedidoSelecionado={tipoPedidoSelecionado}
+          marcaSelecionada={marcaSelecionada}
+          idResumoPedido={idResumoPedido}
+          dadosUltimosPedidos={dadosUltimosPedidos}
+        />
     </Fragment>
   )
 }

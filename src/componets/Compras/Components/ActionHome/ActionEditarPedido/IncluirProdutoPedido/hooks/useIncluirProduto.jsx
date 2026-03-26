@@ -55,7 +55,7 @@ export const useIncluirProduto = ({
     const [stReposicao, setStReposicao] = useState('False');
     const [stRascunho, setRascunho] = useState('False');
     const [tipoCadastro, setTipoCadastro] = useState('');
-    
+
     const { data: dadosVinculoEstiloGrupo = [], error: errorVinculoEstiloGrupo, isLoading: isLoadingVinculoEstiloGrupo, refetch: refetchVinculoEstiloGrupo } = useQuery(
         'vinculo-estilo-grupo',
         async () => { const response = await get(`/vinculo-estilo-grupo?idVinculoEstilo=${dadosDetalhePedido[0]?.IDVINCULOESTILO}`); return response.data },
@@ -241,61 +241,62 @@ export const useIncluirProduto = ({
         }
     };
 
+    
     useEffect(() => {
-    if(dadosDetalhePedido && dadosDetalhePedido.length > 0) {
-        
-
-        setNomeMarca(dadosDetalhePedido[0]?.NOFANTASIA)
-        setStReposicaoSelecionado({
-            value: dadosDetalhePedido[0]?.STREPOSICAO, 
-            label:  dadosDetalhePedido[0]?.STREPOSICAO == 'True' ? 'SIM' : 'NÃO'
-        })
-        setCadastroSelecionado({
-            value: dadosDetalhePedido[0]?.STREPOSICAO, 
-            label:  dadosDetalhePedido[0]?.STREPOSICAO == 'True' ? 'POR REFERÊNCIA' : 'NORMAL'
-        })
-        
-        setDescricaoProduto(dadosDetalhePedido[0]?.DSPRODUTO)
-        setVrCusto(toFloat(dadosDetalhePedido[0]?.VRCUSTOPRODATUAL))
-        setVrVenda(toFloat(dadosDetalhePedido[0]?.VRVENDAPRODATUAL))
-        setQuantidade(toFloat(dadosDetalhePedido[0]?.QTDTOTAL))
-        setQuantidadeCaixa(toFloat(dadosDetalhePedido[0]?.NUCAIXA))
-        setReferencia(dadosDetalhePedido[0]?.NUREF)
-        setFabricanteSelecionado({value: dadosDetalhePedido[0]?.IDFABRICANTE, label: ` ${dadosDetalhePedido[0]?.IDFABRICANTE} - ${dadosDetalhePedido[0]?.DSFABRICANTE}`})
-        setUnidadeSelecionada({value: dadosDetalhePedido[0]?.IDUNIDADEMEDIDA, label: dadosDetalhePedido[0]?.DSSIGLA})
-        setCorSelecionada({value: dadosDetalhePedido[0]?.IDCOR, label: dadosDetalhePedido[0]?.DSCOR})
-        setTipoTecidoSelecionado({value: dadosDetalhePedido[0]?.IDTIPOTECIDO, label: dadosDetalhePedido[0]?.DSTIPOTECIDO})
-        setCategoriaGradeSelecionada({
-            value: dadosDetalhePedido[0]?.IDCATEGORIAGRADE, 
-            label: `${dadosDetalhePedido[0]?.TPCATEGORIAPRODPEDIDO} - ${dadosDetalhePedido[0]?.DSCATEGORIAPEDIDO}`
-        })
-        setEstruturaSelecionada({value: dadosDetalhePedido[0]?.IDSUBGRUPOESTRUTURA, label: dadosDetalhePedido[0]?.DSSUBGRUPOESTRUTURA})
-        setEstiloSelecionado({value: dadosDetalhePedido[0]?.IDESTILO, label: dadosDetalhePedido[0]?.DSESTILO})
-        setCategoriaSelecionada({value: dadosDetalhePedido[0]?.IDCATEGORIAPEDIDO, label: `${dadosDetalhePedido[0]?.CATEGORIAPROD} ${dadosDetalhePedido[0]?.DSCATEGORIAPROD} - ${dadosDetalhePedido[0]?.TPCATEGORIAPROD}`})
-        setLocalExposicaoSelecionado({value: dadosDetalhePedido[0]?.IDLOCALEXPOSICAO, label: dadosDetalhePedido[0]?.DSLOCALEXPOSICAO})
-        setEcommerceSelecionado({value: dadosDetalhePedido[0]?.STECOMMERCE, label: dadosDetalhePedido[0]?.STECOMMERCE == 'True' ? 'SIM' : 'NÃO'})
-        setRedeSocialSelecionada({value: dadosDetalhePedido[0]?.STREDESOCIAL, label: dadosDetalhePedido[0]?.STREDESOCIAL == 'True' ? 'SIM' : 'NÃO'})
-        setVrBruto(toFloat(dadosDetalhePedido[0]?.VRUNITBRUTODETALHEPEDIDO))
-        setPercDescontoI(toFloat(dadosDetalhePedido[0]?.DESC01))
-        setPercDescontoII(toFloat(dadosDetalhePedido[0]?.DESC02))
-        setPercDescontoIII(toFloat(dadosDetalhePedido[0]?.DESC03))
-        setVrLiquido(toFloat(dadosDetalhePedido[0]?.VRUNITLIQDETALHEPEDIDO))
-        setVrSugerido(toFloat(dadosDetalhePedido[0]?.VRVENDADETALHEPEDIDO))
-        setVrTotal(toFloat(dadosDetalhePedido[0]?.VRTOTALDETALHEPEDIDO))
-        setObservacao(dadosDetalhePedido[0]?.OBSPRODUTO)
-        setStPedidoPorIntermediario(dadosDetalhePedido[0]?.STPEDIDOPORINTEMEDIARIO)
-        setObsFornecedor(dadosDetalhePedido[0]?.OBSPEDIDO)
-        setRascunho(dadosDetalhePedido[0]?.STRASCUNHO)
-        // setProdutoDadosGrade(dadosDetalhePedido[0]?.DETALHEGRADE.map((item) => ({
-        //     IDTAMANHO: item.IDTAMANHO,
-        //     DSTAMANHO: item.DSTAMANHO,
-        // })))
-        // console.log(dadosDetalhePedido[0]?.DETALHEGRADE.map((item) => ({
-        //     IDTAMANHO: item.IDTAMANHO,
-        //     DSTAMANHO: item.DSTAMANHO,
-        //     INDICETAMANHO: item.INDICETAMANHO
-        // })), 'dadosDetalhePedido[0]?.DETALHEGRADE - Campos selecionados')
-    }
+        if(dadosDetalhePedido && dadosDetalhePedido.length > 0) {
+            
+            console.log(dadosVisualizarPedido[0], 'dataVisualizarPedido[0] - useEffect do Modal')
+            setNomeMarca(dadosDetalhePedido[0]?.NOFANTASIA)
+            setStReposicaoSelecionado({
+                value: dadosDetalhePedido[0]?.STREPOSICAO, 
+                label:  dadosDetalhePedido[0]?.STREPOSICAO == 'True' ? 'SIM' : 'NÃO'
+            })
+            setCadastroSelecionado({
+                value: dadosDetalhePedido[0]?.STREPOSICAO, 
+                label:  dadosDetalhePedido[0]?.STREPOSICAO == 'True' ? 'POR REFERÊNCIA' : 'NORMAL'
+            })
+            
+            setDescricaoProduto(dadosDetalhePedido[0]?.DSPRODUTO)
+            setVrCusto(toFloat(dadosDetalhePedido[0]?.VRCUSTOPRODATUAL))
+            setVrVenda(toFloat(dadosDetalhePedido[0]?.VRVENDAPRODATUAL))
+            setQuantidade(toFloat(dadosDetalhePedido[0]?.QTDTOTAL))
+            setQuantidadeCaixa(toFloat(dadosDetalhePedido[0]?.NUCAIXA))
+            setReferencia(dadosDetalhePedido[0]?.NUREF)
+            setFabricanteSelecionado({value: dadosDetalhePedido[0]?.IDFABRICANTE, label: ` ${dadosDetalhePedido[0]?.IDFABRICANTE} - ${dadosDetalhePedido[0]?.DSFABRICANTE}`})
+            setUnidadeSelecionada({value: dadosDetalhePedido[0]?.IDUNIDADEMEDIDA, label: dadosDetalhePedido[0]?.DSSIGLA})
+            setCorSelecionada({value: dadosDetalhePedido[0]?.IDCOR, label: dadosDetalhePedido[0]?.DSCOR})
+            setTipoTecidoSelecionado({value: dadosDetalhePedido[0]?.IDTIPOTECIDO, label: dadosDetalhePedido[0]?.DSTIPOTECIDO})
+            setCategoriaGradeSelecionada({
+                value: dadosDetalhePedido[0]?.IDCATEGORIAGRADE, 
+                label: `${dadosDetalhePedido[0]?.TPCATEGORIAPRODPEDIDO} - ${dadosDetalhePedido[0]?.DSCATEGORIAPEDIDO}`
+            })
+            setEstruturaSelecionada({value: dadosDetalhePedido[0]?.IDSUBGRUPOESTRUTURA, label: dadosDetalhePedido[0]?.DSSUBGRUPOESTRUTURA})
+            setEstiloSelecionado({value: dadosDetalhePedido[0]?.IDESTILO, label: dadosDetalhePedido[0]?.DSESTILO})
+            setCategoriaSelecionada({value: dadosDetalhePedido[0]?.IDCATEGORIAPEDIDO, label: `${dadosDetalhePedido[0]?.CATEGORIAPROD} ${dadosDetalhePedido[0]?.DSCATEGORIAPROD} - ${dadosDetalhePedido[0]?.TPCATEGORIAPROD}`})
+            setLocalExposicaoSelecionado({value: dadosDetalhePedido[0]?.IDLOCALEXPOSICAO, label: dadosDetalhePedido[0]?.DSLOCALEXPOSICAO})
+            setEcommerceSelecionado({value: dadosDetalhePedido[0]?.STECOMMERCE, label: dadosDetalhePedido[0]?.STECOMMERCE == 'True' ? 'SIM' : 'NÃO'})
+            setRedeSocialSelecionada({value: dadosDetalhePedido[0]?.STREDESOCIAL, label: dadosDetalhePedido[0]?.STREDESOCIAL == 'True' ? 'SIM' : 'NÃO'})
+            setVrBruto(toFloat(dadosDetalhePedido[0]?.VRUNITBRUTODETALHEPEDIDO))
+            setPercDescontoI(toFloat(dadosDetalhePedido[0]?.DESC01))
+            setPercDescontoII(toFloat(dadosDetalhePedido[0]?.DESC02))
+            setPercDescontoIII(toFloat(dadosDetalhePedido[0]?.DESC03))
+            setVrLiquido(toFloat(dadosDetalhePedido[0]?.VRUNITLIQDETALHEPEDIDO))
+            setVrSugerido(toFloat(dadosDetalhePedido[0]?.VRVENDADETALHEPEDIDO))
+            setVrTotal(toFloat(dadosDetalhePedido[0]?.VRTOTALDETALHEPEDIDO))
+            setObservacao(dadosDetalhePedido[0]?.OBSPRODUTO)
+            setStPedidoPorIntermediario(dadosDetalhePedido[0]?.STPEDIDOPORINTEMEDIARIO)
+            setObsFornecedor(dadosDetalhePedido[0]?.OBSPEDIDO)
+            setRascunho(dadosDetalhePedido[0]?.STRASCUNHO)
+            // setProdutoDadosGrade(dadosDetalhePedido[0]?.DETALHEGRADE.map((item) => ({
+            //     IDTAMANHO: item.IDTAMANHO,
+            //     DSTAMANHO: item.DSTAMANHO,
+            // })))
+            // console.log(dadosDetalhePedido[0]?.DETALHEGRADE.map((item) => ({
+            //     IDTAMANHO: item.IDTAMANHO,
+            //     DSTAMANHO: item.DSTAMANHO,
+            //     INDICETAMANHO: item.INDICETAMANHO
+            // })), 'dadosDetalhePedido[0]?.DETALHEGRADE - Campos selecionados')
+        }
     }, [dadosDetalhePedido]);
     // console.log(dadosDetalheGradePedido, 'dadosDetalheGradePedido')
 

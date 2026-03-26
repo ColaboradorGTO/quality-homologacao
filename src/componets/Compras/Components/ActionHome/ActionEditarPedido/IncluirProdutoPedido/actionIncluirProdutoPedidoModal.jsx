@@ -24,9 +24,9 @@ export const ActionIncluirProdutoPedidoModal = ({
         size="lg"
         centered
       >
-
+        
         <HeaderModal
-          title={`Pedido para VESTUARIO Nº ${dadosDetalhePedido[0]?.IDPEDIDO}`}
+          title={`Pedido para VESTUARIO Nº ${dadosVisualizarPedido[0]?.IDPEDIDO}`}
           subTitle={"Inclusão de Itens do Pedido"}
           handleClose={handleClose}
         />

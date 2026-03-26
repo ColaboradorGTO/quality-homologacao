@@ -5,9 +5,15 @@ import { get, post, put } from "../../../../../api/funcRequest";
 import { getDataAtual } from "../../../../../utils/dataAtual";
 import { useQuery } from "react-query";
 import { toFloat } from "../../../../../utils/toFloat";
+import { use } from "react";
 
 
-export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
+export const useIncluirProutoPedido = ({ 
+    optionsModulos, 
+    usuarioLogado,
+    dadosVisualizarPedido, 
+    dadosDetalhePedido 
+}) => {
     const [dataPesquisaInicio, setDataPesquisaInicio] = useState('')
     const [dataPesquisaFim, setDataPesquisaFim] = useState('')
     const [tabelaVisivel, setTabelaVisivel] = useState(true);
@@ -155,7 +161,19 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
         },
         { staleTime: 5 * 60 * 1000, enabled: false }
     );
+
+    useEffect(() => {
+        if(dadosVisualizarPedido && dadosVisualizarPedido.length > 0) {
+            // console.log((dadosVisualizarPedido[0]), 'dadosVisualizarPedido[0')
+            
+         
+            setIdResumoPedido(dadosVisualizarPedido[0]?.IDPEDIDO || '');
+            setCompradorSelecionado({value: dadosVisualizarPedido[0]?.IDCOMPRADOR, label: dadosVisualizarPedido[0]?.NOMECOMPRADOR });
+       
+        }
+    },[dadosVisualizarPedido, dadosDetalhePedido])
     
+
     const verificaDadosDoFornecedorSelecionado = async (stCarregarDados = true) => {
         try {
             const fornecedor = dadosFornecedores.find(f => f.IDFORNECEDOR == fornecedorSelecionado.value);
@@ -925,27 +943,20 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
     };
 
     const handleIncluir = async () => {
-        let idResumoPedidoAtual =   Number(idResumoPedido || 0);
+        let idResumoPedidoAtual =   toFloat(dadosVisualizarPedido[0]?.IDPEDIDO || 0);
         let idCompradorPedidoAtual = Number(compradorSelecionado?.value || 0);
         let stPedidoPorIntermediario = checked ? 'True' : 'False';
         let idResumoPedidoPrimario = Number(idPedidoPrimario || 0);
-        let stPedidoPrimario = 'False';
-        
-        Swal.fire({
-            title: 'Validando dados, aguarde...',
-            allowOutsideClick: false,
-            showConfirmButton: false,
-            willOpen: () => {
-                Swal.showLoading();
-            }
-        });
-        // o idResumoAtual não está chegando aqui, o que vem da action
-        // o idResumoPedidoPrimario está chegando 0
-        console.log(idResumoPedidoAtual, 'chegoua qui 1')
-        console.log(idResumoPedidoPrimario, 'chegoua qui 2')
-        console.log(stPedidoPorIntermediario,  'chegoua qui 3')
-        console.log(stPedidoPrimario,  'chegoua qui 4')
+        let stPedidoPrimario = dadosVisualizarPedido[0]?.STPEDIDOPRIMARIO || 'False';
+        // console.log(idResumoPedidoAtual,  'chegoua qui 1')
+        // console.log(idCompradorPedidoAtual, 'chegoua qui 1.1')
+        // console.log(idResumoPedidoPrimario, 'chegoua qui 2')
+        // console.log(stPedidoPorIntermediario,  'chegoua qui 3')
+        // console.log(stPedidoPrimario,  'chegoua qui 4')
 
+
+        setModalIncluirProdutoPedido(true);
+  
         let camposValidos = await validarCamposCabecalhoPedido();
 
         if (!camposValidos) {
@@ -977,15 +988,6 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
                 stPedidoPorIntermediario = 'False';
             }
         }
-        
-        Swal.fire({
-            title: 'Carregando dados, aguarde...',
-            allowOutsideClick: false,
-            showConfirmButton: false,
-            willOpen: () => {
-                Swal.showLoading();
-            }
-        });
 
         setCheckboxIntermediario(stPedidoPorIntermediario == 'True')
         const data = {
@@ -1051,7 +1053,6 @@ export const useIncluirProutoPedido = ({ optionsModulos, usuarioLogado }) => {
 
             const ultimoPedidoResponse = await get(`/ultimo-pedido?idcomprador=${idCompradorPedidoAtual}&idPedido=${idResumoPedidoAtual}`);
             setDadosUltimosPedidos(ultimoPedidoResponse.data)
-            setModalIncluirProdutoPedido(true);
 
             Swal.close();
 

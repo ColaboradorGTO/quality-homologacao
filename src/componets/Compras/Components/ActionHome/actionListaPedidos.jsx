@@ -715,6 +715,8 @@ export const ActionListaPedidos = ({
       if (response.data && responseDetlhe.data) {
         setDadosVisualizarPedido(response.data)
         setDadosDetalhePedido(responseDetlhe.data)
+        // console.log(responseDetlhe.data, "dados detalhe pedido lista")
+        // console.log(response.data, "dados pedido lista")
         setActionVisualizarPedido(true)
         setActionHome(false)
         setActionPedidoResumido(false)
@@ -788,7 +790,6 @@ export const ActionListaPedidos = ({
             title="Pedidos"
             value={dadosListaPedidos}
             globalFilter={globalFilterValue}
-            
             size="small"
             selectionMode="single"
             selection={rowSelection}
@@ -796,7 +797,10 @@ export const ActionListaPedidos = ({
             sortOrder={-1}
             paginator={true}
             rows={10}
-            rowsPerPageOptions={[10, 20, 50, 100]}
+            rowsPerPageOptions={[10, 20, 50, 100, dadosListaPedidos.length]}
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+            filterDisplay="menu"
             showGridlines
             stripedRows
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado </div>}
