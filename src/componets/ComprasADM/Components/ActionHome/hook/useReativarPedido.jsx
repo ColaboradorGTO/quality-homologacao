@@ -37,11 +37,11 @@ export const useReativarPedido = ({ usuarioLogado, optionsModulos, handleClick }
     };
 
     
-    const handleReativarPedido = async (IDRESUMOPEDIDO) => {
-
+    const handleReativarPedido = async (row) => {
+        let motivoReativacao = '';
         try {
             const confirmacao = await Swal.fire({
-                title: `Certeza que Deseja Reativar o Pedido(${IDRESUMOPEDIDO}) ?`,
+                title: `Certeza que Deseja Reativar o Pedido(${row?.IDRESUMOPEDIDO}) ?`,
                 text: "Você não poderá reverter esta ação!",
                 icon: "warning",
                 showCancelButton: true,
@@ -55,33 +55,75 @@ export const useReativarPedido = ({ usuarioLogado, optionsModulos, handleClick }
 
             if (!confirmacao.isConfirmed) return;
 
-            const { value: motivo } = await Swal.fire({
-                title: "Motivo da Reativação do Pedido?",
-                input: "text",
-                inputPlaceholder: "Motivo da Devolução do Pedido!",
-                width: "25rem",
+            const motivoModal = await Swal.fire({
+                type: 'question', 
+                title: 'Motivo da Reativação do Pedido?',
+                html: `
+                    <div class="d-block m-auto">
+                    <div class="input-group d-block text-dark text-left pt-0">
+                        <input type="text" id="motivoReativacao" class="swal2-input m-0" 
+                            autocomplete="off" placeholder="Digite o Motivo" 
+                            style="text-transform: uppercase">
+                        <small class="fw-700">*Mínimo 10 caracteres</small>
+                    </div>
+                    </div>
+                `,
+                width: '25rem',
                 focusConfirm: false,
                 showCancelButton: true,
-                confirmButtonText: "Confirmar",
-                cancelButtonText: "Voltar",
-                cancelButtonColor: "#3085d6",
-                inputValidator: (value) => {
-                    if (!value) {
-                        return Swal.showValidationMessage("Adicione o Motivo da Reativação Com no Mínimo 10 Caracteres!");
-                    } else if (value.length > 200) {
-                        return Swal.showValidationMessage("Motivo da Reativação Está Muito Grande, Abrevie!");
+                confirmButtonText: 'Confirmar',
+                confirmButtonColor: '#3085d6',
+                cancelButtonText: 'Cancelar',
+                cancelButtonColor: '#d33',
+                showLoaderOnConfirm: true,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                backdrop: true,
+                
+                // ✅ 3. onOpen exato do jQuery
+                onOpen: () => {
+                    const input = document.getElementById('motivoReativacao');
+                    
+                    // Foco no input e Enter para confirmar
+                    input.focus();
+                    input.addEventListener('keypress', (e) => {
+                    if (e.keyCode === 13) Swal.clickConfirm();
+                    });
+
+                    // Estilo da mensagem de validação
+                    const validationMsg = document.getElementById('swal2-validation-message');
+                    if (validationMsg) {
+                    validationMsg.classList.add('text-danger', 'fw-700');
                     }
                 },
+
+                // ✅ 4. Validação exata do jQuery
+                preConfirm: () => {
+                    const input = document.getElementById('motivoReativacao');
+                    motivoReativacao = input.value?.trim();
+
+                    if (!motivoReativacao?.length || motivoReativacao.length < 10) {
+                        input.focus();
+                        return Swal.showValidationMessage('Adicione o Motivo da Reativação Com no Mínimo 10 Caracteres!');
+                    }
+
+                    if (motivoReativacao.length > 200) {
+                        input.focus();
+                        return Swal.showValidationMessage('Motivo da Reativação Está Muito Grande, Abrevie!');
+                    }
+
+                    return motivoReativacao;
+                }
             });
 
-            if (!motivo) return;
+            if (!motivoModal.isConfirmed || !motivoReativacao) return;
             
-            setLoading(true);
+  
             
             const putData = {
-                IDRESUMOPEDIDO: parseInt(IDRESUMOPEDIDO),
+                IDRESUMOPEDIDO: parseInt(row?.IDRESUMOPEDIDO),
                 IDRESPREATIVACAO: parseInt(usuarioLogado.id),
-                TXTMOTIVOREATIVACAO: motivo
+                TXTMOTIVOREATIVACAO: motivoReativacao?.toUpperCase()
             };
 
             const response = await put("/reativar-pedido/:id", putData);
@@ -95,24 +137,25 @@ export const useReativarPedido = ({ usuarioLogado, optionsModulos, handleClick }
                 DADOS: textDados,
                 IP: ipUsuario || 'Indisponível'
             }
-            // Registra o log da ação
+  
             await post("/log-web", postData);
             
             await Swal.fire({
                 icon: "success",
-                title: "Pedido Reativado!",
+                title: "Sucesso!",
                 text: "Reativação Realizada Com Sucesso!",
                 timer: 5000,
                 customClass: {
                     container: 'custom-swal',
                 },
             });
+
             return response.data;
         } catch (error) {
             const putData = {
-                IDRESUMOPEDIDO: parseInt(IDRESUMOPEDIDO),
+                IDRESUMOPEDIDO: parseInt(row?.IDRESUMOPEDIDO),
                 IDRESPREATIVACAO: parseInt(usuarioLogado.id),
-                TXTMOTIVOREATIVACAO: motivo
+                TXTMOTIVOREATIVACAO: motivoReativacao?.toUpperCase()
             };
             const textDados = JSON.stringify(putData)
             let textoFuncao =  'COMPRASADM/ERRO AO REATIVAR PEDIDO';

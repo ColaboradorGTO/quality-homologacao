@@ -367,9 +367,9 @@ export const ActionListaPedidos = ({
                 {STREATIVADO !== 'True' && (
                   <div className="p-1">
                     <ButtonTable
-                      onClickButton={() => handleReativarPedido(IDPEDIDO)}
+                      onClickButton={() => handleReativarPedido(row)}
                       titleButton={"Reativar Pedido"}
-                      Icon={GrView} // ícone de check seria melhor
+                      Icon={FiSend} 
                       cor={"danger"}
                       iconColor={"white"}
                       iconSize={20}
