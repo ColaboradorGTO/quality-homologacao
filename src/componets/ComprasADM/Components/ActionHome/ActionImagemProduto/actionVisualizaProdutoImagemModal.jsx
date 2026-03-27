@@ -16,7 +16,7 @@ import { GrView } from "react-icons/gr"
 import { Image } from 'primereact/image';
 
 
-export const ActionVisualizarProdutoImagemModal = ({ show, handleClose, dadosDetalheProdutos, usuarioLogado, optionsModulos, handleClick }) => {
+export const ActionVisualizarProdutoImagemModal = ({ show, handleClose, dadosDetalheProdutos }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const dataTableRef = useRef();
 

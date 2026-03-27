@@ -714,8 +714,6 @@ export const ActionListaPedidos = ({
         show={modalProdutoImagem}
         handleClose={() => setModalProdutoImagem(false)}
         dadosDetalheProdutos={dadosDetalheProdutos}
-        usuarioLogado={usuarioLogado}
-        optionsModulos={optionsModulos}
       />
     </Fragment>
   )
