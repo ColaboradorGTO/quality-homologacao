@@ -139,7 +139,7 @@ export const useReativarPedido = ({ usuarioLogado, optionsModulos, handleClick }
             }
   
             await post("/log-web", postData);
-            
+            handleClick();
             await Swal.fire({
                 icon: "success",
                 title: "Sucesso!",
