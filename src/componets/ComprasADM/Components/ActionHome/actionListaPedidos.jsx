@@ -17,6 +17,9 @@ import Swal from 'sweetalert2';
 import { get } from '../../../../api/funcRequest';
 import { useReativarPedido } from './hook/useReativarPedido';
 import { useCancelarPedido } from './hook/useCancelarPedido';
+import { useEnviarPedido } from './hook/useEnviarPedido';
+import { ActionPDFPedidoSemPreco } from './ActionPDFSemPreco/actionPDFPedidoSemPreco';
+import { ActionPDFPedido } from "./ActionPDF/actionPDFPedido"
 
 export const ActionListaPedidos = ({ 
   dadosPedidos,
@@ -46,6 +49,7 @@ export const ActionListaPedidos = ({
 
   const { handleReativarPedido } = useReativarPedido({ usuarioLogado, optionsModulos, handleClick });
   const { handleCancelarPedido } = useCancelarPedido({ usuarioLogado, optionsModulos, handleClick });
+  const { handleEnviarPedido } = useEnviarPedido({ usuarioLogado, optionsModulos, handleClick });
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -391,7 +395,7 @@ export const ActionListaPedidos = ({
               {btnBasicos}
               <div className="p-1">
                 <ButtonTable
-                  onClickButton={() => handleEnviarCompras(IDPEDIDO, 1)}
+                  onClickButton={() => handleEnviarPedido(IDPEDIDO, 1)}
                   titleButton={"Enviar Compras"}
                   Icon={FiSend}
                   cor={"secondary"}
@@ -403,7 +407,7 @@ export const ActionListaPedidos = ({
               </div>
               <div className="p-1">
                 <ButtonTable
-                  onClickButton={() => handleEnviarCadastro(IDPEDIDO, 4)}
+                  onClickButton={() => handleEnviarPedido(IDPEDIDO, 4)}
                   titleButton={"Enviar Cadastro"}
                   Icon={FiSend}
                   cor={"primary"}
@@ -652,6 +656,21 @@ export const ActionListaPedidos = ({
           </DataTable>
         </div>
       </div>
+
+      
+      <ActionPDFPedido
+        show={modalPedidoNota}
+        handleClose={() => setModalPedidoNota(false)}
+        dadosPedido={dadosPedido}
+        dadosDetalhePedido={dadosDetalhePedido}
+      />
+
+      <ActionPDFPedidoSemPreco
+        show={modalPedidoNotaSemPreco}
+        handleClose={() => setModalPedidoNotaSemPreco(false)}
+        dadosPedidoSemPreco={dadosPedidoSemPreco}
+        dadosDetalhePedido={dadosDetalhePedido}
+      />
     </Fragment>
   )
 }
