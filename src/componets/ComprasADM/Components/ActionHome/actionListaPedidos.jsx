@@ -20,8 +20,9 @@ import { useCancelarPedido } from './hook/useCancelarPedido';
 import { useEnviarPedido } from './hook/useEnviarPedido';
 import { ActionPDFPedidoSemPreco } from './ActionPDFSemPreco/actionPDFPedidoSemPreco';
 import { ActionPDFPedido } from "./ActionPDF/actionPDFPedido"
+import { ActionVisualizarProdutoImagemModal } from './ActionImagemProduto/actionVisualizaProdutoImagemModal';
 
-export const ActionListaPedidos = ({ 
+export const ActionListaPedidos = ({
   dadosPedidos,
   dadosVisualizarPedido,
   setDadosVisualizarPedido,
@@ -41,6 +42,8 @@ export const ActionListaPedidos = ({
 }) => {
   const [modalPedidoNota, setModalPedidoNota] = useState(false);
   const [modalPedidoNotaSemPreco, setModalPedidoNotaSemPreco] = useState(false);
+  const [modalProdutoImagem, setModalProdutoImagem] = useState(false);
+  const [dadosDetalheProdutos, setDadosDetalheProdutos] = useState([])
   const [dadosPedido, setDadosPedido] = useState([]);
   const [dadosPedidoSemPreco, setDadosPedidoSemPreco] = useState([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
@@ -117,7 +120,7 @@ export const ActionListaPedidos = ({
   const dados = dadosPedidos.map((item, index) => {
     let contador = index + 1;
     const totalFabricante = calcularTotalFabricante();
-    
+
     return {
       IDPEDIDO: item.IDPEDIDO,
       DTPEDIDO: item.DTPEDIDO,
@@ -251,7 +254,7 @@ export const ActionListaPedidos = ({
       body: (row) => {
         const { DSSETOR, STMIGRADOSAP } = row;
 
-     
+
         if (STMIGRADOSAP !== 'True') {
           return (
             <th style={{ color: 'red' }}>
@@ -265,7 +268,7 @@ export const ActionListaPedidos = ({
             </th>
           );
         }
-        
+
 
         // return <th></th>;
       },
@@ -323,7 +326,7 @@ export const ActionListaPedidos = ({
             </div>
             <div className="p-1">
               <ButtonTable
-                onClickButton={() => handleClickVisualizarPedido(row)}
+                onClickButton={() => clickDetalheProduto(row)}
                 titleButton={"Detalhar Produtos da Imagem"}
                 Icon={GrView}
                 cor={"info"}
@@ -376,7 +379,7 @@ export const ActionListaPedidos = ({
                     <ButtonTable
                       onClickButton={() => handleCancelarPedido(row, 'False')}
                       titleButton={"Reativar Pedido"}
-                      Icon={FiSend} 
+                      Icon={FiSend}
                       cor={"danger"}
                       iconColor={"white"}
                       iconSize={20}
@@ -600,6 +603,41 @@ export const ActionListaPedidos = ({
     }
   }
 
+  const clickDetalheProduto = (row) => {
+    if (row && row.IDPEDIDO) {
+      handleDetalhe(row.IDPEDIDO);
+    }
+  };
+
+  const handleDetalhe = async (IDPEDIDO) => {
+    try {
+      Swal.fire({
+        title: 'Carregando...',
+        html: 'Carregando dados do produtos',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+      const response = await get(`/imagemProdutos?idPedido=${IDPEDIDO}`);
+      if (response.data && response.data.length > 0) {
+        Swal.close();
+        setDadosDetalheProdutos(response.data);
+        setModalDetalhe(true);
+        return response.data;
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: 'Detalhes do produto não encontrados.',
+          customClass: {
+            container: 'custom-swal',
+          }
+        })
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
   return (
     <Fragment>
       <div className="panel">
@@ -657,7 +695,7 @@ export const ActionListaPedidos = ({
         </div>
       </div>
 
-      
+
       <ActionPDFPedido
         show={modalPedidoNota}
         handleClose={() => setModalPedidoNota(false)}
@@ -670,6 +708,14 @@ export const ActionListaPedidos = ({
         handleClose={() => setModalPedidoNotaSemPreco(false)}
         dadosPedidoSemPreco={dadosPedidoSemPreco}
         dadosDetalhePedido={dadosDetalhePedido}
+      />
+
+      <ActionVisualizarProdutoImagemModal 
+        show={modalProdutoImagem}
+        handleClose={() => setModalProdutoImagem(false)}
+        dadosDetalheProdutos={dadosDetalheProdutos}
+        usuarioLogado={usuarioLogado}
+        optionsModulos={optionsModulos}
       />
     </Fragment>
   )
