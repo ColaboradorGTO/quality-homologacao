@@ -15,6 +15,7 @@ import * as XLSX from 'xlsx';
 import HeaderTable from '../../../Tables/headerTable';
 import Swal from 'sweetalert2';
 import { get } from '../../../../api/funcRequest';
+import { useReativarPedido } from './hook/useReativarPedido';
 
 export const ActionListaPedidos = ({ 
   dadosPedidos,
@@ -42,7 +43,7 @@ export const ActionListaPedidos = ({
   const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
 
-
+  const { handleReativarPedido } = useReativarPedido({ usuarioLogado, optionsModulos, handleClick });
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
   };

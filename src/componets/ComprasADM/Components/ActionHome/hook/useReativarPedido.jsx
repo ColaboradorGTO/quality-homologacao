@@ -5,7 +5,7 @@ import axios from "axios";
 import { useEffect } from "react";
 import { getDataAtual } from "../../../../../utils/dataAtual";
 
-export const useAtivarCancelar = ({ usuarioLogado, handleClick, status }) => {
+export const useReativarPedido = ({ usuarioLogado, optionsModulos, handleClick }) => {
     const [ipUsuario, setIpUsuario] = useState('');
     const [data, setData] = useState('');
 
@@ -37,15 +37,15 @@ export const useAtivarCancelar = ({ usuarioLogado, handleClick, status }) => {
     };
 
     
-    const enviarPedidoCompras = async (IDRESUMOPEDIDO) => {
+    const handleReativarPedido = async (IDRESUMOPEDIDO) => {
 
         try {
             const confirmacao = await Swal.fire({
-                title: "Certeza que Deseja Enviar o Pedido para o Dep. Compras?",
+                title: `Certeza que Deseja Reativar o Pedido(${IDRESUMOPEDIDO}) ?`,
                 text: "Você não poderá reverter esta ação!",
                 icon: "warning",
                 showCancelButton: true,
-                confirmButtonText: "Sim, Enviar",
+                confirmButtonText: "Confirmar",
                 cancelButtonText: "Cancelar",
                 customClass: {
                     confirmButton: "btn btn-primary btn-lg",
@@ -56,7 +56,7 @@ export const useAtivarCancelar = ({ usuarioLogado, handleClick, status }) => {
             if (!confirmacao.isConfirmed) return;
 
             const { value: motivo } = await Swal.fire({
-                title: "Motivo da Devolução do Pedido?",
+                title: "Motivo da Reativação do Pedido?",
                 input: "text",
                 inputPlaceholder: "Motivo da Devolução do Pedido!",
                 width: "25rem",
@@ -67,9 +67,9 @@ export const useAtivarCancelar = ({ usuarioLogado, handleClick, status }) => {
                 cancelButtonColor: "#3085d6",
                 inputValidator: (value) => {
                     if (!value) {
-                        return Swal.showValidationMessage("Coloque o Motivo da Devolução do Pedido!");
-                    } else if (value.length < 10) {
-                        return Swal.showValidationMessage("Motivo muito curto, deve conter no mínimo 10 caracteres!");
+                        return Swal.showValidationMessage("Adicione o Motivo da Reativação Com no Mínimo 10 Caracteres!");
+                    } else if (value.length > 200) {
+                        return Swal.showValidationMessage("Motivo da Reativação Está Muito Grande, Abrevie!");
                     }
                 },
             });
@@ -84,7 +84,7 @@ export const useAtivarCancelar = ({ usuarioLogado, handleClick, status }) => {
                 TXTMOTIVOREATIVACAO: motivo
             };
 
-            const response = await put("/andamentoPedido/:id", putData);
+            const response = await put("/reativar-pedido/:id", putData);
             const textDados = JSON.stringify(putData)
             const textoFuncao = "COMPRASADM/REATIVAR PEDIDO"
             const ipUsuario = await getIPUsuario();
@@ -100,13 +100,22 @@ export const useAtivarCancelar = ({ usuarioLogado, handleClick, status }) => {
             
             await Swal.fire({
                 icon: "success",
-                title: "Pedido Enviado!",
-                text: "O pedido foi enviado com sucesso.",
+                title: "Pedido Reativado!",
+                text: "Reativação Realizada Com Sucesso!",
+                timer: 5000,
+                customClass: {
+                    container: 'custom-swal',
+                },
             });
             return response.data;
         } catch (error) {
+            const putData = {
+                IDRESUMOPEDIDO: parseInt(IDRESUMOPEDIDO),
+                IDRESPREATIVACAO: parseInt(usuarioLogado.id),
+                TXTMOTIVOREATIVACAO: motivo
+            };
             const textDados = JSON.stringify(putData)
-            let textoFuncao =  'COMPRASADM/ERRO AO ENVIAR PEDIDO PARA COMPRAS';
+            let textoFuncao =  'COMPRASADM/ERRO AO REATIVAR PEDIDO';
             const ipUsuario = await getIPUsuario();
             const postData = {
                 IDFUNCIONARIO: String(usuarioLogado?.id), 
@@ -118,87 +127,18 @@ export const useAtivarCancelar = ({ usuarioLogado, handleClick, status }) => {
             const responsePost = await post('/log-web', postData)
             Swal.fire({
                 icon: "error",
-                title: "Erro ao Enviar Pedido",
-                text: "Não Foi Possível Devolver o Pedido, TENTE NOVAMENTE OU ENTRE EM CONTATO COM O SUPORTE!.",
+                title: "Erro ao Reativar Pedido",
+                text: "Não Foi Possível Reativar o Pedido!",
+                timer: 5000,
+                customClass: {
+                    container: 'custom-swal',
+                },
             });
             return responsePost.data;
-        } finally {
-            setLoading(false);
-        }
+        } 
     };
 
-    const handleReativarPedido = async (IDRESUMOPEDIDO, STATIVO) => {
-        
-        
-        const putData = {
-            IDRESUMOPEDIDO: parseInt(IDRESUMOPEDIDO),
-            IDRESPREATIVACAO: parseInt(usuarioLogado.id),
-            TXTMOTIVOREATIVACAO: textoCancelaPedido
-        }
-        
-        try {
+ 
 
-            Swal.fire({
-                title: `Deseja Realmente ${txtAcao} o Pedido?`,
-                text: 'Você não poderá reverter a ação!',
-                icon: 'warning',
-                showCancelButton: true,
-                showConfirmButton: true,
-                cancelButtonText: 'Cancelar',
-                confirmButtonText: 'OK',
-                customClass: {
-                    confirmButton: 'btn btn-primary',
-                    cancelButton: 'btn btn-danger',
-                    actions: 'swal-button-spacing'
-                },
-                buttonsStyling: false,
-            })
-
-            const response = await put('/atualizacao-status-pedido/:id', putData)
-            const textDados = JSON.stringify(putData)
-            const ipUsuario = await getIPUsuario();
-         
-            const postData = {
-                IDFUNCIONARIO: String(usuarioLogado.id),
-                PATHFUNCAO: textoFuncao,
-                DADOS: textDados,
-                IP: ipUsuario || 'Indisponível'
-            }
-            
-            await post('/log-web', postData)
-            
-            
-            Swal.fire({
-                icon: 'success',
-                title: 'Sucesso',
-                text: `Pedido ${msgRetorno} com Sucesso!`,
-            });
-            handleClick()
-            return response.data;
-        } catch (error) {
-            const textDados = JSON.stringify(putData)
-            let textoFuncao =  'COMPRAS/ERRO AO ATUALIZAR STATUS DO PEDDIO';
-            const ipUsuario = await getIPUsuario();
-            const postData = {
-                IDFUNCIONARIO: String(usuarioLogado.id),
-                PATHFUNCAO: textoFuncao,
-                DADOS: textDados,
-                IP: ipUsuario || 'Indisponível'
-            }
-
-            const responsePost = await post('/log-web', postData)
-            Swal.fire({
-                icon: 'error',
-                title: 'Erro',
-                text: 'Erro ao atualizar status do pedido, mas o log de erro foi registrado com sucesso.',
-            });
-
-            return responsePost.data;
-        }
-            
-        
-    }
-
-
-    return { handleAtivarCancelarPedido };
+    return { handleReativarPedido };
 }
