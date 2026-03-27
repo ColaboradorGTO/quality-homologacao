@@ -16,6 +16,7 @@ import HeaderTable from '../../../Tables/headerTable';
 import Swal from 'sweetalert2';
 import { get } from '../../../../api/funcRequest';
 import { useReativarPedido } from './hook/useReativarPedido';
+import { useCancelarPedido } from './hook/useCancelarPedido';
 
 export const ActionListaPedidos = ({ 
   dadosPedidos,
@@ -44,6 +45,8 @@ export const ActionListaPedidos = ({
   const dataTableRef = useRef();
 
   const { handleReativarPedido } = useReativarPedido({ usuarioLogado, optionsModulos, handleClick });
+  const { handleCancelarPedido } = useCancelarPedido({ usuarioLogado, optionsModulos, handleClick });
+
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
   };
@@ -345,7 +348,7 @@ export const ActionListaPedidos = ({
                 {btnBasicos}
                 <div className="p-1">
                   <ButtonTable
-                    onClickButton={() => handleClickCancelar(row)}
+                    onClickButton={() => handleCancelarPedido(row)}
                     titleButton={"Cancelar Pedido"}
                     Icon={BsTrash3}
                     cor={"danger"}
@@ -367,7 +370,7 @@ export const ActionListaPedidos = ({
                 {STREATIVADO !== 'True' && (
                   <div className="p-1">
                     <ButtonTable
-                      onClickButton={() => handleReativarPedido(row)}
+                      onClickButton={() => handleCancelarPedido(row, 'False')}
                       titleButton={"Reativar Pedido"}
                       Icon={FiSend} 
                       cor={"danger"}
@@ -413,7 +416,7 @@ export const ActionListaPedidos = ({
               <div className="p-1">
                 <ButtonTable
                   titleButton={"Cancelar Pedido"}
-                  onClickButton={() => handleClickCancelar(row)}
+                  onClickButton={() => handleCancelarPedido(row, 'True')}
                   Icon={BsTrash3}
                   cor={"danger"}
                   iconColor={"white"}
