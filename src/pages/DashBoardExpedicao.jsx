@@ -45,7 +45,7 @@ export const DashBoardExpedicao = () => {
     'menus-usuario',
     async () => {
       const response = await get(`/menus-usuario?idUsuario=${usuarioLogado?.id}&idModulo=${selectedModule?.ID}`);
-      
+
       return response.data;
     },
     { enabled: Boolean(usuarioLogado?.id), staleTime: 5 * 60 * 1000, }
@@ -55,10 +55,10 @@ export const DashBoardExpedicao = () => {
 
   switch (componentToShow) {
     case "/expedicao/ActionPesquisaOT":
-      component = <ActionPesquisaOT />;
+      component = <ActionPesquisaOT usuarioLogado={usuarioLogado} />;
       break;
     case "/expedicao/ActionPesquisaFaturamentoOT":
-      component = <ActionPesquisaFaturamentoOT />
+      component = <ActionPesquisaFaturamentoOT usuarioLogado={usuarioLogado} />
       break;
     default:
       break;
@@ -84,7 +84,7 @@ export const DashBoardExpedicao = () => {
                         <div className="panel-container show">
                           <div className="panel-content">
                             <Suspense fallback={<div>Loading...</div>}>
-                            {actionVisivel && !componentToShow && <ActionPesquisaOT />}
+                              {actionVisivel && !componentToShow && <ActionPesquisaOT />}
                               {componentToShow && component}
                             </Suspense>
                           </div>

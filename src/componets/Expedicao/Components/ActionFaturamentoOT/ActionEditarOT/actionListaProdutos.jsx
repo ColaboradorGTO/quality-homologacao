@@ -65,7 +65,6 @@ export const ActionListaProdutos = ({dadosDetalheTransferencia }) => {
 
     const dados = dadosDetalheTransferencia.map((item, index) => {
        
-
         return {
             IDPRODUTO: item.IDPRODUTO,
             NUCODBARRAS: item.NUCODBARRAS,
@@ -75,9 +74,7 @@ export const ActionListaProdutos = ({dadosDetalheTransferencia }) => {
             QTDEXPEDICAO: toFloat(item.QTDEXPEDICAO),
             QTDRECEPCAO: toFloat(item.QTDRECEPCAO),
             QTDDIFERENCA: toFloat(item.QTDDIFERENCA),
-            QTDAJUSTE: toFloat(item.QTDAJUSTE),
-
-     
+            QTDAJUSTE: toFloat(item.QTDAJUSTE),     
         }
     });
 

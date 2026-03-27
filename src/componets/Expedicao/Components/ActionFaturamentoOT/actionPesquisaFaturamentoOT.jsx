@@ -35,32 +35,39 @@ export const ActionPesquisaFaturamentoOT = () => {
     const dataInicial = getDataAtual();
     // setDataPesquisaInicio(dataInicial);
     // setDataPesquisaFim(dataInicial);
-  
+
     getListaFaturasOT()
     getListaStatusOT()
   }, [])
-
-  const { data: dadosEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas } = useQuery(
-    'listaEmpresaComercial',
+  const { data: dadosEmpresas = [], error: errorMarcas, isLoading: isLoadingMarcas } = useQuery(
+    'empresas',
     async () => {
-      const response = await get(`/listaEmpresaComercial`);
-      
+      const response = await get(`/empresas`);
       return response.data;
     },
-    {enabled: true, staleTime: 5 * 60 * 1000, }
+    { staleTime: 5 * 60 * 1000 }
   );
-
+  /*    const { data: dadosEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas } = useQuery(
+      'listaEmpresaComercial',
+      async () => {
+        const response = await get(`/listaEmpresaComercial?idMarca=${marcaSelecionada}`);
+        
+        return response.data;
+      },
+      {enabled: true, staleTime: 5 * 60 * 1000, }
+    );
+    */
 
   const fetchVendasAtiva = async () => {
     try {
-      
+
       const urlApi = `/faturasOT?idtipofiltro=1&idLojaOrigem=${empresaOrigem}&idLojaDestino=${empresaDestino}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idStatusOt=${statusSelecionado}&dataInicioFatura=${dataPesquisaInicioA}&dataFimFatura=${dataPesquisaFimA}`;
       const response = await get(urlApi);
-      
+
       if (response.data.length && response.data.length === pageSize) {
         let allData = [...response.data];
         animacaoCarregamento(`Carregando... Página ${currentPage} de ${response.data.length}`, true);
-  
+
         async function fetchNextPage(page) {
           try {
             page++;
@@ -76,34 +83,31 @@ export const ActionPesquisaFaturamentoOT = () => {
             throw error;
           }
         }
-  
+
         await fetchNextPage(currentPage);
         return allData;
       } else {
-       
+
         return response.data;
       }
-  
+
     } catch (error) {
       console.error('Error fetching data:', error);
       throw error;
     } finally {
       fecharAnimacaoCarregamento();
     }
-    
+
   };
-   
+
   const { data: dadosVendasAtivas = [], error: errorVendasMarca, isLoading: isLoadingVendasMarca, refetch: refetchVendasAtiva } = useQuery(
     ['faturasOT', empresaDestino, dataPesquisaInicio, dataPesquisaFim, currentPage, pageSize],
     () => fetchVendasAtiva(empresaDestino, dataPesquisaInicio, dataPesquisaFim, currentPage, pageSize),
     {
-      enabled: Boolean(empresaDestino && dataPesquisaInicio && dataPesquisaFim), 
+      enabled: Boolean(empresaDestino && dataPesquisaInicio && dataPesquisaFim),
       staleTime: 5 * 60 * 1000,
     }
   );
-
-
-
 
   const getListaStatusOT = async () => {
     try {
@@ -115,7 +119,6 @@ export const ActionPesquisaFaturamentoOT = () => {
       console.log(error, "não foi possivel pegar os dados da tabela ")
     }
   }
-
 
   const getListaFaturasOT = async () => {
     try {
@@ -142,12 +145,8 @@ export const ActionPesquisaFaturamentoOT = () => {
     if (clickContador % 2 === 0) {
       setTabelaVisivel(true)
       getListaFaturasOT()
-    } 
+    }
   }
-
-
-
-
 
   return (
 
@@ -226,9 +225,9 @@ export const ActionPesquisaFaturamentoOT = () => {
         corSearch={"primary"}
         IconSearch={AiOutlineSearch}
 
-        
+
       />
-       {/* <div className="row mb-4 " style={{marginTop: '10rem'}}>
+      {/* <div className="row mb-4 " style={{marginTop: '10rem'}}>
 
         <ButtonType
           Icon={MdFormatListBulleted}
@@ -273,8 +272,8 @@ export const ActionPesquisaFaturamentoOT = () => {
         </div> */}
       {tabelaVisivel && (
         <div className="card">
-          
-        <ActionListaFaturasOT dadosFaturaOT={dadosFaturaOT} />
+
+          <ActionListaFaturasOT dadosFaturaOT={dadosFaturaOT} />
         </div>
 
       )}

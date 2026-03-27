@@ -3,15 +3,16 @@ import Modal from 'react-bootstrap/Modal';
 import { HeaderModal } from "../../../../Modais/HeaderModal/HeaderModal";
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal";
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal";
-import { ActionListaProdutos } from "./actionListaProdutos";
-import { FormularioIncuirOT } from "./formularioIncluirOT";
+import { FormularioAjusteOT } from "./formularioAjusteOT";
 
-export const ActionIncluirOTModal = ({
+export const ActionAjusteOTModal = ({
   show,
   handleClose,
   optionsModulos,
   usuarioLogado,
-  refetchListaConferencia
+  refetchListaConferencia,
+  dadosDetalheTransferencia,
+  setDadosDetalheTransferencia
 
 }) => {
 
@@ -30,11 +31,13 @@ export const ActionIncluirOTModal = ({
             handleClose={handleClose}
           />
           <Modal.Body >
-            <FormularioIncuirOT
+            <FormularioAjusteOT
               handleClose={handleClose}
               optionsModulos={optionsModulos}
               usuarioLogado={usuarioLogado}
               refetchListaConferencia={refetchListaConferencia}
+              dadosDetalheTransferencia={dadosDetalheTransferencia}
+              setDadosDetalheTransferencia={setDadosDetalheTransferencia}
             />
           </Modal.Body>
 

@@ -127,19 +127,19 @@ export const ActionListaFaturasOT = ({ dadosFaturaOT }) => {
       body: (row) => {
         return (
           <div style={{ background: '', }}>
-              <input
-                type="checkbox"
-                checked={selectedIds.includes(row.IDRESUMOOT)}
-                onChange={(e) => {
-                  const updatedSelectedIds = e.target.checked
-                    ? [...selectedIds, row.IDRESUMOOT]
-                    : selectedIds.filter(id => id !== row.IDRESUMOOT);
-          
-                  setSelectedIds(updatedSelectedIds);
-                  setSelectAll(updatedSelectedIds.length === dados.length);
-                }}
-                
-              />
+            <input
+              type="checkbox"
+              checked={selectedIds.includes(row.IDRESUMOOT)}
+              onChange={(e) => {
+                const updatedSelectedIds = e.target.checked
+                  ? [...selectedIds, row.IDRESUMOOT]
+                  : selectedIds.filter(id => id !== row.IDRESUMOOT);
+
+                setSelectedIds(updatedSelectedIds);
+                setSelectAll(updatedSelectedIds.length === dados.length);
+              }}
+
+            />
           </div>
         )
       }
@@ -195,9 +195,10 @@ export const ActionListaFaturasOT = ({ dadosFaturaOT }) => {
           <div
             style={{
               display: "flex",
-              justifyContent: "space-between",
+              justifyContent: "center",
               alignItems: "center",
-              width: "15rem",
+              gap: "10px",
+              width: "100%",
 
             }}
           >
@@ -208,6 +209,8 @@ export const ActionListaFaturasOT = ({ dadosFaturaOT }) => {
                 onClickButton={() => handleClickVisualizar(row)}
                 Icon={GrView}
                 iconSize={16}
+                width="32px"
+                height="32px"
                 iconColor={"#fff"}
                 cor={"success"}
 
@@ -220,6 +223,8 @@ export const ActionListaFaturasOT = ({ dadosFaturaOT }) => {
                 onClickButton={() => handleCancelar(row.IDRESUMOOT)}
                 Icon={FaRegTrashAlt}
                 iconSize={16}
+                width="32px"
+                height="32px"
                 iconColor={"#fff"}
                 cor={"danger"}
                 disabledBTN={[1, 3].indexOf(row.IDSTATUSOT) >= 0}
@@ -232,6 +237,8 @@ export const ActionListaFaturasOT = ({ dadosFaturaOT }) => {
                 onClickButton={() => handleFaturar(row.IDRESUMOOT)}
                 Icon={FaCheck}
                 iconSize={16}
+                width="32px"
+                height="32px"
                 iconColor={"#fff"}
                 cor={"warning"}
                 disabledBTN={row.IDSTATUSOT === 3}
@@ -245,6 +252,8 @@ export const ActionListaFaturasOT = ({ dadosFaturaOT }) => {
                 onClickButton={() => handleConsultarSefazOT(row.IDRESUMOOT)}
                 Icon={FaCheck}
                 iconSize={16}
+                width="32px"
+                height="32px"
                 iconColor={"#fff"}
                 cor={"info"}
                 disabledBTN={row.IDSTATUSOT === 9}
@@ -258,12 +267,13 @@ export const ActionListaFaturasOT = ({ dadosFaturaOT }) => {
                 onClickButton={() => handleClickImprimir(row)}
                 Icon={MdOutlineLocalPrintshop}
                 iconSize={16}
+                width="32px"
+                height="32px"
                 iconColor={"#fff"}
                 cor={"dark"}
 
               />
             </div>
-
 
             <Fragment>
 
@@ -274,6 +284,8 @@ export const ActionListaFaturasOT = ({ dadosFaturaOT }) => {
                     onClickButton={() => handleClickStatusNota(row)}
                     Icon={FaExclamation}
                     iconSize={16}
+                    width="32px"
+                    height="32px"
                     iconColor={"#fff"}
                     cor={"danger"}
 
@@ -287,6 +299,8 @@ export const ActionListaFaturasOT = ({ dadosFaturaOT }) => {
                       onClickButton={() => handleClickStatusNota(row)}
                       Icon={FaExclamation}
                       iconSize={16}
+                      width="32px"
+                      height="32px"
                       iconColor={"#fff"}
                       cor={"success"}
 
@@ -299,6 +313,8 @@ export const ActionListaFaturasOT = ({ dadosFaturaOT }) => {
                       onClickButton={() => handleClickStatusNota(row)}
                       Icon={FaExclamation}
                       iconSize={16}
+                      width="32px"
+                      height="32px"
                       iconColor={"#fff"}
                       cor={"warning"}
 
@@ -314,6 +330,8 @@ export const ActionListaFaturasOT = ({ dadosFaturaOT }) => {
                 onClickButton={() => window.open(`http://164.152.244.96:3000/files/NFe${row.CHAVESEFAZ}.pdf`)}
                 Icon={MdOutlineLocalPrintshop}
                 iconSize={16}
+                width="32px"
+                height="32px"
                 iconColor={"#fff"}
                 cor={"success"}
 
@@ -326,7 +344,7 @@ export const ActionListaFaturasOT = ({ dadosFaturaOT }) => {
 
   ]
 
-    // useEffect(() => {
+  // useEffect(() => {
   //   if (selectedIds.length > 0) {
   //     handleDetalhar(selectedIds, 'True');
   //   }
@@ -490,85 +508,85 @@ export const ActionListaFaturasOT = ({ dadosFaturaOT }) => {
     });
   };
 
-    const baixarPDFs = async (dados) => {
-      let pdfDataArray = [];
-      let nomeArquivos = [];
-  
-      try {
-        for (const url of dados) {
-          const response = await fetch('https://cors-anywhere.herokuapp.com/' + url);
-          const pdfData = await response.arrayBuffer();
-          pdfDataArray.push(pdfData);
-  
-          // Extrair nome do arquivo da URL
-          const nomeArquivo = url.substring(url.lastIndexOf("/") + 1);
-          nomeArquivos.push(nomeArquivo);
-        }
-  
-        return [pdfDataArray, nomeArquivos];
-      } catch (error) {
-        console.error("Erro ao baixar os arquivos PDF:", error);
-        throw error;
+  const baixarPDFs = async (dados) => {
+    let pdfDataArray = [];
+    let nomeArquivos = [];
+
+    try {
+      for (const url of dados) {
+        const response = await fetch('https://cors-anywhere.herokuapp.com/' + url);
+        const pdfData = await response.arrayBuffer();
+        pdfDataArray.push(pdfData);
+
+        // Extrair nome do arquivo da URL
+        const nomeArquivo = url.substring(url.lastIndexOf("/") + 1);
+        nomeArquivos.push(nomeArquivo);
       }
-    };
-  
-    // Função para comprimir os PDFs em ZIP
-    const comprimirPDFs = async (pdfDataArray, nomeArquivos) => {
-      try {
-        const zip = new JSZip();
-        for (let i = 0; i < pdfDataArray.length; i++) {
-          zip.file(nomeArquivos[i], pdfDataArray[i]);
-        }
-        const zipData = await zip.generateAsync({ type: "blob" });
-        return zipData;
-      } catch (error) {
-        console.error("Erro ao comprimir os arquivos PDF:", error);
-        throw error;
+
+      return [pdfDataArray, nomeArquivos];
+    } catch (error) {
+      console.error("Erro ao baixar os arquivos PDF:", error);
+      throw error;
+    }
+  };
+
+  // Função para comprimir os PDFs em ZIP
+  const comprimirPDFs = async (pdfDataArray, nomeArquivos) => {
+    try {
+      const zip = new JSZip();
+      for (let i = 0; i < pdfDataArray.length; i++) {
+        zip.file(nomeArquivos[i], pdfDataArray[i]);
       }
-    };
-  
-    // Função para fazer o download do ZIP
-    const baixarArquivoZIP = (zipData) => {
-      try {
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(zipData);
-        link.download = "download_notasfiscais.zip";
-        link.click();
-      } catch (error) {
-        console.error("Erro ao baixar o arquivo ZIP:", error);
-        throw error;
+      const zipData = await zip.generateAsync({ type: "blob" });
+      return zipData;
+    } catch (error) {
+      console.error("Erro ao comprimir os arquivos PDF:", error);
+      throw error;
+    }
+  };
+
+  // Função para fazer o download do ZIP
+  const baixarArquivoZIP = (zipData) => {
+    try {
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(zipData);
+      link.download = "download_notasfiscais.zip";
+      link.click();
+    } catch (error) {
+      console.error("Erro ao baixar o arquivo ZIP:", error);
+      throw error;
+    }
+  };
+
+  // Função principal para baixar as notas fiscais
+  const downloadNFE = async () => {
+    try {
+      if (dadosSelecionados.length === 0) {
+        Swal.fire("Atenção", "Nenhuma nota foi selecionada!", "warning");
+        return;
       }
-    };
-  
-    // Função principal para baixar as notas fiscais
-    const downloadNFE = async () => {
-      try {
-        if (dadosSelecionados.length === 0) {
-          Swal.fire("Atenção", "Nenhuma nota foi selecionada!", "warning");
-          return;
-        }
-  
-        const [pdfDataArray, nomeArquivos] = await baixarPDFs(dadosSelecionados);
-        const zipData = await comprimirPDFs(pdfDataArray, nomeArquivos);
-        baixarArquivoZIP(zipData);
-      } catch (error) {
-        Swal.fire("Erro", "Ocorreu um erro ao baixar as notas fiscais.", "error");
-      }
-    };
-  
-    // Exemplo para seleção de dados (substituir lógica de seleção conforme necessidade)
-    const handleSelecionarDados = (CHAVESEFAZ) => {
-      const mockDados = [
-        `http://164.152.244.96:3000/files/NFe${CHAVESEFAZ}.pdf`,
-        `http://164.152.244.96:3000/files/NFe${CHAVESEFAZ}.pdf`,
-      ];
-      setDadosSelecionados(mockDados);
-      Swal.fire("Notas Selecionadas", "As notas foram selecionadas com sucesso!", "success");
-    };
+
+      const [pdfDataArray, nomeArquivos] = await baixarPDFs(dadosSelecionados);
+      const zipData = await comprimirPDFs(pdfDataArray, nomeArquivos);
+      baixarArquivoZIP(zipData);
+    } catch (error) {
+      Swal.fire("Erro", "Ocorreu um erro ao baixar as notas fiscais.", "error");
+    }
+  };
+
+  // Exemplo para seleção de dados (substituir lógica de seleção conforme necessidade)
+  const handleSelecionarDados = (CHAVESEFAZ) => {
+    const mockDados = [
+      `http://164.152.244.96:3000/files/NFe${CHAVESEFAZ}.pdf`,
+      `http://164.152.244.96:3000/files/NFe${CHAVESEFAZ}.pdf`,
+    ];
+    setDadosSelecionados(mockDados);
+    Swal.fire("Notas Selecionadas", "As notas foram selecionadas com sucesso!", "success");
+  };
 
   return (
     <Fragment>
-      <div className="row mb-4 " style={{marginTop: '1rem'}}>
+      <div className="row mb-4 " style={{ marginTop: '1rem' }}>
 
         <ButtonType
           Icon={MdFormatListBulleted}
@@ -610,7 +628,7 @@ export const ActionListaFaturasOT = ({ dadosFaturaOT }) => {
           tipo="button"
           onClickButtonType={""}
         />
-        </div>
+      </div>
       <div className="panel">
 
         <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>

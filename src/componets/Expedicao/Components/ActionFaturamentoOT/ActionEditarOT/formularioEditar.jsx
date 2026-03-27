@@ -17,7 +17,7 @@ export const FormularioEditar = ({ handleClose, dadosDetalheTransferencia }) => 
                 type="text"
                 // id="IDContaBanco"
                 readOnly={true}
-                // value={dadosDetalheTransferencia[0]?.EMPRESAORIGEM}
+              // value={dadosDetalheTransferencia[0]?.EMPRESAORIGEM}
               />
             </div>
             <div className="col-sm-6 col-xl-6" data-select2-id="735">
@@ -38,7 +38,7 @@ export const FormularioEditar = ({ handleClose, dadosDetalheTransferencia }) => 
                 type="text"
                 // id="IDContaBanco"
                 readOnly={true}
-                // value={dadosDetalheTransferencia[0]?.DSOBSERVACAO}
+              // value={dadosDetalheTransferencia[0]?.DSOBSERVACAO}
               />
             </div>
           </div>
@@ -46,7 +46,9 @@ export const FormularioEditar = ({ handleClose, dadosDetalheTransferencia }) => 
 
         </form>
 
-        <ActionListaProdutos dadosDetalheTransferencia={dadosDetalheTransferencia} />
+        <ActionListaProdutos
+          dadosDetalheTransferencia={dadosDetalheTransferencia}
+        />
       </div>
 
       <FooterModal

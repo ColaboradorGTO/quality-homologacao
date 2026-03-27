@@ -16,8 +16,6 @@ export const ActionEditarOTModal = ({show, handleClose, dadosDetalheTransferenci
         size="xl"
 
       >
-  
-
         <HeaderModal
             title="Faturamento Ordem de Transferência"
             subtitle=""

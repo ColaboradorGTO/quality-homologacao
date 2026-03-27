@@ -1,4 +1,4 @@
-import { Fragment, useRef, useState } from "react"
+/* import { Fragment, useRef, useState } from "react"
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import Modal from 'react-bootstrap/Modal';
@@ -146,6 +146,8 @@ export const ActionEditarOTModal = ({
                 onClickButton={() => handleClickEdit(row)}
                 Icon={FaMinus}
                 iconSize={16}
+                height="32px"
+                width="32px"
                 iconColor={"#fff"}
                 cor={"info"}
                 id={row.NUCODBARRAS && row.QTDEXPEDICAO && row.IDRESUMOOT && row.IDPRODUTO}
@@ -160,6 +162,8 @@ export const ActionEditarOTModal = ({
                 onClickButton={() => handleClickEdit(row)}
                 Icon={FaRegTrashAlt}
                 iconSize={16}
+                width="32px"
+                height="32px"
                 iconColor={"#fff"}
                 cor={"danger"}
                 id={row.NUCODBARRAS && row.QTDEXPEDICAO && row.IDRESUMOOT && row.IDPRODUTO}
@@ -378,6 +382,62 @@ export const ActionEditarOTModal = ({
           </div>
 
           <FooterModal handleClose={handleClose} />
+        </div>
+      </Modal>
+    </Fragment>
+  )
+}
+ */
+
+import { Fragment } from "react"
+import Modal from 'react-bootstrap/Modal';
+import { HeaderModal } from "../../../../Modais/HeaderModal/HeaderModal";
+import { FooterModal } from "../../../../Modais/FooterModal/footerModal";
+import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal";
+import { FormularioEditarOT } from "./formularioEditarOT";
+
+export const ActionEditarOTModal = ({
+  show,
+  handleClose,
+  optionsModulos,
+  usuarioLogado,
+  refetchListaConferencia,
+  dadosDetalheTransferencia,
+  setDadosDetalheTransferencia
+
+}) => {
+
+  return (
+
+    <Fragment>
+      <Modal
+        show={show}
+        onHide={handleClose}
+        size="xl"
+      >
+        <div className="modal-content">
+          <HeaderModal
+            title="Controle Ordem de Transferência"
+            subtitle="Nome da Loja"
+            handleClose={handleClose}
+          />
+          <Modal.Body >
+            <FormularioEditarOT
+              handleClose={handleClose}
+              optionsModulos={optionsModulos}
+              usuarioLogado={usuarioLogado}
+              refetchListaConferencia={refetchListaConferencia}
+              dadosDetalheTransferencia={dadosDetalheTransferencia}
+              setDadosDetalheTransferencia={setDadosDetalheTransferencia}
+            />
+          </Modal.Body>
+
+          <FooterModal
+            ButtonTypeFechar={ButtonTypeModal}
+            textButtonFechar={"Fechar"}
+            onClickButtonFechar={handleClose}
+            corFechar={"secondary"}
+          />
         </div>
       </Modal>
     </Fragment>

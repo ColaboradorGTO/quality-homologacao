@@ -9,11 +9,8 @@ import { ButtonTypeModal } from "../../../Buttons/ButtonTypeModal";
 import { FooterModal } from "../../../Modais/FooterModal/footerModal";
 import { HeaderModal } from "../../../Modais/HeaderModal/HeaderModal";
 
- 
-
 export const ActionImprimirEtiquetaOT = ({ show, handleClose, dadosImprimirOT }) => {
   const [layout, setLayout] = useState('layout-normal');
-
 
   const dataTableRef = useRef();
 

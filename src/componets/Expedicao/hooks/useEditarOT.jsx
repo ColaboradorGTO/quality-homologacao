@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { getDataAtual } from "../../../utils/dataAtual";
-import { get, post } from "../../../api/funcRequest";
+import { get, post, put } from "../../../api/funcRequest";
 import { useQuery } from "react-query";
 
-export const useSalvarOT = ({
+export const useEditarOT = ({
   handleClose,
   optionsModulos,
   usuarioLogado,
-  refetchListaConferencia
+  refetchListaConferencia,
+  dadosDetalheTransferencia,
+  setDadosDetalheTransferencia
 
 }) => {
   const [ajusteQuantidade, setAjusteQuantidade] = useState(0)
@@ -21,6 +21,7 @@ export const useSalvarOT = ({
   const [quantidade, setQuantidade] = useState('')
   const [observacao, setObservacao] = useState('')
   const [ipUsuario, setIpUsuario] = useState('');
+  const [idResumoOT, setIdResumoOT] = useState('');
   const [dadosProdutosTabela, setDadosProdutosTabela] = useState([]);
   const [linhaSelecionada, setLinhaSelecionada] = useState(null)
 
@@ -56,7 +57,60 @@ export const useSalvarOT = ({
     { staleTime: 5 * 60 * 1000 }
   );
 
-  const { data: dadosProdutos = [], isLoading: isLoadingProdutos } = useQuery(
+  useEffect(() => {
+    if (!dadosDetalheTransferencia || dadosDetalheTransferencia.length === 0) return;
+
+    const cabecalho = dadosDetalheTransferencia[0];
+
+    setEmpresaOrigem({
+      value: cabecalho.IDEMPRESAORIGEM,
+      label: cabecalho.EMPRESAORIGEM
+    });
+
+    setEmpresaDestino({
+      value: cabecalho.IDEMPRESADESTINO,
+      label: cabecalho.EMPRESADESTINO
+    });
+
+    setIdResumoOT(cabecalho.IDRESUMOOT);
+
+    const produtos = dadosDetalheTransferencia.map(item => ({
+      IDPRODUTO: item.IDPRODUTO,
+      NUCODBARRAS: item.NUCODBARRAS,
+      DSNOME: item.DSNOME,
+      VLRUNITCUSTO: parseFloat(item.VLRUNITCUSTO),
+      VLRUNITVENDA: parseFloat(item.VLRUNITVENDA),
+      QTDEXPEDICAO: parseInt(item.QTDEXPEDICAO),
+      QTDRECEPCAO: parseInt(item.QTDRECEPCAO),
+      QTDDIFERENCA: parseInt(item.QTDDIFERENCA),
+      QTDAJUSTE: parseInt(item.QTDAJUSTE),
+      QTDTOTALITENS: parseInt(item.QTDTOTALITENS),
+      IDRESUMOOT: item.IDRESUMOOT,
+      IDSTATUSOT: item.IDSTATUSOT
+    }));
+
+    setDadosProdutosTabela(produtos);
+
+    setQuantidade(200)
+    setDataEntrega(cabecalho.DTCADASTRO);
+    setDataCadastro(cabecalho.DTCADASTRO);
+    setObservacao(cabecalho.DSOBSERVACAO);
+    setIdResumoOT(cabecalho.IDRESUMOOT);
+  }, [dadosDetalheTransferencia]);
+
+
+  const handleChangeQtdAjuste = (idProduto, novoValor) => {
+    setDadosProdutosTabela(prev =>
+      prev.map(item =>
+        item.IDPRODUTO === idProduto
+          ? { ...item, QTDEXPEDICAO: parseInt(novoValor) || 0 }
+          : item
+      )
+    );
+  };
+
+
+  /* const { data: dadosProdutos = [], isLoading: isLoadingProdutos } = useQuery(
     ['listaProdutos', produto, usuarioLogado?.IDEMPRESA],
     async () => {
 
@@ -88,25 +142,146 @@ export const useSalvarOT = ({
     },
     { enabled: !!(produto.length > 8 && empresaDestino && usuarioLogado?.IDEMPRESA) }
   );
+ */
 
+  const handleExcluirProduto = async (produto) => {
 
-  useEffect(() => {
-    if (!dadosEmpresa || dadosEmpresa.length === 0) return;
-    if (!usuarioLogado?.IDEMPRESA) return;
-    const empresaEncontrada = dadosEmpresa.find(
-      e => String(e.IDEMPRESA) === String(usuarioLogado?.IDEMPRESA)
-    );
-    if (empresaEncontrada) {
-      setEmpresaOrigem({
-        value: empresaEncontrada.IDEMPRESA,
-        label: empresaEncontrada.NOFANTASIA
-      });
+    const idOT = produto.IDRESUMOOT || idResumoOT;
+
+    if (produto.QTDEXPEDICAO === 0) {
+      const result = await Swal.fire({
+        title: 'Atenção',
+        text: 'Deseja excluir esse produto da O.T.?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Sim, excluir',
+        cancelButtonText: 'Cancelar',
+        customClass: {
+          container: 'custom-swal'
+        }
+      })
+
+      if (!result.isConfirmed) {
+        return;
+      }
+
+      const putDataExcluir = {
+        IDPRODUTO: produto.IDPRODUTO,
+        IDSTATUSOT: 5,
+        IDRESUMOOT: idOT,
+      }
+
+      try {
+        const response = await put('/resumo-ordem-transferencia-cega/:id', putDataExcluir);
+
+        setDadosProdutosTabela(prev =>
+          prev.filter(item => item.IDPRODUTO !== produto.IDPRODUTO)
+        );
+
+        const textDados = JSON.stringify(putDataExcluir);
+        let textoFuncao = 'CONFERENCIA CEGA/PRODUTO EXCLUIDO COM SUCESSO';
+        const ipUsuario = await getIPUsuario();
+
+        const createData = {
+          IDFUNCIONARIO: String(usuarioLogado?.id),
+          PATHFUNCAO: textoFuncao,
+          DADOS: textDados,
+          IP: ipUsuario || "INDISPONÍVEL"
+        };
+
+        await post('/log-web', createData)
+
+        Swal.fire({
+          title: 'Sucesso!',
+          text: 'Produto excluído com sucesso.',
+          icon: 'success',
+          customClass: { container: 'custom-swal' }
+        });
+
+        handleClose();
+        refetchListaConferencia()
+
+        return response.data;
+      } catch (error) {
+
+        console.error('Erro ao cadastrar OT:', error);
+        const textDados = JSON.stringify(putDataExcluir);
+        let textoFuncao = 'CONFERENCIA CEGA/ERRO AO EXCLUIR OT COM SUCESSO';
+        const ipUsuario = await getIPUsuario();
+
+        const createData = {
+          IDFUNCIONARIO: String(usuarioLogado?.id),
+          PATHFUNCAO: textoFuncao,
+          DADOS: textDados,
+          IP: ipUsuario || "INDISPONÍVEL"
+        };
+
+        const responsePost = await post('/log-web', createData)
+
+        Swal.fire({
+          title: 'Erro!',
+          text: 'Erro ao excluir produto.',
+          icon: 'error',
+          customClass: {
+            container: 'custom-swal'
+          }
+        });
+        return responsePost.data;
+
+      }
+
+    } else {
+      handleChangeQtdAjuste(produto.IDPRODUTO, 0);
     }
-
-    setQuantidade(200)
-  }, [dadosEmpresa, usuarioLogado]);
+  };
 
 
+  const { data: dadosProdutosDeposito = [] } = useQuery(
+    ['listaProdutos', produto],
+    async () => {
+      const response = await get(
+        `/listaProdutos?idEmpresa=${usuarioLogado?.IDEMPRESA}&idProduto=${produto}&page=1`
+      );
+
+      setDadosDetalheTransferencia(prev => {
+        const novos = [...prev];
+
+        response.data.forEach(novo => {
+          const index = novos.findIndex(p => p.IDPRODUTO === novo.IDPRODUTO);
+
+          if (index >= 0) {
+            novos[index] = {
+              ...novos[index],
+              QTDEXPEDICAO: novos[index].QTDEXPEDICAO + 1
+            };
+          } else {
+            novos.push({
+              IDPRODUTO: novo.IDPRODUTO,
+              NUCODBARRAS: novo.NUCODBARRAS,
+              DSNOME: novo.DSNOME,
+
+              VLRUNITVENDA: Number(novo.PRECOVENDA || 0),
+              VLRUNITCUSTO: Number(novo.PRECOCUSTO || 0),
+
+              QTDEXPEDICAO: 1,
+              QTDRECEPCAO: 0,
+              QTDDIFERENCA: 0,
+              QTDAJUSTE: 0,
+              IDSTATUSOT: 1
+            });
+          }
+        });
+
+        return novos;
+      });
+
+      setProduto("");
+      return response.data;
+    },
+    {
+      enabled: Boolean(produto && produto.length > 8)
+    }
+  );
 
   useEffect(() => {
     if (produto.length > 4 && empresaDestino <= 0) {
@@ -160,7 +335,7 @@ export const useSalvarOT = ({
     let dVlrTotalCusto = 0;
 
     const dadosdetalheot = dadosProdutosTabela.map((item) => {
-      const nQtdProduto = parseInt(item.QUANTIDADE || 0);
+      const nQtdProduto = parseInt(item.QTDEXPEDICAO || 0);
       const nVlrVenda = parseFloat(item.PRECOVENDA || 0);
       const nVlrCusto = parseFloat(item.PRECOCUSTO || 0);
 
@@ -185,7 +360,8 @@ export const useSalvarOT = ({
       };
     });
 
-    const postData = {
+    const putData = {
+      IDRESUMOOT: idResumoOT,
       IDEMPRESAORIGEM: empresaOrigem?.value,
       IDEMPRESADESTINO: empresaDestino?.value,
       DATAEXPEDICAO: "",
@@ -210,20 +386,18 @@ export const useSalvarOT = ({
       STENTRADAINVENTARIO: "False",
       QTDCONFERENCIA: 0,
       dadosdetalheot,
-      IDRESUMOOT: 0,
       IDSTATUSOT: 1,
       IDUSRAJUSTE: 0,
       DTAJUSTE: "",
       QTDTOTALITENSAJUSTE: 0,
-      CONFEREITENS: 'False',
-      IDROTINA: 1,
-      DATAENTREGA: dataEntrega
+
     };
 
     try {
-      const response = await post('/criar-resumo-ordem-transferencia', postData);
+      const response = await put('/resumo-ordem-transferencia/:id', putData);
+      //const response = await put('/resumo-ordem-transferencia-cega/:id', putData);
 
-      const textDados = JSON.stringify(postData);
+      const textDados = JSON.stringify(putData);
       let textoFuncao = 'EXPEDICAO/CRIADO COM SUCESSO';
       const ipUsuario = await getIPUsuario();
 
@@ -254,7 +428,7 @@ export const useSalvarOT = ({
     catch (error) {
 
       console.error('Erro ao cadastrar OT:', error);
-      const textDados = JSON.stringify(postData);
+      const textDados = JSON.stringify(putData);
       let textoFuncao = 'EXPEDICAO/ERRO AO CRIAR OT COM SUCESSO';
       const ipUsuario = await getIPUsuario();
 
@@ -298,9 +472,10 @@ export const useSalvarOT = ({
     linhaSelecionada,
     dadosEmpresa,
     dadosProdutosTabela,
-    dadosProdutos,
     setDadosProdutosTabela,
     setLinhaSelecionada,
+    handleExcluirProduto,
+    handleChangeQtdAjuste,
     onSubmit,
   };
 };

@@ -97,8 +97,6 @@ export const ActionImprimirEtiquetaOT = ({ show, handleClose, dadosImprimirOT })
     });
   };
 
-
-
   return (
     <Fragment>
       <Modal show={show} onHide={handleClose} size="lg" className="modal fade" tabIndex={-1} role="dialog" aria-hidden="true">
