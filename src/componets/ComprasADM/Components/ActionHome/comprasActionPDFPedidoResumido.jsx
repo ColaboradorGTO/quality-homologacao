@@ -96,6 +96,7 @@ export const ActionPDFPedidoResumido = ({ dadosPedidoResumido }) => {
   const calcularTotalContador = () => {
     return dados.length;
   }
+
   const calcularTotalPedido = () => {
     return dados.reduce((total, dados) => {
       return total + parseFloat(dados.VRTOTALLIQUIDO);
@@ -253,12 +254,10 @@ export const ActionPDFPedidoResumido = ({ dadosPedidoResumido }) => {
           <div className="mt-6">
             <table className="semborda">
               <tr>
-                {dados && dados.length > 0 && (
-                  <>
-                    <th style={{ textAlign: 'left', fontSize: '14px' }}>Quantidade de Pedidos: </th>
-                    <th style={{ textAlign: 'right', fontSize: '14px' }}> <b>{calcularTotalContador()}</b></th>
-                  </>
-                )}
+                
+                <th style={{ textAlign: 'left', fontSize: '14px' }}>Quantidade de Pedidos: </th>
+                <th style={{ textAlign: 'right', fontSize: '14px' }}> <b>{calcularTotalContador()}</b></th>
+             
               </tr>
               <tr>
                 <th style={{ textAlign: 'left', fontSize: '14px' }}>Total de Pedidos: </th>
