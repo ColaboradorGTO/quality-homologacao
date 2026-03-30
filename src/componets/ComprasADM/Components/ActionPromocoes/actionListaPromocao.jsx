@@ -272,8 +272,16 @@ export const ActionListaPromocao = ({ dadosListaPromocao, usuarioLogado, options
   };
 
   const handleClickDetalharProduto = (row) => {
-    if (row && row.IDRESUMOPROMOCAOMARKETING) {
-      handleDetalharProduto(row.IDRESUMOPROMOCAOMARKETING);
+    if(optionsModulos[0]?.ALTERAR == 'False') {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Acesso Negado!',
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para alterar os produtos da promoção`,
+      })
+    } else { 
+      if (row && row.IDRESUMOPROMOCAOMARKETING) {
+        handleDetalharProduto(row.IDRESUMOPROMOCAOMARKETING);
+      }
     }
   };
 
