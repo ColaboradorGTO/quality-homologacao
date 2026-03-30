@@ -13,6 +13,7 @@ import { useReactToPrint } from "react-to-print";
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+import Swal from "sweetalert2";
 
 export const ActionListaPromocao = ({ dadosListaPromocao, usuarioLogado, optionsModulos }) => {
   const [dadosListaPromocaoEmpresa, setDadosListaPromocaoEmpresa] = useState([])
@@ -182,10 +183,11 @@ export const ActionListaPromocao = ({ dadosListaPromocao, usuarioLogado, options
               titleButton={"Detalhar Empresas da Promoção"}
               onClickButton={() => handleClickDetalhar(row)}
               Icon={FaRegBuilding}
-              iconSize={18}
+              iconSize={20}
               iconColor={"#fff"}
               cor={"success"}
-
+              width="30px"
+              height="30px"
             />
 
           </div>
@@ -194,9 +196,12 @@ export const ActionListaPromocao = ({ dadosListaPromocao, usuarioLogado, options
               titleButton={"Detalhar Produtos da Promoção"}
               onClickButton={() => handleClickDetalharProduto(row)}
               Icon={FaProductHunt}
-              iconSize={18}
+              iconSize={20}
               iconColor={"#fff"}
               cor={"info"}
+              width="30px"
+              height="30px"
+
             />
 
           </div>
@@ -210,12 +215,18 @@ export const ActionListaPromocao = ({ dadosListaPromocao, usuarioLogado, options
 
   const handleDetalhar = async (IDRESUMOPROMOCAOMARKETING) => {
 
-    try {
-      const response = await get(`/listaEmpresaPromocoes?idResumoPromocoes${IDRESUMOPROMOCAOMARKETING}`)
+    try {                                               
+      const response = await get(`/empresa-promocoes-ativas?idResumoPromocao=${IDRESUMOPROMOCAOMARKETING}`)
       if (response.data && response.data.length > 0) {
         setDadosListaPromocaoEmpresa(response.data)
 
         setModalVisivel(true);
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Nenhum resultado encontrado',
+          text: 'Não foram encontradas empresas para esta promoção.',
+        })
       }
     } catch (error) {
       console.error('Erro ao buscar detalhes da venda: ', error);
@@ -237,6 +248,12 @@ export const ActionListaPromocao = ({ dadosListaPromocao, usuarioLogado, options
       if (response.data && response.data.length > 0) {
         setDadosProdutoOrigem(response.data)
         setModalDetalhePromocaoVisivel(true);
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Nenhum resultado encontrado',
+          text: 'Não foram encontrados produtos para esta promoção.',
+        })
       }
     } catch (error) {
       console.error('Erro ao buscar detalhes da venda: ', error);
@@ -307,6 +324,8 @@ export const ActionListaPromocao = ({ dadosListaPromocao, usuarioLogado, options
         handleClose={() => setModalVisivel(false)}
         dadosListaPromocaoEmpresa={dadosListaPromocaoEmpresa}
         dadosListaPromocao={dadosListaPromocao}
+        usuarioLogado={usuarioLogado}
+        optionsModulos={optionsModulos}
       />
 
       <ActionDetalheProdutoPromocao
@@ -315,6 +334,9 @@ export const ActionListaPromocao = ({ dadosListaPromocao, usuarioLogado, options
         dadosProdutoOrigem={dadosProdutoOrigem}
         dadosProdutoDestino={dadosProdutoDestino}
         dadosListaPromocao={dadosListaPromocao}
+        usuarioLogado={usuarioLogado}
+        optionsModulos={optionsModulos}
+
       />
     </Fragment>
   )

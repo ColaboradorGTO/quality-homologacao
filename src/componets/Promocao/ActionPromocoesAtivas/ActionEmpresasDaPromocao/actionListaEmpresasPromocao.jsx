@@ -24,8 +24,8 @@ export const ActionListaEmpresasPromocao = ({
   const [ipUsuario, setIpUsuario] = useState('');
   const [dadosTabelaEmpresasPromocao, setDadosTabelaEmpresasPromocao] = useState([]);
   const navigate = useNavigate();
-  
-  
+
+
   useEffect(() => {
     const usuarioArmazenado = localStorage.getItem('usuario');
 
@@ -95,15 +95,15 @@ export const ActionListaEmpresasPromocao = ({
   };
 
   useEffect(() => {
-    if(Array.isArray(dadosEmpresasPromocoes) && dadosEmpresasPromocoes.length > 0) {
+    if (Array.isArray(dadosEmpresasPromocoes) && dadosEmpresasPromocoes.length > 0) {
       const dadosEmpresas = dadosEmpresasPromocoes.map((item, index) => ({
-          contador: index + 1,
-          IDEMPRESA: item.IDEMPRESA,
-          NOFANTASIA: item.NOFANTASIA,
-          IDRESUMOPROMOCAOMARKETING: item.IDRESUMOPROMOCAOMARKETING,
-          IDEMPRESAPROMOCAOMARKETING: item.IDEMPRESAPROMOCAOMARKETING,
-          STATIVO: item.STATIVO,
-       
+        contador: index + 1,
+        IDEMPRESA: item.IDEMPRESA,
+        NOFANTASIA: item.NOFANTASIA,
+        IDRESUMOPROMOCAOMARKETING: item.IDRESUMOPROMOCAOMARKETING,
+        IDEMPRESAPROMOCAOMARKETING: item.IDEMPRESAPROMOCAOMARKETING,
+        STATIVO: item.STATIVO,
+
       })) || [];
       setDadosTabelaEmpresasPromocao(dadosEmpresas);
     }
@@ -195,7 +195,7 @@ export const ActionListaEmpresasPromocao = ({
             STATIVO: 'False',
             IDRESUMOPROMOCAOMARKETING: row.IDRESUMOPROMOCAOMARKETING,
             IDEMPRESA: row.IDEMPRESA,
-            IDEMPRESAPROMOCAOMARKETING: row.IDEMPRESAPROMOCAOMARKETING  
+            IDEMPRESAPROMOCAOMARKETING: row.IDEMPRESAPROMOCAOMARKETING
           }
           const response = await put('/desativar-empresa-promocao', putData)
           const textDados = JSON.stringify(putData)
@@ -226,14 +226,14 @@ export const ActionListaEmpresasPromocao = ({
                 : item
             )
           );
-         
+
           return responsePost;
         } catch (error) {
           const putData = {
             STATIVO: 'False',
             IDRESUMOPROMOCAOMARKETING: row.IDRESUMOPROMOCAOMARKETING,
             IDEMPRESA: row.IDEMPRESA,
-            IDEMPRESAPROMOCAOMARKETING: row.IDEMPRESAPROMOCAOMARKETING  
+            IDEMPRESAPROMOCAOMARKETING: row.IDEMPRESAPROMOCAOMARKETING
           }
           const textDados = JSON.stringify(putData)
           let textoFuncao = 'PROMOÇÃO/ERRO AO DESATIVAR EMPRESA PROMOÇÃO ORIGEM';
