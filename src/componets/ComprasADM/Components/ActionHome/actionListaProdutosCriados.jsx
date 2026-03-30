@@ -2,7 +2,7 @@ import { Fragment } from "react"
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { formatMoeda } from "../../../../utils/formatMoeda";
-import { dataFormatada, dataHoraFormatada } from "../../../../utils/dataFormatada";
+import { dataHoraFormatada } from "../../../../utils/dataFormatada";
 
 
 export const ActionListaProdutosCriados = ({ dadosProdutosCriados }) => {
@@ -53,7 +53,7 @@ export const ActionListaProdutosCriados = ({ dadosProdutosCriados }) => {
       header: 'Produto ',
       body: row => {
         return (
-          <th style={{color: 'blue', width: '120px'}}>{row.DSPRODUTO}</th>
+          <p style={{color: 'blue', width: '200px', fontWeight: 600}}>{row.DSPRODUTO}</p>
         )
       }, 
       sortable: true,
@@ -61,7 +61,7 @@ export const ActionListaProdutosCriados = ({ dadosProdutosCriados }) => {
     {
       field: 'DSSUBGRUPOESTRUTURA',
       header: 'Estrutura',
-      body: row => <th style={{color: 'blue'}}>{row.DSSUBGRUPOESTRUTURA}</th>,
+      body: row => <p style={{color: 'blue', width: '150px', fontWeight: 600}}>{row.DSSUBGRUPOESTRUTURA}</p>,
       sortable: true,
     },
     {
@@ -124,7 +124,7 @@ export const ActionListaProdutosCriados = ({ dadosProdutosCriados }) => {
               body={coluna.body}
               footer={coluna.footer}
               sortable={coluna.sortable}
-              headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+              headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '1rem' }}
               footerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
               bodyStyle={{ fontSize: '0.8rem' }}
 
