@@ -336,12 +336,13 @@ export const ActionListaProdutosPromocao = ({
           }
           const response = await put('/desativar-produto-promocao-origem', putData)
           const textDados = JSON.stringify(putData)
-          let textoFuncao = 'PROMOÇÃO/DESATIVAR PRODUTO PROMOÇÃO ORIGEM';
+          let textoFuncao = 'COMPRASADM/DESATIVAR PRODUTO PROMOÇÃO ORIGEM';
+          const ipUsuario = await getIPUsuario();
           const postData = {
             IDFUNCIONARIO: String(usuarioLogado?.id),
             PATHFUNCAO: textoFuncao,
             DADOS: textDados,
-            IP: ipUsuario
+            IP: ipUsuario || 'Indisponível'
           }
 
           const responsePost = await post('/log-web', postData)
@@ -365,13 +366,13 @@ export const ActionListaProdutosPromocao = ({
           );
           return responsePost;
         } catch (error) {
-          let textoFuncao ='PROMOÇÃO/ERRO AO DESATIVAR PRODUTO PROMOÇÃO ORIGEM';
-
+          let textoFuncao ='COMPRASADM/ERRO AO DESATIVAR PRODUTO PROMOÇÃO ORIGEM';
+          const ipUsuario = await getIPUsuario();
           const postData = {
             IDFUNCIONARIO: String(usuarioLogado?.id),
             PATHFUNCAO: textoFuncao,
             DADOS: textDados,
-            IP: ipUsuario
+            IP: ipUsuario || 'Indisponível'
           }
 
           const responsePost = await post('/log-web', postData)
@@ -416,12 +417,13 @@ export const ActionListaProdutosPromocao = ({
           }
           const response = await put('/desativar-produto-promocao-origem', putData)
           const textDados = JSON.stringify(putData)
-          let textoFuncao = 'PROMOÇÃO/ATIVAR PRODUTO PROMOÇÃO ORIGEM';
+          let textoFuncao = 'COMPRASADM/ATIVAR PRODUTO PROMOÇÃO ORIGEM';
+          const ipUsuario = await getIPUsuario();
           const postData = {
             IDFUNCIONARIO: String(usuarioLogado?.id),
             PATHFUNCAO: textoFuncao,
             DADOS: textDados,
-            IP: ipUsuario
+            IP: ipUsuario || 'Indisponível'
           }
 
           const responsePost = await post('/log-web', postData)
@@ -445,13 +447,13 @@ export const ActionListaProdutosPromocao = ({
           );
           return responsePost;
         } catch (error) {
-          let textoFuncao ='PROMOÇÃO/ERRO AO ATIVAR PRODUTO PROMOÇÃO ORIGEM';
-
+          let textoFuncao ='COMPRASADM/ERRO AO ATIVAR PRODUTO PROMOÇÃO ORIGEM';
+          const ipUsuario = await getIPUsuario();
           const postData = {
             IDFUNCIONARIO: String(usuarioLogado?.id),
             PATHFUNCAO: textoFuncao,
             DADOS: textDados,
-            IP: ipUsuario
+            IP: ipUsuario || 'Indisponível'
           }
           const responsePost = await post('/log-web', postData)
           Swal.fire({
@@ -495,12 +497,13 @@ export const ActionListaProdutosPromocao = ({
        
           const response = await put('/desativar-produto-promocao-destino', putData)
           const textDados = JSON.stringify(putData)
-          let textoFuncao = 'PROMOÇÃO/DESATIVAR PRODUTO PROMOÇÃO DESTINO';
+          let textoFuncao = 'COMPRASADM/DESATIVAR PRODUTO PROMOÇÃO DESTINO';
+          const ipUsuario = await getIPUsuario();
           const postData = {
             IDFUNCIONARIO: String(usuarioLogado?.id),
             PATHFUNCAO: textoFuncao,
             DADOS: textDados,
-            IP: ipUsuario
+            IP: ipUsuario || 'Indisponível'
           }
 
           const responsePost = await post('/log-web', postData)
@@ -524,13 +527,13 @@ export const ActionListaProdutosPromocao = ({
           );
           return response.data;
         } catch (error) {
-          let textoFuncao ='PROMOÇÃO/ERRO AO DESATIVAR PRODUTO PROMOÇÃO DESTINO';
-
+          let textoFuncao ='COMPRASADM/ERRO AO DESATIVAR PRODUTO PROMOÇÃO DESTINO';
+          const ipUsuario = await getIPUsuario();
           const postData = {
             IDFUNCIONARIO: String(usuarioLogado?.id),
             PATHFUNCAO: textoFuncao,
             DADOS: '',
-            IP: ipUsuario
+            IP: ipUsuario || 'Indisponível'
           }
 
           const responsePost = await post('/log-web', postData)
@@ -575,12 +578,13 @@ export const ActionListaProdutosPromocao = ({
           }
           const response = await put('/desativar-produto-promocao-destino', putData)
           const textDados = JSON.stringify(putData)
-          let textoFuncao = 'PROMOÇÃO/ATIVAR PRODUTO PROMOÇÃO DESTINO';
+          let textoFuncao = 'COMPRASADM/ATIVAR PRODUTO PROMOÇÃO DESTINO';
+          const ipUsuario = await getIPUsuario();
           const postData = {
             IDFUNCIONARIO: String(usuarioLogado?.id),
             PATHFUNCAO: textoFuncao,
             DADOS: textDados,
-            IP: ipUsuario
+            IP: ipUsuario || 'Indisponível'
           }
 
           const responsePost = await post('/log-web', postData)
@@ -604,13 +608,13 @@ export const ActionListaProdutosPromocao = ({
           );
           return responsePost;
         } catch (error) {
-          let textoFuncao ='PROMOÇÃO/ERRO AO ATIVAR PRODUTO PROMOÇÃO DESTINO';
-
+          let textoFuncao ='COMPRASADM/ERRO AO ATIVAR PRODUTO PROMOÇÃO DESTINO';
+          const ipUsuario = await getIPUsuario();
           const postData = {
             IDFUNCIONARIO: String(usuarioLogado?.id),
             PATHFUNCAO: textoFuncao,
             DADOS: textDados,
-            IP: ipUsuario
+            IP: ipUsuario || 'Indisponível'
           }
           const responsePost = await post('/log-web', postData)
           Swal.fire({
