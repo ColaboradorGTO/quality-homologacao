@@ -83,13 +83,13 @@ export const DashBoardComprasDM = () => {
       component = <ActionComprasADMHome usuarioLogado={usuarioLogado} />
       break;
     case "/comprasadm/ActionPesquisaDistribuicaoHistorico":
-      component = <ActionPesquisaDistribuicaoHistorico />
+      component = <ActionPesquisaDistribuicaoHistorico usuarioLogado={usuarioLogado} />
       break;
     case "/comprasadm/ActionPesquisaPromocao":
-      component = <ActionPesquisaPromocao />
+      component = <ActionPesquisaPromocao usuarioLogado={usuarioLogado}/>
       break;
     case "/comprasadm/ActionPesquisaProduto":
-      component = <ActionPesquisaProduto />
+      component = <ActionPesquisaProduto usuarioLogado={usuarioLogado}/>
       break;
     default:
       break;
@@ -118,7 +118,7 @@ export const DashBoardComprasDM = () => {
                           <div className="panel-content">
                             <Suspense fallback={<div>Loading...</div>}>
                               {actionVisivel && !resumoVisivel && !componentToShow && (
-                                <ActionComprasADMHome />
+                                <ActionComprasADMHome usuarioLogado={usuarioLogado} />
                               )}
 
                               {componentToShow && component}

@@ -14,13 +14,14 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
-export const ActionListaPromocao = ({ dadosListaPromocao }) => {
+export const ActionListaPromocao = ({ dadosListaPromocao, usuarioLogado, optionsModulos }) => {
   const [dadosListaPromocaoEmpresa, setDadosListaPromocaoEmpresa] = useState([])
   const [modalVisivel, setModalVisivel] = useState(false)
   const [dadosProdutoOrigem, setDadosProdutoOrigem] = useState([])
   const [dadosProdutoDestino, setDadosProdutoDestino] = useState([])
   const [modalDetalhePromocaoVisivel, setModalDetalhePromocaoVisivel] = useState(false)
   const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
 
   const onGlobalFilterChange = (e) => {
@@ -250,7 +251,7 @@ export const ActionListaPromocao = ({ dadosListaPromocao }) => {
 
   return (
     <Fragment>
-      <div className="panel" style={{ marginTop: "5rem" }}>
+      <div className="panel" >
         <div className="panel-hdr">
           <h2>Lista de Promoções </h2>
         </div>
@@ -264,15 +265,21 @@ export const ActionListaPromocao = ({ dadosListaPromocao }) => {
             exportToPDF={exportToPDF}
           />
         </div>
-        <div className="card mb-4" ref={dataTableRef}>
+        <div className="card" ref={dataTableRef}>
           <DataTable
             title="Progamação Promoções"
             value={dadosPromocao}
-            size="small"
             globalFilter={globalFilterValue}
+            size="small"
+            selectionMode="single"
+            selection={rowSelection}
+            onSelectionChange={(e) => setRowSelection(e.value)}
             paginator={true}
             rows={10}
             rowsPerPageOptions={[10, 20, 50, 100, dadosPromocao.length]}
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+            filterDisplay="menu"
             showGridlines
             stripedRows
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado </div>}

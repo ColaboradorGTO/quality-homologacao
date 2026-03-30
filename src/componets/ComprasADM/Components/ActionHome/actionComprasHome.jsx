@@ -43,7 +43,7 @@ export const ActionComprasADMHome = ({usuarioLogado}) => {
 
   }, [])
 
-   useEffect(() => {
+  useEffect(() => {
     const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
     if (menuSalvo) {
       const menuParsed = JSON.parse(menuSalvo);
@@ -62,6 +62,7 @@ export const ActionComprasADMHome = ({usuarioLogado}) => {
     },
     { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
   );
+
   const { data: dadosFonecedores = [], error: errorFornecedor, isLoading: isLoadingFornecedor } = useFetchData('fornecedores', '/fornecedores');
   const { data: dadosFabricantes = [], error: errorFabricantes, isLoading: isLoadingFabricantes } = useFetchData('fabricantes', '/fabricantes');
   const { data: dadosMarcas = [], error: errorMarcas, isLoading: isLoadingMarcas } = useFetchData('marcasLista', '/marcasLista');
