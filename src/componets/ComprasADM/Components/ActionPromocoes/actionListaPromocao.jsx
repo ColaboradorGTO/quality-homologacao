@@ -20,6 +20,7 @@ export const ActionListaPromocao = ({ dadosListaPromocao, usuarioLogado, options
   const [modalVisivel, setModalVisivel] = useState(false)
   const [dadosProdutoOrigem, setDadosProdutoOrigem] = useState([])
   const [dadosProdutoDestino, setDadosProdutoDestino] = useState([])
+  const [dadosProdutoPromocao, setDadosProdutoPromocao] = useState([])
   const [modalDetalhePromocaoVisivel, setModalDetalhePromocaoVisivel] = useState(false)
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowSelection, setRowSelection] = useState(null);
@@ -86,8 +87,8 @@ export const ActionListaPromocao = ({ dadosListaPromocao, usuarioLogado, options
     return {
       contador,
       DSPROMOCAOMARKETING: item.DSPROMOCAOMARKETING,
-      DTHORAINICIOFORMAT2: item.DTHORAINICIOFORMAT2,
-      DTHORAFIMFORMAT2: item.DTHORAFIMFORMAT2,
+      DTHORAINICIOFORMAT2: item.DTHORAINICIO,
+      DTHORAFIMFORMAT2: item.DTHORAFIM,
       TPAPLICADOA: item.TPAPLICADOA,
       APARTIRDEQTD: item.APARTIRDEQTD,
       APARTIRDOVLR: item.APARTIRDOVLR,
@@ -95,7 +96,8 @@ export const ActionListaPromocao = ({ dadosListaPromocao, usuarioLogado, options
       FATORPROMOPERC: item.FATORPROMOPERC,
       TPAPARTIRDE: item.TPAPARTIRDE,
       VLPRECOPRODUTO: item.VLPRECOPRODUTO,
-
+      STATIVO: item.STATIVO == 'True' ? 'Ativa' : 'Inativa',
+      STPRODUTO: item.STPRODUTO,  
       TPFATORPROMO: item.TPFATORPROMO,
       IDRESUMOPROMOCAOMARKETING: item.IDRESUMOPROMOCAOMARKETING,
     }
@@ -172,6 +174,12 @@ export const ActionListaPromocao = ({ dadosListaPromocao, usuarioLogado, options
       sortable: true,
     },
     {
+      field: 'STATIVO',
+      header: 'Status',
+      body: row => <th style={{color: row.STATIVO === 'Ativa' ? 'blue' : 'red'}}>{row.STATIVO}</th>,
+      sortable: true,
+    },
+    {
       field: 'IDRESUMOPROMOCAOMARKETING',
       header: 'Opções',
       width: '10%',
@@ -201,7 +209,7 @@ export const ActionListaPromocao = ({ dadosListaPromocao, usuarioLogado, options
               cor={"info"}
               width="30px"
               height="30px"
-
+              // disabledBTN={row.STPRODUTO == 'False' || row.STPRODUTO == null}
             />
 
           </div>
@@ -217,6 +225,7 @@ export const ActionListaPromocao = ({ dadosListaPromocao, usuarioLogado, options
 
     try {                                               
       const response = await get(`/empresa-promocoes-ativas?idResumoPromocao=${IDRESUMOPROMOCAOMARKETING}`)
+      
       if (response.data && response.data.length > 0) {
         setDadosListaPromocaoEmpresa(response.data)
 
@@ -242,11 +251,13 @@ export const ActionListaPromocao = ({ dadosListaPromocao, usuarioLogado, options
   const handleDetalharProduto = async (IDRESUMOPROMOCAOMARKETING) => {
 
     try {
-      const response = await get(`/listaProdutosOrigemPromocoes?idResumoPromocoes${IDRESUMOPROMOCAOMARKETING}`)
-      const response2 = await get(`/listaProdutoDestinoPromocoes?idResumoPromocoes${IDRESUMOPROMOCAOMARKETING}`)
-      setDadosProdutoDestino(response2.data)
+      const response = await get(`/detalhe-promocoes-ativas?idResumoPromocao=${IDRESUMOPROMOCAOMARKETING}`)
+      // const response2 = await get(`/listaProdutoDestinoPromocoes?idResumoPromocoes=${IDRESUMOPROMOCAOMARKETING}`)
+      // setDadosProdutoDestino(response2.data)
+      // console.log('Resposta da API para detalhes da promoção: ', response.data[0]?.ResumoPromocao);
       if (response.data && response.data.length > 0) {
         setDadosProdutoOrigem(response.data)
+        setDadosProdutoPromocao(response.data)
         setModalDetalhePromocaoVisivel(true);
       } else {
         Swal.fire({
@@ -331,8 +342,7 @@ export const ActionListaPromocao = ({ dadosListaPromocao, usuarioLogado, options
       <ActionDetalheProdutoPromocao
         show={modalDetalhePromocaoVisivel}
         handleClose={() => setModalDetalhePromocaoVisivel(false)}
-        dadosProdutoOrigem={dadosProdutoOrigem}
-        dadosProdutoDestino={dadosProdutoDestino}
+        dadosProdutoPromocao={dadosProdutoPromocao}
         dadosListaPromocao={dadosListaPromocao}
         usuarioLogado={usuarioLogado}
         optionsModulos={optionsModulos}

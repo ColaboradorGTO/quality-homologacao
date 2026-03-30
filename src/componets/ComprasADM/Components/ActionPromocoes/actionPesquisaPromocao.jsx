@@ -4,12 +4,12 @@ import { InputField } from "../../../Buttons/Input";
 import { ButtonType } from "../../../Buttons/ButtonType";
 import { get } from "../../../../api/funcRequest";
 import { ActionListaPromocao } from "./actionListaPromocao";
-import { getDataAtual, getDataDoisMesesAtras } from "../../../../utils/dataAtual";
 import { MdAdd } from "react-icons/md";
 import { AiOutlineSearch } from "react-icons/ai";
 import { ActionCadastroPromocaoModal } from "./ActionCadastrar/actionCadastroPromocaoModal";
 import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento"
+import { InputSelectAction } from "../../../Inputs/InputSelectAction";
 
 export const ActionPesquisaPromocao = ({ usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
@@ -17,13 +17,7 @@ export const ActionPesquisaPromocao = ({ usuarioLogado }) => {
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState("");
   const [dataPesquisaFim, setDataPesquisaFim] = useState("");
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
-
-  useEffect(() => {
-    const dataInicio = getDataDoisMesesAtras()
-    const dataFim = getDataAtual()
-    setDataPesquisaInicio(dataInicio)
-    setDataPesquisaFim(dataFim)
-  }, [])
+  const [statusSelecionado, setstatusSelecionado] = useState("")
 
   useEffect(() => {
     const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
@@ -45,8 +39,50 @@ export const ActionPesquisaPromocao = ({ usuarioLogado }) => {
     { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
   );
 
+  /* const fetchListaProdutosPromocao = async () => {
+      const urlBase = `/promocoes-ativas?dataPesquisaInicio=${dataInicio}&dataPesquisaFim=${dataFim}&status=${statusSelecionado}`;
+      let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
+      urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+        try {
+        animacaoCarregamento('Carregando dados...', true);
+  
+        const primeiraPagina = 1;
+        const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+        const page = primeiraResposta.page || primeiraPagina;
+        const pageSize = primeiraResposta.pageSize || 1000;
+        const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
+        const totalPages = Math.ceil(totalRows / pageSize);
+  
+        let allData = [...(primeiraResposta.data || [])];
+  
+        if (totalPages > 1) {
+          for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+            animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
+            const responsePage = await get(`${urlApi}&page=${currentPage}`);
+            allData.push(...(responsePage.data || []));
+          }
+        }
+  
+        return allData;
+      } catch (error) {
+        console.error('Erro ao buscar dados:', error);
+        throw error;
+      } finally {
+        fecharAnimacaoCarregamento();
+      }
+  };
+  
+  const { data: dadosListaPromocao = [], error: errorFuncionario, isLoading: isLoadingFuncionario, refetch: refetchListaProdutos } = useQuery(
+      ['promocoes-ativas'],
+      () => fetchListaProdutosPromocao(dataInicio, dataFim, currentPage, pageSize),
+      {
+        enabled: Boolean(isQueryData), staleTime: 5 * 60 * 1000,
+      }
+  ); */
+
   const fetchListaProdutos = async () => {
-    const urlBase = `/listaPromocoes?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
+    // const urlBase = `/listaPromocoes?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
+    const urlBase = `/promocoes-ativas?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&status=${statusSelecionado}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '')
 
@@ -94,6 +130,19 @@ export const ActionPesquisaPromocao = ({ usuarioLogado }) => {
     setModalCadastro(true)
   }
 
+  const handleClickProdutoDestino = () => {
+
+  }
+
+  const handleClickProdutoOrigem = () => {
+
+  }
+
+  const options = [
+    { value: '', label: 'Selecione' },
+    { value: 'True', label: 'Ativa' },
+    { value: 'False', label: 'Inativa' },
+  ]
 
   return (
 
@@ -105,6 +154,17 @@ export const ActionPesquisaPromocao = ({ usuarioLogado }) => {
         title="Programação -"
         subTitle="Promoções"
 
+        InputSelectMarcasComponent={InputSelectAction}
+        onChangeSelectMarcas={(e) => setstatusSelecionado(e.value)}
+        valueSelectMarca={statusSelecionado}
+        optionsMarcas={[
+          ...options.map((item) => ({
+            value: item.value,
+            label: item.label,
+          }))
+        ]}
+        labelSelectMarcas={"Status da Promoção"}
+
         InputFieldDTInicioComponent={InputField}
         valueInputFieldDTInicio={dataPesquisaInicio}
         labelInputFieldDTInicio={"Data Início"}
@@ -114,6 +174,7 @@ export const ActionPesquisaPromocao = ({ usuarioLogado }) => {
         labelInputFieldDTFim={"Data Fim"}
         valueInputFieldDTFim={dataPesquisaFim}
         onChangeInputFieldDTFim={(e) => setDataPesquisaFim(e.target.value)}
+
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}

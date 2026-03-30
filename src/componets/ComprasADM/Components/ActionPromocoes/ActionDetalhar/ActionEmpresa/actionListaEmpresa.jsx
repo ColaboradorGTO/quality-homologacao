@@ -62,7 +62,7 @@ export const ActionListaEmpresaPromocao = ({
         XLSX.writeFile(workbook, 'lista_empresas_promocoes.xlsx');
     };
 
-    console.log(dadosListaPromocaoEmpresa, 'item')
+  
     const dados = dadosListaPromocaoEmpresa.map((item, index) => {
         let contador = index + 1;
 

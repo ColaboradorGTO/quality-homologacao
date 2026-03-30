@@ -4999,11 +4999,27 @@ a.close.disabled {
 @media (min-width: 992px) {
   .modal-lg,
   .modal-xl {
-    max-width: 800px; } }
+    max-width: 800px; 
+  } 
+  .modal-xll {
+    max-width: 1280px;
+  }
+  .modal-full {
+    max-width: 100%;
+  }
+}
 
 @media (min-width: 1399px) {
   .modal-xl {
-    max-width: 1140px; } }
+    max-width: 1140px; 
+  }
+  .modal-xll {
+    max-width: 1280px;
+  }  
+  .modal-full {
+    max-width: 100%;
+  }
+}
 
 .tooltip {
   position: absolute;
