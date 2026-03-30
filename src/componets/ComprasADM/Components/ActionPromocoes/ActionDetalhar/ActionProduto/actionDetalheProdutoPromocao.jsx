@@ -10,7 +10,9 @@ export const ActionDetalheProdutoPromocao = ({
   show, 
   handleClose, 
   dadosListaPromocao,
-  dadosProdutoPromocao 
+  dadosProdutoPromocao,
+  usuarioLogado,
+  optionsModulos 
 }) => {
 
   return (
@@ -35,6 +37,8 @@ export const ActionDetalheProdutoPromocao = ({
           <ActionListaProdutosPromocao
             dadosProdutoPromocao={dadosProdutoPromocao} 
             handleClose={handleClose}
+            usuarioLogado={usuarioLogado}
+            optionsModulos={optionsModulos}
           />
         </Modal.Body>
 

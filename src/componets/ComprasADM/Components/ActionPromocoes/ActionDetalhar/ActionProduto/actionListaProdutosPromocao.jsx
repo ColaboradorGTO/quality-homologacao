@@ -15,14 +15,15 @@ import { ButtonTable } from "../../../../../ButtonsTabela/ButtonTable";
 
 export const ActionListaProdutosPromocao = ({ 
   dadosProdutoPromocao, 
-  handleClose
+  handleClose,
+  usuarioLogado,
+  optionsModulos
 }) => {
   const [globalFilterValueDestino, setGlobalFilterValueDestino] = useState('');
   const [globalFilterValueOrigem, setGlobalFilterValueOrigem] = useState('');
   const dataTableRef = useRef();
   const [dadosDestino, setDadosDestino] = useState([]);
   const [dadosOrigemTabela, setDadosOrigemTabela] = useState([]);
-  const [usuarioLogado, setUsuarioLogado] = useState(null);
   const [ipUsuario, setIpUsuario] = useState('');
 
   const getIPUsuario = async () => {
@@ -345,7 +346,7 @@ export const ActionListaProdutosPromocao = ({
             IP: ipUsuario || 'Indisponível'
           }
 
-          const responsePost = await post('/log-web', postData)
+          await post('/log-web', postData)
 
           Swal.fire({
             title: 'Sucesso',
@@ -355,8 +356,7 @@ export const ActionListaProdutosPromocao = ({
               container: 'custom-swal',
             }
           });
-          // handleClose()
-          // refetchProdutosPromocoes()
+         
           setDadosOrigemTabela((prev) =>
             prev.map((item) =>
               item.IDPRODUTOORIGEM === row.IDPRODUTOORIGEM
@@ -364,7 +364,7 @@ export const ActionListaProdutosPromocao = ({
                 : item
             )
           );
-          return responsePost;
+          return response.data;
         } catch (error) {
           let textoFuncao ='COMPRASADM/ERRO AO DESATIVAR PRODUTO PROMOÇÃO ORIGEM';
           const ipUsuario = await getIPUsuario();
@@ -409,12 +409,12 @@ export const ActionListaProdutosPromocao = ({
       buttonsStyling: false
     }).then(async (result) => {
       if (result.isConfirmed) {
+        const putData = {
+          STATIVO: 'True',
+          IDRESUMOPROMOCAOMARKETING: row.IDRESUMOPROMOCAOMARKETING,
+          IDPRODUTOORIGEM: row.IDPRODUTOORIGEM,
+        }
         try {
-          const putData = {
-            STATIVO: 'True',
-            IDRESUMOPROMOCAOMARKETING: row.IDRESUMOPROMOCAOMARKETING,
-            IDPRODUTOORIGEM: row.IDPRODUTOORIGEM,
-          }
           const response = await put('/desativar-produto-promocao-origem', putData)
           const textDados = JSON.stringify(putData)
           let textoFuncao = 'COMPRASADM/ATIVAR PRODUTO PROMOÇÃO ORIGEM';
@@ -426,7 +426,7 @@ export const ActionListaProdutosPromocao = ({
             IP: ipUsuario || 'Indisponível'
           }
 
-          const responsePost = await post('/log-web', postData)
+          await post('/log-web', postData)
 
           Swal.fire({
             title: 'Sucesso',
@@ -436,8 +436,7 @@ export const ActionListaProdutosPromocao = ({
               container: 'custom-swal',
             }
           });
-          // handleClose()
-          // refetchProdutosPromocoes()
+   
           setDadosOrigemTabela((prev) =>
             prev.map((item) =>
               item.IDPRODUTOORIGEM === row.IDPRODUTOORIGEM
@@ -445,17 +444,18 @@ export const ActionListaProdutosPromocao = ({
                 : item
             )
           );
-          return responsePost;
+          return response.data;
         } catch (error) {
           let textoFuncao ='COMPRASADM/ERRO AO ATIVAR PRODUTO PROMOÇÃO ORIGEM';
           const ipUsuario = await getIPUsuario();
+          const textDados = JSON.stringify(putData)
           const postData = {
             IDFUNCIONARIO: String(usuarioLogado?.id),
             PATHFUNCAO: textoFuncao,
             DADOS: textDados,
             IP: ipUsuario || 'Indisponível'
           }
-          const responsePost = await post('/log-web', postData)
+          await post('/log-web', postData)
           Swal.fire({
             title: 'Erro',
             text: `Erro ao Ativar Produto da Promoção`,
@@ -464,7 +464,7 @@ export const ActionListaProdutosPromocao = ({
               container: 'custom-swal',
             }
           });
-          return responsePost.data;
+          return response.data;
         }
       }
     })
@@ -488,12 +488,12 @@ export const ActionListaProdutosPromocao = ({
       buttonsStyling: false
     }).then(async (result) => {
       if (result.isConfirmed) {
+        const putData = {
+          STATIVO: 'False',
+          IDRESUMOPROMOCAOMARKETING: row?.IDRESUMOPROMOCAOMARKETING,
+          IDPRODUTODESTINO: row?.IDPRODUTODESTINO,
+        }
         try {
-          const putData = {
-            STATIVO: 'False',
-            IDRESUMOPROMOCAOMARKETING: row?.IDRESUMOPROMOCAOMARKETING,
-            IDPRODUTODESTINO: row?.IDPRODUTODESTINO,
-          }
        
           const response = await put('/desativar-produto-promocao-destino', putData)
           const textDados = JSON.stringify(putData)
@@ -506,7 +506,7 @@ export const ActionListaProdutosPromocao = ({
             IP: ipUsuario || 'Indisponível'
           }
 
-          const responsePost = await post('/log-web', postData)
+          await post('/log-web', postData)
 
           Swal.fire({
             title: 'Sucesso',
@@ -516,8 +516,7 @@ export const ActionListaProdutosPromocao = ({
               container: 'custom-swal',
             }
           });
-          // handleClose()
-          // refetchProdutosPromocoes()
+    
           setDadosDestino((prev) =>
             prev.map((item) =>
               item.IDPRODUTODESTINO === row.IDPRODUTODESTINO
@@ -529,10 +528,11 @@ export const ActionListaProdutosPromocao = ({
         } catch (error) {
           let textoFuncao ='COMPRASADM/ERRO AO DESATIVAR PRODUTO PROMOÇÃO DESTINO';
           const ipUsuario = await getIPUsuario();
+          const textDados = JSON.stringify(putData)
           const postData = {
             IDFUNCIONARIO: String(usuarioLogado?.id),
             PATHFUNCAO: textoFuncao,
-            DADOS: '',
+            DADOS: textDados,
             IP: ipUsuario || 'Indisponível'
           }
 
@@ -587,7 +587,7 @@ export const ActionListaProdutosPromocao = ({
             IP: ipUsuario || 'Indisponível'
           }
 
-          const responsePost = await post('/log-web', postData)
+          await post('/log-web', postData)
 
           Swal.fire({
             title: 'Sucesso',
@@ -597,8 +597,7 @@ export const ActionListaProdutosPromocao = ({
               container: 'custom-swal',
             }
           });
-          // handleClose()
-          // refetchProdutosPromocoes()
+   
           setDadosDestino((prev) =>
             prev.map((item) =>
               item.IDPRODUTODESTINO === row.IDPRODUTODESTINO
@@ -606,7 +605,7 @@ export const ActionListaProdutosPromocao = ({
                 : item
             )
           );
-          return responsePost;
+          return response.data;
         } catch (error) {
           let textoFuncao ='COMPRASADM/ERRO AO ATIVAR PRODUTO PROMOÇÃO DESTINO';
           const ipUsuario = await getIPUsuario();
