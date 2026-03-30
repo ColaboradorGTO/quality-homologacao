@@ -2,13 +2,12 @@ import { Fragment } from "react"
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { formatMoeda } from "../../../../utils/formatMoeda";
-import { dataFormatada } from "../../../../utils/dataFormatada";
+import { dataFormatada, dataHoraFormatada } from "../../../../utils/dataFormatada";
 
 
+export const ActionListaProdutosCriados = ({ dadosProdutosCriados }) => {
 
-export const ActionListaProdutosCriados = ({ dadosListaProdutosCriados }) => {
-
-  const dadosProdutosCriado = dadosListaProdutosCriados.map((item, index) => {
+  const dados = dadosProdutosCriados?.map((item, index) => {
     let contador = index + 1;
 
     return {
@@ -32,29 +31,29 @@ export const ActionListaProdutosCriados = ({ dadosListaProdutosCriados }) => {
   const colunasProdutosCriado = [
     {
       header: 'Nº',
-      body: row => <p style={{color: 'blue'}}>{row.contador}</p>,
+      body: row => <th style={{color: 'blue'}}>{row.contador}</th>,
       sortable: true,
     },
     {
       header: 'Dt. Pedido',
-      body: row => <p style={{color: 'blue'}}>{dataFormatada(row.DTCADASTRO)}</p>,
+      body: row => <th style={{color: 'blue'}}>{dataHoraFormatada(row.DTCADASTRO)}</th>,
       sortable: true,
     },
     {
       header: 'Pedido',
-      body: row => <p style={{color: 'blue'}}>{row.IDRESUMOPEDIDO}</p>,
+      body: row => <th style={{color: 'blue'}}>{row.IDRESUMOPEDIDO}</th>,
       sortable: true,
     },
     {
       header: 'Cód. Barra',
-      body: row => <p style={{color: 'blue'}}>{row.CODBARRAS}</p>,
+      body: row => <th style={{color: 'blue'}}>{row.CODBARRAS}</th>,
       sortable: true,
     },
     {
       header: 'Produto ',
       body: row => {
         return (
-          <p style={{color: 'blue', width: '120px'}}>{row.DSPRODUTO}</p>
+          <th style={{color: 'blue', width: '120px'}}>{row.DSPRODUTO}</th>
         )
       }, 
       sortable: true,
@@ -62,42 +61,42 @@ export const ActionListaProdutosCriados = ({ dadosListaProdutosCriados }) => {
     {
       field: 'DSSUBGRUPOESTRUTURA',
       header: 'Estrutura',
-      body: row => <p style={{color: 'blue'}}>{row.DSSUBGRUPOESTRUTURA}</p>,
+      body: row => <th style={{color: 'blue'}}>{row.DSSUBGRUPOESTRUTURA}</th>,
       sortable: true,
     },
     {
       header: 'NCM',
-      body: row => <p style={{color: 'blue'}}>{parseFloat(row.NUNCM)}</p>,
+      body: row => <th style={{color: 'blue'}}>{parseFloat(row.NUNCM)}</th>,
       sortable: true,
     },
     {
       header: 'TM',
-      body: row => <p style={{color: 'blue'}}>{row.DSTAMANHO}</p>,
+      body: row => <th style={{color: 'blue'}}>{row.DSTAMANHO}</th>,
       sortable: true,
     },
     {
       header: 'QTD',
-      body: row => <p style={{color: 'blue'}}>{parseFloat(row.QTDPRODUTO)}</p>,
+      body: row => <th style={{color: 'blue'}}>{parseFloat(row.QTDPRODUTO)}</th>,
       sortable: true,
     },
     {
       header: 'Vr Custo',
-      body: row => <p style={{color: 'blue'}}>{formatMoeda(row.VRCUSTO)}</p>,
+      body: row => <th style={{color: 'blue'}}>{formatMoeda(row.VRCUSTO)}</th>,
       sortable: true,
     },
     {
       header: 'Vr Venda',
-      body: row => <p style={{color: 'blue'}}>{formatMoeda(row.VRVENDA)}</p>,
+      body: row => <th style={{color: 'blue'}}>{formatMoeda(row.VRVENDA)}</th>,
       sortable: true,
     },
     {
       header: 'Total Venda',
-      body: row => <p style={{color: 'blue'}}>{formatMoeda(row.VRTOTALCUSTO)}</p>,
+      body: row => <th style={{color: 'blue'}}>{formatMoeda(row.VRTOTALCUSTO)}</th>,
       sortable: true,
     },
     {
       header: 'Estoque Ideal',
-      body: row => <p style={{color: 'blue'}}>{parseFloat(row.QTDESTOQUEIDEAL)}</p>,
+      body: row => <th style={{color: 'blue'}}>{parseFloat(row.QTDESTOQUEIDEAL)}</th>,
       sortable: true,
     },
     
@@ -108,7 +107,7 @@ export const ActionListaProdutosCriados = ({ dadosListaProdutosCriados }) => {
       <div className="card">
         <DataTable
           title="Vendas por Loja"
-          value={dadosProdutosCriado}
+          value={dados}
           sortField="VRTOTALPAGO"
           sortOrder={-1}
           rows={10}

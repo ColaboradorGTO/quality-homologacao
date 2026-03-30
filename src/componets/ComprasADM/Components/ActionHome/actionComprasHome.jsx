@@ -314,10 +314,11 @@ export const ActionComprasADMHome = ({usuarioLogado}) => {
           linkNomeSearch={"Atualizar Dados"}
           onButtonClickSearch={handleClick}
           corSearch={"primary"}
+          IconSearch={AiOutlineSearch}
 
           ButtonTypeCadastro={ButtonType}
           linkNome={"Relatório Resumido"}
-          corCadastro={"primary"}
+          corCadastro={"warning"}
           onButtonClickCadastro={handleClickRelatorioResumido}
           IconCadastro={AiOutlineSearch}
 

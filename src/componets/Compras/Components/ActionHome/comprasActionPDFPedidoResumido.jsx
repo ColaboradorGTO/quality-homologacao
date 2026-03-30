@@ -229,8 +229,7 @@ export const ActionPDFPedidoResumido = ({ dadosPedidos }) => {
             sortField="IDPEDIDO"
             sortOrder={-1}
             rows={10}
-            // paginator={true}
-            // rowsPerPageOptions={[5, 10, 20, 500, 1000, 1500]}
+
 
             showGridlines
             stripedRows
