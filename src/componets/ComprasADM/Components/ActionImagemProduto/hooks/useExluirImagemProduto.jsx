@@ -1,30 +1,11 @@
 import Swal from "sweetalert2";
 import { post, put } from "../../../../../api/funcRequest";
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import axios from "axios";
 
 
-export const useExcluirImagemProduto = () => {
-    const [usuarioLogado, setUsuarioLogado] = useState(null);
+export const useExcluirImagemProduto = ({usuarioLogado, optionsModulos}) => {
     const [ipUsuario, setIpUsuario] = useState('');
-
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        const usuarioArmazenado = localStorage.getItem('usuario');
-
-        if (usuarioArmazenado) {
-            try {
-                const parsedUsuario = JSON.parse(usuarioArmazenado);
-                setUsuarioLogado(parsedUsuario);;
-            } catch (error) {
-                console.error('Erro ao parsear o usuário do localStorage:', error);
-            }
-        } else {
-            navigate('/');
-        }
-    }, [navigate]);
 
     const getIPUsuario = async () => {
         let usuarioIP = null;
@@ -49,6 +30,18 @@ export const useExcluirImagemProduto = () => {
     };
 
     const handleExcluir = async (IDIMAGEM, STATIVO) => {
+        if(optionsModulos[0]?.ALTERAR == 'False') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Acesso Negado',
+                html: `${usuarioLogado?.NOFUNCIONARIO}, você não tem permissão para cancelar a imagem do produto.`,
+                customClass: {
+                    container: 'custom-swal',
+                }
+            });
+            return;
+        }
+        
         Swal.fire({
             position: 'center',
             title: `Certeza que Deseja Cancelar essa Imagem?`,
