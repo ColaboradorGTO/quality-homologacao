@@ -11,9 +11,9 @@ import { ButtonTable } from "../../../../ButtonsTabela/ButtonTable";
 import Swal from "sweetalert2";
 
 export const ActionListaProdutosOrdemTransferencia = ({
-
     dadosDetalheTransferencia,
     setDadosDetalheTransferencia,
+    
 }) => {
 
     const [globalFilterValue, setGlobalFilterValue] = useState('');
@@ -211,6 +211,7 @@ export const ActionListaProdutosOrdemTransferencia = ({
             )
         );
     };
+
 
     return (
         <Fragment>

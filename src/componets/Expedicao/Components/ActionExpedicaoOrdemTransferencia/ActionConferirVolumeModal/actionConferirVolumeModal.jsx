@@ -1,21 +1,19 @@
 import { Fragment } from "react"
 import Modal from 'react-bootstrap/Modal';
 import { HeaderModal } from "../../../../Modais/HeaderModal/HeaderModal";
-import { FooterModal } from "../../../../Modais/FooterModal/footerModal";
-import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal";
-import { FormularioIncuirOT } from "./formularioIncluirOT";
+import { FormularioConferirVolume } from "./formularioConfeririVolume";
 
-export const ActionIncluirOTModal = ({
+export const ActionConferirVolumeModal = ({
   show,
   handleClose,
   optionsModulos,
   usuarioLogado,
-  refetchListaConferencia
+  refetchListaConferencia,
+  dadosDetalheTransferencia,
+  setDadosDetalheTransferencia
 
 }) => {
-
   return (
-
     <Fragment>
       <Modal
         show={show}
@@ -24,25 +22,21 @@ export const ActionIncluirOTModal = ({
       >
         <div className="modal-content">
           <HeaderModal
-            title="Controle Ordem de Transferência"
-            subtitle="Nome da Loja"
+            title="Conferir os Volumes da OT"
+            subtitle="Efetuar a Leitura dos Códigos de Barras"
             handleClose={handleClose}
           />
           <Modal.Body >
-            <FormularioIncuirOT
+            <FormularioConferirVolume
               handleClose={handleClose}
               optionsModulos={optionsModulos}
               usuarioLogado={usuarioLogado}
               refetchListaConferencia={refetchListaConferencia}
+              dadosDetalheTransferencia={dadosDetalheTransferencia}
+              setDadosDetalheTransferencia={setDadosDetalheTransferencia}
             />
           </Modal.Body>
 
-          <FooterModal
-            ButtonTypeFechar={ButtonTypeModal}
-            textButtonFechar={"Fechar"}
-            onClickButtonFechar={handleClose}
-            corFechar={"secondary"}
-          />
         </div>
       </Modal>
     </Fragment>

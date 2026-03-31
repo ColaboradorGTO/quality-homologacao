@@ -1,5 +1,4 @@
 import { Fragment } from "react"
-import { useSalvarOT } from "../../../hooks/useSalvarOT";
 import { Controller, useForm } from "react-hook-form";
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal";
 import { FaRegSave } from "react-icons/fa";
@@ -23,6 +22,7 @@ export const FormularioAjusteOT = ({
     const { handleSubmit, formState: { errors }, clearErrors, control, setError } = useForm({
         mode: "onChange"
     })
+    
     const {
         empresaOrigem,
         setEmpresaOrigem,

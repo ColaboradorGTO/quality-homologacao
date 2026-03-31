@@ -7,10 +7,10 @@ import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../../../Tables/headerTable";
 
-
-export const ActionListaProdutosOrdemTransferencia = ({
-    dadosProdutosTabela,
-    handleChangeQtdAjuste,
+export const ActionListaConferirVolume = ({
+    dadosDetalheTransferencia,
+    registrarLeituraVolume,
+    setDadosDetalheTransferencia,
 }) => {
 
     const [globalFilterValue, setGlobalFilterValue] = useState('');
@@ -60,56 +60,59 @@ export const ActionListaProdutosOrdemTransferencia = ({
         doc.save('produtos_controle_transferencia.pdf');
     };
 
+    const dados = dadosDetalheTransferencia.map((item, index) => ({
+        IDRESUMOOT: item.IDRESUMOOT,
+        NUMEROVOLUME: item.NUMEROVOLUME,
+        CONFERIDO: item.CONFERIDO || 'Não',
+        codigoBarras: String(item.IDRESUMOOT) + String(item.NUMEROVOLUME),
+        contador: index + 1
+    }));
+
     const colunasConferencia = [
         {
-            field: 'IDPRODUTO',
-            header: 'Produto',
-            body: row => <th>{row.IDPRODUTO}</th>,
+            field: 'contador',
+            header: '#',
+            body: row => row.contador,
+        },
+        {
+            field: 'NUMEROVOLUME',
+            header: 'Volume',
+            body: row => row.NUMEROVOLUME,
             sortable: true,
         },
         {
-            field: 'NUCODBARRAS',
-            header: 'Cód Barras',
-            body: row => <th>{row.NUCODBARRAS}</th>,
+            field: 'CONFERIDO',
+            header: 'Status',
+            body: row => (
+                <span style={{
+                    color: row.CONFERIDO === 'Sim' ? 'green' : 'red',
+                    fontWeight: 'bold'
+                }}>
+                    {row.CONFERIDO}
+                </span>
+            ),
             sortable: true,
         },
         {
-            field: 'DSNOME',
-            header: 'Descrição',
-            body: row => <th>{row.DSNOME}</th>,
-            sortable: true,
-        },
-        {
-            field: 'VLRUNITVENDA',
-            header: 'R$ Venda',
-            body: row => <th>{row.VLRUNITVENDA}</th>,
-            sortable: true,
-        },
-        {
-            field: 'QTD',
-            header: 'QTD',
-            body: row => <div>
-                <input
-                    type="number"
-                    name="quantidadeProduto"
-                    value={row.QTDEXPEDICAO}
-                    style={{ width: '70px', textAlign: 'center' }}
-                    readOnly={dadosProdutosTabela[0]?.IDSTATUSOT !== 10}
-                    onChange={(e) =>
-                        handleChangeQtdAjuste(row.IDPRODUTO, e.target.value)
-                    }
-                />
-            </div>,
-            sortable: true,
-        },
-        {
-            field: 'opcoes',
-            header: 'Opções',
-            body: (row) => {
-
-            }
+            header: 'Ação',
+            body: row => (
+                <button
+                    className="btn btn-sm btn-primary"
+                    onClick={() => handleConferirVolumeLinha(row)}
+                >
+                    Conferir
+                </button>
+            )
         }
-    ]
+    ];
+
+const handleConferirVolumeLinha = (row) => {
+    const codigo = row.codigoBarras;
+
+    const novosDados = registrarLeituraVolume(codigo);
+
+    setDadosDetalheTransferencia(novosDados);
+};
 
     return (
         <Fragment>
@@ -132,7 +135,7 @@ export const ActionListaProdutosOrdemTransferencia = ({
 
                     <DataTable
                         title="Lista de Produtos"
-                        value={dadosProdutosTabela}
+                        value={dados}
                         globalFilter={globalFilterValue}
                         size={size}
                         sortOrder={-1}

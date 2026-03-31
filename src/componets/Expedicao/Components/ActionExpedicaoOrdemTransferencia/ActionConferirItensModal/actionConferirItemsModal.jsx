@@ -3,23 +3,24 @@ import Modal from 'react-bootstrap/Modal';
 import { HeaderModal } from "../../../../Modais/HeaderModal/HeaderModal";
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal";
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal";
-import { FormularioIncuirOT } from "./formularioIncluirOT";
+import { FormularioConferirItems } from "./formularioConferirItems";
 
-export const ActionIncluirOTModal = ({
+export const ActionConferirItemsModal = ({
   show,
   handleClose,
   optionsModulos,
   usuarioLogado,
-  refetchListaConferencia
+  refetchListaConferencia,
+  dadosDetalheTransferencia,
+  setDadosDetalheTransferencia,
+  setModalConferirItemsModal
 
 }) => {
-
   return (
-
     <Fragment>
       <Modal
         show={show}
-        onHide={handleClose}
+        onHide={setModalConferirItemsModal}
         size="xl"
       >
         <div className="modal-content">
@@ -29,11 +30,14 @@ export const ActionIncluirOTModal = ({
             handleClose={handleClose}
           />
           <Modal.Body >
-            <FormularioIncuirOT
+            <FormularioConferirItems
               handleClose={handleClose}
               optionsModulos={optionsModulos}
               usuarioLogado={usuarioLogado}
               refetchListaConferencia={refetchListaConferencia}
+              dadosDetalheTransferencia={dadosDetalheTransferencia}
+              setDadosDetalheTransferencia={setDadosDetalheTransferencia}
+              setModalConferirItemsModal={setModalConferirItemsModal}
             />
           </Modal.Body>
 

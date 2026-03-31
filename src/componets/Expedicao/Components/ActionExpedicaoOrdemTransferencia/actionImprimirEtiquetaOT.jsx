@@ -3,7 +3,6 @@ import Modal from 'react-bootstrap/Modal';
 import { ReactBarcode } from 'react-jsbarcode';
 import { useReactToPrint } from "react-to-print";
 import jsPDF from 'jspdf';
-
 import Swal from "sweetalert2";
 import { ButtonTypeModal } from "../../../Buttons/ButtonTypeModal";
 import { FooterModal } from "../../../Modais/FooterModal/footerModal";
@@ -50,8 +49,6 @@ export const ActionImprimirEtiquetaOT = ({ show, handleClose, dadosImprimirOT })
     };
   });
 
-
-
   const toggleLayout = () => {
     setLayout(layout === 'layout-normal' ? 'layout-cupom' : 'layout-normal');
   };
@@ -95,8 +92,6 @@ export const ActionImprimirEtiquetaOT = ({ show, handleClose, dadosImprimirOT })
       }
     });
   };
-
-
 
   return (
     <Fragment>
@@ -170,7 +165,6 @@ export const ActionImprimirEtiquetaOT = ({ show, handleClose, dadosImprimirOT })
                 </Fragment>
               ))}
             </div>
-
 
           </Modal.Body>
 

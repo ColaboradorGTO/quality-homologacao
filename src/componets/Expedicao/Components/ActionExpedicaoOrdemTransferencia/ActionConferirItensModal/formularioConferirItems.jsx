@@ -1,22 +1,22 @@
 import { Fragment } from "react"
-import { useSalvarOT } from "../../../hooks/useSalvarOT";
 import { Controller, useForm } from "react-hook-form";
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal";
-import { FaRegSave } from "react-icons/fa";
+import { FaCheck, FaRegSave } from "react-icons/fa";
 import Select from 'react-select';
 import { AlertError } from "../../../../Inputs/alertError";
 import FormField from "../../../../Formularios/FormField";
 import { ActionListaProdutosOrdemTransferencia } from "./ActionListaOrdemTrasferencia";
-import { schema } from "./schema/validacaoFormularioEditarOT";
-import { useEditarOT } from "../../../hooks/useEditarOT";
+import { useConferirItemsOT } from "../../../hooks/useConferirItemsOT";
+import { ActionSalvarVolumeOTModal } from "../ActionVolume/actionSalvarVolumeOT";
 
-export const FormularioEditarOT = ({
+export const FormularioConferirItems = ({
     handleClose,
     optionsModulos,
     usuarioLogado,
     refetchListaConferencia,
     dadosDetalheTransferencia,
-    setDadosDetalheTransferencia
+    setDadosDetalheTransferencia,
+    setModalConferirItemsModal,
 
 }) => {
 
@@ -30,66 +30,31 @@ export const FormularioEditarOT = ({
         setEmpresaDestino,
         produto,
         setProduto,
-        dataEntrega,
-        setDataEntrega,
-        quantidade,
-        setQuantidade,
         observacao,
         setObservacao,
-        linhaSelecionada,
         dadosEmpresa,
         dadosProdutosTabela,
         setDadosProdutosTabela,
-        setLinhaSelecionada,
-        onSubmit,
         handleExcluirProduto,
         handleChangeQtdAjuste,
-    } = useEditarOT({
+        handleConferirItems,
+        salvarConferirItems,
+        visualizarModalVolume,
+        setVisualizarModalVolume,
+    } = useConferirItemsOT({
 
         handleClose,
         optionsModulos,
         usuarioLogado,
         refetchListaConferencia,
         dadosDetalheTransferencia,
-        setDadosDetalheTransferencia
+        setDadosDetalheTransferencia,
+        setModalConferirItemsModal
     });
-
-    const handleValidatedSubmit = async () => {
-        try {
-            const dadosParaValidar = {
-                empresaOrigemSelecionada: empresaOrigem,
-                empresaDestinoSelecionada: empresaDestino,
-                //dataEntregaSelecionada: dataEntrega,
-                quantidadeDigitada: quantidade,
-            };
-
-            await schema.validate(dadosParaValidar, { abortEarly: false });
-            await onSubmit();
-
-        } catch (validationError) {
-            console.error('❌ Erro de validação:', validationError);
-
-            clearErrors();
-
-            if (validationError.inner && validationError.inner.length > 0) {
-                validationError.inner.forEach(error => {
-                    if (error.path) {
-                        setError(error.path, {
-                            type: 'manual',
-                            message: error.message
-                        });
-                    }
-                });
-            }
-
-            const errorMessages = validationError.errors || [validationError.message];
-            //console.log(`Erro de validação:\n${errorMessages.join('\n')}`);
-        }
-    };
 
     return (
         <Fragment>
-            <form onSubmit={handleSubmit(handleValidatedSubmit)}>
+            <form onSubmit={handleSubmit(salvarConferirItems)}>
                 <div className="row" data-select2-id="736">
                     <div className="col-sm-6 col-xl-6">
                         <label className="form-label" htmlFor={""}>Loja Origem</label>
@@ -132,7 +97,6 @@ export const FormularioEditarOT = ({
                                 setEmpresaDestino(opt ?? null);
                                 clearErrors("empresaDestinoSelecionada");
                             }}
-
                         />
 
                         {errors.empresaDestinoSelecionada && (
@@ -144,7 +108,6 @@ export const FormularioEditarOT = ({
                         )}
                     </div>
                 </div>
-
                 <div className="row mt-4">
                     <div className="col-sm-6 col-xl-6">
 
@@ -158,7 +121,6 @@ export const FormularioEditarOT = ({
                                     type="text"
                                     value={produto}
                                     placeholder={"Digite o codigo de barra do produto"}
-                                    readOnly={dadosProdutosTabela[0]?.IDSTATUSOT !== 1}
                                     onChange={(e) => setProduto(e.target.value)}
                                     errors={errors}
                                     clearErrors={clearErrors}
@@ -167,48 +129,6 @@ export const FormularioEditarOT = ({
                         />
                     </div>
                     <div className="col-sm-6 col-xl-6">
-
-                        <Controller
-                            name="dataEntregaSelecionada"
-                            control={control}
-                            render={({ field }) => (
-                                <FormField
-                                    name="dataEntregaSelecionada"
-                                    label={"Data Entrega"}
-                                    type="date"
-                                    readOnly
-                                    value={dataEntrega}
-                                    onChange={(e) => setDataEntrega(e.target.value)}
-                                    errors={errors}
-                                    clearErrors={clearErrors}
-                                />
-                            )}
-                        />
-                    </div>
-                </div>
-                <div className="row mt-4">
-                    <div className="col-sm-6 col-xl-6">
-
-                        <Controller
-                            name="quantidadeDigitada"
-                            control={control}
-                            render={({ field }) => (
-                                <FormField
-                                    name="quantidadeDigitada"
-                                    label={"Quantidade"}
-                                    placeholder={"Digite a Quantidade"}
-                                    type="text"
-                                    value={quantidade}
-                                    readOnly
-                                    onChange={(e) => setQuantidade(e.target.value)}
-                                    errors={errors}
-                                    clearErrors={clearErrors}
-                                />
-                            )}
-                        />
-                    </div>
-                    <div className="col-sm-6 col-xl-6">
-
                         <Controller
                             name="observaçãoDigitada"
                             control={control}
@@ -228,25 +148,28 @@ export const FormularioEditarOT = ({
                         />
                     </div>
                 </div>
+                <div className="row mt-1 col-sm-4 col-xl-4" >
 
-                <div className="row mt-4">
-                    <div className="col-sm-8 col-xl-8">
-
-                        <ButtonTypeModal
-                            Icon={FaRegSave}
-                            textButton={"Salvar"}
-                            cor={"info"}
-                            className={"mr-4"}
-                            isDisabled={dadosProdutosTabela[0]?.IDSTATUSOT !== 1}
-                            tipoBtnCadastrar={"submit"}
-                        />
-
-                    </div>
-                    <div className="col-sm-8 col-xl-8 mt-4">
-                        <label className="form-label" style={{ color: "red" }}>Para confirmar as Alterações e Inclusões dos Produtos, favor clicar no botão Salvar!</label>
-                    </div>
+                    <ButtonTypeModal
+                        Icon={FaRegSave}
+                        textButton={"Salvar"}
+                        cor={"info"}
+                        className={"mt-2 "}
+                        tipoBtnCadastrar={handleSubmit(salvarConferirItems)}
+                    />
                 </div>
             </form>
+            <ButtonTypeModal
+                Icon={FaCheck}
+                textButton={"Finalizar Confêrencia"}
+                cor={"success"}
+                className={"mt-2 "}
+                onClickButtonType={() => handleConferirItems()}
+            />
+
+            <div className="col-sm-8 col-xl-8 mt-4">
+                <label className="form-label" style={{ color: "red" }}>Para confirmar as Alterações e Inclusões dos Produtos, favor clicar no botão Salvar!</label>
+            </div>
 
             <ActionListaProdutosOrdemTransferencia
                 dadosProdutosTabela={dadosProdutosTabela}
@@ -255,6 +178,15 @@ export const FormularioEditarOT = ({
                 setDadosDetalheTransferencia={setDadosDetalheTransferencia}
                 handleExcluirProduto={handleExcluirProduto}
                 handleChangeQtdAjuste={handleChangeQtdAjuste}
+            />
+
+            <ActionSalvarVolumeOTModal
+                show={visualizarModalVolume}
+                handleClose={() => setVisualizarModalVolume(false)}
+                refetchListaConferencia={refetchListaConferencia}
+                dadosDetalheTransferencia={dadosDetalheTransferencia}
+                optionsModulos={optionsModulos}
+                usuarioLogado={usuarioLogado}
             />
 
         </Fragment>

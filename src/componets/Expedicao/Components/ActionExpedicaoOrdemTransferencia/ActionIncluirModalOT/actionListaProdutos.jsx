@@ -11,9 +11,9 @@ import { ButtonTable } from "../../../../ButtonsTabela/ButtonTable";
 import Swal from "sweetalert2";
 
 export const ActionListaProdutos = ({
-  dadosProdutos,
   dadosProdutosTabela,
   setDadosProdutosTabela
+
 }) => {
 
   const [globalFilterValue, setGlobalFilterValue] = useState('');

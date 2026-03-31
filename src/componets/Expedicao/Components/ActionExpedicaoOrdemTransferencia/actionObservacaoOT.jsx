@@ -5,8 +5,6 @@ import { FooterModal } from "../../../Modais/FooterModal/footerModal";
 import { HeaderModal } from "../../../Modais/HeaderModal/HeaderModal";
 import { toFloat } from "../../../../utils/toFloat";
 
-
-
 export const ActionObservacaoOT = ({ show, handleClose, dadosObservacaoOT }) => {
 
   const dados = dadosObservacaoOT.map((item) => {

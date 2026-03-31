@@ -139,7 +139,6 @@ export const ActionPesquisaOT = ({ usuarioLogado }) => {
     }
   );
 
-
   const handleSelectEmpresa = (e) => {
     setEmpresaSelecionada(e.value);
   }

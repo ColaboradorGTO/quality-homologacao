@@ -21,6 +21,9 @@ import { ActionEditarOTModal } from "./ActionEditarModalOT/actionEditarOTModal";
 import { useCancelarOT } from "../../hooks/useCancelarOT";
 import { ActionFinalizarOTModal } from "./ActionFinalizarOT/actionFinalizarOTModal";
 import { ActionAjusteOTModal } from "./ActionAjusteModalOT/actionAjusteOTModal";
+import { useLiberarPedidoOT } from "../../hooks/useLiberarPedidoOT";
+import { ActionConferirItemsModal } from "./ActionConferirItensModal/actionConferirItemsModal";
+import { ActionConferirVolumeModal } from "./ActionConferirVolumeModal/actionConferirVolumeModal";
 
 export const ActionListaOrdemTransferencia = ({
   dadosConferencia,
@@ -37,18 +40,30 @@ export const ActionListaOrdemTransferencia = ({
   const [dadosDetalheTransferencia, setDadosDetalheTransferencia] = useState([]);
   const [dadosImprimirOT, setDadosImprimirOT] = useState([]);
   const [dadosObservacaoOT, setDadosObservacaoOT] = useState([]);
+  const [dadosConferirVolume, setDadosConferirVolume] = useState([]);
   const [valueLojaOrigem, setValueLojaOrigem] = useState('')
   const [ajusteQuantidade, setAjusteQuantidade] = useState(0)
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [dadosFinalizarOT, setDadosFinalizarOT] = useState([]);
+  const [modalConferirItemsModal, setModalConferirItemsModal] = useState(false);
+  const [modalConferirVolumeModal, setModalConferirVolumeModal] = useState(false);
+
   const [size] = useState('small')
   const dataTableRef = useRef();
-
 
   const {
     onSubmit
 
   } = useCancelarOT({
+    optionsModulos,
+    refetchListaConferencia,
+    usuarioLogado
+  })
+
+  const {
+    handleLiberarPedido
+
+  } = useLiberarPedidoOT({
     optionsModulos,
     refetchListaConferencia,
     usuarioLogado
@@ -91,18 +106,15 @@ export const ActionListaOrdemTransferencia = ({
     doc.save('controle_transferencia.pdf');
   };
 
-
   useEffect(() => {
     const timer = setTimeout(() => {
       if (usuarioLogado && usuarioLogado?.NOFANTASIA) {
-        // console.log(usuarioLogado?.NOFANTASIA)
         setValueLojaOrigem(usuarioLogado?.NOFANTASIA);
       }
     }, 3000);
 
     return () => clearTimeout(timer);
   }, [usuarioLogado]);
-  console.log(dadosConferencia, 'dadosConferencia')
 
   const dados = dadosConferencia.map((item, index) => {
     let contador = index + 1;
@@ -169,7 +181,7 @@ export const ActionListaOrdemTransferencia = ({
       field: 'IDSTATUSOT',
       header: 'Opções',
       body: (row) => {
-        if (usuarioLogado?.IDEMPRESA == 1/* == 101 && [10, 11, 12].indexOf(row.IDSTATUSOT) >= 0 */) {
+        if (usuarioLogado?.IDEMPRESA === 101 && [10, 11, 12].indexOf(row.IDSTATUSOT) >= 0) {
           return (
             <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px", width: "100%" }}>
 
@@ -186,7 +198,7 @@ export const ActionListaOrdemTransferencia = ({
 
               <ButtonTable
                 titleButton={"Liberar Pedido"}
-                onClickButton={() => handleClickDetalhar(row)}
+                onClickButton={() => handleClickLiberarPedido(row)}
                 Icon={FaCheck}
                 iconSize={16}
                 width="32px"
@@ -198,7 +210,7 @@ export const ActionListaOrdemTransferencia = ({
 
               <ButtonTable
                 titleButton={"Conferir Itens"}
-                onClickButton={() => handleClickDetalhar(row)}
+                onClickButton={() => handleClickConferirItens(row)}
                 Icon={FaCheck}
                 iconSize={16}
                 width="32px"
@@ -210,7 +222,7 @@ export const ActionListaOrdemTransferencia = ({
 
               <ButtonTable
                 titleButton={"Conferir Volume"}
-                onClickButton={() => handleClickDetalhar(row)}
+                onClickButton={() => handleClickConferirVolume(row)}
                 Icon={FaCheck}
                 iconSize={16}
                 width="32px"
@@ -234,7 +246,7 @@ export const ActionListaOrdemTransferencia = ({
             </div>
           );
 
-        } else if (!usuarioLogado?.IDEMPRESA == 1/* row.IDEMPRESAORIGEM === usuarioLogado?.IDEMPRESA */) {
+        } else if (row.IDEMPRESAORIGEM === usuarioLogado?.IDEMPRESA) {
           return (
             <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px", width: "100%" }}>
 
@@ -350,273 +362,96 @@ export const ActionListaOrdemTransferencia = ({
             </div>
           );
         }
-
-
-        /* 
-        if (usuarioLogado?.IDEMPRESA == 101 && [10, 11, 12].indexOf(row.IDSTATUSOT) >= 0) {
-          return (
-
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                gap: "10px",
-                width: "100%",
-              }}
-            >
-              <div>
-                <ButtonTable
-                  titleButton={"Ajustar Pedido"}
-                  // onClickButton={() => IDRESUMOOT + 0 + IDSTATUSOT + DSOBSERVACAO + DATAENTREGAFORMATADA}
-                  onClickButton={() => handleClickDetalhar(row)}
-                  Icon={CiEdit}
-                  iconSize={16}
-                  width="32px"
-                  height="32px"
-                  iconColor={"#fff"}
-                  cor={"success"}
-                  disabledBTN={row.IDSTATUSOT != 1}
-                />
-              </div>
-
-              <div>
-                <ButtonTable
-                  titleButton={"Liberar Pedido"}
-                  // onClickButton={() => IDRESUMOOT + 0 + IDSTATUSOT + DSOBSERVACAO + DATAENTREGAFORMATADA}
-                  onClickButton={() => handleClickDetalhar(row)}
-                  Icon={CiEdit}
-                  iconSize={16}
-                  width="32px"
-                  height="32px"
-                  iconColor={"#fff"}
-                  cor={"success"}
-                  disabledBTN={usuarioLogado?.IDEMPRESA == 101 && [10, 11, 12].indexOf(row.IDSTATUSOT) >= 0}
-                />
-              </div>
-
-              <div>
-                <ButtonTable
-                  titleButton={"Conferir Itens"}
-                  onClickButton={() => handleClickDetalhar(row)}
-                  Icon={FaCheck}
-                  iconSize={16}
-                  width="32px"
-                  height="32px"
-                  iconColor={"#fff"}
-                  cor={"warning"}
-                  disabledBTN={[11].indexOf(row.IDSTATUSOT) >= 0}
-                />
-              </div>
-
-              <div>
-
-                <ButtonTable
-                  titleButton={"Conferir Volume"}
-                  // onClickButton={() => IDSAPORIGEM}
-                  onClickButton={() => handleClickDetalhar(row)}
-                  Icon={FaCheck}
-                  iconSize={16}
-                  width="32px"
-                  height="32px"
-                  iconColor={"#fff"}
-                  cor={"info"}
-                  disabledBTN={[12].indexOf(row.IDSTATUSOT) >= 0}
-                />
-              </div>
-
-              <div>
-                <ButtonTable
-                  titleButton={"Imprimir Etiqueta"}
-                  // onClickButton={() => IDSAPORIGEM}
-                  onClickButton={() => handleClickImprimir(row)}
-                  Icon={MdOutlineLocalPrintshop}
-                  iconSize={16}
-                  width="32px"
-                  height="32px"
-                  iconColor={"#fff"}
-                  cor={"dark"}
-
-                />
-              </div>
-
-            </div>
-          );
-        } else {
-          if (row.IDEMPRESAORIGEM === usuarioLogado?.IDEMPRESA) {
-            return (
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  gap: "10px",
-                  width: "100%",
-                }}
-              >
-                <div>
-                  <ButtonTable
-                    titleButton={"Editar / Visualizar"}
-                    // onClickButton={() => IDRESUMOOT + 0 + IDSTATUSOT + DSOBSERVACAO + DATAENTREGAFORMATADA}
-                    onClickButton={() => handleClickEdit(row)}
-                    Icon={CiEdit}
-                    iconSize={16}
-                    width="32px"
-                    height="32px"
-                    iconColor={"#fff"}
-                    cor={"info"}
-                  />
-                </div>
-
-                <div>
-                  <ButtonTable
-                    titleButton={"Cancelar"}
-                    // onClickButton={() => IDRESUMOOT + 0 + IDSTATUSOT + DSOBSERVACAO + DATAENTREGAFORMATADA}
-                    onClickButton={() => handleCancelar(row)}
-                    Icon={BsTrash3}
-                    iconSize={16}
-                    width="32px"
-                    height="32px"
-                    iconColor={"#fff"}
-                    cor={"danger"}
-                    disabledBTN={row.IDSTATUSOT != 1}
-                  />
-                </div>
-
-                <div>
-                  <ButtonTable
-                    titleButton={"Finalizar OT"}
-                    onClickButton={() => handleClickDetalhar(row)}
-                    Icon={FaCheck}
-                    iconSize={16}
-                    width="32px"
-                    height="32px"
-                    iconColor={"#fff"}
-                    cor={"warning"}
-                    disabledBTN={row.IDSTATUSOT != 1}
-                  />
-                </div>
-
-                <div>
-                  <ButtonTable
-                    titleButton={"Imprimir Etiqueta"}
-                    // onClickButton={() => IDSAPORIGEM}
-                    onClickButton={() => handleClickImprimir(row)}
-                    Icon={MdOutlineLocalPrintshop}
-                    iconSize={16}
-                    width="32px"
-                    height="32px"
-                    iconColor={"#fff"}
-                    cor={"dark"}
-                  />
-                </div>
-
-                <div>
-                  <ButtonTable
-                    titleButton={"Status Nota Fiscal"}
-                    onClickButton={() => handleClickStatusNota(row)}
-                    Icon={FaExclamation}
-                    iconSize={16}
-                    width="32px"
-                    height="32px"
-                    iconColor={"#fff"}
-                    cor={"warning"}
-
-                  />
-                </div>
-
-                <div>
-                  <ButtonTable
-                    titleButton={"Imprimir Nota Fiscal"}
-                    onClickButton={() => window.open(`http://164.152.244.96:3000/files/NFe53230636769602000236550000000106301779108247.pdf`, '_blank')}
-                    Icon={MdOutlineLocalPrintshop}
-                    iconSize={16}
-                    width="32px"
-                    height="32px"
-                    iconColor={"#fff"}
-                    cor={"primary"}
-
-                  />
-                </div>
-                <div>
-                  <ButtonTable
-                    titleButton={"Processar SEFAZ"}
-                    onClickButton={() => handleGetSefazOT(row)}
-                    Icon={FaCheck}
-                    iconSize={16}
-                    width="32px"
-                    height="32px"
-                    iconColor={"#fff"}
-                    cor={"info"}
-
-                  />
-                </div>
-                <div>
-                  <ButtonTable
-                    titleButton={"Processar Faturamento"}
-                    onClickButton={() => handleFaturarOT(row)}
-                    Icon={FaFileInvoiceDollar}
-                    iconSize={16}
-                    width="32px"
-                    height="32px"
-                    iconColor={"#fff"}
-                    cor={"success"}
-
-                  />
-                </div>
-              </div>
-
-            );
-          } else {
-            return (
-              <Fragment>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    width: "15rem",
-                  }}
-                >
-                  <ButtonTable
-                    titleButton={"Conferir OT"}
-                    onClickButton={() => handleClickDetalhar(row)}
-                    Icon={FaCheck}
-                    iconSize={16}
-                    width="32px"
-                    height="32px"
-                    iconColor={"#fff"}
-                    cor={"success"}
-                    disabledBTN={row.NUMERONOTASEFAZ === ''}
-                  />
-                </div>
-
-                {[8, 5].indexOf(row.IDSTATUSOT) >= 0 ? (
-                  <div>
-                    <ButtonTable
-                      titleButton={"Finalizar Recebimento OT"}
-                      onClickButton={() => handleClickDetalhar(row)}
-                      Icon={MdOutlineLocalPrintshop}
-                      iconSize={16}
-                      width="32px"
-                      height="32px"
-                      iconColor={"#fff"}
-                      cor={"warning"}
-                      disabledBTN={row.NUMERONOTASEFAZ === ''}
-                    />
-                  </div>
-                ) : (
-                  <></>
-                )};
-              </Fragment>
-            )
-          }
-
-
-        }*/
       }
     }
-  ]
+  ];
+
+  const handleConferirItens = async (IDRESUMOOT) => {
+
+    try {
+      const response = await get(`/detalhe-ordem-transferencia?idResumoOT=${IDRESUMOOT}`)
+
+      if (response.data && response.data.length > 0) {
+        setDadosDetalheTransferencia(response.data);
+        setModalConferirItemsModal(true);
+
+      }
+    } catch (error) {
+      console.error('Erro ao buscar detalhes da venda: ', error);
+    }
+  };
+
+  const handleClickConferirItens = (row) => {
+    if (optionsModulos[0]?.ALTERAR === 'False') {
+      Swal.fire({
+        title: 'Atenção',
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para editar/visualizar a OT.`,
+        icon: 'warning',
+        confirmButtonText: 'OK',
+        customClass: {
+          container: 'custom-swal',
+        }
+      });
+      return;
+    }
+
+    if (row && row.IDRESUMOOT) {
+      handleConferirItens(row.IDRESUMOOT);
+    }
+  };
+
+  const handleClickLiberarPedido = async (row) => {
+    if (optionsModulos[0]?.ALTERAR === 'False') {
+      Swal.fire({
+        title: 'Atenção',
+        html: `${usuarioLogado?.NOFUNCIONARIO} < br/> Você não tem permissão para cancelar a OT.`,
+        icon: 'warning',
+        confirmButtonText: 'OK',
+        customClass: {
+          container: 'custom-swal',
+        }
+      });
+      return
+    } else {
+      await handleLiberarPedido(row);
+    }
+  }
+
+
+  const handleConferirVolume = async (IDRESUMOOT) => {
+
+    try {
+      const response = await get(`/detalhe-ordem-transferencia?idResumoOT=${IDRESUMOOT}`)
+
+      if (response.data && response.data.length > 0) {
+        setDadosDetalheTransferencia(response.data);
+        setModalConferirVolumeModal(true);
+
+      }
+    } catch (error) {
+      console.error('Erro ao buscar detalhes da venda: ', error);
+    }
+  };
+
+  const handleClickConferirVolume = (row) => {
+    if (optionsModulos[0]?.ALTERAR === 'False') {
+      Swal.fire({
+        title: 'Atenção',
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para editar/visualizar a OT.`,
+        icon: 'warning',
+        confirmButtonText: 'OK',
+        customClass: {
+          container: 'custom-swal',
+        }
+      });
+      return;
+    }
+
+    if (row && row.IDRESUMOOT) {
+      handleConferirVolume(row.IDRESUMOOT);
+    }
+  };
+
 
   const handleFinalizarOT = async (IDRESUMOOT) => {
     setModalFinalizarOT(true);
@@ -676,7 +511,6 @@ export const ActionListaOrdemTransferencia = ({
       handleAjuste(row.IDRESUMOOT);
     }
   };
-
 
   const handleEdit = async (IDRESUMOOT) => {
 
@@ -759,76 +593,6 @@ export const ActionListaOrdemTransferencia = ({
     }
   };
 
-  const handleFaturarOT = async (row) => {
-
-
-    const putData = {
-      IDSTATUSOT: parseInt(9),
-      IDRESUMOT: row.IDRESUMOT,
-      NOTAFISCAL: parseInt(0)
-    };
-
-    Swal.fire({
-      icon: 'question',
-      title: `Deseja Faturar a OT?`,
-      showCloseButton: true,
-      showCancelButton: true,
-      cancelButtonColor: '#FD1381',
-      confirmButtonColor: '#7352A5',
-      confirmButtonText: 'Sim, quero Faturar!',
-      cancelButtonText: 'Não',
-      customClass: {
-        container: 'custom-swal',
-      },
-    }).then((result) => {
-      if (result.value === true) {
-        dados[0].NOTAFISCAL = parseInt(1);
-        Swal.fire({
-          type: 'info',
-          title: 'Emitindo Faturamento, aguarde...',
-          timer: 120000,
-          onBeForeOpen: async () => {
-            Swal.showLoading();
-            await put('/resumo-ordem-transferencia/:id', putData);
-            Swal.fire('Sucesso!', 'Faturado sucesso.', 'success');
-          }
-        })
-      }
-    })
-  };
-  const handleCancelar = async (row) => {
-
-
-    const putData = {
-      IDSTATUSOT: parseInt(2),
-      IDRESUMOT: row.IDRESUMOT,
-      IDUSRCANCELAMENTO: usuarioLogado?.id,
-    };
-
-    Swal.fire({
-      icon: 'question',
-      title: `Deseja realmente CANCELAR essa OT?`,
-      showCloseButton: true,
-      showCancelButton: true,
-      cancelButtonColor: '#FD1381',
-      confirmButtonColor: '#7352A5',
-      confirmButtonText: 'Sim, quero Cancelar!',
-      cancelButtonText: 'Não',
-      customClass: {
-        container: 'custom-swal',
-      },
-      timer: 3000,
-      preConfirm: async () => {
-        try {
-
-          await put('/atualizar-recompra', putData);
-          Swal.fire('Sucesso!', 'Recompra atualizada com sucesso.', 'success');
-        } catch (error) {
-          Swal.fire('Erro!', 'Erro ao atualizar recompra.', 'error');
-        }
-      }
-    });
-  };
 
   const handleGetSefazOT = async (row) => {
 
@@ -893,7 +657,6 @@ export const ActionListaOrdemTransferencia = ({
 
         console.log(error)
       })
-
   }
 
   return (
@@ -947,7 +710,27 @@ export const ActionListaOrdemTransferencia = ({
         </div>
       </div>
 
+      <ActionConferirVolumeModal
+        show={modalConferirVolumeModal}
+        handleClose={() => setModalConferirVolumeModal(false)}
+        dadosDetalheTransferencia={dadosDetalheTransferencia}
+        setDadosDetalheTransferencia={setDadosDetalheTransferencia}
+        refetchListaConferencia={refetchListaConferencia}
+        optionsModulos={optionsModulos}
+        usuarioLogado={usuarioLogado}
 
+      />
+
+      <ActionConferirItemsModal
+        show={modalConferirItemsModal}
+        handleClose={() => setModalConferirItemsModal(false)}
+        dadosDetalheTransferencia={dadosDetalheTransferencia}
+        setModalConferirItemsModal={setModalConferirItemsModal}
+        setDadosDetalheTransferencia={setDadosDetalheTransferencia}
+        optionsModulos={optionsModulos}
+        usuarioLogado={usuarioLogado}
+        refetchListaConferencia={refetchListaConferencia}
+      />
 
       <ActionAjusteOTModal
         show={modalAjustarModalOT}
