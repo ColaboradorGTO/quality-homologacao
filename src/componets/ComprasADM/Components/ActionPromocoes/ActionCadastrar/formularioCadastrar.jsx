@@ -8,7 +8,7 @@ import FormField from "../../../../Formularios/FormField";
 import { schema } from "./Schema/schemaValidarPromocao"
 import { AlertError } from "../../../../Inputs/alertError";
 
-export const FormularioCadastrar = ({ handleClose }) => {
+export const FormularioCadastrar = ({ handleClose, usuarioLogado, optionsModulos }) => {
     const { handleSubmit, formState: { errors }, clearErrors, control, setError, setValue } = useForm({
         mode: "onChange"
     });
@@ -39,7 +39,7 @@ export const FormularioCadastrar = ({ handleClose }) => {
         optionsAplicaocao,
         optionsFator,
         onSubmit
-    } = useCadastrarPromocaoLoja();
+    } = useCadastrarPromocaoLoja({handleClose, usuarioLogado, optionsModulos });
 
     const handleValidatedSubmit = async () => {
         try {
@@ -71,12 +71,17 @@ export const FormularioCadastrar = ({ handleClose }) => {
     
     }
     
-    useEffect(() => {
-        setAplicacaoSelecionada('')
-    }, [])
+    const handlePorcentoDesconto = (value) => {
+        if (isNaN(value) || value == "" || typeof value !== "number") {
+        setPercentual(0);
+        return;
+        }
+        const val = Math.max(0, Math.min(Number(value), 99));
+        setPercentual(val);
+    }
     return (
         <Fragment>
-            <form onSubmit={handleSubmit(handleValidatedSubmit)}>
+            <form >
 
                 <div className="form-group">
                     <div className="row">
@@ -174,7 +179,21 @@ export const FormularioCadastrar = ({ handleClose }) => {
                                         errors={errors}
                                         clearErrors={clearErrors}
                                         value={qtdAplicacao}
-                                        onChangeModal={(e) => setQtdAplicacao(e.target.value)}
+                                        onChangeModal={(e) => {
+                                            let valor = e.target.value.replace(/,/g, '.');
+                                            valor = valor.replace(/[^0-9.]/g, '');
+                                            const parts = valor.split('.');
+                                            if (parts.length > 2) {
+                                                valor = parts[0] + '.' + parts.slice(1).join('');
+                                            }
+
+                                            if (valor.length > 1 && valor.startsWith('0') && !valor.startsWith('0.')) {
+                                                valor = valor.replace(/^0+/, '');
+                                            }
+                                            setQtdAplicacao(valor)
+                                            // setQtdInicio(valor);
+
+                                        }}
                                         readOnly={aplicacaoSelecionada?.value !== '1'} 
                                     />
                                 )}
@@ -192,7 +211,20 @@ export const FormularioCadastrar = ({ handleClose }) => {
                                         errors={errors}
                                         clearErrors={clearErrors}
                                         value={valor}
-                                        onChangeModal={(e) => setValor(e.target.value)}
+                                        onChangeModal={(e) => {
+                                            let valor = e.target.value.replace(/,/g, '.');
+                                            valor = valor.replace(/[^0-9.]/g, '');
+                                            const parts = valor.split('.');
+                                            if (parts.length > 2) {
+                                                valor = parts[0] + '.' + parts.slice(1).join('');
+                                            }
+
+                                            if (valor.length > 1 && valor.startsWith('0') && !valor.startsWith('0.')) {
+                                                valor = valor.replace(/^0+/, '');
+                                            }
+                                            setValor(Number(valor))
+
+                                        }}
                                         readOnly={aplicacaoSelecionada?.value !== '2'} 
                                     />
                                 )}
@@ -241,7 +273,20 @@ export const FormularioCadastrar = ({ handleClose }) => {
                                         errors={errors}
                                         clearErrors={clearErrors}
                                         value={valorProduto}
-                                        onChangeModal={(e) => setValorProduto(e.target.value)}
+                                        onChangeModal={(e) => {
+                                            let valor = e.target.value.replace(/,/g, '.');
+                                            valor = valor.replace(/[^0-9.]/g, '');
+                                            const parts = valor.split('.');
+                                            if (parts.length > 2) {
+                                                valor = parts[0] + '.' + parts.slice(1).join('');
+                                            }
+
+                                            if (valor.length > 1 && valor.startsWith('0') && !valor.startsWith('0.')) {
+                                                valor = valor.replace(/^0+/, '');
+                                            }
+                                            setValorProduto(Number(valor));
+                                            
+                                        }}
                                         readOnly={fatorSelecionado?.value !== '0'} 
                                     />
                                 )}
@@ -259,7 +304,20 @@ export const FormularioCadastrar = ({ handleClose }) => {
                                         errors={errors}
                                         clearErrors={clearErrors}
                                         value={valorDesconto}
-                                        onChangeModal={(e) => setValorDesconto(e.target.value)}
+                                        onChangeModal={(e) => {
+                                            let valor = e.target.value.replace(/,/g, '.');
+                                            valor = valor.replace(/[^0-9.]/g, '');
+                                            const parts = valor.split('.');
+                                            if (parts.length > 2) {
+                                                valor = parts[0] + '.' + parts.slice(1).join('');
+                                            }
+
+                                            if (valor.length > 1 && valor.startsWith('0') && !valor.startsWith('0.')) {
+                                                valor = valor.replace(/^0+/, '');
+                                            }
+                                            setValorDesconto(Number(valor));
+                                            
+                                        }}
                                         readOnly={fatorSelecionado?.value !== '1'} 
                                     />
                                 )}
@@ -277,7 +335,7 @@ export const FormularioCadastrar = ({ handleClose }) => {
                                         errors={errors}
                                         clearErrors={clearErrors}
                                         value={percentual}
-                                        onChangeModal={(e) => setPercentual(e.target.value)}
+                                        onChangeModal={(e) => handlePorcentoDesconto(Number(e.target.value))}
                                         readOnly={fatorSelecionado?.value !== '2'} 
                                     />
                                 )}
@@ -293,12 +351,12 @@ export const FormularioCadastrar = ({ handleClose }) => {
                     onClickButtonFechar={handleClose}
                     corFechar="secondary"
 
-                    ButtonTypeCadastrar={ButtonTypeModal}
-                    textButtonCadastrar={"Cadastrar"}
-                    onClickButtonCadastrar={handleValidatedSubmit}
-                    corCadastrar="success"
-                    loadingTextCadastrar={"Cadastrando..."}
-                    autoLoadingCadastrar={true}
+                    // ButtonTypeCadastrar={ButtonTypeModal}
+                    // textButtonCadastrar={"Cadastrar"}
+                    // onClickButtonCadastrar={() =>  console.log("clicou")}
+                    // corCadastrar="success"
+                    // loadingTextCadastrar={"Cadastrando..."}
+                    // autoLoadingCadastrar={true}
                 />
             </form>
         </Fragment>

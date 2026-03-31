@@ -1,13 +1,12 @@
 import Swal from "sweetalert2";
 import { post } from "../../../../../../api/funcRequest";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { getDataAtual } from "../../../../../../utils/dataAtual";
 import { toFloat } from "../../../../../../utils/toFloat";
 
 
-export const useCadastrarPromocaoLoja = () => {
+export const useCadastrarPromocaoLoja = ({handleClose, usuarioLogado, optionsModulos}) => {
     const [dataInicio, setDataInicio] = useState('')
     const [dataFim, setDataFim] = useState('')
     const [descricao, setDescricao] = useState('')
@@ -19,7 +18,6 @@ export const useCadastrarPromocaoLoja = () => {
     const [fatorSelecionado, setFatorSelecionado] = useState('')
     const [valorDesconto, setValorDesconto] = useState(0)
     const [percentual, setPercentual] = useState(0)
-    const [usuarioLogado, setUsuarioLogado] = useState(null);
     const [ipUsuario, setIpUsuario] = useState('');
 
     const optionsAplicaocao = [
@@ -33,28 +31,12 @@ export const useCadastrarPromocaoLoja = () => {
         { value: '2', label: 'Por Percentual' },
     ]
 
-    const navigate = useNavigate();
-
     useEffect(() => {
         const dataHoraAtual = getDataAtual()
         setDataInicio(dataHoraAtual)
         setDataFim(dataHoraAtual)
     })
     
-    useEffect(() => {
-        const usuarioArmazenado = localStorage.getItem('usuario');
-
-        if (usuarioArmazenado) {
-            try {
-                const parsedUsuario = JSON.parse(usuarioArmazenado);
-                setUsuarioLogado(parsedUsuario);;
-            } catch (error) {
-                console.error('Erro ao parsear o usuário do localStorage:', error);
-            }
-        } else {
-            navigate('/');
-        }
-    }, [navigate]);
 
     const getIPUsuario = async () => {
         let usuarioIP = null;
@@ -183,7 +165,7 @@ export const useCadastrarPromocaoLoja = () => {
             return false;
         }
 
-        const postData = [{
+        const postData = {
 
             DSPROMOCAOMARKETING: descricao,
             DTHORAINICIO: dataInicio,
@@ -199,7 +181,7 @@ export const useCadastrarPromocaoLoja = () => {
             STEMPRESAPROMO: 'False',
             STDETPROMOORIGEM: 'False',
             STDETPROMODESTINO: 'False',
-        }]
+        }
         try {
 
             const response = await post('/criar-listaPromocoes', postData)
@@ -209,7 +191,7 @@ export const useCadastrarPromocaoLoja = () => {
                 icon: 'success',
                 title: 'Atualizado com sucesso!',
                 showConfirmButton: false,
-                timer: 3000,
+                timer: 5000,
                 customClass: {
                     container: 'custom-swal',
                 }
@@ -217,41 +199,41 @@ export const useCadastrarPromocaoLoja = () => {
 
             const textDados = JSON.stringify(postData)
             let textFuncao = 'COMPRASADM/CADASTRAR PROGRAMAÇÃO DE PROMOÇÕES';
-
+            const ipUsuario = await getIPUsuario();
             const createtLog = {
-                IDFUNCIONARIO: usuarioLogado.id,
+                IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'Indisponível'
+            }
+
+            await post('/log-web', createtLog)
+
+
+            return response.data;
+        } catch (error) {
+            
+            let textFuncao = 'COMPRASADM/ERRO AO CADASTRAR PROGRAMAÇÃO DE PROMOÇÕES'
+            const textDados = JSON.stringify(postData)
+            const createtLog = {
+                IDFUNCIONARIO: String(usuarioLogado.id),
+                PATHFUNCAO: textFuncao,
+                DADOS: textDados,
+                IP: ipUsuario || 'Indisponível'
             }
 
             const responseLog = await post('/log-web', createtLog)
 
-
-            return responseLog.data;
-        } catch (error) {
             Swal.fire({
-                position: 'top-end',
+                position: 'center',
                 icon: 'error',
                 title: 'Ocorreu um erro ao enviar o formulário. Por favor, tente novamente.',
                 showConfirmButton: false,
-                timer: 3000,
+                timer: 5000,
                 customClass: {
                     container: 'custom-swal',
                 },
             });
-            
-            let textFuncao = 'COMPRASADM/ERRO AO CADASTRAR PROGRAMAÇÃO DE PROMOÇÕES'
-
-            const createtLog = {
-                IDFUNCIONARIO: usuarioLogado.id,
-                PATHFUNCAO: textFuncao,
-                DADOS: 'Erro ao criar Cadastro de Programações de Promoções',
-                IP: ipUsuario
-            }
-
-            const responseLog = await post('/log-web', createtLog)
-
 
             console.error('Erro ao criar Cadastro de Progamação de Promoções:', error);
             return responseLog.data;
