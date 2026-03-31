@@ -46,10 +46,10 @@ export const useCadastrarImagemProduto = ({usuarioLogado, optionsModulos}) => {
 
   
     const onSubmit = async () => {
-        if (optionsModulos[0]?.ALTERAR == 'False') {
+        if (optionsModulos[0]?.CRIAR == 'False') {
             Swal.fire({
                 title: 'Erro!',
-                html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para editar um Fornecedor!`,
+                html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para cadastrar imagens de produtos!`,
                 icon: 'error',
                 customClass: {
                     container: 'custom-swal',
