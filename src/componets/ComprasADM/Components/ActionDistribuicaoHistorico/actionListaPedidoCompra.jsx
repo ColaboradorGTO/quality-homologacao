@@ -15,10 +15,10 @@ import * as XLSX from 'xlsx';
 import HeaderTable from '../../../Tables/headerTable';
 import Swal from 'sweetalert2';
 import { ActionListaDistribuicaoSugestoesHistoricoVisualizar } from './actionListaDistribuicaoSugestoesHistoricoVisualizar';
-import { set } from 'date-fns';
+import axios from 'axios';
 
-export const ActionListaPedidoCompra = ({ 
-  show, 
+export const ActionListaPedidoCompra = ({
+  show,
   usuarioLogado,
   optionsModulos,
   dadosPedidosCompra,
@@ -41,6 +41,29 @@ export const ActionListaPedidoCompra = ({
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [selectedId, setSelectedId] = useState(null);
   const dataTableRef = useRef();
+  const [ipUsuario, setIpUsuario] = useState('');
+
+  const getIPUsuario = async () => {
+    let usuarioIP = null;
+
+    try {
+      const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+      usuarioIP = ipWhoisData?.ip;
+    } catch (error) {
+      console.error("Erro ao buscar IP via ifconfig.me:", error);
+    }
+
+    if (!usuarioIP) {
+      try {
+        const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+        usuarioIP = ipifyData?.ip;
+      } catch (error) {
+        console.error("Erro ao buscar IP via ipify.org:", error);
+      }
+    }
+    setIpUsuario(usuarioIP);
+    return usuarioIP;
+  };
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -147,7 +170,7 @@ export const ActionListaPedidoCompra = ({
   const handleDetalhar = async (IDPEDIDOCOMPRA) => {
     try {
       const response = await get(`/detalhe-distribuicao-compras?idPedido=${IDPEDIDOCOMPRA}`);
-      if(response.data && response.data.length > 0) {
+      if (response.data && response.data.length > 0) {
         setDadosDetalhePedido(response.data);
         setModalDetalhePedido(true);
       } else {
@@ -188,54 +211,55 @@ export const ActionListaPedidoCompra = ({
     }
   };
 
-   const handleFinalizar = async (IDPEDIDOCOMPRA) => {
+  const handleFinalizar = async (IDPEDIDOCOMPRA) => {
     Swal.fire({
-        position: 'center',
-        title: `Deseja realmente Finalizar essa Distribuição?`,
-        text: 'Você não poderá reverter a ação!',
-        icon: 'warning',
-        showCancelButton: true,
-        showConfirmButton: true,
-        cancelButtonText: 'Não',
-        confirmButtonText: 'Sim, quero Finalizar!',
-        customClass: {
-          confirmButton: 'btn btn-primary',
-          cancelButton: 'btn btn-danger',
-          loader: 'custom-loader'
-        },
-        buttonsStyling: false
+      position: 'center',
+      title: `Deseja realmente Finalizar essa Distribuição?`,
+      text: 'Você não poderá reverter a ação!',
+      icon: 'warning',
+      showCancelButton: true,
+      showConfirmButton: true,
+      cancelButtonText: 'Não',
+      confirmButtonText: 'Sim, quero Finalizar!',
+      customClass: {
+        confirmButton: 'btn btn-primary',
+        cancelButton: 'btn btn-danger',
+        loader: 'custom-loader'
+      },
+      buttonsStyling: false
     }).then(async (result) => {
-    if (result.isConfirmed) {
+      if (result.isConfirmed) {
         try {
-        const putData = {
+          const putData = {
             IDPEDIDOCOMPRA: parseInt(IDPEDIDOCOMPRA),
-            IDUSUARIO: parseInt(usuarioLogado.id)
-        }
-        const response = await put(`/atualiza-imagem/:id`, putData)
-        const textDados = JSON.stringify(putData)
-        let textoFuncao = 'COMPRASADM/ATUALIZA IMAGEM PRODUTO'
-        const ipUsuario = await getIPUsuario()
-        const postData = {
+            IDUSUARIO: parseInt(usuarioLogado.id),
+            FINALIZAR: 2
+          }
+          const response = await put(`/atualiza-imagem/:id`, putData)
+          const textDados = JSON.stringify(putData)
+          let textoFuncao = 'COMPRASADM/ATUALIZA IMAGEM PRODUTO'
+          const ipUsuario = await getIPUsuario()
+          const postData = {
             IDFUNCIONARIO: usuarioLogado.id,
             PATHFUNCAO: textoFuncao,
             DADOS: textDados,
             IP: ipUsuario || 'Indisponível'
-        }
+          }
 
-        await post('/log-web', postData)
+          await post('/log-web', postData)
 
-        return response.data;
+          return response.data;
         } catch (error) {
-        Swal.fire({
+          Swal.fire({
             title: 'Erro!',
             text: `Erro ao atualizar a Imagem do Produto: ${error}`,
             icon: 'error'
-        });
+          });
         }
-    }
+      }
     })
-    }
-    
+  }
+
   return (
     <Fragment>
       <div className="panel" style={{ marginTop: "5rem" }}>
@@ -311,7 +335,7 @@ export const ActionListaPedidoCompra = ({
         dadosSugestoesHistorico={dadosSugestoesHistorico}
       />
 
-     
+
     </Fragment>
   );
 };
