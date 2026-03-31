@@ -88,7 +88,7 @@ export const DashBoardComprasDM = () => {
     case "/comprasadm/ActionPesquisaPromocao":
       component = <ActionPesquisaPromocao usuarioLogado={usuarioLogado}/>
       break;
-    case "/comprasadm/ActionPesquisaProduto":
+    case "/comprasadm/ActionPesquisaProdutoImagem":
       component = <ActionPesquisaProduto usuarioLogado={usuarioLogado}/>
       break;
     default:

@@ -120,6 +120,8 @@ export const ActionMain = ({
   valueInputFieldOR,
   valueInputFieldOT,
   valueSelectFilial,
+  valueInputFieldComissao,
+  valueInputFieldObsFornecedor,
 
   valueTextAreaFieldComponent,
 
@@ -157,6 +159,8 @@ export const ActionMain = ({
   onChangeInputFieldSearch,
   onChangeInputFieldOR,
   onChangeInputFieldOT,
+  onChangeInputFieldComissao,
+  onChangeInputFieldObsFornecedor,
 
   onChangeSelectEmpresa,
   onChangeSelectMarcas,
@@ -463,7 +467,10 @@ export const ActionMain = ({
   placeHolderInputFieldQuantidade,
   placeHolderInputFieldOR,
   placeHolderInputFieldOT,
-
+  placeHolderInputFieldComissao,
+  placeHolderInputFieldObsFornecedor,
+  placeHolderInputFieldVendedor,
+  
   labelMultSelectGrupo,
   labelMultSelectSubGrupo,
   labelMultSelectMarca,
@@ -818,7 +825,9 @@ export const ActionMain = ({
                         type="text"
                         id={id}
                         name="dtconsultafim"
-                        value=""
+                        value={valueInputFieldComissao}
+                        onChange={onChangeInputFieldComissao}
+                        placeHolder={placeHolderInputFieldComissao}
                       />
                     )}
 
@@ -828,7 +837,9 @@ export const ActionMain = ({
                         type="text"
                         id={id}
                         name="dtconsultafim"
-                        value=""
+                        value={valueInputFieldObsFornecedor}
+                        onChange={onChangeInputFieldObsFornecedor}
+                        placeHolder={placeHolderInputFieldObsFornecedor}
                       />
 
                     )}
@@ -851,6 +862,7 @@ export const ActionMain = ({
                         name="dtconsultafim"
                         value={valueInputFieldVendedor}
                         onChange={onChangeInputFieldVendedor}
+                        placeHolder={placeHolderInputFieldVendedor}
                       />
                     )}
 
