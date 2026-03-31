@@ -1,92 +1,63 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { getDataAtual } from "../../../utils/dataAtual";
 import { post, put } from "../../../api/funcRequest";
 import axios from "axios";
 
-export const useSalvarVolumeOT = (dadosSalvarVolume) => {
+export const useSalvarVolumeOT = ({
+  dadosSalvarVolume,
+  refetchListaConferencia,
+  optionsModulos,
+  usuarioLogado,
+  handleClose
+}) => {
+
   const [descricao, setDescricao] = useState('')
   const [qtdVolume, setQtdVolume] = useState('')
   const [conferirItens, setConferirItens] = useState('')
-  const [usuarioLogado, setUsuarioLogado] = useState(null);
   const [ipUsuario, setIpUsuario] = useState('');
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const usuarioArmazenado = localStorage.getItem('usuario');
-
-    if (usuarioArmazenado) {
-      try {
-        const parsedUsuario = JSON.parse(usuarioArmazenado);
-        setUsuarioLogado(parsedUsuario);
-      } catch (error) {
-        console.error('Erro ao parsear o usuário do localStorage:', error);
-      }
-    } else {
-      navigate('/');
-    }
-  }, [navigate]);
-
-  useEffect(() => {
-    getIPUsuario();
-  }, [usuarioLogado]);
 
   const getIPUsuario = async () => {
-    const response = await axios.get('http://ipwho.is/')
-    if (response.data) {
-      setIpUsuario(response.data.ip);
-    }
-    return response.data;
-  }
+    let usuarioIP = null;
 
-
-  const handleRadioChange = (event) => {
-    const { id } = event.target;
-    if (id === 'Sim') {
-      setConferirItens('True');
-    } else if (id === 'Nao') {
-      setConferirItens('False');
+    try {
+      const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+      usuarioIP = ipWhoisData?.ip;
+    } catch (error) {
+      console.error("Erro ao buscar IP via ipwho.is:", error);
     }
+
+    if (!usuarioIP) {
+      try {
+        const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+        usuarioIP = ipifyData?.ip;
+      } catch (error) {
+        console.error("Erro ao buscar IP via ipify.org:", error);
+      }
+    }
+    setIpUsuario(usuarioIP);
+    return usuarioIP;
   };
 
-
-  const onSalvarVolume = async () => {
-    if(qtdVolume === '' || qtdVolume <= 0) {
+  const onSubmit = async () => {
+    if (optionsModulos[0]?.ALTERAR !== 'True') {
       Swal.fire({
-          icon: 'error',
-          title:'Erro!',
-          text: 'Necessário preencher a Quantidade!',
-          customClass: {
-              container: 'custom-swal',
-          },
-          timer: 3000,
-      })
-      return;
-    }
-
-    if(descricao === '') {
-      Swal.fire({
-          icon: 'error',
-          title:'Erro!',
-          text: 'Necessário preencher a Descrição!',
-          customClass: {
-              container: 'custom-swal',
-          },
-          timer: 3000,
-      })
+        icon: 'error',
+        title: 'Atenção!',
+        text: 'Você não tem permissão para finalizar esta Ordem de Transferência.',
+        confirmButtonColor: '#7352A5',
+      });
       return;
     }
 
     const putData = {
       IDSTATUSOT: parseInt(3),
-      IDRESUMOT: dadosSalvarVolume.IDRESUMOT,
+      IDRESUMOOT: dadosSalvarVolume.IDRESUMOOT,
       IDEMPRESAORIGEM: usuarioLogado.IDEMPRESA,
       NUTOTALVOLUMES: qtdVolume,
       TPVOLUME: descricao,
       NOTAFISCAL: parseInt(0),
     };
-    
+
     Swal.fire({
       icon: 'question',
       title: `Deseja Finalizar a OT?`,
@@ -101,34 +72,63 @@ export const useSalvarVolumeOT = (dadosSalvarVolume) => {
       },
       timer: 3000,
       preConfirm: async () => {
+        
         try {
+          const response = await put('/resumo-ordem-transferencia/:id', putData);
 
-          const response = await put('/listaOrdemTransferenciaConferenciaCega/:id', putData);
-          
-          
           const textDados = JSON.stringify(putData);
           let textoFuncao = 'CONFERENCIA CEGA / FINALIZAR OT';
+          const ipUsuario = await getIPUsuario();
 
           const createData = {
-            IDFUNCIONARIO: usuarioLogado.id,
+            IDFUNCIONARIO: String(usuarioLogado.id),
             PATHFUNCAO: textoFuncao,
             DADOS: textDados,
-            IP: ipUsuario
+            IP: ipUsuario || "INDISPONIVEL"
           };
 
           const responsePost = await post('/log-web', createData)
-            
+
           Swal.fire({
             title: 'Sucesso!',
             text: 'OT Finalizada com sucesso.',
-            icon: 'success'
+            icon: 'success',
+            customClass: {
+              container: 'custom-swal'
+            }
           });
-          
-        
+
+          refetchListaConferencia();
+          handleClose();
+
           return responsePost.data;
 
         } catch (error) {
-          Swal.fire('Erro!', 'Erro ao Finalizar OT.', 'error');
+          console.error('Erro ao salvar dados:', error);
+
+          const textDados = JSON.stringify(putData);
+          let textoFuncao = 'CONFERENCIA CEGA / ERROR AO FINALIZAR OT';
+          const ipUsuario = await getIPUsuario();
+
+          const createData = {
+            IDFUNCIONARIO: String(usuarioLogado.id),
+            PATHFUNCAO: textoFuncao,
+            DADOS: textDados,
+            IP: ipUsuario || "INDISPONIVEL"
+          };
+
+          const responsePost = await post('/log-web', createData)
+
+          Swal.fire({
+            title: 'Sucesso!',
+            text: 'OT Finalizada com sucesso.',
+            icon: 'success',
+            customClass: {
+              container: 'custom-swal'
+            }
+          });
+
+          return responsePost.data;
         }
       }
     });
@@ -142,7 +142,6 @@ export const useSalvarVolumeOT = (dadosSalvarVolume) => {
     conferirItens,
     setConferirItens,
     usuarioLogado,
-    setUsuarioLogado,
-    onSalvarVolume,
+    onSubmit,
   };
 };

@@ -1,21 +1,26 @@
 import Swal from "sweetalert2";
 import { useQuery } from "react-query";
 import { useState, useEffect } from "react";
-import { get, post } from "../../../api/funcRequest";
+import { get, post, put } from "../../../api/funcRequest";
 
-export const useSalvarOT = ({
+export const useEditarOTDeposito = ({
   handleClose,
   refetchListaConferencia,
   optionsModulos,
   usuarioLogado,
+  dadosDetalheTransferencia,
+  setDadosDetalheTransferencia,
+
 }) => {
 
   const [empresaOrigem, setEmpresaOrigem] = useState('')
   const [empresaDestino, setEmpresaDestino] = useState('')
   const [produto, setProduto] = useState('')
   const [ipUsuario, setIpUsuario] = useState('');
+  const [quantidadeAjuste, setQuantidadeAjuste] = useState(0)
   const [dadosProdutosTabela, setDadosProdutosTabela] = useState([]);
   const [produtoSalvo, setProdutoSalvo] = useState([]);
+  const [idResumoOT, setIdResumoOT] = useState('');
   const [observacao, setObservacao] = useState('')
 
   const getIPUsuario = async () => {
@@ -40,7 +45,6 @@ export const useSalvarOT = ({
     return usuarioIP;
   };
 
-
   const { data: dadosEmpresa = [], error: errorMarcas, isLoading: isLoadingMarcas } = useQuery(
     'empresas',
     async () => {
@@ -50,13 +54,60 @@ export const useSalvarOT = ({
     { staleTime: 5 * 60 * 1000 }
   );
 
-  const { data: dadosProdutos = [], isLoading: isLoadingProdutos } = useQuery(
-    ['listaProdutos', produto, usuarioLogado?.IDEMPRESA],
+  useEffect(() => {
+    if (!dadosDetalheTransferencia || dadosDetalheTransferencia.length === 0) return;
+
+    const cabecalho = dadosDetalheTransferencia[0];
+
+    setEmpresaOrigem({
+      value: cabecalho.IDEMPRESAORIGEM,
+      label: cabecalho.EMPRESAORIGEM
+    });
+
+    setEmpresaDestino({
+      value: cabecalho.IDEMPRESADESTINO,
+      label: cabecalho.EMPRESADESTINO
+    });
+
+    setIdResumoOT(cabecalho.IDRESUMOOT);
+
+    const produtos = dadosDetalheTransferencia.map(item => ({
+      IDPRODUTO: item.IDPRODUTO,
+      NUCODBARRAS: item.NUCODBARRAS,
+      DSNOME: item.DSNOME,
+      VLRUNITCUSTO: parseFloat(item.VLRUNITCUSTO),
+      VLRUNITVENDA: parseFloat(item.VLRUNITVENDA),
+      QTDEXPEDICAO: parseInt(item.QTDEXPEDICAO),
+      QTDRECEPCAO: parseInt(item.QTDRECEPCAO),
+      QTDDIFERENCA: parseInt(item.QTDDIFERENCA),
+      QTDAJUSTE: parseInt(item.QTDAJUSTE),
+      QTDTOTALITENS: parseInt(item.QTDTOTALITENS),
+      IDRESUMOOT: item.IDRESUMOOT,
+      IDSTATUSOT: item.IDSTATUSOT
+    }));
+
+    setDadosProdutosTabela(produtos);
+
+  }, [dadosDetalheTransferencia]);
+
+  const handleChangeQtdAjuste = (idProduto, novoValor) => {
+    setDadosProdutosTabela(prev =>
+      prev.map(item =>
+        item.IDPRODUTO === idProduto
+          ? { ...item, QTDAJUSTE: parseInt(novoValor) || 0 }
+          : item
+      )
+    );
+  };
+
+  const { data: dadosProdutosDeposito = [] } = useQuery(
+    ['listaProdutos', produto],
     async () => {
+      const response = await get(
+        `/listaProdutos?idEmpresa=${usuarioLogado?.IDEMPRESA}&idProduto=${produto}&page=1`
+      );
 
-      const response = await get(`/listaProdutos?idEmpresa=${usuarioLogado?.IDEMPRESA}&idProduto=${produto}&page=1 `);
-
-      setDadosProdutosTabela(prev => {
+      setDadosDetalheTransferencia(prev => {
         const novos = [...prev];
 
         response.data.forEach(novo => {
@@ -65,22 +116,36 @@ export const useSalvarOT = ({
           if (index >= 0) {
             novos[index] = {
               ...novos[index],
-              QUANTIDADE: (novos[index].QUANTIDADE || 1) + 1
+              QTDEXPEDICAO: novos[index].QTDEXPEDICAO + 1
             };
           } else {
             novos.push({
-              ...novo,
-              QUANTIDADE: 1
+              IDPRODUTO: novo.IDPRODUTO,
+              NUCODBARRAS: novo.NUCODBARRAS,
+              DSNOME: novo.DSNOME,
+
+              VLRUNITVENDA: Number(novo.PRECOVENDA || 0),
+              VLRUNITCUSTO: Number(novo.PRECOCUSTO || 0),
+
+              QTDEXPEDICAO: 1,
+              QTDRECEPCAO: 0,
+              QTDDIFERENCA: 0,
+              QTDAJUSTE: 0,
+
+              IDSTATUSOT: 1
             });
           }
         });
 
         return novos;
       });
+
       setProduto("");
       return response.data;
     },
-    { enabled: !!(produto.length > 8 && empresaDestino?.value && usuarioLogado?.IDEMPRESA) }
+    {
+      enabled: Boolean(produto && produto.length > 8)
+    }
   );
 
   useEffect(() => {
@@ -98,10 +163,8 @@ export const useSalvarOT = ({
     }
   }, [produto, empresaDestino]);
 
-  useEffect(() => { }, [])
-
   const onSubmit = async () => {
-    if (optionsModulos[0]?.CRIAR == 'False') {
+    if (optionsModulos[0]?.ALTERAR == 'False') {
       Swal.fire({
         title: 'Erro!',
         text: `${usuarioLogado?.NOFUNCIONARIO},\nVocê não tem permissão para criar a OT!`,
@@ -134,10 +197,10 @@ export const useSalvarOT = ({
     let dVlrTotalVenda = 0;
     let dVlrTotalCusto = 0;
 
-    const dadosdetalheot = dadosProdutosTabela.map((item) => {
-      const nQtdProduto = parseInt(item.QUANTIDADE || 0);
-      const nVlrVenda = parseFloat(item.PRECOVENDA || 0);
-      const nVlrCusto = parseFloat(item.PRECOCUSTO || 0);
+    const dadosdetalheot = dadosProdutosTabela.map(item => {
+      const nQtdProduto = parseInt(item.QTDEXPEDICAO || 0);
+      const nVlrVenda = parseFloat(item.VLRUNITVENDA || 0);
+      const nVlrCusto = parseFloat(item.VLRUNITCUSTO || 0);
 
       nCtTotalItens++;
       nQtdTotalItens += nQtdProduto;
@@ -159,7 +222,8 @@ export const useSalvarOT = ({
         STSOBRA: 'False',
       };
     });
-    const postData = {
+
+    const putData = {
       IDEMPRESAORIGEM: empresaOrigem?.value,
       IDEMPRESADESTINO: empresaDestino?.value,
       DATAEXPEDICAO: "",
@@ -174,7 +238,7 @@ export const useSalvarOT = ({
       VRTOTALVENDA: dVlrTotalVenda,
       DTRECEPCAO: "",
       IDOPERADORRECEPTOR: 0,
-      DSOBSERVACAO: observacao,
+      DSOBSERVACAO: "",
       IDUSRCANCELAMENTO: 0,
       DTULTALTERACAO: "",
       IDSTDIVERGENCIA: 0,
@@ -184,7 +248,7 @@ export const useSalvarOT = ({
       STENTRADAINVENTARIO: "False",
       QTDCONFERENCIA: 0,
       dadosdetalheot,
-      IDRESUMOOT: 0,
+      IDRESUMOOT: idResumoOT,
       IDSTATUSOT: 1,
       IDUSRAJUSTE: 0,
       DTAJUSTE: "",
@@ -192,10 +256,11 @@ export const useSalvarOT = ({
     };
 
     try {
-      const response = await post('/criar-resumo-ordem-transferencia', postData);
 
-      const textDados = JSON.stringify(postData);
-      let textoFuncao = 'EXPEDICAO/CRIADO COM SUCESSO';
+      const response = await put('/resumo-ordem-transferencia/:id', putData);
+
+      const textDados = JSON.stringify(putData);
+      let textoFuncao = 'DEPOSITO/ OT ATUALIZADA COM SUCESSO';
       const ipUsuario = await getIPUsuario();
 
       const createData = {
@@ -208,8 +273,8 @@ export const useSalvarOT = ({
       await post('/log-web', createData)
 
       Swal.fire({
-        title: 'Cadastro',
-        text: 'OT cadastrada com Sucesso',
+        title: 'Sucesso',
+        text: 'OT atualizada com Sucesso',
         icon: 'success',
         confirmButtonText: 'OK',
         customClass: {
@@ -223,10 +288,10 @@ export const useSalvarOT = ({
       return response.data;
 
     } catch (error) {
-      console.error('Erro ao cadastrar OT:', error);
 
-      const textDados = JSON.stringify(postData);
-      let textoFuncao = 'EXPEDICAO/ERRO AO CRIAR OT COM SUCESSO';
+      console.error('Erro ao atualizar OT:', error);
+      const textDados = JSON.stringify(putData);
+      let textoFuncao = 'DEPOSITO/ERRO AO ATUALIZAR OT';
       const ipUsuario = await getIPUsuario();
 
       const createData = {
@@ -264,6 +329,9 @@ export const useSalvarOT = ({
     setDadosProdutosTabela,
     produtoSalvo,
     setProdutoSalvo,
+    quantidadeAjuste,
+    setQuantidadeAjuste,
+    handleChangeQtdAjuste,
     onSubmit,
   }
 };

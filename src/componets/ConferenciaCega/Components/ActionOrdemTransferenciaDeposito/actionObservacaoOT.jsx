@@ -5,8 +5,6 @@ import { FooterModal } from "../../../Modais/FooterModal/footerModal";
 import { HeaderModal } from "../../../Modais/HeaderModal/HeaderModal";
 import { toFloat } from "../../../../utils/toFloat";
 
-
-
 export const ActionObservacaoOT = ({ show, handleClose, dadosObservacaoOT }) => {
 
   const dados = dadosObservacaoOT.map((item) => {
@@ -49,7 +47,6 @@ export const ActionObservacaoOT = ({ show, handleClose, dadosObservacaoOT }) => 
       Mensagem: Mensagem
     };
   });
-
 
   return (
     <Fragment>
@@ -102,7 +99,6 @@ export const ActionObservacaoOT = ({ show, handleClose, dadosObservacaoOT }) => 
               <th style={{border: 'none'}} colspan="4">{dados[0]?.Mensagem}</th>
             </tr>
           </table>
-
 
         </Modal.Body>
 
