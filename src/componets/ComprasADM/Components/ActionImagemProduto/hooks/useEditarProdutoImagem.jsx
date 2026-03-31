@@ -3,11 +3,9 @@ import { post, put } from "../../../../../api/funcRequest";
 import { useState } from "react";
 import axios from "axios";
 
-
 export const useEditarProdutoImagem = ({usuarioLogado, optionsModulos, handleClick}) => {
     const [ipUsuario, setIpUsuario] = useState('');
-
-    
+  
     const getIPUsuario = async () => {
         let usuarioIP = null;
 

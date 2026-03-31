@@ -165,8 +165,11 @@ export const ActionCarregaImagem = ({
     return (
       <div className={className} style={{ backgroundColor: 'transparent', display: 'flex', alignItems: 'center' }}>
         {chooseButton}
-        {uploadButton}
-        {cancelButton}
+        {/* {uploadButton} */}
+
+        <div onClick={() => onTemplateClear()}>
+          {cancelButton}
+        </div>
         <div className="flex align-items-center gap-3 ml-auto">
           <span>{formatedValue} / 2 MB</span>
           <ProgressBar value={value} showValue={false} style={{ width: '10rem', height: '12px' }}></ProgressBar>
@@ -277,7 +280,12 @@ export const ActionCarregaImagem = ({
   const cancelOptions = { 
     icon: <AiOutlineCloseCircle size={25}/>, 
     className: 'custom-cancel-btn p-button-danger p-button-rounded p-button-outlined', 
-    label: 'Limpar' 
+    label: 'Limpar Imagem',
+    onClick: () => {
+      // Lógica específica para limpeza
+      onTemplateClear();
+      fileUploadRef.current.clear();
+    }
   };
 
   return (
