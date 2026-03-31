@@ -71,9 +71,9 @@ export const useExcluirImagemProduto = () => {
                 IDIMAGEM: IDIMAGEM,
                 STATIVO: STATIVO
             }
-            const response = await put(`/imagemProdutos/:id`, putData)
+            const response = await put(`/atualiza-imagem/:id`, putData)
             const textDados = JSON.stringify(putData)
-            let textoFuncao = 'COMPRAS/EXCLUSÃO IMAGEM PRODUTO'
+            let textoFuncao = 'COMPRASADM/ATUALIZA IMAGEM PRODUTO'
             const ipUsuario = await getIPUsuario()
             const postData = {
                 IDFUNCIONARIO: usuarioLogado.id,
@@ -88,8 +88,8 @@ export const useExcluirImagemProduto = () => {
             } catch (error) {
             Swal.fire({
                 title: 'Erro!',
-                text: `Erro ao excluir a Imagem do Produto: ${error}`,
-                icon: 'success'
+                text: `Erro ao atualizar a Imagem do Produto: ${error}`,
+                icon: 'error'
             });
             }
         }

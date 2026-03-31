@@ -17,6 +17,7 @@ export const ActionPesquisaProduto = ({ usuarioLogado }) => {
   const [fabricanteSelecionado, setFabricanteSelecionado] = useState('');
   const [estruturaSelecionada, setEstruturaSelecionada] = useState('');
   const [pedido, setPedido] = useState('');
+  const [produto, setProduto] = useState('');
   const [modalCadastro, setModalCadastro] = useState(false)
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
     
@@ -39,7 +40,7 @@ export const ActionPesquisaProduto = ({ usuarioLogado }) => {
   );
 
   const fetchListaProdutos = async () => {
-    const urlBase = `/imagemProdutos?numeroRefProduto=${referencia}&idFabricante=${fabricanteSelecionado}&idSubEstrutura=${estruturaSelecionada}&idPedido=${pedido}`;
+    const urlBase = `/imagemProdutos?numeroRefProduto=${referencia}&idFabricante=${fabricanteSelecionado}&idSubEstrutura=${estruturaSelecionada}&idPedido=${pedido}&idNomeCodBarrasProd=${produto}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
@@ -107,8 +108,8 @@ export const ActionPesquisaProduto = ({ usuarioLogado }) => {
 
         InputFieldVendedor={InputField}
         labelInputFieldVendedor={"Id / Código de Barras / Nome Produto"}
-        valueInputFieldVendedor={referencia}
-        onChangeInputFieldVendedor={(e) => setReferencia(e.target.value)}
+        valueInputFieldVendedor={produto}
+        onChangeInputFieldVendedor={(e) => setProduto(e.target.value)}
         placeHolderInputFieldVendedor={""}
 
         InputSelectFornecedorComponent={InputSelectAction}

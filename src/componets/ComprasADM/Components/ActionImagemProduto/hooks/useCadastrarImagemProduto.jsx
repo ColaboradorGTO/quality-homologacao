@@ -19,7 +19,7 @@ export const useCadastrarImagemProduto = ({usuarioLogado, optionsModulos}) => {
             const response = await get(`/produtos-imagens?numeroRefProduto=${referencia}`);
             return response.data;
         },
-        { enabled: Boolean(referencia.length > 4), staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
+        { enabled: Boolean(referencia.length > 2), staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
     );
 
     const getIPUsuario = async () => {
@@ -90,7 +90,7 @@ export const useCadastrarImagemProduto = ({usuarioLogado, optionsModulos}) => {
 
 
             const textDados = JSON.stringify(postData)
-            let textFuncao = 'COMPRAS/EDITAR FORNECEDOR';
+            let textFuncao = 'COMPRASADM/CADASTRAR IMAGEM PRODUTO';
             const ipUsuario = await getIPUsuario();
             const createtLog = {
                 IDFUNCIONARIO: String(usuarioLogado.id),
@@ -115,7 +115,7 @@ export const useCadastrarImagemProduto = ({usuarioLogado, optionsModulos}) => {
             return response.data;
         } catch (error) {
             const textDados = JSON.stringify(postData)
-            let textFuncao = 'COMPRAS/ERRO AO EDITAR FORNECEDOR';
+            let textFuncao = 'COMPRASADM/ERRO AO CADASTRAR IMAGEM PRODUTO';
             const ipUsuario = await getIPUsuario();
             const createtLog = {
                 IDFUNCIONARIO: String(usuarioLogado.id),
@@ -134,7 +134,7 @@ export const useCadastrarImagemProduto = ({usuarioLogado, optionsModulos}) => {
                     container: 'custom-swal',
                 },
             });
-            console.error('Erro ao editar fornecedor:', error);
+            console.error('Erro ao cadastrar imagem do produto:', error);
         }
     }
     return {
