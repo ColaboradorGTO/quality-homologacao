@@ -38,7 +38,7 @@ export const ActionPesquisaPromocao = ({ usuarioLogado }) => {
     },
     { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
   );
-  console.log('optionsModulos:', optionsModulos);
+ 
   /* const fetchListaProdutosPromocao = async () => {
       const urlBase = `/promocoes-ativas?dataPesquisaInicio=${dataInicio}&dataPesquisaFim=${dataFim}&status=${statusSelecionado}`;
       let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';

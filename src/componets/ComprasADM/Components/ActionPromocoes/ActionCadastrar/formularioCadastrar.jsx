@@ -1,13 +1,18 @@
-import { Fragment } from "react"
-import { useForm } from "react-hook-form"
+import { Fragment, useEffect } from "react"
+import { Controller, useForm } from "react-hook-form";
 import Select from 'react-select';
-import { InputFieldModal } from "../../../../Buttons/InputFieldModal";
-import { useCadastrarPromocaoLoja } from "../hooks/useCadastrarPromocaoLoja";
+import { useCadastrarPromocaoLoja } from "./hook/useCadastrarPromocaoLoja";
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal";
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal";
+import FormField from "../../../../Formularios/FormField";
+import { schema } from "./Schema/schemaValidarPromocao"
+import { AlertError } from "../../../../Inputs/alertError";
 
 export const FormularioCadastrar = ({ handleClose }) => {
-    const { register, handleSubmit, formState: { errors } } = useForm();
+    const { handleSubmit, formState: { errors }, clearErrors, control, setError, setValue } = useForm({
+        mode: "onChange"
+    });
+    
     const {
         dataInicio,
         setDataInicio,
@@ -33,53 +38,98 @@ export const FormularioCadastrar = ({ handleClose }) => {
         setAplicacaoSaida,
         optionsAplicaocao,
         optionsFator,
-        handleCadastrar
+        onSubmit
     } = useCadastrarPromocaoLoja();
+
+    const handleValidatedSubmit = async () => {
+        try {
+            const dadosParaValidar = {
+                descricaPromo: descricao,
+            };
+            
+            await schema.validate(dadosParaValidar, { abortEarly: false });
+            await onSubmit();
+        } catch (validationError) {
+            console.error('❌ Erro de validação:', validationError);
+
+            clearErrors();
+
+            if (validationError.inner && validationError.inner.length > 0) {
+                validationError.inner.forEach(error => {
+                    if (error.path) {
+                        setError(error.path, {
+                            type: 'manual',
+                            message: error.message
+                        });
+                    }
+                });
+            }
+
+            const errorMessages = validationError.errors || [validationError.message];
+            console.log(`Erro de validação:\n${errorMessages.join('\n')}`);
+        }
+    
+    }
+    
+    useEffect(() => {
+        setAplicacaoSelecionada('')
+    }, [])
     return (
         <Fragment>
-            <form onSubmit={handleSubmit(handleCadastrar)}>
+            <form onSubmit={handleSubmit(handleValidatedSubmit)}>
 
                 <div className="form-group">
                     <div className="row">
 
                         <div className="col-sm-6 col-lg-6">
-                            <InputFieldModal
-                                label={"Descrição *"}
-                                type={"text"}
-                                id={"descricao"}
-                                value={descricao}
-                                onChangeModal={(e) => setDescricao(e.target.value)}
-                                {...register("descricao", { required: "Campo obrigatório Informe a Descrição.", })}
-                                required={true}
-                                placeholder={"Informe a Descrição da Categoria do Pedido."}
-                                readOnly={false}
+                            <Controller
+                                name="descricaoPromo"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        name="descricaoPromo"
+                                        label={"Descrição *"}
+                                        type="text"
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        value={descricao}
+                                        onChangeModal={(e) => setDescricao(e.target.value)}
+                                    />
+                                )}
                             />
                         </div>
                         <div className="col-sm-6 col-lg-3">
-
-                            <InputFieldModal
-                                label={"Data Início *"}
-                                type={"date"}
-                                id={"dataInicio"}
-                                value={dataInicio}
-                                onChangeModal={(e) => setDataInicio(e.target.value)}
-                                {...register("dataInicio", { required: "Campo obrigatório Informe a Data de Início.", })}
-                                required={true}
-                                placeholder={"Informe a Data de Início."}
-                                readOnly={false}
+                            <Controller
+                                name="dataPromo"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        name="dataPromo"
+                                        label={"Data Início *"}
+                                        type="date"
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        value={dataInicio}
+                                        onChangeModal={(e) => setDataInicio(e.target.value)}
+                                    />
+                                )}
                             />
                         </div>
                         <div className="col-sm-6 col-lg-3">
-                            <InputFieldModal
-                                label={"Data Fim *"}
-                                type={"date"}
-                                id={"dataFim"}
-                                value={dataFim}
-                                onChangeModal={(e) => setDataFim(e.target.value)}
-                                {...register("dataFim", { required: "Campo obrigatório Informe a Data de Fim.", })}
-                                required={true}
-                                placeholder={"Informe a Data de Fim."}
-                                readOnly={false}
+                            <Controller
+                                name="dataPromoFim"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        name="dataPromoFim"
+                                        label={"Data Fim *"}
+                                        type="date"
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        value={dataFim}
+                                        onChangeModal={(e) => setDataFim(e.target.value)}
+                                    />
+                                )}
                             />
                         </div>
                     </div>
@@ -89,6 +139,9 @@ export const FormularioCadastrar = ({ handleClose }) => {
                         <div className="col-sm-3 col-md-3 col-lg-3">
                             <label className="form-label" htmlFor="promoaplicst">Aplicação</label>
                             <Select
+                                name="aplicacaoPromo"
+                                className="basic-single"
+                                classNamePrefix="select"
                                 options={optionsAplicaocao.map((item) => {
                                     return {
                                         value: item.value,
@@ -96,51 +149,55 @@ export const FormularioCadastrar = ({ handleClose }) => {
                                     }
                                 })}
                                 value={aplicacaoSelecionada}
-                                onChange={(e) => setAplicacaoSelecionada(e)}
+                                onChange={(e) => {
+                                    setAplicacaoSelecionada(e)
+                                    clearErrors("aplicacaoPromo")
+                                }}
                             />
+                            {errors.aplicacaoPromo && (
+                                <AlertError
+                                    error={errors.aplicacaoPromo}
+                                    onClose={clearErrors}
+                                    fieldName="aplicacaoPromo"
+                                />
+                            )}
                         </div>
                         <div className="col-sm-3 col-md-3 col-lg-3">
-
-                            <InputFieldModal
-                                label={"QTD Apartir De"}
-                                type={"text"}
-                                id={"qtd"}
-                                value={qtdAplicacao}
-                                onChangeModal={(e) => setQtdAplicacao(e.target.value)}
-                                {...register("qtd", { required: "Campo obrigatório Informe a Quantidade.", })}
-                                required={true}
-                                placeholder={"0"}
-                                readOnly={true}
+                            <Controller
+                                name="qtdPromo"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        name="qtdPromo"
+                                        label={"QTD Apartir De *"}
+                                        type="text"
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        value={qtdAplicacao}
+                                        onChangeModal={(e) => setQtdAplicacao(e.target.value)}
+                                        readOnly={aplicacaoSelecionada?.value !== '1'} // Habilitado apenas quando "Por QTD" for selecionado
+                                    />
+                                )}
                             />
                         </div>
                         <div className="col-sm-3 cold-md-3 col-lg-3">
-                            <InputFieldModal
-                                label={"Valor Produto"}
-                                type={"text"}
-                                id={"vrAplicao"}
-                                value={valor}
-                                onChangeModal={(e) => setValor(e.target.value)}
-                                {...register("vrAplicao", { required: "Campo obrigatório Informe o Valor.", })}
-                                required={true}
-                                placeholder={"0"}
-
-                                readOnly={true}
+                            <Controller
+                                name="vrAplicao"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        name="vrAplicao"
+                                        label={"Valor Produto *"}
+                                        type="text"
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        value={valor}
+                                        onChangeModal={(e) => setValor(e.target.value)}
+                                        readOnly={aplicacaoSelecionada?.value !== '2'} // Habilitado apenas quando "Por Valor" for selecionado
+                                    />
+                                )}
                             />
                         </div>
-
-                        {/* <div className="col-sm-3 col-md-3 col-lg-3">
-                            <label className="form-label" htmlFor="promoaplicst">Aplicação Saída*</label>
-                            <Select
-                                options={optionsAplicaocao.map((item) => {
-                                    return {
-                                        value: item.value,
-                                        label: item.label
-                                    }
-                                })}
-                                value={aplicacaoSelecionada}
-                                onChange={(e) => setAplicacaoSelecionada(e)}
-                            />
-                        </div> */}
 
                     </div>
                 </div>
@@ -149,6 +206,9 @@ export const FormularioCadastrar = ({ handleClose }) => {
                         <div className="col-sm-3 col-lg-3">
                             <label className="form-label" htmlFor="promofatorst">Fator *</label>
                             <Select
+                                name="fatorPromo"
+                                className="basic-single"
+                                classNamePrefix="select"
                                 options={optionsFator.map((item) => {
                                     return {
                                         value: item.value,
@@ -156,57 +216,77 @@ export const FormularioCadastrar = ({ handleClose }) => {
                                     }
                                 })}
                                 value={fatorSelecionado}
-                                onChange={(e) => setFatorSelecionado(e)}
+                                onChange={(e) => {
+                                    setFatorSelecionado(e)
+                                    clearErrors("fatorPromo")
+                                }}
+                            />
+                            {errors.fatorPromo && (
+                                <AlertError
+                                    error={errors.fatorPromo}
+                                    onClose={clearErrors}
+                                    fieldName="fatorPromo"
+                                />      
+                            )}
+                        </div>
+                        <div className="col-sm-3 col-lg-3">
+                            <Controller
+                                name="vrProduto"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        name="vrProduto"
+                                        label={"Valor Produto *"}
+                                        type="text"
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        value={valorProduto}
+                                        onChangeModal={(e) => setValorProduto(e.target.value)}
+                                        readOnly={fatorSelecionado?.value !== '0'} // Habilitado apenas quando "Por Valor do Produto" for selecionado
+                                    />
+                                )}
                             />
                         </div>
                         <div className="col-sm-3 col-lg-3">
-
-                            <InputFieldModal
-                                label={"Valor Produto"}
-                                type={"text"}
-                                id={"vrProduto"}
-                                value={valorProduto}
-                                onChangeModal={(e) => setValorProduto(e.target.value)}
-                                {...register("vrProduto", { required: "Campo obrigatório Informe o Valor do Produto.", })}
-                                required={true}
-                                placeholder={"0"}
-                                readOnly={true}
+                            <Controller
+                                name="vrDesconto"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        name="vrDesconto"
+                                        label={"Valor Desconto"}
+                                        type="text"
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        value={valorDesconto}
+                                        onChangeModal={(e) => setValorDesconto(e.target.value)}
+                                        readOnly={fatorSelecionado?.value !== '1'} // Habilitado apenas quando "Valor de Desconto" for selecionado
+                                    />
+                                )}
                             />
                         </div>
                         <div className="col-sm-3 col-lg-3">
-                            <InputFieldModal
-                                label={"Valor Desconto"}
-                                type={"text"}
-                                id={"vrDesconto"}
-                                value={valorDesconto}
-                                onChangeModal={(e) => setValorDesconto(e.target.value)}
-                                {...register("vrDesconto", { required: "Campo obrigatório Informe o Valor do Desconto.", })}
-                                required={true}
-                                placeholder={"0"}
-                                readOnly={true}
-                            />
-                        </div>
-                        <div className="col-sm-3 col-lg-3">
-                            <InputFieldModal
-                                label={"Percentual"}
-                                type={"text"}
-                                id={"percentual"}
-                                value={percentual}
-                                onChangeModal={(e) => setPercentual(e.target.value)}
-                                {...register("percentual", { required: "Campo obrigatório Informe o Percentual.", })}
-                                required={true}
-                                placeholder={"0"}
-                                readOnly={true}
+                            <Controller
+                                name="percentualPromo"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        name="percentualPromo"
+                                        label={"Percentual"}
+                                        type="text"
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        value={percentual}
+                                        onChangeModal={(e) => setPercentual(e.target.value)}
+                                        readOnly={fatorSelecionado?.value !== '2'} // Habilitado apenas quando "Por Percentual" for selecionado
+                                    />
+                                )}
                             />
                         </div>
                     </div>
                 </div>
 
-                <div className="form-group">
-                    <div className="row">
-                        <h3 style={{ color: "red" }}>* Campos Obrigatórios *</h3>
-                    </div>
-                </div>
+
                 <FooterModal
                     ButtonTypeFechar={ButtonTypeModal}
                     textButtonFechar={"Fechar"}
@@ -215,7 +295,7 @@ export const FormularioCadastrar = ({ handleClose }) => {
 
                     ButtonTypeCadastrar={ButtonTypeModal}
                     textButtonCadastrar={"Cadastrar"}
-                    onClickButtonCadastrar={handleCadastrar}
+                    onClickButtonCadastrar={handleValidatedSubmit}
                     corCadastrar="success"
                     loadingTextCadastrar={"Cadastrando..."}
                     autoLoadingCadastrar={true}

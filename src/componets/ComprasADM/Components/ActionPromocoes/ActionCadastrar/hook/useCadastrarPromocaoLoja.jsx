@@ -1,10 +1,10 @@
 import Swal from "sweetalert2";
-import { post } from "../../../../../api/funcRequest";
+import { post } from "../../../../../../api/funcRequest";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { getDataAtual } from "../../../../../utils/dataAtual";
-import { toFloat } from "../../../../../utils/toFloat";
+import { getDataAtual } from "../../../../../../utils/dataAtual";
+import { toFloat } from "../../../../../../utils/toFloat";
 
 
 export const useCadastrarPromocaoLoja = () => {
@@ -56,19 +56,29 @@ export const useCadastrarPromocaoLoja = () => {
         }
     }, [navigate]);
 
-    useEffect(() => {
-        getIPUsuario();
-    }, [usuarioLogado]);
-
     const getIPUsuario = async () => {
-        const response = await axios.get('http://ipwho.is/')
-        if (response.data) {
-            setIpUsuario(response.data.ip);
-        }
-        return response.data;
-    }
+        let usuarioIP = null;
 
-    const handleCadastrar = async () => {
+        try {
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+            usuarioIP = ipWhoisData?.ip;
+        } catch (error) {
+            console.error("Erro ao buscar IP via ipwho.is:", error);
+        }
+
+        if (!usuarioIP) {
+            try {
+                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+                usuarioIP = ipifyData?.ip;
+            } catch (error) {
+                console.error("Erro ao buscar IP via ipify.org:", error);
+            }
+        }
+        setIpUsuario(usuarioIP);
+        return usuarioIP;
+    };
+
+    const onSubmit = async () => {
         if (descricao == '') {
             Swal.fire({
                 icon: 'error',
@@ -120,19 +130,6 @@ export const useCadastrarPromocaoLoja = () => {
             })
             return false;
         }
-
-        // if (aplicacaoSaida == '') {
-        //     Swal.fire({
-        //         icon: 'error',
-        //         title: 'Oops...',
-        //         text: 'Informe a Aplicação de Saída!',
-        //         customClass: {
-        //             container: 'custom-swal',
-        //         },
-        //         timer: 1500,
-        //     })
-        //     return false;
-        // }
 
         if (fatorSelecionado == '') {
             Swal.fire({
@@ -287,6 +284,6 @@ export const useCadastrarPromocaoLoja = () => {
         setAplicacaoSaida,
         optionsAplicaocao,
         optionsFator,
-        handleCadastrar
+        onSubmit
     }
 }
