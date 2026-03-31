@@ -175,7 +175,7 @@ export const FormularioCadastrar = ({ handleClose }) => {
                                         clearErrors={clearErrors}
                                         value={qtdAplicacao}
                                         onChangeModal={(e) => setQtdAplicacao(e.target.value)}
-                                        readOnly={aplicacaoSelecionada?.value !== '1'} // Habilitado apenas quando "Por QTD" for selecionado
+                                        readOnly={aplicacaoSelecionada?.value !== '1'} 
                                     />
                                 )}
                             />
@@ -193,7 +193,7 @@ export const FormularioCadastrar = ({ handleClose }) => {
                                         clearErrors={clearErrors}
                                         value={valor}
                                         onChangeModal={(e) => setValor(e.target.value)}
-                                        readOnly={aplicacaoSelecionada?.value !== '2'} // Habilitado apenas quando "Por Valor" for selecionado
+                                        readOnly={aplicacaoSelecionada?.value !== '2'} 
                                     />
                                 )}
                             />
@@ -242,7 +242,7 @@ export const FormularioCadastrar = ({ handleClose }) => {
                                         clearErrors={clearErrors}
                                         value={valorProduto}
                                         onChangeModal={(e) => setValorProduto(e.target.value)}
-                                        readOnly={fatorSelecionado?.value !== '0'} // Habilitado apenas quando "Por Valor do Produto" for selecionado
+                                        readOnly={fatorSelecionado?.value !== '0'} 
                                     />
                                 )}
                             />
@@ -260,7 +260,7 @@ export const FormularioCadastrar = ({ handleClose }) => {
                                         clearErrors={clearErrors}
                                         value={valorDesconto}
                                         onChangeModal={(e) => setValorDesconto(e.target.value)}
-                                        readOnly={fatorSelecionado?.value !== '1'} // Habilitado apenas quando "Valor de Desconto" for selecionado
+                                        readOnly={fatorSelecionado?.value !== '1'} 
                                     />
                                 )}
                             />
@@ -278,7 +278,7 @@ export const FormularioCadastrar = ({ handleClose }) => {
                                         clearErrors={clearErrors}
                                         value={percentual}
                                         onChangeModal={(e) => setPercentual(e.target.value)}
-                                        readOnly={fatorSelecionado?.value !== '2'} // Habilitado apenas quando "Por Percentual" for selecionado
+                                        readOnly={fatorSelecionado?.value !== '2'} 
                                     />
                                 )}
                             />
