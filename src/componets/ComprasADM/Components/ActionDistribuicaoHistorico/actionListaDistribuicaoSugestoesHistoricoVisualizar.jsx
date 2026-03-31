@@ -8,7 +8,7 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
-export const ActionListaDistribuicaoSugestoesHistorico = ({ dadosSugestoesHistorico }) => {
+export const ActionListaDistribuicaoSugestoesHistoricoVisualizar = ({ dadosSugestoesHistorico }) => {
 
   const [dadosProcessados, setDadosProcessados] = useState([]);
   const [colunasDinamicas, setColunasDinamicas] = useState([]);
@@ -243,6 +243,7 @@ export const ActionListaDistribuicaoSugestoesHistorico = ({ dadosSugestoesHistor
           exportToPDF={exportToPDF}
         />
       </div>
+      <h1>Produtos Sugestões</h1>
       <div className="scroll" ref={dataTableRef}>
         <DataTable
           value={dadosProcessados}

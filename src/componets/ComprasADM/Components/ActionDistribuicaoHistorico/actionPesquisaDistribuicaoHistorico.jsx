@@ -9,10 +9,15 @@ import { ActionListaPedidoCompra } from "./actionListaPedidoCompra";
 import { useFetchData } from "../../../../hooks/useFetchData";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
 import { useQuery } from "react-query";
+import { ActionListaDistribuicaoSugestoesHistoricoVisualizar } from "./actionListaDistribuicaoSugestoesHistoricoVisualizar";
+import { FaCheck } from "react-icons/fa6";
+import { MdMenu, MdOutlineSearch } from "react-icons/md";
 
 
 export const ActionPesquisaDistribuicaoHistorico = () => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
+  const [tabelaSugestao, setTabelaSugestao] = useState(false);
+  const [tabelaVisualizar, setTabelaVisualizar] = useState(false);
   const [modalVisivel, setModalVisivel] = useState(false);
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('')
   const [dataPesquisaFim, setDataPesquisaFim] = useState('')
@@ -20,15 +25,15 @@ export const ActionPesquisaDistribuicaoHistorico = () => {
   const [numeroPedido, setNumeroPedido] = useState('')
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(1000);
+  const [dadosSugestoesHistorico, setDadosSugestoesHistorico] = useState([]);
 
+  // useEffect(() => {
+  //   const dataInicial = getDataAtual()
+  //   const dataFim = getDataAtual()
+  //   setDataPesquisaInicio(dataInicial)
+  //   setDataPesquisaFim(dataFim)
 
-  useEffect(() => {
-    const dataInicial = getDataAtual()
-    const dataFim = getDataAtual()
-    setDataPesquisaInicio(dataInicial)
-    setDataPesquisaFim(dataFim)
-
-  }, [])
+  // }, [])
 
   const fetchListaPedidos = async () => {
     const urlBase = `/distribuicao-compras-historico?idFornecedor=${fornecedorSelecionado}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
@@ -141,14 +146,44 @@ export const ActionPesquisaDistribuicaoHistorico = () => {
         linkNomeSearch={"Pesquisar"}
         onButtonClickSearch={handleClickActionDistribuicaoCompras}
         corSearch={"primary"}
+        IconSearch={MdOutlineSearch}
+
+        ButtonTypeCadastro={ButtonType}
+        linkNome="Visualizar"
+        onButtonClickCadastro
+        corCadastro={"secondary"}
+        IconCadastro={MdMenu}
+        // styleCadastro
+
+        ButtonTypeCancelar={ButtonType}
+        linkCancelar={"Finalizar"}
+        corCancelar={"success"}
+        IconCancelar={FaCheck}
+        // styleCancelar={}
       />
 
       {tabelaVisivel && (
-        <ActionListaPedidoCompra dadosPedidosCompra={dadosPedidosCompra} />
+        <ActionListaPedidoCompra 
+          dadosPedidosCompra={dadosPedidosCompra} 
+          dadosSugestoesHistorico={dadosSugestoesHistorico} 
+          setDadosSugestoesHistorico={setDadosSugestoesHistorico}
+          tabelaVisivel={tabelaVisivel}
+          setTabelaVisivel={setTabelaVisivel}
+          tabelaVisualizar={tabelaVisualizar}
+          setTabelaVisualizar={setTabelaVisualizar}
+          tabelaSugestao={tabelaSugestao}
+          setTabelaSugestao={setTabelaSugestao}
+          
+        />
 
       )}
 
+      {tabelaVisualizar && (
 
+        <ActionListaDistribuicaoSugestoesHistoricoVisualizar
+          dadosSugestoesHistorico={dadosSugestoesHistorico}
+        />
+      )}
     </Fragment>
   )
 }

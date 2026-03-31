@@ -13,15 +13,29 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from '../../../Tables/headerTable';
+import Swal from 'sweetalert2';
+import { ActionListaDistribuicaoSugestoesHistoricoVisualizar } from './actionListaDistribuicaoSugestoesHistoricoVisualizar';
+import { set } from 'date-fns';
 
-export const ActionListaPedidoCompra = ({ show, dadosPedidosCompra }) => {
+export const ActionListaPedidoCompra = ({ 
+  show, 
+  dadosPedidosCompra,
+  dadosSugestoesHistorico,
+  setDadosSugestoesHistorico,
+  tabelaVisivel,
+  setTabelaVisivel,
+  tabelaVisualizar,
+  setTabelaVisualizar,
+  tabelaSugestao,
+  setTabelaSugestao
+}) => {
   const [actionListaPedidos, setActionListaPedidos] = useState(true);
   const [actionPedidoResumido, setActionPedidoResumido] = useState(true);
   const [rowClick, setRowClick] = useState(true);
   const [empresaSelecionada, setEmpresaSelecionada] = useState(null);
   const [modalDetalhePedido, setModalDetalhePedido] = useState(false);
   const [dadosDetalhePedido, setDadosDetalhePedido] = useState([]);
-  const [dadosSugestoesHistorico, setDadosSugestoesHistorico] = useState([]);
+  // const [dadosSugestoesHistorico, setDadosSugestoesHistorico] = useState([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [selectedId, setSelectedId] = useState(null);
   const dataTableRef = useRef();
@@ -91,11 +105,13 @@ export const ActionListaPedidoCompra = ({ show, dadosPedidosCompra }) => {
             <div className="p-1">
               <ButtonTable
                 Icon={GrView}
-                cor={"success"}
+                cor={"primary"}
                 iconColor={"white"}
                 iconSize={20}
                 onClickButton={() => handleClickDetalhar(row)}
                 titleButton={"Visualizar Detalhes do Pedido"}
+                width="30px"
+                height="30px"
               />
             </div>
             <div className="custom-control custom-checkbox p-1">
@@ -128,9 +144,17 @@ export const ActionListaPedidoCompra = ({ show, dadosPedidosCompra }) => {
 
   const handleDetalhar = async (IDPEDIDOCOMPRA) => {
     try {
-      const response = await get(`/detalhe-distribuicao-compras?idResumoPedido=${IDPEDIDOCOMPRA}`);
-      setDadosDetalhePedido(response.data);
-      setModalDetalhePedido(true);
+      const response = await get(`/detalhe-distribuicao-compras?idPedido=${IDPEDIDOCOMPRA}`);
+      if(response.data && response.data.length > 0) {
+        setDadosDetalhePedido(response.data);
+        setModalDetalhePedido(true);
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Sem detalhes',
+          text: 'Não foram encontrados detalhes para este pedido.',
+        })
+      }
     } catch (error) {
       console.error(error);
     }
@@ -138,8 +162,24 @@ export const ActionListaPedidoCompra = ({ show, dadosPedidosCompra }) => {
 
   const handleClickCheck = async (IDPEDIDOCOMPRA) => {
     try {
-      const response = await get(`/distribuicao-compras-sugestoes-historico?idPedidoCompra=${IDPEDIDOCOMPRA}`);
+      const response = await get(`/distribuicao-compras-sugestoes-historico?idPedido=${IDPEDIDOCOMPRA}`);
       setDadosSugestoesHistorico(response);
+      setTabelaSugestao(true)
+      setTabelaVisualizar(false);
+      setTabelaVisivel(false);
+      return response.data;
+    } catch (error) {
+      console.log(error, "não foi possivel pegar os dados da tabela ");
+    }
+  };
+
+  const handleClickCheckVisualizar = async (IDPEDIDOCOMPRA) => {
+    try {
+      const response = await get(`/distribuicao-compras-sugestoes-historico?idPedido=${IDPEDIDOCOMPRA}`);
+      setDadosSugestoesHistorico(response);
+      setTabelaVisualizar(true);
+      setTabelaVisivel(false);
+      setTabelaSugestao(false);
       return response.data;
     } catch (error) {
       console.log(error, "não foi possivel pegar os dados da tabela ");
@@ -220,6 +260,8 @@ export const ActionListaPedidoCompra = ({ show, dadosPedidosCompra }) => {
       <ActionListaDistribuicaoSugestoesHistorico
         dadosSugestoesHistorico={dadosSugestoesHistorico}
       />
+
+     
     </Fragment>
   );
 };
