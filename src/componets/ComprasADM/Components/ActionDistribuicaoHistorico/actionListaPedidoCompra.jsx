@@ -19,6 +19,8 @@ import { set } from 'date-fns';
 
 export const ActionListaPedidoCompra = ({ 
   show, 
+  usuarioLogado,
+  optionsModulos,
   dadosPedidosCompra,
   dadosSugestoesHistorico,
   setDadosSugestoesHistorico,
@@ -186,6 +188,54 @@ export const ActionListaPedidoCompra = ({
     }
   };
 
+   const handleFinalizar = async (IDPEDIDOCOMPRA) => {
+    Swal.fire({
+        position: 'center',
+        title: `Deseja realmente Finalizar essa Distribuição?`,
+        text: 'Você não poderá reverter a ação!',
+        icon: 'warning',
+        showCancelButton: true,
+        showConfirmButton: true,
+        cancelButtonText: 'Não',
+        confirmButtonText: 'Sim, quero Finalizar!',
+        customClass: {
+          confirmButton: 'btn btn-primary',
+          cancelButton: 'btn btn-danger',
+          loader: 'custom-loader'
+        },
+        buttonsStyling: false
+    }).then(async (result) => {
+    if (result.isConfirmed) {
+        try {
+        const putData = {
+            IDPEDIDOCOMPRA: parseInt(IDPEDIDOCOMPRA),
+            IDUSUARIO: parseInt(usuarioLogado.id)
+        }
+        const response = await put(`/atualiza-imagem/:id`, putData)
+        const textDados = JSON.stringify(putData)
+        let textoFuncao = 'COMPRASADM/ATUALIZA IMAGEM PRODUTO'
+        const ipUsuario = await getIPUsuario()
+        const postData = {
+            IDFUNCIONARIO: usuarioLogado.id,
+            PATHFUNCAO: textoFuncao,
+            DADOS: textDados,
+            IP: ipUsuario || 'Indisponível'
+        }
+
+        await post('/log-web', postData)
+
+        return response.data;
+        } catch (error) {
+        Swal.fire({
+            title: 'Erro!',
+            text: `Erro ao atualizar a Imagem do Produto: ${error}`,
+            icon: 'error'
+        });
+        }
+    }
+    })
+    }
+    
   return (
     <Fragment>
       <div className="panel" style={{ marginTop: "5rem" }}>
