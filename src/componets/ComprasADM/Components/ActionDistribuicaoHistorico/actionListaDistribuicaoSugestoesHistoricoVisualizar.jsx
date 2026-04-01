@@ -1,13 +1,117 @@
-import { Fragment, useRef } from "react";
+import { Fragment, useRef, useState, useEffect } from "react";
 import './styles.css'
 import './print-styles.css'
 import { useReactToPrint } from "react-to-print";
 import * as XLSX from 'xlsx';
+import { put } from '../../../../api/funcRequest';
+import Swal from 'sweetalert2';
 
 export const ActionListaDistribuicaoSugestoesHistoricoVisualizar = ({ 
   dadosSugestoesHistorico, 
 }) => {
   const dataTableRef = useRef();
+  const [dadosProcessados, setDadosProcessados] = useState([]);
+  const [usuarioLogado, setUsuarioLogado] = useState(null);
+
+  // Carrega usuário logado
+  useEffect(() => {
+    const usuarioArmazenado = localStorage.getItem('usuario');
+    if (usuarioArmazenado) {
+      try {
+        const parsedUsuario = JSON.parse(usuarioArmazenado);
+        setUsuarioLogado(parsedUsuario);
+      } catch (error) {
+        console.error('Erro ao parsear o usuário do localStorage:', error);
+      }
+    }
+  }, []);
+
+  // AlterarQtdSugestao - Função idêntica ao jQuery
+  const AlterarQtdSugestao = async (id) => {
+    if (!usuarioLogado?.id) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Atenção!',
+        text: 'Usuário não identificado. Faça login novamente.',
+      });
+      return;
+    }
+
+    const idchave = id.split(":");
+    const iddistribuicaocompras = idchave[0];
+    const idpedidocompra = idchave[1];
+    const idempresa = idchave[2];
+    const idfilial = idchave[3];
+    const codbarras = idchave[4];
+
+    const inputElement = document.getElementById(id);
+    const spanTotal = document.getElementById(codbarras);
+    
+    if (!inputElement || !spanTotal) {
+      console.error('Elementos não encontrados:', { inputElement, spanTotal });
+      return;
+    }
+
+    const qtdsugestaoalterada = parseInt(inputElement.value) || 0;
+    const qtdsugestao = parseInt(inputElement.defaultValue) || 0;
+    
+    const qtdtotal = (parseInt(spanTotal.textContent) - qtdsugestao) + qtdsugestaoalterada;
+
+    const dados = [{
+      "IDDISTRIBUICAOCOMPRASHISTORICO": parseInt(iddistribuicaocompras),
+      "IDPEDIDOCOMPRA": parseInt(idpedidocompra),
+      "IDEMPRESA": parseInt(idempresa),
+      "IDFILIAL": parseInt(idfilial),
+      "CODBARRAS": codbarras,
+      "QTDSUGESTAOALTERACAOHISTORICO": parseInt(qtdsugestaoalterada),
+      "IDUSUARIOALTERACAO": parseInt(usuarioLogado.id),
+      "FINALIZAR": 0
+    }];
+
+    try {
+      await put("/compras/distribuicao-compras-historico", dados);
+      
+      // Atualiza o DOM como no jQuery
+      inputElement.defaultValue = qtdsugestaoalterada;
+      spanTotal.textContent = qtdtotal;
+      
+      // Atualiza o estado também para manter consistência
+      setDadosProcessados(prevDados => {
+        return prevDados.map(produto => {
+          if (produto.CodBarras === codbarras) {
+            const novasFiliais = produto.filiais.map(filial => {
+              if (filial.IdFilial.toString() === idfilial) {
+                return { ...filial, qtdsugestaoalterada };
+              }
+              return filial;
+            });
+            return {
+              ...produto,
+              filiais: novasFiliais,
+              totalqtd: qtdtotal
+            };
+          }
+          return produto;
+        });
+      });
+      
+      // Alerta de sucesso
+      Swal.fire({
+        position: 'top-end',
+        icon: 'success',
+        title: 'Quantidade atualizada com sucesso!',
+        showConfirmButton: false,
+        timer: 1500
+      });
+    } catch (error) {
+      console.error('Erro ao atualizar quantidade:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Erro!',
+        text: 'Erro ao atualizar quantidade. Tente novamente.',
+      });
+    }
+  };
   
   const handlePrint = useReactToPrint({
     content: () => dataTableRef.current,
@@ -78,7 +182,11 @@ export const ActionListaDistribuicaoSugestoesHistoricoVisualizar = ({
         filiaisProcessadas.push({
           IdFilial: idfilial,
           DescFilial: retfilialsugerida.DescFilial,
-          qtdsugestaoalterada
+          qtdsugestaoalterada,
+          qtdsugestao,
+          iddistribuicaocompras,
+          // Criar inputId idêntico ao jQuery
+          inputId: `${iddistribuicaocompras}:${registro.IdPedidoCompra}:${registro.IdEmpresa}:${idfilial}:${registro.CodBarras}`
         });
 
         totalqtd += parseInt(qtdsugestaoalterada);
@@ -90,10 +198,15 @@ export const ActionListaDistribuicaoSugestoesHistoricoVisualizar = ({
         QtdGrade: registro.QtdGrade,
         Grade: registro.Grade,
         CodBarras: registro.CodBarras,
+        IdPedidoCompra: registro.IdPedidoCompra,
+        IdEmpresa: registro.IdEmpresa,
         totalqtd,
         filiais: filiaisProcessadas
       };
     });
+
+    // Armazena os dados processados no state
+    setDadosProcessados(produtos);
 
     return { produtos, filiais };
   };
@@ -187,23 +300,69 @@ export const ActionListaDistribuicaoSugestoesHistoricoVisualizar = ({
           </thead>
           
           <tbody>           
-            {produtos.map((produto, index) => (
-              <tr key={index} id={`dt-basic-distribuicao-lista-${index}`}>
-                <td className="td">{produto.DescProduto}</td>
-                <td className="td">{produto.PrecoVenda}</td>
-                <td className="td">{produto.QtdGrade}</td>
-                <td className="td">{produto.Grade}</td>
-                <td className="td">
-                  <span id={produto.CodBarras}>{produto.totalqtd}</span>
-                </td>
-                
-                {produto.filiais.map((filial) => (
-                  <td key={filial.IdFilial} className="td">
-                    {filial.qtdsugestaoalterada}
+            {produtos.map((produto, index) => {
+              // Busca o produto atualizado do state
+              const produtoAtualizado = dadosProcessados.find(p => p.CodBarras === produto.CodBarras);
+              const totalAtualizado = produtoAtualizado?.totalqtd || produto.totalqtd;
+              
+              return (
+                <tr key={index} id={`dt-basic-distribuicao-lista-${index}`}>
+                  <td className="td">{produto.DescProduto}</td>
+                  <td className="td">{produto.PrecoVenda}</td>
+                  <td className="td">{produto.QtdGrade}</td>
+                  <td className="td">{produto.Grade}</td>
+                  <td className="td">
+                    <span id={produto.CodBarras}>{totalAtualizado}</span>
                   </td>
-                ))}
-              </tr>
-            ))}
+                  
+                  {produto.filiais.map((filial) => {
+                    // Encontra o produto atual no state para pegar o valor atualizado
+                    const filialAtualizada = produtoAtualizado?.filiais.find(f => f.IdFilial === filial.IdFilial);
+                    const valorAtual = filialAtualizada?.qtdsugestaoalterada || filial.qtdsugestaoalterada;
+                    
+                    return (
+                      <td key={filial.IdFilial} className="td">
+                        <input
+                          type="number"
+                          id={filial.inputId}
+                          name="qtdsugestaoalterada"
+                          defaultValue={filial.qtdsugestao}
+                          value={valorAtual}
+                          onChange={(e) => {
+                            // Atualiza o state localmente para responsividade 
+                            const novoValor = parseInt(e.target.value) || 0;
+                            setDadosProcessados(prevDados => {
+                              return prevDados.map(prod => {
+                                if (prod.CodBarras === produto.CodBarras) {
+                                  const novasFiliais = prod.filiais.map(fil => {
+                                    if (fil.IdFilial === filial.IdFilial) {
+                                      return { ...fil, qtdsugestaoalterada: novoValor };
+                                    }
+                                    return fil;
+                                  });
+                                  // Recalcula o total local
+                                  const novoTotal = novasFiliais.reduce((acc, fil) => acc + parseInt(fil.qtdsugestaoalterada), 0);
+                                  return { ...prod, filiais: novasFiliais, totalqtd: novoTotal };
+                                }
+                                return prod;
+                              });
+                            });
+                          }}
+                          onBlur={() => AlterarQtdSugestao(filial.inputId)}
+                          size="2"
+                          data-default-value={filial.qtdsugestao}
+                          style={{
+                            width: '45px',
+                            textAlign: 'center',
+                            border: '1px solid #ccc'
+                          }}
+                        />
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

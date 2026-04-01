@@ -7,9 +7,10 @@ import { useReactToPrint } from "react-to-print";
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+import Swal from "sweetalert2";
+import { put } from "../../../../api/funcRequest";
 
-export const ActionListaDistribuicaoSugestoesHistorico = ({ dadosSugestoesHistorico }) => {
-
+export const ActionListaDistribuicaoSugestoesHistorico = ({ dadosSugestoesHistorico,usuarioLogado }) => {
   const [dadosProcessados, setDadosProcessados] = useState([]);
   const [colunasDinamicas, setColunasDinamicas] = useState([]);
   const dataTableRef = useRef();
@@ -118,41 +119,127 @@ export const ActionListaDistribuicaoSugestoesHistorico = ({ dadosSugestoesHistor
   }, [dadosSugestoesHistorico]);
 
   // ✅ 5. Função AlterarQtdSugestao idêntica ao jQuery
-  const AlterarQtdSugestao = (inputId, novoValor, rowData) => {
-    const idchave = inputId.split(":");
-    const iddistribuicaocompras = idchave[0];
-    const idpedidocompra = idchave[1];
-    const idempresa = idchave[2];
-    const idfilial = idchave[3];
-    const codbarras = idchave[4];
+  // const AlterarQtdSugestao = (inputId, novoValor, rowData) => {
+  //   const idchave = inputId.split(":");
+  //   const iddistribuicaocompras = idchave[0];
+  //   const idpedidocompra = idchave[1];
+  //   const idempresa = idchave[2];
+  //   const idfilial = idchave[3];
+  //   const codbarras = idchave[4];
 
-    const qtdsugestaoalterada = parseInt(novoValor);
+  //   const qtdsugestaoalterada = parseInt(novoValor);
 
-    // ✅ 6. Recalcula total - atualiza estado
-    setDadosProcessados(prevDados => {
-      return prevDados.map(item => {
-        if (item.CodBarras === codbarras) {
-          const filialKey = `filial_${idfilial}`;
-          const filialAtual = item[filialKey];
+  //   // ✅ 6. Recalcula total - atualiza estado
+  //   setDadosProcessados(prevDados => {
+  //     return prevDados.map(item => {
+  //       if (item.CodBarras === codbarras) {
+  //         const filialKey = `filial_${idfilial}`;
+  //         const filialAtual = item[filialKey];
 
-          if (filialAtual) {
-            const diferencaQtd = qtdsugestaoalterada - filialAtual.qtdsugestaoalterada;
+  //         if (filialAtual) {
+  //           const diferencaQtd = qtdsugestaoalterada - filialAtual.qtdsugestaoalterada;
 
-            return {
-              ...item,
-              [filialKey]: {
-                ...filialAtual,
-                qtdsugestaoalterada
-              },
-              totalGeralProduto: item.totalGeralProduto + diferencaQtd
-            };
-          }
-        }
-        return item;
-      });
-    });
+  //           return {
+  //             ...item,
+  //             [filialKey]: {
+  //               ...filialAtual,
+  //               qtdsugestaoalterada
+  //             },
+  //             totalGeralProduto: item.totalGeralProduto + diferencaQtd
+  //           };
+  //         }
+  //       }
+  //       return item;
+  //     });
+  //   });
 
-  };
+  // };
+
+  const AlterarQtdSugestao = async (id) => {
+      if (!usuarioLogado?.id) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Atenção!',
+          text: 'Usuário não identificado. Faça login novamente.',
+        });
+        return;
+      }
+  
+      const idchave = id.split(":");
+      const iddistribuicaocompras = idchave[0];
+      const idpedidocompra = idchave[1];
+      const idempresa = idchave[2];
+      const idfilial = idchave[3];
+      const codbarras = idchave[4];
+  
+      const inputElement = document.getElementById(id);
+      const spanTotal = document.getElementById(codbarras);
+      
+      if (!inputElement || !spanTotal) {
+        console.error('Elementos não encontrados:', { inputElement, spanTotal });
+        return;
+      }
+  
+      const qtdsugestaoalterada = parseInt(inputElement.value) || 0;
+      const qtdsugestao = parseInt(inputElement.defaultValue) || 0;
+      
+      const qtdtotal = (parseInt(spanTotal.textContent) - qtdsugestao) + qtdsugestaoalterada;
+  
+      const dados = {
+        "IDDISTRIBUICAOCOMPRASHISTORICO": parseInt(iddistribuicaocompras),
+        "IDPEDIDOCOMPRA": parseInt(idpedidocompra),
+        "IDEMPRESA": parseInt(idempresa),
+        "IDFILIAL": parseInt(idfilial),
+        "CODBARRAS": codbarras,
+        "QTDSUGESTAOALTERACAOHISTORICO": parseInt(qtdsugestaoalterada),
+        "IDUSUARIOALTERACAO": parseInt(usuarioLogado.id),
+        "FINALIZAR": 0
+      };
+  
+      try {
+        await put("/distribuicao-compras-historico/:id", dados);
+        
+        // Atualiza o DOM como no jQuery
+        inputElement.defaultValue = qtdsugestaoalterada;
+        spanTotal.textContent = qtdtotal;
+        
+        // Atualiza o estado também para manter consistência
+        setDadosProcessados(prevDados => {
+          return prevDados.map(produto => {
+            if (produto.CodBarras === codbarras) {
+              const novasFiliais = produto.filiais?.map(filial => {
+                if (filial.IdFilial.toString() === idfilial) {
+                  return { ...filial, qtdsugestaoalterada };
+                }
+                return filial;
+              });
+              return {
+                ...produto,
+                filiais: novasFiliais,
+                totalqtd: qtdtotal
+              };
+            }
+            return produto;
+          });
+        });
+        
+        // Alerta de sucesso
+        Swal.fire({
+          position: 'top-end',
+          icon: 'success',
+          title: 'Quantidade atualizada com sucesso!',
+          showConfirmButton: false,
+          timer: 1500
+        });
+      } catch (error) {
+        console.error('Erro ao atualizar quantidade:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro!',
+          text: 'Erro ao atualizar quantidade. Tente novamente.',
+        });
+      }
+    };
 
   // ✅ 8. Template para coluna de produto (th style)
   const produtoBodyTemplate = (rowData) => (

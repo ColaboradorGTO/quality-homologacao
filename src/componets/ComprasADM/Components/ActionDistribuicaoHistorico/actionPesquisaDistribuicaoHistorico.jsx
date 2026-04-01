@@ -13,7 +13,7 @@ import { FaCheck } from "react-icons/fa6";
 import { MdMenu, MdOutlineSearch } from "react-icons/md";
 import { ActionListaDistribuicaoSugestoesHistorico } from "./actionListaDistribuicaoSugestoesHistorico";
 import Swal from "sweetalert2";
-
+import axios from "axios";
 
 export const ActionPesquisaDistribuicaoHistorico = ({usuarioLogado}) => {
   const [actionVisivel, setActionVisivel] = useState(true);
@@ -235,6 +235,7 @@ export const ActionPesquisaDistribuicaoHistorico = ({usuarioLogado}) => {
 
         <ActionListaDistribuicaoSugestoesHistorico
           dadosSugestoesHistorico={dadosSugestoesHistorico}
+          usuarioLogado={usuarioLogado}
         />
       )} 
    
