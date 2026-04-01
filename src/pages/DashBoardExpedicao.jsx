@@ -7,8 +7,10 @@ import { MenuButton } from "../componets/Buttons/menuButton";
 import { FooterMain } from "../componets/Footer";
 import { useQuery } from "react-query";
 import { get } from "../api/funcRequest";
+
 const ActionPesquisaFaturamentoOT = lazy(() => import("../componets/Expedicao/Components/ActionFaturamentoOT/actionPesquisaFaturamentoOT").then(module => ({ default: module.ActionPesquisaFaturamentoOT })));
 const ActionPesquisaOT = lazy(() => import("../componets/Expedicao/Components/ActionExpedicaoOrdemTransferencia/ActionPesquisaOT").then(module => ({ default: module.ActionPesquisaOT })));
+const ActionStatusDivergencia = lazy(() => import("../componets/Expedicao/Components/ActionStatusDivergencia/actionPesquisaStatusDivergencia").then(module => ({ default: module.ActionStatusDivergencia })));
 
 export const DashBoardExpedicao = () => {
   const [actionVisivel, setActionVisivel] = useState(true);
@@ -59,6 +61,9 @@ export const DashBoardExpedicao = () => {
       break;
     case "/expedicao/ActionPesquisaFaturamentoOT":
       component = <ActionPesquisaFaturamentoOT usuarioLogado={usuarioLogado} />
+      break;
+    case "/expedicao/ExpedicaoActionStatusDivergencia":
+      component = <ActionStatusDivergencia usuarioLogado={usuarioLogado} />
       break;
     default:
       break;
