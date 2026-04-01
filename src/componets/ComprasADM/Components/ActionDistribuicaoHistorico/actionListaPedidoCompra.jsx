@@ -24,12 +24,11 @@ export const ActionListaPedidoCompra = ({
   dadosPedidosCompra,
   dadosSugestoesHistorico,
   setDadosSugestoesHistorico,
-  tabelaVisivel,
   setTabelaVisivel,
-  tabelaVisualizar,
   setTabelaVisualizar,
-  tabelaSugestao,
-  setTabelaSugestao
+  setTabelaSugestao,
+  handleVisualizar,
+  setSelectedItens 
 }) => {
   const [actionListaPedidos, setActionListaPedidos] = useState(true);
   const [actionPedidoResumido, setActionPedidoResumido] = useState(true);
@@ -145,6 +144,7 @@ export const ActionListaPedidoCompra = ({
                 checked={selectedId === row.IDPEDIDOCOMPRA}
                 onChange={(e) => {
                   setSelectedId(e.target.checked ? row.IDPEDIDOCOMPRA : null);
+                  setSelectedItens(row.IDPEDIDOCOMPRA);
                 }}
                 selectionMode="single"
               />
@@ -205,6 +205,7 @@ export const ActionListaPedidoCompra = ({
       setTabelaVisualizar(true);
       setTabelaVisivel(false);
       setTabelaSugestao(false);
+      handleVisualizar();
       return response.data;
     } catch (error) {
       console.log(error, "não foi possivel pegar os dados da tabela ");
@@ -262,7 +263,60 @@ export const ActionListaPedidoCompra = ({
 
   return (
     <Fragment>
-      <div className="panel" style={{ marginTop: "5rem" }}>
+      <div className="panel" >
+        <div className="row">
+          <div>
+
+            <ButtonType
+              textButton={"Pesquisar"}
+              Icon={FiSend}
+              cor={"primary"}
+              iconColor={"white"}
+              iconSize={20}
+              onClickButtonType={() => {
+                if (selectedId) {
+                  handleClickCheck(selectedId);
+                } else {
+                  alert("Selecione um pedido para pesquisar.");
+                }
+              }}
+            />
+          </div>
+          <div>
+
+            <ButtonType
+              textButton={"Visualizar"}
+              Icon={FiSend}
+              cor={"secondary"}
+              iconColor={"white"}
+              iconSize={20}
+              onClickButtonType={() => {
+                if (selectedId) {
+                  handleClickCheck(selectedId);
+                } else {
+                  alert("Selecione um pedido para pesquisar.");
+                }
+              }}
+            />
+          </div>
+          <div>
+
+            <ButtonType
+              textButton={"Finalizar"}
+              Icon={FiSend}
+              cor={"success"}
+              iconColor={"white"}
+              iconSize={20}
+              onClickButtonType={() => {
+                if (selectedId) {
+                  handleClickCheck(selectedId);
+                } else {
+                  alert("Selecione um pedido para pesquisar.");
+                }
+              }}
+            />
+          </div>
+        </div>
         <div className="panel-hdr">
           <h2>Histórico da Distribuição de Compras </h2>
         </div>
@@ -308,20 +362,7 @@ export const ActionListaPedidoCompra = ({
             ))}
           </DataTable>
 
-          <ButtonType
-            textButton={"Pesquisar"}
-            Icon={FiSend}
-            cor={"primary"}
-            iconColor={"white"}
-            iconSize={20}
-            onClickButtonType={() => {
-              if (selectedId) {
-                handleClickCheck(selectedId);
-              } else {
-                alert("Selecione um pedido para pesquisar.");
-              }
-            }}
-          />
+      
         </div>
       </div>
 
@@ -331,9 +372,9 @@ export const ActionListaPedidoCompra = ({
         dadosDetalhePedido={dadosDetalhePedido}
       />
 
-      <ActionListaDistribuicaoSugestoesHistorico
+      {/* <ActionListaDistribuicaoSugestoesHistorico
         dadosSugestoesHistorico={dadosSugestoesHistorico}
-      />
+      /> */}
 
 
     </Fragment>

@@ -1,310 +1,174 @@
-import React, { Fragment, useState, useEffect, useMemo, useRef } from "react";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import { InputText } from "primereact/inputtext";
-import HeaderTable from "../../../Tables/headerTable";
+import { Fragment, useRef } from "react";
+import './styles.css'
+import './print-styles.css'
 import { useReactToPrint } from "react-to-print";
-import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
-import * as XLSX from 'xlsx';
 
-export const ActionListaDistribuicaoSugestoesHistoricoVisualizar = ({ dadosSugestoesHistorico }) => {
-
-  const [dadosProcessados, setDadosProcessados] = useState([]);
-  const [colunasDinamicas, setColunasDinamicas] = useState([]);
+export const ActionListaDistribuicaoSugestoesHistoricoVisualizar = ({ 
+  dadosSugestoesHistorico, 
+  IdRadioResumoPedido 
+}) => {
   const dataTableRef = useRef();
-  const [globalFilterValue, setGlobalFilterValue] = useState('');
-  const onGlobalFilterChange = (e) => {
-    setGlobalFilterValue(e.target.value);
-  };
+    const handlePrint = useReactToPrint({
+      content: () => dataTableRef.current,
+      documentTitle: 'Histórico da Distribuição',
+      onBeforePrint: () => {
+        const style = document.createElement('style');
+        style.innerHTML = `
+          *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box !important;
+          }
+          @page {
+            size: A4 landscape;
+            margin: 5mm !important;
+            background: #f60000;
+          }
+          @media print {
+            .print-div-table{ width: 100%; };
+            .hidden-print {
+              display: none !important;
+            }
+            .tbody > tr > td {
+             margin: 0;
+             padding: 0;
+            }
+          }
+          body {
+            padding: 0 !important;
+            margin: 0 !important;
+            width: 100% !important;
+            height: 100vh !important;
+            background: white !important;
+          }
+        `;
+        document.head.appendChild(style);   
+      }
+      // document.head.appendChild(style);
+    })
 
-  const handlePrint = useReactToPrint({
-    content: () => dataTableRef.current,
-    documentTitle: 'Histórico da Distribuição',
-  });
+  const processarDadosParaTabela = (respostaListaDistribuicaoCompras) => {
+    if (!respostaListaDistribuicaoCompras || respostaListaDistribuicaoCompras.length === 0) {
+      return { produtos: [], filiais: [] };
+    }
 
-  const exportToPDF = () => {
-    const doc = new jsPDF();
-    doc.autoTable({
-      head: [['Produto', 'Valor', 'Qtd', 'Grade', 'Total', 'Filiais...']],
-      body: dadosProcessados.map(item => [
-        item.DescProduto,
-        item.PrecoVenda,
-        item.QtdGrade,
-        item.Grade,
-        item.totalGeralProduto,
-        ...colunasDinamicas.map(filial => item[`filial_${filial.IdFilial}`]?.qtdsugestaoalterada || 0)
-      ]),
-      horizontalPageBreak: true,
-      horizontalPageBreakBehaviour: 'immediately'
-    });
-    doc.save('historico_distribuicao_compras.pdf');
-  };
+    // ✅ 1. Extrai filiais do primeiro registro
+    const filiais = respostaListaDistribuicaoCompras[0]?.Filiais || [];
+    
+    // ✅ 2. Processa cada produto
+    const produtos = respostaListaDistribuicaoCompras.map((registro) => {
+      let totalqtd = 0;
+      const filiaisProcessadas = [];
 
-  const exportToExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(dadosProcessados);
-    const workbook = XLSX.utils.book_new();
-    const header = ['Produto', 'Valor', 'Qtd', 'Grade', 'Total', 'Filiais...'];
-    worksheet['!cols'] = [
-      { wpx: 100, caption: 'Produto' },
-      { wpx: 100, caption: 'Valor' },
-      { wpx: 100, caption: 'Qtd' },
-      { wpx: 100, caption: 'Grade' },
-      { wpx: 100, caption: 'Total' },
-      { wpx: 150, caption: 'Filiais...' },
-    ];
-    XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Histórico da Distribuição');
-    XLSX.writeFile(workbook, 'historico_distribuicao_compras.xlsx');
-  };
-
-  const processarDados = (dados) => {
-    if (!dados || dados.length === 0) return [];
-
-    // ✅ 1. Extrai filiais do primeiro registro (como jQuery)
-    const filiaisBase = dados[0]?.Filiais || [];
-    setColunasDinamicas(filiaisBase);
-
-    return dados.map((item) => {
-      const filiais = Array.isArray(item.Filiais) ? item.Filiais : [];
-      const sugestoes = item.Sugestao || [];
-
-      let totalGeralProduto = 0;
-      const filiaisData = {};
-
-      // ✅ 2. Processa cada filial
-      filiais.forEach(filial => {
+      // ✅ 3. Para cada filial, calcula quantidade
+      registro.Filiais.forEach((retfilialsugerida) => {
         let qtdsugestao = 0;
         let iddistribuicaocompras = 0;
         let qtdsugestaoalterada = 0;
+        const idfilial = retfilialsugerida.IdFilial;
 
-        sugestoes.forEach(sug => {
-          if (parseInt(filial.IdFilial) === parseInt(sug.IdFilial)) {
-            qtdsugestao = sug.QtdSugestao;
-            iddistribuicaocompras = sug.IdDistribuicaoCompras;
-            qtdsugestaoalterada = parseInt(sug.QtdSugestaoAlteracao) === 0 ? qtdsugestao : sug.QtdSugestaoAlteracao;
+        // ✅ 4. Busca sugestão para a filial
+        registro.Sugestao.forEach((retqtdsugerida) => {
+          if (parseInt(idfilial) === parseInt(retqtdsugerida.IdFilial)) {
+            qtdsugestao = retqtdsugerida.QtdSugestao;
+            iddistribuicaocompras = retqtdsugerida.IdDistribuicaoCompras;
+            qtdsugestaoalterada = parseInt(retqtdsugerida.QtdSugestaoAlteracao) === 0 
+              ? qtdsugestao 
+              : retqtdsugerida.QtdSugestaoAlteracao;
           }
         });
 
-        totalGeralProduto += parseInt(qtdsugestaoalterada);
+        filiaisProcessadas.push({
+          IdFilial: idfilial,
+          DescFilial: retfilialsugerida.DescFilial,
+          qtdsugestaoalterada
+        });
 
-        // ✅ 3. Cria propriedade dinâmica para cada filial
-        filiaisData[`filial_${filial.IdFilial}`] = {
-          qtdsugestaoalterada,
-          qtdsugestao,
-          iddistribuicaocompras,
-          inputId: `${iddistribuicaocompras}:${item.IdPedidoCompra}:${item.IdEmpresa}:${filial.IdFilial}:${item.CodBarras}`,
-          DescFilial: filial.DescFilial,
-          IdFilial: filial.IdFilial
-        };
+        totalqtd += parseInt(qtdsugestaoalterada);
       });
 
       return {
-        DescProduto: item.DescProduto,
-        CodBarras: item.CodBarras,
-        Grade: item.Grade,
-        IdEmpresa: item.IdEmpresa,
-        IdPedidoCompra: item.IdPedidoCompra,
-        PrecoVenda: item.PrecoVenda,
-        QtdGrade: item.QtdGrade,
-        totalGeralProduto,
-        ...filiaisData // ✅ 4. Spread das propriedades das filiais
+        DescProduto: registro.DescProduto,
+        PrecoVenda: registro.PrecoVenda,
+        QtdGrade: registro.QtdGrade,
+        Grade: registro.Grade,
+        CodBarras: registro.CodBarras,
+        totalqtd,
+        filiais: filiaisProcessadas
       };
     });
+
+    return { produtos, filiais };
   };
 
-  useEffect(() => {
-    setDadosProcessados(processarDados(dadosSugestoesHistorico));
-  }, [dadosSugestoesHistorico]);
+  const { produtos, filiais } = processarDadosParaTabela(dadosSugestoesHistorico);
 
-  // ✅ 5. Função AlterarQtdSugestao idêntica ao jQuery
-  const AlterarQtdSugestao = (inputId, novoValor, rowData) => {
-    const idchave = inputId.split(":");
-    const iddistribuicaocompras = idchave[0];
-    const idpedidocompra = idchave[1];
-    const idempresa = idchave[2];
-    const idfilial = idchave[3];
-    const codbarras = idchave[4];
-
-    const qtdsugestaoalterada = parseInt(novoValor);
-
-    // ✅ 6. Recalcula total - atualiza estado
-    setDadosProcessados(prevDados => {
-      return prevDados.map(item => {
-        if (item.CodBarras === codbarras) {
-          const filialKey = `filial_${idfilial}`;
-          const filialAtual = item[filialKey];
-
-          if (filialAtual) {
-            const diferencaQtd = qtdsugestaoalterada - filialAtual.qtdsugestaoalterada;
-
-            return {
-              ...item,
-              [filialKey]: {
-                ...filialAtual,
-                qtdsugestaoalterada
-              },
-              totalGeralProduto: item.totalGeralProduto + diferencaQtd
-            };
-          }
-        }
-        return item;
-      });
-    });
-
-  };
-
-  // ✅ 8. Template para coluna de produto (th style)
-  const produtoBodyTemplate = (rowData) => (
-    <strong style={{ fontWeight: 700, width: '350px' }}>
-      {rowData.DescProduto}
-    </strong>
-  );
-
-  // ✅ 9. Template para valor/qtd/grade (th style)
-  const thBodyTemplate = (field) => (rowData) => (
-    <strong style={{ fontWeight: 500 }}>
-      {rowData[field]}
-    </strong>
-  );
-
-  // ✅ 10. Template para input total readonly
-  const totalBodyTemplate = (rowData) => (
-    <InputText
-      id={rowData.CodBarras}
-      name="totalqtd"
-      value={rowData.totalGeralProduto}
-      readOnly
-      size={2}
-      style={{ width: '45px', textAlign: 'center' }}
-    />
-  );
-
-  // ✅ 11. Template para inputs das filiais
-  const createFilialBodyTemplate = (filial) => (rowData) => {
-    const filialData = rowData[`filial_${filial.IdFilial}`];
-
-    if (!filialData) return null;
-
-    return (
-      <div>
-        <InputText
-          id={filialData.inputId}
-          name="qtdsugestaoalterada"
-          value={filialData.qtdsugestaoalterada}
-          onChange={(e) => AlterarQtdSugestao(filialData.inputId, e.target.value, rowData)}
-          size={2}
-          style={{ width: '45px', textAlign: 'center' }}
-          data-default-value={filialData.qtdsugestao}
-        />
-        {/* ✅ 12. Span oculto para compatibilidade */}
-        <span style={{ display: 'none' }}>
-          {filialData.qtdsugestaoalterada}
-        </span>
-      </div>
-    );
-  };
-
-  // ✅ 13. Template para header das filiais (rotacionado)
-  const createFilialHeader = (filial) => (
-    <div style={{ height: '280px', display: 'flex', alignItems: 'end' }}>
-      <span
-        className="rotate-270 text-nowrap h-200 d-flex pos-top"
-        style={{ width: '45px' }}
-      >
-        &nbsp;&nbsp;{filial.DescFilial}
-      </span>
-    </div>
-  );
-
-  // ✅ 14. UseEffect para mostrar botões
-  useEffect(() => {
-    if (dadosProcessados.length > 0) {
-      const btnVisualizar = document.getElementById("btnvisualizar");
-      const btnFinalizar = document.getElementById("btnfinalizar");
-
-      if (btnVisualizar) btnVisualizar.style.display = 'block';
-      if (btnFinalizar) btnFinalizar.style.display = 'block';
-    }
-  }, [dadosProcessados]);
-
-  if (dadosProcessados.length === 0) {
+  if (produtos.length === 0) {
     return null;
   }
 
   return (
     <Fragment>
-      <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
-        <HeaderTable
-          globalFilterValue={globalFilterValue}
-          onGlobalFilterChange={onGlobalFilterChange}
-          handlePrint={handlePrint}
-          exportToExcel={exportToExcel}
-          exportToPDF={exportToPDF}
-        />
+      <div>
+
+        <button onClick={handlePrint}>Imprimir</button>
       </div>
-      <h1>Produtos Sugestões</h1>
-      <div className="scroll" ref={dataTableRef}>
-        <DataTable
-          value={dadosProcessados}
-          id="dt-basic-distribuicao"
+      <div className="" ref={dataTableRef}>
+        <table 
+          id="dt-basic-distribuicao" 
           className="table table-bordered table-hover table-striped w-100"
-          stripedRows
-          tableStyle={{ minWidth: '50rem' }}
-          scrollable
-          scrollHeight="600px"
+          ref={dataTableRef}
         >
-          {/* ✅ 15. Colunas fixas */}
-          <Column
-            field="DescProduto"
-            header="Produto"
-            body={produtoBodyTemplate}
-            headerClassName="bg-primary-600"
-            style={{ minWidth: '400px' }}
-          />
-
-          <Column
-            field="PrecoVenda"
-            header="Valor"
-            body={thBodyTemplate('PrecoVenda')}
-            headerClassName="bg-primary-600"
-            style={{ minWidth: '100px' }}
-          />
-
-          <Column
-            field="QtdGrade"
-            header="Qtd"
-            body={thBodyTemplate('QtdGrade')}
-            headerClassName="bg-primary-600"
-            style={{ minWidth: '80px' }}
-          />
-
-          <Column
-            field="Grade"
-            header="Grade"
-            body={thBodyTemplate('Grade')}
-            headerClassName="bg-primary-600"
-            style={{ minWidth: '100px' }}
-          />
-
-          <Column
-            header="Total"
-            body={totalBodyTemplate}
-            headerClassName="bg-primary-600"
-            style={{ minWidth: '80px' }}
-          />
-
-          {/* ✅ 16. Colunas dinâmicas das filiais */}
-          {colunasDinamicas.map((filial) => (
-            <Column
-              key={filial.IdFilial}
-              header={createFilialHeader(filial)}
-              body={createFilialBodyTemplate(filial)}
-              headerClassName="bg-primary-600"
-              style={{ minWidth: '70px' }}
-            />
-          ))}
-        </DataTable>
+          <thead>
+        
+            <tr className="td">
+              <th className="td" colSpan="5">Nº Pedido {dadosSugestoesHistorico[0]?.IdPedidoCompra}</th>
+            </tr>
+            
+          
+            <tr id="dt-basic-distribuicao-titulo">
+              <th className="td" width="300px">Produto</th>
+              <th className="td" width="60">Valor</th>
+              <th className="td" width="60px">Qtd</th>
+              <th className="td" width="50px">Grade</th>
+              <th className="td" width="60px">Total</th>
+              
+           
+              {filiais.map((filial) => (
+                <th key={filial.IdFilial} className="td" height="200px">
+                  <span 
+                    className="rotate-270 text-nowrap h-170 d-flex pos-bottom" 
+                    style={{ width: '20px' }}
+                  >
+                    &nbsp;&nbsp;{filial.DescFilial}
+                  </span>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          
+          <tbody>
+            
+            {produtos.map((produto, index) => (
+              <tr key={index} id={`dt-basic-distribuicao-lista-${index}`}>
+                <td className="td">{produto.DescProduto}</td>
+                <td className="td">{produto.PrecoVenda}</td>
+                <td className="td">{produto.QtdGrade}</td>
+                <td className="td">{produto.Grade}</td>
+                <td className="td">
+                  <span id={produto.CodBarras}>{produto.totalqtd}</span>
+                </td>
+                
+                
+                {produto.filiais.map((filial) => (
+                  <td key={filial.IdFilial} className="td">
+                    {filial.qtdsugestaoalterada}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </Fragment>
   );

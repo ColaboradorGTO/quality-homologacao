@@ -4,7 +4,6 @@ import { ActionMain } from "../../../Actions/actionMain";
 import { InputSelectAction } from "../../../Inputs/InputSelectAction";
 import { ButtonType } from "../../../Buttons/ButtonType";
 import { get } from "../../../../api/funcRequest";
-import { getDataAtual } from "../../../../utils/dataAtual";
 import { ActionListaPedidoCompra } from "./actionListaPedidoCompra";
 import { useFetchData } from "../../../../hooks/useFetchData";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
@@ -12,10 +11,13 @@ import { useQuery } from "react-query";
 import { ActionListaDistribuicaoSugestoesHistoricoVisualizar } from "./actionListaDistribuicaoSugestoesHistoricoVisualizar";
 import { FaCheck } from "react-icons/fa6";
 import { MdMenu, MdOutlineSearch } from "react-icons/md";
+import { ActionListaDistribuicaoSugestoesHistorico } from "./actionListaDistribuicaoSugestoesHistorico";
+import Swal from "sweetalert2";
 
 
 export const ActionPesquisaDistribuicaoHistorico = ({usuarioLogado}) => {
-  const [tabelaVisivel, setTabelaVisivel] = useState(false);
+  const [actionVisivel, setActionVisivel] = useState(true);
+  const [tabelaVisivel, setTabelaVisivel] = useState(true);
   const [tabelaSugestao, setTabelaSugestao] = useState(false);
   const [tabelaVisualizar, setTabelaVisualizar] = useState(false);
   const [modalVisivel, setModalVisivel] = useState(false);
@@ -23,11 +25,11 @@ export const ActionPesquisaDistribuicaoHistorico = ({usuarioLogado}) => {
   const [dataPesquisaFim, setDataPesquisaFim] = useState('')
   const [fornecedorSelecionado, setFornecedorSelecionado] = useState('')
   const [numeroPedido, setNumeroPedido] = useState('')
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(1000);
   const [dadosSugestoesHistorico, setDadosSugestoesHistorico] = useState([]);
-   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
-    
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
+  const [selectedItens, setSelectedItens] = useState([]);
+  const [btnVisivel, setBtnVisivel] = useState(false);  
+
   useEffect(() => {
     const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
     if (menuSalvo) {
@@ -45,14 +47,6 @@ export const ActionPesquisaDistribuicaoHistorico = ({usuarioLogado}) => {
     },
     { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
   );
-  
-  // useEffect(() => {
-  //   const dataInicial = getDataAtual()
-  //   const dataFim = getDataAtual()
-  //   setDataPesquisaInicio(dataInicial)
-  //   setDataPesquisaFim(dataFim)
-
-  // }, [])
 
   const fetchListaPedidos = async () => {
     const urlBase = `/distribuicao-compras-historico?idFornecedor=${fornecedorSelecionado}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
@@ -96,19 +90,57 @@ export const ActionPesquisaDistribuicaoHistorico = ({usuarioLogado}) => {
 
   const { data: dadosFonecedores = [], error: errorFornecedor, isLoading: isLoadingFornecedor } = useFetchData('fornecedores', '/fornecedores');
 
-
-
-
-
   const handleSelectFornecedor = (e) => {
     setFornecedorSelecionado(e.value);
   }
 
   const handleClickActionDistribuicaoCompras = () => {
-    setCurrentPage(prevPage => prevPage + 1)
     refetchListaPedidos()
     setTabelaVisivel(true)
+    setTabelaSugestao(false)
+    setTabelaVisualizar(false);
   }
+
+
+  const handleClickProduto = async () => {
+    const response = await get(`/distribuicao-compras-sugestoes-historico?idPedido=${selectedItens}`);
+    if (response.length > 0 ) {
+      setDadosSugestoesHistorico(response);
+      setTabelaSugestao(true)
+      setTabelaVisualizar(false);
+      setTabelaVisivel(false);
+      return response.data;
+    } else {
+      Swal.fire({
+        icon: 'info',
+        title: 'Nenhuma sugestão encontrada',
+        text: 'Não foram encontradas sugestões para o pedido selecionado.',
+      })
+    }
+  }
+
+  const handleClickCheckVisualizar = async () => {
+    if(selectedItens.length === 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Nenhum pedido selecionado',
+        text: 'Por favor, selecione um pedido para visualizar as sugestões de distribuição.',
+      });
+      return;
+    }
+    try {
+      const response = await get(`/distribuicao-compras-sugestoes-historico?idPedido=${selectedItens}`);
+      setDadosSugestoesHistorico(response);
+      setTabelaVisualizar(true);
+      setActionVisivel(false);
+      setTabelaVisivel(false);
+      setTabelaSugestao(false);
+      handleVisualizar();
+      return response.data;
+    } catch (error) {
+      console.log(error, "não foi possivel pegar os dados da tabela ");
+    }
+  };
 
   const handleModalVisivel = () => {
     setModalVisivel(true)
@@ -117,69 +149,70 @@ export const ActionPesquisaDistribuicaoHistorico = ({usuarioLogado}) => {
   const handleClose = () => {
     setModalVisivel(false)
   }
-  const options = [
-    { value: '1', label: 'Marca 1' },
-    { value: '2', label: 'Marca 2' },
-    { value: '3', label: 'Marca 3' }
-  ]
+
+
   return (
 
     <Fragment>
-      <ActionMain
-        linkComponentAnterior={["Home"]}
-        linkComponent={["Distruibuição de Compras"]}
-        title="Analisar Histórico da Distribuição de Compras"
-        subTitle="Nome da Loja"
+      {actionVisivel && (
 
-        InputFieldDTInicioComponent={InputField}
-        labelInputFieldDTInicio={"Data Início"}
-        valueInputFieldDTInicio={dataPesquisaInicio}
-        onChangeInputFieldDTInicio={e => setDataPesquisaInicio(e.target.value)}
+        <ActionMain
+          linkComponentAnterior={["Home"]}
+          linkComponent={["Distruibuição de Compras"]}
+          title="Analisar Histórico da Distribuição de Compras"
+          subTitle="Nome da Loja"
 
-        InputFieldDTFimComponent={InputField}
-        labelInputFieldDTFim={"Data Fim"}
-        valueInputFieldDTFim={dataPesquisaFim}
-        onChangeInputFieldDTFim={e => setDataPesquisaFim(e.target.value)}
+          InputFieldDTInicioComponent={InputField}
+          labelInputFieldDTInicio={"Data Início"}
+          valueInputFieldDTInicio={dataPesquisaInicio}
+          onChangeInputFieldDTInicio={e => setDataPesquisaInicio(e.target.value)}
 
-        InputSelectEmpresaComponent={InputSelectAction}
-        labelSelectEmpresa={"Fornecedor"}
-        optionsEmpresas={[
-          { value: '', label: 'Selecione o Fornecedor' },
-          ...dadosFonecedores.map(item => ({
-            value: item.IDFORNECEDOR,
-            label: `${item.IDFORNECEDOR} - ${item.NOFANTASIA} - ${item.NUCNPJ} - ${item.NORAZAOSOCIAL}`
-          }))
-        ]}
-        valueSelectEmpresa={fornecedorSelecionado}
-        onChangeSelectEmpresa={handleSelectFornecedor}
+          InputFieldDTFimComponent={InputField}
+          labelInputFieldDTFim={"Data Fim"}
+          valueInputFieldDTFim={dataPesquisaFim}
+          onChangeInputFieldDTFim={e => setDataPesquisaFim(e.target.value)}
+
+          InputSelectEmpresaComponent={InputSelectAction}
+          labelSelectEmpresa={"Fornecedor"}
+          optionsEmpresas={[
+            { value: '', label: 'Selecione o Fornecedor' },
+            ...dadosFonecedores.map(item => ({
+              value: item.IDFORNECEDOR,
+              label: `${item.IDFORNECEDOR} - ${item.NOFANTASIA} - ${item.NUCNPJ} - ${item.NORAZAOSOCIAL}`
+            }))
+          ]}
+          valueSelectEmpresa={fornecedorSelecionado}
+          onChangeSelectEmpresa={handleSelectFornecedor}
 
 
 
-        InputFieldComponent={InputField}
-        labelInputFieldF={"Numero Pedido"}
-        placeHolderInputFieldComponent={"Numero Pedido"}
-        valueInputField={numeroPedido}
-        onChangeInputField={(e) => setNumeroPedido(e.target.value)}
+          InputFieldComponent={InputField}
+          labelInputFieldF={"Numero Pedido"}
+          placeHolderInputFieldComponent={"Numero Pedido"}
+          valueInputField={numeroPedido}
+          onChangeInputField={(e) => setNumeroPedido(e.target.value)}
 
-        ButtonSearchComponent={ButtonType}
-        linkNomeSearch={"Pesquisar"}
-        onButtonClickSearch={handleClickActionDistribuicaoCompras}
-        corSearch={"primary"}
-        IconSearch={MdOutlineSearch}
+          ButtonSearchComponent={ButtonType}
+          linkNomeSearch={"Pesquisar"}
+          onButtonClickSearch={handleClickActionDistribuicaoCompras}
+          corSearch={"primary"}
+          IconSearch={MdOutlineSearch}
 
-        ButtonTypeCadastro={ButtonType}
-        linkNome="Visualizar"
-        onButtonClickCadastro
-        corCadastro={"secondary"}
-        IconCadastro={MdMenu}
-        // styleCadastro
+          ButtonTypeCadastro={ButtonType}
+          linkNome="Pesquisar Produto"
+          onButtonClickCadastro={handleClickProduto}
+          corCadastro={"secondary"}
+          IconCadastro={MdOutlineSearch}
+          // styleCadastro
 
-        ButtonTypeCancelar={ButtonType}
-        linkCancelar={"Finalizar"}
-        corCancelar={"success"}
-        IconCancelar={FaCheck}
-        // styleCancelar={}
-      />
+          ButtonTypeCancelar={ButtonType}
+          onButtonClickCancelar={handleClickCheckVisualizar}
+          linkCancelar={"Visualizar"}
+          corCancelar={"success"}
+          IconCancelar={MdMenu}
+          // styleCancelar={}
+        />
+      )}
 
       {tabelaVisivel && (
         <ActionListaPedidoCompra 
@@ -192,11 +225,19 @@ export const ActionPesquisaDistribuicaoHistorico = ({usuarioLogado}) => {
           setTabelaVisualizar={setTabelaVisualizar}
           tabelaSugestao={tabelaSugestao}
           setTabelaSugestao={setTabelaSugestao}
-          
+          setSelectedItens={setSelectedItens}
+   
         />
 
       )}
 
+      {tabelaSugestao && ( 
+
+        <ActionListaDistribuicaoSugestoesHistorico
+          dadosSugestoesHistorico={dadosSugestoesHistorico}
+        />
+      )} 
+   
       {tabelaVisualizar && (
 
         <ActionListaDistribuicaoSugestoesHistoricoVisualizar
