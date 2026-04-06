@@ -38,6 +38,18 @@ export const useCancelarPedido = ({ usuarioLogado, optionsModulos, handleClick }
 
     
     const handleCancelarPedido = async (row, status) => {
+        if(optionsModulos[0]?.ALTERAR == 'False') {
+            Swal.fire({
+                icon: "error",
+                title: "Permissão Negada!",
+                html: `${usuarioLogado?.NOFUNCIONARIO} <br/>  Você não tem permissão para cancelar pedidos.`,
+                customClass: {
+                    container: 'custom-swal',
+                }
+            })
+            return; 
+        }
+
         let motivoCancelamento = '';
         let msgtitulo, textoCancelaPedido, idAndamento;
         
@@ -147,7 +159,7 @@ export const useCancelarPedido = ({ usuarioLogado, optionsModulos, handleClick }
 
             const response = await put("/cancelar-pedido/:id", putData);
             const textDados = JSON.stringify(putData)
-            const textoFuncao = "COMPRASADM/REATIVAR PEDIDO"
+            const textoFuncao = "COMPRASADM/CANCELAR PEDIDO"
             const ipUsuario = await getIPUsuario();
 
             const postData  = {
@@ -180,7 +192,7 @@ export const useCancelarPedido = ({ usuarioLogado, optionsModulos, handleClick }
                 STCANCELADO: status
             };
             const textDados = JSON.stringify(putData)
-            let textoFuncao =  'COMPRASADM/ERRO AO REATIVAR PEDIDO';
+            let textoFuncao =  'COMPRASADM/ERRO AO CANCELAR PEDIDO';
             const ipUsuario = await getIPUsuario();
             const postData = {
                 IDFUNCIONARIO: String(usuarioLogado?.id), 
@@ -193,7 +205,7 @@ export const useCancelarPedido = ({ usuarioLogado, optionsModulos, handleClick }
             Swal.fire({
                 icon: "error",
                 title: "Erro!",
-                text: `Erro ao ${msgtitulo}`,
+                text: `Erro ao cancelar o pedido`,
                 timer: 5000,
                 customClass: {
                     container: 'custom-swal',

@@ -38,6 +38,17 @@ export const useReativarPedido = ({ usuarioLogado, optionsModulos, handleClick }
 
     
     const handleReativarPedido = async (row) => {
+        if(optionsModulos[0]?.ALTERAR == 'False') {
+            Swal.fire({
+                icon: "error",
+                title: "Permissão Negada!",
+                html: `${usuarioLogado?.NOFUNCIONARIO} <br/>  Você não tem permissão para reativar pedidos.`,
+                customClass: {
+                    container: 'custom-swal',
+                }
+            })
+            return; 
+        }
         let motivoReativacao = '';
         try {
             const confirmacao = await Swal.fire({

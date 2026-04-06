@@ -48,6 +48,17 @@ export const useEnviarPedido = ({ usuarioLogado, optionsModulos, handleClick }) 
     );
 
     const handleEnviarPedido = async (row) => { 
+        if(optionsModulos[0]?.ALTERAR == 'False') {
+            Swal.fire({
+                icon: "error",
+                title: "Permissão Negada!",
+                html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para enviar pedidos.`,
+                customClass: {
+                    container: 'custom-swal',
+                }
+            })
+            return; 
+        }
         let motivoDevolucao = '';
         
         try {
