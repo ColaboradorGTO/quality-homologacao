@@ -14,6 +14,7 @@ import { useFetchData } from "../../../../hooks/useFetchData";
 import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
 
+
 export const ActionComprasADMHome = ({usuarioLogado}) => {
   const [actionHome, setActionHome] = useState(true)
   const [actionBTN, setActionBTN] = useState(true)
@@ -104,7 +105,7 @@ export const ActionComprasADMHome = ({usuarioLogado}) => {
   const { data: dadosPedidos = [], error: errorPedidos, isLoading: isLoadingPedidos, refetch: refetchListaPedidos } = useQuery(
     ['lista-pedidos', ],
     () => fetchListaPedidos(),
-    { enabled: false, staleTime: 5 * 60 * 1000 }
+    { enabled:true, staleTime: 5 * 60 * 1000 }
   )
 
   const fetchListaPedidosDetalhados = async () => {

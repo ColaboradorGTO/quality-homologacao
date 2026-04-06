@@ -152,31 +152,31 @@ export const ActionListaPedidos = ({
     {
       field: 'DTPEDIDO',
       header: 'Data',
-      body: row => <th>{row.DTPEDIDO}</th>,
+      body: row => <p style={{width: '100px', fontWeight: 600}}>{row.DTPEDIDO}</p>,
       sortable: true,
     },
     {
       field: 'IDPEDIDO',
       header: 'Nº Pedido',
-      body: row => <th>{row.IDPEDIDO}</th>,
+      body: row => <p style={{width: '100px', fontWeight: 600}}>{row.IDPEDIDO}</p>,
       sortable: true,
     },
     {
       field: 'NOFANTASIA',
       header: 'Marca',
-      body: row => <th>{row.NOFANTASIA}</th>,
+      body: row => <p style={{width: '200px', fontWeight: 600}}>{row.NOFANTASIA}</p>,
       sortable: true,
     },
     {
       field: 'NOMECOMPRADOR',
       header: 'Comprador',
-      body: row => <th>{row.NOMECOMPRADOR}</th>,
+      body: row => <p style={{width: '200px', fontWeight: 600}}>{row.NOMECOMPRADOR}</p>,
       sortable: true,
     },
     {
       field: 'NOFORNECEDOR',
       header: 'Fornecedor',
-      body: row => <th>{row.NOFORNECEDOR}</th>,
+      body: row => <p style={{width: '200px', fontWeight: 600}}>{row.NOFORNECEDOR}</p>,
       footer: 'Total ',
       sortable: true,
     },
@@ -200,7 +200,14 @@ export const ActionListaPedidos = ({
       body: row => {
         return (
           <div>
-            <th style={{ color: row.DSSETOR == 'CADASTRO' ? 'green' : row.DSSETOR == 'COMPRAS' ? 'blue' : row.DSSETOR == 'COMPRAS ADM' ? 'gray' : '' }} >{row.DSSETOR}</th>
+            <p 
+              style={{ 
+                width: '100px', 
+                textAlign: 'center', 
+                fontWeight: 600,
+                color: row.DSSETOR == 'CADASTRO' ? 'green' : row.DSSETOR == 'COMPRAS' ? 'blue' : row.DSSETOR == 'COMPRAS ADM' ? 'gray' : '' 
+              }} 
+            >{row.DSSETOR}</p>
           </div>
         )
       },
@@ -688,7 +695,7 @@ export const ActionListaPedidos = ({
                 sortable={coluna.sortable}
                 headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
                 footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem' }}
-                bodyStyle={{ fontSize: '0.8rem' }}
+                bodyStyle={{ fontSize: '0.8rem',  }}
               />
             ))}
           </DataTable>
