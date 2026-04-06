@@ -49,7 +49,6 @@ export const ActionComprasADMHome = ({usuarioLogado}) => {
     if (menuSalvo) {
       const menuParsed = JSON.parse(menuSalvo);
       setMenuFilhoAtual(menuParsed);
-
     }
   }, []);
 
@@ -214,7 +213,7 @@ export const ActionComprasADMHome = ({usuarioLogado}) => {
     setActionProdutosCriados(false);
     setActionHome(false);
     setActionBTN(false);
-    getListaPedidos();
+    refetchListaPedidos();
   }
 
   const handleClickRelatorioDetalhado = () => {
@@ -338,48 +337,6 @@ export const ActionComprasADMHome = ({usuarioLogado}) => {
         />
       )}
 
-      {/* {actionBTN && (
-        <div className="panel" >
-          <div className="panel-hdr">
-            <h2>
-              Lista de Pedidos <span class="fw-300"><i>Por Período</i></span>
-            </h2>
-          </div>
-          <div className="row p-1 mb-2" style={{ width: '75%' }}>
-
-
-            <ButtonType
-              textButton="Relatório Resumido"
-              onClickButtonType={handleClickRelatorioResumido}
-              cor="primary"
-              Icon={AiOutlineSearch}
-              iconColor="white"
-              iconSize={16}
-            />
-
-            <ButtonType
-              Icon={AiOutlineSearch}
-              iconSize={16}
-              textButton="Relatório Detalhado"
-              cor="secondary"
-              tipo="button"
-              onClickButtonType={handleClickRelatorioDetalhado}
-            />
-
-
-            <ButtonType
-              textButton="Produtos Criados"
-              onClickButtonType={handleClickRelatorioProdutosCriados}
-              cor="info"
-              Icon={AiOutlineSearch}
-              iconColor="white"
-              iconSize={16}
-            />
-
-
-          </div>
-        </div>
-      )} */}
 
       {!actionPedidoResumido && actionListaPedidos && actionHome && (
         <Fragment>
@@ -406,7 +363,6 @@ export const ActionComprasADMHome = ({usuarioLogado}) => {
         </Fragment>
       )}
 
-      {/* preciso que ActionPDFPedidoResumido esteja visivel as outras não esteja visivel quando for clicado no button resumo relatorio */}
       {actionPedidoResumido && (
         <ActionPDFPedidoResumido dadosPedidoResumido={dadosPedidoResumido} />
       )}
@@ -420,5 +376,4 @@ export const ActionComprasADMHome = ({usuarioLogado}) => {
       )}
     </Fragment>
   )
-
 }
