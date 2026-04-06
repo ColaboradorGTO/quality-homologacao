@@ -10,11 +10,12 @@ import * as XLSX from 'xlsx';
 import Swal from "sweetalert2";
 import { put } from "../../../../api/funcRequest";
 
-export const ActionListaDistribuicaoSugestoesHistorico = ({ dadosSugestoesHistorico,usuarioLogado }) => {
+export const ActionListaDistribuicaoSugestoesHistorico = ({ dadosSugestoesHistorico, usuarioLogado }) => {
   const [dadosProcessados, setDadosProcessados] = useState([]);
   const [colunasDinamicas, setColunasDinamicas] = useState([]);
-  const dataTableRef = useRef();
+  const [editando, setEditando] = useState({});
   const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const dataTableRef = useRef();
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
   };
@@ -118,128 +119,85 @@ export const ActionListaDistribuicaoSugestoesHistorico = ({ dadosSugestoesHistor
     setDadosProcessados(processarDados(dadosSugestoesHistorico));
   }, [dadosSugestoesHistorico]);
 
-  // ✅ 5. Função AlterarQtdSugestao idêntica ao jQuery
-  // const AlterarQtdSugestao = (inputId, novoValor, rowData) => {
-  //   const idchave = inputId.split(":");
-  //   const iddistribuicaocompras = idchave[0];
-  //   const idpedidocompra = idchave[1];
-  //   const idempresa = idchave[2];
-  //   const idfilial = idchave[3];
-  //   const codbarras = idchave[4];
+  const handleChange = (id, value) => {
+    setEditando((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+  };
 
-  //   const qtdsugestaoalterada = parseInt(novoValor);
+  const handleBlur = async (id, rowData) => {
+    const valor = editando[id];
+    if (valor === undefined) return;
 
-  //   // ✅ 6. Recalcula total - atualiza estado
-  //   setDadosProcessados(prevDados => {
-  //     return prevDados.map(item => {
-  //       if (item.CodBarras === codbarras) {
-  //         const filialKey = `filial_${idfilial}`;
-  //         const filialAtual = item[filialKey];
+    await AlterarQtdSugestao(id, valor, rowData);
 
-  //         if (filialAtual) {
-  //           const diferencaQtd = qtdsugestaoalterada - filialAtual.qtdsugestaoalterada;
+    setEditando((prev) => {
+      const novo = { ...prev };
+      delete novo[id];
+      return novo;
+    });
+  };
 
-  //           return {
-  //             ...item,
-  //             [filialKey]: {
-  //               ...filialAtual,
-  //               qtdsugestaoalterada
-  //             },
-  //             totalGeralProduto: item.totalGeralProduto + diferencaQtd
-  //           };
-  //         }
-  //       }
-  //       return item;
-  //     });
-  //   });
 
-  // };
+   const AlterarQtdSugestao = async (id, novoValor, rowData) => {
+    if (!usuarioLogado?.id) {
+      Swal.fire("Atenção", "Usuário não identificado", "warning");
+      return;
+    }
 
-  const AlterarQtdSugestao = async (id) => {
-      if (!usuarioLogado?.id) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Atenção!',
-          text: 'Usuário não identificado. Faça login novamente.',
-        });
-        return;
-      }
-  
-      const idchave = id.split(":");
-      const iddistribuicaocompras = idchave[0];
-      const idpedidocompra = idchave[1];
-      const idempresa = idchave[2];
-      const idfilial = idchave[3];
-      const codbarras = idchave[4];
-  
-      const inputElement = document.getElementById(id);
-      const spanTotal = document.getElementById(codbarras);
-      
-      if (!inputElement || !spanTotal) {
-        console.error('Elementos não encontrados:', { inputElement, spanTotal });
-        return;
-      }
-  
-      const qtdsugestaoalterada = parseInt(inputElement.value) || 0;
-      const qtdsugestao = parseInt(inputElement.defaultValue) || 0;
-      
-      const qtdtotal = (parseInt(spanTotal.textContent) - qtdsugestao) + qtdsugestaoalterada;
-  
-      const dados = {
-        "IDDISTRIBUICAOCOMPRASHISTORICO": parseInt(iddistribuicaocompras),
-        "IDPEDIDOCOMPRA": parseInt(idpedidocompra),
-        "IDEMPRESA": parseInt(idempresa),
-        "IDFILIAL": parseInt(idfilial),
-        "CODBARRAS": codbarras,
-        "QTDSUGESTAOALTERACAOHISTORICO": parseInt(qtdsugestaoalterada),
-        "IDUSUARIOALTERACAO": parseInt(usuarioLogado.id),
-        "FINALIZAR": 0
-      };
-  
-      try {
-        await put("/distribuicao-compras-historico/:id", dados);
-        
-        // Atualiza o DOM como no jQuery
-        inputElement.defaultValue = qtdsugestaoalterada;
-        spanTotal.textContent = qtdtotal;
-        
-        // Atualiza o estado também para manter consistência
-        setDadosProcessados(prevDados => {
-          return prevDados.map(produto => {
-            if (produto.CodBarras === codbarras) {
-              const novasFiliais = produto.filiais?.map(filial => {
-                if (filial.IdFilial.toString() === idfilial) {
-                  return { ...filial, qtdsugestaoalterada };
-                }
-                return filial;
-              });
-              return {
-                ...produto,
-                filiais: novasFiliais,
-                totalqtd: qtdtotal
-              };
-            }
-            return produto;
-          });
-        });
-        
-        // Alerta de sucesso
-        Swal.fire({
-          position: 'top-end',
-          icon: 'success',
-          title: 'Quantidade atualizada com sucesso!',
-          showConfirmButton: false,
-          timer: 1500
-        });
-      } catch (error) {
-        console.error('Erro ao atualizar quantidade:', error);
-        Swal.fire({
-          icon: 'error',
-          title: 'Erro!',
-          text: 'Erro ao atualizar quantidade. Tente novamente.',
-        });
-      }
+    const [iddistribuicaocompras, idpedidocompra, idempresa, idfilial, codbarras] =
+      id.split(":");
+
+    const qtdNova = parseInt(novoValor) || 0;
+
+    const payload = {
+      IDDISTRIBUICAOCOMPRASHISTORICO: Number(iddistribuicaocompras),
+      IDPEDIDOCOMPRA: Number(idpedidocompra),
+      IDEMPRESA: Number(idempresa),
+      IDFILIAL: Number(idfilial),
+      CODBARRAS: codbarras,
+      QTDSUGESTAOALTERACAOHISTORICO: qtdNova,
+      IDUSUARIOALTERACAO: Number(usuarioLogado.id),
+      FINALIZAR: 0,
     };
+
+    try {
+      await put("/distribuicao-compras-historico/:id", payload);
+
+      setDadosProcessados((prev) =>
+        prev.map((item) => {
+          if (item.CodBarras !== codbarras) return item;
+
+          const filialKey = `filial_${idfilial}`;
+          const filialAtual = item[filialKey];
+
+          if (!filialAtual) return item;
+
+          const diferenca = qtdNova - filialAtual.qtdsugestaoalterada;
+
+          return {
+            ...item,
+            [filialKey]: {
+              ...filialAtual,
+              qtdsugestaoalterada: qtdNova,
+            },
+            totalGeralProduto: item.totalGeralProduto + diferenca,
+          };
+        })
+      );
+
+      Swal.fire({
+        icon: "success",
+        title: "Atualizado com sucesso!",
+        timer: 1200,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      Swal.fire("Erro", "Falha ao atualizar", "error");
+    }
+  };
+
 
   // ✅ 8. Template para coluna de produto (th style)
   const produtoBodyTemplate = (rowData) => (
@@ -273,16 +231,22 @@ export const ActionListaDistribuicaoSugestoesHistorico = ({ dadosSugestoesHistor
 
     if (!filialData) return null;
 
+    const value =
+      editando[filialData.inputId] !== undefined
+        ? editando[filialData.inputId]
+        : filialData.qtdsugestaoalterada;
     return (
       <div>
         <InputText
-          id={filialData.inputId}
-          name="qtdsugestaoalterada"
-          value={filialData.qtdsugestaoalterada}
-          onChange={(e) => AlterarQtdSugestao(filialData.inputId, e.target.value, rowData)}
-          size={2}
-          style={{ width: '45px', textAlign: 'center' }}
-          data-default-value={filialData.qtdsugestao}
+          value={value}
+          onChange={(e) => handleChange(filialData.inputId, e.target.value)}
+          onBlur={() => handleBlur(filialData.inputId, rowData)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleBlur(filialData.inputId, rowData);
+            }
+          }}
+          style={{ width: 50, textAlign: "center" }}
         />
         {/* ✅ 12. Span oculto para compatibilidade */}
         <span style={{ display: 'none' }}>
@@ -304,16 +268,7 @@ export const ActionListaDistribuicaoSugestoesHistorico = ({ dadosSugestoesHistor
     </div>
   );
 
-  // ✅ 14. UseEffect para mostrar botões
-  useEffect(() => {
-    if (dadosProcessados.length > 0) {
-      const btnVisualizar = document.getElementById("btnvisualizar");
-      const btnFinalizar = document.getElementById("btnfinalizar");
 
-      if (btnVisualizar) btnVisualizar.style.display = 'block';
-      if (btnFinalizar) btnFinalizar.style.display = 'block';
-    }
-  }, [dadosProcessados]);
 
   if (dadosProcessados.length === 0) {
     return null;

@@ -15,7 +15,7 @@ import { ActionListaDistribuicaoSugestoesHistorico } from "./actionListaDistribu
 import Swal from "sweetalert2";
 import axios from "axios";
 
-export const ActionPesquisaDistribuicaoHistorico = ({usuarioLogado}) => {
+export const ActionPesquisaDistribuicaoHistorico = ({ usuarioLogado }) => {
   const [actionVisivel, setActionVisivel] = useState(true);
   const [tabelaVisivel, setTabelaVisivel] = useState(true);
   const [tabelaSugestao, setTabelaSugestao] = useState(false);
@@ -28,8 +28,32 @@ export const ActionPesquisaDistribuicaoHistorico = ({usuarioLogado}) => {
   const [dadosSugestoesHistorico, setDadosSugestoesHistorico] = useState([]);
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
   const [selectedItens, setSelectedItens] = useState([]);
-  const [btnVisivel, setBtnVisivel] = useState(false);  
+  const [btnVisivel, setBtnVisivel] = useState(false);
+  const [ipUsuario, setIpUsuario] = useState('');
 
+  const getIPUsuario = async () => {
+    let usuarioIP = null;
+
+    try {
+      const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+      usuarioIP = ipWhoisData?.ip;
+    } catch (error) {
+      console.error("Erro ao buscar IP via ifconfig.me:", error);
+    }
+
+    if (!usuarioIP) {
+      try {
+        const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+        usuarioIP = ipifyData?.ip;
+      } catch (error) {
+        console.error("Erro ao buscar IP via ipify.org:", error);
+      }
+    }
+    setIpUsuario(usuarioIP);
+    return usuarioIP;
+  };
+  
+    
   useEffect(() => {
     const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
     if (menuSalvo) {
@@ -37,15 +61,15 @@ export const ActionPesquisaDistribuicaoHistorico = ({usuarioLogado}) => {
       setMenuFilhoAtual(menuParsed);
     }
   }, []);
-  
+
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
     ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
       const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
-      
+
       return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
   );
 
   const fetchListaPedidos = async () => {
@@ -104,7 +128,7 @@ export const ActionPesquisaDistribuicaoHistorico = ({usuarioLogado}) => {
 
   const handleClickProduto = async () => {
     const response = await get(`/distribuicao-compras-sugestoes-historico?idPedido=${selectedItens}`);
-    if (response.length > 0 ) {
+    if (response.length > 0) {
       setDadosSugestoesHistorico(response);
       setTabelaSugestao(true)
       setTabelaVisualizar(false);
@@ -120,7 +144,7 @@ export const ActionPesquisaDistribuicaoHistorico = ({usuarioLogado}) => {
   }
 
   const handleClickCheckVisualizar = async () => {
-    if(selectedItens.length === 0) {
+    if (selectedItens.length === 0) {
       Swal.fire({
         icon: 'warning',
         title: 'Nenhum pedido selecionado',
@@ -142,14 +166,67 @@ export const ActionPesquisaDistribuicaoHistorico = ({usuarioLogado}) => {
     }
   };
 
-  const handleModalVisivel = () => {
-    setModalVisivel(true)
-  }
+ 
+  const handleFinalizar = async () => {
+    
+    if (selectedItens.length === 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Nenhum pedido selecionado',
+        text: 'Por favor, selecione um pedido para visualizar as sugestões de distribuição.',
+      });
+      return;
+    }
 
-  const handleClose = () => {
-    setModalVisivel(false)
-  }
+    Swal.fire({
+      position: 'center',
+      title: `Deseja realmente Finalizar essa Distribuição?`,
+      text: 'Você não poderá reverter a ação!',
+      icon: 'warning',
+      showCancelButton: true,
+      showConfirmButton: true,
+      cancelButtonText: 'Não',
+      confirmButtonText: 'Sim, quero Finalizar!',
+      customClass: {
+        confirmButton: 'btn btn-primary',
+        cancelButton: 'btn btn-danger',
+        loader: 'custom-loader'
+      },
+      buttonsStyling: false
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
 
+          const putData = {
+            IDPEDIDOCOMPRA: parseInt(selectedItens),
+            IDUSUARIO: parseInt(usuarioLogado?.id),
+            FINALIZAR: 2
+          }
+
+          const response = await put(`/distribuicao-compras-historico/:id`, putData)
+          const textDados = JSON.stringify(putData)
+          let textoFuncao = 'COMPRASADM/FINALIZAR DISTRIBUICAO HISTORICO'
+          const ipUsuario = await getIPUsuario()
+          const postData = {
+            IDFUNCIONARIO: usuarioLogado.id,
+            PATHFUNCAO: textoFuncao,
+            DADOS: textDados,
+            IP: ipUsuario || 'Indisponível'
+          }
+
+          await post('/log-web', postData)
+
+          return response.data;
+        } catch (error) {
+          Swal.fire({
+            title: 'Erro!',
+            text: `Erro ao finalizar a Distribuição do Histórico: ${error}`,
+            icon: 'error'
+          });
+        }
+      }
+    })
+  }
 
   return (
 
@@ -211,13 +288,21 @@ export const ActionPesquisaDistribuicaoHistorico = ({usuarioLogado}) => {
           corCancelar={"success"}
           IconCancelar={MdMenu}
           // styleCancelar={}
-        />
+
+          ButtonTypeVendasEstrutura={ButtonType}
+          linkNomeVendasEstrutura={"Finalizar"}
+          onButtonClickVendasEstrutura={handleFinalizar}
+          corVendasEstrutura={"danger"}
+          IconVendasEstrutura={FaCheck}
+          // styleVendasEstrutura={{ display: tabelaVisualizar ? 'block' : 'none' }}
+          // btnVisivelEstrutura
+          />
       )}
 
       {tabelaVisivel && (
-        <ActionListaPedidoCompra 
-          dadosPedidosCompra={dadosPedidosCompra} 
-          dadosSugestoesHistorico={dadosSugestoesHistorico} 
+        <ActionListaPedidoCompra
+          dadosPedidosCompra={dadosPedidosCompra}
+          dadosSugestoesHistorico={dadosSugestoesHistorico}
           setDadosSugestoesHistorico={setDadosSugestoesHistorico}
           tabelaVisivel={tabelaVisivel}
           setTabelaVisivel={setTabelaVisivel}
@@ -226,19 +311,19 @@ export const ActionPesquisaDistribuicaoHistorico = ({usuarioLogado}) => {
           tabelaSugestao={tabelaSugestao}
           setTabelaSugestao={setTabelaSugestao}
           setSelectedItens={setSelectedItens}
-   
+
         />
 
       )}
 
-      {tabelaSugestao && ( 
+      {tabelaSugestao && (
 
         <ActionListaDistribuicaoSugestoesHistorico
           dadosSugestoesHistorico={dadosSugestoesHistorico}
           usuarioLogado={usuarioLogado}
         />
-      )} 
-   
+      )}
+
       {tabelaVisualizar && (
 
         <ActionListaDistribuicaoSugestoesHistoricoVisualizar

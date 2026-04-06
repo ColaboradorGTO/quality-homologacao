@@ -3,18 +3,14 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { ButtonTable } from '../../../ButtonsTabela/ButtonTable';
 import { GrView } from 'react-icons/gr';
-import { FiSend } from 'react-icons/fi';
 import { get } from '../../../../api/funcRequest';
 import { ActionDetalhePedidoModal } from './actionDetalhePedidoModal';
-import { ActionListaDistribuicaoSugestoesHistorico } from './actionListaDistribuicaoSugestoesHistorico';
-import { ButtonType } from '../../../Buttons/ButtonType';
 import { useReactToPrint } from "react-to-print";
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from '../../../Tables/headerTable';
 import Swal from 'sweetalert2';
-import { ActionListaDistribuicaoSugestoesHistoricoVisualizar } from './actionListaDistribuicaoSugestoesHistoricoVisualizar';
 import axios from 'axios';
 
 export const ActionListaPedidoCompra = ({
@@ -22,47 +18,15 @@ export const ActionListaPedidoCompra = ({
   usuarioLogado,
   optionsModulos,
   dadosPedidosCompra,
-  dadosSugestoesHistorico,
-  setDadosSugestoesHistorico,
-  setTabelaVisivel,
-  setTabelaVisualizar,
-  setTabelaSugestao,
-  handleVisualizar,
   setSelectedItens 
 }) => {
-  const [actionListaPedidos, setActionListaPedidos] = useState(true);
-  const [actionPedidoResumido, setActionPedidoResumido] = useState(true);
   const [rowClick, setRowClick] = useState(true);
   const [empresaSelecionada, setEmpresaSelecionada] = useState(null);
   const [modalDetalhePedido, setModalDetalhePedido] = useState(false);
   const [dadosDetalhePedido, setDadosDetalhePedido] = useState([]);
-  // const [dadosSugestoesHistorico, setDadosSugestoesHistorico] = useState([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [selectedId, setSelectedId] = useState(null);
   const dataTableRef = useRef();
-  const [ipUsuario, setIpUsuario] = useState('');
-
-  const getIPUsuario = async () => {
-    let usuarioIP = null;
-
-    try {
-      const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
-      usuarioIP = ipWhoisData?.ip;
-    } catch (error) {
-      console.error("Erro ao buscar IP via ifconfig.me:", error);
-    }
-
-    if (!usuarioIP) {
-      try {
-        const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-        usuarioIP = ipifyData?.ip;
-      } catch (error) {
-        console.error("Erro ao buscar IP via ipify.org:", error);
-      }
-    }
-    setIpUsuario(usuarioIP);
-    return usuarioIP;
-  };
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -185,138 +149,9 @@ export const ActionListaPedidoCompra = ({
     }
   };
 
-  const handleClickCheck = async (IDPEDIDOCOMPRA) => {
-    try {
-      const response = await get(`/distribuicao-compras-sugestoes-historico?idPedido=${IDPEDIDOCOMPRA}`);
-      setDadosSugestoesHistorico(response);
-      setTabelaSugestao(true)
-      setTabelaVisualizar(false);
-      setTabelaVisivel(false);
-      return response.data;
-    } catch (error) {
-      console.log(error, "não foi possivel pegar os dados da tabela ");
-    }
-  };
-
-  const handleClickCheckVisualizar = async (IDPEDIDOCOMPRA) => {
-    try {
-      const response = await get(`/distribuicao-compras-sugestoes-historico?idPedido=${IDPEDIDOCOMPRA}`);
-      setDadosSugestoesHistorico(response);
-      setTabelaVisualizar(true);
-      setTabelaVisivel(false);
-      setTabelaSugestao(false);
-      handleVisualizar();
-      return response.data;
-    } catch (error) {
-      console.log(error, "não foi possivel pegar os dados da tabela ");
-    }
-  };
-
-  const handleFinalizar = async (IDPEDIDOCOMPRA) => {
-    Swal.fire({
-      position: 'center',
-      title: `Deseja realmente Finalizar essa Distribuição?`,
-      text: 'Você não poderá reverter a ação!',
-      icon: 'warning',
-      showCancelButton: true,
-      showConfirmButton: true,
-      cancelButtonText: 'Não',
-      confirmButtonText: 'Sim, quero Finalizar!',
-      customClass: {
-        confirmButton: 'btn btn-primary',
-        cancelButton: 'btn btn-danger',
-        loader: 'custom-loader'
-      },
-      buttonsStyling: false
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          const putData = {
-            IDPEDIDOCOMPRA: parseInt(IDPEDIDOCOMPRA),
-            IDUSUARIO: parseInt(usuarioLogado.id),
-            FINALIZAR: 2
-          }
-          const response = await put(`/atualiza-imagem/:id`, putData)
-          const textDados = JSON.stringify(putData)
-          let textoFuncao = 'COMPRASADM/ATUALIZA IMAGEM PRODUTO'
-          const ipUsuario = await getIPUsuario()
-          const postData = {
-            IDFUNCIONARIO: usuarioLogado.id,
-            PATHFUNCAO: textoFuncao,
-            DADOS: textDados,
-            IP: ipUsuario || 'Indisponível'
-          }
-
-          await post('/log-web', postData)
-
-          return response.data;
-        } catch (error) {
-          Swal.fire({
-            title: 'Erro!',
-            text: `Erro ao atualizar a Imagem do Produto: ${error}`,
-            icon: 'error'
-          });
-        }
-      }
-    })
-  }
-
   return (
     <Fragment>
       <div className="panel" >
-        <div className="row">
-          <div>
-
-            <ButtonType
-              textButton={"Pesquisar"}
-              Icon={FiSend}
-              cor={"primary"}
-              iconColor={"white"}
-              iconSize={20}
-              onClickButtonType={() => {
-                if (selectedId) {
-                  handleClickCheck(selectedId);
-                } else {
-                  alert("Selecione um pedido para pesquisar.");
-                }
-              }}
-            />
-          </div>
-          <div>
-
-            <ButtonType
-              textButton={"Visualizar"}
-              Icon={FiSend}
-              cor={"secondary"}
-              iconColor={"white"}
-              iconSize={20}
-              onClickButtonType={() => {
-                if (selectedId) {
-                  handleClickCheck(selectedId);
-                } else {
-                  alert("Selecione um pedido para pesquisar.");
-                }
-              }}
-            />
-          </div>
-          <div>
-
-            <ButtonType
-              textButton={"Finalizar"}
-              Icon={FiSend}
-              cor={"success"}
-              iconColor={"white"}
-              iconSize={20}
-              onClickButtonType={() => {
-                if (selectedId) {
-                  handleClickCheck(selectedId);
-                } else {
-                  alert("Selecione um pedido para pesquisar.");
-                }
-              }}
-            />
-          </div>
-        </div>
         <div className="panel-hdr">
           <h2>Histórico da Distribuição de Compras </h2>
         </div>
@@ -330,7 +165,7 @@ export const ActionListaPedidoCompra = ({
             exportToPDF={exportToPDF}
           />
         </div>
-        <div className="card mb-4" ref={dataTableRef}>
+        <div className="card" ref={dataTableRef}>
           <DataTable
             title="Histórico da Distribuição de Compras"
             value={dados}
@@ -341,7 +176,7 @@ export const ActionListaPedidoCompra = ({
             sortOrder={-1}
             paginator={true}
             rows={10}
-            rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
+            rowsPerPageOptions={[10, 20, 30, 40, 50, 100, dados.length]}
             showGridlines
             stripedRows
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
