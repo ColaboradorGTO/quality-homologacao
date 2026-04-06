@@ -253,7 +253,7 @@ export const ActionMainNovoPedido = ({
                       {InputSelectFornecedorComponent && (
                         <InputSelectFornecedorComponent
                           label={labelSelectFornecedor}
-                          readOnly={readOnlyFornecedor}
+                          isDisabled={readOnlyFornecedor}
                           id={id}
                           options={optionsFornecedores}
                           onChange={onChangeSelectFornecedor}
@@ -309,7 +309,7 @@ export const ActionMainNovoPedido = ({
                           onChange={onChangeSelectFiscal}
                           value={valueSelectFiscal}
                           defaultValue={defaultValueSelectFiscal}
-                          readOnly={readOnlyFiscal}
+                          isDisabled={readOnlyFiscal}
                         />
 
                       )}
@@ -322,7 +322,7 @@ export const ActionMainNovoPedido = ({
                           label={labelSelectEnviar}
                           type="select"
                           id={id}
-                          readOnly={readOnlyEnviar}
+                          isDisabled={readOnlyEnviar}
                           options={optionsSelectEnviar}
                           value={valueSelectEnviar}
                           onChange={onChangeSelectEnviar}
@@ -341,7 +341,7 @@ export const ActionMainNovoPedido = ({
                       {InputSelectCompradorComponent && (
                         <InputSelectCompradorComponent
                           label={labelSelectComprador}
-                          readOnly={readOnlyComprador}
+                          isDisabled={readOnlyComprador}
                           id={id}
                           options={optionsCompradores}
                           defaultValue={defaultValueSelectComprador}
@@ -367,7 +367,7 @@ export const ActionMainNovoPedido = ({
                       {InputSelectMarcasComponent && (
                         <InputSelectMarcasComponent
                           label={labelSelectMarcas}
-                          readOnly={readOnlyMarcas}
+                          isDisabled={readOnlyMarcas}
                           id={id}
                           options={optionsMarcas}
                           onChange={onChangeSelectMarcas}
@@ -392,7 +392,7 @@ export const ActionMainNovoPedido = ({
                           options={optionsCondicoesPagamentos}
                           value={valueSelectCondicoesPagamentos}
                           onChange={onChangeSelectCondicoesPagamentos}
-                          readOnly={readOnlyCondicoesPagamentos}
+                          isDisabled={readOnlyCondicoesPagamentos}
                           defaultValue={defaultValueSelectCondicoesPagamentos}
                         />
                       )}
@@ -440,7 +440,7 @@ export const ActionMainNovoPedido = ({
                           options={optionsTipoPedido}
                           value={valueSelectTipoPedido}
                           onChange={onChangeSelectTipoPedido}
-                          readOnly={readOnlyTipoPedido}
+                          isDisabled={readOnlyTipoPedido}
                           defaultValue={defaultValueSelectTipoPedido}
                         />
                       )}
@@ -551,7 +551,7 @@ export const ActionMainNovoPedido = ({
                           label={labelSelectTransportadora}
                           nome="idloja"
                           id={id}
-                          readOnly={readOnlyTransportadora}
+                          isDisabled={readOnlyTransportadora}
                           options={optionsSelectTransportadora}
                           value={valueSelectTransportadora}
                           onChange={onChangeSelectTransportadora}
@@ -569,7 +569,7 @@ export const ActionMainNovoPedido = ({
                           label={labelSelectFrete}
                           nome="idloja"
                           id={id}
-                          readOnly={readOnlyFrete}
+                          isDisabled={readOnlyFrete}
                           options={optionsFrete}
                           value={valueSelectFrete}
                           onChange={onChangeSelectFrete}

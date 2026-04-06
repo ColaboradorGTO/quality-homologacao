@@ -13,6 +13,7 @@ import { ActionListaProdutosCriados } from "./actionListaProdutosCriados";
 import { useFetchData } from "../../../../hooks/useFetchData";
 import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
+import { ActionVisualizarPedido } from "./ActionVisualizar/actionVisualizarPedido";
 
 
 export const ActionComprasADMHome = ({usuarioLogado}) => {
@@ -373,6 +374,30 @@ export const ActionComprasADMHome = ({usuarioLogado}) => {
 
       {actionProdutosCriados && (
         <ActionListaProdutosCriados dadosProdutosCriados={dadosProdutosCriados} />
+      )}
+
+
+      {actionVisualizarPedido && (
+      
+        <ActionVisualizarPedido
+          dadosPedidos={dadosPedidos}
+          dadosVisualizarPedido={dadosVisualizarPedido}
+          setDadosVisualizarPedido={setDadosVisualizarPedido}
+          setDadosDetalhePedido={setDadosDetalhePedido}
+          dadosDetalhePedido={dadosDetalhePedido}
+          setActionVisualizarPedido={setActionVisualizarPedido}
+          actionVisualizarPedido={actionVisualizarPedido}
+          actionEditarPedido={actionEditarPedido}
+          setActionEditarPedido={setActionEditarPedido}
+          setActionPedidoResumido={setActionPedidoResumido}
+          actionHome={actionHome}
+          setActionHome={setActionHome}
+          actionListaPedidos={actionListaPedidos}
+          setActionListaPedidos={setActionListaPedidos}
+          handleClick={handleClick}
+          usuarioLogado={usuarioLogado}
+          optionsModulos={optionsModulos}
+        />
       )}
     </Fragment>
   )
