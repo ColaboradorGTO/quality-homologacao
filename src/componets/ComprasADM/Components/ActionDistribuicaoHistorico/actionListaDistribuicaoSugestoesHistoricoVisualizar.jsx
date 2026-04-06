@@ -1,225 +1,212 @@
-import { Fragment, useRef, useState, useEffect } from "react";
+import { Fragment, useRef } from "react";
 import './styles.css'
 import './print-styles.css'
 import { useReactToPrint } from "react-to-print";
 import * as XLSX from 'xlsx';
-import { put } from '../../../../api/funcRequest';
-import Swal from 'sweetalert2';
 
 export const ActionListaDistribuicaoSugestoesHistoricoVisualizar = ({ 
   dadosSugestoesHistorico, 
+
 }) => {
-
   const dataTableRef = useRef();
-
-  const [dadosProcessados, setDadosProcessados] = useState([]);
-  const [usuarioLogado, setUsuarioLogado] = useState(null);
-
-  // 🆕 buffer de edição
-  const [editingValues, setEditingValues] = useState({});
-
-  useEffect(() => {
-    const usuarioArmazenado = localStorage.getItem('usuario');
-    if (usuarioArmazenado) {
-      setUsuarioLogado(JSON.parse(usuarioArmazenado));
-    }
-  }, []);
-
-  // 🔥 NOVA FUNÇÃO DE SALVAR (centralizada)
-  const salvarValor = async (filial, produto, value) => {
-    const numero = parseInt(value);
-
-    if (isNaN(numero)) return;
-
-    // limpa edição
-    setEditingValues(prev => {
-      const copia = { ...prev };
-      delete copia[filial.inputId];
-      return copia;
-    });
-
-    // atualiza tela primeiro (UX melhor)
-    setDadosProcessados(prev =>
-      prev.map(prod => {
-        if (prod.CodBarras === produto.CodBarras) {
-
-          const novasFiliais = prod.filiais.map(fil => {
-            if (fil.IdFilial === filial.IdFilial) {
-              return { ...fil, qtdsugestaoalterada: numero };
-            }
-            return fil;
-          });
-
-          const novoTotal = novasFiliais.reduce(
-            (acc, fil) => acc + (parseInt(fil.qtdsugestaoalterada) || 0),
-            0
-          );
-
-          return {
-            ...prod,
-            filiais: novasFiliais,
-            totalqtd: novoTotal
-          };
+  
+  const handlePrint = useReactToPrint({
+    content: () => dataTableRef.current,
+    documentTitle: 'Histórico da Distribuição',
+    onBeforePrint: () => {
+      const style = document.createElement('style');
+      style.innerHTML = `
+        *{
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box !important;
         }
-        return prod;
-      })
-    );
-    console.log(dadosProcessados, 'dadosProcessados');
-    try {
-      await put("/compras/distribuicao-compras-historico", [{
-        IDDISTRIBUICAOCOMPRASHISTORICO: parseInt(filial.inputId.split(":")[0]),
-        IDPEDIDOCOMPRA: parseInt(filial.inputId.split(":")[1]),
-        IDEMPRESA: parseInt(filial.inputId.split(":")[2]),
-        IDFILIAL: parseInt(filial.inputId.split(":")[3]),
-        CODBARRAS: filial.inputId.split(":")[4],
-        QTDSUGESTAOALTERACAOHISTORICO: numero,
-        IDUSUARIOALTERACAO: usuarioLogado?.id,
-        FINALIZAR: 0
-      }]);
-
-      Swal.fire({
-        icon: 'success',
-        title: 'Atualizado!',
-        timer: 1000,
-        showConfirmButton: false
-      });
-
-    } catch (err) {
-      Swal.fire('Erro ao salvar');
+        @page {
+          size: A4 landscape;
+          margin: 5mm !important;
+          background: #f60000;
+        }
+        @media print {
+          .print-div-table{ width: 100%; };
+          .hidden-print {
+            display: none !important;
+          }
+          .tbody > tr > td {
+            margin: 0;
+            padding: 0;
+          }
+        }
+        body {
+          padding: 0 !important;
+          margin: 0 !important;
+          width: 100% !important;
+          height: 100vh !important;
+          background: white !important;
+        }
+      `;
+      document.head.appendChild(style);   
     }
-  };
+    // document.head.appendChild(style);
+  })
 
-  console.log(dadosSugestoesHistorico, 'dadosSugestoesHistorico');
-  const processarDadosParaTabela = (dados) => {
-    if (!dados?.length) return { produtos: [], filiais: [] };
 
-    const filiais = dados[0]?.Filiais || [];
+  const processarDadosParaTabela = (respostaListaDistribuicaoCompras) => {
+    if (!respostaListaDistribuicaoCompras || respostaListaDistribuicaoCompras.length === 0) {
+      return { produtos: [], filiais: [] };
+    }
     
-    console.log(dados[0], 'dados');
-    const produtos = dados.map(registro => {
+    const filiais = respostaListaDistribuicaoCompras[0]?.Filiais || [];
+
+    const produtos = respostaListaDistribuicaoCompras.map((registro) => {
       let totalqtd = 0;
-      console.log(registro, 'registro');
-      const filiaisProcessadas = registro.Filiais.map(fil => {
-        const sug = registro.Sugestao.find(s => s.IdFilial === fil.IdFilial);
+      const filiaisProcessadas = [];
 
-        const qtd = sug?.QtdSugestao || 0;
-        const qtdAlt = sug?.QtdSugestaoAlteracao || qtd;
+      registro.Filiais.forEach((retfilialsugerida) => {
+        let qtdsugestao = 0;
+        let iddistribuicaocompras = 0;
+        let qtdsugestaoalterada = 0;
+        const idfilial = retfilialsugerida.IdFilial;
 
-        totalqtd += qtdAlt;
+        registro.Sugestao.forEach((retqtdsugerida) => {
+          if (parseInt(idfilial) === parseInt(retqtdsugerida.IdFilial)) {
+            qtdsugestao = retqtdsugerida.QtdSugestao;
+            iddistribuicaocompras = retqtdsugerida.IdDistribuicaoCompras;
+            qtdsugestaoalterada = parseInt(retqtdsugerida.QtdSugestaoAlteracao) === 0 
+              ? qtdsugestao 
+              : retqtdsugerida.QtdSugestaoAlteracao;
+          }
+        });
 
-        return {
-          IdFilial: fil.IdFilial,
-          DescFilial: fil.DescFilial,
-          qtdsugestao: qtd,
-          qtdsugestaoalterada: qtdAlt,
-          inputId: `${sug?.IdDistribuicaoCompras}:${registro.IdPedidoCompra}:${registro.IdEmpresa}:${fil.IdFilial}:${registro.CodBarras}`
-        };
+        filiaisProcessadas.push({
+          IdFilial: idfilial,
+          DescFilial: retfilialsugerida.DescFilial,
+          qtdsugestaoalterada
+        });
+
+        totalqtd += parseInt(qtdsugestaoalterada);
       });
 
       return {
-        ...registro,
+        DescProduto: registro.DescProduto,
+        PrecoVenda: registro.PrecoVenda,
+        QtdGrade: registro.QtdGrade,
+        Grade: registro.Grade,
+        CodBarras: registro.CodBarras,
         totalqtd,
         filiais: filiaisProcessadas
       };
     });
-
-    setDadosProcessados(produtos);
 
     return { produtos, filiais };
   };
 
   const { produtos, filiais } = processarDadosParaTabela(dadosSugestoesHistorico);
 
+  if (produtos.length === 0) {
+    return null;
+  }
+
+  const exportToExcel = () => {
+    const worksheet = XLSX.utils.json_to_sheet(produtos.map(produto => {
+      const produtoData = {
+        Produto: produto.DescProduto,
+        Valor: produto.PrecoVenda,
+        Qtd: produto.QtdGrade,
+        Grade: produto.Grade,
+        Total: produto.totalqtd,
+      };
+      produto.filiais.forEach((filial) => {
+        produtoData[`${filial.DescFilial} ${filial.IdFilial}`] = filial.qtdsugestaoalterada;
+      });
+      return produtoData;
+    }));
+    const workbook = XLSX.utils.book_new();
+    const header = ['Produto', 'Valor', 'Qtd', 'Grade', 'Total', ...filiais.map(filial => `${filial.DescFilial}`)];
+    worksheet['!cols'] = [
+      { wpx: 250, caption: 'Produto' },
+      { wpx: 50, caption: 'Valor' },
+      { wpx: 50, caption: 'Qtd' },
+      { wpx: 50, caption: 'Grade' },
+      { wpx: 50, caption: 'Total' },
+      ...filiais.map(filial => ({ wpx: 200, caption: `${filial.DescFilial}` }))
+    ];
+    XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Histórico da Distribuição');
+    XLSX.writeFile(workbook, 'historico_distribuicao_compras.xlsx');
+  };
+
   return (
     <Fragment>
+      <div className="row ">
+        <div className="mr-4">
 
-      <div ref={dataTableRef}>
-        <table className="table table-bordered">
+          <button
+            className="btn btn-primary mb-3 hidden-print"
+            onClick={handlePrint}
+          >
+            Imprimir PDF
+          </button> 
+        </div>
+        <div>
 
+          <button
+            className="btn btn-success mb-3 hidden-print"
+            onClick={exportToExcel}
+          >
+            Gerar Excel
+          </button> 
+        </div>
+      </div>
+      <div className="" ref={dataTableRef}>
+        <table 
+          id="dt-basic-distribuicao" 
+          className="table table-bordered table-hover table-striped w-100"
+          ref={dataTableRef}
+        >
           <thead>
-            <tr>
-              <th>Produto</th>
-              <th>Total</th>
-              {filiais.map(f => (
-                <th key={f.IdFilial}>{f.DescFilial}</th>
-              ))}
+            <tr className="td">
+              <th className="td" colSpan="5">Nº Pedido {dadosSugestoesHistorico[0]?.IdPedidoCompra}</th>
+            </tr>
+            
+            <tr id="dt-basic-distribuicao-titulo">
+              <th className="td" width="300px">Produto</th>
+              <th className="td" width="60">Valor</th>
+              <th className="td" width="60px">Qtd</th>
+              <th className="td" width="50px">Grade</th>
+              <th className="td" width="60px">Total</th>
+                  
+              {filiais.map((filial) => (
+                <th key={filial.IdFilial} className="td" height="250px">
+                  <span 
+                    className="rotate-270 text-nowrap h-250 d-flex pos-bottom" 
+                    style={{ width: '20px' }}
+                  >
+                    &nbsp;&nbsp;{filial.DescFilial}
+                  </span>
+                </th>
+              ))}  
             </tr>
           </thead>
-
-          <tbody>
-            {produtos.map(produto => {
-
-              const produtoAtualizado = dadosProcessados.find(p => p.CodBarras === produto.CodBarras);
-
-              return (
-                <tr key={produto.CodBarras}>
-                  <td>{produto.DescProduto}</td>
-                  <td>{produtoAtualizado?.totalqtd}</td>
-
-                  {produto.filiais.map(filial => {
-
-                    const valorAtual = produtoAtualizado?.filiais.find(f => f.IdFilial === filial.IdFilial)?.qtdsugestaoalterada;
-
-                    return (
-                      <td key={filial.IdFilial}>
-                        <input
-                          type="number"
-
-                          value={
-                            editingValues[filial.inputId] !== undefined
-                              ? editingValues[filial.inputId]
-                              : valorAtual ?? ''
-                          }
-
-                          onChange={(e) => {
-                            setEditingValues(prev => ({
-                              ...prev,
-                              [filial.inputId]: e.target.value
-                            }));
-                          }}
-
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                              const value = editingValues[filial.inputId];
-                              if (value === '') return;
-                              salvarValor(filial, produto, value);
-                              e.target.blur();
-                            }
-
-                            if (e.key === 'Escape') {
-                              setEditingValues(prev => {
-                                const copia = { ...prev };
-                                delete copia[filial.inputId];
-                                return copia;
-                              });
-                              e.target.blur();
-                            }
-                          }}
-
-                          onBlur={() => {
-                            const value = editingValues[filial.inputId];
-
-                            if (value === '' || value === undefined) return;
-
-                            salvarValor(filial, produto, value);
-                          }}
-
-                          style={{
-                            width: 50,
-                            backgroundColor:
-                              editingValues[filial.inputId] !== undefined
-                                ? '#fff3cd'
-                                : 'white'
-                          }}
-                        />
-                      </td>
-                    );
-                  })}
-                </tr>
-              );
-            })}
+          
+          <tbody>           
+            {produtos.map((produto, index) => (
+              <tr key={index} id={`dt-basic-distribuicao-lista-${index}`}>
+                <td className="td">{produto.DescProduto}</td>
+                <td className="td">{produto.PrecoVenda}</td>
+                <td className="td">{produto.QtdGrade}</td>
+                <td className="td">{produto.Grade}</td>
+                <td className="td">
+                  <span id={produto.CodBarras}>{produto.totalqtd}</span>
+                </td>
+                
+                {produto.filiais.map((filial) => (
+                  <td key={filial.IdFilial} className="td">
+                    {filial.qtdsugestaoalterada}
+                  </td>
+                ))}
+              </tr>
+            ))}
           </tbody>
-
         </table>
       </div>
     </Fragment>

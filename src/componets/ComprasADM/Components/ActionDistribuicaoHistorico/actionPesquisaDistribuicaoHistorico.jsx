@@ -3,7 +3,7 @@ import { InputField } from "../../../Buttons/Input";
 import { ActionMain } from "../../../Actions/actionMain";
 import { InputSelectAction } from "../../../Inputs/InputSelectAction";
 import { ButtonType } from "../../../Buttons/ButtonType";
-import { get } from "../../../../api/funcRequest";
+import { get, post, put } from "../../../../api/funcRequest";
 import { ActionListaPedidoCompra } from "./actionListaPedidoCompra";
 import { useFetchData } from "../../../../hooks/useFetchData";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
@@ -159,7 +159,6 @@ export const ActionPesquisaDistribuicaoHistorico = ({ usuarioLogado }) => {
       setActionVisivel(false);
       setTabelaVisivel(false);
       setTabelaSugestao(false);
-      handleVisualizar();
       return response.data;
     } catch (error) {
       console.log(error, "não foi possivel pegar os dados da tabela ");
@@ -188,7 +187,7 @@ export const ActionPesquisaDistribuicaoHistorico = ({ usuarioLogado }) => {
       cancelButtonText: 'Não',
       confirmButtonText: 'Sim, quero Finalizar!',
       customClass: {
-        confirmButton: 'btn btn-primary',
+        confirmButton: 'btn btn-primary mr-2',
         cancelButton: 'btn btn-danger',
         loader: 'custom-loader'
       },
@@ -208,7 +207,7 @@ export const ActionPesquisaDistribuicaoHistorico = ({ usuarioLogado }) => {
           let textoFuncao = 'COMPRASADM/FINALIZAR DISTRIBUICAO HISTORICO'
           const ipUsuario = await getIPUsuario()
           const postData = {
-            IDFUNCIONARIO: usuarioLogado.id,
+            IDFUNCIONARIO: String(usuarioLogado.id),
             PATHFUNCAO: textoFuncao,
             DADOS: textDados,
             IP: ipUsuario || 'Indisponível'
@@ -328,6 +327,7 @@ export const ActionPesquisaDistribuicaoHistorico = ({ usuarioLogado }) => {
 
         <ActionListaDistribuicaoSugestoesHistoricoVisualizar
           dadosSugestoesHistorico={dadosSugestoesHistorico}
+         
         />
       )}
     </Fragment>
