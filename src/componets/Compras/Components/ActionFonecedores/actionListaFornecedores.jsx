@@ -528,6 +528,7 @@ export const ActionListaFornecedores = ({
             stripedRows
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado </div>}
           >
+            
             {colunasFornecedores.map(coluna => (
               <Column
                 key={coluna.field}

@@ -13,7 +13,7 @@ import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../ut
 import { useFetchData } from "../../../../hooks/useFetchData";
 
 
-export const ActionPesquisaAlteracaoPreco = () => {
+export const ActionPesquisaAlteracaoPreco = ({ usuarioLogado }) => {
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
   const [dataPesquisaFim, setDataPesquisaFim] = useState('');
   const [grupoSelecionado, setGrupoSelecionado] = useState('');
@@ -26,7 +26,7 @@ export const ActionPesquisaAlteracaoPreco = () => {
   const [idProduto, setIdProduto] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(1000);
-
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
   useEffect(() => {
     const dataInicial = getDataAtual()
@@ -35,7 +35,24 @@ export const ActionPesquisaAlteracaoPreco = () => {
     setDataPesquisaFim(dataFim)
   }, []);
 
-
+  useEffect(() => {
+    const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
+    if (menuSalvo) {
+      const menuParsed = JSON.parse(menuSalvo);
+      setMenuFilhoAtual(menuParsed);
+    }
+  }, []);
+  
+  const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
+    ['menus-usuario-excecao', menuFilhoAtual?.ID],
+    async () => {
+      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
+      
+      return response.data;
+    },
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
+  );
+     
 
   const { data: dadosResponsaveisAlteracao = [] } = useFetchData('responsaveisAlteracaoPrecos', '/responsaveisAlteracaoPrecos');
   // const { data: dadosMarcas = [] } = useFetchData('listaMarcaProduto', '/listaMarcaProduto');
@@ -206,7 +223,11 @@ export const ActionPesquisaAlteracaoPreco = () => {
 
       />
 
-      <ActionListaAlteracaoPreco dadosAlteracaoPreco={dadosAlteracaoPreco} />
+      <ActionListaAlteracaoPreco 
+        dadosAlteracaoPreco={dadosAlteracaoPreco} 
+        optionsModulos={optionsModulos}
+        usuarioLogado={usuarioLogado} 
+      />
 
 
     </Fragment>

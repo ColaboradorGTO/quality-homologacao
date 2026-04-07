@@ -84,26 +84,26 @@ export const DashBoardCadastro = () => {
   //   break;
   switch (componentToShow) {
     case "/cadastro/ActionPesquisaHome":
-      component = < ActionPesquisaHome />;
+      component = < ActionPesquisaHome usuarioLogado={usuarioLogado} />;
       break;
     case "/cadastro/ActionPesquisaProdutosAvulso":
-      component = <ActionPesquisaProdutosAvulso />;
+      component = <ActionPesquisaProdutosAvulso usuarioLogado={usuarioLogado} />;
       break;
     case "/cadastro/ActionPesquisaEstilos":
-      component = <ActionPesquisaEstilos />;
+      component = <ActionPesquisaEstilos usuarioLogado={usuarioLogado} />;
       break;
     case "/cadastro/ActionPesquisaNFE":
-      component = <ActionPesquisaNFE />;
+      component = <ActionPesquisaNFE usuarioLogado={usuarioLogado} />;
       break;
     case "/cadastro/ActionPesquisaProdutoEtiqueta":
-      component = <ActionPesquisaProdutoEtiqueta />;
+      component = <ActionPesquisaProdutoEtiqueta usuarioLogado={usuarioLogado} />;
       break;
 
     case "/cadastro/ActionPesquisaAlteracaoPreco":
-      component = <ActionPesquisaAlteracaoPreco />;
+      component = <ActionPesquisaAlteracaoPreco usuarioLogado={usuarioLogado} />;
       break;
     case "/cadastro/ActionPesquisaPreco":
-      component = <ActionPesquisaPreco />;
+      component = <ActionPesquisaPreco usuarioLogado={usuarioLogado} />;
       break;
     default:
       component = null;
@@ -136,7 +136,7 @@ export const DashBoardCadastro = () => {
                             <Suspense fallback={<div>Loading...</div>}>
                             {resumoVisivel && !componentToShow && (
 
-                              <ActionPesquisaHome />
+                              <ActionPesquisaHome usuarioLogado={usuarioLogado} />
                             )}
 
 

@@ -14,9 +14,14 @@ import { GrView } from "react-icons/gr";
 import { ActionEditarAlteracaoPrecosModal } from "./ActionEditarAlteracaoPreco/actionEditarAlteracaoPrecosModal";
 import { ActionDetalhesAlteracaoPrecos } from "./ActionDetalheVisualizar/actionDetalhesAlteracaoPrecos";
 import { get } from "../../../../api/funcRequest";
+import Swal from "sweetalert2";
 
 
-export const ActionListaAlteracaoPreco = ({dadosAlteracaoPreco}) => {
+export const ActionListaAlteracaoPreco = ({
+  dadosAlteracaoPreco,
+  optionsModulos,
+  usuarioLogado
+}) => {
   const [modalEditar, setModalEditar] = useState(false);
   const [modalVisualizar, setModalVisualizar] = useState(false);
   const [dadosDetalheAlteracao, setDadosDetalheAlteracao] = useState([]);
@@ -61,7 +66,7 @@ export const ActionListaAlteracaoPreco = ({dadosAlteracaoPreco}) => {
   const exportToExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(dados);
     const workbook = XLSX.utils.book_new();
-    const header = ['Nº', 'ID Alteração', 'Lista de Preço',  'Responsável', 'QTD Produtos', 'Data Criação', 'Data Agendamento'];
+    const header = ['Nº', 'ID Alteração', 'Lista de Preço', 'Responsável', 'QTD Produtos', 'Data Criação', 'Data Agendamento'];
     worksheet['!cols'] = [
       { wpx: 70, caption: 'Nº' },
       { wpx: 100, caption: 'ID Alteração' },
@@ -70,7 +75,7 @@ export const ActionListaAlteracaoPreco = ({dadosAlteracaoPreco}) => {
       { wpx: 100, caption: 'Qtd. Produtos' },
       { wpx: 200, caption: 'Data Criação' },
       { wpx: 200, caption: 'Data Agendamento' },
-  
+
     ];
     XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Lista de Alteração Preço');
@@ -79,8 +84,15 @@ export const ActionListaAlteracaoPreco = ({dadosAlteracaoPreco}) => {
 
   const dados = dadosAlteracaoPreco.map((item, index) => {
     let contador = index + 1;
-    let stAlteracaoPreco;
-
+      let dtCriacao = item.DATACRIACAOFORMATADA || '';
+    let dtAgendamento = item.AGENDAMENTOALTERACAO || dtCriacao;
+    let dtAgendamentoFormatado = item.AGENDAMENTOALTERACAOFORMATADO || dtCriacao;
+    
+    // 🔧 Comparação de datas EXATAMENTE como no jQuery
+    let dataAgendada = new Date(dtAgendamento);
+    let dataHoraHoje = new Date();
+    let authEdit = dataAgendada.getTime() > dataHoraHoje.getTime() ? true : false;
+  
     return {
       contador,
       IDRESUMOALTERACAOPRECOPRODUTO: item.IDRESUMOALTERACAOPRECOPRODUTO,
@@ -88,9 +100,9 @@ export const ActionListaAlteracaoPreco = ({dadosAlteracaoPreco}) => {
       NOFUNCIONARIO: item.NOFUNCIONARIO,
       QTDITENS: toFloat(item.QTDITENS),
       DATACRIACAOFORMATADA: item.DATACRIACAOFORMATADA,
-      AGENDAMENTOALTERACAOFORMATADO: item.AGENDAMENTOALTERACAOFORMATADO,    
-      AGENDAMENTOALTERACAO: item.AGENDAMENTOALTERACAO, 
-      authEdit: new Date(item.AGENDAMENTOALTERACAO) > dataHoje,
+      AGENDAMENTOALTERACAOFORMATADO: item.AGENDAMENTOALTERACAOFORMATADO || item.DATACRIACAOFORMATADA,
+      AGENDAMENTOALTERACAO: item.AGENDAMENTOALTERACAO || item.DATACRIACAOFORMATADA,
+      authEdit,
       STCANCELADO: item.STCANCELADO == 'False' ? false : true,
       STEXECUTADO: item.STEXECUTADO == 'False' ? false : true,
     }
@@ -116,7 +128,7 @@ export const ActionListaAlteracaoPreco = ({dadosAlteracaoPreco}) => {
         return (
           <th> {row.NOMELISTA}</th>
         )
-      
+
       },
       sortable: true,
     },
@@ -164,18 +176,18 @@ export const ActionListaAlteracaoPreco = ({dadosAlteracaoPreco}) => {
       field: '',
       header: 'Status',
       body: row => {
-        if(!row.STCANCELADO && !row.STEXECUTADO){
+        if (!row.STCANCELADO && !row.STEXECUTADO) {
           return <span className='text-info fw-900'>Em Espera</span>
-        } 
-         
-        if(row.STEXECUTADO && !row.STCANCELADO){
+        }
+
+        if (row.STEXECUTADO && !row.STCANCELADO) {
           return <span className='text-success fw-900'>Concluído</span>
         }
 
-        if(row.STCANCELADO){
+        if (row.STCANCELADO) {
           return <span className='text-danger fw-900'>Cancelado</span>
 
-        } 
+        }
       },
       sortable: true,
     },
@@ -183,35 +195,20 @@ export const ActionListaAlteracaoPreco = ({dadosAlteracaoPreco}) => {
       field: 'IDRESUMOALTERACAOPRECOPRODUTO',
       header: 'Detalhes',
       body: row => {
-        if(row.authEdit){
-          return (
-            <div>
-              <ButtonTable
-                titleButton={"Editar "}
-                cor={"primary"}
-                Icon={CiEdit}
-                iconSize={22}
-                iconColor={"#fff"}
-                onClickButton={() => clickEditar(row)}
-                width="30px"
-                height="30px"
-              />
-            </div>
-          )
-        } else
         return (
           <div>
             <ButtonTable
-              titleButton={"Visualizar"}
-              onClickButton={() => clickVisualizar(row)}
-              cor={"success"}
-              Icon={GrView}
+              titleButton={row.authEdit ? "Editar" : "Visualizar"}
+              cor={row.authEdit ? "warning" : "info"}
+              Icon={row.authEdit ? CiEdit : GrView}
               iconSize={22}
               iconColor={"#fff"}
+              onClickButton={() => row.authEdit ? clickEditar(row) : clickVisualizar(row)}
               width="30px"
               height="30px"
             />
           </div>
+
         )
       },
       sortable: true,
@@ -226,9 +223,25 @@ export const ActionListaAlteracaoPreco = ({dadosAlteracaoPreco}) => {
 
   const handleEditar = async (IDRESUMOALTERACAOPRECOPRODUTO) => {
     try {
+      Swal.fire({
+        title: 'Carregando...',
+        html: 'Carregando dados da alteração de preço.',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
       const response = await get(`/alteracoes-de-precos-detalhes?idAlteracaoPreco=${IDRESUMOALTERACAOPRECOPRODUTO}`);
-      setDadosDetalheAlteracao(response.data);
-      setModalEditar(true)
+      if(response.data && response.data.length > 0) {
+        Swal.close();
+        setDadosDetalheAlteracao(response.data);
+        setModalEditar(true)
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Nenhum detalhe encontrado',
+          text: 'Não foram encontrados detalhes para esta alteração de preço.',
+        })
+        return;
+      }
     } catch (error) {
       console.error(error);
     }
@@ -241,9 +254,25 @@ export const ActionListaAlteracaoPreco = ({dadosAlteracaoPreco}) => {
 
   const handleVisualizar = async (IDRESUMOALTERACAOPRECOPRODUTO) => {
     try {
+      Swal.fire({
+        title: 'Carregando...',
+        html: 'Carregando dados da alteração de preço.',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
       const response = await get(`/alteracoes-de-precos-detalhes?idAlteracaoPreco=${IDRESUMOALTERACAOPRECOPRODUTO}`);
-      setDadosVisualizarDetalhe(response.data);
-      setModalVisualizar(true)
+      if(response.data && response.data.length > 0) {
+        Swal.close();
+        setDadosVisualizarDetalhe(response.data);
+        setModalVisualizar(true)
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Nenhum detalhe encontrado',
+          text: 'Não foram encontrados detalhes para esta alteração de preço.',
+        })
+        return;
+      }
     } catch (error) {
       console.error(error);
     }
@@ -267,38 +296,38 @@ export const ActionListaAlteracaoPreco = ({dadosAlteracaoPreco}) => {
         </div>
         <div className="card " ref={dataTableRef}>
 
-        <DataTable
-          title="Vendas por Loja"
-          value={dados}
-          globalFilter={globalFilterValue}
-          size="small"
-          sortOrder={-1}
-          paginator={true}
-          rows={10}
-          rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
-          paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-          currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
-          filterDisplay="menu"
-          showGridlines
-          stripedRows
-          emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado </div>}
-        >
-          {colunasAlteracoesPreco.map(coluna => (
-            <Column
-              key={coluna.field}
-              field={coluna.field}
-              header={coluna.header}
+          <DataTable
+            title="Vendas por Loja"
+            value={dados}
+            globalFilter={globalFilterValue}
+            size="small"
+            sortOrder={-1}
+            paginator={true}
+            rows={10}
+            rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+            filterDisplay="menu"
+            showGridlines
+            stripedRows
+            emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado </div>}
+          >
+            {colunasAlteracoesPreco.map(coluna => (
+              <Column
+                key={coluna.field}
+                field={coluna.field}
+                header={coluna.header}
 
-              body={coluna.body}
-              footer={coluna.footer}
-              sortable={coluna.sortable}
-              headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
-              footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
-              bodyStyle={{ fontSize: '0.8rem' }}
+                body={coluna.body}
+                footer={coluna.footer}
+                sortable={coluna.sortable}
+                headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+                footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
+                bodyStyle={{ fontSize: '0.8rem' }}
 
-            />
-          ))}
-        </DataTable>
+              />
+            ))}
+          </DataTable>
         </div>
       </div>
 
@@ -306,12 +335,16 @@ export const ActionListaAlteracaoPreco = ({dadosAlteracaoPreco}) => {
         show={modalEditar}
         handleClose={() => setModalEditar(false)}
         dadosDetalheAlteracao={dadosDetalheAlteracao}
+        optionsModulos={optionsModulos}
+        usuarioLogado={usuarioLogado}
       />
 
-      <ActionDetalhesAlteracaoPrecos 
+      <ActionDetalhesAlteracaoPrecos
         show={modalVisualizar}
         handleClose={() => setModalVisualizar(false)}
         dadosVisualizarDetalhe={dadosVisualizarDetalhe}
+        optionsModulos={optionsModulos}
+        usuarioLogado={usuarioLogado}
       />
     </Fragment>
   )
