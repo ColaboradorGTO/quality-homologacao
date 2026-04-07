@@ -17,7 +17,6 @@ export const ActionAjusteOTModal = ({
 }) => {
 
   return (
-
     <Fragment>
       <Modal
         show={show}

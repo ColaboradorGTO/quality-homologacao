@@ -1,32 +1,36 @@
 import { Fragment, useEffect, useRef, useState } from "react"
-import { useNavigate } from "react-router-dom";
-import { CiEdit } from "react-icons/ci";
 import { FaCheck, FaExclamation, FaRegTrashAlt } from "react-icons/fa";
 import Swal from 'sweetalert2';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { ButtonTable } from "../../../ButtonsTabela/ButtonTable";
-import { MdFormatListBulleted, MdOutlineLocalPrintshop } from "react-icons/md";
+import { MdOutlineLocalPrintshop } from "react-icons/md";
 import HeaderTable from "../../../Tables/headerTable";
 import { useReactToPrint } from "react-to-print";
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
-import { ActionEditarOTModal } from "../ActionExpedicaoOrdemTransferencia/actionEditarOTModal";
-// import { ActionVisualizarOTModal } from "./ActionVisualizarOT/actionEditarFaturamentoOTModal";
 import { get } from "../../../../api/funcRequest";
-import { GrDocumentDownload, GrView } from "react-icons/gr";
+import { GrView } from "react-icons/gr";
 import { ActionImprimirEtiquetaOT } from "./ActionImprimirEtiquetaOT/actionImprimirEtiquetaOT";
 import { useCancelarFaturaOT } from "./hooks/useCancelarFaturaOT";
-import { useFaturarOT } from "./hooks/useFaturarOT";
 import { toFloat } from "../../../../utils/toFloat";
 import { ActionObservacaoOT } from "./ActionObservacaoOT/actionObservacaoOTModal";
-import { ButtonType } from "../../../Buttons/ButtonType";
-import { FcProcess } from "react-icons/fc";
-import { FaTruckFast } from "react-icons/fa6";
-import JSZip from "jszip";
+import { useProcessarFaturamentoOT } from "./hooks/useProcessarFaturamentoOT";
+import { useProcessarSefazOT } from "./hooks/useProcessarSefazOT";
+import { ActionVisualizarOTModal } from "./ActionVisualizarOT/actionVisualizarOTModal";
 
-export const ActionListaFaturasOT = ({ dadosFaturaOT }) => {
+export const ActionListaFaturasOT = ({
+  dadosFaturaOT,
+  optionsModulos,
+  usuarioLogado,
+  refetchFaturaOT,
+  setSelectedRows,
+  selectedIds,
+  setSelectedIds,
+
+}) => {
+
   const [modalVisualizar, setModalVisualizar] = useState(false);
   const [modalEditar, setModalEditar] = useState(false);
   const [modalImprimir, setModalImprimir] = useState(false);
@@ -37,10 +41,20 @@ export const ActionListaFaturasOT = ({ dadosFaturaOT }) => {
   const [modalObservacao, setModalObservacao] = useState(false);
   const [dadosSelecionados, setDadosSelecionados] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
-  const [selectedIds, setSelectedIds] = useState([]);
+
   const dataTableRef = useRef();
-  const { handleCancelar } = useCancelarFaturaOT();
-  const { handleFaturar } = useFaturarOT();
+
+  const {
+    handleCancelar
+  } = useCancelarFaturaOT({ usuarioLogado, refetchFaturaOT, optionsModulos });
+
+  const {
+    handleProcessarFaturamento,
+  } = useProcessarFaturamentoOT({ usuarioLogado, refetchFaturaOT, optionsModulos });
+
+  const {
+    handleProcessarSefaz
+  } = useProcessarSefazOT({ usuarioLogado, refetchFaturaOT, optionsModulos });
 
   useEffect(() => {
     setDadosSelecionados(dadosFaturaOT.slice(0, 10));
@@ -93,7 +107,6 @@ export const ActionListaFaturasOT = ({ dadosFaturaOT }) => {
     XLSX.writeFile(workbook, 'faturas_ot.xlsx');
   };
 
-
   const dados = dadosFaturaOT.map((item, index) => {
     let contador = index + 1;
 
@@ -105,7 +118,6 @@ export const ActionListaFaturasOT = ({ dadosFaturaOT }) => {
       DATAEMISSAOSEFAZFORMATADA: item.DATAEMISSAOSEFAZFORMATADA,
       NUMERONOTASEFAZ: item.NUMERONOTASEFAZ,
       DESCRICAOOT: item.DESCRICAOOT,
-
       QTDCONFERENCIA: item.QTDCONFERENCIA,
       IDSTATUSOT: item.IDSTATUSOT,
       IDSAPORIGEM: toFloat(item.IDSAPORIGEM),
@@ -131,14 +143,31 @@ export const ActionListaFaturasOT = ({ dadosFaturaOT }) => {
               type="checkbox"
               checked={selectedIds.includes(row.IDRESUMOOT)}
               onChange={(e) => {
-                const updatedSelectedIds = e.target.checked
-                  ? [...selectedIds, row.IDRESUMOOT]
-                  : selectedIds.filter(id => id !== row.IDRESUMOOT);
+                const isChecked = e.target.checked;
+                const id = parseInt(row.IDRESUMOOT);
+                if (isChecked) {
+                  setSelectedIds(prev =>
+                    prev.includes(id)
+                      ? prev
+                      : [...prev, id]
+                  );
 
-                setSelectedIds(updatedSelectedIds);
-                setSelectAll(updatedSelectedIds.length === dados.length);
+                  setSelectedRows(prev =>
+                    prev.some(item => parseInt(item.IDRESUMOOT) === id)
+                      ? prev
+                      : [...prev, row]
+                  );
+
+                } else {
+                  setSelectedIds(prev =>
+                    prev.filter(PrevId => PrevId !== id)
+                  );
+
+                  setSelectedRows(prev =>
+                    prev.filter(item => parseInt(item.IDRESUMOOT) !== id)
+                  );
+                }
               }}
-
             />
           </div>
         )
@@ -183,27 +212,26 @@ export const ActionListaFaturasOT = ({ dadosFaturaOT }) => {
     {
       field: 'DESCRICAOOT',
       header: 'Status',
-      body: row => <th style={{ color: row.DESCRICAOOT == 'CANCELADO' || 'red' && row.DESCRICAOOT == 'FECHADO' ? 'red' : '' }} >{row.DESCRICAOOT}</th>,
+      body: row => <th style={{
+        color: row.DESCRICAOOT == 'CANCELADO' || 'red' &&
+          row.DESCRICAOOT == 'FECHADO' ? 'red' : ''
+      }} >{row.DESCRICAOOT}</th>,
       sortable: true,
     },
     {
       field: 'IDSTATUSOT',
       header: 'Opções',
       body: (row) => {
+        const colorButton = row.ERRORLOGSAP?.length
+          ? 'danger'
+          : (row.IDSAPORIGEM > 0 && row.IDSAPDESTINO > 0)
+            ? 'success'
+            : 'warning';
 
         return (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: "10px",
-              width: "100%",
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px", width: "100%" }}>
 
-            }}
-          >
             <div>
-
               <ButtonTable
                 titleButton={"Visualizar"}
                 onClickButton={() => handleClickVisualizar(row)}
@@ -213,11 +241,10 @@ export const ActionListaFaturasOT = ({ dadosFaturaOT }) => {
                 height="32px"
                 iconColor={"#fff"}
                 cor={"success"}
-
               />
             </div>
-            <div>
 
+            <div>
               <ButtonTable
                 titleButton={"Cancelar"}
                 onClickButton={() => handleCancelar(row.IDRESUMOOT)}
@@ -227,43 +254,41 @@ export const ActionListaFaturasOT = ({ dadosFaturaOT }) => {
                 height="32px"
                 iconColor={"#fff"}
                 cor={"danger"}
-                disabledBTN={[1, 3].indexOf(row.IDSTATUSOT) >= 0}
+                disabledBTN={[1, 3].indexOf(row.IDSTATUSOT) < 0}
               />
             </div>
-            <div>
 
+            <div>
               <ButtonTable
                 titleButton={"Processar Faturamento"}
-                onClickButton={() => handleFaturar(row.IDRESUMOOT)}
+                onClickButton={() => handleProcessarFaturamento([row.IDRESUMOOT], false)}
                 Icon={FaCheck}
                 iconSize={16}
                 width="32px"
                 height="32px"
                 iconColor={"#fff"}
                 cor={"warning"}
-                disabledBTN={row.IDSTATUSOT === 3}
+                disabledBTN={row.IDSTATUSOT !== 3}
               />
             </div>
-            <div>
 
+            <div>
               <ButtonTable
                 titleButton={"Processar SEFAZ"}
-                // onClickButton={() => IDSAPORIGEM}
-                onClickButton={() => handleConsultarSefazOT(row.IDRESUMOOT)}
+                onClickButton={() => handleProcessarSefaz([row.IDSAPORIGEM])}
                 Icon={FaCheck}
                 iconSize={16}
                 width="32px"
                 height="32px"
                 iconColor={"#fff"}
                 cor={"info"}
-                disabledBTN={row.IDSTATUSOT === 9}
+                disabledBTN={row.IDSTATUSOT !== 9}
               />
             </div>
-            <div>
 
+            <div>
               <ButtonTable
                 titleButton={"Imprimir Etiqueta"}
-                // onClickButton={() => IDSAPORIGEM}
                 onClickButton={() => handleClickImprimir(row)}
                 Icon={MdOutlineLocalPrintshop}
                 iconSize={16}
@@ -271,59 +296,22 @@ export const ActionListaFaturasOT = ({ dadosFaturaOT }) => {
                 height="32px"
                 iconColor={"#fff"}
                 cor={"dark"}
-
               />
             </div>
 
-            <Fragment>
+            <div>
+              <ButtonTable
+                titleButton={"Status Nota Fiscal"}
+                onClickButton={() => handleClickStatusNota(row)}
+                Icon={FaExclamation}
+                iconSize={16}
+                width="32px"
+                height="32px"
+                iconColor={"#fff"}
+                cor={colorButton}
+              />
+            </div>
 
-              {row.ERRORLOGSAP !== '' && row.ERRORLOGSAP !== null ? (
-                <div>
-                  <ButtonTable
-                    titleButton={"Status Nota Fiscal"}
-                    onClickButton={() => handleClickStatusNota(row)}
-                    Icon={FaExclamation}
-                    iconSize={16}
-                    width="32px"
-                    height="32px"
-                    iconColor={"#fff"}
-                    cor={"danger"}
-
-                  />
-                </div>
-              ) : (
-                (row.ERRORLOGSAP === '' || row.ERRORLOGSAP === null) && row.IDSAPORIGEM > 0 && row.IDSAPDESTINO > 0 ? (
-                  <div>
-                    <ButtonTable
-                      titleButton={"Status Nota Fiscal"}
-                      onClickButton={() => handleClickStatusNota(row)}
-                      Icon={FaExclamation}
-                      iconSize={16}
-                      width="32px"
-                      height="32px"
-                      iconColor={"#fff"}
-                      cor={"success"}
-
-                    />
-                  </div>
-                ) : (
-                  <div>
-                    <ButtonTable
-                      titleButton={"Status Nota Fiscal"}
-                      onClickButton={() => handleClickStatusNota(row)}
-                      Icon={FaExclamation}
-                      iconSize={16}
-                      width="32px"
-                      height="32px"
-                      iconColor={"#fff"}
-                      cor={"warning"}
-
-                    />
-                  </div>
-
-                ))}
-
-            </Fragment>
             <div>
               <ButtonTable
                 titleButton={"Imprimir Nota Fiscal"}
@@ -334,9 +322,10 @@ export const ActionListaFaturasOT = ({ dadosFaturaOT }) => {
                 height="32px"
                 iconColor={"#fff"}
                 cor={"success"}
-
+                disabledBTN={!row.CHAVESEFAZ}
               />
             </div>
+
           </div>
         );
       }
@@ -344,32 +333,22 @@ export const ActionListaFaturasOT = ({ dadosFaturaOT }) => {
 
   ]
 
-  // useEffect(() => {
-  //   if (selectedIds.length > 0) {
-  //     handleDetalhar(selectedIds, 'True');
-  //   }
-  // }, [selectedIds]);
-
-
-  const handleSelectAll = (isChecked) => {
-    setSelectAll(isChecked);
-
-    const updatedSelectedIds = isChecked ? dados.map(item => item.IDRESUMOOT) : [];
-    setSelectedIds(updatedSelectedIds);
-
-    // if (updatedSelectedIds.length > 0) {
-    //   handleDetalhar(updatedSelectedIds, 'True');
-    // }
-  };
-
   const handleVisualizar = async (IDRESUMOOT) => {
-
     try {
       const response = await get(`/detalhe-ordem-transferencia?idResumoOT=${IDRESUMOOT}`)
 
       if (response.data && response.data.length > 0) {
         setDadosDetalheTransferencia(response.data);
         setModalVisualizar(true);
+      } else {
+        Swal.fire({
+          title: 'Nao foram encontrados produtos para essa OT',
+          icon: 'info',
+          confirmButtonText: 'OK',
+          customClass: {
+            container: 'custom-swal',
+          }
+        })
       }
     } catch (error) {
       console.error('Erro ao buscar detalhes da venda: ', error);
@@ -377,26 +356,9 @@ export const ActionListaFaturasOT = ({ dadosFaturaOT }) => {
   };
 
   const handleClickVisualizar = (row) => {
+
     if (row && row.IDRESUMOOT) {
       handleVisualizar(row.IDRESUMOOT);
-    }
-  };
-
-  const handleEdit = async (IDRESUMOOT) => {
-    try {
-      const response = await get(`/detalhe-ordem-transferencia?idResumoOT=${IDRESUMOOT}`)
-      if (response.data && response.data.length > 0) {
-        setDadosDetalheTransferencia(response.data);
-        setModalEditar(true);
-      }
-    } catch (error) {
-      console.error('Erro ao buscar detahes transferência: ', error);
-    }
-  };
-
-  const handleClickEdit = (row) => {
-    if (row && row.IDRESUMOOT) {
-      handleEdit(row.IDRESUMOOT);
     }
   };
 
@@ -406,6 +368,15 @@ export const ActionListaFaturasOT = ({ dadosFaturaOT }) => {
       if (response.data && response.data.length > 0) {
         setDadosImprimirOT(response.data);
         setModalImprimir(true);
+      } else {
+        Swal.fire({
+          title: 'Nao foram encontrados etiquetas para essa OT',
+          icon: 'info',
+          confirmButtonText: 'OK',
+          customClass: {
+            container: 'custom-swal',
+          }
+        })
       }
     } catch (error) {
       console.error('Erro ao buscar detahes transferência: ', error);
@@ -416,38 +387,6 @@ export const ActionListaFaturasOT = ({ dadosFaturaOT }) => {
     if (row && row.IDRESUMOOT) {
       handleImprimir(row.IDRESUMOOT);
     }
-  };
-
-  const handleConsultarSefazOT = async (IDRESUMOOT) => {
-    Swal.fire({
-      title: 'Deseja Realizar a Emissão da Nota?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Sim, quero Faturar!',
-      cancelButtonText: 'Não',
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          const response = await get('/consulta-nfe-saida-tranferencia');
-          Swal.fire({
-            title: 'Sucesso!',
-            text: 'Nota Fiscal Emitida com Sucesso!',
-            icon: 'success',
-            timer: 2000
-          })
-
-          return response.data;
-        } catch (error) {
-          Swal.fire({
-            title: 'Erro!',
-            text: `Erro ao Consultar a SEFAZ: ${error}`,
-            icon: 'success'
-          });
-        }
-      }
-    })
   };
 
   const handleStatusNota = async (IDRESUMOOT) => {
@@ -470,165 +409,8 @@ export const ActionListaFaturasOT = ({ dadosFaturaOT }) => {
     }
   };
 
-  const selecionarRegistros = () => {
-    Swal.fire({
-      title: '<strong>Selecionar <u>OT</u></strong>',
-      icon: 'info',
-      html: 'A rotina irá selecionar os <b>10 (dez) primeiros</b>, registros de acordo com a opção escolhida!',
-      showCloseButton: true,
-      showCancelButton: true,
-      focusConfirm: false,
-      confirmButtonText: 'Faturamento',
-      confirmButtonColor: '#ffc241',
-      cancelButtonText: 'SEFAZ',
-      cancelButtonColor: '#3085d6'
-    }).then((result) => {
-      let selected = [];
-      let count = 0;
-
-      if (result.isConfirmed) {
-        // Faturamento
-        dadosFaturaOT.forEach((item) => {
-          if (count < 10 && item.IDSAPORIGEM === 0) {
-            selected.push(item.IDRESUMOOT);
-            count++;
-          }
-        });
-      } else if (result.dismiss === Swal.DismissReason.cancel) {
-        // SEFAZ
-        dadosFaturaOT.forEach((item) => {
-          if (count < 10 && item.IDSAPORIGEM !== 0 && item.IDSTATUSOT === 9) {
-            selected.push(item.IDRESUMOOT);
-            count++;
-          }
-        });
-      }
-
-      setSelectedIds(selected);
-    });
-  };
-
-  const baixarPDFs = async (dados) => {
-    let pdfDataArray = [];
-    let nomeArquivos = [];
-
-    try {
-      for (const url of dados) {
-        const response = await fetch('https://cors-anywhere.herokuapp.com/' + url);
-        const pdfData = await response.arrayBuffer();
-        pdfDataArray.push(pdfData);
-
-        // Extrair nome do arquivo da URL
-        const nomeArquivo = url.substring(url.lastIndexOf("/") + 1);
-        nomeArquivos.push(nomeArquivo);
-      }
-
-      return [pdfDataArray, nomeArquivos];
-    } catch (error) {
-      console.error("Erro ao baixar os arquivos PDF:", error);
-      throw error;
-    }
-  };
-
-  // Função para comprimir os PDFs em ZIP
-  const comprimirPDFs = async (pdfDataArray, nomeArquivos) => {
-    try {
-      const zip = new JSZip();
-      for (let i = 0; i < pdfDataArray.length; i++) {
-        zip.file(nomeArquivos[i], pdfDataArray[i]);
-      }
-      const zipData = await zip.generateAsync({ type: "blob" });
-      return zipData;
-    } catch (error) {
-      console.error("Erro ao comprimir os arquivos PDF:", error);
-      throw error;
-    }
-  };
-
-  // Função para fazer o download do ZIP
-  const baixarArquivoZIP = (zipData) => {
-    try {
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(zipData);
-      link.download = "download_notasfiscais.zip";
-      link.click();
-    } catch (error) {
-      console.error("Erro ao baixar o arquivo ZIP:", error);
-      throw error;
-    }
-  };
-
-  // Função principal para baixar as notas fiscais
-  const downloadNFE = async () => {
-    try {
-      if (dadosSelecionados.length === 0) {
-        Swal.fire("Atenção", "Nenhuma nota foi selecionada!", "warning");
-        return;
-      }
-
-      const [pdfDataArray, nomeArquivos] = await baixarPDFs(dadosSelecionados);
-      const zipData = await comprimirPDFs(pdfDataArray, nomeArquivos);
-      baixarArquivoZIP(zipData);
-    } catch (error) {
-      Swal.fire("Erro", "Ocorreu um erro ao baixar as notas fiscais.", "error");
-    }
-  };
-
-  // Exemplo para seleção de dados (substituir lógica de seleção conforme necessidade)
-  const handleSelecionarDados = (CHAVESEFAZ) => {
-    const mockDados = [
-      `http://164.152.244.96:3000/files/NFe${CHAVESEFAZ}.pdf`,
-      `http://164.152.244.96:3000/files/NFe${CHAVESEFAZ}.pdf`,
-    ];
-    setDadosSelecionados(mockDados);
-    Swal.fire("Notas Selecionadas", "As notas foram selecionadas com sucesso!", "success");
-  };
-
   return (
     <Fragment>
-      <div className="row mb-4 " style={{ marginTop: '1rem' }}>
-
-        <ButtonType
-          Icon={MdFormatListBulleted}
-          iconSize="16px"
-          textButton="Selecionar Registros"
-          cor="primary"
-          tipo="button"
-          onClickButtonType={selecionarRegistros}
-        />
-        <ButtonType
-          Icon={FcProcess}
-          iconSize="16px"
-          textButton="Processar Faturamento"
-          cor="warning"
-          tipo="button"
-          onClickButtonType={""}
-        />
-        <ButtonType
-          Icon={FcProcess}
-          iconSize="16px"
-          textButton="Processar SEFAZ"
-          cor="info"
-          tipo="button"
-          onClickButtonType={""}
-        />
-        <ButtonType
-          Icon={GrDocumentDownload}
-          iconSize="16px"
-          textButton="Download Notas"
-          cor="danger"
-          tipo="button"
-          onClickButtonType={""}
-        />
-        <ButtonType
-          Icon={FaTruckFast}
-          iconSize="16px"
-          textButton="Conhecimento Entrega"
-          cor="danger"
-          tipo="button"
-          onClickButtonType={""}
-        />
-      </div>
       <div className="panel">
 
         <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
@@ -653,12 +435,7 @@ export const ActionListaFaturasOT = ({ dadosFaturaOT }) => {
             rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
             showGridlines
             stripedRows
-
             dataKey="IDRESUMOOT"
-            selectionMode="checkbox"
-            selection={selectedIds}
-            onSelectionChange={(e) => setSelectedIds(e.value)}
-
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado </div>}
           >
             {colunasFaturasOT.map(coluna => (
@@ -680,15 +457,9 @@ export const ActionListaFaturasOT = ({ dadosFaturaOT }) => {
         </div>
       </div>
 
-      {/* <ActionVisualizarOTModal
+      <ActionVisualizarOTModal
         show={modalVisualizar}
         handleClose={() => setModalVisualizar(false)}
-        dadosDetalheTransferencia={dadosDetalheTransferencia}
-      /> */}
-
-      <ActionEditarOTModal
-        show={modalEditar}
-        handleClose={() => setModalEditar(false)}
         dadosDetalheTransferencia={dadosDetalheTransferencia}
       />
 
@@ -696,12 +467,14 @@ export const ActionListaFaturasOT = ({ dadosFaturaOT }) => {
         show={modalImprimir}
         handleClose={() => setModalImprimir(false)}
         dadosImprimirOT={dadosImprimirOT}
+        usuarioLogado={usuarioLogado}
       />
 
       <ActionObservacaoOT
         show={modalObservacao}
         handleClose={() => setModalObservacao(false)}
         dadosObservacaoOT={dadosObservacaoOT}
+        usuarioLogado={usuarioLogado}
       />
     </Fragment>
   )

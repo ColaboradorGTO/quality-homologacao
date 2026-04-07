@@ -8,10 +8,8 @@ import { HeaderModal } from "../../../../Modais/HeaderModal/HeaderModal";
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal";
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal";
 
-
 export const ActionImprimirEtiquetaOT = ({ show, handleClose, dadosImprimirOT }) => {
   const [layout, setLayout] = useState('layout-normal');
-
 
   const dataTableRef = useRef();
 
@@ -50,8 +48,6 @@ export const ActionImprimirEtiquetaOT = ({ show, handleClose, dadosImprimirOT })
       NUMEROVOLUME: item.NUMEROVOLUME,
     };
   });
-
-
 
   const toggleLayout = () => {
     setLayout(layout === 'layout-normal' ? 'layout-cupom' : 'layout-normal');
@@ -175,16 +171,13 @@ export const ActionImprimirEtiquetaOT = ({ show, handleClose, dadosImprimirOT })
                       <p style={{ fontSize: '18px' }}>
                         <strong> {dados[0]?.TPVOLUME} </strong>
                       </p>
-
                     </div>
                   </div>
                 </div>
 
-
               </Fragment>
             ))}
           </div>
-
 
         </Modal.Body>
 
@@ -199,7 +192,6 @@ export const ActionImprimirEtiquetaOT = ({ show, handleClose, dadosImprimirOT })
           onClickButtonFechar={handleImprimir}
           corFechar="primary"
         />
-
       </Modal >
     </Fragment >
   );

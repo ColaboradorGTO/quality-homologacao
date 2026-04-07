@@ -7,7 +7,6 @@ import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../../../Tables/headerTable";
 
-
 export const ActionListaProdutosOrdemTransferencia = ({
     dadosProdutosTabela,
     handleChangeQtdAjuste,

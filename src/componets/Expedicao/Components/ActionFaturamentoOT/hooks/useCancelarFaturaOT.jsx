@@ -1,46 +1,58 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { post } from "../../../../../api/funcRequest";
 import { put } from "../../../../../api/funcRequest";
 
-export const useCancelarFaturaOT = () => {
+export const useCancelarFaturaOT = ({
+  usuarioLogado,
+  refetchFaturaOT,
+  optionsModulos
+}) => {
+
   const [ipUsuario, setIpUsuario] = useState('');
-  const [usuarioLogado, setUsuarioLogado] = useState(null);
-  const navigate = useNavigate();
 
-  useEffect(() => {
-
-    const usuarioArmazenado = localStorage.getItem('usuario');
-
-    if (usuarioArmazenado) {
-      try {
-        const parsedUsuario = JSON.parse(usuarioArmazenado);
-        setUsuarioLogado(parsedUsuario);
-      } catch (error) {
-        console.error('Erro ao parsear o usuário do localStorage:', error);
-      }
-    } else {
-      navigate('/');
-    }
-
-  }, []);
-
-  
-  useEffect(() => {
-    getIPUsuario();
-  }, [usuarioLogado]);
-  
   const getIPUsuario = async () => {
-    const response = await axios.get('http://ipwho.is/')
-    if (response.data) {
-      setIpUsuario(response.data.ip);
+    let usuarioIP = null;
+
+    try {
+      const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+      usuarioIP = ipWhoisData?.ip;
+    } catch (error) {
+      console.error("Erro ao buscar IP via ipwho.is:", error);
     }
-    return response.data;
-  }
+
+    if (!usuarioIP) {
+      try {
+        const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+        usuarioIP = ipifyData?.ip;
+      } catch (error) {
+        console.error("Erro ao buscar IP via ipify.org:", error);
+      }
+    }
+    setIpUsuario(usuarioIP);
+    return usuarioIP;
+  };
 
   const handleCancelar = async (IDRESUMOOT) => {
+    if (optionsModulos[0]?.ALTERAR === 'False') {
+      Swal.fire({
+        title: 'Erro!',
+        text: `${usuarioLogado?.NOFUNCIONARIO},\nVocê não tem permissão para processar  SEFAZ!`,
+        icon: 'error',
+        customClass: {
+          container: 'custom-swal'
+        },
+      });
+      return;
+    }
+
+    const postData = {
+      IDSTATUSOT: parseInt(2),
+      IDRESUMOOT: IDRESUMOOT,
+      IDUSRCANCELAMENTO: usuarioLogado.id,
+    };
+
     Swal.fire({
       title: 'Deseja realmente CANCELAR essa OT?',
       icon: 'warning',
@@ -52,42 +64,53 @@ export const useCancelarFaturaOT = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const postData = {
-            IDSTATUSOT: 2,
-            IDRESUMOOT: IDRESUMOOT,
-            IDUSRCANCELAMENTO: usuarioLogado.id,
-          };
-
           const response = await put('/resumo-ordem-transferencia/:id', postData);
+
           const textDados = JSON.stringify(postData);
           let textoFuncao = 'EXPEDICAO/OT CANCELADA COM SUCESSO';
+          const ipUsuario = await getIPUsuario();
 
           const createData = {
-            IDFUNCIONARIO: usuarioLogado.id,
+            IDFUNCIONARIO: String(usuarioLogado.id),
             PATHFUNCAO: textoFuncao,
             DADOS: textDados,
-            IP: ipUsuario
+            IP: ipUsuario || "INDISPONIVEL"
           };
-      
-          const responsePost = await post('/log-web', createData)
 
-          return responsePost.data;
+          await post('/log-web', createData)
+
+
+          Swal.fire({
+            title: 'Sucesso!',
+            text: 'OT Cancelada com sucesso.',
+            icon: 'success',
+            timer: 1500,
+            customClass: {
+              container: 'custom-swal'
+            }
+          });
+
+          refetchFaturaOT()
+
+          return response.data;
         } catch (error) {
           Swal.fire({
             title: 'Erro!',
             text: `Erro ao Cancelar a OT: ${error}`,
             icon: 'success'
           });
-          
+
+          const textDados = JSON.stringify(postData);
           let textoFuncao = 'EXPEDICAO/ERRO AO CANCELAR OT';
+          const ipUsuario = await getIPUsuario();
 
           const createData = {
             IDFUNCIONARIO: usuarioLogado.id,
             PATHFUNCAO: textoFuncao,
-            DADOS: 'Erro ao Cancelar a OT',
-            IP: ipUsuario
+            DADOS: textDados,
+            IP: ipUsuario || "INDISPONIVEL"
           };
-      
+
           const responsePost = await post('/log-web', createData)
 
           return responsePost.data;
@@ -97,8 +120,7 @@ export const useCancelarFaturaOT = () => {
   };
 
   return {
-    usuarioLogado,
-    setUsuarioLogado,
+
     handleCancelar,
   };
 };
