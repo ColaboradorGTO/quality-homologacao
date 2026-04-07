@@ -32,7 +32,6 @@ export const ActionListaFaturasOT = ({
 }) => {
 
   const [modalVisualizar, setModalVisualizar] = useState(false);
-  const [modalEditar, setModalEditar] = useState(false);
   const [modalImprimir, setModalImprimir] = useState(false);
   const [dadosImprimirOT, setDadosImprimirOT] = useState([]);
   const [dadosDetalheTransferencia, setDadosDetalheTransferencia] = useState([]);
@@ -40,7 +39,8 @@ export const ActionListaFaturasOT = ({
   const [dadosObservacaoOT, setDadosObservacaoOT] = useState([]);
   const [modalObservacao, setModalObservacao] = useState(false);
   const [dadosSelecionados, setDadosSelecionados] = useState([]);
-  const [selectAll, setSelectAll] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
+  
 
   const dataTableRef = useRef();
 
@@ -432,6 +432,8 @@ export const ActionListaFaturasOT = ({
             sortOrder={-1}
             paginator={true}
             rows={10}
+            selection={selectedRow}
+            selectionMode={'single'}
             rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
             showGridlines
             stripedRows

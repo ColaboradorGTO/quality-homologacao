@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Swal from "sweetalert2";
 import { post, put } from "../../../api/funcRequest";
 import axios from "axios";
@@ -16,7 +16,6 @@ export const useSalvarVolumeOT = ({
   const [conferirItens, setConferirItens] = useState('')
   const [ipUsuario, setIpUsuario] = useState('');
 
-//console.log(dadosDetalheTransferencia[0]?.IDRESUMOOT)
 
   const getIPUsuario = async () => {
     let usuarioIP = null;

@@ -7,8 +7,8 @@ export const useCancelarOT = ({
     refetchListaConferencia,
     optionsModulos,
     usuarioLogado,
-}) => {
 
+}) => {
     const [ipUsuario, setIpUsuario] = useState('');
 
     const getIPUsuario = async () => {
@@ -66,7 +66,6 @@ export const useCancelarOT = ({
             preConfirm: async () => {
                 try {
                     const response = await put('/resumo-ordem-transferencia-cega/:id', putData);
-                    // const response = await put('/listaOrdemTransferenciaConferenciaCega/:id', putData);
 
                     const textDados = JSON.stringify(putData);
                     let textoFuncao = 'CONFERNCIA CEGA / SUCESSO AO CANCELAR OT';

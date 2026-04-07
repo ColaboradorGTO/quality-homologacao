@@ -11,11 +11,8 @@ export const useConferirItemsOT = ({
   refetchListaConferencia,
   dadosDetalheTransferencia,
   setDadosDetalheTransferencia,
-  setModalConferirItemsModal,
-  
 
 }) => {
-  const [ajusteQuantidade, setAjusteQuantidade] = useState(0)
   const [empresaOrigem, setEmpresaOrigem] = useState('')
   const [visualizarModalVolume, setVisualizarModalVolume] = useState(false)
   const [empresaDestino, setEmpresaDestino] = useState('')

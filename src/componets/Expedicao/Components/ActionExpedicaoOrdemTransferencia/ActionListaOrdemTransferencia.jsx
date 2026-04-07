@@ -1,9 +1,7 @@
 import { Fragment, useEffect, useRef, useState } from "react"
-import { useNavigate } from "react-router-dom";
 import { CiEdit } from "react-icons/ci";
 import { FaCheck, FaExclamation, FaList } from "react-icons/fa";
 import Swal from 'sweetalert2';
-import { useForm } from "react-hook-form";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { ButtonTable } from "../../../ButtonsTabela/ButtonTable";
@@ -32,8 +30,8 @@ export const ActionListaOrdemTransferencia = ({
   optionsModulos,
   refetchListaConferencia,
   usuarioLogado
+
 }) => {
-  const { register, handleSubmit, errors } = useForm();
   const [modalVisivel, setModalVisivel] = useState(false);
   const [modalAjustarModalOT, setModalAjustarModalOT] = useState(false);
   const [modalFinalizarOT, setModalFinalizarOT] = useState(false);
@@ -44,12 +42,12 @@ export const ActionListaOrdemTransferencia = ({
   const [dadosObservacaoOT, setDadosObservacaoOT] = useState([]);
   const [dadosConferirVolume, setDadosConferirVolume] = useState([]);
   const [valueLojaOrigem, setValueLojaOrigem] = useState('')
-  const [ajusteQuantidade, setAjusteQuantidade] = useState(0)
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [dadosFinalizarOT, setDadosFinalizarOT] = useState([]);
   const [modalConferirItemsModal, setModalConferirItemsModal] = useState(false);
   const [conferirOTModal, setConferirOTModal] = useState(false);
   const [modalConferirVolumeModal, setModalConferirVolumeModal] = useState(false);
+  const [rowSelection, setRowSelection] = useState(null);
 
   const [size] = useState('small')
   const dataTableRef = useRef();
@@ -646,72 +644,6 @@ export const ActionListaOrdemTransferencia = ({
     }
   };
 
-
-  const handleGetSefazOT = async (row) => {
-
-    Swal.fire({
-      icon: 'question',
-      title: `Deseja Realizar a Emissão da Nota?`,
-      showCloseButton: true,
-      showCancelButton: true,
-      cancelButtonColor: '#FD1381',
-      confirmButtonColor: '#7352A5',
-      confirmButtonText: 'Sim',
-      cancelButtonText: 'Não',
-      customClass: {
-        container: 'custom-swal',
-      },
-      timer: 3000,
-      preConfirm: async () => {
-        try {
-
-          await get(`/consulta-nfe-saida-tranferencia?idSapOrigem=${row.IDSAPORIGEM}`);
-          Swal.fire('Sucesso!', 'Nota Emitida com Sucesso!', 'success');
-        } catch (error) {
-          Swal.fire('Erro!', 'Erro ao Emitir Nota.', 'error');
-        }
-      }
-    });
-  };
-
-  const handleChangeAjuste = (e, row) => {
-    const value = parseInt(e.target.value);
-    if (!isNaN(value)) {
-      const updateRow = { ...row, QTDAJUSTE: value };
-      const updateData = dadosTransferenciaDetalhe.map((item => (item.IDPRODUTO === row.IDPRODUTO ? updateRow : item)));
-      setDadosDetalheTransferencia(updateData);
-      setAjusteQuantidade(value);
-
-    }
-  }
-
-  const salvarOT = async (data) => {
-    let postData = {
-      QTDAJUSTE: ajusteQuantidade,
-    }
-    const response = await put('/updateOrdemTransferencia', postData)
-
-    Swal.fire({
-      position: 'top-end',
-      icon: 'success',
-      title: 'Ordem de Transferência atualizada com sucesso!',
-      showConfirmButton: false,
-      timer: 1500
-    })
-
-      .catch(error => {
-        Swal.fire({
-          position: 'top-end',
-          icon: 'error',
-          title: 'Erro ao atualizar Ordem de Transferência!',
-          showConfirmButton: false,
-          timer: 1500
-        });
-
-        console.log(error)
-      })
-  }
-
   return (
     <Fragment>
       <div className="panel">
@@ -738,6 +670,8 @@ export const ActionListaOrdemTransferencia = ({
             size={size}
             sortOrder={-1}
             paginator={true}
+            selectionMode="single"
+            selection={rowSelection}
             rows={10}
             rowsPerPageOptions={[5, 10, 20, 50]}
             showGridlines
@@ -766,7 +700,6 @@ export const ActionListaOrdemTransferencia = ({
       <ActionConferirOT
         show={conferirOTModal}
         handleClose={() => setConferirOTModal(false)}
-        //dadosEncerrarOT={dadosEncerrarOT}
         dadosDetalheTransferencia={dadosDetalheTransferencia}
         setDadosDetalheTransferencia={setDadosDetalheTransferencia}
         usuarioLogado={usuarioLogado}

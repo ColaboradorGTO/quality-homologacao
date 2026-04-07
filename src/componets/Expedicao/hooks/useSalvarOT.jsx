@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { getDataAtual } from "../../../utils/dataAtual";
 import { get, post } from "../../../api/funcRequest";
 import { useQuery } from "react-query";
 
@@ -12,7 +10,6 @@ export const useSalvarOT = ({
   refetchListaConferencia
 
 }) => {
-  const [ajusteQuantidade, setAjusteQuantidade] = useState(0)
   const [empresaOrigem, setEmpresaOrigem] = useState('')
   const [empresaDestino, setEmpresaDestino] = useState('')
   const [produto, setProduto] = useState('')
@@ -305,15 +302,3 @@ export const useSalvarOT = ({
   };
 };
 
-// IDPRODUTO: cIdProduto,
-// QTDEXPEDICAO: nQtdProduto,
-// QTDRECEPCAO: 0,
-// QTDDIFERENCA: 0,
-// QTDAJUSTE: 0,
-// VLRUNITVENDA: nVlrVenda,
-// VLRUNITCUSTO: 0,
-// STCONFERIDO: 'False',
-// IDUSRAJUSTE: 0,
-// STATIVO: 'True',
-// STFALTA: 'False',
-// STSOBRA: 'False',

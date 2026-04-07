@@ -1,8 +1,4 @@
 import { Fragment, useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom";
-import { FaRegTrashAlt } from "react-icons/fa";
-import Swal from 'sweetalert2';
-import { useForm } from "react-hook-form";
 import { ActionMain } from "../../../Actions/actionMain";
 import { InputField } from "../../../Buttons/Input";
 import { ButtonType } from "../../../Buttons/ButtonType";
@@ -16,20 +12,15 @@ import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
 import { ActionIncluirOTModal } from "./ActionIncluirModalOT/actionIncluirOTModal";
 
-
 export const ActionPesquisaOT = ({ usuarioLogado }) => {
-  const { register, handleSubmit, errors } = useForm();
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [modalVisivel, setModalVisivel] = useState(false);
-  const [clickContador, setClickContador] = useState(0);
-  const [dadosDetalheTransferencia, setDadosDetalheTransferencia] = useState([]);
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('')
   const [dataInicioEntrega, setDataInicioEntrega] = useState('')
   const [dataFimEntrega, setDataFimEntrega] = useState('')
   const [dataPesquisaFim, setDataPesquisaFim] = useState('')
   const [empresaSelecionada, setEmpresaSelecionada] = useState(null)
   const [valueLojaOrigem, setValueLojaOrigem] = useState('')
-  const [ajusteQuantidade, setAjusteQuantidade] = useState(0)
   const [rotinaSelecionada, setRotinaSelecionada] = useState('')
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -39,8 +30,6 @@ export const ActionPesquisaOT = ({ usuarioLogado }) => {
     const dataAtual = getDataAtual();
     setDataPesquisaInicio(dataAtual);
     setDataPesquisaFim(dataAtual);
-    // setDataInicioEntrega(dataAtual);
-    // setDataFimEntrega(dataAtual);
   }, []);
 
 
@@ -154,7 +143,6 @@ export const ActionPesquisaOT = ({ usuarioLogado }) => {
     setModalVisivel(true)
   }
 
-
   return (
     <Fragment>
 
@@ -238,7 +226,6 @@ export const ActionPesquisaOT = ({ usuarioLogado }) => {
           />
         </div>
       )}
-
 
       <ActionIncluirOTModal
         show={modalVisivel}

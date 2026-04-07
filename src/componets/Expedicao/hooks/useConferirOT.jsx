@@ -20,7 +20,6 @@ export const useConferirOT = ({
   const [dadosProdutosTabela, setDadosProdutosTabela] = useState([]);
   const [produtoSalvo, setProdutoSalvo] = useState([]);
   const [idResumoOT, setIdResumoOT] = useState('');
-  const [observacao, setObservacao] = useState('')
 
   const getIPUsuario = async () => {
     let usuarioIP = null;

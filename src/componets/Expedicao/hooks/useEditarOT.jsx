@@ -12,7 +12,6 @@ export const useEditarOT = ({
   setDadosDetalheTransferencia
 
 }) => {
-  const [ajusteQuantidade, setAjusteQuantidade] = useState(0)
   const [empresaOrigem, setEmpresaOrigem] = useState('')
   const [empresaDestino, setEmpresaDestino] = useState('')
   const [produto, setProduto] = useState('')
@@ -108,41 +107,6 @@ export const useEditarOT = ({
       )
     );
   };
-
-
-  /* const { data: dadosProdutos = [], isLoading: isLoadingProdutos } = useQuery(
-    ['listaProdutos', produto, usuarioLogado?.IDEMPRESA],
-    async () => {
-
-      const response = await get(`/listaProdutos?idEmpresa=${usuarioLogado?.IDEMPRESA}&idProduto=${produto}&page=1 `);
-
-      setDadosProdutosTabela(prev => {
-        const novos = [...prev];
-
-        response.data.forEach(novo => {
-          const index = novos.findIndex(p => p.IDPRODUTO === novo.IDPRODUTO);
-
-          if (index >= 0) {
-            novos[index] = {
-              ...novos[index],
-              QUANTIDADE: (novos[index].QUANTIDADE || 1) + 1
-            };
-          } else {
-            novos.push({
-              ...novo,
-              QUANTIDADE: 1
-            });
-          }
-        });
-
-        return novos;
-      });
-      setProduto("");
-      return response.data;
-    },
-    { enabled: !!(produto.length > 8 && empresaDestino && usuarioLogado?.IDEMPRESA) }
-  );
- */
 
   const handleExcluirProduto = async (produto) => {
 
@@ -395,7 +359,6 @@ export const useEditarOT = ({
 
     try {
       const response = await put('/resumo-ordem-transferencia/:id', putData);
-      //const response = await put('/resumo-ordem-transferencia-cega/:id', putData);
 
       const textDados = JSON.stringify(putData);
       let textoFuncao = 'EXPEDICAO/CRIADO COM SUCESSO';
@@ -480,15 +443,3 @@ export const useEditarOT = ({
   };
 };
 
-// IDPRODUTO: cIdProduto,
-// QTDEXPEDICAO: nQtdProduto,
-// QTDRECEPCAO: 0,
-// QTDDIFERENCA: 0,
-// QTDAJUSTE: 0,
-// VLRUNITVENDA: nVlrVenda,
-// VLRUNITCUSTO: 0,
-// STCONFERIDO: 'False',
-// IDUSRAJUSTE: 0,
-// STATIVO: 'True',
-// STFALTA: 'False',
-// STSOBRA: 'False',

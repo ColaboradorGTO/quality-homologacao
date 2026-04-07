@@ -106,7 +106,6 @@ export const useEditarDivergencia = ({
       let textoFuncao = 'CONFERNCIA CEGA / ALTERAR DIVERGENCIA OT';
       const ipUsuario = await getIPUsuario();
 
-
       const createData = {
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,

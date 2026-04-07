@@ -99,7 +99,6 @@ export const ActionObservacaoOT = ({ show, handleClose, dadosObservacaoOT }) => 
             </tr>
           </table>
 
-
         </Modal.Body>
 
         <FooterModal

@@ -27,12 +27,10 @@ export const ActionPesquisaFaturamentoOT = ({ usuarioLogado }) => {
   const [dataPesquisaFimA, setDataPesquisaFimA] = useState('');
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [clickContador, setClickContador] = useState(0);
-  // const [dadosEmpresas, setDadosEmpresas] = useState([])
   const [dadosStatusOT, setDadosStatusOT] = useState([])
   const [empresaDestino, setEmpresaDestino] = useState('')
   const [empresaOrigem, setEmpresaOrigem] = useState('')
   const [statusSelecionado, setStatusSelecionado] = useState('')
-  //const [dadosFaturaOT, setDadosFaturaOT] = useState([])
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(1000);
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
@@ -42,13 +40,11 @@ export const ActionPesquisaFaturamentoOT = ({ usuarioLogado }) => {
   const [dadosConhecimentoEntrega, setDadosConhecimentoEntrega] = useState([]);
 
 
-
   useEffect(() => {
     const dataInicial = getDataAtual();
     /*      setDataPesquisaInicio(dataInicial);
          setDataPesquisaFim(dataInicial); */
 
-    //getListaFaturasOT()
     getListaStatusOT()
   }, [])
 
@@ -70,62 +66,9 @@ export const ActionPesquisaFaturamentoOT = ({ usuarioLogado }) => {
     },
     { staleTime: 5 * 60 * 1000 }
   );
-  /*    const { data: dadosEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas } = useQuery(
-      'listaEmpresaComercial',
-      async () => {
-        const response = await get(`/listaEmpresaComercial?idMarca=${marcaSelecionada}`);
-        
-        return response.data;
-      },
-      {enabled: true, staleTime: 5 * 60 * 1000, }
-    );
-    */
-
-  /*   const fetchVendasAtiva = async () => {
-      try {
-  
-  
-        const urlApi = `/faturasOT?idtipofiltro=1&idLojaOrigem=${empresaOrigem}&idLojaDestino=${empresaDestino}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idStatusOt=${statusSelecionado}&dataInicioFatura=${dataPesquisaInicioA}&dataFimFatura=${dataPesquisaFimA}`;
-        const response = await get(urlApi);
-  
-        if (response.data.length && response.data.length === pageSize) {
-          let allData = [...response.data];
-          animacaoCarregamento(`Carregando... Página ${currentPage} de ${response.data.length}`, true);
-  
-          async function fetchNextPage(page) {
-            try {
-              page++;
-              const responseNextPage = await get(`${urlApi}&page=${page}`);
-              if (responseNextPage.data.length) {
-                allData.push(...responseNextPage.data);
-                return fetchNextPage(page);
-              } else {
-                return allData;
-              }
-            } catch (error) {
-              console.error('Erro ao buscar próxima página:', error);
-              throw error;
-            }
-          }
-  
-          await fetchNextPage(currentPage);
-          return allData;
-        } else {
-  
-          return response.data;
-        }
-  
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        throw error;
-      } finally {
-        fecharAnimacaoCarregamento();
-      }
-    }; */
 
   const fetchListaFaturasOT = async () => {
     try {
-
 
       const urlApi = `/faturasOT?idtipofiltro=1&idLojaOrigem=${empresaOrigem}&idLojaDestino=${empresaDestino}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idStatusOt=${statusSelecionado}&dataInicioFatura=${dataPesquisaInicioA}&dataFimFatura=${dataPesquisaFimA}`;
       const response = await get(urlApi);
@@ -174,14 +117,6 @@ export const ActionPesquisaFaturamentoOT = ({ usuarioLogado }) => {
     }
   );
 
-  /*   const { data: dadosVendasAtivas = [], error: errorVendasMarca, isLoading: isLoadingVendasMarca, refetch: refetchVendasAtiva } = useQuery(
-      ['faturasOT', empresaDestino, dataPesquisaInicio, dataPesquisaFim, currentPage, pageSize],
-      () => fetchVendasAtiva(empresaDestino, dataPesquisaInicio, dataPesquisaFim, currentPage, pageSize),
-      {
-        enabled: Boolean(empresaDestino && dataPesquisaInicio && dataPesquisaFim),
-        staleTime: 5 * 60 * 1000,
-      }
-    ); */
 
   const getListaStatusOT = async () => {
     try {
@@ -193,17 +128,6 @@ export const ActionPesquisaFaturamentoOT = ({ usuarioLogado }) => {
       console.log(error, "não foi possivel pegar os dados da tabela ")
     }
   }
-
-  /*   const getListaFaturasOT = async () => {
-      try {
-        const response = await get(`/faturasOT?idtipofiltro=1&idLojaOrigem=${empresaOrigem}&idLojaDestino=${empresaDestino}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idStatusOt=${statusSelecionado}&dataInicioFatura=${dataPesquisaInicioA}&dataFimFatura=${dataPesquisaFimA}`)
-        if (response.data) {
-          setDadosFaturaOT(response.data)
-        }
-      } catch (error) {
-        console.log(error, "não foi possivel pegar os dados da tabela ")
-      }
-    } */
 
   const handleEmpresaDestino = (e) => {
     setEmpresaDestino(e.value)
@@ -219,7 +143,6 @@ export const ActionPesquisaFaturamentoOT = ({ usuarioLogado }) => {
     if (clickContador % 2 === 0) {
       setTabelaVisivel(true)
       refetchFaturaOT()
-      //getListaFaturasOT()
     }
   }
 
@@ -266,7 +189,6 @@ export const ActionPesquisaFaturamentoOT = ({ usuarioLogado }) => {
   };
 
   const handleConhecimentoEntrega = async (selectedIds) => {
-
     try {
       const response = await get(`/impressao-entrega?idResumoOT=${selectedIds}`)
 
@@ -281,19 +203,7 @@ export const ActionPesquisaFaturamentoOT = ({ usuarioLogado }) => {
   };
 
   const handleClickConhencimentoEntrega = (selectedIds) => {
-    /*   if (optionsModulos[0]?.ALTERAR === 'False') {
-        Swal.fire({
-          title: 'Atenção',
-          html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para editar/visualizar a OT.`,
-          icon: 'warning',
-          confirmButtonText: 'OK',
-          customClass: {
-            container: 'custom-swal',
-          }
-        });
-        return;
-      }
-   */
+
     if (selectedIds) {
       handleConhecimentoEntrega(selectedIds);
     }
@@ -431,61 +341,8 @@ export const ActionPesquisaFaturamentoOT = ({ usuarioLogado }) => {
           onClickButtonType={() => handleClickConhencimentoEntrega(selectedIds)}
         />
 
-       {/*  <ButtonType
-          Icon={FaTrashAlt}
-          iconSize="16px"
-          textButton="Excluir Selecionados"
-          cor="danger"
-          tipo="button"
-          onClickButtonType={() => {
-            setSelectedIds([]);
-            setSelectedRows([]);
-          }}
-        /> */}
       </div>
-      {/* <div className="row mb-4 " style={{marginTop: '10rem'}}>
 
-        <ButtonType
-          Icon={MdFormatListBulleted}
-          iconSize="16px"
-          textButton="Selecionar Registros"
-          cor="primary"
-          tipo="button"
-          onClickButtonType={""}
-        />
-        <ButtonType
-          Icon={FcProcess}
-          iconSize="16px"
-          textButton="Processar Faturamento"
-          cor="warning"
-          tipo="button"
-          onClickButtonType={""}
-        />
-        <ButtonType
-          Icon={FcProcess}
-          iconSize="16px"
-          textButton="Processar SEFAZ"
-          cor="info"
-          tipo="button"
-          onClickButtonType={""}
-        />
-        <ButtonType
-          Icon={GrDocumentDownload}
-          iconSize="16px"
-          textButton="Download Notas"
-          cor="danger"
-          tipo="button"
-          onClickButtonType={""}
-        />
-        <ButtonType
-          Icon={FaTruckFast}
-          iconSize="16px"
-          textButton="Conhecimento Entrega"
-          cor="danger"
-          tipo="button"
-          onClickButtonType={""}
-        />
-        </div> */}
       {tabelaVisivel && (
         <div className="card">
 
@@ -500,7 +357,6 @@ export const ActionPesquisaFaturamentoOT = ({ usuarioLogado }) => {
             refetchFaturaOT={refetchFaturaOT}
             modalConhecimentoEntrega={modalConhecimentoEntrega}
             setModalConhecimentoEntrega={setModalConhecimentoEntrega}
-
           />
         </div>
 

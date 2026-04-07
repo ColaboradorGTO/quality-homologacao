@@ -17,6 +17,7 @@ export const ActionListaStatusDivergencia = ({
   const [modalEditar, setModalEditar] = useState(false);
   const [dadosStatusDivergencia, setDadosStatusDivergencia] = useState([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [selectedRow, setSelectedRow] = useState(null);
   const [size] = useState('small')
   const dataTableRef = useRef();
 
@@ -166,8 +167,9 @@ export const ActionListaStatusDivergencia = ({
             sortOrder={-1}
             paginator
             rows={10}
+             selection={selectedRow}
+            selectionMode={'single'}
             rowsPerPageOptions={[10, 20, 30, 50, 100, dados.length]}
-
             showGridlines
             stripedRows
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
