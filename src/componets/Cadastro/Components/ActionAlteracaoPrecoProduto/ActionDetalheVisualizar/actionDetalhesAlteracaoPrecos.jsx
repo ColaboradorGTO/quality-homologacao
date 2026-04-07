@@ -85,7 +85,7 @@ export const ActionDetalhesAlteracaoPrecos = ({ show, handleClose, dadosVisualiz
       >
 
         <HeaderModal
-          title={"Edição de Alteração de Preços"}
+          title={"Visualização dos Detalhes da Alteração de Preços"}
           subTitle={`Alteração de Preço Nº: ${dadosVisualizarDetalhe[0]?.alteracaoPreco.IDRESUMOALTERACAOPRECOPRODUTO}`}
           handleClose={handleClose}
         />
@@ -129,7 +129,7 @@ export const ActionDetalhesAlteracaoPrecos = ({ show, handleClose, dadosVisualiz
                     value={statusSelecionado}
                     options={optionsStatus}
                     onChange={handleChangeStatus}
-                    // isDisabled={!authEdit}
+                    isDisabled={true}
                   />
                 </div>
                 <div className="col-sm-3 col-xl-1">
@@ -187,7 +187,7 @@ export const ActionDetalhesAlteracaoPrecos = ({ show, handleClose, dadosVisualiz
                     onChangeModal={""}
 
                     {...register("nomeListaPreco", { required: "Campo obrigatório Informe a Descrição do Grupo Estrutura Mercadológica", })}
-                    required={true}
+                    readOnly={true}
                   />
                 </div>
 

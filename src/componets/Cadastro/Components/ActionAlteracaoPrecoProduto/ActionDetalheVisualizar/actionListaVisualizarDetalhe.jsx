@@ -11,6 +11,9 @@ import { formatMoeda } from "../../../../../utils/formatMoeda";
 
 export const ActionListaVisualizarDetalhe = ({ dadosVisualizarDetalhe }) => {
     const [globalFilterValue, setGlobalFilterValue] = useState('');
+    const [selectedProducts, setSelectedProducts] = useState([]);
+    const [selectAll, setSelectAll] = useState(false);
+    const [editingPrices, setEditingPrices] = useState([]);
     const dataTableRef = useRef();
 
 
@@ -26,62 +29,92 @@ export const ActionListaVisualizarDetalhe = ({ dadosVisualizarDetalhe }) => {
     const exportToPDF = () => {
         const doc = new jsPDF();
         doc.autoTable({
-            head: [['Nº', 'ID Alteração', 'Lista de Preço', 'Responsável', 'QTD Produtos', 'Data Criação', 'Data Agendamento']],
+            head: [['Nº', 'ID Produto', 'Descrição', 'Código Barras', 'Preço Anterior', 'Preço Novo', 'Estoque']],
             body: dados.map(item => [
                 item.contador,
-                item.IDRESUMOALTERACAOPRECOPRODUTO,
-                item.NOMELISTA || item.NOFANTASIA,
-                item.NOFUNCIONARIO,
-                toFloat(item.QTDITENS),
-                item.DATACRIACAOFORMATADA,
-                item.AGENDAMENTOALTERACAOFORMATADO,
+                item.IDPRODUTO,
+                item.DSNOME,
+                item.NUCODBARRAS,
+                formatMoeda(item.PRECOVENDAANTERIOR),
+                formatMoeda(item.PRECOVENDANOVO),
+                toFloat(item.quantidadeEstoque),
             ]),
             horizontalPageBreak: true,
             horizontalPageBreakBehaviour: 'immediately'
         });
-        doc.save('lista_alteracao_preco.pdf');
+        doc.save('lista_alteracao_preco_detalhes.pdf');
     };
 
     const exportToExcel = () => {
-        const worksheet = XLSX.utils.json_to_sheet(dados);
+        const worksheet = XLSX.utils.json_to_sheet(dados.map(item => ({
+            'Nº': item.contador,
+            'ID Produto': item.IDPRODUTO,
+            'Descrição': item.DSNOME,
+            'Código Barras': item.NUCODBARRAS,
+            'Dt. Cadastro': item.DTCADASTRO,
+            'Preço Anterior': item.PRECOVENDAANTERIOR,
+            'Preço Novo': item.PRECOVENDANOVO,
+            'Estoque': item.quantidadeEstoque,
+            'Status': item.STATIVO ? 'ATIVA' : 'INATIVA'
+        })));
         const workbook = XLSX.utils.book_new();
-        const header = ['Nº', 'ID Alteração', 'Lista de Preço', 'Responsável', 'QTD Produtos', 'Data Criação', 'Data Agendamento'];
+        const header = ['Nº', 'ID Produto', 'Descrição', 'Código Barras', 'Dt. Cadastro', 'Preço Anterior', 'Preço Novo', 'Estoque', 'Status'];
         worksheet['!cols'] = [
             { wpx: 70, caption: 'Nº' },
-            { wpx: 100, caption: 'ID Alteração' },
-            { wpx: 250, caption: 'Lista de Preço' },
-            { wpx: 200, caption: 'Responsável' },
-            { wpx: 100, caption: 'Qtd. Produtos' },
-            { wpx: 200, caption: 'Data Criação' },
-            { wpx: 200, caption: 'Data Agendamento' },
-
+            { wpx: 100, caption: 'ID Produto' },
+            { wpx: 300, caption: 'Descrição' },
+            { wpx: 150, caption: 'Código Barras' },
+            { wpx: 120, caption: 'Dt. Cadastro' },
+            { wpx: 120, caption: 'Preço Anterior' },
+            { wpx: 120, caption: 'Preço Novo' },
+            { wpx: 100, caption: 'Estoque' },
+            { wpx: 100, caption: 'Status' },
         ];
         XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
-        XLSX.utils.book_append_sheet(workbook, worksheet, 'Lista de Alteração Preço');
-        XLSX.writeFile(workbook, 'lista_alteracao_preco.xlsx');
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Detalhes Alteração Preço');
+        XLSX.writeFile(workbook, 'lista_alteracao_preco_detalhes.xlsx');
     };
 
 
-    const dados = dadosVisualizarDetalhe.map((item, index) => {
-        let contador = index + 1;
-        // console.log(item?.alteracaoPreco.detalheAlteracao[0]?.produto.DTCADASTRO)
-        return {
-
-            contador,
-            IDRESUMOALTERACAOPRECOPRODUTO: item[0]?.produto.IDRESUMOALTERACAOPRECOPRODUTO,
-            AGENDAMENTOALTERACAO: item?.alteracaoPreco.AGENDAMENTOALTERACAO,
-            IDPRODUTO: item?.alteracaoPreco.detalheAlteracao[0]?.produto.IDPRODUTO,
-            DTCADASTRO: item?.alteracaoPreco.detalheAlteracao[0]?.produto.DTCADASTRO,
-            DSNOME: item?.alteracaoPreco.detalheAlteracao[0]?.produto.DSNOME,
-            NUCODBARRAS: item?.alteracaoPreco.detalheAlteracao[0]?.produto.NUCODBARRAS,
-            STATIVO: item?.alteracaoPreco.detalheAlteracao[0]?.produto.STATIVO == 'True' ? true : false,
-            PRECOVENDAANTERIOR: toFloat(item?.alteracaoPreco.detalheAlteracao[0]?.produto.PRECOVENDAANTERIOR),
-            PRECOVENDANOVO: toFloat(item?.alteracaoPreco.detalheAlteracao[0]?.produto.PRECOVENDANOVO),
-            QTDESTOQUEAOCADASTRAR: item?.alteracaoPreco.detalheAlteracao[0]?.produto.QTDESTOQUEAOCADASTRAR,
-            QTDESTOQUEATUAL: item?.alteracaoPreco.detalheAlteracao[0]?.produto.QTDESTOQUEATUAL,
-            quantidadeEstoque: item[0]?.alteracaoPreco.STEXECUTADO != 'False' ? true : false ? item[0]?.produto.QTDESTOQUEAOCADASTRAR : item[0]?.produto.QTDESTOQUEATUAL,
+    const dados = dadosVisualizarDetalhe.flatMap((item, index) => {
+        const dadosAlteracao = item?.alteracaoPreco;
+        const stExecutado = dadosAlteracao?.STEXECUTADO !== 'False';
+        const stCancelado = dadosAlteracao?.STCANCELADO !== 'False'; 
+        const authEdit = !stExecutado && !stCancelado;
+        // Verifica se existe alteracaoPreco e detalheAlteracao
+        if (!item?.alteracaoPreco?.detalheAlteracao) {
+            return [];
         }
-    })
+
+        // Mapeia todos os produtos do detalheAlteracao
+        return item.alteracaoPreco.detalheAlteracao.map((detalhe, produtoIndex) => {
+            let contador = (index * 1000) + (produtoIndex + 1); // Contador único para cada produto
+            let status = 'ATIVO'; 
+            return {
+                contador,
+                IDRESUMOALTERACAOPRECOPRODUTO: detalhe.produto?.IDRESUMOALTERACAOPRECOPRODUTO,
+                AGENDAMENTOALTERACAO: item?.alteracaoPreco?.AGENDAMENTOALTERACAO,
+                IDPRODUTO: detalhe.produto?.IDPRODUTO,
+                DTCADASTRO: detalhe.produto?.DTCADASTRO,
+                DSNOME: detalhe.produto?.DSNOME,
+                NUCODBARRAS: detalhe.produto?.NUCODBARRAS,
+                STATIVO: detalhe.produto?.STATIVO === 'True',
+                PRECOVENDAANTERIOR: toFloat(detalhe.produto?.PRECOVENDAANTERIOR),
+                PRECOVENDANOVO: toFloat(detalhe.produto?.PRECOVENDANOVO),
+                QTDESTOQUEAOCADASTRAR: detalhe.produto?.QTDESTOQUEAOCADASTRAR,
+                QTDESTOQUEATUAL: detalhe.produto?.QTDESTOQUEATUAL,
+                // Lógica para quantidade de estoque baseada no status de execução
+                quantidadeEstoque: !stExecutado ? detalhe.produto?.QTDESTOQUEAOCADASTRAR : detalhe.produto?.QTDESTOQUEATUAL, 
+                status,
+                stExecutado,
+                stCancelado, 
+                authEdit,
+                stProd: detalhe.produto?.STATIVO === 'True',
+                idDetalheAlteracao: detalhe.produto?.IDDETALHEALTERACAOPRECOPRODUTO,
+                idResumoAlteracao: detalhe.produto?.IDRESUMOALTERACAOPRECOPRODUTO,
+            }
+        });
+    });
 
     const colunasDetalhes = [
         {
@@ -89,6 +122,27 @@ export const ActionListaVisualizarDetalhe = ({ dadosVisualizarDetalhe }) => {
             header: 'Nº',
             body: row => <th>{row.contador}</th>,
             sortable: true,
+        },
+        {
+            field: 'selecao',
+            header: 'Seleção',
+            body: row => {
+                // Só mostra se pode editar e produto está ativo
+                if (!row.authEdit || !row.stProd) return null;
+                
+                return (
+                    <div className="custom-control custom-checkbox">
+                        <input 
+                            type="checkbox"
+                            checked={selectedProducts.has(row.idDetalheAlteracao)}
+                            onChange={(e) => handleSelectProduct(row.idDetalheAlteracao, e.target.checked)}
+                        />
+                    </div>
+                );
+            },
+            sortable: false,
+            // Só aparece se não foi executado nem cancelado
+            style: { display: dados.some(d => d.authEdit) ? 'table-cell' : 'none' }
         },
         {
             field: 'DTCADASTRO',
@@ -140,9 +194,22 @@ export const ActionListaVisualizarDetalhe = ({ dadosVisualizarDetalhe }) => {
             field: 'PRECOVENDANOVO',
             header: 'Preço Novo',
             body: row => {
-                return (
-                    <th>{formatMoeda(row.PRECOVENDANOVO)}</th>
-                )
+                // Se pode editar e produto ativo = input editável
+                if (row.authEdit && row.stProd) {
+                    return (
+                        <input
+                            type="text"
+                            value={editingPrices[`${row.idResumoAlteracao}_${row.idDetalheAlteracao}`] || row.PRECOVENDANOVO}
+                            onChange={(e) => handlePriceChange(row, e.target.value)}
+                            onFocus={() => handleSelectProduct(row.idDetalheAlteracao, true)}
+                            style={{ width: '80px', textAlign: 'center' }}
+                            className="form-control"
+                        />
+                    );
+                }
+                
+                // Senão = label simples
+                return <th>{formatMoeda(row.PRECOVENDANOVO)}</th>;
             },
             sortable: true,
         },
@@ -160,18 +227,76 @@ export const ActionListaVisualizarDetalhe = ({ dadosVisualizarDetalhe }) => {
             field: 'STATIVO',
             header: 'Status',
             body: row => {
-                return (
-                    <th style={{ color: row.STATIVO == 'True' ? 'blue' : 'red' }} >{row.STATIVO == 'True' ? 'ATIVA' : 'INATIVA'}</th>
-                )
+                let className = '';
+                let texto = '';
+                
+                if (row.stCancelado) {
+                    return <th style={{ color: '#fd3995', fontWeight: 900 }}>CANCELADO</th>;
+                } else if (row.stExecutado) {
+                    return <th style={{ color: '#1dc9b7', fontWeight: 900 }}>ALTERADO</th>;
+                } else if (row.stProd) {
+                    return <th style={{ color: '#2196f3', fontWeight: 900 }}>ATIVO</th>;
+                } else {
+                    return <th style={{ color: '#fd3995', fontWeight: 900 }}>CANCELADO</th>;
+                }
+            
             },
             sortable: true,
         },
+        {
+            field: 'opcoes',
+            header: 'Opções',
+            body: row => {
+                if (row.stCancelado) return null;
+                
+                const hasChanges = editingPrices[`${row.idResumoAlteracao}_${row.idDetalheAlteracao}`] !== row.PRECOVENDANOVO;
+                
+                return (
+                    <div style={{ width: '100px' }}>
+                        {/* Botão confirmar - só se editou o preço */}
+                        {row.authEdit && row.stProd && hasChanges && (
+                            <button 
+                                className="btn btn-warning btn-sm"
+                                onClick={() => handleConfirmPriceChange(row)}
+                                title="Confirmar Alteração"
+                            >
+                                <i className="fa fa-check"></i>
+                            </button>
+                        )}
+                        
+                        {/* Botão desativar - se produto ativo */}
+                        {row.authEdit && row.stProd && (
+                            <button 
+                                className="btn btn-danger btn-sm"
+                                onClick={() => handleDeactivateProduct(row)}
+                                title="Desativar Produto"
+                            >
+                                <i className="fa fa-times"></i>
+                            </button>
+                        )}
+                        
+                        {/* Botão ativar - se produto inativo */}
+                        {row.authEdit && !row.stProd && (
+                            <button 
+                                className="btn btn-success btn-sm"
+                                onClick={() => handleActivateProduct(row)}
+                                title="Ativar Produto"
+                            >
+                                <i className="fa fa-check"></i>
+                            </button>
+                        )}
+                    </div>
+                );
+            },
+            sortable: false,
+            style: { display: dados.some(d => d.authEdit) ? 'table-cell' : 'none' }
+        }
     ]
 
     return (
         <div className="panel">
             <div className="panel-hdr">
-                <h2>Lista Alteração Preço</h2>
+                <h2>Lista de Produtos</h2>
             </div>
             <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
                 <HeaderTable

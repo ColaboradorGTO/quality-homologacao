@@ -82,10 +82,10 @@ export const ActionPesquisaAlteracaoPreco = () => {
   };
    
   const { data: dadosAlteracaoPreco = [], error: errorEstilos, isLoading: isLoadingEstilos, refetch: refetchListaPreco } = useQuery(
-    ['alteracoes-de-precos-resumo', listaPrecoSelecionada, responsavelSelcionado, descricaoProduto, dataPesquisaInicio, dataPesquisaFim, currentPage, pageSize],
-    () => fetchListaPreco(listaPrecoSelecionada, responsavelSelcionado, descricaoProduto, dataPesquisaInicio, dataPesquisaFim, currentPage, pageSize),
+    ['alteracoes-de-precos-resumo', ],
+    () => fetchListaPreco(),
     {
-      enabled: Boolean(listaPrecoSelecionada),
+      enabled: false,
     }
   );
 

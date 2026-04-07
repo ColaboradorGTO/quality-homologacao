@@ -79,6 +79,7 @@ export const ActionListaAlteracaoPreco = ({dadosAlteracaoPreco}) => {
 
   const dados = dadosAlteracaoPreco.map((item, index) => {
     let contador = index + 1;
+    let stAlteracaoPreco;
 
     return {
       contador,
@@ -90,6 +91,8 @@ export const ActionListaAlteracaoPreco = ({dadosAlteracaoPreco}) => {
       AGENDAMENTOALTERACAOFORMATADO: item.AGENDAMENTOALTERACAOFORMATADO,    
       AGENDAMENTOALTERACAO: item.AGENDAMENTOALTERACAO, 
       authEdit: new Date(item.AGENDAMENTOALTERACAO) > dataHoje,
+      STCANCELADO: item.STCANCELADO == 'False' ? false : true,
+      STEXECUTADO: item.STEXECUTADO == 'False' ? false : true,
     }
   })
 
@@ -157,7 +160,25 @@ export const ActionListaAlteracaoPreco = ({dadosAlteracaoPreco}) => {
       },
       sortable: true,
     },
-  
+    {
+      field: '',
+      header: 'Status',
+      body: row => {
+        if(!row.STCANCELADO && !row.STEXECUTADO){
+          return <span className='text-info fw-900'>Em Espera</span>
+        } 
+         
+        if(row.STEXECUTADO && !row.STCANCELADO){
+          return <span className='text-success fw-900'>Concluído</span>
+        }
+
+        if(row.STCANCELADO){
+          return <span className='text-danger fw-900'>Cancelado</span>
+
+        } 
+      },
+      sortable: true,
+    },
     {
       field: 'IDRESUMOALTERACAOPRECOPRODUTO',
       header: 'Detalhes',
@@ -172,6 +193,8 @@ export const ActionListaAlteracaoPreco = ({dadosAlteracaoPreco}) => {
                 iconSize={22}
                 iconColor={"#fff"}
                 onClickButton={() => clickEditar(row)}
+                width="30px"
+                height="30px"
               />
             </div>
           )
@@ -185,6 +208,8 @@ export const ActionListaAlteracaoPreco = ({dadosAlteracaoPreco}) => {
               Icon={GrView}
               iconSize={22}
               iconColor={"#fff"}
+              width="30px"
+              height="30px"
             />
           </div>
         )
@@ -240,7 +265,7 @@ export const ActionListaAlteracaoPreco = ({dadosAlteracaoPreco}) => {
           />
 
         </div>
-        <div className="card mb-4" ref={dataTableRef}>
+        <div className="card " ref={dataTableRef}>
 
         <DataTable
           title="Vendas por Loja"
@@ -251,6 +276,9 @@ export const ActionListaAlteracaoPreco = ({dadosAlteracaoPreco}) => {
           paginator={true}
           rows={10}
           rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
+          paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+          currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+          filterDisplay="menu"
           showGridlines
           stripedRows
           emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado </div>}
