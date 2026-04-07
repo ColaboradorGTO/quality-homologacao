@@ -7,60 +7,76 @@ import { AiOutlineSearch } from "react-icons/ai";
 import { get } from "../../../../api/funcRequest";
 import { getDataAtual } from "../../../../utils/dataAtual";
 import { ActionListaFaturasOT } from "./ActionListaFaturasOT";
+import { useQuery } from "react-query";
 import { MdFormatListBulleted } from "react-icons/md";
 import { FcProcess } from "react-icons/fc";
 import { GrDocumentDownload } from "react-icons/gr";
 import { FaTruckFast } from "react-icons/fa6";
+import { FaTrashAlt } from "react-icons/fa";
+import { useProcessarSefazOT } from "./hooks/useProcessarSefazOT";
+import { useProcessarFaturamentoOT } from "./hooks/useProcessarFaturamentoOT";
+import { useDowloadNotasSaida } from "./hooks/useDowloadNotas";
+import { ActionConhecimentoEntrega } from "./ActionConhecimentoEntrega/actionConhecimentoEntrega";
 import Swal from "sweetalert2";
-import { useQuery } from "react-query";
+import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
 
-
-export const ActionPesquisaFaturamentoOT = () => {
+export const ActionPesquisaFaturamentoOT = ({ usuarioLogado }) => {
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
   const [dataPesquisaFim, setDataPesquisaFim] = useState('');
   const [dataPesquisaInicioA, setDataPesquisaInicioA] = useState('');
   const [dataPesquisaFimA, setDataPesquisaFimA] = useState('');
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [clickContador, setClickContador] = useState(0);
-  // const [dadosEmpresas, setDadosEmpresas] = useState([])
   const [dadosStatusOT, setDadosStatusOT] = useState([])
   const [empresaDestino, setEmpresaDestino] = useState('')
   const [empresaOrigem, setEmpresaOrigem] = useState('')
   const [statusSelecionado, setStatusSelecionado] = useState('')
-  const [dadosFaturaOT, setDadosFaturaOT] = useState([])
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(1000);
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [modalConhecimentoEntrega, setModalConhecimentoEntrega] = useState(false);
+  const [dadosConhecimentoEntrega, setDadosConhecimentoEntrega] = useState([]);
+
 
   useEffect(() => {
     const dataInicial = getDataAtual();
-    // setDataPesquisaInicio(dataInicial);
-    // setDataPesquisaFim(dataInicial);
-  
-    getListaFaturasOT()
+    /*      setDataPesquisaInicio(dataInicial);
+         setDataPesquisaFim(dataInicial); */
+
     getListaStatusOT()
   }, [])
 
-  const { data: dadosEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas } = useQuery(
-    'listaEmpresaComercial',
+  const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
+    ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
-      const response = await get(`/listaEmpresaComercial`);
-      
+      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
+
       return response.data;
     },
-    {enabled: true, staleTime: 5 * 60 * 1000, }
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
   );
 
+  const { data: dadosEmpresas = [], error: errorMarcas, isLoading: isLoadingMarcas } = useQuery(
+    'empresas',
+    async () => {
+      const response = await get(`/empresas`);
+      return response.data;
+    },
+    { staleTime: 5 * 60 * 1000 }
+  );
 
-  const fetchVendasAtiva = async () => {
+  const fetchListaFaturasOT = async () => {
     try {
-      
+
       const urlApi = `/faturasOT?idtipofiltro=1&idLojaOrigem=${empresaOrigem}&idLojaDestino=${empresaDestino}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idStatusOt=${statusSelecionado}&dataInicioFatura=${dataPesquisaInicioA}&dataFimFatura=${dataPesquisaFimA}`;
       const response = await get(urlApi);
-      
+
       if (response.data.length && response.data.length === pageSize) {
         let allData = [...response.data];
         animacaoCarregamento(`Carregando... Página ${currentPage} de ${response.data.length}`, true);
-  
+
         async function fetchNextPage(page) {
           try {
             page++;
@@ -76,33 +92,30 @@ export const ActionPesquisaFaturamentoOT = () => {
             throw error;
           }
         }
-  
+
         await fetchNextPage(currentPage);
         return allData;
       } else {
-       
+
         return response.data;
       }
-  
+
     } catch (error) {
       console.error('Error fetching data:', error);
       throw error;
     } finally {
       fecharAnimacaoCarregamento();
     }
-    
   };
-   
-  const { data: dadosVendasAtivas = [], error: errorVendasMarca, isLoading: isLoadingVendasMarca, refetch: refetchVendasAtiva } = useQuery(
-    ['faturasOT', empresaDestino, dataPesquisaInicio, dataPesquisaFim, currentPage, pageSize],
-    () => fetchVendasAtiva(empresaDestino, dataPesquisaInicio, dataPesquisaFim, currentPage, pageSize),
+
+  const { data: dadosFaturaOT = [], error: errorFaturaOT, isLoading: isLoadingFaturaOT, refetch: refetchFaturaOT } = useQuery(
+    ['fetchListaFaturasOT', empresaDestino, dataPesquisaInicio, dataPesquisaFim, currentPage, pageSize],
+    () => fetchListaFaturasOT(empresaDestino, dataPesquisaInicio, dataPesquisaFim, currentPage, pageSize),
     {
-      enabled: Boolean(empresaDestino && dataPesquisaInicio && dataPesquisaFim), 
+      enabled: Boolean(empresaDestino && dataPesquisaInicio && dataPesquisaFim),
       staleTime: 5 * 60 * 1000,
     }
   );
-
-
 
 
   const getListaStatusOT = async () => {
@@ -110,18 +123,6 @@ export const ActionPesquisaFaturamentoOT = () => {
       const response = await get(`/statusOrdemTransferencia`)
       if (response.data) {
         setDadosStatusOT(response.data)
-      }
-    } catch (error) {
-      console.log(error, "não foi possivel pegar os dados da tabela ")
-    }
-  }
-
-
-  const getListaFaturasOT = async () => {
-    try {
-      const response = await get(`/faturasOT?idtipofiltro=1&idLojaOrigem=${empresaOrigem}&idLojaDestino=${empresaDestino}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idStatusOt=${statusSelecionado}&dataInicioFatura=${dataPesquisaInicioA}&dataFimFatura=${dataPesquisaFimA}`)
-      if (response.data) {
-        setDadosFaturaOT(response.data)
       }
     } catch (error) {
       console.log(error, "não foi possivel pegar os dados da tabela ")
@@ -141,21 +142,91 @@ export const ActionPesquisaFaturamentoOT = () => {
 
     if (clickContador % 2 === 0) {
       setTabelaVisivel(true)
-      getListaFaturasOT()
-    } 
+      refetchFaturaOT()
+    }
   }
 
+  const selecionarRegistros = () => {
+    Swal.fire({
+      title: '<strong>Selecionar <u>OT</u></strong>',
+      icon: 'info',
+      html: 'A rotina irá selecionar os <b>10 (dez) primeiros</b>, registros de acordo com a opção escolhida!',
+      showCloseButton: true,
+      showCancelButton: true,
+      focusConfirm: false,
+      confirmButtonText: 'Faturamento',
+      confirmButtonColor: '#ffc241',
+      cancelButtonText: 'SEFAZ',
+      cancelButtonColor: '#3085d6'
+    }).then((result) => {
+      let selectedIdsTemp = [];
+      let selectedRowsTemp = [];
+      let count = 0;
 
+      if (result.isConfirmed) {
+        // Faturamento
+        dadosFaturaOT.forEach((item) => {
+          if (count < 10 && (item.IDSAPORIGEM == null || item.IDSAPORIGEM === 0)) {
+            selectedIdsTemp.push(parseInt(item.IDRESUMOOT));
+            selectedRowsTemp.push(item);
+            count++;
+          }
+        });
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        // SEFAZ
+        dadosFaturaOT.forEach((item) => {
+          if (count < 10 && item.IDSAPORIGEM !== 0 && item.IDSTATUSOT === 9) {
+            selectedIdsTemp.push(parseInt(item.IDRESUMOOT));
+            selectedRowsTemp.push(item);
+            count++;
+          }
+        });
+      }
 
+      setSelectedIds(selectedIdsTemp);
+      setSelectedRows(selectedRowsTemp);
+    });
+  };
 
+  const handleConhecimentoEntrega = async (selectedIds) => {
+    try {
+      const response = await get(`/impressao-entrega?idResumoOT=${selectedIds}`)
+
+      if (response.data && response.data.length > 0) {
+        setDadosConhecimentoEntrega(response.data);
+        setModalConhecimentoEntrega(true);
+
+      }
+    } catch (error) {
+      console.error('Erro ao buscar detalhes da OT ', error);
+    }
+  };
+
+  const handleClickConhencimentoEntrega = (selectedIds) => {
+
+    if (selectedIds) {
+      handleConhecimentoEntrega(selectedIds);
+    }
+  };
+
+  const {
+    handleProcessarSefaz
+  } = useProcessarSefazOT({ usuarioLogado, refetchFaturaOT, optionsModulos });
+
+  const {
+    handleProcessarFaturamento
+  } = useProcessarFaturamentoOT({ usuarioLogado, refetchFaturaOT, optionsModulos });
+
+  const {
+    downloadNFE
+  } = useDowloadNotasSaida({ usuarioLogado, refetchFaturaOT, optionsModulos });
 
   return (
 
     <Fragment>
-
       <ActionMain
         linkComponentAnterior={["Home"]}
-        linkComponent={["Faturamento O. T"]}
+        linkComponent={["Faturamento O.T"]}
         title="Faturamento Ordem de Transferência"
         subTitle="Nome da Loja"
 
@@ -225,10 +296,9 @@ export const ActionPesquisaFaturamentoOT = () => {
         onButtonClickSearch={handleClick}
         corSearch={"primary"}
         IconSearch={AiOutlineSearch}
-
-        
       />
-       {/* <div className="row mb-4 " style={{marginTop: '10rem'}}>
+
+      <div className="row mb-4 " style={{ marginTop: '1rem' }}>
 
         <ButtonType
           Icon={MdFormatListBulleted}
@@ -236,7 +306,7 @@ export const ActionPesquisaFaturamentoOT = () => {
           textButton="Selecionar Registros"
           cor="primary"
           tipo="button"
-          onClickButtonType={""}
+          onClickButtonType={selecionarRegistros}
         />
         <ButtonType
           Icon={FcProcess}
@@ -244,7 +314,7 @@ export const ActionPesquisaFaturamentoOT = () => {
           textButton="Processar Faturamento"
           cor="warning"
           tipo="button"
-          onClickButtonType={""}
+          onClickButtonType={() => handleProcessarFaturamento(selectedIds, true)}
         />
         <ButtonType
           Icon={FcProcess}
@@ -252,7 +322,7 @@ export const ActionPesquisaFaturamentoOT = () => {
           textButton="Processar SEFAZ"
           cor="info"
           tipo="button"
-          onClickButtonType={""}
+          onClickButtonType={() => handleProcessarSefaz(selectedIds)}
         />
         <ButtonType
           Icon={GrDocumentDownload}
@@ -260,7 +330,7 @@ export const ActionPesquisaFaturamentoOT = () => {
           textButton="Download Notas"
           cor="danger"
           tipo="button"
-          onClickButtonType={""}
+          onClickButtonType={() => downloadNFE(selectedRows, selectedIds)}
         />
         <ButtonType
           Icon={FaTruckFast}
@@ -268,16 +338,35 @@ export const ActionPesquisaFaturamentoOT = () => {
           textButton="Conhecimento Entrega"
           cor="danger"
           tipo="button"
-          onClickButtonType={""}
+          onClickButtonType={() => handleClickConhencimentoEntrega(selectedIds)}
         />
-        </div> */}
+
+      </div>
+
       {tabelaVisivel && (
         <div className="card">
-          
-        <ActionListaFaturasOT dadosFaturaOT={dadosFaturaOT} />
+
+          <ActionListaFaturasOT
+            dadosFaturaOT={dadosFaturaOT}
+            optionsModulos={optionsModulos}
+            usuarioLogado={usuarioLogado}
+            selectedRows={selectedRows}
+            setSelectedRows={setSelectedRows}
+            selectedIds={selectedIds}
+            setSelectedIds={setSelectedIds}
+            refetchFaturaOT={refetchFaturaOT}
+            modalConhecimentoEntrega={modalConhecimentoEntrega}
+            setModalConhecimentoEntrega={setModalConhecimentoEntrega}
+          />
         </div>
 
       )}
+      <ActionConhecimentoEntrega
+        show={modalConhecimentoEntrega}
+        handleClose={() => setModalConhecimentoEntrega(false)}
+        dadosConhecimentoEntrega={dadosConhecimentoEntrega}
+        usuarioLogado={usuarioLogado}
+      />
     </Fragment>
   )
 }
