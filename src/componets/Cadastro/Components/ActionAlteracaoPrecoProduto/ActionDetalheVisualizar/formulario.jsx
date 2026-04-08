@@ -1,10 +1,7 @@
-import { useEffect, useState } from "react";
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal"
-import { InputFieldModal } from "../../../../Buttons/InputFieldModal"
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal"
 import { useForm, Controller } from "react-hook-form";
 import Select from 'react-select';
-import { toFloat } from "../../../../../utils/toFloat";
 import FormField from "../../../../Formularios/FormField";
 import { AlertError } from "../../../../Inputs/alertError";
 import { useEditarAlteracaoPreco } from "../hooks/useEditarAlteracaoPreco";
@@ -34,6 +31,7 @@ export const Formulario = ({
         setFuncionario,
         disabled,
         setDisabled,
+        optionsAlteracaoPreco,
         onSubmit
     } = useEditarAlteracaoPreco({
         handleClose,
@@ -41,13 +39,6 @@ export const Formulario = ({
         optionsModulos,
         usuarioLogado
     })
-
-
-    const optionsStatus = [
-        { value: 'True', label: 'CANCELADA' },
-        { value: 'False', label: 'EM ESPERA' },
-        { value: 'FINALIZADA', label: 'FINALIZADA' }
-    ]
 
     return (
         <form action="">
@@ -99,7 +90,7 @@ export const Formulario = ({
                             classNamePrefix="select"
                             name="statusAlteracao"
                             value={statusSelecionado}
-                            options={optionsStatus}
+                            options={optionsAlteracaoPreco}
                             onChange={(selectedOption) => { 
                                 setStatusSelecionado(selectedOption)
                                 clearErrors("statusAlteracao");

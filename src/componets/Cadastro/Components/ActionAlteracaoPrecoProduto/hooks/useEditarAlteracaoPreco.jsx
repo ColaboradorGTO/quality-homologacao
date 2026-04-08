@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { post, put } from "../../../../../api/funcRequest";
-
+import { optionsAlteracaoPreco } from "../../../../../../parceiro.json"
 
 export const useEditarAlteracaoPreco = ({
     handleClose,
@@ -170,6 +170,7 @@ export const useEditarAlteracaoPreco = ({
         setFuncionario,
         disabled,
         setDisabled,
+        optionsAlteracaoPreco,
         onSubmit
     }
 }

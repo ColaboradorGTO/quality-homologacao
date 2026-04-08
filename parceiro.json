@@ -262,5 +262,10 @@
   "optionsTipoCadastro": [
     { "value": "True", "label": "POR REFERÊNCIA" },
     { "value": "False", "label": "NORMAL" }
+  ],
+  "optionsAlteracaoPreco": [
+    { "value": "True", "label": "CANCELADA" },
+    { "value": "False", "label": "EM ESPERA" },
+    { "value": "FINALIZADA", "label": "FINALIZADA" }
   ]
 }
