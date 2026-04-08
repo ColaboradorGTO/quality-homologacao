@@ -38,17 +38,18 @@ const ActionPesquisaRecebimentosLoja = lazy(() => import("../componets/Gerencia/
 const ActionRelatorioBI = lazy(() => import("../componets/Gerencia/Components/ActionBI/actionRelatorioBI").then(module => ({ default: module.ActionRelatorioBI })));
 const ActionPesquisaEtiquetasVolumes = lazy(() => import("../componets/Gerencia/Components/ActionEtiquetasVolumes/actionPesquisaEtiquetasVolumes").then(module => ({ default: module.ActionPesquisaEtiquetasVolumes })));
 const ActionPesquisaVendaVoucher = lazy(() => import("../componets/Gerencia/Components/ActionVendaVoucher/actionPesquisaVendaVoucher").then(module => ({ default: module.ActionPesquisaVendaVoucher })));
+const ActionPesquisaVendasDigitais = lazy(() => import("../componets/Gerencia/Components/ActionVendasDigitais/actionPesquisaVendasDigitais").then(module => ({ default: module.ActionPesquisaVendasDigitais })));
 
 export const DashBoardGerencia = () => {
   const storedModule = localStorage.getItem('moduloselecionado');
   const selectedModule = JSON.parse(storedModule);
   const [menuSelected, setMenuSelected] = useState(null);
   const [menuFilhoSelecionado, setMenuFilhoSelecionado] = useState(null);
-  
+
   const [resumoVisivel, setResumoVisivel] = useState(true);
   const [componentToShow, setComponentToShow] = useState("");
   const [usuarioLogado, setUsuarioLogado] = useState(null);
-  
+
   useEffect(() => {
     const usuarioArmazenado = localStorage.getItem('usuario');
     if (usuarioArmazenado) {
@@ -70,7 +71,7 @@ export const DashBoardGerencia = () => {
     const menuFilhoSelecionado = selectedModule.menuPai.menuFilho.find(
       menu => menu.URL === componentName
     );
-  
+
     if (menuFilhoSelecionado) {
       // Salvar todas as informações do menu selecionado no localStorage
       localStorage.setItem('menuFilhoSelecionado', JSON.stringify({
@@ -102,62 +103,62 @@ export const DashBoardGerencia = () => {
   );
 
   const permissaoUsuario = selectedModule.menuPai.menuFilho;
-  const {   
-    ID, 
+  const {
+    ID,
     IDPERFIL
   } = permissaoUsuario.map(item => ({
     ID: item.ID,
     IDPERFIL: item.IDPERFIL,
   })).reduce((acc, curr) => {
-    
+
     return { ...acc, ...curr };
   }, {});
- 
+
 
   let component = null;
 
   switch (componentToShow) {
     case "/gerencia/ResumoDashBoardGerencia":
-      component = <ResumoDashBoardGerencia usuarioLogado={usuarioLogado}  />;
+      component = <ResumoDashBoardGerencia usuarioLogado={usuarioLogado} />;
       break;
     case "/gerencia/ActionPesquisaProdutoEtiqueta":
-      component = <ActionPesquisaProdutoEtiqueta usuarioLogado={usuarioLogado}  optionsEmpresas={optionsEmpresas}/>;
+      component = <ActionPesquisaProdutoEtiqueta usuarioLogado={usuarioLogado} optionsEmpresas={optionsEmpresas} />;
       break;
     case "/gerencia/ActionPesquisaEtiquetaRemarcacao":
-      component = <ActionPesquisaEtiquetaRemarcacao usuarioLogado={usuarioLogado}  optionsEmpresas={optionsEmpresas}/>;
+      component = <ActionPesquisaEtiquetaRemarcacao usuarioLogado={usuarioLogado} optionsEmpresas={optionsEmpresas} />;
       break;
     case "/gerencia/ActionPesquisaProdutosQuality":
-      component = <ActionPesquisaProdutosQuality usuarioLogado={usuarioLogado}  optionsEmpresas={optionsEmpresas} />;
+      component = <ActionPesquisaProdutosQuality usuarioLogado={usuarioLogado} optionsEmpresas={optionsEmpresas} />;
       break;
     case "/gerencia/ActionPesquisaProdutosSap":
-      component = <ActionPesquisaProdutosSap usuarioLogado={usuarioLogado}  optionsEmpresas={optionsEmpresas} />;
+      component = <ActionPesquisaProdutosSap usuarioLogado={usuarioLogado} optionsEmpresas={optionsEmpresas} />;
       break;
     case "/gerencia/ActionPesquisaAdiantamentoSalarioLoja":
-      component = <ActionPesquisaAdiantamentoSalarioLoja  usuarioLogado={usuarioLogado}  optionsEmpresas={optionsEmpresas}/>
+      component = <ActionPesquisaAdiantamentoSalarioLoja usuarioLogado={usuarioLogado} optionsEmpresas={optionsEmpresas} />
       break;
     case "/gerencia/ActionPesquisaDepositoLoja":
-      component = <ActionPesquisaDepositoLoja usuarioLogado={usuarioLogado}  optionsEmpresas={optionsEmpresas} />
+      component = <ActionPesquisaDepositoLoja usuarioLogado={usuarioLogado} optionsEmpresas={optionsEmpresas} />
       break;
     case "/gerencia/ActionPesquisaDespesaLoja":
-      component = <ActionPesquisaDespesaLoja usuarioLogado={usuarioLogado}  optionsEmpresas={optionsEmpresas} />
+      component = <ActionPesquisaDespesaLoja usuarioLogado={usuarioLogado} optionsEmpresas={optionsEmpresas} />
       break;
     case "/gerencia/ActionPesquisaValeTransporte":
-      component = <ActionPesquisaValeTransporte usuarioLogado={usuarioLogado}  />
+      component = <ActionPesquisaValeTransporte usuarioLogado={usuarioLogado} />
       break;
     case "/gerencia/ActionPesquisaConferenciaCaixa":
-      component = <ActionPesquisaConferenciaCaixa usuarioLogado={usuarioLogado}  optionsEmpresas={optionsEmpresas} />
+      component = <ActionPesquisaConferenciaCaixa usuarioLogado={usuarioLogado} optionsEmpresas={optionsEmpresas} />
       break;
     case "/gerencia/ActionPesquisaFaturaLoja":
-      component = <ActionPesquisaFaturaLoja usuarioLogado={usuarioLogado}  optionsEmpresas={optionsEmpresas} />
+      component = <ActionPesquisaFaturaLoja usuarioLogado={usuarioLogado} optionsEmpresas={optionsEmpresas} />
       break;
     case "/gerencia/ActionPesquisaCreateVoucher":
-      component = <ActionPesquisaCreateVoucher usuarioLogado={usuarioLogado}  optionsEmpresas={optionsEmpresas} />
+      component = <ActionPesquisaCreateVoucher usuarioLogado={usuarioLogado} optionsEmpresas={optionsEmpresas} />
       break;
     case "/gerencia/ActionPesquisaVoucherEmitido":
-      component = <ActionPesquisaVoucherEmitido usuarioLogado={usuarioLogado}  />
+      component = <ActionPesquisaVoucherEmitido usuarioLogado={usuarioLogado} />
       break;
     case "/gerencia/ActionPesquisaQuebraCaixa":
-      component = <ActionPesquisaQuebraCaixa usuarioLogado={usuarioLogado}  optionsEmpresas={optionsEmpresas} />
+      component = <ActionPesquisaQuebraCaixa usuarioLogado={usuarioLogado} optionsEmpresas={optionsEmpresas} />
       break;
     case "/gerencia/ActionPesquisaConferenciaMalote":
       component = <ActionPesquisaConferenciaMalote usuarioLogado={usuarioLogado} />
@@ -166,46 +167,49 @@ export const DashBoardGerencia = () => {
       component = <ActionPesquisaOT usuarioLogado={usuarioLogado} />
       break;
     case "/gerencia/ActionExtratoDeContasCorrenteLoja":
-      component = <ActionPesquisaExtratoContaCorenteLoja usuarioLogado={usuarioLogado}  optionsEmpresas={optionsEmpresas} />
+      component = <ActionPesquisaExtratoContaCorenteLoja usuarioLogado={usuarioLogado} optionsEmpresas={optionsEmpresas} />
       break;
     case "/gerencia/ActionPesquisaRecebimentosLoja":
       component = <ActionPesquisaRecebimentosLoja usuarioLogado={usuarioLogado} />
       break;
     case "/gerencia/ActionPesquisaVendasLojas":
-      component = <ActionPesquisaVendasLojas usuarioLogado={usuarioLogado}  optionsEmpresas={optionsEmpresas}/>
+      component = <ActionPesquisaVendasLojas usuarioLogado={usuarioLogado} optionsEmpresas={optionsEmpresas} />
       break;
     case "/gerencia/ActionPesquisaVendasVendedor":
-      component = <ActionPesquisaVendasVendedor usuarioLogado={usuarioLogado}  optionsEmpresas={optionsEmpresas} />
+      component = <ActionPesquisaVendasVendedor usuarioLogado={usuarioLogado} optionsEmpresas={optionsEmpresas} />
       break;
     case "/gerencia/ActionPesquisaVendasEstrutura":
-      component = <ActionPesquisaVendasEstrutura usuarioLogado={usuarioLogado}  optionsEmpresas={optionsEmpresas}/>
+      component = <ActionPesquisaVendasEstrutura usuarioLogado={usuarioLogado} optionsEmpresas={optionsEmpresas} />
       break;
     case "/gerencia/ActionPesquisaEstoqueLoja":
-      component = <ActionPesquisaEstoqueLoja usuarioLogado={usuarioLogado}  optionsEmpresas={optionsEmpresas}/>
+      component = <ActionPesquisaEstoqueLoja usuarioLogado={usuarioLogado} optionsEmpresas={optionsEmpresas} />
       break;
     case "/gerencia/ActionRelatorioBI":
       component = <ActionRelatorioBI usuarioLogado={usuarioLogado} />
       break;
     case "/gerencia/ActionPesquisaAlteracaoPreco":
-      component = <ActionPesquisaAlteracaoPreco usuarioLogado={usuarioLogado}  />
+      component = <ActionPesquisaAlteracaoPreco usuarioLogado={usuarioLogado} />
       break;
     case "/gerencia/ActionPesquisaEmpresas":
-      component = <ActionPesquisaEmpresas usuarioLogado={usuarioLogado}  optionsEmpresas={optionsEmpresas} />
+      component = <ActionPesquisaEmpresas usuarioLogado={usuarioLogado} optionsEmpresas={optionsEmpresas} />
       break;
     case "/gerencia/ActionPesquisaClientesVendas":
-      component = <ActionPesquisaClientesVendas usuarioLogado={usuarioLogado}  optionsEmpresas={optionsEmpresas}/>
+      component = <ActionPesquisaClientesVendas usuarioLogado={usuarioLogado} optionsEmpresas={optionsEmpresas} />
       break;
     case "/gerencia/ActionPesquisaVendasDescontoFuncionario":
-      component = <ActionPesquisaVendasDescontoFuncionario usuarioLogado={usuarioLogado}  optionsEmpresas={optionsEmpresas}/>
+      component = <ActionPesquisaVendasDescontoFuncionario usuarioLogado={usuarioLogado} optionsEmpresas={optionsEmpresas} />
       break;
     case "/gerencia/ActionPesquisaBalancoLoja":
-      component = <ActionPesquisaBalancoLoja usuarioLogado={usuarioLogado}  optionsEmpresas={optionsEmpresas}/>
+      component = <ActionPesquisaBalancoLoja usuarioLogado={usuarioLogado} optionsEmpresas={optionsEmpresas} />
       break;
     case "/gerencia/ActionPesquisaVendaVoucher":
-      component = <ActionPesquisaVendaVoucher usuarioLogado={usuarioLogado}/>
+      component = <ActionPesquisaVendaVoucher usuarioLogado={usuarioLogado} />
       break;
     case "/gerencia/ActionPesquisaEtiquetasVolumes":
-      component = <ActionPesquisaEtiquetasVolumes usuarioLogado={usuarioLogado}  />
+      component = <ActionPesquisaEtiquetasVolumes usuarioLogado={usuarioLogado} />
+      break;
+    case "/gerencia/ActionPesquisaVendasDigitais":
+      component = <ActionPesquisaVendasDigitais usuarioLogado={usuarioLogado} optionsEmpresas={optionsEmpresas} />
       break;
     default:
       component = null;
@@ -213,7 +217,6 @@ export const DashBoardGerencia = () => {
   }
 
   return (
-
 
     <Fragment>
       {usuarioLogado && (
