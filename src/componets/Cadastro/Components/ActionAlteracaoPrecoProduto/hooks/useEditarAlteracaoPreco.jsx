@@ -101,7 +101,7 @@ export const useEditarAlteracaoPreco = ({
         }
 
         try {
-            const response = await put('/fornecedor/:id', putData)
+            const response = await put('/alteracoes-de-precos-resumo/:id', putData)
             
                         
             const textDados = JSON.stringify(putData)
@@ -124,6 +124,7 @@ export const useEditarAlteracaoPreco = ({
                     container: 'custom-swal',
                 }
             })
+
             await post('/log-web', createtLog)
 
 
@@ -151,5 +152,24 @@ export const useEditarAlteracaoPreco = ({
             });
             console.error('Erro ao editar alteração de preço:', error);
         }
+    }
+
+    return {
+        statusSelecionado,
+        setStatusSelecionado,
+        stAlteracaoImediato,
+        setStAlteracaoImediato,
+        authEdit,
+        dataCriacao,
+        setDataCriacao,
+        dataAlteracao,
+        setDataAlteracao,
+        qtdProdutos,
+        setQtdProdutos,
+        funcionario,
+        setFuncionario,
+        disabled,
+        setDisabled,
+        onSubmit
     }
 }

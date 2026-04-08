@@ -7,6 +7,7 @@ import Select from 'react-select';
 import { toFloat } from "../../../../../utils/toFloat";
 import FormField from "../../../../Formularios/FormField";
 import { AlertError } from "../../../../Inputs/alertError";
+import { useEditarAlteracaoPreco } from "../hooks/useEditarAlteracaoPreco";
 
 export const Formulario = ({
     handleClose,
@@ -17,51 +18,36 @@ export const Formulario = ({
     const { register, handleSubmit, formState: { errors }, clearErrors, setError, control } = useForm({
         mode: "onChange"
     });
-    const [statusSelecionado, setStatusSelecionado] = useState(null)
-    const [authEdit, setAuthEdit] = useState(true);
-    const [dataCriacao, setDataCriacao] = useState('');
-    const [dataAlteracao, setDataAlteracao] = useState('');
-    const [qtdProdutos, setQtdProdutos] = useState(0);
-    const [funcionario, setFuncionario] = useState('');
-    const [disabled, setDisabled] = useState(true);
+    const {
+        statusSelecionado,
+        setStatusSelecionado,
+        stAlteracaoImediato,
+        setStAlteracaoImediato,
+        authEdit,
+        dataCriacao,
+        setDataCriacao,
+        dataAlteracao,
+        setDataAlteracao,
+        qtdProdutos,
+        setQtdProdutos,
+        funcionario,
+        setFuncionario,
+        disabled,
+        setDisabled,
+        onSubmit
+    } = useEditarAlteracaoPreco({
+        handleClose,
+        dadosVisualizarDetalhe,
+        optionsModulos,
+        usuarioLogado
+    })
+
 
     const optionsStatus = [
         { value: 'True', label: 'CANCELADA' },
         { value: 'False', label: 'EM ESPERA' },
         { value: 'FINALIZADA', label: 'FINALIZADA' }
     ]
-
-
-    useEffect(() => {
-        if (dadosVisualizarDetalhe?.length > 0) {
-            const dados = dadosVisualizarDetalhe[0]?.alteracaoPreco || {};
-            setDataCriacao(dados.DATACRIACAOFORMATADA);
-            setDataAlteracao(dados.AGENDAMENTOALTERACAO);
-            setQtdProdutos(toFloat(dados.QTDITENS));
-            setFuncionario(dados.NOFUNCIONARIO);
-    
-            const stCancelado = dados.STCANCELADO;
-            const stExecutado = dados.STEXECUTADO === "True" ? "FINALIZADA" : "False";
-            const dtAlterAgendada = new Date(dados.AGENDAMENTOALTERACAO);
-            const dataHoraHoje = new Date();
-
-     
-            const authEditCheck = stExecutado === "False" && stCancelado !== "True" && dtAlterAgendada.getTime() > dataHoraHoje.getTime();
-            setAuthEdit(authEditCheck);
-            if (!authEditCheck && (stExecutado != 'False' || stCancelado == 'True')) {
-                setDisabled(true);
-            } else {
-                setDisabled(false);
-                setStatusSelecionado('FINALIZADA')
-            }
-          
-            const stAlteracao = stCancelado === "False" && stExecutado === "FINALIZADA" ? stExecutado : stCancelado;
-
-            const selectedOption = optionsStatus.find(opt => opt.value === stAlteracao) || null;
-
-            setStatusSelecionado(selectedOption);
-        }
-    }, [dadosVisualizarDetalhe]);
 
     return (
         <form action="">
