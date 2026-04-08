@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal"
 import { InputFieldModal } from "../../../../Buttons/InputFieldModal"
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal"
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import Select from 'react-select';
 import { toFloat } from "../../../../../utils/toFloat";
+import FormField from "../../../../Formularios/FormField";
+import { AlertError } from "../../../../Inputs/alertError";
 
 export const Formulario = ({
     handleClose,
@@ -12,7 +14,9 @@ export const Formulario = ({
     optionsModulos,
     usuarioLogado
 }) => {
-    const { register, handleSubmit, formState: { errors } } = useForm();
+    const { register, handleSubmit, formState: { errors }, clearErrors, setError, control } = useForm({
+        mode: "onChange"
+    });
     const [statusSelecionado, setStatusSelecionado] = useState(null)
     const [authEdit, setAuthEdit] = useState(true);
     const [dataCriacao, setDataCriacao] = useState('');
@@ -30,7 +34,10 @@ export const Formulario = ({
     useEffect(() => {
         if (dadosVisualizarDetalhe?.length > 0) {
             const dados = dadosVisualizarDetalhe[0]?.alteracaoPreco || {};
-
+            setDataCriacao(dados.DATACRIACAOFORMATADA);
+            setDataAlteracao(dados.AGENDAMENTOALTERACAOFORMATADO);
+            setQtdProdutos(toFloat(dados.QTDITENS));
+            console.log(dados.AGENDAMENTOALTERACAOFORMATADO, 'DADOS' )
             const stCancelado = dados.STCANCELADO;
             const stExecutado = dados.STEXECUTADO === "True" ? "FINALIZADA" : "False";
             const dtAlterAgendada = new Date(dados.AGENDAMENTOALTERACAO);
@@ -52,9 +59,7 @@ export const Formulario = ({
             const selectedOption = optionsStatus.find(opt => opt.value === stAlteracao) || null;
 
             setStatusSelecionado(selectedOption); // Define null se não encontrar
-            console.log(selectedOption, 'selectedOption');
-            console.log(statusSelecionado, 'statusSelecionado');
-            console.log(dadosVisualizarDetalhe, "dadosVisualizarDetalhe");
+     
         }
     }, [dadosVisualizarDetalhe]);
 
@@ -63,29 +68,39 @@ export const Formulario = ({
             <div className="form-group">
                 <div className="row">
                     <div className="col-sm-3 col-xl-3">
-                        <InputFieldModal
-                            label={"Data Criação *"}
-                            type={"text"}
+                        <Controller
+                            name="dtCreateListaPreco"
+                            control={control}
+                            render={({ field }) => (
+                                <FormField
+                                    label={"Data Criação *"}
+                                    name="dtCreateListaPreco"
+                                    type="date"
+                                    value={dataCriacao}
+                                    onChange={(e) => setDataCriacao(e.target.value)}
+                                    errors={errors}
+                                    clearErrors={clearErrors}
+                                />
 
-                            id={"dtCreateListaPreco"}
-                            value={dadosVisualizarDetalhe[0]?.alteracaoPreco.DATACRIACAOFORMATADA}
-                            onChangeModal={""}
-                            readOnly={true}
-                            {...register("dtCreateListaPreco", { required: "Campo obrigatório Informe a Descrição do Grupo Estrutura Mercadológica", })}
-
+                            )}
                         />
                     </div>
                     <div className="col-sm-3 col-xl-3">
-                        <InputFieldModal
-                            label={"Data Alteração *"}
-                            type={"date"}
+                        <Controller
+                            name="dtAlterListaPreco"
+                            control={control}
+                            render={({ field }) => (
+                                <FormField
+                                    label={"Data Alteração *"}
+                                    name="dtAlterListaPreco"
+                                    type="date"
+                                    value={dataAlteracao}
+                                    onChange={(e) => setDataAlteracao(e.target.value)}
+                                    errors={errors}
+                                    clearErrors={clearErrors}
+                                />
 
-                            id={"dtAlterListaPreco"}
-                            value={dadosVisualizarDetalhe[0]?.alteracaoPreco.AGENDAMENTOALTERACAOFORMATADO}
-                            onChangeModal={""}
-                            readOnly={disabled}
-                            {...register("dtAlterListaPreco", { required: "Campo obrigatório Informe a Descrição do Grupo Estrutura Mercadológica", })}
-
+                            )}
                         />
                     </div>
 
@@ -93,23 +108,42 @@ export const Formulario = ({
 
                         <label htmlFor="">Status Alteração *</label>
                         <Select
+                            className="basic-single"
+                            classNamePrefix="select"
+                            name="statusAlteracao"
                             value={statusSelecionado}
                             options={optionsStatus}
-                            onChange={(selectedOption) => setStatusSelecionado(selectedOption)}
-                            isDisabled={disabled}
+                            onChange={(selectedOption) => { 
+                                setStatusSelecionado(selectedOption)
+                                clearErrors("statusAlteracao");
+                            }}
+                            isDisabled={disabled} 
                         />
+                        {errors.statusAlteracao && (
+                            <AlertError
+                                error={errors.statusAlteracao}
+                                onClose={clearErrors}
+                                fieldName="statusAlteracao"
+                            />
+                        )}
                     </div>
                     <div className="col-sm-3 col-xl-2">
-                        <InputFieldModal
-                            label={"Alteração "}
-                            type={"text"}
-                            styleInputFieldModal={{textAlign: 'center'}}
-                            id={"idListaPreco"}
-                            value={dadosVisualizarDetalhe[0]?.alteracaoPreco.IDRESUMOALTERACAOPRECOPRODUTO}
-                            onChangeModal={""}
-                            readOnly={true}
-                            {...register("idListaPreco", { required: "Campo obrigatório Informe a Descrição do Grupo Estrutura Mercadológica", })}
+                        <Controller
+                            name="idListaPreco"
+                            control={control}
+                            render={({ field }) => (
+                                <FormField
+                                    label={"Alteração *"}
+                                    name="idListaPreco"
+                                    type="text"
+                                    value={dadosVisualizarDetalhe[0]?.alteracaoPreco.IDRESUMOALTERACAOPRECOPRODUTO}
+                                    onChange
+                                    errors={errors}
+                                    clearErrors={clearErrors}
+                                    readOnly={true}
+                                />
 
+                            )}
                         />
                     </div>
                 </div>
@@ -117,36 +151,49 @@ export const Formulario = ({
 
                 <div className="row mt-4">
                     <div className="col-sm-2 col-xl-3">
-                        <InputFieldModal
-                            label={"Lista Alvo de Alteração *"}
-                            type={"text"}
-                            id={"nomeListaPreco"}
-                            value={dadosVisualizarDetalhe[0]?.alteracaoPreco.NOMELISTA || dadosVisualizarDetalhe[0]?.alteracaoPreco.NOEMPRESA}
-                            onChangeModal={""}
-                            readOnly={true}
-                            {...register("nomeListaPreco", { required: "Campo obrigatório Informe a Descrição do Grupo Estrutura Mercadológica", })}
+                        <Controller
+                            name="idListaPreco"
+                            control={control}
+                            render={({ field }) => (
+                                <FormField
+                                    label={"Lista Alvo de Alteração *"}
+                                    name="nomeListaPreco"
+                                    type="text"
+                                    value={dadosVisualizarDetalhe[0]?.alteracaoPreco.NOMELISTA || dadosVisualizarDetalhe[0]?.alteracaoPreco.NOEMPRESA}
+                                    onChange
+                                    errors={errors}
+                                    clearErrors={clearErrors}
+                                    readOnly={true}
+                                />
 
+                            )}
                         />
                     </div>
 
                     <div className="col-sm-3 col-xl-2">
-                        <InputFieldModal
-                            label={"Qtd. Produtos"}
-                            type={"text"}
-                            styleInputFieldModal={{textAlign: 'center'}}
-                            id={"idListaPreco"}
-                            value={toFloat(dadosVisualizarDetalhe[0]?.alteracaoPreco.QTDITENS)}
-                            onChangeModal={""}
-                            readOnly={true}
-                            {...register("idListaPreco", { required: "Campo obrigatório Informe a Descrição do Grupo Estrutura Mercadológica", })}
+                        <Controller
+                            name="qtdListaPreco"
+                            control={control}
+                            render={({ field }) => (
+                                <FormField
+                                    label={"Qtd. Produtos *"}
+                                    name="qtdListaPreco"
+                                    type="text"
+                                    value={qtdProdutos}
+                                    onChange={(e) => setQtdProdutos(e.target.value)}
+                                    errors={errors}
+                                    clearErrors={clearErrors}
+                                    readOnly={true}
+                                    style={{textAlign: 'center'}}
+                                />
 
+                            )}
                         />
                     </div>
                     <div className="col-sm-6 col-xl-6">
                         <InputFieldModal
                             label={"Responsável "}
                             type={"text"}
-                           
                             id={"nomeListaPreco"}
                             value={dadosVisualizarDetalhe[0]?.alteracaoPreco.NOFUNCIONARIO}
                             onChangeModal={""}
