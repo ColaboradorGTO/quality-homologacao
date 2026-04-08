@@ -8,8 +8,9 @@ import { get } from "../../../../api/funcRequest";
 import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
 import { ActionListaVendasDigitais } from "./actionListaVendasDigitais";
+import { InputSelectAction } from "../../../Inputs/InputSelectAction";
 
-export const ActionPesquisaVendasDigitais = ({ usuarioLogado }) => {
+export const ActionPesquisaVendasDigitais = ({ usuarioLogado, optionsEmpresas }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
   const [dataPesquisaFim, setDataPesquisaFim] = useState('');
@@ -96,6 +97,19 @@ export const ActionPesquisaVendasDigitais = ({ usuarioLogado }) => {
         linkComponentAnterior={["Home"]}
         linkComponent={["Vendas Digital por Marcas e Período"]}
         title="Vendas Digital por Marcas e Período"
+
+        InputSelectPendenciaComponent={InputSelectAction}
+        labelSelectPendencia="Selecione a Empresa"
+        optionsPendencia={[
+          { value: '', label: 'Todas' },
+          ...optionsEmpresas.map((empresa) => ({
+            value: empresa.IDEMPRESA,
+            label: empresa.NOFANTASIA,
+          }))
+        ]}
+        onChangeSelectPendencia={(e) => setEmpresaSelecionada(e.value)}
+        valueSelectPendencia={empresaSelecionada}
+        stylePendencia={optionsModulos[0]?.ADMINISTRADOR === "True"}
 
         InputFieldDTInicioAComponent={InputField}
         valueInputFieldDTInicioA={dataPesquisaInicio}
