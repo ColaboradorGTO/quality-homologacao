@@ -22,6 +22,7 @@ export const Formulario = ({
     const [dataCriacao, setDataCriacao] = useState('');
     const [dataAlteracao, setDataAlteracao] = useState('');
     const [qtdProdutos, setQtdProdutos] = useState(0);
+    const [funcionario, setFuncionario] = useState('');
     const [disabled, setDisabled] = useState(true);
 
     const optionsStatus = [
@@ -35,15 +36,16 @@ export const Formulario = ({
         if (dadosVisualizarDetalhe?.length > 0) {
             const dados = dadosVisualizarDetalhe[0]?.alteracaoPreco || {};
             setDataCriacao(dados.DATACRIACAOFORMATADA);
-            setDataAlteracao(dados.AGENDAMENTOALTERACAOFORMATADO);
+            setDataAlteracao(dados.AGENDAMENTOALTERACAO);
             setQtdProdutos(toFloat(dados.QTDITENS));
-            console.log(dados.AGENDAMENTOALTERACAOFORMATADO, 'DADOS' )
+            setFuncionario(dados.NOFUNCIONARIO);
+    
             const stCancelado = dados.STCANCELADO;
             const stExecutado = dados.STEXECUTADO === "True" ? "FINALIZADA" : "False";
             const dtAlterAgendada = new Date(dados.AGENDAMENTOALTERACAO);
             const dataHoraHoje = new Date();
 
-            // Verifica se é permitido editar
+     
             const authEditCheck = stExecutado === "False" && stCancelado !== "True" && dtAlterAgendada.getTime() > dataHoraHoje.getTime();
             setAuthEdit(authEditCheck);
             if (!authEditCheck && (stExecutado != 'False' || stCancelado == 'True')) {
@@ -52,14 +54,12 @@ export const Formulario = ({
                 setDisabled(false);
                 setStatusSelecionado('FINALIZADA')
             }
-            // Determina o status da alteração
+          
             const stAlteracao = stCancelado === "False" && stExecutado === "FINALIZADA" ? stExecutado : stCancelado;
 
-            // Verifica se há correspondência no optionsStatus
             const selectedOption = optionsStatus.find(opt => opt.value === stAlteracao) || null;
 
-            setStatusSelecionado(selectedOption); // Define null se não encontrar
-     
+            setStatusSelecionado(selectedOption);
         }
     }, [dadosVisualizarDetalhe]);
 
@@ -75,11 +75,12 @@ export const Formulario = ({
                                 <FormField
                                     label={"Data Criação *"}
                                     name="dtCreateListaPreco"
-                                    type="date"
+                                    type="datetime"
                                     value={dataCriacao}
                                     onChange={(e) => setDataCriacao(e.target.value)}
                                     errors={errors}
                                     clearErrors={clearErrors}
+                                    readOnly={true}
                                 />
 
                             )}
@@ -93,7 +94,7 @@ export const Formulario = ({
                                 <FormField
                                     label={"Data Alteração *"}
                                     name="dtAlterListaPreco"
-                                    type="date"
+                                    type="datetime-local"
                                     value={dataAlteracao}
                                     onChange={(e) => setDataAlteracao(e.target.value)}
                                     errors={errors}
@@ -191,15 +192,21 @@ export const Formulario = ({
                         />
                     </div>
                     <div className="col-sm-6 col-xl-6">
-                        <InputFieldModal
-                            label={"Responsável "}
-                            type={"text"}
-                            id={"nomeListaPreco"}
-                            value={dadosVisualizarDetalhe[0]?.alteracaoPreco.NOFUNCIONARIO}
-                            onChangeModal={""}
-
-                            {...register("nomeListaPreco", { required: "Campo obrigatório Informe a Descrição do Grupo Estrutura Mercadológica", })}
-                            readOnly={true}
+                        <Controller
+                            name="responsavelListaPreco"
+                            control={control}
+                            render={({ field }) => (
+                                <FormField
+                                    label={"Responsável *"}
+                                    name="responsavelListaPreco"
+                                    type="text"
+                                    value={funcionario}
+                                    onChange={(e) => setFuncionario(e.target.value)}
+                                    errors={errors}
+                                    clearErrors={clearErrors}
+                                    readOnly={true}
+                                />
+                            )}
                         />
                     </div>
 
