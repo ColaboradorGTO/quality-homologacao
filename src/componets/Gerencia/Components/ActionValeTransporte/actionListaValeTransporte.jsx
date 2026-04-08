@@ -90,7 +90,6 @@ export const ActionListaValeTransporte = ({ dadosDespesasLoja, optionsModulos, u
     XLSX.writeFile(workbook, 'despesas_loja.xlsx');
   };
 
-
   useEffect(() => {
     const data = getDataAtual()
     setDataHoje(data);
@@ -134,7 +133,6 @@ export const ActionListaValeTransporte = ({ dadosDespesasLoja, optionsModulos, u
       };
     });
 
-
   const calcularValor = () => {
     let total = 0;
     for (let dados of dadosDespesasLoja) {
@@ -145,7 +143,6 @@ export const ActionListaValeTransporte = ({ dadosDespesasLoja, optionsModulos, u
     }
     return total;
   }
-
 
   const colunasVouchers = [
     {
@@ -198,7 +195,7 @@ export const ActionListaValeTransporte = ({ dadosDespesasLoja, optionsModulos, u
       sortable: true,
     },
     {
-      field: 'DTDESPESA',
+      field: 'Opções',
       header: 'Opções',
       body: (row) => {
 
@@ -270,7 +267,6 @@ export const ActionListaValeTransporte = ({ dadosDespesasLoja, optionsModulos, u
     }
   ]
 
-
   const handleEdit = async (IDDESPESASLOJA) => {
     try {
       const response = await get(`/despesa-Loja-todos?idDespesas=${IDDESPESASLOJA}`);
@@ -288,7 +284,6 @@ export const ActionListaValeTransporte = ({ dadosDespesasLoja, optionsModulos, u
       handleEdit(row.IDDESPESASLOJA);
     }
   };
-
 
   return (
 
