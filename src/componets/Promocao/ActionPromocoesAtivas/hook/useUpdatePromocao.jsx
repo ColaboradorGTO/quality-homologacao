@@ -265,12 +265,32 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
     XLSX.writeFile(workbook, 'modelo_produtos.xlsx');
   };
 
+  const clearFileError = (isOrigem) => {
+      // Limpa o estado do arquivo
+    if (isOrigem) {
+        setFileProdutoOrigem([]);
+    } else {
+        setFileProdutoDestino([]);
+    }
+    
+    // Limpa o input file se existir
+    const fileInputs = document.querySelectorAll('input[type="file"]');
+    fileInputs.forEach(input => {
+        if (input) {
+            input.value = '';
+        }
+    });
+  };
+
   const handleFileUpload = async (file, isOrigem) => {
       try {
           const data = await processFile(file);
 
           // ✅ VALIDAÇÃO: Limite de produtos
           if (data.length > 1000) {
+
+              clearFileError(isOrigem);
+
               Swal.fire({
                   icon: 'warning',
                   title: 'Limite Excedido',
@@ -301,45 +321,47 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
       } catch (error) {
           console.error('Erro ao processar arquivo:', error);
           
+          clearFileError(isOrigem);
+
           // ✅ ERRO ESPECÍFICO: Mostra a estrutura correta se erro de validação
-          if (error.message.includes('cabeçalho "ID"') || error.message.includes('Nenhum ID')) {
-              Swal.fire({
-                  icon: 'error',
-                  title: 'Estrutura Incorreta da Planilha!',
-                  html: `
-                      <div style="text-align: left;">
-                          <p><strong>Erro:</strong> ${error.message}</p>
-                          <br>
-                          <p><strong>Estrutura correta da planilha:</strong></p>
-                          <table border="1" style="width: 100%; margin: 10px 0;">
-                              <tr style="background-color: #f0f0f0;">
-                                  <th style="padding: 8px; text-align: center;"><strong>ID</strong></th>
-                              </tr>
-                              <tr>
-                                  <td style="padding: 8px; text-align: center;">11654</td>
-                              </tr>
-                              <tr>
-                                  <td style="padding: 8px; text-align: center;">11655</td>
-                              </tr>
-                              <tr>
-                                  <td style="padding: 8px; text-align: center;">0038266148</td>
-                              </tr>
-                              <tr>
-                                  <td style="padding: 8px; text-align: center;">...</td>
-                              </tr>
-                          </table>
-                          <p><em>A primeira linha deve conter obrigatoriamente o cabeçalho "ID"</em></p>
-                      </div>
-                  `,
-                  confirmButtonText: 'Entendi'
-              });
+          if (error.message.includes('cabeçalho "ID"') || error.message.includes('Nenhum Nº Item')) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Modelo Incorreto da Planilha!',
+                html: `
+                    <div style="text-align: left;">
+                        <p><strong>Erro:</strong> ${error.message}</p>
+                        <br>
+                        <p><strong>Modelo da planilha:</strong></p>
+                        <table border="1" style="width: 100%; margin: 10px 0;">
+                            <tr style="background-color: #f0f0f0;">
+                                <th style="padding: 8px; text-align: center;"><strong>ID</strong></th>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; text-align: center;">11654</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; text-align: center;">11655</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; text-align: center;">0038266148</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; text-align: center;">...</td>
+                            </tr>
+                        </table>
+                        <p><em>A primeira linha deve conter obrigatoriamente o cabeçalho "ID"</em></p>
+                    </div>
+                `,
+                confirmButtonText: 'Entendi'
+            });
           } else {
               // ✅ ERRO GENÉRICO
-              Swal.fire({
-                  icon: 'error',
-                  title: 'Erro',
-                  text: 'Falha ao processar o arquivo. Verifique o formato.',
-              });
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro',
+                text: 'Falha ao processar o arquivo. Verifique o formato.',
+            });
           }
       }
   };
