@@ -19,8 +19,6 @@ export const ActionPesquisaPreco = ({ usuarioLogado }) => {
   const [empresaSelecionada, setEmpresaSelecionada] = useState('')
   const [numeroPedido, setNumeroPedido] = useState('')
   const [nomeLista, setNomeLista] = useState('')
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(1000);
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
   useEffect(() => {
@@ -28,7 +26,6 @@ export const ActionPesquisaPreco = ({ usuarioLogado }) => {
     const dataPesquisaFim = getDataAtual()
     setDataPesquisaInicio(dataPesquisaInicio)
     setDataPesquisaFim(dataPesquisaFim)
- 
   }, [])
 
   useEffect(() => {
@@ -38,78 +35,63 @@ export const ActionPesquisaPreco = ({ usuarioLogado }) => {
       setMenuFilhoAtual(menuParsed);
     }
   }, []);
-  
+
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
     ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
       const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
-      
+
       return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
   );
 
   const { data: dadosEmpresas = [] } = useFetchData('empresas', '/empresas');
 
+
   const fetchListaPreco = async () => {
+    const urlBase = `/lista-de-preco?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idLoja=${empresaSelecionada}&idLista=${numeroPedido}&nomeLista=${nomeLista}`;
+    let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
+    urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
-      const urlApi = `/lista-de-preco?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idLoja=${empresaSelecionada}&idLista=${numeroPedido}&nomeLista=${nomeLista}`;
-      const response = await get(urlApi);
-      
-      if (response.data.length && response.data.length === pageSize) {
-        let allData = [...response.data];
-        animacaoCarregamento(`Carregando... Página ${currentPage} de ${response.data.length}`, true);
-  
-        async function fetchNextPage(currentPage) {
-          try {
-            currentPage++;
-            const responseNextPage = await get(`${urlApi}&page=${currentPage}`);
-            if (responseNextPage.length) {
-              allData.push(...responseNextPage.data);
-              return fetchNextPage(currentPage);
-            } else {
-              return allData;
-            }
-          } catch (error) {
-            console.error('Erro ao buscar próxima página:', error);
-            throw error;
-          }
+      animacaoCarregamento('Carregando dados...', true);
+
+      const primeiraPagina = 1;
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const page = primeiraResposta.page || primeiraPagina;
+      const pageSize = primeiraResposta.pageSize || 1000;
+      const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
+      const totalPages = Math.ceil(totalRows / pageSize);
+
+      let allData = [...(primeiraResposta.data || [])];
+
+      if (totalPages > 1) {
+        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          allData.push(...(responsePage.data || []));
         }
-  
-        await fetchNextPage(currentPage);
-        return allData;
-      } else {
-       
-        return response.data;
       }
-  
+
+      return allData;
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Erro ao buscar dados da api:', error);
       throw error;
     } finally {
       fecharAnimacaoCarregamento();
     }
   };
-   
+
   const { data: dadosListaPedidos = [], error: errorEstilos, isLoading: isLoadingEstilos, refetch: refetchListaPreco } = useQuery(
-    ['listaPreco', ],
+    ['listaPreco',],
     () => fetchListaPreco(),
-    {
-      enabled: true
-    }
-  );
-
-
-  const handleChangeMarca = (e) => {
-    setEmpresaSelecionada(e.value);
-  }
+    { enabled: true }
+  )
 
   const handleClick = () => {
-    setCurrentPage(prevPage => prevPage + 1);
     refetchListaPreco();
     setTabelaVisivel(true)
   }
-
 
   return (
 
@@ -152,7 +134,7 @@ export const ActionPesquisaPreco = ({ usuarioLogado }) => {
             label: marca.NOFANTASIA,
           }))]}
         valueSelectEmpresa={empresaSelecionada}
-        onChangeSelectEmpresa={handleChangeMarca}
+        onChangeSelectEmpresa={(e) => setEmpresaSelecionada(e.value)}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}
@@ -161,8 +143,8 @@ export const ActionPesquisaPreco = ({ usuarioLogado }) => {
         corSearch={"primary"}
       />
 
-      <ActionListaPrecos 
-        dadosListaPedidos={dadosListaPedidos} 
+      <ActionListaPrecos
+        dadosListaPedidos={dadosListaPedidos}
         usuarioLogado={usuarioLogado}
         optionsModulos={optionsModulos}
       />

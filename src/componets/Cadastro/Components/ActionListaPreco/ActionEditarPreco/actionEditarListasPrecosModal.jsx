@@ -15,13 +15,19 @@ import { useEditarListaPrecos } from "../../../hooks/useEditarListaPrecos";
 import { ActionEditarListasPrecos } from "./actionEditarListasPreco";
 
 
-export const ActionEditarListasPrecosModal = ({ show, handleClose, dadosListaLoja}) => {
+export const ActionEditarListasPrecosModal = ({ 
+  show, 
+  handleClose, 
+  dadosListaLoja,
+  optionsModulos,
+  usuarioLogado
+}) => {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const {
     statusSelecionado,
     setStatusSelecionado,
     handleChangeStatus,
-  } = useEditarListaPrecos()
+  } = useEditarListaPrecos({optionsModulos, usuarioLogado, dadosListaLoja})
 
   const optionsStatus = [
     { value: 'True', label: 'ATIVO' },
@@ -51,7 +57,7 @@ export const ActionEditarListasPrecosModal = ({ show, handleClose, dadosListaLoj
           <form action="">
             <div className="form-group">
               <div className="row">
-                <div className="col-sm-6 col-xl-6">
+                <div className="col-sm-6 col-xl-3">
                   <InputFieldModal
                     label={"Data Criação *"}
                     type={"date"}
@@ -64,23 +70,8 @@ export const ActionEditarListasPrecosModal = ({ show, handleClose, dadosListaLoj
                     required={true}
                   />
                 </div>
-                <div className="col-sm-6 col-xl-6">
-                  <InputFieldModal
-                    label={"Data Alteração *"}
-                    type={"date"}
 
-                    id={"dtAlterListaPreco"}
-                    value={""}
-                    onChangeModal={""}
-
-                    {...register("dtAlterListaPreco", { required: "Campo obrigatório Informe a Descrição do Grupo Estrutura Mercadológica", })}
-                    required={true}
-                  />
-                </div>
-
-              </div>
-              <div className="row mt-4">
-                <div className="col-sm-6 col-xl-6">
+                <div className="col-sm-6 col-xl-3">
                   <InputFieldModal
                     label={"Nº *"}
                     type={"text"}
@@ -93,7 +84,7 @@ export const ActionEditarListasPrecosModal = ({ show, handleClose, dadosListaLoj
                     required={true}
                   />
                 </div>
-                <div className="col-sm-6 col-xl-6">
+                <div className="col-sm-6 col-xl-3">
                   <InputFieldModal
                     label={"Nome Lista Preço *"}
                     type={"text"}
@@ -106,9 +97,6 @@ export const ActionEditarListasPrecosModal = ({ show, handleClose, dadosListaLoj
                     required={true}
                   />
                 </div>
-
-              </div>
-              <div className="row mt-4">
                 <div className="col-sm-6 col-xl-3">
 
                   <label htmlFor="">Situação *</label>
@@ -125,6 +113,7 @@ export const ActionEditarListasPrecosModal = ({ show, handleClose, dadosListaLoj
                   />
                 </div>
               </div>
+      
             </div>
 
             <ActionEditarListasPrecos dadosListaLoja={dadosListaLoja}  />

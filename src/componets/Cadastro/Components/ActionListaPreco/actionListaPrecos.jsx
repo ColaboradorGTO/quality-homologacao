@@ -23,6 +23,7 @@ export const ActionListaPrecos = ({
   const [modalEditar, setModalEditar] = useState(false);
   const [dadosListaLoja, setDadosListaLoja] = useState([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
 
 
@@ -251,17 +252,23 @@ export const ActionListaPrecos = ({
           />
 
         </div>
-          <div className="card mb-4" ref={dataTableRef}>
+          <div className="card" ref={dataTableRef}>
         
           <DataTable
-            title="Vendas por Loja"
+            title="Lista de Preços"
             value={dados}
-            // header={header}
+            globalFilter={globalFilterValue}
             size="small"
             sortOrder={-1}
             paginator={true}
             rows={10}
-            rowsPerPageOptions={[5, 10, 20, 50, 100]}
+            selectionMode="single"
+            selection={rowSelection}
+            onSelectionChange={(e) => setRowSelection(e.value)}
+            rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+            filterDisplay="menu"
             showGridlines
             stripedRows
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado </div>}
@@ -294,6 +301,8 @@ export const ActionListaPrecos = ({
         show={modalEditar}
         handleClose={() => setModalEditar(false)}
         dadosListaLoja={dadosListaLoja}
+        optionsModulos={optionsModulos}
+        usuarioLogado={usuarioLogado}
       />
     </Fragment>
   )

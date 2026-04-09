@@ -437,7 +437,7 @@ export const ActionListaBalancoPorLoja = ({ dadosBalanco, optionsModulos, usuari
         </div>
         <div className="card" ref={dataTableRef}>
           <DataTable
-            title="Vendas por Loja"
+            title="Balanço por Loja"
             value={dados}
             globalFilter={globalFilterValue}
             size="small"
