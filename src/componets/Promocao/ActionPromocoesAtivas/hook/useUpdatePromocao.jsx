@@ -7,6 +7,8 @@ import * as XLSX from 'xlsx';
 import { optionsMecanica } from "../../../../../mecanica"
 import { useNavigate } from "react-router-dom"
 import axios from "axios";
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
 
 export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
   const [mecanicaSelecionada, setMecanicaSelecionada] = useState(0)
@@ -256,14 +258,100 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
     refetchMarcas()
   }, [marcaSelecionada, refetchEmpresas,refetchEmpresasPromocoes]);
 
-  const downloadPlanilhaModelo = () => {
-    const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.aoa_to_sheet([['ID']]);
-    
-    worksheet['!cols'] = [{ wpx: 150 }];
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Produtos');
-    XLSX.writeFile(workbook, 'modelo_produtos.xlsx');
-  };
+  const downloadPlanilhaModelo = async () => {
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet("Produtos");
+  
+      // 🔴 TÍTULO
+      worksheet.mergeCells("A1:C1");
+  
+      const titulo = worksheet.getCell("A1");
+      titulo.value = "Produtos da Promoção";
+  
+      titulo.font = {
+          bold: true,
+          size: 14,
+          color: { argb: "FFFFFFFF" }
+      };
+  
+      titulo.alignment = {
+          horizontal: "center",
+          vertical: "middle"
+      };
+  
+      titulo.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FFFF0000" } // vermelho
+      };
+  
+      // 📌 HEADER (linha 2)
+      const headers = ["ID"];
+  
+      headers.forEach((text, index) => {
+          const cell = worksheet.getCell(2, index + 1);
+          cell.value = text;
+  
+          cell.font = {
+              bold: true,
+              color: { argb: "FFFFFFFF" }
+          };
+  
+          cell.alignment = {
+              horizontal: "center",
+              vertical: "middle"
+          };
+  
+          cell.fill = {
+              type: "pattern",
+              pattern: "solid",
+              fgColor: { argb: "FF000000" } // preto
+          };
+  
+          cell.border = {
+              top: { style: "thin" },
+              left: { style: "thin" },
+              bottom: { style: "thin" },
+              right: { style: "thin" }
+          };
+      });
+  
+      // 📏 Largura da coluna A
+      worksheet.getColumn(1).width = 30;
+  
+      // 🔒 Validação (máx 30 caracteres)
+      for (let i = 3; i <= 1000; i++) {
+          worksheet.getCell(`A${i}`).dataValidation = {
+              type: "textLength",
+              operator: "lessThanOrEqual",
+              showErrorMessage: true,
+              formulae: [30],
+              error: "Máximo de 30 caracteres permitido."
+          };
+      }
+  
+      // 🎨 (Opcional) aplicar estilo nas células da coluna A
+      for (let i = 3; i <= 20; i++) {
+          const cell = worksheet.getCell(`A${i}`);
+  
+          cell.fill = {
+              type: "pattern",
+              pattern: "solid",
+              fgColor: { argb: "FFF2F2F2" } // cinza claro
+          };
+  
+          cell.border = {
+              top: { style: "thin" },
+              left: { style: "thin" },
+              bottom: { style: "thin" },
+              right: { style: "thin" }
+          };
+      }
+  
+      // 💾 Gerar arquivo
+      const buffer = await workbook.xlsx.writeBuffer();
+      saveAs(new Blob([buffer]), "modelo_produtos.xlsx");
+    };
 
   const clearFileError = (isOrigem) => {
       // Limpa o estado do arquivo
