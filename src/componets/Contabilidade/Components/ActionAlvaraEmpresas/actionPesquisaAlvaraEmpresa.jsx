@@ -18,9 +18,7 @@ export const ActionPesquisaAlvaraEmpresa = ({ usuarioLogado }) => {
     const [tipoAlvara, setTipoAlvara] = useState('');
     const [tipoAvaraAplicado, setTipoAvaraAplicado] = useState('');
     const [tabelaVisivel, setTabelaVisivel] = useState(false);
-    const [idEmpresaSelecionada, setIdEmpresaSelecionada] = useState('');
-    const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize, setPageSize] = useState(1000);
+    const [idEmpresaSelecionada, setIdEmpresaSelecionada] = useState('');;
     const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
     useEffect(() => {
@@ -30,15 +28,15 @@ export const ActionPesquisaAlvaraEmpresa = ({ usuarioLogado }) => {
             setMenuFilhoAtual(menuParsed);
         }
     }, []);
-    
+
     const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
-    ['menus-usuario-excecao', menuFilhoAtual?.ID],
-    async () => {
-        const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
-        
-        return response.data;
-    },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
+        ['menus-usuario-excecao', menuFilhoAtual?.ID],
+        async () => {
+            const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
+
+            return response.data;
+        },
+        { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
     );
 
     const { data: marcas = [], error: errorMarcas, isLoading: isLoadingMarcas }
@@ -69,39 +67,32 @@ export const ActionPesquisaAlvaraEmpresa = ({ usuarioLogado }) => {
     );
 
     const fetchListaAlvaraEmpresa = async () => {
+        const urlBase = `/alvaras-empresa?idFilial=${empresaSelecionada}&idSubGrupoEmpresa=${marcaSelecionada}&stAtivo=${satusFilialSelecionada}&ufFiliais=${ufSelecionada}`;
+        let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
+        urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
         try {
+            animacaoCarregamento('Carregando dados...', true);
 
-            const urlApi = `/alvaras-empresa?idFilial=${empresaSelecionada}&idSubGrupoEmpresa=${marcaSelecionada}&stAtivo=${satusFilialSelecionada}&ufFiliais=${ufSelecionada}`;
-            const response = await get(urlApi);
+            const primeiraPagina = 1;
+            const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+            const page = primeiraResposta.page || primeiraPagina;
+            const pageSize = primeiraResposta.pageSize || 1000;
+            const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
+            const totalPages = Math.ceil(totalRows / pageSize);
 
-            if (response.data.length && response.data.length === pageSize) {
-                let allData = [...response.data];
-                animacaoCarregamento(`Carregando... Página ${currentPage} de ${response.data.length}`, true);
+            let allData = [...(primeiraResposta.data || [])];
 
-                async function fetchNextPage(currentPage) {
-                    try {
-                        currentPage++;
-                        const responseNextPage = await get(`${urlApi}&page=${currentPage}`);
-                        if (responseNextPage.length) {
-                            allData.push(...responseNextPage.data);
-                            return fetchNextPage(currentPage);
-                        } else {
-                            return allData;
-                        }
-                    } catch (error) {
-                        console.error('Erro ao buscar próxima página:', error);
-                        throw error;
-                    }
+            if (totalPages > 1) {
+                for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+                    animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
+                    const responsePage = await get(`${urlApi}&page=${currentPage}`);
+                    allData.push(...(responsePage.data || []));
                 }
-
-                await fetchNextPage(currentPage);
-                return allData;
-            } else {
-
-                return response.data;
             }
+
+            return allData;
         } catch (error) {
-            console.error('Erro ao buscar dados:', error);
+            console.error('Erro ao buscar dados da api:', error);
             throw error;
         } finally {
             fecharAnimacaoCarregamento();
@@ -237,4 +228,3 @@ export const ActionPesquisaAlvaraEmpresa = ({ usuarioLogado }) => {
         </Fragment>
     )
 }
-

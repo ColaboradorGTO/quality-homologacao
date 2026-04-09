@@ -12,8 +12,13 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../../Tables/headerTable";
+import Swal from "sweetalert2";
 
-export const ActionListaPrecos = ({dadosListaPedidos}) => {
+export const ActionListaPrecos = ({
+  dadosListaPedidos,
+  usuarioLogado,
+  optionsModulos
+}) => {
   const [modalVisualizar, setModalVisualizar] = useState(false);
   const [modalEditar, setModalEditar] = useState(false);
   const [dadosListaLoja, setDadosListaLoja] = useState([]);
@@ -78,7 +83,7 @@ export const ActionListaPrecos = ({dadosListaPedidos}) => {
       detalheLista: item.detalheLista.length,
       DATACRIACAO: item.listaPreco?.DATACRIACAO,
       DATAALTERACAO: item.listaPreco?.DATAALTERACAO,
-      STATIVO: item.listaPreco?.STATIVO,
+      STATIVO: item.listaPreco?.STATIVO == 'True' ? 'ATIVA' : 'INATIVA',
     }
   })
 
@@ -102,7 +107,6 @@ export const ActionListaPrecos = ({dadosListaPedidos}) => {
         return (
           <th>{row.NOMELISTA}</th>
         )
-        
       },
       sortable: true,
     },
@@ -129,7 +133,7 @@ export const ActionListaPrecos = ({dadosListaPedidos}) => {
       header: 'Situação',
       body: row => {
         return (
-          <th style={{color: row.STATIVO == 'True' ? 'blue' : 'red'}} >{row.STATIVO == 'True' ? 'ATIVA' : 'INATIVA'}</th>
+          <th style={{color: row.STATIVO == 'ATIVA' ? 'blue' : 'red'}} >{row.STATIVO}</th>
         )
       },
       sortable: true,
@@ -147,9 +151,10 @@ export const ActionListaPrecos = ({dadosListaPedidos}) => {
                 onClickButton={() => clickVisualizar(row)}
                 cor={"success"}
                 Icon={GrView}
-                iconSize={22}
+                iconSize={20}
                 iconColor={"#fff"}
-
+                width="30px"
+                height="30px"
               />
             </div>
             <div>
@@ -158,9 +163,10 @@ export const ActionListaPrecos = ({dadosListaPedidos}) => {
                 onClickButton={() => clickEditar(row)}
                 cor={"primary"}
                 Icon={CiEdit}
-                iconSize={22}
+                iconSize={20}
                 iconColor={"#fff"}
-
+                width="30px"
+                height="30px"
               />
             </div>
 
@@ -180,9 +186,16 @@ export const ActionListaPrecos = ({dadosListaPedidos}) => {
   const handleVisualizar = async (IDRESUMOLISTAPRECO) => {
     try {
       const response = await get(`/lista-de-preco?idLista=${IDRESUMOLISTAPRECO}`);
-      if(response && response.data) {
+      if(response.data && response.data.length > 0) {
         setDadosListaLoja(response.data);
         setModalVisualizar(true)
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Nenhuma loja encontrada para esta lista de preço.',
+          text: 'Esta lista de preço não está associada a nenhuma loja.',
+        })
+        return;
       }
     } catch (error) {
       console.error(error);
@@ -196,11 +209,26 @@ export const ActionListaPrecos = ({dadosListaPedidos}) => {
   };
 
   const handleEditar = async (IDRESUMOLISTAPRECO) => {
+    if(optionsModulos[0]?.ALTERAR !== 'True') {
+      Swal.fire({
+        icon: 'error',
+        title: 'Acesso Negado',
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para editar esta lista de preço.`,
+      });
+      return;
+    }
     try {
       const response = await get(`/lista-de-preco?idLista=${IDRESUMOLISTAPRECO}`);
-      if(response && response.data) {
+      if(response.data && response.data.length > 0) {
         setDadosListaLoja(response.data);
         setModalEditar(true)
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Nenhuma loja encontrada para esta lista de preço.',
+          text: 'Esta lista de preço não está associada a nenhuma loja.',
+        })
+        return;
       }
     } catch (error) {
       console.error(error);
@@ -211,7 +239,7 @@ export const ActionListaPrecos = ({dadosListaPedidos}) => {
     <Fragment>
       <div className="panel">
         <div className="panel-hdr">
-          <h2>Lista de Notas Fiscais</h2>
+          <h2>Lista de Preços</h2>
         </div>
         <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
           <HeaderTable

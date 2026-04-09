@@ -91,7 +91,7 @@ export const DashBoardContabilidade = () => {
 
   switch (componentToShow) {
     case "/contabilidade/ResumoDashBoardContabilidade":
-      component = <ResumoDashBoardContabilidade />;
+      component = <ResumoDashBoardContabilidade usuarioLogado={usuarioLogado} />;
       break;
     case "/contabilidade/ActionPesquisaVendasMarca":
       component = <ActionPesquisaVendasMarca />;
@@ -100,7 +100,7 @@ export const DashBoardContabilidade = () => {
       component = <ActionPesquisaVendasContingencia usuarioLogado={usuarioLogado} ID={ID} />;
       break;
     case "/contabilidade/ActionPesquisaVendasXML":
-      component = <ActionPesquisaVendasXML />;
+      component = <ActionPesquisaVendasXML usuarioLogado={usuarioLogado} />;
       break;
     case "/contabilidade/ActionPesquisaProductoPreco":
       component = <ActionPesquisaProductoPreco />;
@@ -135,7 +135,7 @@ export const DashBoardContabilidade = () => {
                           <div className="panel-content">
                             <Suspense fallback={<div>Loading...</div>}>
                               {resumoVisivel && !componentToShow && (
-                                <ResumoDashBoardContabilidade />
+                                <ResumoDashBoardContabilidade usuarioLogado={usuarioLogado} ID={ID} />
                               )}
                               {componentToShow && component}
                             </Suspense>

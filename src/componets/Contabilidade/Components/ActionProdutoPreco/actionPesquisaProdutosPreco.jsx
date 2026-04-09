@@ -15,40 +15,33 @@ export const ActionPesquisaProductoPreco = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(1000);
 
-    const fetchListaProdutos = async () => {
+  const fetchListaProdutos = async () => {
+    const urlBase = `/buscar-produtos?descProd=${produto}`;
+    let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
+    urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
+      animacaoCarregamento('Carregando dados...', true);
 
-      const urlApi = `/buscar-produtos?descProd=${produto}`;
-      const response = await get(urlApi);
+      const primeiraPagina = 1;
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const page = primeiraResposta.page || primeiraPagina;
+      const pageSize = primeiraResposta.pageSize || 1000;
+      const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
+      const totalPages = Math.ceil(totalRows / pageSize);
 
-      if (response.data.length && response.data.length === pageSize) {
-        let allData = [...response.data];
-        animacaoCarregamento(`Carregando... Página ${currentPage} de ${response.data.length}`, true);
+      let allData = [...(primeiraResposta.data || [])];
 
-        async function fetchNextPage(currentPage) {
-          try {
-            currentPage++;
-            const responseNextPage = await get(`${urlApi}&page=${currentPage}`);
-            if (responseNextPage.length) {
-              allData.push(...responseNextPage.data);
-              return fetchNextPage(currentPage);
-            } else {
-              return allData;
-            }
-          } catch (error) {
-            console.error('Erro ao buscar próxima página:', error);
-            throw error;
-          }
+      if (totalPages > 1) {
+        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          allData.push(...(responsePage.data || []));
         }
-
-        await fetchNextPage(currentPage);
-        return allData;
-      } else {
-
-        return response.data;
       }
+
+      return allData;
     } catch (error) {
-      console.error('Erro ao buscar dados:', error);
+      console.error('Erro ao buscar dados da api:', error);
       throw error;
     } finally {
       fecharAnimacaoCarregamento();
@@ -58,13 +51,13 @@ export const ActionPesquisaProductoPreco = () => {
   const { data: dadosProdutos = [], error: errorProdutos, isLoading: isLoadingProdutos, refetch: refetchListaProdutos } = useQuery(
     ['buscar-produtos', produto, currentPage, pageSize],
     fetchListaProdutos,
-    { enabled: Boolean(produto.length > 4), staleTime: 60 * 60 * 1000 },
+    { enabled: false, staleTime: 60 * 60 * 1000 },
   );
 
 
   const handleClick = () => {
     if (produto.length > 4) {
-      setCurrentPage(prevPage => prevPage + 1)
+      
       refetchListaProdutos()
       setTabelaVisivel(true);
     } else {
@@ -106,7 +99,6 @@ export const ActionPesquisaProductoPreco = () => {
         valueInputField={produto}
         onChangeInputField={(e) => setProduto(e.target.value)}
 
-
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}
         onButtonClickSearch={handleClick}
@@ -125,4 +117,3 @@ export const ActionPesquisaProductoPreco = () => {
     </Fragment>
   )
 }
-

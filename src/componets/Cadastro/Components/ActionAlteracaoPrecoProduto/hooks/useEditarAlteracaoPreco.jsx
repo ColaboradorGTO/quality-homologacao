@@ -3,6 +3,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { post, put } from "../../../../../api/funcRequest";
 import { optionsAlteracaoPreco } from "../../../../../../parceiro.json"
+import { toFloat } from "../../../../../utils/toFloat";
 
 export const useEditarAlteracaoPreco = ({
     handleClose,

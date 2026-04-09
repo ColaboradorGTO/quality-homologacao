@@ -13,8 +13,14 @@ import * as XLSX from 'xlsx';
 import HeaderTable from "../../../Tables/headerTable";
 import { ActionFechamentoLojaModal } from "../actionFechamentoLojaModal";
 import { formatarDataParaBR } from "../../../../utils/dataFormatada";
+import Swal from "sweetalert2";
 
-export const ActionListaVendasLojasResumo = ({ dadosTotalVendasEmpresa, dataPesquisa }) => {
+export const ActionListaVendasLojasResumo = ({ 
+  dadosTotalVendasEmpresa, 
+  dataPesquisa,
+  optionsModulos,
+  usuarioLogado
+}) => {
   const [modalVisivel, setModalVisivel] = useState(false);
   const [rowSelection, setRowSelection] = useState(null);
   const [dadosDetalheFechamento, setDadosDetalheFechamento] = useState([]);
@@ -233,11 +239,11 @@ export const ActionListaVendasLojasResumo = ({ dadosTotalVendasEmpresa, dataPesq
             titleButton={"Detalhar Fechamento"}
             onClickButton={() => handleClickEdit(row)}
             Icon={GrView}
-            iconSize={25}
+            iconSize={20}
             iconColor={"#fff"}
             cor={"success"}
-            width="40px"
-            height="40px"
+            width="30px"
+            height="30px"
           />
 
         </div>
@@ -253,6 +259,14 @@ export const ActionListaVendasLojasResumo = ({ dadosTotalVendasEmpresa, dataPesq
       if (response.data && response.data.length > 0) {
         setDadosDetalheFechamento(response.data);
         setModalVisivel(true);
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Nenhum detalhe encontrado',
+          html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Não foram encontrados detalhes para a loja .`,
+          confirmButtonText: 'Fechar',
+        });
+        return;
       }
     } catch (error) {
       console.error('Erro ao buscar detalhes da venda: ', error);
@@ -271,7 +285,7 @@ export const ActionListaVendasLojasResumo = ({ dadosTotalVendasEmpresa, dataPesq
       <div className="panel">
         <div className="panel-hdr mb-4">
 
-          <h3>Lista de Vendas Por Loja</h3>
+          <h2>Lista de Vendas Por Loja</h2>
         </div>
         <div style={{ marginBottom: "1rem" }}>
           <HeaderTable
@@ -330,6 +344,4 @@ export const ActionListaVendasLojasResumo = ({ dadosTotalVendasEmpresa, dataPesq
       />
     </Fragment>
   )
-
 }
-

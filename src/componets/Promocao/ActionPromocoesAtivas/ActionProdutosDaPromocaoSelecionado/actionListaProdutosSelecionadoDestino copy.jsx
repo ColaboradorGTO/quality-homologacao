@@ -69,6 +69,7 @@ export const ActionListaProdutosSelecionadoDestino = ({
       typeof produtoDestinoSelecionado[0] !== "object"
     ) {
       setIdsParaBuscar(produtoDestinoSelecionado);
+      console.log(produtoDestinoSelecionado, 'ids para buscar');
     }
   }, [produtoDestinoSelecionado]);
 
@@ -78,7 +79,7 @@ export const ActionListaProdutosSelecionadoDestino = ({
         try {
           const ids = idsParaBuscar.join(',');
 
-       
+          console.log(ids, 'ids para buscar');
           // Primeira tentativa: solicitar todos de uma vez
           let response = await post(`/criar-produto-promocao-ativa`, {
             idProduto: ids,

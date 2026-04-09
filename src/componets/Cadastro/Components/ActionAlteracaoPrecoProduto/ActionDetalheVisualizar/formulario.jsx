@@ -5,6 +5,8 @@ import Select from 'react-select';
 import FormField from "../../../../Formularios/FormField";
 import { AlertError } from "../../../../Inputs/alertError";
 import { useEditarAlteracaoPreco } from "../hooks/useEditarAlteracaoPreco";
+import { schema } from "./Schema/useEditarSchema";
+import { MdEdit } from "react-icons/md";
 
 export const Formulario = ({
     handleClose,
@@ -40,8 +42,35 @@ export const Formulario = ({
         usuarioLogado
     })
 
+    const handleValidatedSubmit = async () => {
+        try {
+            const dadosValidar = {
+                statusSelecionado: statusSelecionado?.value || '',
+            }    
+            await schema.validate(dadosValidar, { abortEarly: false });
+
+            await onSubmit()
+        } catch(validationError) {
+            clearErrors();
+
+            if (validationError.inner && validationError.inner.length > 0) {
+                validationError.inner.forEach(error => {
+                    if (error.path) {
+                        setError(error.path, {
+                            type: 'manual',
+                            message: error.message
+                        });
+                    }
+                });
+            }
+
+            const errorMessages = validationError.errors || [validationError.message];
+            console.log(`Erro de validação:\n${errorMessages.join('\n')}`);
+        }
+    }
+
     return (
-        <form action="">
+        <form action="" onSubmit={handleSubmit(handleValidatedSubmit)}>
             <div className="form-group">
                 <div className="row">
                     <div className="col-sm-3 col-xl-3">
@@ -188,6 +217,23 @@ export const Formulario = ({
                     </div>
 
                 </div>
+                <div className="row mt-4">
+
+                    <div className="col-sm-6 col-xl-3">
+                        <ButtonTypeModal
+                            cor={"warning"}
+                            textButton={"Alterar Selecionados"}
+                            Icon={MdEdit}
+                        />
+                    </div>
+                    <div className="col-sm-6 col-xl-3">
+                        <ButtonTypeModal
+                            cor={"info"}
+                            textButton={"Inserir Alteração"}
+                            Icon={MdEdit}
+                        />
+                    </div>
+                </div>
 
             </div>
 
@@ -199,7 +245,7 @@ export const Formulario = ({
                 corFechar={"secondary"}
 
                 ButtonTypeCadastrar={ButtonTypeModal}
-                onClickButtonCadastrar
+                onClickButtonCadastrar={handleSubmit(handleValidatedSubmit)}
                 textButtonCadastrar={"Salvar"}
                 corCadastrar={"success"}
                 loadingTextCadastrar={"Cadastrando..."}

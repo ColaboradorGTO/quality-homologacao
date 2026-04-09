@@ -4,7 +4,7 @@ import { HeaderModal } from "../../../Modais/HeaderModal/HeaderModal"
 import { Modal } from "react-bootstrap"
 import { Fragment } from "react"
 import { ActionListaProdutosSelecionadoDestino } from "./actionListaProdutosSelecionadoDestino"
-import { ActionListaProdutosSelecionadoOrigem } from "./actionListaProdutosSelecionadoOrigem"
+
 export const ActionProdutoModalPromocaoSelecionadoDestino = ({ 
     show, 
     handleClose,  

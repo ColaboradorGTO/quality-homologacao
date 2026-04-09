@@ -13,8 +13,13 @@ import HeaderTable from "../../../Tables/headerTable";
 import { ActionVendaXMLModal } from "./actionVendaXMLModal";
 import { GrView } from "react-icons/gr";
 import { TbFileTypeXml } from "react-icons/tb";
+import Swal from "sweetalert2";
 
-export const ActionListaVendasXML = ({ dadosVendasXML }) => {
+export const ActionListaVendasXML = ({
+  dadosVendasXML,
+  usuarioLogado,
+  optionsModulos,
+}) => {
   const [dadosDetalheVendas, setDadosDetalheVendas] = useState([]);
   const [rowSelection, setRowSelection] = useState(null);
   const [dadosDetalhePagamento, setDadosDetalhePagamento] = useState([]);
@@ -190,15 +195,21 @@ export const ActionListaVendasXML = ({ dadosVendasXML }) => {
   const handleEdit = async (IDVENDA) => {
     try {
       const response = await get(`/vendasPagamentoContigencia?idVenda=${IDVENDA}`);
-      const resonseDetalhe = await get(`/vendasDetalheContigencia?idVenda=${IDVENDA}`);
-      if (response.data && response.data.length > 0) {
+      const responseDetalhe = await get(`/vendasDetalheContigencia?idVenda=${IDVENDA}`);
+      if (response.data && responseDetalhe.data) {
         setDadosDetalhePagamento(response.data)
+        setDadosDetalheVendas(responseDetalhe.data)
         setModalVendas(true);
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Sem Detalhes',
+          html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Não foi possível encontrar os detalhes para esta venda.`,
+          customClass: {
+          }
+        })
       }
-      if (resonseDetalhe.data) {
-        setDadosDetalheVendas(resonseDetalhe.data)
-        setModalVendas(true);
-      }
+
     } catch (error) {
       console.error('Erro ao buscar detalhes da venda: ', error);
     }
@@ -220,9 +231,16 @@ export const ActionListaVendasXML = ({ dadosVendasXML }) => {
   const handleDetalharVendaXML = async (IDVENDA) => {
     try {
       const response = await get(`/venda-xml?idVenda=${IDVENDA}`);
-      setDetalheVendaXMLModal(true);
-      setDadosDetalheVendasXML(response.data)
-
+      if (response.data && response.data.length > 0) {
+        setDadosDetalheVendasXML(response.data)
+        setDetalheVendaXMLModal(true);
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Venda sem XML',
+          html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Não foi encontrado o XML para esta venda.`,
+        });
+      }
     } catch (error) {
       console.error(error);
     }
@@ -231,10 +249,10 @@ export const ActionListaVendasXML = ({ dadosVendasXML }) => {
   return (
 
     <Fragment>
-      <div className="panel" style={{ marginTop: '6rem' }}>
+      <div className="panel" >
         <div className="panel-hdr mb-4">
 
-          <h3>Lista de Vendas Contigência</h3>
+          <h2>Lista de Vendas Contigência</h2>
         </div>
         <div style={{ marginBottom: "1rem" }}>
           <HeaderTable

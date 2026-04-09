@@ -1,7 +1,7 @@
-import React, { Fragment, useEffect, useRef, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { AiOutlineSearch } from "react-icons/ai";
 import { BsGem } from "react-icons/bs";
-import { FaCashRegister, FaRegLightbulb, FaRegMoneyBillAlt, FaSearch } from "react-icons/fa";
+import { FaCashRegister, FaRegLightbulb, FaRegMoneyBillAlt } from "react-icons/fa";
 import { MdOutlinePayment } from "react-icons/md";
 import { ResultadoResumo } from "../../../ResultadoResumo/ResultadoResumo";
 import { get } from "../../../../api/funcRequest";
@@ -12,20 +12,37 @@ import { formatMoeda } from "../../../../utils/formatMoeda";
 import { getDataAtual } from "../../../../utils/dataAtual";
 import { toFloat } from "../../../../utils/toFloat";
 import { ActionListaVendasLojasResumo } from "./actionListaVendasLojasResumo";
-import { ActionListaTransacoesLojas } from "./actionListaTransacoesLojas";
 import { useQuery } from 'react-query';
 
-export const ResumoDashBoardContabilidade = () => {
+export const ResumoDashBoardContabilidade = ({usuarioLogado}) => {
   const [resumoVisivel, setResumoVisivel] = useState(false);
   const [dataPesquisa, setDataPesquisa] = useState('');
   const [currentPage, setCurrentPage] = useState(1)
-  const [pageSize, setPageSize] = useState(1000)
   const [isLoadingPesquisa, setIsLoadingPesquisa] = useState(true)
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
+
+
+  useEffect(() => {
+    const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
+    if (menuSalvo) {
+      const menuParsed = JSON.parse(menuSalvo);
+      setMenuFilhoAtual(menuParsed);
+    }
+  }, []);
+  
+  const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
+    ['menus-usuario-excecao', menuFilhoAtual?.ID],
+    async () => {
+      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
+      
+      return response.data;
+    },
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
+  );
 
   useEffect(() => {
     const dataAtual = getDataAtual();
     setDataPesquisa(dataAtual);
-
   }, [])
 
   const { data: dadosResumoVendas = [], refetch: refetchResumoVendas } = useQuery(
@@ -40,9 +57,7 @@ export const ResumoDashBoardContabilidade = () => {
   );
 
   const calcularTotalDespesasAdiantamento = (item) => {
-
     return (
-
       toFloat(item.VALORTOTALDESPESA) +
       toFloat(item.VALORTOTALADIANTAMENTOSALARIAL)
     );
@@ -102,8 +117,6 @@ export const ResumoDashBoardContabilidade = () => {
     }
   );
 
-
-
   const handleClick = () => {
     setResumoVisivel(true);
     setIsLoadingPesquisa(true);
@@ -113,7 +126,6 @@ export const ResumoDashBoardContabilidade = () => {
     refetch()
 
   }
-
 
   return (
     <Fragment>
@@ -134,7 +146,6 @@ export const ResumoDashBoardContabilidade = () => {
         IconSearch={AiOutlineSearch}
         corSearch={"primary"}
       />
-
 
       <Fragment>
 
@@ -169,11 +180,6 @@ export const ResumoDashBoardContabilidade = () => {
           cardEcommerce={true}
           IconValorEcommerce={FaCashRegister}
 
-          // nomeVoucher="Convênio"
-          // valorVoucher={formatMoeda(toFloat(dadosVendasResumo[0]?.VALORTOTALCONVENIO))}
-          // cardVoucher={true}
-          // IconVoucher={BsGem}
-
           iconSize={100}
           iconColor="white"
         />
@@ -181,12 +187,9 @@ export const ResumoDashBoardContabilidade = () => {
         <ActionListaVendasLojasResumo
           dadosTotalVendasEmpresa={dadosTotalVendasEmpresa}
           dataPesquisa={dataPesquisa}
+          optionsModulos={optionsModulos}
+          usuarioLogado={usuarioLogado}
         />
-
-        {/* <ActionListaTransacoesLojas
-         dadosTransacoesEmpresas={dadosTransacoesEmpresas}
-          dataPesquisa={dataPesquisa} />
-           */}
       </Fragment>
     </Fragment>
   )

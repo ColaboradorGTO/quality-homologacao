@@ -127,7 +127,7 @@ export const ActionEditarListasPrecosModal = ({ show, handleClose, dadosListaLoj
               </div>
             </div>
 
-            <ActionEditarListasPrecos  />
+            <ActionEditarListasPrecos dadosListaLoja={dadosListaLoja}  />
             <FooterModal
               ButtonTypeFechar={ButtonTypeModal}
               onClickButtonFechar={handleClose}

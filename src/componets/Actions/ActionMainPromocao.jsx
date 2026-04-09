@@ -154,6 +154,7 @@ export const ActionMainPromocao = ({
   ButtonTypeProdutoPesquisadoOrigem,
   ButtonTypeProdutoPesquisadoDestino,
   ButtonTypeRetornar,
+  ButtonTypeDownload,
 
   linkNomeSearch,
   linkNome,
@@ -167,6 +168,7 @@ export const ActionMainPromocao = ({
   linkNomeProdutoPesquisadoOrigem,
   linkNomeProdutoPesquisadoDestino,
   linkRetornar,
+  linkDownload,
 
   onButtonClickSearch,
   onButtonClickCadastro,
@@ -180,6 +182,7 @@ export const ActionMainPromocao = ({
   onButtonClickProdutoPesquisadoOrigem,
   onButtonClickProdutoPesquisadoDestino,
   onButtonClickRetornar,
+  onButtonClickDownload,
 
   corSearch,
   corCadastro,
@@ -193,6 +196,7 @@ export const ActionMainPromocao = ({
   corProdutoPesquisadoOrigem,
   corProdutoPesquisadoDestino,
   corRetornar,
+  corDownload,
 
   IconSearch,
   IconCadastro,
@@ -206,6 +210,7 @@ export const ActionMainPromocao = ({
   IconProdutoPesquisadoOrigem,
   IconProdutoPesquisadoDestino,
   IconRetornar,
+  IconDownload,
 
   readOnlyDTInicio,
   readOnlyDTFim,
@@ -937,6 +942,20 @@ export const ActionMainPromocao = ({
                         tipo="button"
                         Icon={IconRetornar}
                         iconColor="#000"
+                        iconSize={25}
+                        style={{ color: 'white' }}
+                      />
+                    )}
+                   
+                    {ButtonTypeDownload && (
+                      <ButtonTypeDownload
+                        textButton={linkDownload}
+                        onClickButtonType={onButtonClickDownload}
+                        // cor="danger"
+                        cor={corDownload}
+                        tipo="button"
+                        Icon={IconDownload}
+                        iconColor="#fff"
                         iconSize={25}
                         style={{ color: 'white' }}
                       />

@@ -176,34 +176,117 @@ export const useCreatePromocaoAtiva = ({ }) => {
     refetchMarcas()
   }, [marcaSelecionada, refetchEmpresas]);
 
-  const handleFileUpload = async (file, isOrigem) => {
-    try {
-      const data = await processFile(file);
+  // ✅ Versão minimalista
+  const downloadPlanilhaModelo = () => {
+      const workbook = XLSX.utils.book_new();
+      const worksheet = XLSX.utils.aoa_to_sheet([['ID']]);
       
-      if (data.length > 1000) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Limite Excedido',
-          html: `
-            Limite máximo permitido: 1.000 produtos por promoção.
-            Caso contrário, os produtos não serão inseridos na promoção.
-          `,
-        });
-        return; // Interrompe o processamento
-      }
+      worksheet['!cols'] = [{ wpx: 150 }];
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Produtos');
+      XLSX.writeFile(workbook, 'modelo_produtos.xlsx');
+  };
+
+  // ✅ ADICIONAR: Função para limpar quando há erro
+  const clearFileError = (isOrigem) => {
+      // Limpa o estado do arquivo
       if (isOrigem) {
-        setFileProdutoOrigem(JSON.stringify(data));
+          setFileProdutoOrigem([]);
       } else {
-        setFileProdutoDestino(JSON.stringify(data));
+          setFileProdutoDestino([]);
       }
-    } catch (error) {
-      console.error('Erro ao processar arquivo:', error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Erro',
-        text: 'Falha ao processar o arquivo. Verifique o formato.',
+      
+      // Limpa o input file se existir
+      const fileInputs = document.querySelectorAll('input[type="file"]');
+      fileInputs.forEach(input => {
+          if (input) {
+              input.value = '';
+          }
       });
-    }
+  };
+  
+  const handleFileUpload = async (file, isOrigem) => {
+      try {
+          const data = await processFile(file);
+
+          // ✅ VALIDAÇÃO: Limite de produtos
+          if (data.length > 1000) {
+              // ✅ LIMPA ARQUIVO quando excede limite
+              clearFileError(isOrigem);
+              
+              Swal.fire({
+                  icon: 'warning',
+                  title: 'Limite Excedido',
+                  html: `
+                      Limite máximo permitido: 1.000 produtos por promoção.<br>
+                      Produtos encontrados: ${data.length}<br>
+                      Caso contrário, os produtos não serão inseridos na promoção.
+                  `,
+              });
+              return;
+          }
+
+          // ✅ SUCESSO: Mostra quantos IDs foram encontrados
+          await Swal.fire({
+              icon: 'success',
+              title: 'Arquivo Processado!',
+              text: `${data.length} produtos foram encontrados na planilha`,
+              timer: 2000,
+              showConfirmButton: false
+          });
+
+          if (isOrigem) {
+              setFileProdutoOrigem(JSON.stringify(data));
+          } else {
+              setFileProdutoDestino(JSON.stringify(data));
+          }
+
+      } catch (error) {
+          console.error('Erro ao processar arquivo:', error);
+          
+          // ✅ LIMPA ARQUIVO quando há erro de validação
+          clearFileError(isOrigem);
+          
+          // ✅ ERRO ESPECÍFICO: Mostra a estrutura correta se erro de validação
+          if (error.message.includes('cabeçalho "ID"') || error.message.includes('Nenhum Nº Item')) {
+              Swal.fire({
+                  icon: 'error',
+                  title: 'Modelo Incorreto da Planilha!',
+                  html: `
+                      <div style="text-align: left;">
+                          <p><strong>Erro:</strong> ${error.message}</p>
+                          <br>
+                          <p><strong>Modelo da planilha:</strong></p>
+                          <table border="1" style="width: 100%; margin: 10px 0;">
+                              <tr style="background-color: #f0f0f0;">
+                                  <th style="padding: 8px; text-align: center;"><strong>ID</strong></th>
+                              </tr>
+                              <tr>
+                                  <td style="padding: 8px; text-align: center;">11654</td>
+                              </tr>
+                              <tr>
+                                  <td style="padding: 8px; text-align: center;">11655</td>
+                              </tr>
+                              <tr>
+                                  <td style="padding: 8px; text-align: center;">0038266148</td>
+                              </tr>
+                              <tr>
+                                  <td style="padding: 8px; text-align: center;">...</td>
+                              </tr>
+                          </table>
+                          <p><em>A primeira linha deve conter obrigatoriamente o cabeçalho "ID"</em></p>
+                      </div>
+                  `,
+                  confirmButtonText: 'Entendi'
+              });
+          } else {
+              // ✅ ERRO GENÉRICO
+              Swal.fire({
+                  icon: 'error',
+                  title: 'Erro',
+                  text: 'Falha ao processar o arquivo. Verifique o formato.',
+              });
+          }
+      }
   };
 
   const processFile = (file) => {
@@ -254,26 +337,55 @@ export const useCreatePromocaoAtiva = ({ }) => {
     }
     return result;
   }
-
+  
   const processXLSX = (xlsxContent) => {
-    const workbook = XLSX.read(xlsxContent, { type: 'array' });
-    const sheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[sheetName];
+      const workbook = XLSX.read(xlsxContent, { type: 'array' });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
 
-    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-    const result = [];
-    for (let i = 0; i < jsonData.length; i++) {
-      const row = jsonData[i];
-      if (row && row.length > 0) {
-        const firstCell = row[0]?.toString().trim();
-        if (firstCell) {
-          result.push(firstCell);
-        }
+      // ✅ VALIDAÇÃO: Verifica se tem dados
+      if (!jsonData || jsonData.length === 0) {
+          throw new Error('Planilha vazia ou não foi possível ler o arquivo');
       }
-    }
-    return result;
-  }
+
+      // ✅ VALIDAÇÃO: Pega a primeira linha (cabeçalhos)
+      const headers = jsonData[0];
+      
+      // ✅ VALIDAÇÃO: Verifica se existe a coluna "ID"
+      const hasIdColumn = headers.some(header => 
+          header && header.toString().toUpperCase().trim() === 'ID'
+      );
+      
+      if (!hasIdColumn) {
+          throw new Error('A planilha deve ter um cabeçalho "ID" na primeira linha');
+      }
+
+      // ✅ BUSCA: Encontra o índice da coluna "ID"
+      const idColumnIndex = headers.findIndex(header => 
+          header && header.toString().toUpperCase().trim() === 'ID'
+      );
+
+      // ✅ EXTRAÇÃO: Pega apenas os IDs (pula a primeira linha do cabeçalho)
+      const result = [];
+      for (let i = 1; i < jsonData.length; i++) { // Começa em 1 para pular cabeçalho
+          const row = jsonData[i];
+          if (row && row.length > idColumnIndex) {
+              const idValue = row[idColumnIndex]?.toString().trim();
+              if (idValue && idValue !== '') {
+                  result.push(idValue);
+              }
+          }
+      }
+
+      // ✅ VALIDAÇÃO: Verifica se encontrou IDs
+      if (result.length === 0) {
+          throw new Error('Nenhum ID foi encontrado na coluna ID da planilha');
+      }
+
+      return result;
+  };
 
   const mostrarProdutosSelecionados = useCallback((tipo) => {
     let produtos = [];
@@ -1235,6 +1347,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
     setSubGrupoDestino,
     subGrupoOrigem,
     setSubGrupoOrigem,
+    downloadPlanilhaModelo,
     onSubmitEstrutura
   }
 }

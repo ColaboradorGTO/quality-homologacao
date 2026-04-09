@@ -371,7 +371,7 @@ export const ActionListaAlvaras = ({
             Swal.fire({
                 icon: 'error',
                 title: 'Atenção!',
-                text: 'Você não tem permissão para editar alvará.',
+                html: `${usuarioLogado?.NOFUNCIONARIO} <br /> Você não tem permissão para editar alvará.`,
                 confirmButtonColor: '#7352A5',
                 customClass: {
                     container: 'custom-swal',
@@ -391,7 +391,7 @@ export const ActionListaAlvaras = ({
             <div className="panel">
                 <div className="panel-hdr mb-4">
 
-                    <h3>Lista de Produtos - Preços</h3>
+                    <h2>Lista de Empresas</h2>
 
                 </div>
                 <div style={{ marginBottom: "1rem" }}>

@@ -18,6 +18,7 @@ import { ActionDocumentacaoCriar } from "../ActionPromocoesAtivas/ActionDocument
 import { useState } from "react";
 import { MenuTreeSelect } from "../../Inputs/menuTreeSelect";
 import { InputFieldActionRadio } from "../../Buttons/InputActionRadio";
+import { AiOutlineFileExcel } from "react-icons/ai";
 
 
 
@@ -136,6 +137,7 @@ export const ActionPesquisaPromocao = ({ }) => {
     subGrupoOrigem,
     setSubGrupoOrigem,
     onSubmit,
+    downloadPlanilhaModelo,
     onSubmitEstrutura
 
   } = useCreatePromocaoAtiva({});
@@ -736,8 +738,14 @@ export const ActionPesquisaPromocao = ({ }) => {
         ButtonTypeTXT={ButtonType}
         linkTXT={"Documentação"}
         onButtonClickTXT={mostrarDocumentacao}
-        corTXT={"success"}
+        corTXT={"warning"}
         IconTXT={GrFormView}
+
+        ButtonTypeRetornar={ButtonType}
+        linkRetornar={"Baixar Planilha"}
+        onButtonClickRetornar={downloadPlanilhaModelo}
+        corRetornar={"success"}
+        IconRetornar={AiOutlineFileExcel}
       />
 
 

@@ -143,6 +143,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
     setGrupoSelecionadoOrigem,
     grupoSelecionadoDestino,
     setGrupoSelecionadoDestino,
+    downloadPlanilhaModelo,
     onSubmitEstrutura
   } = useUpdatePromocaoAtiva({ dadosPromocao });
 
@@ -780,11 +781,20 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
         corTXT={"success"}
         IconTXT={GrFormView}
 
-       ButtonTypeRetornar={ButtonType}
+        ButtonTypeRetornar={ButtonType}
         linkRetornar={"Voltar para Pesquisa"}
         corRetornar={"danger"}
         onButtonClickRetornar={handleClickIncluir}
         IconRetornar={AiFillBackward}
+
+        ButtonTypeDownload={ButtonType}
+        linkDownload={"Download Planilha Modelo"}
+        corDownload={"warning"}
+        onButtonClickDownload={downloadPlanilhaModelo}
+        IconDownload={GrDocumentCsv}
+
+
+        // downloadPlanilhaModelo
       />
 
       <ActionProdutoDestinoModal
