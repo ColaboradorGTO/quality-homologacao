@@ -17,13 +17,10 @@ export const Formulario = ({dadosListaLoja , handleClose, optionsModulos, usuari
     setStatusSelecionado,
     empresaSelecionada,
     setEmpresaSelecionada,
+    situacao,
     onSubmit,
   } = useEditarListaPrecos({ optionsModulos, usuarioLogado, dadosListaLoja, handleClose })
 
-  const optionsStatus = [
-    { value: 'True', label: 'ATIVO' },
-    { value: 'False', label: 'INATIVO' }
-  ]
 
   const handleValidatedSubmit = async () => {
     try {
@@ -56,8 +53,7 @@ export const Formulario = ({dadosListaLoja , handleClose, optionsModulos, usuari
   }
 
   return (
-    // <form onSubmit={handleSubmit(handleValidatedSubmit)}>
-    <form action="">
+    <form onSubmit={handleSubmit(handleValidatedSubmit)}>
       <div className="form-group">
         <div className="row">
           <div className="col-sm-6 col-xl-3">
@@ -121,7 +117,7 @@ export const Formulario = ({dadosListaLoja , handleClose, optionsModulos, usuari
               className="basic-single"
               classNamePrefix="select"
               name="situacao"
-              options={optionsStatus.map((item) => {
+              options={situacao?.map((item) => {
                 return {
                   value: item.value,
                   label: item.label
@@ -153,7 +149,7 @@ export const Formulario = ({dadosListaLoja , handleClose, optionsModulos, usuari
         corFechar={"secondary"}
 
         ButtonTypeCadastrar={ButtonTypeModal}
-        onClickButtonCadastrar
+        onClickButtonCadastrar={handleSubmit(handleValidatedSubmit)}
         textButtonCadastrar={"Salvar"}
         corCadastrar={"success"}
         loadingTextCadastrar={"Cadastrando..."}

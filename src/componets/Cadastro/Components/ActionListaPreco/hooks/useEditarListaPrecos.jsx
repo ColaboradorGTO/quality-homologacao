@@ -2,6 +2,7 @@ import Swal from "sweetalert2"
 import { useEffect, useState } from "react"
 import axios from "axios"
 import { get, put, post } from "../../../../../api/funcRequest"
+import { situacao } from "../../../../../../parceiro.json"
 
 export const useEditarListaPrecos = ({optionsModulos, usuarioLogado, dadosListaLoja }) => {
   const [descricao, setDescricao] = useState('')
@@ -45,11 +46,11 @@ export const useEditarListaPrecos = ({optionsModulos, usuarioLogado, dadosListaL
   };
 
   useEffect(() => {
-    if (dadosListaLoja && dadosListaLoja.length > 0) {
-      setStatusSelecionado({ value: dadosListaLoja[0]?.STATIVO, label: dadosListaLoja[0]?.STATIVO == 'True' ? 'ATIVO' : 'INATIVO' })
+    if (dadosListaLoja && dadosListaLoja.length > 0) { 
+      setStatusSelecionado({ value: dadosListaLoja[0]?.listaPreco.STATIVO == 'True' ? 'True' : 'False', label: dadosListaLoja[0]?.listaPreco.STATIVO == 'True' ? 'ATIVO' : 'INATIVO' })
       setEmpresaSelecionada(dadosListaLoja[0]?.listaPreco.NOMELISTA)
+   
     }
-    console.log(dadosListaLoja, "dadosListaLoja")
   }, [dadosListaLoja])
 
 
@@ -144,6 +145,7 @@ export const useEditarListaPrecos = ({optionsModulos, usuarioLogado, dadosListaL
     setStatusSelecionado,
     empresaSelecionada,
     setEmpresaSelecionada,
+    situacao,
     onSubmit,
   }
 }
