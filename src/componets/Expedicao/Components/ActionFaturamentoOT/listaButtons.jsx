@@ -7,7 +7,6 @@ import { MdFormatListBulleted } from "react-icons/md"
 import Swal from "sweetalert2"
 import JSZip from "jszip";
 
-
 export const ListaButtons = ({dados}) => {
     const baixarPDFs = async (dados) => {
           let pdfDataArray = [];

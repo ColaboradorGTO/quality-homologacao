@@ -7,8 +7,10 @@ import { MenuButton } from "../componets/Buttons/menuButton";
 import { FooterMain } from "../componets/Footer";
 import { useQuery } from "react-query";
 import { get } from "../api/funcRequest";
+
 const ActionPesquisaFaturamentoOT = lazy(() => import("../componets/Expedicao/Components/ActionFaturamentoOT/actionPesquisaFaturamentoOT").then(module => ({ default: module.ActionPesquisaFaturamentoOT })));
 const ActionPesquisaOT = lazy(() => import("../componets/Expedicao/Components/ActionExpedicaoOrdemTransferencia/ActionPesquisaOT").then(module => ({ default: module.ActionPesquisaOT })));
+const ActionStatusDivergencia = lazy(() => import("../componets/Expedicao/Components/ActionStatusDivergencia/actionPesquisaStatusDivergencia").then(module => ({ default: module.ActionStatusDivergencia })));
 
 export const DashBoardExpedicao = () => {
   const [actionVisivel, setActionVisivel] = useState(true);
@@ -45,7 +47,7 @@ export const DashBoardExpedicao = () => {
     'menus-usuario',
     async () => {
       const response = await get(`/menus-usuario?idUsuario=${usuarioLogado?.id}&idModulo=${selectedModule?.ID}`);
-      
+
       return response.data;
     },
     { enabled: Boolean(usuarioLogado?.id), staleTime: 5 * 60 * 1000, }
@@ -55,10 +57,13 @@ export const DashBoardExpedicao = () => {
 
   switch (componentToShow) {
     case "/expedicao/ActionPesquisaOT":
-      component = <ActionPesquisaOT />;
+      component = <ActionPesquisaOT usuarioLogado={usuarioLogado} />;
       break;
     case "/expedicao/ActionPesquisaFaturamentoOT":
-      component = <ActionPesquisaFaturamentoOT />
+      component = <ActionPesquisaFaturamentoOT usuarioLogado={usuarioLogado} />
+      break;
+    case "/expedicao/ExpedicaoActionStatusDivergencia":
+      component = <ActionStatusDivergencia usuarioLogado={usuarioLogado} />
       break;
     default:
       break;
@@ -84,7 +89,7 @@ export const DashBoardExpedicao = () => {
                         <div className="panel-container show">
                           <div className="panel-content">
                             <Suspense fallback={<div>Loading...</div>}>
-                            {actionVisivel && !componentToShow && <ActionPesquisaOT />}
+                              {actionVisivel && !componentToShow && <ActionPesquisaOT />}
                               {componentToShow && component}
                             </Suspense>
                           </div>

@@ -5,10 +5,10 @@ import { useReactToPrint } from "react-to-print";
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
-import HeaderTable from "../../../Tables/headerTable";
+import HeaderTable from "../../../../Tables/headerTable";
 import { toFloat } from "../../../../../utils/toFloat";
 
-export const ActionListaProdutos = ({dadosDetalheTransferencia }) => {
+export const ActionListaVisualizar = ({dadosDetalheTransferencia }) => {
     const [globalFilterValue, setGlobalFilterValue] = useState('');
 
     const dataTableRef = useRef();
@@ -62,10 +62,8 @@ export const ActionListaProdutos = ({dadosDetalheTransferencia }) => {
         doc.save('faturamento_ot.pdf');
     };
 
-
     const dados = dadosDetalheTransferencia.map((item, index) => {
        
-
         return {
             IDPRODUTO: item.IDPRODUTO,
             NUCODBARRAS: item.NUCODBARRAS,
@@ -75,9 +73,7 @@ export const ActionListaProdutos = ({dadosDetalheTransferencia }) => {
             QTDEXPEDICAO: toFloat(item.QTDEXPEDICAO),
             QTDRECEPCAO: toFloat(item.QTDRECEPCAO),
             QTDDIFERENCA: toFloat(item.QTDDIFERENCA),
-            QTDAJUSTE: toFloat(item.QTDAJUSTE),
-
-     
+            QTDAJUSTE: toFloat(item.QTDAJUSTE),     
         }
     });
 
@@ -137,11 +133,9 @@ export const ActionListaProdutos = ({dadosDetalheTransferencia }) => {
             body: row => <th>{row.QTDAJUSTE}</th>,
             sortable: true,
         },
-      
     ]
 
     return (
-
         <Fragment>
             <div className="panel">
                 <div className="panel-hdr">
@@ -185,15 +179,11 @@ export const ActionListaProdutos = ({dadosDetalheTransferencia }) => {
                                 headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
                                 footerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
                                 bodyStyle={{ fontSize: '0.8rem' }}
-
                             />
                         ))}
                     </DataTable>
                 </div>
             </div>
-
-        
-
     </Fragment >
   )
 }
