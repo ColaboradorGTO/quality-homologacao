@@ -4,7 +4,7 @@ import { ActionMainPromocao } from "../../Actions/ActionMainPromocao";
 import { InputFieldAction } from "../../Buttons/InputAction";
 import { InputSelectActionPromocao } from "../../Inputs/InputSelectActionPromocao";
 import { MultSelectAction } from "../../Select/MultSelectAction";
-import { GrDocumentCsv, GrFormView, GrView } from "react-icons/gr";
+import { GrFormView, GrView } from "react-icons/gr";
 import { IoIosSend } from "react-icons/io";
 import { useUpdatePromocaoAtiva } from "./hook/useUpdatePromocao";
 import { ActionProdutoDestinoModal } from "./ActionProdutosDestino/actionProdutoDestinoModal";
@@ -17,6 +17,7 @@ import { ActionProdutoModalPromocaoSelecionado } from "./ActionProdutosDaPromoca
 import { ActionProdutoModalPromocaoSelecionadoDestino } from "./ActionProdutosDaPromocaoSelecionado/actionProdutoModalPromocaoSelecionaDestino";
 import { MenuTreeSelect } from "../../Inputs/menuTreeSelect";
 import { InputFieldActionRadio } from "../../Buttons/InputActionRadio";
+import { FaDownload } from "react-icons/fa6";
 
 
 
@@ -778,23 +779,21 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
         ButtonTypeTXT={ButtonType}
         linkTXT={"Documentação"}
         onButtonClickTXT={mostrarDocumentacao}
-        corTXT={"success"}
+        corTXT={"warning"}
         IconTXT={GrFormView}
 
         ButtonTypeRetornar={ButtonType}
-        linkRetornar={"Voltar para Pesquisa"}
+        linkRetornar={"Voltar"}
         corRetornar={"danger"}
         onButtonClickRetornar={handleClickIncluir}
         IconRetornar={AiFillBackward}
 
         ButtonTypeDownload={ButtonType}
-        linkDownload={"Download Planilha Modelo"}
-        corDownload={"warning"}
+        linkDownload={"Baixar Planilha"}
+        corDownload={"success"}
         onButtonClickDownload={downloadPlanilhaModelo}
-        IconDownload={GrDocumentCsv}
+        IconDownload={FaDownload}
 
-
-        // downloadPlanilhaModelo
       />
 
       <ActionProdutoDestinoModal

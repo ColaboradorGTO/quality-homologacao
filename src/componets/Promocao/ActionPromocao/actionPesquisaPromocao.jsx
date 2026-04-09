@@ -18,7 +18,7 @@ import { ActionDocumentacaoCriar } from "../ActionPromocoesAtivas/ActionDocument
 import { useState } from "react";
 import { MenuTreeSelect } from "../../Inputs/menuTreeSelect";
 import { InputFieldActionRadio } from "../../Buttons/InputActionRadio";
-import { AiOutlineFileExcel } from "react-icons/ai";
+import { FaDownload } from "react-icons/fa6";
 
 
 
@@ -745,7 +745,7 @@ export const ActionPesquisaPromocao = ({ }) => {
         linkRetornar={"Baixar Planilha"}
         onButtonClickRetornar={downloadPlanilhaModelo}
         corRetornar={"success"}
-        IconRetornar={AiOutlineFileExcel}
+        IconRetornar={FaDownload}
       />
 
 
