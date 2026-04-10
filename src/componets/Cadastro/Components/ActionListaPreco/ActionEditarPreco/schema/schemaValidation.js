@@ -2,9 +2,9 @@ import * as yup from 'yup';
 
 export const schema = yup.object({
 
-  descricaoCores: yup
+  nomeListaPreco: yup
     .string()
-    .required('Descrição Obrigatória'),
+    .required('Nome Lista Preço Obrigatório'),
 
   grupoCores: yup.object()
     .nullable()

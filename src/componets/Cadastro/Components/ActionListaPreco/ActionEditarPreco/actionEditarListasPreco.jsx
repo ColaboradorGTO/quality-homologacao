@@ -9,16 +9,16 @@ import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
 
-export const ActionEditarListasPrecos = ({ show, handleClose, dadosListaLoja }) => {
+export const ActionEditarListasPrecos = ({ dadosListaLoja, optionsModulos, usuarioLogado }) => {
   const {
     dadosEmpresas,
     empresaSelecionada,
     setEmpresaSelecionada,
-  } = useEditarListaPrecos()
+  } = useEditarListaPrecos({optionsModulos, usuarioLogado});
+  
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowClick, setRowClick] = useState(false);
   const dataTableRef = useRef();
-
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -26,7 +26,7 @@ export const ActionEditarListasPrecos = ({ show, handleClose, dadosListaLoja }) 
 
   const handlePrint = useReactToPrint({
     content: () => dataTableRef.current,
-    documentTitle: 'Lista de Preço',
+    documentTitle: 'Lista de Lojas',
   });
 
   const exportToPDF = () => {
@@ -45,7 +45,7 @@ export const ActionEditarListasPrecos = ({ show, handleClose, dadosListaLoja }) 
       horizontalPageBreak: true,
       horizontalPageBreakBehaviour: 'immediately'
     });
-    doc.save('lista_preco.pdf');
+    doc.save('lista_lojas.pdf');
   };
 
   const exportToExcel = () => {
@@ -60,19 +60,19 @@ export const ActionEditarListasPrecos = ({ show, handleClose, dadosListaLoja }) 
   
     ];
     XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Lista de Preço');
-    XLSX.writeFile(workbook, 'lista_preco.xlsx');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Lista de Lojas');
+    XLSX.writeFile(workbook, 'lista_lojas.xlsx');
   };
 
   const dados = dadosEmpresas.map((item, index) => {
     let contador = index + 1;
-    return {
 
+    return {
       IDEMPRESA: item.IDEMPRESA,
       NOFANTASIA: item.NOFANTASIA,
-      STATIVO: item.STATIVO,
+      STATIVO: item.STATIVO == 'True' ? 'ATIVA' : 'INATIVA',
+      IDGRUPOEMPRESARIAL: item.IDGRUPOEMPRESARIAL,
       contador
-
     }
   })
 
@@ -96,7 +96,6 @@ export const ActionEditarListasPrecos = ({ show, handleClose, dadosListaLoja }) 
         return (
           <th>{row.NOFANTASIA}</th>
         )
-
       },
       sortable: true,
     },
@@ -105,7 +104,7 @@ export const ActionEditarListasPrecos = ({ show, handleClose, dadosListaLoja }) 
       header: 'Situação',
       body: row => {
         return (
-          <th style={{ color: row.STATIVO == 'True' ? 'blue' : 'red' }} >{row.STATIVO == 'True' ? 'ATIVA' : 'INATIVA'}</th>
+          <th style={{ color: row.STATIVO == 'ATIVA' ? 'blue' : 'red' }} >{row.STATIVO}</th>
         )
       },
       sortable: true,
@@ -117,7 +116,6 @@ export const ActionEditarListasPrecos = ({ show, handleClose, dadosListaLoja }) 
       width: '10px',
       sortable: true,
     },
-
   ]
 
   return (
@@ -125,7 +123,9 @@ export const ActionEditarListasPrecos = ({ show, handleClose, dadosListaLoja }) 
     <Fragment>
 
       <div className="panel">
-
+        <div className="panel-hdr">
+          <h2>Lista de Lojas</h2>
+        </div>
         <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
           <HeaderTable
             globalFilterValue={globalFilterValue}
@@ -136,10 +136,12 @@ export const ActionEditarListasPrecos = ({ show, handleClose, dadosListaLoja }) 
           />
 
         </div>
-        <div className="card mb-4" ref={dataTableRef}>
+        <div className="card " ref={dataTableRef}>
 
           <DataTable
-            title="Vendas por Loja"
+            scrollable 
+            scrollHeight="400px"
+            title="Lista de Lojas"
             value={dados}
             size="small"
             globalFilter={globalFilterValue}
@@ -148,8 +150,11 @@ export const ActionEditarListasPrecos = ({ show, handleClose, dadosListaLoja }) 
             onSelectionChange={e => setEmpresaSelecionada(e.value)}
             sortOrder={-1}
             paginator={true}
-            rows={10}
+            rows={dados.length}
             rowsPerPageOptions={[5, 10, 20, 50, 100]}
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+            filterDisplay="menu"
             showGridlines
             stripedRows
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado </div>}

@@ -3,25 +3,25 @@ import { useEffect, useState } from "react"
 import axios from "axios"
 import { get, put, post } from "../../../../../api/funcRequest"
 import { situacao } from "../../../../../../parceiro.json"
+import { useQuery } from "react-query"
+
 
 export const useEditarListaPrecos = ({optionsModulos, usuarioLogado, dadosListaLoja }) => {
   const [descricao, setDescricao] = useState('')
   const [statusSelecionado, setStatusSelecionado] = useState([])
   const [ipUsuario, setIpUsuario] = useState('');
-  const [dadosEmpresas, setDadosEmpresas] = useState([])
   const [empresaSelecionada, setEmpresaSelecionada] = useState(null);
+  const [nomeListaPreco, setNomeListaPreco] = useState('');
 
+  const { data: dadosEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas } = useQuery(
+    ['empresas'],
+    async () => {
+      const response = await get(`/empresas`);
 
-  const getListaEmpresas = async () => {
-    try {
-      const response = await get(`/empresas`)
-      if (response.data) {
-        setDadosEmpresas(response.data)
-      }
-    } catch (error) {
-      console.log(error, "não foi possivel pegar os dados da tabela ")
-    }
-  }
+      return response.data;
+    },
+    { enabled: true, staleTime: 60 * 60 * 1000, }
+  );
 
   const getIPUsuario = async () => {
     let usuarioIP = null;
@@ -48,19 +48,18 @@ export const useEditarListaPrecos = ({optionsModulos, usuarioLogado, dadosListaL
   useEffect(() => {
     if (dadosListaLoja && dadosListaLoja.length > 0) { 
       setStatusSelecionado({ value: dadosListaLoja[0]?.listaPreco.STATIVO == 'True' ? 'True' : 'False', label: dadosListaLoja[0]?.listaPreco.STATIVO == 'True' ? 'ATIVO' : 'INATIVO' })
-      setEmpresaSelecionada(dadosListaLoja[0]?.listaPreco.NOMELISTA)
-   
+      setNomeListaPreco(dadosListaLoja[0]?.listaPreco.NOMELISTA)
     }
   }, [dadosListaLoja])
 
-
+  console.log(empresaSelecionada, 'empresaSelecionada')
   const onSubmit = async () => {
 
     if (optionsModulos[0]?.ALTERAR == 'False') {
       Swal.fire({
         icon: 'info',
         title: 'Acesso Negado!',
-        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para alterar a Cor!`,
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para alterar Lista de Preços!`,
         timer: 5000,
         customClass: {
           container: 'custom-swal',
@@ -75,11 +74,12 @@ export const useEditarListaPrecos = ({optionsModulos, usuarioLogado, dadosListaL
       IDGRUPOEMPRESARIAL: descricao,
       IDEMPRESA: empresaSelecionada?.value,
       STATIVO: statusSelecionado.value,
+      lojas: empresaSelecionada?.map(item => item.value) 
     }
 
     try {
 
-      const response = await put('/cores/:id', postData)
+      const response = await put('/lista-de-preco/:id', postData)
 
       const textDados = JSON.stringify(postData)
       let textFuncao = 'COMPRAS / ALTERAÇÃO DE COR';
@@ -145,7 +145,10 @@ export const useEditarListaPrecos = ({optionsModulos, usuarioLogado, dadosListaL
     setStatusSelecionado,
     empresaSelecionada,
     setEmpresaSelecionada,
+    nomeListaPreco,
+    setNomeListaPreco,
     situacao,
+    dadosEmpresas,
     onSubmit,
   }
 }

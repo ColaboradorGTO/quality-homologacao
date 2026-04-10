@@ -351,7 +351,7 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
       // 💾 Gerar arquivo
       const buffer = await workbook.xlsx.writeBuffer();
       saveAs(new Blob([buffer]), "modelo_produtos.xlsx");
-    };
+  };
 
   const clearFileError = (isOrigem) => {
       // Limpa o estado do arquivo
@@ -460,7 +460,7 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
                 });
             }
         }
-    };
+  };
   
 
   const processFile = (file) => {
@@ -910,19 +910,19 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
         return;
       }
 
-      // if (descricao.length < 20 || descricao.length > 200) {
-      //   Swal.fire({
-      //     position: 'center',
-      //     icon: 'error',
-      //     title: 'Descrição deve ter entre 20 e 200 caracteres!',
-      //     customClass: {
-      //       container: 'custom-swal',
-      //     },
-      //     showConfirmButton: false,
-      //     timer: 3000,
-      //   })
-      //   return;
-      // }
+      if (descricao.length > 80) {
+          Swal.fire({
+            position: 'center',
+            icon: 'error',
+            title: 'Descrição deve ter no máximo 80 caracteres!',
+            customClass: {
+              container: 'custom-swal',
+            },
+            showConfirmButton: false,
+            timer: 3000,
+          })
+          return;
+      }
 
       const produtosOrigem = 
         (fileProdutoOrigem && fileProdutoOrigem.length > 0)
