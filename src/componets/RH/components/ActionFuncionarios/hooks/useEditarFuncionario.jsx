@@ -9,7 +9,6 @@ import { removerMascaraCPF } from "../../../../../utils/formatCPF";
 import { removerMascaraTelefone } from "../../../../../utils/mascaraTelefone";
 import { removerFormatacaoMoeda } from "../../../../../utils/formatMoeda";
 
-
 export const useEditarFuncionario = ({
   handleClose,
   dadosAtualizarFuncionarios,
@@ -18,6 +17,7 @@ export const useEditarFuncionario = ({
   usuarioLogado,
   optionsModulos,
 }) => {
+  
   const [empresaSelecionada, setEmpresaSelecionada] = useState('');
   const [subGrupoEmpresarialSelecionado, setSubGrupoEmpresarialSelecionado] = useState('');
   const [funcaoSelecionada, setFuncaoSelecionada] = useState('');
@@ -228,7 +228,7 @@ export const useEditarFuncionario = ({
       STDESCONTOFOLHA: categoriaContratacao === 'CLT' ? 'True' : 'False',
       STATIVO: situacaoSelecionada.value,
       STLOJA: localizacaoSelcionada.value,
-      IDFUNCALTERACAO: usuarioLogado.id,
+      IDFUNCIONARIOULTALTERACAO: usuarioLogado.id,
       MOTIVODESC: '',
       TELEFONE: removerMascaraTelefone(telefone) || '',
       DEPARTAMENTO: departamentoSelecionado?.value || ''
@@ -236,7 +236,7 @@ export const useEditarFuncionario = ({
 
     try {
 
-      const response = await put('/funcionarios-loja/:id', putData);
+      const response = await put('/funcionarioLojaRH/:id', putData);
       const textDados = JSON.stringify(putData)
       const textoFuncao = 'RH/ATUALIZAÇÃO DE FUNCIONARIO';
 
@@ -245,7 +245,7 @@ export const useEditarFuncionario = ({
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario || 'Indisponível'
+        IP: ipUsuario || 'INDISPONIVEL'
       }
 
       await post('/log-web', createData)
@@ -270,7 +270,7 @@ export const useEditarFuncionario = ({
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario || 'Indisponível'
+        IP: ipUsuario || 'INDISPONIVEL'
       }
       handleClick()
       const responsePost = await post('/log-web', createData)

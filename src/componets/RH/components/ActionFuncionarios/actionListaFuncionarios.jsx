@@ -253,7 +253,6 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
       body: row => <th>{formatarDataBR(row.DATA_DEMISSAO)}</th>,
       sortable: true,
     },
-
     {
       field: 'ID',
       header: 'Opções',

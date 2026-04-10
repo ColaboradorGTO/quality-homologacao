@@ -164,7 +164,7 @@ export const useCriarFuncionario = ({ handleClose, usuarioLogado, optionsModulos
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario || 'Indisponível' 
+        IP: ipUsuario || 'INDISPONIVEL' 
       }
 
      await post('/log-web', createLog)
@@ -303,9 +303,9 @@ export const useCriarFuncionario = ({ handleClose, usuarioLogado, optionsModulos
       let response;
 
       if (isUpdate) {
-        response = await put('/funcionarios-loja/:id', putData);
+        response = await put('/funcionarioLojaRH/:id', putData);
       } else {
-        response = await post('/criar-funcionarios-loja', postData);
+        response = await post('/criarFuncionariosLojaRH', postData);
       }
 
       setEmpresaSelecionada('');
@@ -334,7 +334,7 @@ export const useCriarFuncionario = ({ handleClose, usuarioLogado, optionsModulos
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario || 'Indisponível'
+        IP: ipUsuario || 'INDISPONIVEL'
       }
 
       const responsePost = await post('/log-web', createData)
@@ -352,7 +352,7 @@ export const useCriarFuncionario = ({ handleClose, usuarioLogado, optionsModulos
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario || 'Indisponível'
+        IP: ipUsuario || 'INDISPONIVEL'
       }
 
       const responsePost = await post('/log-web', createData)
