@@ -57,7 +57,7 @@ export const useDesligarFuncionario = ({ handleClose, optionsModulos, usuarioLog
     }
 
     try {
-      const response = await put('/inativar-funcionario', putData)
+      const response = await put('/inativarFuncionarioRH', putData)
 
       Swal.fire({
         title: 'Atualização',
@@ -83,7 +83,7 @@ export const useDesligarFuncionario = ({ handleClose, optionsModulos, usuarioLog
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || 'INDISPONIVEL'
       }
 
       await post('/log-web', createData)
@@ -105,7 +105,7 @@ export const useDesligarFuncionario = ({ handleClose, optionsModulos, usuarioLog
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || 'INDISPONIVEL'
       }
       const responsePost = await post('/log-web', createData)
       Swal.fire({
