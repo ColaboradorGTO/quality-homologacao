@@ -163,16 +163,14 @@ export const optionsMecanica = [
         mecanica: 2,
         tipoDesconto: 1,
         color: "darkslategray"
+    },
+    {
+        value: 21,
+        label: "PROMOÇÃO POR EM UM PRODUTO // VALOR // VALOR FINAL",
+        aplicacaoDestino: 4,  // ✅ TPAPARTIRDE = 4
+        mecanica: 1,          // ✅ TPAPLICADOA = 1
+        tipoDesconto: 0,      // ✅ TPFATORPROMO = 0  
+        color: "navy"
     }
 ]
 
-// CREATE TABLE QUALITY_CONC_HML.MECANICASELECTPROMOCAOMARKETING (
-//     ID INT NOT NULL,
-//     DESCRICAO VARCHAR(255),
-//     APLICACAODESTINO INT NOT NULL,
-//     MECANICA INT NOT NULL,
-//     TIPODESCONTO INT NOT NULL,
-//     DTCRIACAO TIMESTAMP NOT NULL,
-//     DTULTIMAALTERACAO TIMESTAMP NOT NULL,
-//     STATIVO VARCHAR(10)
-// );

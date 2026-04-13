@@ -96,7 +96,7 @@ export const ActionListaPromocoesAtivas = ({
       STDETPROMOORIGEM: item.STDETPROMOORIGEM,
       STDETPROMODESTINO: item.STDETPROMODESTINO,
       STATIVO: item.STATIVO === 'True' ? 'ATIVO' : 'INATIVO',
-      STPRODUTO: item.STPRODUTO,
+      STPRODUTO: item.STPRODUTO == 'False' ? 'Por Estrutura' : 'Por Produto',
     }
   });
 
@@ -135,6 +135,13 @@ export const ActionListaPromocoesAtivas = ({
         header: 'Status',
         body: row => <th style={{ color: row.STATIVO === 'ATIVO' ? 'blue' : 'red', fontWeight: 'bold' }} >{row.STATIVO}</th>,
         style: { width: '10%' },
+        bodyStyle: { textAlign: 'center' },
+        sortable: true,
+      },
+      {
+        field: 'STPRODUTO',
+        header: 'Promoção',
+        body: row => <p style={{width: '100px', color: row.STPRODUTO === 'Por Produto' ? '#3D9CE8' : '#FD61AA', fontWeight: 'bold' }} >{row.STPRODUTO}</p>,
         bodyStyle: { textAlign: 'center' },
         sortable: true,
       },

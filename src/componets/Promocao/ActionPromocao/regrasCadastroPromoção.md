@@ -28,6 +28,8 @@
 
   
 
+  
+
 
 
 # Cadastro de Promoções - Regras de Negócio
@@ -118,17 +120,32 @@ Essas regras garantem a integridade e unicidade das promoções cadastradas no s
 
 
 <!--  
-1.produto tem que ser pesquisado por
-descrição codigo de barras, idproduto
-no input 
 
-2.quando for editar promoção trazer os dados da campanha
-para mesma tela de criação de campanha
+  //  TPAPARTIRDE = 0 // aplicação destino por pares
+  //  TPAPARTIRDE = 1 // aplicação destino em todos os produtos
+  //  TPAPARTIRDE = 2 // aplicação destino no ultimo após entrada da promoção
+  //  TPAPARTIRDE = 3 // aplicação destino menos na primeira
+  //  TPAPARTIRDE = 4 // aplicação destino em 1(um) produto
 
-3.permitir edição da mecanica no select colocar icon de editar,
-para que seja possível editar a mecanica 
+  // TABELAS RESUMOPROMOCAOMARKETING
+  // TPAPLICADOA = 1->APLICADO A VALOR // 2-> APLICADO A QUANTIDADE
+  // TPFATORPROMO = USADO PARA O PDV IDENTIFICAR A PROMOCAO
+  // 	TPFATORPROMO = 0 // por valor final
+  //  TPFATORPROMO = 1 // por valor desconto
+  // 	TPFATORPROMO = 2 // por percentual desconto
+  
+  pegando por base as regras acima, da mecânica de promoção, o que será feito é o seguinte:
+  TPAPLICADOA = 1->APLICADO A VALOR // 2-> APLICADO A QUANTIDADE será ou no valor ou na quantidade
+  depois o usuario irá escolher 
+  TPAPARTIRDE = 0 aplicação destino por pares, se o usuario escolher
+  TPAPARTIRDE = 1 aplicação destino em todos os produtos, se o usuario escolher
+  TPAPARTIRDE = 2 aplicação destino no ultimo após entrada da promoção, se o usuario escolher
+  TPAPARTIRDE = 3 aplicação destino menos na primeira, se o usuario escolher
+  TPAPARTIRDE = 4 aplicação destino em um produto 
 
-4.Adicionar o nome da mecanica adicionada na tabela MECANICARESUMOPROMOCAOMARKETING [X]
 
-5.Adicionar um STATIVO na tabela RESUMOPROMOCAOMARKETING
+  preciso mapear uma promoção
+  TPAPLICADOA = 1 -> APLICADO A VALOR
+  TPFATORPROMO = 0 por valor final
+  TPAPARTIRDE = 4 aplicação destino em um produto 
 -->

@@ -14,6 +14,10 @@ export const ActionEditarListasPrecos = ({ dadosListaLoja, optionsModulos, usuar
     dadosEmpresas,
     empresaSelecionada,
     setEmpresaSelecionada,
+    selectedIds,
+    setSelectedIds,
+    selectAllChecked,
+    setSelectAllChecked,
   } = useEditarListaPrecos({optionsModulos, usuarioLogado});
   
   const [globalFilterValue, setGlobalFilterValue] = useState('');
@@ -70,11 +74,13 @@ export const ActionEditarListasPrecos = ({ dadosListaLoja, optionsModulos, usuar
     return {
       IDEMPRESA: item.IDEMPRESA,
       NOFANTASIA: item.NOFANTASIA,
-      STATIVO: item.STATIVO == 'True' ? 'ATIVA' : 'INATIVA',
+      STATIVO: item.STATIVO,
       IDGRUPOEMPRESARIAL: item.IDGRUPOEMPRESARIAL,
       contador
     }
   })
+
+
 
   const colunasEmpresas = [
     {
@@ -104,15 +110,44 @@ export const ActionEditarListasPrecos = ({ dadosListaLoja, optionsModulos, usuar
       header: 'Situação',
       body: row => {
         return (
-          <th style={{ color: row.STATIVO == 'ATIVA' ? 'blue' : 'red' }} >{row.STATIVO}</th>
+          <th style={{ color: row.STATIVO == 'True' ? 'blue' : 'red' }} >{row.STATIVO == 'True' ? 'ATIVA' : 'INATIVA'}</th>
         )
       },
       sortable: true,
     },
     {
-      header: 'Selecione',
-      selectionMode: 'multiple',
-      selection: empresaSelecionada,
+       header: (
+        <div>
+          <label>{selectAllChecked ? 'Desmarcar Todos' : 'Marcar Todos'}</label>
+          <input
+            type="checkbox"
+            checked={selectAllChecked}
+            onChange={(e) => onSelectAllChange(e.target.checked)}
+          />
+        </div>
+      ),
+      body: (rowData) => {
+        return (
+          <div>
+            <input
+              type="checkbox"
+              checked={selectedIds.includes(rowData.IDEMPRESA)}
+              onChange={(e) => {
+                const isChecked = e.target.checked
+                const updatedSelectedIds = e.target.checked
+                  ? [...selectedIds, rowData.IDEMPRESA]
+                  : selectedIds.filter(id => id !== rowData.IDEMPRESA);
+                setSelectedIds(updatedSelectedIds);
+                // setQtdProduto(rowData.IDEMPRESA, isChecked)
+                // setSelectAll(updatedSelectedIds.length === dados.length);
+                setEmpresaSelecionada(isChecked ? [...empresaSelecionada, rowData] : empresaSelecionada.filter(item => item.IDEMPRESA !== rowData.IDEMPRESA));
+
+              }}
+              disabled={rowData.stDisabled === 'disabled'}
+            />
+          </div>
+        );
+      },
       width: '10px',
       sortable: true,
     },
