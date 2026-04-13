@@ -141,6 +141,12 @@ export const ActionPesquisaPreco = ({ usuarioLogado }) => {
         onButtonClickSearch={handleClick}
         IconSearch={AiOutlineSearch}
         corSearch={"primary"}
+
+        ButtonTypeCadastro={ButtonType}
+        linkNome={"Criar Lista"}
+        onButtonClickCadastro
+        IconCadastro={AiOutlineSearch}
+        corCadastro={"success"}
       />
 
       <ActionListaPrecos

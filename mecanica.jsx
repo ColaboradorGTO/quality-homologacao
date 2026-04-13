@@ -166,7 +166,7 @@ export const optionsMecanica = [
     },
     {
         value: 21,
-        label: "PROMOÇÃO POR EM UM PRODUTO // VALOR // VALOR FINAL",
+        label: "PROMOÇÃO POR EM UM PRODUTO // QUANTIDADE VALOR // VALOR FINAL",
         aplicacaoDestino: 4,  // ✅ TPAPARTIRDE = 4
         mecanica: 1,          // ✅ TPAPLICADOA = 1
         tipoDesconto: 0,      // ✅ TPFATORPROMO = 0  
