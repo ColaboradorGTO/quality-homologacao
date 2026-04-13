@@ -211,7 +211,7 @@ export const ActionPesquisaPromocao = ({ }) => {
       setValorInicio(0);
     }
 
-    if (mecanicaSelecionada == 1 && mecanicaSelecionadaEdicao !== "PROMOÇÃO POR EM UM PRODUTO // VALOR // VALOR FINAL") {
+    if (mecanicaSelecionada == 1 && mecanicaSelecionadaEdicao !== "PROMOÇÃO POR EM UM PRODUTO // QUANTIDADE VALOR // VALOR FINAL") {
       setQtdInicio(0);
     }
 
@@ -416,7 +416,7 @@ export const ActionPesquisaPromocao = ({ }) => {
           setQtdInicio(valor);
         }}
         readOnlyQTDInicio={
-          mecanicaSelecionada == 1 && mecanicaSelecionadaEdicao !== "PROMOÇÃO POR EM UM PRODUTO // VALOR // VALOR FINAL" 
+          mecanicaSelecionada == 1 && mecanicaSelecionadaEdicao !== "PROMOÇÃO POR EM UM PRODUTO // QUANTIDADE VALOR // VALOR FINAL" 
             ? true 
             : false
         }
