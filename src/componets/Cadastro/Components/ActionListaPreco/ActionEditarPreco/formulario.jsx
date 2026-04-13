@@ -29,7 +29,6 @@ export const Formulario = ({dadosListaLoja , handleClose, optionsModulos, usuari
     try {
       const dadosParaValidar = {
         situacao: statusSelecionado,
-        nomeListaPreco: empresaSelecionada,
       };
 
       await schema.validate(dadosParaValidar, { abortEarly: false });
@@ -160,9 +159,9 @@ export const Formulario = ({dadosListaLoja , handleClose, optionsModulos, usuari
 
           ButtonTypeCadastrar={ButtonTypeModal}
           onClickButtonCadastrar={handleSubmit(handleValidatedSubmit)}
-          textButtonCadastrar={"Salvar"}
+          textButtonCadastrar={"Atualizar Lista"}
           corCadastrar={"success"}
-          loadingTextCadastrar={"Cadastrando..."}
+          loadingTextCadastrar={"Atualizando..."}
           autoLoadingCadastrar={true}
         />
 

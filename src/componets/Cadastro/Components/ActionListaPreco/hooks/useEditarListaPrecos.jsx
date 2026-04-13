@@ -10,7 +10,7 @@ export const useEditarListaPrecos = ({optionsModulos, usuarioLogado, dadosListaL
   const [descricao, setDescricao] = useState('')
   const [statusSelecionado, setStatusSelecionado] = useState([])
   const [ipUsuario, setIpUsuario] = useState('');
-  const [empresaSelecionada, setEmpresaSelecionada] = useState(null);
+  const [empresaSelecionada, setEmpresaSelecionada] = useState([]);
   const [nomeListaPreco, setNomeListaPreco] = useState('');
   const [selectedIds, setSelectedIds] = useState([]);
   const [selectAllChecked, setSelectAllChecked] = useState(false);
@@ -24,6 +24,28 @@ export const useEditarListaPrecos = ({optionsModulos, usuarioLogado, dadosListaL
     },
     { enabled: true, staleTime: 60 * 60 * 1000, }
   );
+
+  useEffect(() => {
+    if (dadosListaLoja && dadosListaLoja.length > 0) {
+      const empresas = dadosListaLoja[0]?.detalheLista?.map(detalhe => ({
+        IDEMPRESA: detalhe.loja?.IDEMPRESA,
+        NOFANTASIA: detalhe.loja?.NOFANTASIA,
+        STATIVO: detalhe.loja?.STATIVO,
+        IDGRUPOEMPRESARIAL: detalhe.loja?.IDGRUPOEMPRESARIAL,
+      })) || [];
+      
+      const empresaIds = empresas.map(empresa => empresa.IDEMPRESA);
+      
+      setEmpresaSelecionada(empresas);
+      setSelectedIds(empresaIds);
+      
+      if (dadosEmpresas.length > 0 && empresaIds.length === dadosEmpresas.length) {
+        setSelectAllChecked(true);
+      }
+    }
+  }, [dadosListaLoja, dadosEmpresas]);
+
+
 
   const getIPUsuario = async () => {
     let usuarioIP = null;
@@ -53,8 +75,7 @@ export const useEditarListaPrecos = ({optionsModulos, usuarioLogado, dadosListaL
       setNomeListaPreco(dadosListaLoja[0]?.listaPreco.NOMELISTA)
     }
   }, [dadosListaLoja])
-
-  console.log(dadosListaLoja?.map((item) => item), 'dadosListaLoja')
+  
   const onSubmit = async () => {
 
     if (optionsModulos[0]?.ALTERAR == 'False') {
@@ -70,19 +91,15 @@ export const useEditarListaPrecos = ({optionsModulos, usuarioLogado, dadosListaL
       return;
     }
 
-    // ✅ DADOS PRINCIPAIS: Mesma lógica do jQuery
     const IDRESUMOLISTAPRECO = Number(dadosListaLoja[0]?.listaPreco.IDRESUMOLISTAPRECO);
-    const NOMELISTA = nomeListaPreco; // Usar o estado do nome da lista
-    const IDUSERALTERACAO = usuarioLogado?.id; // Para edição (modo edit)
+    const NOMELISTA = nomeListaPreco;
+    const IDUSERALTERACAO = usuarioLogado?.id; 
     const STATIVO = statusSelecionado?.value;
 
-    // ✅ MAPEAMENTO DAS LOJAS: Equivale ao map do jQuery
     let dadosDetalheLista = [];
 
-    // Mapear as empresas selecionadas (equivale às lojas selecionadas no jQuery)
     if (empresaSelecionada && empresaSelecionada.length > 0) {
       empresaSelecionada.forEach((empresa) => {
-        // Buscar o detalhe existente para esta empresa (se houver)
         const detalheExistente = dadosListaLoja?.find(item => 
           item.detalheLista?.some(detalhe => detalhe.IDEMPRESA === empresa.IDEMPRESA)
         );
@@ -105,31 +122,16 @@ export const useEditarListaPrecos = ({optionsModulos, usuarioLogado, dadosListaL
       });
     }
 
-    // ✅ ESTRUTURA FINAL: Exatamente igual ao jQuery
-    const dadosLista = [{
+    const dadosLista = {
       IDRESUMOLISTAPRECO,
       NOMELISTA,
-      IDUSERCRIACAO: '', // Vazio para edição (modo edit)
-      IDUSERALTERACAO,
+      IDUSERCRIACAO: dadosListaLoja[0]?.listaPreco.IDUSERCRIACAO,
+      IDUSERALTERACAO: usuarioLogado?.id,
       STATIVO,
       lojas: dadosDetalheLista
-    }];
+    };
 
-    // ✅ VALIDAÇÕES: Mesma lógica do jQuery
-    if (!dadosLista[0]?.NOMELISTA.length || dadosLista[0]?.NOMELISTA.length < 10) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Atenção',
-        text: 'Lista Sem Nome ou Nome Muito Curto, favor adicionar o nome da lista e tentar novamente!',
-        timer: 10000,
-        showConfirmButton: true,
-        customClass: {
-          container: 'custom-swal',
-        },
-      });
-      return;
-    }
-
+    
     if (!dadosDetalheLista.length) {
       Swal.fire({
         icon: 'warning',
@@ -144,7 +146,6 @@ export const useEditarListaPrecos = ({optionsModulos, usuarioLogado, dadosListaL
       return;
     }
 
-    // ✅ LOADING: Equivale ao setTimeout do jQuery
     const loadingAlert = Swal.fire({
       title: 'Atualizando...',
       text: 'Por favor aguarde.',
@@ -155,43 +156,44 @@ export const useEditarListaPrecos = ({optionsModulos, usuarioLogado, dadosListaL
     });
 
     try {
-      // ✅ CHAMADA PUT: Equivale ao ajaxPut do jQuery
-      const response = await put('/listas-de-precos', dadosLista);
+      const response = await put('/lista-de-preco/:id', dadosLista);
 
-      Swal.close();
+      const textDados = JSON.stringify(dadosLista);
+      const textFuncao = 'CADASTRO / ALTERAÇÃO DE LISTA DE PREÇOS';
+      const ipUsuario = await getIPUsuario();
+      const createtLog = {
+        IDFUNCIONARIO: String(usuarioLogado.id),
+        PATHFUNCAO: textFuncao,
+        DADOS: textDados,
+        IP: ipUsuario || 'Indisponível'
+      };
 
-      // ✅ TRATAMENTO DE SUCESSO: Mesma lógica do jQuery
-      if (response.typeMsg === "success") {
-        await Swal.fire({
-          icon: 'success',
-          title: 'Sucesso!',
-          text: response.msg,
-          customClass: {
-            container: 'custom-swal',
-          }
-        });
-
-        // Equivale ao modal hide e pesquisa do jQuery
-        handleClose();
-        refetchListaCores();
-        
-        return response;
-      } else {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Atenção',
-          text: response.msg,
-          customClass: {
-            container: 'custom-swal',
-          },
-        });
-      }
-
+      await post('/log-web', createtLog);
+      
+      Swal.fire({
+        icon: 'success',
+        title: 'Sucesso',
+        text: 'Lista de preço atualizada com sucesso!',
+        timer: 5000,
+        customClass: {
+          container: 'custom-swal',
+        },
+      })
+      return response.data;
     } catch (error) {
       console.error('Erro ao atualizar lista de preço:', error);
       Swal.close();
-
-      // ✅ TRATAMENTO DE ERRO: Mesma lógica do jQuery
+      const textDados = JSON.stringify(dadosLista);
+      let textFuncao = 'CADASTRO / ALTERAÇÃO DE LISTA DE PREÇOS';
+      const ipUsuario = await getIPUsuario();
+      const createtLog = {
+        IDFUNCIONARIO: String(usuarioLogado.id),
+        PATHFUNCAO: textFuncao,
+        DADOS: textDados,
+        IP: ipUsuario || 'Indisponível'
+      };
+  
+      await post('/log-web', createtLog);
       Swal.fire({
         icon: 'error',
         title: 'Erro',
@@ -202,22 +204,6 @@ export const useEditarListaPrecos = ({optionsModulos, usuarioLogado, dadosListaL
       });
     }
 
-    // Log da operação (mantendo o log original)
-    try {
-      const textDados = JSON.stringify(dadosLista);
-      let textFuncao = 'CADASTRO / ALTERAÇÃO DE LISTA DE PREÇOS';
-      const ipUsuario = await getIPUsuario();
-      const createtLog = {
-        IDFUNCIONARIO: String(usuarioLogado.id),
-        PATHFUNCAO: textFuncao,
-        DADOS: textDados,
-        IP: ipUsuario || 'Indisponível'
-      };
-
-      await post('/log-web', createtLog);
-    } catch (logError) {
-      console.error('Erro ao criar log:', logError);
-    }
   }
 
 

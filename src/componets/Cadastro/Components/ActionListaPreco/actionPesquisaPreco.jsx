@@ -85,7 +85,7 @@ export const ActionPesquisaPreco = ({ usuarioLogado }) => {
   const { data: dadosListaPedidos = [], error: errorEstilos, isLoading: isLoadingEstilos, refetch: refetchListaPreco } = useQuery(
     ['listaPreco',],
     () => fetchListaPreco(),
-    { enabled: true }
+    { enabled: false }
   )
 
   const handleClick = () => {
