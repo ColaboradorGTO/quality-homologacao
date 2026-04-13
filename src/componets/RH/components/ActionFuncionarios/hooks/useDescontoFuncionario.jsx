@@ -85,7 +85,7 @@ export const useEditarDescontoFuncionario = ({
         }
         try {
 
-            const response = await put('/funcionarios-desconto/:id', putData)
+            const response = await put('/funcionarioDescontoRH/:id', putData)
             const textDados = JSON.stringify(putData)
             const textoFuncao = 'RH/ATUALIZAR DESCONTO FUNCIONARIO AUTORIZADO';
 
@@ -94,7 +94,7 @@ export const useEditarDescontoFuncionario = ({
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'INDISPONIVEL'
             }
 
             await post('/log-web', createData)
@@ -119,7 +119,7 @@ export const useEditarDescontoFuncionario = ({
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'INDISPONIVEL'
             }
 
             const responsePost = await post('/log-web', createData)

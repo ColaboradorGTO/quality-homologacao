@@ -17,7 +17,7 @@ export const useAtivarFuncionario = ({ handleClose, optionsModulos, usuarioLogad
     let usuarioIP = null;
 
     try {
-      const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+      const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
       usuarioIP = ipWhoisData?.ip;
     } catch (error) {
       console.error("Erro ao buscar IP via ipwho.is:", error);
@@ -56,7 +56,7 @@ export const useAtivarFuncionario = ({ handleClose, optionsModulos, usuarioLogad
       ID: Number(row.ID)
     }
     try {
-      const response = await put('/inativar-funcionario', putData)
+      const response = await put('/inativarFuncionarioRH', putData)
 
 
       Swal.fire({
@@ -83,7 +83,7 @@ export const useAtivarFuncionario = ({ handleClose, optionsModulos, usuarioLogad
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario || ""
+        IP: ipUsuario || " INDISPONIVEL"
       }
 
       await post('/log-web', createData)
@@ -105,7 +105,7 @@ export const useAtivarFuncionario = ({ handleClose, optionsModulos, usuarioLogad
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario || ""
+        IP: ipUsuario || "INDISPONIVEL"
       }
 
       const responsePost = await post('/log-web', createData)
