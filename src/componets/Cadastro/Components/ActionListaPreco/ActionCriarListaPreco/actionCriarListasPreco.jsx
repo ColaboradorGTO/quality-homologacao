@@ -9,7 +9,7 @@ import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
 
-export const ActionEditarListasPrecos = ({ dadosListaLoja, optionsModulos, usuarioLogado }) => {
+export const ActionCriarListasPrecos = ({ dadosListaLoja, optionsModulos, usuarioLogado }) => {
   const {
     dadosEmpresas,
     empresaSelecionada,
