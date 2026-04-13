@@ -4,6 +4,7 @@ import axios from "axios"
 import { get, post } from "../../../../../api/funcRequest"
 import { situacao } from "../../../../../../parceiro.json"
 import { useQuery } from "react-query"
+import { getDataAtual } from "../../../../../utils/dataAtual"
 
 
 export const useCriarListaPrecos = ({optionsModulos, usuarioLogado }) => {
@@ -14,6 +15,12 @@ export const useCriarListaPrecos = ({optionsModulos, usuarioLogado }) => {
   const [nomeListaPreco, setNomeListaPreco] = useState('');
   const [selectedIds, setSelectedIds] = useState([]);
   const [selectAllChecked, setSelectAllChecked] = useState(false);
+  const [dataCriacao, setDataCriacao] = useState('');
+
+  useEffect(() => {
+    const dataAtual = getDataAtual();
+    setDataCriacao(dataAtual);
+  }, [])
 
   const { data: dadosEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas } = useQuery(
     ['empresas'],
@@ -215,6 +222,8 @@ export const useCriarListaPrecos = ({optionsModulos, usuarioLogado }) => {
     setEmpresaSelecionada,
     nomeListaPreco,
     setNomeListaPreco,
+    dataCriacao,
+    setDataCriacao,
     situacao,
     dadosEmpresas,
     selectedIds,

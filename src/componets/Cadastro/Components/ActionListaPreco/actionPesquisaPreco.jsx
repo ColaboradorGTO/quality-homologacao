@@ -10,6 +10,8 @@ import { ActionListaPrecos } from "./actionListaPrecos"
 import { useQuery } from "react-query"
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento"
 import { useFetchData } from "../../../../hooks/useFetchData"
+import { MdAdd } from "react-icons/md"
+import { ActionCriarListasPrecosModal } from "./ActionCriarListaPreco/actionCriarListasPrecosModal"
 
 
 export const ActionPesquisaPreco = ({ usuarioLogado }) => {
@@ -20,6 +22,7 @@ export const ActionPesquisaPreco = ({ usuarioLogado }) => {
   const [numeroPedido, setNumeroPedido] = useState('')
   const [nomeLista, setNomeLista] = useState('')
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
+  const [modalVisivel, setModalVisivel] = useState(false);
 
   useEffect(() => {
     const dataPesquisaInicio = getDataAtual();
@@ -144,8 +147,8 @@ export const ActionPesquisaPreco = ({ usuarioLogado }) => {
 
         ButtonTypeCadastro={ButtonType}
         linkNome={"Criar Lista"}
-        onButtonClickCadastro
-        IconCadastro={AiOutlineSearch}
+        onButtonClickCadastro={() => setModalVisivel(true)}
+        IconCadastro={MdAdd}
         corCadastro={"success"}
       />
 
@@ -155,6 +158,12 @@ export const ActionPesquisaPreco = ({ usuarioLogado }) => {
         optionsModulos={optionsModulos}
       />
 
+      <ActionCriarListasPrecosModal 
+        show={modalVisivel}
+        handleClose={() => setModalVisivel(false)}
+        optionsModulos={optionsModulos}
+        usuarioLogado={usuarioLogado}
+      />
     </Fragment>
   )
 }

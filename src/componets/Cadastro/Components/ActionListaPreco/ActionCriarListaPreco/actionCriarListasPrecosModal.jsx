@@ -7,7 +7,6 @@ import { Formulario } from "./formulario";
 export const ActionCriarListasPrecosModal = ({ 
   show, 
   handleClose, 
-  dadosListaLoja,
   optionsModulos,
   usuarioLogado
 }) => {
@@ -27,14 +26,13 @@ export const ActionCriarListasPrecosModal = ({
 
         <HeaderModal
           title={"Criação de Lista de Preços"}
-          subTitle={`Lista de Lojas: ${dadosListaLoja[0]?.listaPreco.NOMELISTA}`}
+          subTitle={`Lista de Lojas - Criar Lista de Preços`}
           handleClose={handleClose}
         />
 
 
         <Modal.Body>
           <Formulario 
-            dadosListaLoja={dadosListaLoja}
             handleClose={handleClose}
             optionsModulos={optionsModulos}
             usuarioLogado={usuarioLogado}

@@ -2,14 +2,14 @@ import React, { Fragment } from "react";
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal"
 import { Controller, useForm } from "react-hook-form";
 import Select from 'react-select';
-import { useEditarListaPrecos } from "../hooks/useEditarListaPrecos";
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal";
 import FormField from "../../../../Formularios/FormField";
 import { AlertError } from "../../../../Inputs/alertError";
 import { schema } from "./schema/schemaValidation";
 import { ActionCriarListasPrecos } from "./actionCriarListasPreco"
+import { useCriarListaPrecos } from "../hooks/useCriarListaPrecos";
 
-export const Formulario = ({dadosListaLoja , handleClose, optionsModulos, usuarioLogado}) => {
+export const Formulario = ({handleClose, optionsModulos, usuarioLogado}) => {
   const { handleSubmit, formState: { errors }, clearErrors, control, setError, setValue } = useForm({
     mode: "onChange"
   });
@@ -20,9 +20,11 @@ export const Formulario = ({dadosListaLoja , handleClose, optionsModulos, usuari
     setEmpresaSelecionada,
     nomeListaPreco,
     setNomeListaPreco,
+    dataCriacao,
+    setDataCriacao,
     situacao,
     onSubmit,
-  } = useEditarListaPrecos({ optionsModulos, usuarioLogado, dadosListaLoja, handleClose })
+  } = useCriarListaPrecos({ optionsModulos, usuarioLogado, handleClose })
 
 
   const handleValidatedSubmit = async () => {
@@ -69,11 +71,11 @@ export const Formulario = ({dadosListaLoja , handleClose, optionsModulos, usuari
                   <FormField
                     name="dtCreateListaPreco"
                     label={"Data Criação *"}
-                    type="text"
+                    type="date"
                     errors={errors}
                     clearErrors={clearErrors}
-                    value={dadosListaLoja[0]?.listaPreco.DATACRIACAO}
-                  // onChangeModal={(e) => setDescricao(e.target.value)}
+                    value={dataCriacao}
+                    onChangeModal={(e) => setDataCriacao(e.target.value)}
                     readOnly={true}
                   />
                 )}
@@ -91,7 +93,7 @@ export const Formulario = ({dadosListaLoja , handleClose, optionsModulos, usuari
                     type="text"
                     errors={errors}
                     clearErrors={clearErrors}
-                    value={dadosListaLoja[0]?.listaPreco.IDRESUMOLISTAPRECO}
+                    value={''}
                     readOnly={true}
                   
                   />
@@ -146,7 +148,6 @@ export const Formulario = ({dadosListaLoja , handleClose, optionsModulos, usuari
 
         </div>
         <ActionCriarListasPrecos
-          dadosListaLoja={dadosListaLoja} 
           optionsModulos={optionsModulos}
           usuarioLogado={usuarioLogado}
         />
