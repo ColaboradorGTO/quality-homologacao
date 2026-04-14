@@ -66,6 +66,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
   const [modalPodutoSelecionadoOrigemCSV, setModalPodutoSelecionadoOrigemCSV] = useState(false);
   const [isCheckedGrupo, setIsCheckedGrupo] = useState(false)
   const [isCheckedProduto, setIsCheckedProduto] = useState(true)
+  const [isCheckedGrupoProduto, setIsCheckedGrupoProduto] = useState(false)
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -114,7 +115,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
 
 
   const { data: dadosMecanicas = [], error: errorMecanicas, isLoading: isLoadingMecanica, refetch: refetchMecanica } = useQuery(
-    'fornecedor-produto',
+    'mecanicas-ativas',
     async () => {
       const response = await get(`/mecanicas-ativas`);
       return response.data;
@@ -1505,6 +1506,8 @@ export const useCreatePromocaoAtiva = ({ }) => {
     setIsCheckedGrupo,
     isCheckedProduto,
     setIsCheckedProduto,
+    isCheckedGrupoProduto, 
+    setIsCheckedGrupoProduto,
     subGrupoDestino,
     setSubGrupoDestino,
     subGrupoOrigem,

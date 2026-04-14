@@ -20,6 +20,9 @@ import { MenuTreeSelect } from "../../Inputs/menuTreeSelect";
 import { InputFieldActionRadio } from "../../Buttons/InputActionRadio";
 
 import { FaDownload } from "react-icons/fa6";
+import { get } from "../../../api/funcRequest";
+import { useQuery } from "react-query";
+import { ActionEstruturaProdutoOrigemModal } from "./ActionProdutosOrigem/actionEstruturaProdutoOrigemModal";
 
 
 
@@ -129,10 +132,12 @@ export const ActionPesquisaPromocao = ({ }) => {
     setModalDocumentacao,
     modalPodutoSelecionadoDestinoCSV, setModalPodutoSelecionadoDestinoCSV,
     modalPodutoSelecionadoOrigemCSV, setModalPodutoSelecionadoOrigemCSV,
-    isCheckedGrupo, 
+    isCheckedGrupo,
     setIsCheckedGrupo,
     isCheckedProduto,
     setIsCheckedProduto,
+    isCheckedGrupoProduto,
+    setIsCheckedGrupoProduto,
     subGrupoDestino,
     setSubGrupoDestino,
     subGrupoOrigem,
@@ -171,8 +176,6 @@ export const ActionPesquisaPromocao = ({ }) => {
   }, [setSubGrupoOrigem]);
 
   const handleChangeMecanica = useCallback((selectedValue) => {
-
-
     const selectedOption = dadosMecanicas.find(option => option.ID == selectedValue);
 
     if (selectedOption) {
@@ -181,9 +184,8 @@ export const ActionPesquisaPromocao = ({ }) => {
       setAplicacaoDestinoSelecionada(selectedOption.APLICACAODESTINO);
       setTipoDescontoSelecionado(selectedOption.TIPODESCONTO);
     }
-    console.log(mecanicaSelecionadaEdicao, 'mecanicaSelecionadaEdicao')
-  }, [dadosMecanicas, setMecanicaSelecionada, setAplicacaoDestinoSelecionada, setTipoDescontoSelecionado,]);
 
+  }, [dadosMecanicas, setMecanicaSelecionada, setAplicacaoDestinoSelecionada, setTipoDescontoSelecionado,]);
 
   const handleEditarMecanica = () => {
     const selectedOption = dadosMecanicas.find(option => option.ID == mecanicaSelecionada);
@@ -251,62 +253,66 @@ export const ActionPesquisaPromocao = ({ }) => {
   }, []);
 
   const [treeData, setTreeData] = useState([]);
+  const [treeDataEstProd, setTreeDataEstProd] = useState([]);
   const [selectedNodesOrigem, setSelectedNodesOrigem] = useState({});
   const [selectedNodesDestino, setSelectedNodesDestino] = useState({});
+  const [produtoSelecionadoEstProdDestino, setProdutoSelecionadoEstProdutoDestino] = useState([]);
+  const [produtoSelecionadoEstProdOrigem, setProdutoSelecionadoEstProdutoOrigem] = useState([]);
+  const [modalEstProdOrigem, setModalEstProdOrigem] = useState([]);
 
   useEffect(() => {
-  if (dadosSubGrupo.length) {
-    // 1. Agrupar subgrupos por IDGRUPOESTRUTURA
-    const gruposMap = new Map();
-    
-    dadosSubGrupo.forEach(subgrupo => {
-      const grupoId = subgrupo.IDGRUPOESTRUTURA; // ID do grupo (não do subgrupo)
-      const grupoDescricao = subgrupo.DSGRUPOESTRUTURA; // Nome do grupo
-      
-      // Se o grupo ainda não existe no Map, criar
-      if (!gruposMap.has(grupoId)) {
-        gruposMap.set(grupoId, {
-          key: `grupo_${grupoId}`, // Chave única para o grupo com prefixo
-          label: grupoDescricao,    // Nome do grupo
-          children: [],             // Array dos subgrupos
+    if (dadosSubGrupo.length) {
+      // 1. Agrupar subgrupos por IDGRUPOESTRUTURA
+      const gruposMap = new Map();
+
+      dadosSubGrupo.forEach(subgrupo => {
+        const grupoId = subgrupo.IDGRUPOESTRUTURA; // ID do grupo (não do subgrupo)
+        const grupoDescricao = subgrupo.DSGRUPOESTRUTURA; // Nome do grupo
+
+        // Se o grupo ainda não existe no Map, criar
+        if (!gruposMap.has(grupoId)) {
+          gruposMap.set(grupoId, {
+            key: `grupo_${grupoId}`, // Chave única para o grupo com prefixo
+            label: grupoDescricao,    // Nome do grupo
+            children: [],             // Array dos subgrupos
+          });
+        }
+
+        // Adicionar o subgrupo como filho do grupo
+        gruposMap.get(grupoId).children.push({
+          key: `subgrupo_${subgrupo.IDSUBGRUPOESTRUTURA}`, // Chave do subgrupo com prefixo
+          label: subgrupo.DSSUBGRUPOESTRUTURA,              // Nome do subgrupo
+          data: subgrupo // Opcional: dados completos do subgrupo
         });
-      }
-      
-      // Adicionar o subgrupo como filho do grupo
-      gruposMap.get(grupoId).children.push({
-        key: `subgrupo_${subgrupo.IDSUBGRUPOESTRUTURA}`, // Chave do subgrupo com prefixo
-        label: subgrupo.DSSUBGRUPOESTRUTURA,              // Nome do subgrupo
-        data: subgrupo // Opcional: dados completos do subgrupo
       });
-    });
-    
-    // 2. Converter o Map em array para o TreeSelect
-    const formattedTreeData = Array.from(gruposMap.values());
-    setTreeData(formattedTreeData);
-    
-  }
-}, [dadosSubGrupo]);
+
+      // 2. Converter o Map em array para o TreeSelect
+      const formattedTreeData = Array.from(gruposMap.values());
+      setTreeData(formattedTreeData);
+
+    }
+  }, [dadosSubGrupo]);
 
   // UseEffect para inicializar seleções baseado nos dados existentes
   useEffect(() => {
     if (treeData.length && (grupoSelecionado.length || subGrupoDestino.length)) {
       const initialSelection = {};
-      
+
       // Marcar grupos selecionados
-      grupoSelecionado.forEach(grupoId => {
+      grupoSelecionado?.forEach(grupoId => {
         const chaveGrupo = `grupo_${grupoId}`;
         initialSelection[chaveGrupo] = true;
       });
-      
+
       // Marcar subgrupos selecionados
       subGrupoDestino.forEach(subgrupoId => {
         const chaveSubgrupo = `subgrupo_${subgrupoId}`;
         initialSelection[chaveSubgrupo] = true;
       });
-      
+
       setSelectedNodesOrigem(initialSelection);
       setSelectedNodesDestino(initialSelection);
-      
+
     }
   }, [treeData]);
 
@@ -358,6 +364,46 @@ export const ActionPesquisaPromocao = ({ }) => {
     setSubGrupoDestino(selectedSubGrupo);
   };
 
+  const { data: dadosProdutoSubGrupo = [], error: errorProdutoSubGrupo, isLoading: isLoadingProdutoSubGrupo, refetch: refetchProdutoSubGrupo } = useQuery(
+    ['produto-subGrupo', subGrupoDestino],
+    async () => {
+      const response = await get(`/produto-subGrupo?idSubGrupo=${subGrupoDestino.join(',')}`);
+      return response.data;
+    },
+    { enabled: Boolean(subGrupoDestino), staleTime: 1000 * 60 * 60, cacheTime: 1000 * 60 * 60, }
+  );
+
+  const handleChangeGrupo = (e) => {
+    const checked = e.checked;
+    setIsCheckedGrupo(checked);
+    if (checked) {
+      setIsCheckedGrupoProduto(false);
+      setIsCheckedProduto(false);
+    }
+  }
+
+  const handleChangeProduto = (e) => {
+    const checked = e.checked;
+    setIsCheckedProduto(checked);
+    if (checked) {
+      setIsCheckedGrupo(false);
+      setIsCheckedGrupoProduto(false);
+    }
+  }
+
+  const handleChangeGrupoProduto = (e) => {
+    const checked = e.checked;
+    setIsCheckedGrupoProduto(checked);
+    if (checked) {
+      setIsCheckedGrupo(false);
+      setIsCheckedProduto(false);
+    }
+  }
+
+  const mostrarModalEstruturaDestino = () => {
+    setModalEstProdOrigem(true);
+  }
+
   return (
     <Fragment>
       <ActionMainPromocao
@@ -369,7 +415,7 @@ export const ActionPesquisaPromocao = ({ }) => {
         labelSelectMecanica={"Mecanica"}
         optionsMecanica={dadosMecanicas.map((item) => ({
           value: item.ID,
-          label: item.DESCRICAO,
+          label: `${item.ID} - ${item.DESCRICAO}`,
           APLICAODESTINO: item.APLICAODESTINO,
           TIPODESCONTO: item.TIPODESCONTO
         }))}
@@ -629,34 +675,51 @@ export const ActionPesquisaPromocao = ({ }) => {
         optionsTreeSelectDestino={treeData}
         placeholderTreeSelectDestino={"Selecione"}
     
-     
+        MenuTreeSelectOrigemComponentEstProd={MenuTreeSelect}
+        valueTreeSelectOrigemEstProd={selectedNodesOrigem}
+        onChangeTreeSelectOrigemEstProd={handleTreeSelectOrigemChange}
+        optionsTreeSelectOrigemEstProd={treeData}
+        // placeholderTreeSelectOrigemEstProd
+        labelSelectSubGrupoOrigemAsyncEstProd={"Sub Grupo Origem"}
+        
+        ButtonTypeProdutoEstruturaOrigem={ButtonType}
+        linkNomeProdutoEstruturaOrigem={"Visualizar Estrutura / Produto Origem"}
+        onButtonClickProdutoEstruturaOrigem
+        corProdutoEstruturaOrigem={"warning"}
+        IconProdutoEstruturaOrigem={GrView}
+
+        MenuTreeSelectDestinoComponentEstProd={MenuTreeSelect}
+        valueTreeSelectDestinoEstProd={selectedNodesDestino}
+        onChangeTreeSelectDestinoEstProd={handleTreeSelectDestinoChange}
+        optionsTreeSelectDestinoEstProd={treeData}
+        placeholderTreeSelectDestinoEstProd
+        labelSelectSubGrupoDestinoAsyncEstProd={"Sub Grupo Destino"}
+
+        ButtonTypeProdutoEstruturaDestino={ButtonType}
+        linkNomeProdutoEstruturaDestino={"Visualizar Estrutura / Produto Destino"}
+        onButtonClickProdutoEstruturaDestino
+        corProdutoEstruturaDestino={"info"}
+        IconProdutoEstruturaDestino={GrView}
+
+
         InputGrupoEstrutura={InputFieldActionRadio}
         labelInputGrupoEstrutura={"Estrutura Mercadológica"}
         valueInputGrupoEstrutura={isCheckedGrupo}
-        onChangeInputGrupoEstrutura={(e) => {
-          if (e.checked) {
-            setIsCheckedGrupo(true);
-            setIsCheckedProduto(false); // Desmarca o outro
-          } else {
-            setIsCheckedGrupo(false);
-          }
-        }}
-      
+        onChangeInputGrupoEstrutura={handleChangeGrupo}
+
+        InputGrupoEstruturaProduto={InputFieldActionRadio}
+        labelInputGrupoEstruturaProduto={"Estrutura / Produto"}
+        valueInputGrupoEstruturaProduto={isCheckedGrupoProduto}
+        onChangeInputGrupoEstruturaProduto={handleChangeGrupoProduto}
+
         InputProduto={InputFieldActionRadio}
         labelInputProduto={"Por Produtos"}
         valueInputProduto={isCheckedProduto}
-        onChangeInputProduto={(e) => {
-          if (e.checked) {
-            setIsCheckedProduto(true);
-            setIsCheckedGrupo(false); // Desmarca o outro
-          } else {
-            setIsCheckedProduto(false);
-          }
-        }}
+        onChangeInputProduto={handleChangeProduto}
 
-
-        styleProduto={{ display: isCheckedGrupo ? 'none' : 'block' }}
-        styleEstrutura={{ display: isCheckedProduto ? 'none' : 'block' }}
+        styleProduto={{ display: isCheckedProduto ? 'block' : 'none' }}
+        styleEstrutura={{ display: isCheckedGrupo ? 'block' : 'none' }}
+        styleEstruturaProduto={{ display: isCheckedGrupoProduto ? 'block' : 'none' }}
 
         InputFieldProdutoOigem={InputFieldAction}
         labelInputFieldProdutoOigem={"Produto Origem"}
@@ -755,7 +818,6 @@ export const ActionPesquisaPromocao = ({ }) => {
         IconRetornar={FaDownload}
       />
 
-
       <ActionCadastrarPromocaoModal
         dadosPromocoesAtivas={dadosPromocoesAtivas}
         show={modalVisivel}
@@ -816,6 +878,16 @@ export const ActionPesquisaPromocao = ({ }) => {
         setFileProdutoDestino={setFileProdutoDestino}
       />
 
+
+      <ActionEstruturaProdutoOrigemModal
+        show={modalEstProdOrigem}
+        handleClose={() => setModalEstProdOrigem(false)}
+        dadosProdutoSubGrupo={dadosProdutoSubGrupo}
+        produtoSelecionadoEstProdOrigem={produtoSelecionadoEstProdOrigem}
+        setProdutoSelecionadoEstProdutoOrigem={setProdutoSelecionadoEstProdutoOrigem}
+        // novoProdutoOrigem={novoProdutoOrigem}
+        // setNovoProdutoOrigem={setNovoProdutoOrigem}
+      />  
 
       <ActionDocumentacaoCriar
         show={modalDocumentacao}

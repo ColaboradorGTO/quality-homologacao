@@ -24,6 +24,7 @@ export const MenuTreeSelect = ({
                 options={optionsMenuSelect}
                 onChange={onChangeMenuSelect}
                 placeholder={placeholderMenuSelect}
+                filter
                 display="chip"
                 selectionMode="checkbox"
                 metaKeySelection={false}
