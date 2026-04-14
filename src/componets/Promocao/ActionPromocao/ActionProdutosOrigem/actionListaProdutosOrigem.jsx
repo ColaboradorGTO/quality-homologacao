@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useRef, useState } from "react"
+import React, { Fragment, useRef, useState } from "react"
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { useReactToPrint } from "react-to-print";
@@ -6,20 +6,19 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../../Tables/headerTable";
-import { post, put } from "../../../../api/funcRequest";
-import Swal from "sweetalert2";
 
 
 export const ActionListaProdutosOrigem = ({
   dadosProdutoSubGrupo,
   produtoSelecionadoEstProdOrigem,
-  setProdutoSelecionadoEstProdutoOrigem    
+  setProdutoSelecionadoEstProdutoOrigem
 
 }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
 
-  
+
   const handleCheckboxChangeOrigem = (id) => {
     const produto = dados.find(item => String(item.IDPRODUTO) === String(id));
     setProdutoSelecionadoEstProdutoOrigem(prevState => {
@@ -29,7 +28,7 @@ export const ActionListaProdutosOrigem = ({
         : [...prevState, produto];
     });
   }
-
+  
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
   };
@@ -70,10 +69,9 @@ export const ActionListaProdutosOrigem = ({
   };
 
 
-  console.log(dadosProdutoSubGrupo, "dadosProdutoSubGrupo")
   const dados = dadosProdutoSubGrupo.map((item, index) => {
     let contador = index + 1;
-   
+
     return {
       contador,
       IDPRODUTO: item.IDPRODUTO,
@@ -167,9 +165,14 @@ export const ActionListaProdutosOrigem = ({
           <DataTable
             title="Lista de Produtos"
             value={dados}
+            globalFilter={globalFilterValue}
+            scrollable
+            scrollHeight="500px"
             size="small"
             dataKey="IDPRODUTO"
-            globalFilter={globalFilterValue}
+            selectionMode="single"
+            selection={rowSelection}
+            onSelectionChange={(e) => setRowSelection(e.value)}
             sortOrder={-1}
             paginator={true}
             rows={100}

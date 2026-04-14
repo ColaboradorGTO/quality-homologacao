@@ -23,6 +23,7 @@ import { FaDownload } from "react-icons/fa6";
 import { get } from "../../../api/funcRequest";
 import { useQuery } from "react-query";
 import { ActionEstruturaProdutoOrigemModal } from "./ActionProdutosOrigem/actionEstruturaProdutoOrigemModal";
+import { ActionEstruturaProdutoDestinoModal } from "./ActionProdutosDestino/actionEstruturaProdutoDestinoModal";
 
 
 
@@ -259,6 +260,7 @@ export const ActionPesquisaPromocao = ({ }) => {
   const [produtoSelecionadoEstProdDestino, setProdutoSelecionadoEstProdutoDestino] = useState([]);
   const [produtoSelecionadoEstProdOrigem, setProdutoSelecionadoEstProdutoOrigem] = useState([]);
   const [modalEstProdOrigem, setModalEstProdOrigem] = useState([]);
+  const [modalEstProdDestino, setModalEstProdDestino] = useState([]);
 
   useEffect(() => {
     if (dadosSubGrupo.length) {
@@ -293,7 +295,7 @@ export const ActionPesquisaPromocao = ({ }) => {
     }
   }, [dadosSubGrupo]);
 
-  // UseEffect para inicializar seleções baseado nos dados existentes
+  
   useEffect(() => {
     if (treeData.length && (grupoSelecionado.length || subGrupoDestino.length)) {
       const initialSelection = {};
@@ -401,6 +403,10 @@ export const ActionPesquisaPromocao = ({ }) => {
   }
 
   const mostrarModalEstruturaDestino = () => {
+    setModalEstProdDestino(true);
+  }
+
+  const mostrarModalEstruturaOrigem = () => {
     setModalEstProdOrigem(true);
   }
 
@@ -684,7 +690,7 @@ export const ActionPesquisaPromocao = ({ }) => {
         
         ButtonTypeProdutoEstruturaOrigem={ButtonType}
         linkNomeProdutoEstruturaOrigem={"Visualizar Estrutura / Produto Origem"}
-        onButtonClickProdutoEstruturaOrigem
+        onButtonClickProdutoEstruturaOrigem={mostrarModalEstruturaOrigem}
         corProdutoEstruturaOrigem={"warning"}
         IconProdutoEstruturaOrigem={GrView}
 
@@ -697,7 +703,7 @@ export const ActionPesquisaPromocao = ({ }) => {
 
         ButtonTypeProdutoEstruturaDestino={ButtonType}
         linkNomeProdutoEstruturaDestino={"Visualizar Estrutura / Produto Destino"}
-        onButtonClickProdutoEstruturaDestino
+        onButtonClickProdutoEstruturaDestino={mostrarModalEstruturaDestino}
         corProdutoEstruturaDestino={"info"}
         IconProdutoEstruturaDestino={GrView}
 
@@ -889,6 +895,15 @@ export const ActionPesquisaPromocao = ({ }) => {
         // setNovoProdutoOrigem={setNovoProdutoOrigem}
       />  
 
+      <ActionEstruturaProdutoDestinoModal 
+        show={modalEstProdDestino}
+        handleClose={() => setModalEstProdDestino(false)}
+        dadosProdutoSubGrupo={dadosProdutoSubGrupo}
+        produtoSelecionadoEstProdDestino={produtoSelecionadoEstProdDestino}
+        setProdutoSelecionadoEstProdutoDestino={setProdutoSelecionadoEstProdutoDestino}
+        // novoProdutoDestino={novoProdutoDestino}
+        // setNovoProdutoDestino={setNovoProdutoDestino}
+      />
       <ActionDocumentacaoCriar
         show={modalDocumentacao}
         handleClose={() => setModalDocumentacao(false)}
