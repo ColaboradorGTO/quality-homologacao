@@ -6,6 +6,7 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../../Tables/headerTable";
+import Swal from "sweetalert2";
 
 
 export const ActionListaProdutosOrigem = ({
@@ -16,73 +17,145 @@ export const ActionListaProdutosOrigem = ({
 }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowSelection, setRowSelection] = useState(null);
+  const [selectAllChecked, setSelectAllChecked] = useState(false);
   const dataTableRef = useRef();
-
-
-  const handleCheckboxChangeOrigem = (id) => {
-    const produto = dados.find(item => String(item.IDPRODUTO) === String(id));
-    setProdutoSelecionadoEstProdutoOrigem(prevState => {
-      const exists = prevState.some(item => String(item.IDPRODUTO) === String(id));
-      return exists
-        ? prevState.filter(item => String(item.IDPRODUTO) !== String(id))
-        : [...prevState, produto];
-    });
-  }
   
+  const dados = dadosProdutoSubGrupo.map((item, index) => {
+    let contador = index + 1;
+
+    return {
+      IDSUBGRUPO: item.IDSUBGRUPO,
+      DSGRUPOESTRUTURA: item.DSGRUPOESTRUTURA,
+      DSSUBGRUPOESTRUTURA: item.DSSUBGRUPOESTRUTURA,
+      IDPRODUTO: item.IDPRODUTO,
+      DSNOME: item.DSNOME,
+      NUCODBARRAS: item.NUCODBARRAS
+    }
+  });
+
+   useEffect(() => {
+      if (dados.length > 0) {
+        const todosSelecionados = dados.every(item => 
+          produtoSelecionadoEstProdOrigem?.some(selected => 
+            String(selected.IDPRODUTO) === String(item.IDPRODUTO)
+          )
+        );
+        setSelectAllChecked(todosSelecionados);
+      }
+    }, [produtoSelecionadoEstProdOrigem, dados]);
+  
+    
+    const handleCheckboxChangeOrigem = (id) => {
+      const produtoSelecionado = dados.find(item => String(item.IDPRODUTO) === String(id));
+      
+      if (!produtoSelecionado) {
+        console.warn('Produto não encontrado:', id);
+        return;
+      }
+      
+      setProdutoSelecionadoEstProdutoOrigem(prevState => {
+        const existe = prevState.some(item => String(item.IDPRODUTO) === String(id));
+        if (existe) {
+
+          return prevState.filter(item => String(item.IDPRODUTO) !== String(id));
+        } else {
+
+          return [...prevState, produtoSelecionado];
+        }
+      });
+    }
+    
+    const onSelectAllChange = (e) => {
+      const isChecked = e.checked;
+      
+      if (isChecked) {
+        Swal.fire({
+          icon: 'question',
+          title: 'Selecionar Todos os Produtos?',
+          text: `Deseja selecionar todos os ${dados.length} produtos da lista de origem?`,
+          showConfirmButton: true,
+          showCancelButton: true,
+          showCloseButton: true,
+          confirmButtonText: 'Selecionar Todos',
+          cancelButtonText: 'Cancelar',
+          customClass: {
+            container: 'custom-swal',
+          },
+          cancelButtonColor: '#d33',
+          confirmButtonColor: '#3085d6',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            setProdutoSelecionadoEstProdutoOrigem(dados);
+          }
+        });
+      } else {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Desmarcar Todos os Produtos?',
+          text: 'Tem certeza que deseja desmarcar todos os produtos selecionados?',
+          showConfirmButton: true,
+          showCancelButton: true,
+          confirmButtonText: 'Desmarcar Todos',
+          cancelButtonText: 'Cancelar',
+          customClass: {
+            container: 'custom-swal',
+          },
+          cancelButtonColor: '#d33',
+          confirmButtonColor: '#3085d6',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            setProdutoSelecionadoEstProdutoOrigem([]);
+          }
+        });
+      }
+    }
+
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
   };
 
   const handlePrint = useReactToPrint({
     content: () => dataTableRef.current,
-    documentTitle: 'Produtos Promoções',
+    documentTitle: 'Produtos Sub Grupo',
   });
 
   const exportToPDF = () => {
     const doc = new jsPDF();
     doc.autoTable({
-      head: [['N.Itens', 'Código de Barras', 'Descrição']],
+      head: [['Nº Sub Grupo', 'Grupo', 'Sub Grupo', 'N.Itens', 'Produto', 'Cód Barras']],
       body: dados.map(item => [
+        item.IDSUBGRUPO,
+        item.DSGRUPOESTRUTURA,
+        item.DSSUBGRUPOESTRUTURA,
         item.IDPRODUTO,
-        item.NUCODBARRAS,
         item.DSNOME,
+        item.NUCODBARRAS,
       ]),
       horizontalPageBreak: true,
       horizontalPageBreakBehaviour: 'immediately'
     });
-    doc.save('produtos_promocoes.pdf');
+    doc.save('produtos_sub_grupo.pdf');
   };
 
   const exportToExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(dados);
     const workbook = XLSX.utils.book_new();
-    const header = ['N.Itens', 'Código de Barras', 'Descrição'];
+    const header = ['Nº Sub Grupo', 'Grupo', 'Sub Grupo', 'N.Itens', 'Produto', 'Cód Barras'];
     worksheet['!cols'] = [
+      { wpx: 50, caption: 'Nº Sub Grupo' },
+      { wpx: 100, caption: 'Grupo' },
+      { wpx: 150, caption: 'Sub Grupo' },
       { wpx: 100, caption: 'N.Itens' },
+      { wpx: 300, caption: 'Produto' },
       { wpx: 200, caption: 'Código de Barras' },
-      { wpx: 200, caption: 'Descrição' },
 
     ];
     XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Produtos Promoções Ativas');
-    XLSX.writeFile(workbook, 'produtos_promocoes.xlsx');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Produtos Sub Grupo');
+    XLSX.writeFile(workbook, 'produtos_sub_grupo.xlsx');
   };
 
-
-  const dados = dadosProdutoSubGrupo.map((item, index) => {
-    let contador = index + 1;
-
-    return {
-      contador,
-      IDPRODUTO: item.IDPRODUTO,
-      NUCODBARRAS: item.NUCODBARRAS,
-      DSNOME: item.DSNOME,
-      IDSUBGRUPO: item.IDSUBGRUPO,
-      DSSUBGRUPOESTRUTURA: item.DSSUBGRUPOESTRUTURA,
-      DSGRUPOESTRUTURA: item.DSGRUPOESTRUTURA,
-      STATIVO: item.STATIVO,
-    }
-  });
+ 
 
   const colunasProdutos = [
     {
@@ -104,7 +177,7 @@ export const ActionListaProdutosOrigem = ({
       sortable: true,
     },
     {
-      field: 'DPRODUTO',
+      field: 'IDPRODUTO',
       header: 'N.Item',
       body: row => <th>{row.IDPRODUTO}</th>,
       sortable: true,
@@ -123,19 +196,26 @@ export const ActionListaProdutosOrigem = ({
     },
     {
       field: '',
-      header: 'Opções',
+      header: 'Selecionar',
       body: row => {
+        const isChecked = produtoSelecionadoEstProdOrigem?.some(item => 
+          String(item.IDPRODUTO) === String(row.IDPRODUTO)
+        );
         return (
-          <input
-            type="checkbox"
-            checked={produtoSelecionadoEstProdOrigem?.some(item => String(item.IDPRODUTO) === String(row.IDPRODUTO))}
-            // checked={produtoSelecionadoEstProdOrigem?.includes(row.IDPRODUTO)}
-            onChange={() =>
-              handleCheckboxChangeOrigem(
-                row.IDPRODUTO,
-              )
-            }
-          />
+          <div style={{ textAlign: 'center' }}>
+            <input
+              type="checkbox"
+              checked={isChecked}
+              onChange={() => handleCheckboxChangeOrigem(row.IDPRODUTO)}
+              style={{ 
+                width: '18px', 
+                height: '18px', 
+                cursor: 'pointer',
+                accentColor: '#7a59ad'
+              }}
+              title={isChecked ? 'Desmarcar produto' : 'Marcar produto'}
+            />
+          </div>
         );
       },
       sortable: false,
@@ -160,6 +240,21 @@ export const ActionListaProdutosOrigem = ({
             exportToExcel={exportToExcel}
             exportToPDF={exportToPDF}
           />
+        </div>
+
+        <div style={{ width: "100%", display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+          <div className="custom-control custom-checkbox">
+            <Checkbox
+              checked={selectAllChecked}
+              onChange={onSelectAllChange}
+            />
+            <span style={{ marginLeft: '8px', fontWeight: '500' }}>
+              {selectAllChecked 
+                ? `Desmarcar Todos (${produtoSelecionadoEstProdOrigem?.length || 0}/${dados.length} selecionados)`
+                : `Marcar Todos (${produtoSelecionadoEstProdOrigem?.length || 0}/${dados.length} selecionados)`
+              }
+            </span>
+          </div>
         </div>
         <div className="card custom-swal" ref={dataTableRef}>
           <DataTable

@@ -18,8 +18,7 @@ export const ActionListaProdutosDestino = ({
   const [rowSelection, setRowSelection] = useState(null);
   const [selectAllChecked, setSelectAllChecked] = useState(false);
   const dataTableRef = useRef();
-
-  // Processar dados antes de usar em useEffect e funções
+  
   const dados = dadosProdutoSubGrupo.map((item, index) => {
     let contador = index + 1;
     return {
@@ -32,7 +31,7 @@ export const ActionListaProdutosDestino = ({
     }
   });
   
-  // Monitorar mudanças nas seleções para atualizar o estado "Marcar Todos"
+  
   useEffect(() => {
     if (dados.length > 0) {
       const todosSelecionados = dados.every(item => 
@@ -192,7 +191,7 @@ export const ActionListaProdutosDestino = ({
       body: row => <th>{row.NUCODBARRAS}</th>,
       sortable: true,
     },
-     {
+    {
       field: '',
       header: 'Selecionar',
       body: row => {
@@ -241,22 +240,19 @@ export const ActionListaProdutosDestino = ({
         </div>
 
         <div style={{ width: "100%", display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-        
-        {/* Controle para selecionar/desmarcar todos os produtos */}
-        <div className="custom-control custom-checkbox">
-          <Checkbox
-            checked={selectAllChecked}
-            onChange={onSelectAllChange}
-          />
-          <span style={{ marginLeft: '8px', fontWeight: '500' }}>
-            {selectAllChecked 
-              ? `Desmarcar Todos (${produtoSelecionadoEstProdDestino?.length || 0}/${dados.length} selecionados)`
-              : `Marcar Todos (${produtoSelecionadoEstProdDestino?.length || 0}/${dados.length} selecionados)`
-            }
-          </span>
+          <div className="custom-control custom-checkbox">
+            <Checkbox
+              checked={selectAllChecked}
+              onChange={onSelectAllChange}
+            />
+            <span style={{ marginLeft: '8px', fontWeight: '500' }}>
+              {selectAllChecked 
+                ? `Desmarcar Todos (${produtoSelecionadoEstProdDestino?.length || 0}/${dados.length} selecionados)`
+                : `Marcar Todos (${produtoSelecionadoEstProdDestino?.length || 0}/${dados.length} selecionados)`
+              }
+            </span>
+          </div>
         </div>
-
-      </div>
 
         <div className="card custom-swal" ref={dataTableRef}>
           <DataTable
