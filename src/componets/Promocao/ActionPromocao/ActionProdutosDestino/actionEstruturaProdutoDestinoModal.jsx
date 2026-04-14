@@ -28,7 +28,8 @@ export const ActionEstruturaProdutoDestinoModal = ({
                 <HeaderModal
                     title={"Lista de Produtos Destino"}
                     subTitle={"Estrutura Mercadológica"}
-                    handleClose={() => {handleClose(), setProdutoDestino('')}}
+                    handleClose={handleClose}
+                    // handleClose={() => {handleClose(), setProdutoDestino('')}}
                 />
 
                 <Modal.Body>
@@ -41,7 +42,7 @@ export const ActionEstruturaProdutoDestinoModal = ({
                     />
                     <FooterModal
                         ButtonTypeFechar={ButtonTypeModal}
-                        onClickButtonFechar={() => {handleClose(); setProdutoDestino('')}}
+                        onClickButtonFechar={handleClose}
                         textButtonFechar={"Fechar"}
                         corFechar={"secondary"}
                     />

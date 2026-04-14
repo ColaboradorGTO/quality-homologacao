@@ -116,7 +116,7 @@ export const ActionListaProdutosDestino = ({
 
   const handlePrint = useReactToPrint({
     content: () => dataTableRef.current,
-    documentTitle: 'Produtos Promoções',
+    documentTitle: 'Produtos Sub Grupo',
   });
 
   const exportToPDF = () => {
@@ -134,7 +134,7 @@ export const ActionListaProdutosDestino = ({
       horizontalPageBreak: true,
       horizontalPageBreakBehaviour: 'immediately'
     });
-    doc.save('produtos_promocoes.pdf');
+    doc.save('produtos_sub_grupo.pdf');
   };
 
   const exportToExcel = () => {
@@ -151,11 +151,9 @@ export const ActionListaProdutosDestino = ({
      
     ];
     XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Produtos Promoções Ativas');
-    XLSX.writeFile(workbook, 'produtos_promocoes.xlsx');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Produtos Sub Grupo');
+    XLSX.writeFile(workbook, 'produtos_sub_grupo.xlsx');
   };
-
-
 
   const colunasProdutos = [
     {
