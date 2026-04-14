@@ -5,12 +5,13 @@ import { Modal } from "react-bootstrap"
 import { ActionListaProdutosOrigem } from "./actionListaProdutosOrigem"
 import { Fragment } from "react"
 export const ActionEstruturaProdutoOrigemModal = ({ 
-    dadosProdutoSubGrupo, 
+    dadosProdutoSubGrupoOrigem, 
     show, 
     handleClose,
     produtoSelecionadoEstProdOrigem,
     setProdutoSelecionadoEstProdutoOrigem, 
-    setProdutoOrigem
+    novoProdutoEstProdOrigem,
+    setNovoProdutoEstProdOrigem
 }) => {
     return (
         <Fragment>
@@ -34,10 +35,11 @@ export const ActionEstruturaProdutoOrigemModal = ({
                 <Modal.Body>
 
                     <ActionListaProdutosOrigem
-                        dadosProdutoSubGrupo={dadosProdutoSubGrupo} 
+                        dadosProdutoSubGrupoOrigem={dadosProdutoSubGrupoOrigem} 
                         produtoSelecionadoEstProdOrigem={produtoSelecionadoEstProdOrigem}
                         setProdutoSelecionadoEstProdutoOrigem={setProdutoSelecionadoEstProdutoOrigem}    
-                
+                        novoProdutoEstProdOrigem={novoProdutoEstProdOrigem}
+                        setNovoProdutoEstProdOrigem={setNovoProdutoEstProdOrigem}
                     />
                     <FooterModal
                         ButtonTypeFechar={ButtonTypeModal}

@@ -1397,6 +1397,197 @@ export const useCreatePromocaoAtiva = ({ }) => {
 
   }
 
+  const onSubmitEstruturaProduto = async (data) => {
+  
+    try {
+      if (!mecanicaSelecionada) {
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: 'Selecione uma mecânica!',
+          customClass: {
+            container: 'custom-swal',
+          },
+          showConfirmButton: false,
+          timer: 3000,
+        })
+        return;
+      }
+
+      if (!empresaSelecionada || empresaSelecionada.length == 0) {
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: 'Selecione uma empresa!',
+          customClass: {
+            container: 'custom-swal',
+          },
+          showConfirmButton: false,
+          timer: 3000,
+        })
+        return;
+      }
+
+      if(!subGrupoDestino && !subGrupoOrigem) {
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: 'Selecione um subgrupo para origem e destino!',
+          customClass: {
+            container: 'custom-swal',
+          },
+          showConfirmButton: false,
+          timer: 5000,
+        })
+        return;
+      }
+
+      if (descricao.length > 80) {
+          Swal.fire({
+            position: 'center',
+            icon: 'error',
+            title: 'Descrição deve ter no máximo 80 caracteres!',
+            customClass: {
+              container: 'custom-swal',
+            },
+            showConfirmButton: false,
+            timer: 3000,
+          })
+          return;
+      }
+
+      const produtosOrigem = 
+        (fileProdutoOrigem && fileProdutoOrigem.length > 0)
+          ? JSON.parse(fileProdutoOrigem)
+          : produtoOrigem
+        ? [produtoOrigem]
+        : (produtoOrigemSelecionado && produtoOrigemSelecionado.length > 0)
+          ? produtoOrigemSelecionado
+          : [];
+
+      const produtosDestino = 
+        (fileProdutoDestino && fileProdutoDestino.length > 0)
+          ? JSON.parse(fileProdutoDestino)
+          : produtoDestino
+        ? [produtoDestino]
+        : (produtoDestinoSelecionado && produtoDestinoSelecionado.length > 0)
+          ? produtoDestinoSelecionado
+          : [];
+
+      const extractIds = arr => {
+        if (!arr) return [];
+        if (Array.isArray(arr)) {
+          return arr
+            .map(item => typeof item === 'object' && item !== null && item.IDPRODUTO ? item.IDPRODUTO : item)
+            .filter(Boolean);
+        }
+        if (typeof arr === 'object' && arr !== null && arr.IDPRODUTO) {
+          return [arr.IDPRODUTO];
+        }
+        return [arr];
+      };
+
+      const postData = {
+        TPAPARTIRDE: aplicacaoDestinoSelecionada,
+        TPAPLICADOA: mecanicaSelecionada,
+        TPFATORPROMO: tipoDescontoSelecionado,
+        APARTIRDEQTD: Number(qtdInicio),
+        APARTIRDOVLR: valorInicio,
+        FATORPROMOVLR: vrDesconto,
+        FATORPROMOPERC: porcentoDesconto,
+        VLPRECOPRODUTO: Number(precoProduto),
+        DTHORAINICIO: dataInicio,
+        DTHORAFIM: dataFim + ' 23:59:59',
+        DSPROMOCAOMARKETING: descricao.toUpperCase(),
+        IDEMPRESA: empresaSelecionada,
+        STATIVO: "True",
+        STEMPRESAPROMO: "True",
+        STDETPROMOORIGEM: "True",
+        STDETPROMODESTINO: "True",
+        STDETPROMODESTINO: "True",
+        STPRODUTO: "True",
+        IDGRUPOEMDESTINO: grupoSelecionadoDestino,
+        IDSUBGRUPOEMDESTINO: subGrupoDestino,
+        IDMARCAEMDESTINO: marcaDestino,
+        IDFORNECEDOREMDESTINO: fornecedorSelecionado,
+        IDGRUPOEMORIGEM: grupoSelecionadoOrigem,
+        IDSUBGRUPOEMORIGEM: subGrupoOrigem,
+        IDMARCAEMORIGEM: marcaOrigem,
+        IDFORNECEDOREMORIGEM: fornecedorSelecionado,
+
+        IDPRODUTO: Array.from(new Set([
+          ...extractIds(produtosDestino),
+          ...extractIds(produtoDestinoSelecionado),
+          ...extractIds(novoProdutoDestino),
+        ])),
+        IDPRODUTODESTINO: Array.from(new Set([
+          ...extractIds(produtosDestino),
+          ...extractIds(produtoDestinoSelecionado),
+          ...extractIds(novoProdutoDestino),
+        ])),
+        IDPRODUTOORIGEM: Array.from(new Set([
+          ...extractIds(produtosOrigem),
+          ...extractIds(produtoOrigemSelecionado),
+          ...extractIds(novoProdutoOrigem),
+        ].filter(Boolean))),
+
+  
+      };
+
+      let timerInterval;
+      Swal.fire({
+        title: 'Processando sua promoção...',
+        html: 'Aguarde enquanto enviamos os dados <b></b>',
+        timerProgressBar: true,
+        timer: 30000,
+        didOpen: () => {
+          Swal.showLoading();
+          timerInterval = setInterval(() => {
+            const content = Swal.getHtmlContainer();
+            if (content) {
+              const b = content.querySelector('b');
+              if (b) {
+                b.textContent = `${Math.floor(Swal.getTimerLeft() / 1000)}s`;
+              }
+            }
+          }, 100);
+        },
+        willClose: () => {
+          clearInterval(timerInterval);
+        }
+      });
+
+      const response = await post('/criar-promocoes-ativas-subGrupo', postData);
+
+      Swal.fire({
+        position: 'center',
+        icon: 'success',
+        title: 'Cadastro realizado com sucesso!',
+        customClass: {
+          container: 'custom-swal',
+        },
+        showConfirmButton: false,
+        timer: 1500,
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao cadastrar promoção:', error);
+      Swal.fire({
+        position: 'top-end',
+        icon: 'error',
+        title: 'Erro ao Cadastrar Promoção!',
+        text: error.message || 'Ocorreu um erro durante o cadastro',
+        customClass: {
+          container: 'custom-swal',
+        },
+        showConfirmButton: false,
+        timer: 3000,
+      });
+      return null;
+    }
+  };
+
   return {
     mecanicaSelecionada,
     setMecanicaSelecionada,

@@ -1,4 +1,4 @@
-import React, { Fragment, useRef, useState } from "react"
+import React, { Fragment, useRef, useState, useEffect } from "react"
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { useReactToPrint } from "react-to-print";
@@ -7,10 +7,10 @@ import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../../Tables/headerTable";
 import Swal from "sweetalert2";
-
+import { Checkbox } from "primereact/checkbox";
 
 export const ActionListaProdutosOrigem = ({
-  dadosProdutoSubGrupo,
+  dadosProdutoSubGrupoOrigem,
   produtoSelecionadoEstProdOrigem,
   setProdutoSelecionadoEstProdutoOrigem
 
@@ -20,7 +20,7 @@ export const ActionListaProdutosOrigem = ({
   const [selectAllChecked, setSelectAllChecked] = useState(false);
   const dataTableRef = useRef();
   
-  const dados = dadosProdutoSubGrupo.map((item, index) => {
+  const dados = dadosProdutoSubGrupoOrigem?.map((item, index) => {
     let contador = index + 1;
 
     return {
@@ -34,7 +34,7 @@ export const ActionListaProdutosOrigem = ({
   });
 
    useEffect(() => {
-      if (dados.length > 0) {
+      if (dados?.length > 0) {
         const todosSelecionados = dados.every(item => 
           produtoSelecionadoEstProdOrigem?.some(selected => 
             String(selected.IDPRODUTO) === String(item.IDPRODUTO)
@@ -72,7 +72,7 @@ export const ActionListaProdutosOrigem = ({
         Swal.fire({
           icon: 'question',
           title: 'Selecionar Todos os Produtos?',
-          text: `Deseja selecionar todos os ${dados.length} produtos da lista de origem?`,
+          text: `Deseja selecionar todos os ${dados?.length} produtos da lista de origem?`,
           showConfirmButton: true,
           showCancelButton: true,
           showCloseButton: true,
@@ -250,8 +250,8 @@ export const ActionListaProdutosOrigem = ({
             />
             <span style={{ marginLeft: '8px', fontWeight: '500' }}>
               {selectAllChecked 
-                ? `Desmarcar Todos (${produtoSelecionadoEstProdOrigem?.length || 0}/${dados.length} selecionados)`
-                : `Marcar Todos (${produtoSelecionadoEstProdOrigem?.length || 0}/${dados.length} selecionados)`
+                ? `Desmarcar Todos (${produtoSelecionadoEstProdOrigem?.length || 0}/${dados?.length} selecionados)`
+                : `Marcar Todos (${produtoSelecionadoEstProdOrigem?.length || 0}/${dados?.length} selecionados)`
               }
             </span>
           </div>

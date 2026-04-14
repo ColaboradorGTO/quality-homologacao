@@ -10,7 +10,7 @@ import Swal from "sweetalert2";
 import { Checkbox } from "primereact/checkbox";
 
 export const ActionListaProdutosDestino = ({ 
-  dadosProdutoSubGrupo,
+  dadosProdutoSubGrupoDestino,
   produtoSelecionadoEstProdDestino,
   setProdutoSelecionadoEstProdutoDestino,
 }) => {
@@ -19,7 +19,7 @@ export const ActionListaProdutosDestino = ({
   const [selectAllChecked, setSelectAllChecked] = useState(false);
   const dataTableRef = useRef();
   
-  const dados = dadosProdutoSubGrupo.map((item, index) => {
+  const dados = dadosProdutoSubGrupoDestino?.map((item, index) => {
     let contador = index + 1;
     return {
       IDSUBGRUPO: item.IDSUBGRUPO,
@@ -33,7 +33,7 @@ export const ActionListaProdutosDestino = ({
   
   
   useEffect(() => {
-    if (dados.length > 0) {
+    if (dados?.length > 0) {
       const todosSelecionados = dados.every(item => 
         produtoSelecionadoEstProdDestino?.some(selected => 
           String(selected.IDPRODUTO) === String(item.IDPRODUTO)
@@ -71,7 +71,7 @@ export const ActionListaProdutosDestino = ({
       Swal.fire({
         icon: 'question',
         title: 'Selecionar Todos os Produtos?',
-        text: `Deseja selecionar todos os ${dados.length} produtos da lista de destino?`,
+        text: `Deseja selecionar todos os ${dados?.length} produtos da lista de destino?`,
         showConfirmButton: true,
         showCancelButton: true,
         showCloseButton: true,
@@ -220,14 +220,12 @@ export const ActionListaProdutosDestino = ({
   ]
 
 
-
   return (
     <Fragment>
 
       <div className="panel">
         <div className="panel-hdr mb-4">
           <h2>Lista de Produtos</h2>
-
         </div>
         <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
           <HeaderTable
@@ -247,8 +245,8 @@ export const ActionListaProdutosDestino = ({
             />
             <span style={{ marginLeft: '8px', fontWeight: '500' }}>
               {selectAllChecked 
-                ? `Desmarcar Todos (${produtoSelecionadoEstProdDestino?.length || 0}/${dados.length} selecionados)`
-                : `Marcar Todos (${produtoSelecionadoEstProdDestino?.length || 0}/${dados.length} selecionados)`
+                ? `Desmarcar Todos (${produtoSelecionadoEstProdDestino?.length || 0}/${dados?.length} selecionados)`
+                : `Marcar Todos (${produtoSelecionadoEstProdDestino?.length || 0}/${dados?.length} selecionados)`
               }
             </span>
           </div>

@@ -259,8 +259,10 @@ export const ActionPesquisaPromocao = ({ }) => {
   const [selectedNodesDestino, setSelectedNodesDestino] = useState({});
   const [produtoSelecionadoEstProdDestino, setProdutoSelecionadoEstProdutoDestino] = useState([]);
   const [produtoSelecionadoEstProdOrigem, setProdutoSelecionadoEstProdutoOrigem] = useState([]);
-  const [modalEstProdOrigem, setModalEstProdOrigem] = useState([]);
-  const [modalEstProdDestino, setModalEstProdDestino] = useState([]);
+  const [novoProdutoEstProdOrigem, setNovoProdutoEstProdOrigem] = useState([]);
+  const [novoProdutoEstProdDestino, setNovoProdutoEstProdDestino] = useState([]);
+  const [modalEstProdOrigem, setModalEstProdOrigem] = useState(false);
+  const [modalEstProdDestino, setModalEstProdDestino] = useState(false);
 
   useEffect(() => {
     if (dadosSubGrupo.length) {
@@ -401,10 +403,16 @@ export const ActionPesquisaPromocao = ({ }) => {
 
   };
 
-  const { data: dadosProdutoSubGrupo = [], error: errorProdutoSubGrupo, isLoading: isLoadingProdutoSubGrupo, refetch: refetchProdutoSubGrupo } = useQuery(
+  const { data: dadosProdutoSubGrupoDestino = [], error: errorProdutoSubGrupoDestino, isLoading: isLoadingProdutoSubGrupoDestino, refetch: refetchProdutoSubGrupoDestino } = useQuery(
     ['produto-subGrupo', subGrupoDestino],
     async () => fetchProdutoSubGrupo(),
     { enabled: Boolean(subGrupoDestino), staleTime: 1000 * 60 * 60, cacheTime: 1000 * 60 * 60, }
+  );
+
+  const { data: dadosProdutoSubGrupoOrigem = [], error: errorProdutoSubGrupoOrigem, isLoading: isLoadingProdutoSubGrupoOrigem, refetch: refetchProdutoSubGrupoOrigem } = useQuery(
+    ['produto-subGrupo', subGrupoOrigem],
+    async () => fetchProdutoSubGrupo(),
+    { enabled: Boolean(subGrupoOrigem), staleTime: 1000 * 60 * 60, cacheTime: 1000 * 60 * 60, }
   );
 
   const handleChangeGrupo = (e) => {
@@ -920,21 +928,21 @@ export const ActionPesquisaPromocao = ({ }) => {
       <ActionEstruturaProdutoOrigemModal
         show={modalEstProdOrigem}
         handleClose={() => setModalEstProdOrigem(false)}
-        dadosProdutoSubGrupo={dadosProdutoSubGrupo}
+        dadosProdutoSubGrupoOrigem={dadosProdutoSubGrupoOrigem}
         produtoSelecionadoEstProdOrigem={produtoSelecionadoEstProdOrigem}
         setProdutoSelecionadoEstProdutoOrigem={setProdutoSelecionadoEstProdutoOrigem}
-        // novoProdutoOrigem={novoProdutoOrigem}
-        // setNovoProdutoOrigem={setNovoProdutoOrigem}
+        novoProdutoEstProdOrigem={novoProdutoEstProdOrigem}
+        setNovoProdutoEstProdOrigem={setNovoProdutoEstProdOrigem}
       />  
 
       <ActionEstruturaProdutoDestinoModal 
         show={modalEstProdDestino}
         handleClose={() => setModalEstProdDestino(false)}
-        dadosProdutoSubGrupo={dadosProdutoSubGrupo}
+        dadosProdutoSubGrupoDestino={dadosProdutoSubGrupoDestino}
         produtoSelecionadoEstProdDestino={produtoSelecionadoEstProdDestino}
         setProdutoSelecionadoEstProdutoDestino={setProdutoSelecionadoEstProdutoDestino}
-        // novoProdutoDestino={novoProdutoDestino}
-        // setNovoProdutoDestino={setNovoProdutoDestino}
+        novoProdutoEstProdDestino={novoProdutoEstProdDestino}
+        setNovoProdutoEstProdDestino={setNovoProdutoEstProdDestino}
       />
       <ActionDocumentacaoCriar
         show={modalDocumentacao}
