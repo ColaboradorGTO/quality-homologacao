@@ -69,6 +69,8 @@ export const useCreatePromocaoAtiva = ({ }) => {
   const [isCheckedGrupoProduto, setIsCheckedGrupoProduto] = useState(false)
   const [produtoSelecionadoEstProdDestino, setProdutoSelecionadoEstProdutoDestino] = useState([]);
   const [produtoSelecionadoEstProdOrigem, setProdutoSelecionadoEstProdutoOrigem] = useState([]);
+  const [subGrupoProdutoDestino, setSubGrupoProdutoDestino] = useState([])
+  const [subGrupoProdutoOrigem, setSubGrupoProdutoOrigem] = useState([])
   const [novoProdutoEstProdOrigem, setNovoProdutoEstProdOrigem] = useState([]);
   const [novoProdutoEstProdDestino, setNovoProdutoEstProdDestino] = useState([]);
   const [modalEstProdOrigem, setModalEstProdOrigem] = useState(false);
@@ -1535,11 +1537,11 @@ export const useCreatePromocaoAtiva = ({ }) => {
         STDETPROMOORIGEM: "True",
         STDETPROMODESTINO: "True",
         IDGRUPOEMDESTINO: grupoSelecionadoDestino,
-        IDSUBGRUPOEMDESTINO: subGrupoSelecionado,
+        IDSUBGRUPOEMDESTINO: subGrupoProdutoDestino,
         IDMARCAEMDESTINO: marcaDestino,
         IDFORNECEDOREMDESTINO: fornecedorSelecionado,
         IDGRUPOEMORIGEM: grupoSelecionadoOrigem,
-        IDSUBGRUPOEMORIGEM: subGrupoSelecionado,
+        IDSUBGRUPOEMORIGEM: subGrupoProdutoOrigem,
         IDMARCAEMORIGEM: marcaOrigem,
         IDFORNECEDOREMORIGEM: fornecedorSelecionado,
 
@@ -1807,6 +1809,10 @@ export const useCreatePromocaoAtiva = ({ }) => {
     setModalEstProdOrigem,
     modalEstProdDestino,
     setModalEstProdDestino,
+    subGrupoProdutoDestino,
+    setSubGrupoProdutoDestino,
+    subGrupoProdutoOrigem,
+    setSubGrupoProdutoOrigem,
     subGrupoDestino,
     setSubGrupoDestino,
     subGrupoOrigem,
