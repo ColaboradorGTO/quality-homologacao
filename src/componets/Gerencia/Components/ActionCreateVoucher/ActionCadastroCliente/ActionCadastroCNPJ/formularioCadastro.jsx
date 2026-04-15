@@ -60,6 +60,8 @@ export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos 
         setCidade,
         setEstado,
         setTelefoneComercial,
+        setIM,
+        setIE,
         optionsIndicacaoIE,
         onSubmit
     } = useCadastrarClienteCNPJ({ usuarioLogado, optionsModulos, handleClose });

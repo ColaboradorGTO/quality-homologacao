@@ -246,7 +246,6 @@ export const useCadastrarClienteCNPJ = ({ usuarioLogado, optionsModulos, handleC
         }
     }
 
-
     const { data: optionsCNPJ = [], error: errorCNPJ, isLoading: isLoadingCNPJ, refetch: refetchCNPJ } = useQuery(
         ['clientes', cnpj],
         async () => {
@@ -587,7 +586,7 @@ export const useCadastrarClienteCNPJ = ({ usuarioLogado, optionsModulos, handleC
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario || "IP NÃO DISPONIVEL"
+                IP: ipUsuario || "INDISPONIVEL"
             }
 
             await post('/log-web', postDataLog)
@@ -683,6 +682,8 @@ export const useCadastrarClienteCNPJ = ({ usuarioLogado, optionsModulos, handleC
         setNuIBGE,
         setCidade,
         setEstado,
+        setIM,
+        setIE, 
         setTelefoneComercial,
         optionsIndicacaoIE,
         onSubmit

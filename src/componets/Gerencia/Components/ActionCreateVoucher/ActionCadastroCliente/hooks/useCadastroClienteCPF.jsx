@@ -291,7 +291,7 @@ export const useCadastrarClienteCPF = ({ usuarioLogado, optionsModulos, handleCl
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario || "IP NÃO DISPONIVEL"
+                IP: ipUsuario || "INDISPONIVEL"
             }
 
             await post('/log-web', postData)

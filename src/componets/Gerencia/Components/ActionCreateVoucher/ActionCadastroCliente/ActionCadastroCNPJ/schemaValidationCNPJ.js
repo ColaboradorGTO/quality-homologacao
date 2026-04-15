@@ -1,7 +1,9 @@
 import * as yup from "yup";
+import { validaEmail } from "../../../../../../utils/validaEmail";
+
 
 export const schema = yup.object().shape({
-        // Identificação
+    // Identificação
     idClienteEmpresa: yup.string(),
     tipoCliente: yup.string(),
     dataCadastroCliente: yup.date(),
@@ -26,10 +28,10 @@ export const schema = yup.object().shape({
         }),
     emailCliente: yup.string()
         .test('email-valido', 'E-mail Inválido', (value) => {
-        if (!value || value.length === 0) return true;
+            if (!value || value.length === 0) return true;
             return validaEmail(value);
         }),
-    
+
     telefone: yup.string()
         .required('Telefone Obrigatório')
         .matches(/^(\(?\d{2}\)?\s?)?(\d{4,5}\-?\d{4})$/, 'Numero de Telefone Inválido, verifique o TELEFONE e tente novamente!'),
@@ -44,11 +46,11 @@ export const schema = yup.object().shape({
     enderecoCliente: yup.string()
         .required('Endereço Obrigatório')
         .test('not-ni', 'Campo pode ser vazio ou diferente de "NI"', (value) => {
-            if(!value || value === 'NI') return true;
-            return  value.length > 0;
+            if (!value || value === 'NI') return true;
+            return value.length > 0;
         })
         .test('valid-characters', 'Endereço contém caracteres inválidos', (value) => {
-            if(!value || value === 'NI') return true;
+            if (!value || value === 'NI') return true;
             return /^[A-Za-z0-9\s\-\/.,ºªÇçÁáÉéÍíÓóÚúÂâÊêÎîÔôÛûÀàÈèÌìÒòÙùÃãÕõÜü]*$/.test(value);
         })
         .test('not-only-numbers', 'Endereço não pode conter apenas números', (value) => {
@@ -59,7 +61,7 @@ export const schema = yup.object().shape({
         .required('Número Obrigatório')
         .test('not-ni-check', 'Campo deve ter conteúdo válido', (value) => {
             if (value === 'SN') return true;
- 
+
             return value && value.length > 0;
         })
         .test('valid-format', 'Número deve começar com dígitos seguidos de letras ou símbolos', (value) => {
