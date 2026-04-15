@@ -67,6 +67,12 @@ export const useCreatePromocaoAtiva = ({ }) => {
   const [isCheckedGrupo, setIsCheckedGrupo] = useState(false)
   const [isCheckedProduto, setIsCheckedProduto] = useState(true)
   const [isCheckedGrupoProduto, setIsCheckedGrupoProduto] = useState(false)
+  const [produtoSelecionadoEstProdDestino, setProdutoSelecionadoEstProdutoDestino] = useState([]);
+  const [produtoSelecionadoEstProdOrigem, setProdutoSelecionadoEstProdutoOrigem] = useState([]);
+  const [novoProdutoEstProdOrigem, setNovoProdutoEstProdOrigem] = useState([]);
+  const [novoProdutoEstProdDestino, setNovoProdutoEstProdDestino] = useState([]);
+  const [modalEstProdOrigem, setModalEstProdOrigem] = useState(false);
+  const [modalEstProdDestino, setModalEstProdDestino] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -179,67 +185,6 @@ export const useCreatePromocaoAtiva = ({ }) => {
     refetchMarcas()
   }, [marcaSelecionada, refetchEmpresas]);
 
-  // ✅ Versão minimalista
-  // const downloadPlanilhaModelo = () => {
-  //     const workbook = XLSX.utils.book_new();
-  //     const worksheet = XLSX.utils.aoa_to_sheet([['ID']]);
-      
-  //     worksheet['!cols'] = [{ wpx: 150 }];
-  //     XLSX.utils.book_append_sheet(workbook, worksheet, 'Produtos');
-  //     XLSX.writeFile(workbook, 'modelo_produtos.xlsx');
-  // };
-
-  // const downloadPlanilhaModelo = () => {
-  //   const workbook = XLSX.utils.book_new();
-
-  //   // Dados da planilha (título + header)
-  //   const data = [
-  //       ['Produtos da Promoção'], // título
-  //       ['ID'] // header
-  //   ];
-
-  //   const worksheet = XLSX.utils.aoa_to_sheet(data);
-
-  //   // Mesclar células para o título ocupar a linha inteira
-  //   worksheet['!merges'] = [
-  //       { s: { r: 0, c: 0 }, e: { r: 0, c: 2 } } // mescla A1 até C1
-  //   ];
-
-  //   // Estilo do título (OBS: precisa da versão xlsx-style ou similar)
-  //   worksheet['A1'].s = {
-  //       font: {
-  //           bold: true,
-  //           color: { rgb: "FFFFFF" },
-  //           sz: 14
-  //       },
-  //       fill: {
-  //           fgColor: { rgb: "FF0000" } // vermelho
-  //       },
-  //       alignment: {
-  //           horizontal: "center",
-  //           vertical: "center"
-  //       }
-  //   };
-
-  //   // Largura da coluna
-  //   worksheet['!cols'] = [{ wpx: 200 }];
-
-  //   // Validação de dados (limite de 30 caracteres na coluna A)
-  //   worksheet['!dataValidation'] = [
-  //       {
-  //           sqref: "A2:A1000", // aplica da linha 2 pra baixo
-  //           type: "textLength",
-  //           operator: "lessThanOrEqual",
-  //           formula1: "30",
-  //           showErrorMessage: true,
-  //           error: "Máximo de 30 caracteres permitido."
-  //       }
-  //   ];
-
-  //   XLSX.utils.book_append_sheet(workbook, worksheet, 'Produtos');
-  //   XLSX.writeFile(workbook, 'modelo_produtos.xlsx');
-  // };
-
   const downloadPlanilhaModelo = async () => {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Produtos");
@@ -334,7 +279,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
     const buffer = await workbook.xlsx.writeBuffer();
     saveAs(new Blob([buffer]), "modelo_produtos.xlsx");
   };
-  // ✅ ADICIONAR: Função para limpar quando há erro
+
   const clearFileError = (isOrigem) => {
       // Limpa o estado do arquivo
       if (isOrigem) {
@@ -1092,6 +1037,9 @@ export const useCreatePromocaoAtiva = ({ }) => {
         DSPROMOCAOMARKETING: descricao.toUpperCase(),
         IDEMPRESA: empresaSelecionada,
         STATIVO: "True",
+        STESTRUTURA: "False",
+        STPRODUTO: "True",
+        STESTRUTURAPRODUTO: "False",
         STEMPRESAPROMO: "True",
         STDETPROMOORIGEM: "True",
         STDETPROMODESTINO: "True",
@@ -1175,7 +1123,6 @@ export const useCreatePromocaoAtiva = ({ }) => {
     }
   };
 
-
   const onSubmitEstrutura = async (data) => {
   
     try {
@@ -1250,6 +1197,9 @@ export const useCreatePromocaoAtiva = ({ }) => {
         DSPROMOCAOMARKETING: descricao.toUpperCase(),
         IDEMPRESA: empresaSelecionada,
         STATIVO: "True",
+        STESTRUTURA: "True",
+        STPRODUTO: "False",
+        STESTRUTURAPRODUTO: "False",
         STEMPRESAPROMO: "True",
         STDETPROMOORIGEM: "True",
         STDETPROMODESTINO: "True",
@@ -1317,6 +1267,342 @@ export const useCreatePromocaoAtiva = ({ }) => {
         },
         showConfirmButton: false,
         timer: 3000,
+      });
+      return null;
+    }
+  };
+
+  console.log(produtoSelecionadoEstProdDestino, 'produtoSelecionadoEstProdDestino');
+  console.log(produtoSelecionadoEstProdOrigem, 'produtoSelecionadoEstProdOrigem');
+
+  const onSubmitEstruturaProduto = async (data) => {
+
+    try {
+
+      const responsePromocao = await get(`/promocoes-ativas?dataPesquisaFim=${dataFim}`);
+      const promocoesAtivas = responsePromocao.data;
+      setDadosPromocoesAtivas(promocoesAtivas);
+
+      if (!mecanicaSelecionada) {
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: 'Selecione uma mecânica!',
+          customClass: {
+            container: 'custom-swal',
+          },
+          showConfirmButton: false,
+          timer: 3000,
+        })
+        return;
+      }
+
+      if (!empresaSelecionada || empresaSelecionada.length == 0) {
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: 'Selecione uma empresa!',
+          customClass: {
+            container: 'custom-swal',
+          },
+          showConfirmButton: false,
+          timer: 3000,
+        })
+        return;
+      }
+
+      if (descricao.length > 80) {
+          Swal.fire({
+            position: 'center',
+            icon: 'error',
+            title: 'Descrição deve ter no máximo 80 caracteres!',
+            customClass: {
+              container: 'custom-swal',
+            },
+            showConfirmButton: false,
+            timer: 3000,
+          })
+          return;
+      }
+
+
+
+      if (promocoesAtivas && promocoesAtivas.length > 0) {
+        const produtoDestinoArray = Array.isArray(produtoSelecionadoEstProdDestino) ? produtoSelecionadoEstProdDestino : [produtoSelecionadoEstProdDestino];
+        const idsResumo = promocoesAtivas.map(p => p.IDRESUMOPROMOCAOMARKETING).filter(Boolean);
+        const existeAplicaoDestino = promocoesAtivas.some(ap => ap.TPAPARTIRDE == aplicacaoDestinoSelecionada);
+
+        if (idsResumo && idsResumo.length > 0) {
+          const idResumo = idsResumo.join(',');
+          const responseProdutoExistente = await get(`/detalhe-promocoes-ativas?idResumoPromocao=${idResumo}&dataPesquisaFim=${dataFim}`);
+
+          if (!responseProdutoExistente.data) {
+            throw new Error('Falha ao verificar produtos existentes');
+          }
+
+          const produtosExistentes = responseProdutoExistente.data.detalhePromo || [];
+          const existeProduto = produtosExistentes.some(produto =>
+            produtoDestinoArray.includes(produto.IDPRODUTO)
+          );
+
+          if (existeProduto) {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Produto já está em uma promoção ativa!',
+              text: 'Um dos produtos destino já está vinculado a uma promoção ativa.',
+              customClass: { container: 'custom-swal' },
+              confirmButtonText: 'OK'
+            });
+            return;
+          }
+
+          const promocoesValidas = responseProdutoExistente.data;
+          const promocaoPorParesAtiva = promocoesValidas.some(promo => promo.TPAPARTIRDE == 0);
+          const promocaoPorMenosNaPrimeira = promocoesValidas.some(promo => promo.TPAPARTIRDE == 3 && promo.TPAPARTIRDE == 0);
+          const promocaoPorParesEmUmProduto = promocoesValidas.some(promo => promo.TPAPARTIRDE == 0 && promo.TPAPARTIRDE == 4);
+          const descontoAtivoPromocaoPorEmpresa = promocoesValidas.some(promo => promo.TPFATORPROMO == tipoDescontoSelecionado)
+
+          if (promocaoPorParesEmUmProduto) {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Promoção por pares e em um produto não podem ser usadas juntas!',
+              text: 'Não é permitido cadastrar uma promoção por pares e em um produto ao mesmo tempo.',
+              customClass: { container: 'custom-swal' },
+              confirmButtonText: 'OK'
+            });
+            return;
+          }
+
+          if (descontoAtivoPromocaoPorEmpresa) {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Tipo Desconto já ativo nesta empresa!',
+              text: 'Já existe um desconto ativo com o mesmo tipo de desconto nesta empresa. Não é permitido cadastrar outro.',
+              customClass: { container: 'custom-swal' },
+              confirmButtonText: 'OK'
+            });
+            return;
+          }
+
+          const promocoesValidasNaEmpresaSelecionada = [];
+          responseProdutoExistente.data.forEach(item => {
+            if (Array.isArray(item.empresaPromocaoMarketing)) {
+              item.empresaPromocaoMarketing.forEach(empresa => {
+                if (empresa.det.IDEMPRESA == empresaSelecionada) {
+                  promocoesValidasNaEmpresaSelecionada.push(empresa.det.IDEMPRESA);
+                }
+              });
+            }
+          })
+
+          if (promocaoPorParesAtiva) {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Promoção por pares já existente!',
+              text: 'Já existe uma promoção ativa com aplicação destino por pares. Não é permitido cadastrar outra.',
+              customClass: { container: 'custom-swal' },
+              confirmButtonText: 'OK'
+            });
+            return;
+          }
+
+          if (promocaoPorMenosNaPrimeira) {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Promoção menos na primeira já existente!',
+              text: 'Já existe uma promoção ativa com aplicação destino menos na primeira. Não é permitido cadastrar outra.',
+              customClass: { container: 'custom-swal' },
+              confirmButtonText: 'OK'
+            });
+            return;
+          }
+
+          if (promocoesValidasNaEmpresaSelecionada.length >= 3) {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Limite atingido',
+              text: 'Já existem 3 promoções ativas nesta empresa. Não é permitido cadastrar outra..',
+              customClass: { container: 'custom-swal' },
+              confirmButtonText: 'OK'
+            });
+            return;
+          }
+        }
+      }
+
+      if (aplicacaoDestinoSelecionada == 0 || aplicacaoDestinoSelecionada == 3) {
+        const origem = produtoSelecionadoEstProdOrigem;
+        const destino = produtoSelecionadoEstProdDestino;
+        const iguais = origem.length === destino.length && origem.every((v, i) => v === destino[i]);
+
+        if (!iguais) {
+          Swal.fire({
+            position: 'center',
+            icon: 'error',
+            title: 'Erro Produtos Origem e Destino',
+            text: 'Para Mecânica por pares ou menos na primeira, os produtos de origem e destino devem ser iguais.',
+            customClass: {
+              container: 'custom-swal',
+            },
+            showConfirmButton: false,
+            timer: 5000,
+          });
+          return;
+        }
+      }
+
+      if (aplicacaoDestinoSelecionada == 1) {
+        if (produtoSelecionadoEstProdDestino.length !== produtoSelecionadoEstProdOrigem.length) {
+          Swal.fire({
+            position: 'center',
+            icon: 'error',
+            title: 'Erro Aplicação Destino',
+            text: 'Para Mecânica por todos os produtos, os produtos de origem e destino devem ser iguais.',
+            customClass: { container: 'custom-swal' },
+            showConfirmButton: false,
+            timer: 8000,
+          });
+          return;
+        }
+      }
+
+      if (aplicacaoDestinoSelecionada == 4) {
+
+        if (produtoSelecionadoEstProdDestino.length !== 1 || produtoSelecionadoEstProdOrigem.length !== 1) {
+          Swal.fire({
+            position: 'center',
+            icon: 'error',
+            title: 'Erro Aplicação Destino',
+            text: 'Para Mecânica em um produto, apenas um produto pode ser enviado tanto na origem quanto no destino.',
+            customClass: { container: 'custom-swal' },
+            showConfirmButton: false,
+            timer: 8000,
+          });
+          return;
+        }
+
+       
+
+        const origemId = typeof produtoSelecionadoEstProdOrigem[0] === 'object' && produtoSelecionadoEstProdOrigem[0] !== null ? produtoSelecionadoEstProdOrigem[0].IDPRODUTO : produtoSelecionadoEstProdOrigem[0];
+        const destinoId = typeof produtoSelecionadoEstProdDestino[0] === 'object' && produtoSelecionadoEstProdDestino[0] !== null ? produtoSelecionadoEstProdDestino[0].IDPRODUTO : produtoSelecionadoEstProdDestino[0];
+        if (origemId !== destinoId) {
+          
+          Swal.fire({
+            position: 'center',
+            icon: 'error',
+            title: 'Erro Aplicação Destino',
+            text: 'Para Mecânica em um produto, o produto de origem e destino deve ser o mesmo.',
+            customClass: { container: 'custom-swal' },
+            showConfirmButton: false,
+            timer: 8000,
+          });
+          return;
+        }
+      }
+
+      // Helper to extract only IDPRODUTO from array or value
+      const extractIds = arr => {
+        if (!arr) return [];
+        if (Array.isArray(arr)) {
+          return arr
+            .map(item => typeof item === 'object' && item !== null && item.IDPRODUTO ? item.IDPRODUTO : item)
+            .filter(Boolean);
+        }
+        if (typeof arr === 'object' && arr !== null && arr.IDPRODUTO) {
+          return [arr.IDPRODUTO];
+        }
+        return [arr];
+      };
+
+      const postData = {
+        TPAPARTIRDE: aplicacaoDestinoSelecionada,
+        TPAPLICADOA: mecanicaSelecionada,
+        TPFATORPROMO: tipoDescontoSelecionado,
+        APARTIRDEQTD: Number(qtdInicio),
+        APARTIRDOVLR: valorInicio,
+        FATORPROMOVLR: vrDesconto,
+        FATORPROMOPERC: porcentoDesconto,
+        VLPRECOPRODUTO: Number(precoProduto),
+        DTHORAINICIO: dataInicio,
+        DTHORAFIM: dataFim + ' 23:59:59',
+        DSPROMOCAOMARKETING: descricao,
+        IDEMPRESA: empresaSelecionada,
+        STATIVO: "True",
+        STESTRUTURA: "False",
+        STPRODUTO: "False",
+        STESTRUTURAPRODUTO: "True",
+        STEMPRESAPROMO: "True",
+        STDETPROMOORIGEM: "True",
+        STDETPROMODESTINO: "True",
+        IDGRUPOEMDESTINO: grupoSelecionadoDestino,
+        IDSUBGRUPOEMDESTINO: subGrupoSelecionado,
+        IDMARCAEMDESTINO: marcaDestino,
+        IDFORNECEDOREMDESTINO: fornecedorSelecionado,
+        IDGRUPOEMORIGEM: grupoSelecionadoOrigem,
+        IDSUBGRUPOEMORIGEM: subGrupoSelecionado,
+        IDMARCAEMORIGEM: marcaOrigem,
+        IDFORNECEDOREMORIGEM: fornecedorSelecionado,
+
+        IDPRODUTO: Array.from(new Set([
+          ...extractIds(produtoSelecionadoEstProdDestino),
+        ])),
+        IDPRODUTODESTINO: Array.from(new Set([
+          ...extractIds(produtoSelecionadoEstProdDestino),
+        ])),
+        IDPRODUTOORIGEM: Array.from(new Set([
+          ...extractIds(produtoSelecionadoEstProdOrigem),
+        ].filter(Boolean))),
+      };
+
+      let timerInterval;
+      Swal.fire({
+        title: 'Processando sua promoção...',
+        html: 'Aguarde enquanto enviamos os dados <b></b>',
+        timerProgressBar: true,
+        timer: 30000,
+        didOpen: () => {
+          Swal.showLoading();
+          timerInterval = setInterval(() => {
+            const content = Swal.getHtmlContainer();
+            if (content) {
+              const b = content.querySelector('b');
+              if (b) {
+                b.textContent = `${Math.floor(Swal.getTimerLeft() / 1000)}s`;
+              }
+            }
+          }, 100);
+        },
+        willClose: () => {
+          clearInterval(timerInterval);
+        }
+      });
+
+      const response = await post('/criar-promocoes-ativas', postData);
+
+      Swal.fire({
+        position: 'center',
+        icon: 'success',
+        title: 'Cadastro realizado com sucesso!',
+        customClass: {
+          container: 'custom-swal',
+        },
+        showConfirmButton: false,
+        timer: 5000,
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao cadastrar promoção:', error);
+      Swal.fire({
+        position: 'top-end',
+        icon: 'error',
+        title: 'Erro ao Cadastrar Promoção!',
+        text: error.message || 'Ocorreu um erro durante o cadastro',
+        customClass: {
+          container: 'custom-swal',
+        },
+        showConfirmButton: false,
+        timer: 5000,
       });
       return null;
     }
@@ -1396,197 +1682,6 @@ export const useCreatePromocaoAtiva = ({ }) => {
     }
 
   }
-
-  const onSubmitEstruturaProduto = async (data) => {
-  
-    try {
-      if (!mecanicaSelecionada) {
-        Swal.fire({
-          position: 'center',
-          icon: 'error',
-          title: 'Selecione uma mecânica!',
-          customClass: {
-            container: 'custom-swal',
-          },
-          showConfirmButton: false,
-          timer: 3000,
-        })
-        return;
-      }
-
-      if (!empresaSelecionada || empresaSelecionada.length == 0) {
-        Swal.fire({
-          position: 'center',
-          icon: 'error',
-          title: 'Selecione uma empresa!',
-          customClass: {
-            container: 'custom-swal',
-          },
-          showConfirmButton: false,
-          timer: 3000,
-        })
-        return;
-      }
-
-      if(!subGrupoDestino && !subGrupoOrigem) {
-        Swal.fire({
-          position: 'center',
-          icon: 'error',
-          title: 'Selecione um subgrupo para origem e destino!',
-          customClass: {
-            container: 'custom-swal',
-          },
-          showConfirmButton: false,
-          timer: 5000,
-        })
-        return;
-      }
-
-      if (descricao.length > 80) {
-          Swal.fire({
-            position: 'center',
-            icon: 'error',
-            title: 'Descrição deve ter no máximo 80 caracteres!',
-            customClass: {
-              container: 'custom-swal',
-            },
-            showConfirmButton: false,
-            timer: 3000,
-          })
-          return;
-      }
-
-      const produtosOrigem = 
-        (fileProdutoOrigem && fileProdutoOrigem.length > 0)
-          ? JSON.parse(fileProdutoOrigem)
-          : produtoOrigem
-        ? [produtoOrigem]
-        : (produtoOrigemSelecionado && produtoOrigemSelecionado.length > 0)
-          ? produtoOrigemSelecionado
-          : [];
-
-      const produtosDestino = 
-        (fileProdutoDestino && fileProdutoDestino.length > 0)
-          ? JSON.parse(fileProdutoDestino)
-          : produtoDestino
-        ? [produtoDestino]
-        : (produtoDestinoSelecionado && produtoDestinoSelecionado.length > 0)
-          ? produtoDestinoSelecionado
-          : [];
-
-      const extractIds = arr => {
-        if (!arr) return [];
-        if (Array.isArray(arr)) {
-          return arr
-            .map(item => typeof item === 'object' && item !== null && item.IDPRODUTO ? item.IDPRODUTO : item)
-            .filter(Boolean);
-        }
-        if (typeof arr === 'object' && arr !== null && arr.IDPRODUTO) {
-          return [arr.IDPRODUTO];
-        }
-        return [arr];
-      };
-
-      const postData = {
-        TPAPARTIRDE: aplicacaoDestinoSelecionada,
-        TPAPLICADOA: mecanicaSelecionada,
-        TPFATORPROMO: tipoDescontoSelecionado,
-        APARTIRDEQTD: Number(qtdInicio),
-        APARTIRDOVLR: valorInicio,
-        FATORPROMOVLR: vrDesconto,
-        FATORPROMOPERC: porcentoDesconto,
-        VLPRECOPRODUTO: Number(precoProduto),
-        DTHORAINICIO: dataInicio,
-        DTHORAFIM: dataFim + ' 23:59:59',
-        DSPROMOCAOMARKETING: descricao.toUpperCase(),
-        IDEMPRESA: empresaSelecionada,
-        STATIVO: "True",
-        STEMPRESAPROMO: "True",
-        STDETPROMOORIGEM: "True",
-        STDETPROMODESTINO: "True",
-        STDETPROMODESTINO: "True",
-        STPRODUTO: "True",
-        IDGRUPOEMDESTINO: grupoSelecionadoDestino,
-        IDSUBGRUPOEMDESTINO: subGrupoDestino,
-        IDMARCAEMDESTINO: marcaDestino,
-        IDFORNECEDOREMDESTINO: fornecedorSelecionado,
-        IDGRUPOEMORIGEM: grupoSelecionadoOrigem,
-        IDSUBGRUPOEMORIGEM: subGrupoOrigem,
-        IDMARCAEMORIGEM: marcaOrigem,
-        IDFORNECEDOREMORIGEM: fornecedorSelecionado,
-
-        IDPRODUTO: Array.from(new Set([
-          ...extractIds(produtosDestino),
-          ...extractIds(produtoDestinoSelecionado),
-          ...extractIds(novoProdutoDestino),
-        ])),
-        IDPRODUTODESTINO: Array.from(new Set([
-          ...extractIds(produtosDestino),
-          ...extractIds(produtoDestinoSelecionado),
-          ...extractIds(novoProdutoDestino),
-        ])),
-        IDPRODUTOORIGEM: Array.from(new Set([
-          ...extractIds(produtosOrigem),
-          ...extractIds(produtoOrigemSelecionado),
-          ...extractIds(novoProdutoOrigem),
-        ].filter(Boolean))),
-
-  
-      };
-
-      let timerInterval;
-      Swal.fire({
-        title: 'Processando sua promoção...',
-        html: 'Aguarde enquanto enviamos os dados <b></b>',
-        timerProgressBar: true,
-        timer: 30000,
-        didOpen: () => {
-          Swal.showLoading();
-          timerInterval = setInterval(() => {
-            const content = Swal.getHtmlContainer();
-            if (content) {
-              const b = content.querySelector('b');
-              if (b) {
-                b.textContent = `${Math.floor(Swal.getTimerLeft() / 1000)}s`;
-              }
-            }
-          }, 100);
-        },
-        willClose: () => {
-          clearInterval(timerInterval);
-        }
-      });
-
-      const response = await post('/criar-promocoes-ativas-subGrupo', postData);
-
-      Swal.fire({
-        position: 'center',
-        icon: 'success',
-        title: 'Cadastro realizado com sucesso!',
-        customClass: {
-          container: 'custom-swal',
-        },
-        showConfirmButton: false,
-        timer: 1500,
-      });
-
-      return response.data;
-    } catch (error) {
-      console.error('Erro ao cadastrar promoção:', error);
-      Swal.fire({
-        position: 'top-end',
-        icon: 'error',
-        title: 'Erro ao Cadastrar Promoção!',
-        text: error.message || 'Ocorreu um erro durante o cadastro',
-        customClass: {
-          container: 'custom-swal',
-        },
-        showConfirmButton: false,
-        timer: 3000,
-      });
-      return null;
-    }
-  };
 
   return {
     mecanicaSelecionada,
@@ -1689,9 +1784,10 @@ export const useCreatePromocaoAtiva = ({ }) => {
     mostrarProdutosSelecionadosOrigem,
     mostrarProdutosSelecionadosDestino,
     modalDocumentacao,
-
-    modalPodutoSelecionadoDestinoCSV, setModalPodutoSelecionadoDestinoCSV,
-    modalPodutoSelecionadoOrigemCSV, setModalPodutoSelecionadoOrigemCSV,
+    modalPodutoSelecionadoDestinoCSV, 
+    setModalPodutoSelecionadoDestinoCSV,
+    modalPodutoSelecionadoOrigemCSV, 
+    setModalPodutoSelecionadoOrigemCSV,
     setModalDocumentacao,
     isCheckedGrupo, 
     setIsCheckedGrupo,
@@ -1699,11 +1795,24 @@ export const useCreatePromocaoAtiva = ({ }) => {
     setIsCheckedProduto,
     isCheckedGrupoProduto, 
     setIsCheckedGrupoProduto,
+    produtoSelecionadoEstProdDestino,
+    setProdutoSelecionadoEstProdutoDestino,
+    produtoSelecionadoEstProdOrigem,
+    setProdutoSelecionadoEstProdutoOrigem,
+    novoProdutoEstProdOrigem,
+    setNovoProdutoEstProdOrigem,
+    novoProdutoEstProdDestino,
+    setNovoProdutoEstProdDestino,
+    modalEstProdOrigem,
+    setModalEstProdOrigem,
+    modalEstProdDestino,
+    setModalEstProdDestino,
     subGrupoDestino,
     setSubGrupoDestino,
     subGrupoOrigem,
     setSubGrupoOrigem,
     downloadPlanilhaModelo,
-    onSubmitEstrutura
+    onSubmitEstrutura,
+    onSubmitEstruturaProduto
   }
 }

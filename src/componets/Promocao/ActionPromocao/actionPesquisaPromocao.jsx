@@ -25,6 +25,7 @@ import { useQuery } from "react-query";
 import { ActionEstruturaProdutoOrigemModal } from "./ActionProdutosOrigem/actionEstruturaProdutoOrigemModal";
 import { ActionEstruturaProdutoDestinoModal } from "./ActionProdutosDestino/actionEstruturaProdutoDestinoModal";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../utils/animationCarregamento"
+import Swal from "sweetalert2";
 
 
 export const ActionPesquisaPromocao = ({ }) => {
@@ -139,13 +140,26 @@ export const ActionPesquisaPromocao = ({ }) => {
     setIsCheckedProduto,
     isCheckedGrupoProduto,
     setIsCheckedGrupoProduto,
+    produtoSelecionadoEstProdDestino,
+    setProdutoSelecionadoEstProdutoDestino,
+    produtoSelecionadoEstProdOrigem,
+    setProdutoSelecionadoEstProdutoOrigem,
+    novoProdutoEstProdOrigem,
+    setNovoProdutoEstProdOrigem,
+    novoProdutoEstProdDestino,
+    setNovoProdutoEstProdDestino,
+    modalEstProdOrigem,
+    setModalEstProdOrigem,
+    modalEstProdDestino,
+    setModalEstProdDestino,
     subGrupoDestino,
     setSubGrupoDestino,
     subGrupoOrigem,
     setSubGrupoOrigem,
     onSubmit,
     downloadPlanilhaModelo,
-    onSubmitEstrutura
+    onSubmitEstrutura,
+    onSubmitEstruturaProduto 
 
   } = useCreatePromocaoAtiva({});
 
@@ -254,49 +268,40 @@ export const ActionPesquisaPromocao = ({ }) => {
   }, []);
 
   const [treeData, setTreeData] = useState([]);
-  const [treeDataEstProd, setTreeDataEstProd] = useState([]);
   const [selectedNodesOrigem, setSelectedNodesOrigem] = useState({});
   const [selectedNodesDestino, setSelectedNodesDestino] = useState({});
-  const [produtoSelecionadoEstProdDestino, setProdutoSelecionadoEstProdutoDestino] = useState([]);
-  const [produtoSelecionadoEstProdOrigem, setProdutoSelecionadoEstProdutoOrigem] = useState([]);
-  const [novoProdutoEstProdOrigem, setNovoProdutoEstProdOrigem] = useState([]);
-  const [novoProdutoEstProdDestino, setNovoProdutoEstProdDestino] = useState([]);
-  const [modalEstProdOrigem, setModalEstProdOrigem] = useState(false);
-  const [modalEstProdDestino, setModalEstProdDestino] = useState(false);
 
   useEffect(() => {
     if (dadosSubGrupo.length) {
-      // 1. Agrupar subgrupos por IDGRUPOESTRUTURA
+    
       const gruposMap = new Map();
 
       dadosSubGrupo.forEach(subgrupo => {
-        const grupoId = subgrupo.IDGRUPOESTRUTURA; // ID do grupo (não do subgrupo)
-        const grupoDescricao = subgrupo.DSGRUPOESTRUTURA; // Nome do grupo
+        const grupoId = subgrupo.IDGRUPOESTRUTURA;
+        const grupoDescricao = subgrupo.DSGRUPOESTRUTURA; 
 
-        // Se o grupo ainda não existe no Map, criar
+  
         if (!gruposMap.has(grupoId)) {
           gruposMap.set(grupoId, {
-            key: `grupo_${grupoId}`, // Chave única para o grupo com prefixo
-            label: grupoDescricao,    // Nome do grupo
-            children: [],             // Array dos subgrupos
+            key: `grupo_${grupoId}`,
+            label: grupoDescricao,   
+            children: [],           
           });
         }
 
-        // Adicionar o subgrupo como filho do grupo
         gruposMap.get(grupoId).children.push({
-          key: `subgrupo_${subgrupo.IDSUBGRUPOESTRUTURA}`, // Chave do subgrupo com prefixo
-          label: subgrupo.DSSUBGRUPOESTRUTURA,              // Nome do subgrupo
-          data: subgrupo // Opcional: dados completos do subgrupo
+          key: `subgrupo_${subgrupo.IDSUBGRUPOESTRUTURA}`,
+          label: subgrupo.DSSUBGRUPOESTRUTURA, 
+          data: subgrupo 
         });
       });
 
-      // 2. Converter o Map em array para o TreeSelect
+ 
       const formattedTreeData = Array.from(gruposMap.values());
       setTreeData(formattedTreeData);
 
     }
   }, [dadosSubGrupo]);
-
   
   useEffect(() => {
     if (treeData.length && (grupoSelecionado.length || subGrupoDestino.length)) {
@@ -368,11 +373,65 @@ export const ActionPesquisaPromocao = ({ }) => {
     setSubGrupoDestino(selectedSubGrupo);
   };
 
-  const fetchProdutoSubGrupo = async () => {
+  const handleProdutoSubGrupoOrigemChange = (e) => {
+    const selectedValue = e.value;
+    setSelectedNodesOrigem(selectedValue);
+
+    const selectedGrupo = [];
+    const selectedSubGrupo = [];
+
+    // Processar as chaves selecionadas
+    Object.keys(selectedValue).forEach(key => {
+      if (key.startsWith('grupo_')) {
+        // Extrair o ID do grupo (remove o prefixo 'grupo_')
+        const grupoId = key.replace('grupo_', '');
+        selectedGrupo.push(grupoId);
+      } else if (key.startsWith('subgrupo_')) {
+        // Extrair o ID do subgrupo (remove o prefixo 'subgrupo_')
+        const subgrupoId = Number(key.replace('subgrupo_', ''));
+        selectedSubGrupo.push(subgrupoId);
+      }
+    });
+
+    setGrupoSelecionado(selectedGrupo);
+    setSubGrupoOrigem(selectedSubGrupo);
+    
+    if (subGrupoOrigem.length > 0) {
+      refetchProdutoSubGrupoOrigem();
+    }
+  };
+
+  const handleProdutoSubGrupoDestinoChange = (e) => {
+    const selectedValue = e.value;
+    setSelectedNodesDestino(selectedValue);
+
+    const selectedGrupo = [];
+    const selectedSubGrupo = [];
+
+    // Processar as chaves selecionadas
+    Object.keys(selectedValue).forEach(key => {
+      if (key.startsWith('grupo_')) {
+        // Extrair o ID do grupo (remove o prefixo 'grupo_')
+        const grupoId = key.replace('grupo_', '');
+        selectedGrupo.push(grupoId);
+      } else if (key.startsWith('subgrupo_')) {
+        // Extrair o ID do subgrupo (remove o prefixo 'subgrupo_')
+        const subgrupoId = Number(key.replace('subgrupo_', ''));
+        selectedSubGrupo.push(subgrupoId);
+      }
+    });
+
+    setGrupoSelecionado(selectedGrupo);
+    setSubGrupoDestino(selectedSubGrupo);
+    if (subGrupoDestino.length > 0) {
+      refetchProdutoSubGrupoDestino();
+    }
+  };
+
+  const fetchProdutoSubGrupoDestino = async () => {
     const urlBase = `/produto-subGrupo?idSubGrupo=${subGrupoDestino.join(',')}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
-
     try {
       animacaoCarregamento('Carregando dados...', true);
 
@@ -400,19 +459,51 @@ export const ActionPesquisaPromocao = ({ }) => {
     } finally {
       fecharAnimacaoCarregamento();
     }
-
   };
-
+  
   const { data: dadosProdutoSubGrupoDestino = [], error: errorProdutoSubGrupoDestino, isLoading: isLoadingProdutoSubGrupoDestino, refetch: refetchProdutoSubGrupoDestino } = useQuery(
     ['produto-subGrupo', subGrupoDestino],
-    async () => fetchProdutoSubGrupo(),
-    { enabled: Boolean(subGrupoDestino), staleTime: 1000 * 60 * 60, cacheTime: 1000 * 60 * 60, }
+    async () => fetchProdutoSubGrupoDestino(),
+    { enabled: Boolean(subGrupoDestino.length), staleTime: 1000 * 60 * 60, cacheTime: 1000 * 60 * 60, }
   );
+
+  const fetchProdutoSubGrupoOrigem = async () => {
+    const urlBase = `/produto-subGrupo?idSubGrupo=${subGrupoOrigem.join(',')}`;
+    let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
+    urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+    try {
+      animacaoCarregamento('Carregando dados...', true);
+
+      const primeiraPagina = 1;
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const page = primeiraResposta.page || primeiraPagina;
+      const pageSize = primeiraResposta.pageSize || 1000;
+      const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
+      const totalPages = Math.ceil(totalRows / pageSize);
+
+      let allData = [...(primeiraResposta.data || [])];
+
+      if (totalPages > 1) {
+        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          allData.push(...(responsePage.data || []));
+        }
+      }
+
+      return allData;
+    } catch (error) {
+      console.error('Erro ao buscar dados da api:', error);
+      throw error;
+    } finally {
+      fecharAnimacaoCarregamento();
+    }
+  };
 
   const { data: dadosProdutoSubGrupoOrigem = [], error: errorProdutoSubGrupoOrigem, isLoading: isLoadingProdutoSubGrupoOrigem, refetch: refetchProdutoSubGrupoOrigem } = useQuery(
     ['produto-subGrupo', subGrupoOrigem],
-    async () => fetchProdutoSubGrupo(),
-    { enabled: Boolean(subGrupoOrigem), staleTime: 1000 * 60 * 60, cacheTime: 1000 * 60 * 60, }
+    async () => fetchProdutoSubGrupoOrigem(),
+    { enabled: false, staleTime: 1000 * 60 * 60, cacheTime: 1000 * 60 * 60, }
   );
 
   const handleChangeGrupo = (e) => {
@@ -443,11 +534,29 @@ export const ActionPesquisaPromocao = ({ }) => {
   }
 
   const mostrarModalEstruturaDestino = () => {
-    setModalEstProdDestino(true);
+    if(dadosProdutoSubGrupoDestino.length > 0) {
+      setModalEstProdDestino(true);
+    } else {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Nenhum produto encontrado.',
+        text: 'para os subgrupos selecionados no destino',
+        confirmButtonText: 'OK'
+      })
+    }
   }
 
   const mostrarModalEstruturaOrigem = () => {
-    setModalEstProdOrigem(true);
+    if(dadosProdutoSubGrupoOrigem.length > 0) {
+      setModalEstProdOrigem(true);
+    } else {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Nenhum produto encontrado.',
+        text: 'para os subgrupos selecionados na origem',
+        confirmButtonText: 'OK'
+      })
+    }
   }
 
   return (
@@ -723,9 +832,9 @@ export const ActionPesquisaPromocao = ({ }) => {
     
         MenuTreeSelectOrigemComponentEstProd={MenuTreeSelect}
         valueTreeSelectOrigemEstProd={selectedNodesOrigem}
-        onChangeTreeSelectOrigemEstProd={handleTreeSelectOrigemChange}
+        onChangeTreeSelectOrigemEstProd={handleProdutoSubGrupoOrigemChange}
         optionsTreeSelectOrigemEstProd={treeData}
-        // placeholderTreeSelectOrigemEstProd
+        placeholderTreeSelectOrigemEstProd="Selecione"
         labelSelectSubGrupoOrigemAsyncEstProd={"Sub Grupo Origem"}
         
         ButtonTypeProdutoEstruturaOrigem={ButtonType}
@@ -736,9 +845,9 @@ export const ActionPesquisaPromocao = ({ }) => {
 
         MenuTreeSelectDestinoComponentEstProd={MenuTreeSelect}
         valueTreeSelectDestinoEstProd={selectedNodesDestino}
-        onChangeTreeSelectDestinoEstProd={handleTreeSelectDestinoChange}
+        onChangeTreeSelectDestinoEstProd={handleProdutoSubGrupoDestinoChange}
         optionsTreeSelectDestinoEstProd={treeData}
-        placeholderTreeSelectDestinoEstProd
+        placeholderTreeSelectDestinoEstProd="Selecione"
         labelSelectSubGrupoDestinoAsyncEstProd={"Sub Grupo Destino"}
 
         ButtonTypeProdutoEstruturaDestino={ButtonType}
@@ -844,6 +953,13 @@ export const ActionPesquisaPromocao = ({ }) => {
         IconSearch={IoIosSend}
         styleButtonSearch={isCheckedProduto ? false : true}
 
+        ButtonTypeEstruturaProduto={ButtonType}
+        linkEstruturaProduto={"Cadastrar Promoção Estrutura / Produto"}
+        onButtonClickEstruturaProduto={onSubmitEstruturaProduto}
+        corEstruturaProduto={"success"}
+        IconEstruturaProduto={IoIosSend}
+        disabledBTEstruturaProduto={isCheckedGrupoProduto ? false : true}
+
         ButtonTypePedido={ButtonType}
         linkPedido={"Cadastrar Promoção Mercadologica"}
         onButtonClickPedido={handleCadastrarEstrutura}
@@ -900,7 +1016,6 @@ export const ActionPesquisaPromocao = ({ }) => {
       />
 
 
-      {/* <ActionProdutoModalPromocaoSelecionado */}
       <ActionProdutoModalPromocaoSelecionadoCSVOrigem
         show={modalPodutoSelecionadoOrigem}
         handleClose={() => setModalPodutoSelecionadoOrigem(false)}

@@ -150,6 +150,7 @@ export const ActionMainPromocao = ({
   ButtonTypeCadastro,
   ButtonTypeCancelar,
   ButtonTypePedido,
+  ButtonTypeEstruturaProduto,
   ButtonTypeTXT,
   ButtonTypeSalvarMecanica,
   ButtonTypeEditarMecanica,
@@ -166,6 +167,7 @@ export const ActionMainPromocao = ({
   linkNome,
   linkCancelar,
   linkPedido,
+  linkEstruturaProduto,
   linkTXT,
   linkNomeSalvarMecanica,
   linkNomeEditarMecanica,
@@ -182,6 +184,7 @@ export const ActionMainPromocao = ({
   onButtonClickCadastro,
   onButtonClickCancelar,
   onButtonClickPedido,
+  onButtonClickEstruturaProduto,
   onButtonClickTXT,
   onButtonClickSalvarMecanica,
   onButtonClickEditarMecanica,
@@ -198,6 +201,7 @@ export const ActionMainPromocao = ({
   corCadastro,
   corCancelar,
   corPedido,
+  corEstruturaProduto,
   corTXT,
   corEditarMecanica,
   corSalvarMecanica,
@@ -214,6 +218,7 @@ export const ActionMainPromocao = ({
   IconCadastro,
   IconCancelar,
   IconPedido,
+  IconEstruturaProduto,
   IconTXT,
   IconSalvarMecanica,
   IconEditarMecanica,
@@ -1033,6 +1038,21 @@ export const ActionMainPromocao = ({
                         disabledBTN={disabledBTBPedido}
                       />
                     )}
+
+                    {ButtonTypeEstruturaProduto && (
+                      <ButtonTypeEstruturaProduto
+                        textButton={linkEstruturaProduto}
+                        onClickButtonType={onButtonClickEstruturaProduto}
+                        // cor="danger"
+                        cor={corEstruturaProduto}
+                        tipo="button"
+                        Icon={IconEstruturaProduto}
+                        iconColor="#fff"
+                        iconSize={25}
+                        style={{ color: 'white' }}
+                      />
+                    )}
+
                     {ButtonTypeTXT && (
                       <ButtonTypeTXT
                         textButton={linkTXT}
@@ -1074,6 +1094,8 @@ export const ActionMainPromocao = ({
                         style={{ color: 'white' }}
                       />
                     )}
+
+              
 
                   </div>
                 </div>
