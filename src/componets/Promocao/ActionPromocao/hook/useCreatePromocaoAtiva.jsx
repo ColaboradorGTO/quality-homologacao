@@ -1274,8 +1274,6 @@ export const useCreatePromocaoAtiva = ({ }) => {
     }
   };
 
-  console.log(produtoSelecionadoEstProdDestino, 'produtoSelecionadoEstProdDestino');
-  console.log(produtoSelecionadoEstProdOrigem, 'produtoSelecionadoEstProdOrigem');
 
   const onSubmitEstruturaProduto = async (data) => {
 
@@ -1579,7 +1577,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
         }
       });
 
-      const response = await post('/criar-promocoes-ativas', postData);
+      const response = await post('/criar-promocoes-ativas-subGrupo-produto', postData);
 
       Swal.fire({
         position: 'center',

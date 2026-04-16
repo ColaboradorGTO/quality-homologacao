@@ -399,6 +399,7 @@ export const ActionPesquisaPromocao = ({ }) => {
 
     setGrupoSelecionado(selectedGrupo);
     setSubGrupoOrigem(selectedSubGrupo);
+    setSubGrupoProdutoOrigem(selectedSubGrupo);
     
     if (subGrupoOrigem.length > 0) {
       refetchProdutoSubGrupoOrigem();
@@ -427,6 +428,7 @@ export const ActionPesquisaPromocao = ({ }) => {
 
     setGrupoSelecionado(selectedGrupo);
     setSubGrupoDestino(selectedSubGrupo);
+    setSubGrupoProdutoDestino(selectedSubGrupo);
     if (subGrupoDestino.length > 0) {
       refetchProdutoSubGrupoDestino();
     }
@@ -538,29 +540,29 @@ export const ActionPesquisaPromocao = ({ }) => {
   }
 
   const mostrarModalEstruturaDestino = () => {
-    if(dadosProdutoSubGrupoDestino.length > 0) {
-      setModalEstProdDestino(true);
-    } else {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Nenhum produto encontrado.',
-        text: 'para os subgrupos selecionados no destino',
-        confirmButtonText: 'OK'
-      })
-    }
+    setModalEstProdDestino(true);
+    // if(dadosProdutoSubGrupoDestino.length > 0) {
+    // } else {
+    //   Swal.fire({
+    //     icon: 'warning',
+    //     title: 'Nenhum produto encontrado.',
+    //     text: 'para os subgrupos selecionados no destino',
+    //     confirmButtonText: 'OK'
+    //   })
+    // }
   }
 
   const mostrarModalEstruturaOrigem = () => {
-    if(dadosProdutoSubGrupoOrigem.length > 0) {
-      setModalEstProdOrigem(true);
-    } else {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Nenhum produto encontrado.',
-        text: 'para os subgrupos selecionados na origem',
-        confirmButtonText: 'OK'
-      })
-    }
+    setModalEstProdOrigem(true);
+    // if(dadosProdutoSubGrupoOrigem.length > 0) {
+    // } else {
+    //   Swal.fire({
+    //     icon: 'warning',
+    //     title: 'Nenhum produto encontrado.',
+    //     text: 'para os subgrupos selecionados na origem',
+    //     confirmButtonText: 'OK'
+    //   })
+    // }
   }
 
   return (

@@ -96,7 +96,9 @@ export const ActionListaPromocoesAtivas = ({
       STDETPROMOORIGEM: item.STDETPROMOORIGEM,
       STDETPROMODESTINO: item.STDETPROMODESTINO,
       STATIVO: item.STATIVO === 'True' ? 'ATIVO' : 'INATIVO',
-      STPRODUTO: item.STPRODUTO == 'False' ? 'Por Estrutura' : 'Por Produto',
+      STPRODUTO: item.STPRODUTO,
+      STESTRUTURA: item.STESTRUTURA,
+      STESTRUTURAPRODUTO: item.STESTRUTURAPRODUTO,
     }
   });
 
@@ -141,7 +143,30 @@ export const ActionListaPromocoesAtivas = ({
       {
         field: 'STPRODUTO',
         header: 'Promoção',
-        body: row => <p style={{width: '100px', color: row.STPRODUTO === 'Por Produto' ? '#3D9CE8' : '#FD61AA', fontWeight: 'bold' }} >{row.STPRODUTO}</p>,
+        body: row => {
+          if (row.STPRODUTO == 'True') {
+            return (
+              <p style={{ width: '150px', color: '#3D9CE8', fontWeight: 'bold' }}>Por Produto</p>
+            );
+          }
+
+          if (row.STESTRUTURA == 'True') {
+            return (
+              <p style={{ width: '150px', color: '#1DC9B7', fontWeight: 'bold' }}>Por Estrutura</p>
+            );
+          }
+
+          if (row.STESTRUTURAPRODUTO == 'True') {
+            return (
+              <p style={{ width: '150px', color: '#7A59AD', fontWeight: 'bold' }}>Estrutura / Produto</p>
+            );
+          }
+
+          return (
+            <p style={{ width: '150px', color: '#3D9CE8', fontWeight: 'bold' }}>Por Produto</p>
+          );
+        }, 
+          
         bodyStyle: { textAlign: 'center' },
         sortable: true,
       },

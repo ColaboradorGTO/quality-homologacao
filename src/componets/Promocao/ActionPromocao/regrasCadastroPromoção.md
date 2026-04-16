@@ -128,7 +128,8 @@ Essas regras garantem a integridade e unicidade das promoções cadastradas no s
   //  TPAPARTIRDE = 4 // aplicação destino em 1(um) produto
 
   // TABELAS RESUMOPROMOCAOMARKETING
-  // TPAPLICADOA = 1->APLICADO A VALOR // 2-> APLICADO A QUANTIDADE
+  // TPAPLICADOA = 1->APLICADO A VALOR 
+  // 2-> APLICADO A QUANTIDADE
   // TPFATORPROMO = USADO PARA O PDV IDENTIFICAR A PROMOCAO
   // 	TPFATORPROMO = 0 // por valor final
   //  TPFATORPROMO = 1 // por valor desconto
@@ -148,4 +149,11 @@ Essas regras garantem a integridade e unicidade das promoções cadastradas no s
   TPAPLICADOA = 1 -> APLICADO A VALOR
   TPFATORPROMO = 0 por valor final
   TPAPARTIRDE = 4 aplicação destino em um produto 
+-->
+
+<!--
+
+ESTA PROMOÇÃO NÃO FUNCIONOU PROMOÇÃO POR EM UM PRODUTO // QUANTIDADE VALOR // VALOR FINAL COM OUTRAS PROMOÇÕES
+
+
 -->
