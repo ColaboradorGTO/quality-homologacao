@@ -1072,3 +1072,17 @@ export const ActionPesquisaPromocao = ({ }) => {
     </Fragment>
   )
 }
+
+/* 
+  o usuario seleciona o subGrupo ai ele traz todos os produtos, deste subgrupo
+  se o usuario não selecionar nem um produto,  IDSUBGRUPOEMDESTINO: subGrupoProdutoDestino, IDSUBGRUPOEMORIGEM: subGrupoProdutoOrigem,
+  e o IDPRODUTOEMDESTINO: null, IDPRODUTOEMORIGEM: null, IDPRODUTO: null,
+  se o usuario selecionar o subgrupo e selecionar os produtos, deste subGrupo
+  IDSUBGRUPOEMDESTINO: -1, IDSUBGRUPOEMORIGEM: -1,
+  IDPRODUTOEMDESTINO: produtoSelecionadoEstProdDestino, IDPRODUTOEMORIGEM: produtoSelecionadoEstProdOrigem, IDPRODUTO: produtoSelecionadoEstProdDestino,
+  se tem produto ele pricisa esta no destino e na origem o mesmo, produto.
+   
+  precisar verificar se o produto selecionado já existe em outra promoção ativa, se sim, não permitir cadastrar a promoção, com este produto
+  se for por subgGrupo, verificar se o subgrupo selecionado, já existe em outra promoção ativa, se sim, não permitir cadastrar a promoção, com este subgrupo
+  estas verificações precisam ser feitas no detalhe destino e origem
+*/

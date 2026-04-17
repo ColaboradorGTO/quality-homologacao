@@ -1,0 +1,5 @@
+<!-- 
+    Estas promoções não funciona juntas
+    PROMOÇÃO POR EM UM PRODUTO // QUANTIDADE // PERCENTUAL DESCONTO
+    PROMOÇÃO POR EM UM PRODUTO // QUANTIDADE VALOR // VALOR FINAL
+ -->

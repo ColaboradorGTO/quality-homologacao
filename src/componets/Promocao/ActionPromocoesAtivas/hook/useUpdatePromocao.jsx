@@ -180,28 +180,31 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
 
 
   useEffect(() => {
-   if(dadosPromocao) {
-    setQtdInicio(dadosPromocao[0]?.APARTIRDEQTD)
-    setValorInicio(dadosPromocao[0]?.APARTIRDOVLR)
-    setVrDesconto(dadosPromocao[0]?.FATORPROMOVLR)
-   
-    setPrecoProduto(dadosPromocao[0]?.VLPRECOPRODUTO)
-    setMecanicaSelecionadaEdicao(dadosPromocao[0]?.DSPROMOCAOMARKETING)
-    setMecanicaSelecionada(dadosPromocao[0]?.DSPROMOCAOMARKETING)
-    setDescricao(dadosPromocao[0]?.DSPROMOCAOMARKETING)
-    setDataInicio(dadosPromocao[0]?.DTHORAINICIO)
-    setDataFim(dadosPromocao[0]?.DTHORAFIM)
-    setIdResumoPromocao(dadosPromocao[0]?.IDRESUMOPROMOCAOMARKETING)
+    
+    if(dadosPromocao.length && dadosPromocao.length > 0) {
+      const dados = dadosPromocao[0]
+      setQtdInicio(dados?.APARTIRDEQTD)
+      setValorInicio(Number(dados?.APARTIRDOVLR))
+      setVrDesconto(dados?.FATORPROMOVLR)
+      console.log(dados, "dadosPromocao")
+      console.log(Number(dados?.APARTIRDOVLR), "?.FATORPROMOVLR")
+      setPrecoProduto(dados?.VLPRECOPRODUTO)
+      setMecanicaSelecionadaEdicao(dados?.DSPROMOCAOMARKETING)
+    setMecanicaSelecionada(dados?.DSPROMOCAOMARKETING)
+    setDescricao(dados?.DSPROMOCAOMARKETING)
+    setDataInicio(dados?.DTHORAINICIO)
+    setDataFim(dados?.DTHORAFIM)
+    setIdResumoPromocao(dados?.IDRESUMOPROMOCAOMARKETING)
 
-    const statusValue = dadosPromocao[0]?.STATIVO == "True" ?  "True" : "False"; 
+    const statusValue = dados?.STATIVO == "True" ?  "True" : "False"; 
     
     setStatusSelecionado(statusValue);
 
-
-   }
+    
+  }
 
    if(dadosPromocao[0]?.STPRODUTO == "False") {
-    setIsCheckedProduto(false)
+     setIsCheckedProduto(false)
     setIsCheckedGrupo(true)
    } else {
     setIsCheckedProduto(true)
@@ -214,7 +217,15 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
         setPorcentoDesconto(valor);
       }
     }
-  }, [dadosPromocao, setQtdInicio, setValorInicio, setVrDesconto, setPrecoProduto, setPorcentoDesconto, setMecanicaSelecionadaEdicao, setDescricao, setDataInicio, setDataFim, setStatusSelecionado]);
+
+    if(dadosPromocao && dadosPromocao[0]?.APARTIRDOVLR !== undefined) {
+      const valor = parseFloat(dadosPromocao[0].APARTIRDOVLR);
+      if (!isNaN(valor)) {
+        setValorInicio(valor);
+      }
+    }
+  }, [dadosPromocao, setQtdInicio, setValorInicio, valorInicio, setVrDesconto, setPrecoProduto, setPorcentoDesconto, setMecanicaSelecionadaEdicao, setDescricao, setDataInicio, setDataFim, setStatusSelecionado]);
+  console.log(valorInicio, 'valorInicio')
 
   const optionsStatus = useMemo(() => [
     { value: "True", label: "ATIVO" },

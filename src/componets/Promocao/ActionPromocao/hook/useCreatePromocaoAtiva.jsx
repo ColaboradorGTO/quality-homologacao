@@ -1274,7 +1274,8 @@ export const useCreatePromocaoAtiva = ({ }) => {
     }
   };
 
-
+    // console.log(subGrupoProdutoDestino, 'subGrupoProdutoDestino')
+    // console.log(subGrupoProdutoOrigem, 'subGrupoProdutoOrigem')
   const onSubmitEstruturaProduto = async (data) => {
 
     try {
@@ -1326,7 +1327,6 @@ export const useCreatePromocaoAtiva = ({ }) => {
       }
 
 
-
       if (promocoesAtivas && promocoesAtivas.length > 0) {
         const produtoDestinoArray = Array.isArray(produtoSelecionadoEstProdDestino) ? produtoSelecionadoEstProdDestino : [produtoSelecionadoEstProdDestino];
         const idsResumo = promocoesAtivas.map(p => p.IDRESUMOPROMOCAOMARKETING).filter(Boolean);
@@ -1335,7 +1335,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
         if (idsResumo && idsResumo.length > 0) {
           const idResumo = idsResumo.join(',');
           const responseProdutoExistente = await get(`/detalhe-promocoes-ativas?idResumoPromocao=${idResumo}&dataPesquisaFim=${dataFim}`);
-
+          console.log(responseProdutoExistente.data, 'responseProdutoExistente: onSubmitEstruturaProduto');
           if (!responseProdutoExistente.data) {
             throw new Error('Falha ao verificar produtos existentes');
           }
@@ -1433,7 +1433,12 @@ export const useCreatePromocaoAtiva = ({ }) => {
       if (aplicacaoDestinoSelecionada == 0 || aplicacaoDestinoSelecionada == 3) {
         const origem = produtoSelecionadoEstProdOrigem;
         const destino = produtoSelecionadoEstProdDestino;
-        const iguais = origem.length === destino.length && origem.every((v, i) => v === destino[i]);
+        const iguais = origem.length == destino.length && 
+          origem.every((v, i) => {
+            const idOrigem = typeof v === 'object' && v !== null ? v.IDPRODUTO : v;
+            const idDestino = typeof destino[i] === 'object' && destino[i] !== null ? destino[i].IDPRODUTO : destino[i];
+            return idOrigem === idDestino;
+          });
 
         if (!iguais) {
           Swal.fire({
@@ -1445,7 +1450,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
               container: 'custom-swal',
             },
             showConfirmButton: false,
-            timer: 5000,
+            timer: 15000,
           });
           return;
         }
@@ -1500,7 +1505,6 @@ export const useCreatePromocaoAtiva = ({ }) => {
         }
       }
 
-      // Helper to extract only IDPRODUTO from array or value
       const extractIds = arr => {
         if (!arr) return [];
         if (Array.isArray(arr)) {
@@ -1513,6 +1517,71 @@ export const useCreatePromocaoAtiva = ({ }) => {
         }
         return [arr];
       };
+
+      const hasSelection = (value) => {
+        if (Array.isArray(value)) return value.length > 0;
+        return value !== null && value !== undefined && value !== "" && value !== -1;
+      };
+
+      const idsDestino = Array.from(new Set(extractIds(produtoSelecionadoEstProdDestino)));
+      const idsOrigem = Array.from(new Set(extractIds(produtoSelecionadoEstProdOrigem)));
+      const temProduto = idsDestino.length > 0 || idsOrigem.length > 0;
+
+      const temSubGrupoDestino = hasSelection(subGrupoProdutoDestino);
+      const temSubGrupoOrigem = hasSelection(subGrupoProdutoOrigem);
+      const temSubGrupo = temSubGrupoDestino || temSubGrupoOrigem;
+
+      if (temProduto && !temSubGrupo) {
+        Swal.fire({
+          position: "center",
+          icon: "warning",
+          title: "Seleção inválida",
+          text: "Para selecionar produto, é obrigatório selecionar subgrupo de origem e/ou destino.",
+          customClass: { container: "custom-swal" },
+          showConfirmButton: true
+        });
+        return;
+      }
+
+      if (!temSubGrupo && !temProduto) {
+        Swal.fire({
+          position: "center",
+          icon: "warning",
+          title: "Seleção obrigatória",
+          text: "Selecione ao menos um subgrupo (com ou sem produto).",
+          customClass: { container: "custom-swal" },
+          showConfirmButton: true
+        });
+        return;
+      }
+
+      let camposEstruturaProduto = {};
+
+      // 1) Subgrupo + produto selecionados
+      if (temSubGrupo && temProduto) {
+        camposEstruturaProduto = {
+          IDSUBGRUPOEMDESTINO: -1,
+          IDSUBGRUPOEMORIGEM: -1,
+          IDPRODUTO: idsDestino,
+          IDPRODUTODESTINO: idsDestino,
+          IDPRODUTOORIGEM: idsOrigem,
+          STESTRUTURA: "False",
+          STPRODUTO: "True",
+        };
+      }
+    
+      // 2) Subgrupo selecionado e sem produto
+      if (temSubGrupo && !temProduto) {
+        camposEstruturaProduto = {
+          IDSUBGRUPOEMDESTINO: subGrupoProdutoDestino,
+          IDSUBGRUPOEMORIGEM: subGrupoProdutoOrigem,
+          IDPRODUTO: null,
+          IDPRODUTODESTINO: null,
+          IDPRODUTOORIGEM: null,
+          STESTRUTURA: "True",
+          STPRODUTO: "False",
+        };
+      }
 
       const postData = {
         TPAPARTIRDE: aplicacaoDestinoSelecionada,
@@ -1528,31 +1597,29 @@ export const useCreatePromocaoAtiva = ({ }) => {
         DSPROMOCAOMARKETING: descricao,
         IDEMPRESA: empresaSelecionada,
         STATIVO: "True",
-        STESTRUTURA: "False",
-        STPRODUTO: "False",
-        STESTRUTURAPRODUTO: "True",
         STEMPRESAPROMO: "True",
         STDETPROMOORIGEM: "True",
         STDETPROMODESTINO: "True",
         IDGRUPOEMDESTINO: grupoSelecionadoDestino,
-        IDSUBGRUPOEMDESTINO: subGrupoProdutoDestino,
         IDMARCAEMDESTINO: marcaDestino,
         IDFORNECEDOREMDESTINO: fornecedorSelecionado,
         IDGRUPOEMORIGEM: grupoSelecionadoOrigem,
-        IDSUBGRUPOEMORIGEM: subGrupoProdutoOrigem,
         IDMARCAEMORIGEM: marcaOrigem,
         IDFORNECEDOREMORIGEM: fornecedorSelecionado,
-
-        IDPRODUTO: Array.from(new Set([
-          ...extractIds(produtoSelecionadoEstProdDestino),
-        ])),
-        IDPRODUTODESTINO: Array.from(new Set([
-          ...extractIds(produtoSelecionadoEstProdDestino),
-        ])),
-        IDPRODUTOORIGEM: Array.from(new Set([
-          ...extractIds(produtoSelecionadoEstProdOrigem),
-        ].filter(Boolean))),
+        STESTRUTURAPRODUTO: "False",
+        ...camposEstruturaProduto
       };
+      // IDSUBGRUPOEMDESTINO: subGrupoProdutoDestino,
+      // IDSUBGRUPOEMORIGEM: subGrupoProdutoOrigem,
+      // IDPRODUTO: Array.from(new Set([
+      //   ...extractIds(produtoSelecionadoEstProdDestino),
+      // ])),
+      // IDPRODUTODESTINO: Array.from(new Set([
+      //   ...extractIds(produtoSelecionadoEstProdDestino),
+      // ])),
+      // IDPRODUTOORIGEM: Array.from(new Set([
+      //   ...extractIds(produtoSelecionadoEstProdOrigem),
+      // ].filter(Boolean))),
 
       let timerInterval;
       Swal.fire({
@@ -1577,7 +1644,8 @@ export const useCreatePromocaoAtiva = ({ }) => {
         }
       });
 
-      const response = await post('/criar-promocoes-ativas-subGrupo-produto', postData);
+      const response = await post('/criar', postData);
+      // const response = await post('/criar-promocoes-ativas-subGrupo-produto', postData);
 
       Swal.fire({
         position: 'center',
