@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom"
 import axios from "axios";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
+import { sub } from "date-fns"
 
 export const useCreatePromocaoAtiva = ({ }) => {
   const [mecanicaSelecionada, setMecanicaSelecionada] = useState(0)
@@ -1274,8 +1275,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
     }
   };
 
-    // console.log(subGrupoProdutoDestino, 'subGrupoProdutoDestino')
-    // console.log(subGrupoProdutoOrigem, 'subGrupoProdutoOrigem')
+
   const onSubmitEstruturaProduto = async (data) => {
 
     try {
@@ -1329,22 +1329,23 @@ export const useCreatePromocaoAtiva = ({ }) => {
 
       if (promocoesAtivas && promocoesAtivas.length > 0) {
         const produtoDestinoArray = Array.isArray(produtoSelecionadoEstProdDestino) ? produtoSelecionadoEstProdDestino : [produtoSelecionadoEstProdDestino];
+        const subGrupoProdutoOrigemArray = Array.isArray(subGrupoProdutoOrigem) ? subGrupoProdutoOrigem : [subGrupoProdutoOrigem];
+        const subGrupoProdutoDestinoArray = Array.isArray(subGrupoProdutoDestino) ? subGrupoProdutoDestino : [subGrupoProdutoDestino];
         const idsResumo = promocoesAtivas.map(p => p.IDRESUMOPROMOCAOMARKETING).filter(Boolean);
         const existeAplicaoDestino = promocoesAtivas.some(ap => ap.TPAPARTIRDE == aplicacaoDestinoSelecionada);
 
         if (idsResumo && idsResumo.length > 0) {
           const idResumo = idsResumo.join(',');
           const responseProdutoExistente = await get(`/detalhe-promocoes-ativas?idResumoPromocao=${idResumo}&dataPesquisaFim=${dataFim}`);
-          console.log(responseProdutoExistente.data, 'responseProdutoExistente: onSubmitEstruturaProduto');
           if (!responseProdutoExistente.data) {
             throw new Error('Falha ao verificar produtos existentes');
           }
-
+          
           const produtosExistentes = responseProdutoExistente.data.detalhePromo || [];
           const existeProduto = produtosExistentes.some(produto =>
             produtoDestinoArray.includes(produto.IDPRODUTO)
           );
-
+          
           if (existeProduto) {
             Swal.fire({
               icon: 'warning',
@@ -1355,6 +1356,79 @@ export const useCreatePromocaoAtiva = ({ }) => {
             });
             return;
           }
+          
+          const normalizeToArray = (value) => {
+            if (Array.isArray(value)) return value;
+            if (value === null || value === undefined || value === "") return [];
+            return [value];
+          };
+
+          const subgruposDestinoSelecionados = normalizeToArray(subGrupoProdutoDestino)
+            .map(v => Number(v))
+            .filter(v => !Number.isNaN(v) && v !== -1);
+
+          const subgruposOrigemSelecionados = normalizeToArray(subGrupoProdutoOrigem)
+            .map(v => Number(v))
+            .filter(v => !Number.isNaN(v) && v !== -1);
+
+          const subgruposDestinoAtivos = responseProdutoExistente.data.flatMap((promo) =>
+            (promo.empresaPromocaoDestino || [])
+              .map(item => Number(item?.det?.IDSUBGRUPOEMDESTINO))
+              .filter(v => !Number.isNaN(v) && v !== -1)
+          );
+
+          const subgruposOrigemAtivos = responseProdutoExistente.data.flatMap((promo) =>
+            (promo.empresaPromocaoOrigem || [])
+              .map(item => Number(item?.det?.IDSUBGRUPOEMORIGEM))
+              .filter(v => !Number.isNaN(v) && v !== -1)
+          );
+
+          const conflitosDestino = subgruposDestinoSelecionados.filter(id => subgruposDestinoAtivos.includes(id));
+          const conflitosOrigem = subgruposOrigemSelecionados.filter(id => subgruposOrigemAtivos.includes(id));
+
+          let conflitos = Array.from(new Set([...conflitosDestino, ...conflitosOrigem]));
+          // console.log(conflitosDestino, 'conflitosDestino');
+          // console.log(conflitosOrigem, 'conflitosOrigem');
+          // console.log(conflitos, 'conflitos');
+          console.log(conflitos, 'antes do swal');
+console.log(conflitos.map(v => ({ valor: v, tipo: typeof v })));
+          if (conflitos.length > 0) {
+            Swal.fire({
+              icon: "warning",
+              title: "Subgrupo já está em promoção ativa",
+              html: `
+                IDs em conflito: <b>${conflitos.join(", ")}</b><br/>
+                Ajuste os subgrupos para continuar.
+              `,
+              customClass: { container: "custom-swal" },
+              confirmButtonText: "OK"
+            });
+            return;
+          }
+
+         
+
+          // if (subGrupoOrigemExistente) {
+          //   Swal.fire({
+          //     icon: 'warning',
+          //     title: 'Subgrupo de origem já está em uma promoção ativa!',
+          //     text: 'O subgrupo de origem selecionado já está vinculado a uma promoção ativa.',
+          //     customClass: { container: 'custom-swal' },
+          //     confirmButtonText: 'OK'
+          //   });
+          //   return;
+          // }
+
+          // if (subGrupoDestinoExistente) {
+          //   Swal.fire({
+          //     icon: 'warning',
+          //     title: 'Subgrupo de destino já está em uma promoção ativa!',
+          //     text: 'O subgrupo de destino selecionado já está vinculado a uma promoção ativa.',
+          //     customClass: { container: 'custom-swal' },
+          //     confirmButtonText: 'OK'
+          //   });
+          //   return;
+          // }
 
           const promocoesValidas = responseProdutoExistente.data;
           const promocaoPorParesAtiva = promocoesValidas.some(promo => promo.TPAPARTIRDE == 0);

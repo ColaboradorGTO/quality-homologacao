@@ -295,7 +295,7 @@ export const ActionPesquisaPromocao = ({ }) => {
 
         gruposMap.get(grupoId).children.push({
           key: `subgrupo_${subgrupo.IDSUBGRUPOESTRUTURA}`,
-          label: subgrupo.DSSUBGRUPOESTRUTURA, 
+          label: `${subgrupo.IDSUBGRUPOESTRUTURA} - ${subgrupo.DSSUBGRUPOESTRUTURA} `, 
           data: subgrupo 
         });
       });
