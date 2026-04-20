@@ -115,7 +115,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
         console.error("Erro ao buscar IP via ipify.org:", error);
       }
     }
-    setIpUsuario(usuarioIP);
+      setIpUsuario(usuarioIP);
     return usuarioIP;
   };
 
@@ -151,7 +151,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
       const response = await get(`/grupoEstrutura`);
       return response.data;
     },
-    { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000, }
+    {enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000, }
   );
 
   const { data: dadosSubGrupo = [], error: errorSubGrupo, isLoading: isLoadingSubGrupo, refetch: refetchSubGrupo } = useQuery(
@@ -160,7 +160,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
       const response = await get(`/subGrupoEstrutura`);
       return response.data;
     },
-    { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000, }
+    {enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000, }
   );
 
   const { data: optionsMarcas = [], error: errorMarcas, isLoading: isLoadingMarcas, refetch: refetchMarcas } = useQuery(
@@ -203,51 +203,51 @@ export const useCreatePromocaoAtiva = ({ }) => {
     titulo.value = "Produtos da Promoção";
 
     titulo.font = {
-      bold: true,
-      size: 14,
-      color: { argb: "FFFFFFFF" }
+        bold: true,
+        size: 14,
+        color: { argb: "FFFFFFFF" }
     };
 
     titulo.alignment = {
-      horizontal: "center",
-      vertical: "middle"
+        horizontal: "center",
+        vertical: "middle"
     };
 
     titulo.fill = {
-      type: "pattern",
-      pattern: "solid",
-      fgColor: { argb: "FFFF0000" } // vermelho
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FFFF0000" } // vermelho
     };
 
     // 📌 HEADER (linha 2)
     const headers = ["ID"];
 
     headers.forEach((text, index) => {
-      const cell = worksheet.getCell(2, index + 1);
-      cell.value = text;
+        const cell = worksheet.getCell(2, index + 1);
+        cell.value = text;
 
-      cell.font = {
-        bold: true,
-        color: { argb: "FFFFFFFF" }
-      };
+        cell.font = {
+            bold: true,
+            color: { argb: "FFFFFFFF" }
+        };
 
-      cell.alignment = {
-        horizontal: "center",
-        vertical: "middle"
-      };
+        cell.alignment = {
+            horizontal: "center",
+            vertical: "middle"
+        };
 
-      cell.fill = {
-        type: "pattern",
-        pattern: "solid",
-        fgColor: { argb: "FF000000" } // preto
-      };
+        cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "FF000000" } // preto
+        };
 
-      cell.border = {
-        top: { style: "thin" },
-        left: { style: "thin" },
-        bottom: { style: "thin" },
-        right: { style: "thin" }
-      };
+        cell.border = {
+            top: { style: "thin" },
+            left: { style: "thin" },
+            bottom: { style: "thin" },
+            right: { style: "thin" }
+        };
     });
 
     // 📏 Largura da coluna A
@@ -255,31 +255,31 @@ export const useCreatePromocaoAtiva = ({ }) => {
 
     // 🔒 Validação (máx 30 caracteres)
     for (let i = 3; i <= 1000; i++) {
-      worksheet.getCell(`A${i}`).dataValidation = {
-        type: "textLength",
-        operator: "lessThanOrEqual",
-        showErrorMessage: true,
-        formulae: [30],
-        error: "Máximo de 30 caracteres permitido."
-      };
+        worksheet.getCell(`A${i}`).dataValidation = {
+            type: "textLength",
+            operator: "lessThanOrEqual",
+            showErrorMessage: true,
+            formulae: [30],
+            error: "Máximo de 30 caracteres permitido."
+        };
     }
 
     // 🎨 (Opcional) aplicar estilo nas células da coluna A
     for (let i = 3; i <= 20; i++) {
-      const cell = worksheet.getCell(`A${i}`);
+        const cell = worksheet.getCell(`A${i}`);
 
-      cell.fill = {
-        type: "pattern",
-        pattern: "solid",
-        fgColor: { argb: "FFF2F2F2" } // cinza claro
-      };
+        cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "FFF2F2F2" } // cinza claro
+        };
 
-      cell.border = {
-        top: { style: "thin" },
-        left: { style: "thin" },
-        bottom: { style: "thin" },
-        right: { style: "thin" }
-      };
+        cell.border = {
+            top: { style: "thin" },
+            left: { style: "thin" },
+            bottom: { style: "thin" },
+            right: { style: "thin" }
+        };
     }
 
     // 💾 Gerar arquivo
@@ -288,70 +288,70 @@ export const useCreatePromocaoAtiva = ({ }) => {
   };
 
   const clearFileError = (isOrigem) => {
-    // Limpa o estado do arquivo
-    if (isOrigem) {
-      setFileProdutoOrigem([]);
-    } else {
-      setFileProdutoDestino([]);
-    }
-
-    // Limpa o input file se existir
-    const fileInputs = document.querySelectorAll('input[type="file"]');
-    fileInputs.forEach(input => {
-      if (input) {
-        input.value = '';
+      // Limpa o estado do arquivo
+      if (isOrigem) {
+          setFileProdutoOrigem([]);
+      } else {
+          setFileProdutoDestino([]);
       }
-    });
+      
+      // Limpa o input file se existir
+      const fileInputs = document.querySelectorAll('input[type="file"]');
+      fileInputs.forEach(input => {
+          if (input) {
+              input.value = '';
+          }
+      });
   };
-
+  
   const handleFileUpload = async (file, isOrigem) => {
-    try {
-      const data = await processFile(file);
+      try {
+          const data = await processFile(file);
 
-      // ✅ VALIDAÇÃO: Limite de produtos
-      if (data.length > 1000) {
-        // ✅ LIMPA ARQUIVO quando excede limite
-        clearFileError(isOrigem);
-
-        Swal.fire({
-          icon: 'warning',
-          title: 'Limite Excedido',
-          html: `
+          // ✅ VALIDAÇÃO: Limite de produtos
+          if (data.length > 1000) {
+              // ✅ LIMPA ARQUIVO quando excede limite
+              clearFileError(isOrigem);
+              
+              Swal.fire({
+                  icon: 'warning',
+                  title: 'Limite Excedido',
+                  html: `
                       Limite máximo permitido: 1.000 produtos por promoção.<br>
                       Produtos encontrados: ${data.length}<br>
                       Caso contrário, os produtos não serão inseridos na promoção.
                   `,
-        });
-        return;
-      }
+              });
+              return;
+          }
 
-      // ✅ SUCESSO: Mostra quantos IDs foram encontrados
-      await Swal.fire({
-        icon: 'success',
-        title: 'Arquivo Processado!',
-        text: `${data.length} produtos foram encontrados na planilha`,
-        timer: 2000,
-        showConfirmButton: false
-      });
+          // ✅ SUCESSO: Mostra quantos IDs foram encontrados
+          await Swal.fire({
+              icon: 'success',
+              title: 'Arquivo Processado!',
+              text: `${data.length} produtos foram encontrados na planilha`,
+              timer: 2000,
+              showConfirmButton: false
+          });
 
-      if (isOrigem) {
-        setFileProdutoOrigem(JSON.stringify(data));
-      } else {
-        setFileProdutoDestino(JSON.stringify(data));
-      }
+          if (isOrigem) {
+              setFileProdutoOrigem(JSON.stringify(data));
+          } else {
+              setFileProdutoDestino(JSON.stringify(data));
+          }
 
-    } catch (error) {
-      console.error('Erro ao processar arquivo:', error);
-
-      // ✅ LIMPA ARQUIVO quando há erro de validação
-      clearFileError(isOrigem);
-
-      // ✅ ERRO ESPECÍFICO: Mostra a estrutura correta se erro de validação
-      if (error.message.includes('cabeçalho "ID"') || error.message.includes('Nenhum ID') || error.message.includes('título "Produtos da Promoção"')) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Modelo Incorreto da Planilha!',
-          html: `
+      } catch (error) {
+          console.error('Erro ao processar arquivo:', error);
+          
+          // ✅ LIMPA ARQUIVO quando há erro de validação
+          clearFileError(isOrigem);
+          
+          // ✅ ERRO ESPECÍFICO: Mostra a estrutura correta se erro de validação
+          if (error.message.includes('cabeçalho "ID"') || error.message.includes('Nenhum ID') || error.message.includes('título "Produtos da Promoção"')) {
+              Swal.fire({
+                  icon: 'error',
+                  title: 'Modelo Incorreto da Planilha!',
+                  html: `
                       <div style="text-align: left;">
                           <p><strong>Erro:</strong> ${error.message}</p>
                           <br>
@@ -383,17 +383,17 @@ export const useCreatePromocaoAtiva = ({ }) => {
                           <p style="color: #ff0000;"><strong>⚠️ IMPORTANTE:</strong> Use a planilha modelo baixada do sistema!</p>
                       </div>
                   `,
-          confirmButtonText: 'Entendi'
-        });
-      } else {
-        // ✅ ERRO GENÉRICO
-        Swal.fire({
-          icon: 'error',
-          title: 'Erro',
-          text: 'Falha ao processar o arquivo. Verifique o formato.',
-        });
+                  confirmButtonText: 'Entendi'
+              });
+          } else {
+              // ✅ ERRO GENÉRICO
+              Swal.fire({
+                  icon: 'error',
+                  title: 'Erro',
+                  text: 'Falha ao processar o arquivo. Verifique o formato.',
+              });
+          }
       }
-    }
   };
 
   const processFile = (file) => {
@@ -444,62 +444,62 @@ export const useCreatePromocaoAtiva = ({ }) => {
     }
     return result;
   }
-
+  
   const processXLSX = (xlsxContent) => {
-    const workbook = XLSX.read(xlsxContent, { type: 'array' });
-    const sheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[sheetName];
+      const workbook = XLSX.read(xlsxContent, { type: 'array' });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
 
-    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-    // ✅ VALIDAÇÃO: Verifica se tem dados
-    if (!jsonData || jsonData.length < 2) {
-      throw new Error('Planilha deve ter pelo menos 2 linhas (título e cabeçalho)');
-    }
-
-    // ✅ VALIDAÇÃO: Verifica se o título está correto na primeira linha
-    const primeiraLinha = jsonData[0];
-    const titulo = primeiraLinha && primeiraLinha[0] ? primeiraLinha[0].toString().trim() : '';
-
-    if (titulo !== 'Produtos da Promoção') {
-      throw new Error('A primeira linha deve conter exatamente o título "Produtos da Promoção"');
-    }
-
-    // ✅ VALIDAÇÃO: Pega a segunda linha (cabeçalhos) - primeira linha é o título
-    const headers = jsonData[1];
-
-    // ✅ VALIDAÇÃO: Verifica se existe a coluna "ID"
-    const hasIdColumn = headers && headers.some(header =>
-      header && header.toString().toUpperCase().trim() === 'ID'
-    );
-
-    if (!hasIdColumn) {
-      throw new Error('A planilha deve ter um cabeçalho "ID" na segunda linha');
-    }
-
-    // ✅ BUSCA: Encontra o índice da coluna "ID"
-    const idColumnIndex = headers.findIndex(header =>
-      header && header.toString().toUpperCase().trim() === 'ID'
-    );
-
-    // ✅ EXTRAÇÃO: Pega apenas os IDs (pula título e cabeçalho - começa da linha 3)
-    const result = [];
-    for (let i = 2; i < jsonData.length; i++) { // Começa em 2 para pular título e cabeçalho
-      const row = jsonData[i];
-      if (row && row.length > idColumnIndex) {
-        const idValue = row[idColumnIndex]?.toString().trim();
-        if (idValue && idValue !== '') {
-          result.push(idValue);
-        }
+      // ✅ VALIDAÇÃO: Verifica se tem dados
+      if (!jsonData || jsonData.length < 2) {
+          throw new Error('Planilha deve ter pelo menos 2 linhas (título e cabeçalho)');
       }
-    }
 
-    // ✅ VALIDAÇÃO: Verifica se encontrou IDs
-    if (result.length === 0) {
-      throw new Error('Nenhum ID foi encontrado na coluna ID da planilha');
-    }
+      // ✅ VALIDAÇÃO: Verifica se o título está correto na primeira linha
+      const primeiraLinha = jsonData[0];
+      const titulo = primeiraLinha && primeiraLinha[0] ? primeiraLinha[0].toString().trim() : '';
+      
+      if (titulo !== 'Produtos da Promoção') {
+          throw new Error('A primeira linha deve conter exatamente o título "Produtos da Promoção"');
+      }
 
-    return result;
+      // ✅ VALIDAÇÃO: Pega a segunda linha (cabeçalhos) - primeira linha é o título
+      const headers = jsonData[1];
+      
+      // ✅ VALIDAÇÃO: Verifica se existe a coluna "ID"
+      const hasIdColumn = headers && headers.some(header => 
+          header && header.toString().toUpperCase().trim() === 'ID'
+      );
+      
+      if (!hasIdColumn) {
+          throw new Error('A planilha deve ter um cabeçalho "ID" na segunda linha');
+      }
+
+      // ✅ BUSCA: Encontra o índice da coluna "ID"
+      const idColumnIndex = headers.findIndex(header => 
+          header && header.toString().toUpperCase().trim() === 'ID'
+      );
+
+      // ✅ EXTRAÇÃO: Pega apenas os IDs (pula título e cabeçalho - começa da linha 3)
+      const result = [];
+      for (let i = 2; i < jsonData.length; i++) { // Começa em 2 para pular título e cabeçalho
+          const row = jsonData[i];
+          if (row && row.length > idColumnIndex) {
+              const idValue = row[idColumnIndex]?.toString().trim();
+              if (idValue && idValue !== '') {
+                  result.push(idValue);
+              }
+          }
+      }
+
+      // ✅ VALIDAÇÃO: Verifica se encontrou IDs
+      if (result.length === 0) {
+          throw new Error('Nenhum ID foi encontrado na coluna ID da planilha');
+      }
+
+      return result;
   };
 
   const mostrarProdutosSelecionados = useCallback((tipo) => {
@@ -786,17 +786,17 @@ export const useCreatePromocaoAtiva = ({ }) => {
       }
 
       if (descricao.length > 80) {
-        Swal.fire({
-          position: 'center',
-          icon: 'error',
-          title: 'Descrição deve ter no máximo 80 caracteres!',
-          customClass: {
-            container: 'custom-swal',
-          },
-          showConfirmButton: false,
-          timer: 3000,
-        })
-        return;
+          Swal.fire({
+            position: 'center',
+            icon: 'error',
+            title: 'Descrição deve ter no máximo 80 caracteres!',
+            customClass: {
+              container: 'custom-swal',
+            },
+            showConfirmButton: false,
+            timer: 3000,
+          })
+          return;
       }
 
       // if (descricao.length < 20 || descricao.length > 200) {
@@ -814,23 +814,23 @@ export const useCreatePromocaoAtiva = ({ }) => {
       // }
 
       // Considera produtos de origem e destino vindos do arquivo, input ou seleção manual
-      const produtosOrigem =
+      const produtosOrigem = 
         (fileProdutoOrigem && fileProdutoOrigem.length > 0)
           ? JSON.parse(fileProdutoOrigem)
           : produtoOrigem
-            ? [produtoOrigem]
-            : (produtoOrigemSelecionado && produtoOrigemSelecionado.length > 0)
-              ? produtoOrigemSelecionado
-              : [];
+        ? [produtoOrigem]
+        : (produtoOrigemSelecionado && produtoOrigemSelecionado.length > 0)
+          ? produtoOrigemSelecionado
+          : [];
 
-      const produtosDestino =
+      const produtosDestino = 
         (fileProdutoDestino && fileProdutoDestino.length > 0)
           ? JSON.parse(fileProdutoDestino)
           : produtoDestino
-            ? [produtoDestino]
-            : (produtoDestinoSelecionado && produtoDestinoSelecionado.length > 0)
-              ? produtoDestinoSelecionado
-              : [];
+        ? [produtoDestino]
+        : (produtoDestinoSelecionado && produtoDestinoSelecionado.length > 0)
+          ? produtoDestinoSelecionado
+          : [];
 
       if (promocoesAtivas && promocoesAtivas.length > 0) {
         const produtoDestinoArray = Array.isArray(produtosDestino) ? produtosDestino : [produtosDestino];
@@ -997,12 +997,12 @@ export const useCreatePromocaoAtiva = ({ }) => {
           return;
         }
 
-
+       
 
         const origemId = typeof produtosOrigem[0] === 'object' && produtosOrigem[0] !== null ? produtosOrigem[0].IDPRODUTO : produtosOrigem[0];
         const destinoId = typeof produtosDestino[0] === 'object' && produtosDestino[0] !== null ? produtosDestino[0].IDPRODUTO : produtosDestino[0];
         if (origemId !== destinoId) {
-
+          
           Swal.fire({
             position: 'center',
             icon: 'error',
@@ -1131,7 +1131,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
   };
 
   const onSubmitEstrutura = async (data) => {
-
+  
     try {
       if (!mecanicaSelecionada) {
         Swal.fire({
@@ -1161,7 +1161,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
         return;
       }
 
-      if (!subGrupoDestino && !subGrupoOrigem) {
+      if(!subGrupoDestino && !subGrupoOrigem) {
         Swal.fire({
           position: 'center',
           icon: 'error',
@@ -1176,17 +1176,17 @@ export const useCreatePromocaoAtiva = ({ }) => {
       }
 
       if (descricao.length > 80) {
-        Swal.fire({
-          position: 'center',
-          icon: 'error',
-          title: 'Descrição deve ter no máximo 80 caracteres!',
-          customClass: {
-            container: 'custom-swal',
-          },
-          showConfirmButton: false,
-          timer: 3000,
-        })
-        return;
+          Swal.fire({
+            position: 'center',
+            icon: 'error',
+            title: 'Descrição deve ter no máximo 80 caracteres!',
+            customClass: {
+              container: 'custom-swal',
+            },
+            showConfirmButton: false,
+            timer: 3000,
+          })
+          return;
       }
 
 
@@ -1222,7 +1222,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
         IDPRODUTO: null,
         IDPRODUTODESTINO: null,
         IDPRODUTOORIGEM: null,
-
+  
       };
 
       let timerInterval;
@@ -1279,7 +1279,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
     }
   };
 
-
+  
   const onSubmitEstruturaProduto = async (data) => {
 
     try {
@@ -1317,25 +1317,19 @@ export const useCreatePromocaoAtiva = ({ }) => {
       }
 
       if (descricao.length > 80) {
-        Swal.fire({
-          position: 'center',
-          icon: 'error',
-          title: 'Descrição deve ter no máximo 80 caracteres!',
-          customClass: {
-            container: 'custom-swal',
-          },
-          showConfirmButton: false,
-          timer: 3000,
-        })
-        return;
+          Swal.fire({
+            position: 'center',
+            icon: 'error',
+            title: 'Descrição deve ter no máximo 80 caracteres!',
+            customClass: {
+              container: 'custom-swal',
+            },
+            showConfirmButton: false,
+            timer: 3000,
+          })
+          return;
       }
 
-      
-      const normalizeToArray = (value) => {
-        if (Array.isArray(value)) return value;
-        if (value === null || value === undefined || value === "") return [];
-        return [value];
-      };
 
       if (promocoesAtivas && promocoesAtivas.length > 0) {
         const produtoDestinoArray = Array.isArray(produtoSelecionadoEstProdDestino) ? produtoSelecionadoEstProdDestino : [produtoSelecionadoEstProdDestino];
@@ -1351,82 +1345,27 @@ export const useCreatePromocaoAtiva = ({ }) => {
             throw new Error('Falha ao verificar produtos existentes');
           }
           
-          console.log(responseProdutoExistente.data, 'responseProdutoExistente');
-          
-          // Extrair todos os IDs de produtos existentes da nova estrutura aninhada
-          const produtosExistentes = [];
-          
-          responseProdutoExistente.data.forEach(promocao => {
-            // Verificar produtos destino
-            if (promocao.empresaPromocaoDestino && Array.isArray(promocao.empresaPromocaoDestino)) {
-              promocao.empresaPromocaoDestino.forEach(empresaItem => {
-                if (empresaItem.det) {
-                  // IDPRODUTO
-                  if (empresaItem.det.IDPRODUTO && empresaItem.det.IDPRODUTO !== null) {
-                    produtosExistentes.push(empresaItem.det.IDPRODUTO.toString());
-                  }
-                  
-                  // IDPRODUTODESTINO (pode ser string com múltiplos IDs separados por vírgula)
-                  if (empresaItem.det.IDPRODUTODESTINO && empresaItem.det.IDPRODUTODESTINO !== null) {
-                    const idsDestino = empresaItem.det.IDPRODUTODESTINO.toString().split(',');
-                    idsDestino.forEach(id => {
-                      const idLimpo = id.trim();
-                      if (idLimpo) produtosExistentes.push(idLimpo);
-                    });
-                  }
-                }
-              });
-            }
-            
-            // Verificar produtos origem
-            if (promocao.empresaPromocaoOrigem && Array.isArray(promocao.empresaPromocaoOrigem)) {
-              promocao.empresaPromocaoOrigem.forEach(empresaItem => {
-                if (empresaItem.det) {
-                  // IDPRODUTO
-                  if (empresaItem.det.IDPRODUTO && empresaItem.det.IDPRODUTO !== null) {
-                    produtosExistentes.push(empresaItem.det.IDPRODUTO.toString());
-                  }
-                  
-                  // IDPRODUTOORIGEM (pode ser string com múltiplos IDs separados por vírgula)
-                  if (empresaItem.det.IDPRODUTOORIGEM && empresaItem.det.IDPRODUTOORIGEM !== null) {
-                    const idsOrigem = empresaItem.det.IDPRODUTOORIGEM.toString().split(',');
-                    idsOrigem.forEach(id => {
-                      const idLimpo = id.trim();
-                      if (idLimpo) produtosExistentes.push(idLimpo);
-                    });
-                  }
-                }
-              });
-            }
-          });
-          
-          // Remove duplicados e converte para números para comparação
-          const idsUnicos = [...new Set(produtosExistentes)].map(id => Number(id));
-          console.log(idsUnicos, 'idsUnicos de produtos existentes');
-          console.log(produtoDestinoArray, 'produtoDestinoArray que está tentando salvar');
-          
-          // Verificar se algum produto destino já existe
-          const existeProduto = idsUnicos.some(idExistente =>
-            produtoDestinoArray.some(produtoDestino => {
-              // Considerar que produtoDestino pode ser objeto ou número
-              const idDestino = typeof produtoDestino === 'object' && produtoDestino !== null 
-                ? Number(produtoDestino.IDPRODUTO) 
-                : Number(produtoDestino);
-              return idExistente === idDestino;
-            })
+          const produtosExistentes = responseProdutoExistente.data.detalhePromo || [];
+          const existeProduto = produtosExistentes.some(produto =>
+            produtoDestinoArray.includes(produto.IDPRODUTO)
           );
-          console.log(existeProduto, 'existeProduto');
           
           if (existeProduto) {
             Swal.fire({
               icon: 'warning',
               title: 'Produto já está em uma promoção ativa!',
-              text: `Produtos  Nº ${produtoDestinoArray.map(p => typeof p === 'object' ? p.IDPRODUTO : p).join(', ')} destino já está vinculado a uma promoção ativa.`,
+              text: 'Um dos produtos destino já está vinculado a uma promoção ativa.',
               customClass: { container: 'custom-swal' },
               confirmButtonText: 'OK'
             });
             return;
           }
+          
+          const normalizeToArray = (value) => {
+            if (Array.isArray(value)) return value;
+            if (value === null || value === undefined || value === "") return [];
+            return [value];
+          };
 
           const subgruposDestinoSelecionados = normalizeToArray(subGrupoProdutoDestino)
             .map(v => Number(v))
@@ -1544,7 +1483,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
       if (aplicacaoDestinoSelecionada == 0 || aplicacaoDestinoSelecionada == 3) {
         const origem = produtoSelecionadoEstProdOrigem;
         const destino = produtoSelecionadoEstProdDestino;
-        const iguais = origem.length == destino.length &&
+        const iguais = origem.length == destino.length && 
           origem.every((v, i) => {
             const idOrigem = typeof v === 'object' && v !== null ? v.IDPRODUTO : v;
             const idDestino = typeof destino[i] === 'object' && destino[i] !== null ? destino[i].IDPRODUTO : destino[i];
@@ -1597,12 +1536,12 @@ export const useCreatePromocaoAtiva = ({ }) => {
           return;
         }
 
-
+       
 
         const origemId = typeof produtoSelecionadoEstProdOrigem[0] === 'object' && produtoSelecionadoEstProdOrigem[0] !== null ? produtoSelecionadoEstProdOrigem[0].IDPRODUTO : produtoSelecionadoEstProdOrigem[0];
         const destinoId = typeof produtoSelecionadoEstProdDestino[0] === 'object' && produtoSelecionadoEstProdDestino[0] !== null ? produtoSelecionadoEstProdDestino[0].IDPRODUTO : produtoSelecionadoEstProdDestino[0];
         if (origemId !== destinoId) {
-
+          
           Swal.fire({
             position: 'center',
             icon: 'error',
@@ -1670,167 +1609,44 @@ export const useCreatePromocaoAtiva = ({ }) => {
         return;
       }
 
-      const produtosDestino = normalizeToArray(produtoSelecionadoEstProdDestino);
-      const produtosOrigem = normalizeToArray(produtoSelecionadoEstProdOrigem);
+      let camposEstruturaProduto = {};
 
-      const subgruposDestino = normalizeToArray(subGrupoProdutoDestino).map(Number);
-      const subgruposOrigem = normalizeToArray(subGrupoProdutoOrigem).map(Number);
-
-      // Nova estrutura de dados baseada em arrays de objetos separados
-      const gerarDetalhesDestino = () => {
-        const detalhesDestino = [];
-
-        // Agrupar produtos por subgrupo
-        const produtosPorSubgrupo = {};
-        produtosDestino.forEach(p => {
-          if (!p) return;
-          const idSub = Number(p.IDSUBGRUPO);
-          const idProd = Number(p.IDPRODUTO);
-          if (!idSub || !idProd) return;
-          if (!produtosPorSubgrupo[idSub]) produtosPorSubgrupo[idSub] = [];
-          produtosPorSubgrupo[idSub].push(idProd);
-        });
-
-        subgruposDestino.forEach(subDestino => {
-          if (!subDestino || subDestino === -1) return;
-
-          const produtosDoSubgrupo = produtosPorSubgrupo[subDestino] || [];
-          
-          if (produtosDoSubgrupo.length > 0) {
-            // Criar um objeto para cada produto individual
-            produtosDoSubgrupo.forEach(idProduto => {
-              const objetoDestino = {
-                IDGRUPOEMDESTINO: grupoSelecionadoDestino || -1,
-                IDSUBGRUPOEMDESTINO: -1,
-                IDMARCAEMDESTINO: marcaDestino || -1,
-                IDFORNECEDOREMDESTINO: fornecedorSelecionado || -1,
-                IDPRODUTODESTINO: String(idProduto), // Produto individual, não array
-                STDETPROMODESTINO: "True"
-              };
-              detalhesDestino.push(objetoDestino);
-            });
-          } else {
-            // Subgrupo sem produtos
-            const objetoDestino = {
-              IDGRUPOEMDESTINO: grupoSelecionadoDestino || -1,
-              IDSUBGRUPOEMDESTINO: subDestino,
-              IDMARCAEMDESTINO: marcaDestino || -1,
-              IDFORNECEDOREMDESTINO: fornecedorSelecionado || -1,
-              IDPRODUTODESTINO: null,
-              STDETPROMODESTINO: "True"
-            };
-            detalhesDestino.push(objetoDestino);
-          }
-        });
-
-        return detalhesDestino;
-      };
-
-      const gerarDetalhesOrigem = () => {
-        const detalhesOrigem = [];
-
-        // Agrupar produtos por subgrupo
-        const produtosPorSubgrupo = {};
-        produtosOrigem.forEach(p => {
-          if (!p) return;
-          const idSub = Number(p.IDSUBGRUPO);
-          const idProd = Number(p.IDPRODUTO);
-          if (!idSub || !idProd) return;
-          if (!produtosPorSubgrupo[idSub]) produtosPorSubgrupo[idSub] = [];
-          produtosPorSubgrupo[idSub].push(idProd);
-        });
-
-        subgruposOrigem.forEach(subOrigem => {
-          if (!subOrigem || subOrigem === -1) return;
-
-          const produtosDoSubgrupo = produtosPorSubgrupo[subOrigem] || [];
-          
-          if (produtosDoSubgrupo.length > 0) {
-            // Criar um objeto para cada produto individual
-            produtosDoSubgrupo.forEach(idProduto => {
-              const objetoOrigem = {
-                IDGRUPOEMORIGEM: grupoSelecionadoOrigem || -1,
-                IDSUBGRUPOEMORIGEM: -1,
-                IDMARCAEMORIGEM: marcaOrigem || -1,
-                IDFORNECEDOREMORIGEM: fornecedorSelecionado || -1,
-                IDPRODUTOORIGEM: String(idProduto), // Produto individual, não array
-                STDETPROMOORIGEM: "True"
-              };
-              detalhesOrigem.push(objetoOrigem);
-            });
-          } else {
-            // Subgrupo sem produtos
-            const objetoOrigem = {
-              IDGRUPOEMORIGEM: grupoSelecionadoOrigem || -1,
-              IDSUBGRUPOEMORIGEM: subOrigem,
-              IDMARCAEMORIGEM: marcaOrigem || -1,
-              IDFORNECEDOREMORIGEM: fornecedorSelecionado || -1,
-              IDPRODUTOORIGEM: null,
-              STDETPROMOORIGEM: "True"
-            };
-            detalhesOrigem.push(objetoOrigem);
-          }
-        });
-
-        return detalhesOrigem;
-      };
-
-      const detalhesDestino = gerarDetalhesDestino();
-      const detalhesOrigem = gerarDetalhesOrigem();
-
-      if (detalhesDestino.length === 0 && detalhesOrigem.length === 0) {
-        Swal.fire({
-          icon: "warning",
-          title: "Seleção obrigatória",
-          text: "Selecione ao menos um subgrupo ou produto."
-        });
-        return;
-      }
-
-      // Determinar as flags baseadas no tipo de conteúdo dos detalhes
-      const temProdutos = [...detalhesDestino, ...detalhesOrigem].some(item => 
-        (item.IDPRODUTODESTINO && item.IDPRODUTODESTINO.length > 0) || 
-        (item.IDPRODUTOORIGEM && item.IDPRODUTOORIGEM.length > 0)
-      );
-      
-      const temEstrutura = [...detalhesDestino, ...detalhesOrigem].some(item => 
-        (item.IDSUBGRUPOEMDESTINO && item.IDSUBGRUPOEMDESTINO !== -1) || 
-        (item.IDSUBGRUPOEMORIGEM && item.IDSUBGRUPOEMORIGEM !== -1)
-      );
-
-      // Definir flags conforme a proposta:
-      // se for só por grupo: STESTRUTURA: "True", STESTRUTURAPRODUTO: "False", STPRODUTO: "False"
-      // se for por produto: STESTRUTURA: "False", STESTRUTURAPRODUTO: "False", STPRODUTO: "True"
-      // se for por estrutura e produto: STESTRUTURA: "True", STESTRUTURAPRODUTO: "True", STPRODUTO: "True"
-      let status = {};
-      
-      if (temEstrutura && temProdutos) {
-        // Estrutura + Produto
-        status = {
+      if(temSubGrupo && temProduto) {
+        camposEstruturaProduto = {
+          IDSUBGRUPOEMDESTINO: subGrupoProdutoDestino,
+          IDSUBGRUPOEMORIGEM: subGrupoProdutoOrigem,
+          IDPRODUTO: idsDestino,
+          IDPRODUTODESTINO: idsDestino,
+          IDPRODUTOORIGEM: idsOrigem,
           STESTRUTURA: "False",
+          STPRODUTO: "False",
           STESTRUTURAPRODUTO: "True",
-          STPRODUTO: "False"
         };
-      } else if (temProdutos && !temEstrutura) {
-        // Apenas Produto
-        status = {
+      }
+      if (!temSubGrupo && temProduto) {
+        camposEstruturaProduto = {
+          IDSUBGRUPOEMDESTINO: -1,
+          IDSUBGRUPOEMORIGEM: -1,
+          IDPRODUTO: idsDestino,
+          IDPRODUTODESTINO: idsDestino,
+          IDPRODUTOORIGEM: idsOrigem,
           STESTRUTURA: "False",
           STESTRUTURAPRODUTO: "False",
-          STPRODUTO: "True"
+          STPRODUTO: "True",
         };
-      } else if (temEstrutura && !temProdutos) {
-        // Apenas Estrutura (só por grupo)
-        status = {
+      }
+    
+      // 2) Subgrupo selecionado e sem produto
+      if (temSubGrupo && !temProduto) {
+        camposEstruturaProduto = {
+          IDSUBGRUPOEMDESTINO: subGrupoProdutoDestino,
+          IDSUBGRUPOEMORIGEM: subGrupoProdutoOrigem,
+          IDPRODUTO: null,
+          IDPRODUTODESTINO: null,
+          IDPRODUTOORIGEM: null,
           STESTRUTURA: "True",
           STESTRUTURAPRODUTO: "False",
-          STPRODUTO: "False"
-        };
-      } else {
-        // Fallback (não deveria acontecer devido à validação acima)
-        status = {
-          STESTRUTURA: "False",
-          STESTRUTURAPRODUTO: "False",
-          STPRODUTO: "False"
+          STPRODUTO: "False",
         };
       }
 
@@ -1844,20 +1660,20 @@ export const useCreatePromocaoAtiva = ({ }) => {
         FATORPROMOPERC: porcentoDesconto,
         VLPRECOPRODUTO: Number(precoProduto),
         DTHORAINICIO: dataInicio,
-        DTHORAFIM: dataFim ,
-        DSPROMOCAOMARKETING: descricao.toUpperCase(),
+        DTHORAFIM: dataFim + ' 23:59:59',
+        DSPROMOCAOMARKETING: descricao,
         IDEMPRESA: empresaSelecionada,
         STATIVO: "True",
         STEMPRESAPROMO: "True",
-        
-        // Flags baseadas no conteúdo dos detalhes
-        ...status,
-        STDETPROMOORIGEM: detalhesOrigem.length > 0 ? "True" : "False",
-        STDETPROMODESTINO: detalhesDestino.length > 0 ? "True" : "False",
-        
-        // Arrays de detalhes estruturados conforme sugestão
-        detalhesDestino: detalhesDestino,
-        detalhesOrigem: detalhesOrigem
+        STDETPROMOORIGEM: "True",
+        STDETPROMODESTINO: "True",
+        IDGRUPOEMDESTINO: grupoSelecionadoDestino,
+        IDMARCAEMDESTINO: marcaDestino,
+        IDFORNECEDOREMDESTINO: fornecedorSelecionado,
+        IDGRUPOEMORIGEM: grupoSelecionadoOrigem,
+        IDMARCAEMORIGEM: marcaOrigem,
+        IDFORNECEDOREMORIGEM: fornecedorSelecionado,
+        ...camposEstruturaProduto
       };
       // IDSUBGRUPOEMDESTINO: subGrupoProdutoDestino,
       // IDSUBGRUPOEMORIGEM: subGrupoProdutoOrigem,
@@ -2102,16 +1918,16 @@ export const useCreatePromocaoAtiva = ({ }) => {
     mostrarProdutosSelecionadosOrigem,
     mostrarProdutosSelecionadosDestino,
     modalDocumentacao,
-    modalPodutoSelecionadoDestinoCSV,
+    modalPodutoSelecionadoDestinoCSV, 
     setModalPodutoSelecionadoDestinoCSV,
-    modalPodutoSelecionadoOrigemCSV,
+    modalPodutoSelecionadoOrigemCSV, 
     setModalPodutoSelecionadoOrigemCSV,
     setModalDocumentacao,
-    isCheckedGrupo,
+    isCheckedGrupo, 
     setIsCheckedGrupo,
     isCheckedProduto,
     setIsCheckedProduto,
-    isCheckedGrupoProduto,
+    isCheckedGrupoProduto, 
     setIsCheckedGrupoProduto,
     produtoSelecionadoEstProdDestino,
     setProdutoSelecionadoEstProdutoDestino,
@@ -2143,26 +1959,78 @@ export const useCreatePromocaoAtiva = ({ }) => {
     onSubmitEstruturaProduto
   }
 }
-
 /*
-os campos IDSUBGRUPOEMDESTINO, IDSUBGRUPOEMORIGEM,  IDPRODUTODESTINO IDPRODUTOORIGEM e IDPRODUTO
-permite arrays de objetos e null ?
-exemplo de um payload no post,
-
-por que a seguinte lógica poderá acontecer
- O usuario pode selecionar o subGrupo e não selecionar os produtos,
-  neste caso o IDPRODUTO: null, IDPRODUTOEMORIGEM: null, IDPRODUTO: null, IDSUBGRUPOEMDESTINO: subGrupoProdutoDestino, IDSUBGRUPOEMORIGEM: subGrupoProdutoOrigem,
-  ou usuario pode selecionar o subGrupo e selecionar os produtos, se o produto pertencer ao subgrupo, neste caso o 
-  IDPRODUTOEMORIGEM: produtoSelecionadoEstProdOrigem, IDPRODUTO: produtoSelecionadoEstProdDestino, IDSUBGRUPOEMDESTINO: -1, IDSUBGRUPOEMORIGEM: -1
-  mais o usuario pode selecionar. vários subgrupos e vários produtos, neste caso se o usuario selecionar 2 subgrupos e selecionar diversoso produtos
-  mais os produtos selecionados pertencem a apenas um dos subgrupos, neste caso o IDPRODUTOEMORIGEM: produtoSelecionadoEstProdOrigem, IDPRODUTO: produtoSelecionadoEstProdDestino, IDSUBGRUPOEMDESTINO: -1, IDSUBGRUPOEMORIGEM: -1 do subGrupo que os produtos selecionados pertencem, 
-  e o outro subgrupo selecionado que não tem produto selecionado, fica com IDPRODUTOEMORIGEM: null, IDPRODUTO: null, IDSUBGRUPOEMDESTINO: subGrupoProdutoDestino, IDSUBGRUPOEMORIGEM: subGrupoProdutoOrigem
-
-  NÃO ALTERE NADA APENAS EXPLIQUE SE É POSSIVEL ENVIAR DESTA FORMA SENÃO ME MOSTRE COMO ADEQUEAR O MEU CÓDIGO E O PAYLOAD DA MANEIRA CORRETA.
-
-  Vamos montar uma estratégia, mais assertiva, neste caso preciso da seguinte lógica primeiro salvar o ResumoPromoção
-  com o IDRESUMOPROMOCAOMARKETING
-  e depois salvando os detalhes da promoção, onde o IDRESUMOPROMOCAOMARKETING é a chave para relacionar os detalhes com o resumo,
-  e assim enviando os objetos de detalhes um a um por que eles podem ser varios objetos detalhes
-  mandando o objeto de destino e origem seprados, dentro de um array de objetos
+ esta arvore dados acho que seria o ideal pois assim aconteceria o insert de cada objeto por vez, 
+ tanto para destino como para origem, veja o que você acha desta abordagem ? 
+  sendo que os campos apesar de estarem no objeto principal do resumoPromocao e não nos destalhes 
+  a lógica deles depende de como estão os detahes 
+  se for só por grupo
+    STESTRUTURA: "True",
+    STESTRUTURAPRODUTO: "False",
+    STPRODUTO: "False",
+  se for por produto
+    STESTRUTURA: "False",
+    STESTRUTURAPRODUTO: "False",
+    STPRODUTO: "True",
+  se for por estrutura e produto
+    STESTRUTURA: "True",
+    STESTRUTURAPRODUTO: "True",
+    STPRODUTO: "True"
 */
+
+{
+  [ 
+    {
+        "IDGRUPOEMDESTINO": -1, 
+        "IDSUBGRUPOEMDESTINO": -1,
+        "IDMARCAEMDESTINO": -1, 
+        "IDFORNECEDOREMDESTINO": -1, 
+        "IDPRODUTODESTINO": [
+            11796,
+            11797,
+            11798
+        ],
+        "STDETPROMODESTINO": "True"
+    },
+  ]
+  [ 
+    {
+      "IDGRUPOEMDESTINO": -1, 
+      "IDSUBGRUPOEMDESTINO": 172,
+      "IDMARCAEMDESTINO": -1, 
+      "IDFORNECEDOREMDESTINO": -1, 
+      "IDPRODUTODESTINO": null,
+      "STDETPROMODESTINO": "True"
+    },
+  ]
+  [ 
+    {
+      "IDGRUPOEMDESTINO": -1, 
+      "IDSUBGRUPOEMDESTINO": 172,
+      "IDMARCAEMDESTINO": -1, 
+      "IDFORNECEDOREMDESTINO": -1, 
+      "IDPRODUTODESTINO": [
+        11796,
+        11797,
+        11798
+      ],
+      "STDETPROMODESTINO": "True"
+    },
+  ]
+  
+    "TPAPARTIRDE": 0,
+    "TPAPLICADOA": 2,
+    "TPFATORPROMO": 2,
+    "APARTIRDEQTD": 1,
+    "APARTIRDOVLR": 0,
+    "FATORPROMOVLR": 0,
+    "FATORPROMOPERC": 10,
+    "VLPRECOPRODUTO": 0,
+    "DTHORAINICIO": "2026-04-20",
+    "DTHORAFIM": "2026-05-20 23:59:59",
+    "DSPROMOCAOMARKETING": "teste",
+    "IDEMPRESA": [
+        54
+    ],
+    "STATIVO": "True",
+}

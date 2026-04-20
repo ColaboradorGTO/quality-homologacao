@@ -160,6 +160,10 @@ export const ActionPesquisaPromocao = ({ }) => {
     setSubGrupoDestino,
     subGrupoOrigem,
     setSubGrupoOrigem,
+    produtosSubGrupoDestino,
+    setProdutosSubGrupoDestino,
+    produtosSubGrupoOrigem,
+    setProdutosSubGrupoOrigem,
     onSubmit,
     downloadPlanilhaModelo,
     onSubmitEstrutura,
@@ -1085,4 +1089,20 @@ export const ActionPesquisaPromocao = ({ }) => {
   precisar verificar se o produto selecionado já existe em outra promoção ativa, se sim, não permitir cadastrar a promoção, com este produto
   se for por subgGrupo, verificar se o subgrupo selecionado, já existe em outra promoção ativa, se sim, não permitir cadastrar a promoção, com este subgrupo
   estas verificações precisam ser feitas no detalhe destino e origem
+
+  O usuario pode selecionar o subGrupo e não selecionar os produtos,
+  neste caso o IDPRODUTO: null, IDPRODUTOEMORIGEM: null, IDPRODUTO: null, IDSUBGRUPOEMDESTINO: subGrupoProdutoDestino, IDSUBGRUPOEMORIGEM: subGrupoProdutoOrigem,
+  ou usuario pode selecionar o subGrupo e selecionar os produtos, se o produto pertencer ao subgrupo, neste caso o 
+  IDPRODUTOEMORIGEM: produtoSelecionadoEstProdOrigem, IDPRODUTO: produtoSelecionadoEstProdDestino, IDSUBGRUPOEMDESTINO: -1, IDSUBGRUPOEMORIGEM: -1
+  mais o usuario pode selecionar. vários subgrupos e vários produtos, neste caso se o usuario selecionar 2 subgrupos e selecionar diversoso produtos
+  mais os produtos selecionados pertencem a apenas um dos subgrupos, neste caso o IDPRODUTOEMORIGEM: produtoSelecionadoEstProdOrigem, IDPRODUTO: produtoSelecionadoEstProdDestino, IDSUBGRUPOEMDESTINO: -1, IDSUBGRUPOEMORIGEM: -1 do subGrupo que os produtos selecionados pertencem, 
+  e o outro subgrupo selecionado que não tem produto selecionado, fica com IDPRODUTOEMORIGEM: null, IDPRODUTO: null, IDSUBGRUPOEMDESTINO: subGrupoProdutoDestino, IDSUBGRUPOEMORIGEM: subGrupoProdutoOrigem
+
+  para verificar se o produtos selecionados pertencem ao subgrupo, eles vem estes aqui   
+  console.log(produtoSelecionadoEstProdDestino, 'produtoSelecionadoEstProdDestino');
+  console.log(produtoSelecionadoEstProdOrigem, 'produtoSelecionadoEstProdOrigem');
+  que tras os retorno que contem as informações abaixo
+  IDPRODUTO: "11797"
+  IDSUBGRUPO: 138
+
 */
