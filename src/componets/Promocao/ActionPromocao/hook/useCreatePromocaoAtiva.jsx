@@ -1351,22 +1351,16 @@ export const useCreatePromocaoAtiva = ({ }) => {
             throw new Error('Falha ao verificar produtos existentes');
           }
           
-          console.log(responseProdutoExistente.data, 'responseProdutoExistente');
-          
-          // Extrair todos os IDs de produtos existentes da nova estrutura aninhada
           const produtosExistentes = [];
           
           responseProdutoExistente.data.forEach(promocao => {
-            // Verificar produtos destino
             if (promocao.empresaPromocaoDestino && Array.isArray(promocao.empresaPromocaoDestino)) {
               promocao.empresaPromocaoDestino.forEach(empresaItem => {
                 if (empresaItem.det) {
-                  // IDPRODUTO
                   if (empresaItem.det.IDPRODUTO && empresaItem.det.IDPRODUTO !== null) {
                     produtosExistentes.push(empresaItem.det.IDPRODUTO.toString());
                   }
                   
-                  // IDPRODUTODESTINO (pode ser string com múltiplos IDs separados por vírgula)
                   if (empresaItem.det.IDPRODUTODESTINO && empresaItem.det.IDPRODUTODESTINO !== null) {
                     const idsDestino = empresaItem.det.IDPRODUTODESTINO.toString().split(',');
                     idsDestino.forEach(id => {
@@ -1378,16 +1372,13 @@ export const useCreatePromocaoAtiva = ({ }) => {
               });
             }
             
-            // Verificar produtos origem
             if (promocao.empresaPromocaoOrigem && Array.isArray(promocao.empresaPromocaoOrigem)) {
               promocao.empresaPromocaoOrigem.forEach(empresaItem => {
                 if (empresaItem.det) {
-                  // IDPRODUTO
                   if (empresaItem.det.IDPRODUTO && empresaItem.det.IDPRODUTO !== null) {
                     produtosExistentes.push(empresaItem.det.IDPRODUTO.toString());
                   }
                   
-                  // IDPRODUTOORIGEM (pode ser string com múltiplos IDs separados por vírgula)
                   if (empresaItem.det.IDPRODUTOORIGEM && empresaItem.det.IDPRODUTOORIGEM !== null) {
                     const idsOrigem = empresaItem.det.IDPRODUTOORIGEM.toString().split(',');
                     idsOrigem.forEach(id => {
@@ -1400,22 +1391,18 @@ export const useCreatePromocaoAtiva = ({ }) => {
             }
           });
           
-          // Remove duplicados e converte para números para comparação
           const idsUnicos = [...new Set(produtosExistentes)].map(id => Number(id));
-          console.log(idsUnicos, 'idsUnicos de produtos existentes');
-          console.log(produtoDestinoArray, 'produtoDestinoArray que está tentando salvar');
-          
-          // Verificar se algum produto destino já existe
+
+
           const existeProduto = idsUnicos.some(idExistente =>
             produtoDestinoArray.some(produtoDestino => {
-              // Considerar que produtoDestino pode ser objeto ou número
               const idDestino = typeof produtoDestino === 'object' && produtoDestino !== null 
                 ? Number(produtoDestino.IDPRODUTO) 
                 : Number(produtoDestino);
               return idExistente === idDestino;
             })
           );
-          console.log(existeProduto, 'existeProduto');
+       
           
           if (existeProduto) {
             Swal.fire({
