@@ -77,8 +77,6 @@ export const useCreatePromocaoAtiva = ({ }) => {
   const [modalEstProdOrigem, setModalEstProdOrigem] = useState(false);
   const [modalEstProdDestino, setModalEstProdDestino] = useState(false);
 
-  const [produtosSubGrupoDestino, setProdutosSubGrupoDestino] = useState([]);
-  const [produtosSubGrupoOrigem, setProdutosSubGrupoOrigem] = useState([]);
 
   const navigate = useNavigate();
 
@@ -1437,17 +1435,31 @@ export const useCreatePromocaoAtiva = ({ }) => {
 
           const conflitosDestino = subgruposDestinoSelecionados.filter(id => subgruposDestinoAtivos.includes(id));
           const conflitosOrigem = subgruposOrigemSelecionados.filter(id => subgruposOrigemAtivos.includes(id));
-
+          console.log(conflitosDestino, 'conflitosDestino');
+          console.log(conflitosOrigem, 'conflitosOrigem');
           let conflitos = Array.from(new Set([...conflitosDestino, ...conflitosOrigem]));
-
+          console.log(conflitos, 'conflitos');
           if (conflitos.length > 0) {
+            // Debug para verificar os valores antes de exibir
+            console.log('conflitos antes do join:', conflitos);
+            console.log('conflitos tipos:', conflitos.map(c => typeof c));
+            console.log('conflitos são NaN?:', conflitos.map(c => Number.isNaN(c)));
+            
+            const conflitosString = conflitos
+              .filter(c => !Number.isNaN(c)) // Remove qualquer NaN que possa ter passado
+              .map(c => String(c)) // Converte explicitamente para string
+              .join(", ");
+              
+            console.log('conflitosString final:', conflitosString);
+            
+            // Construção mais explícita da mensagem HTML
+            const htmlMessage = "IDs em conflito: <b>" + conflitosString + "</b><br/>Ajuste os subgrupos para continuar.";
+            console.log('htmlMessage:', htmlMessage);
+            
             Swal.fire({
               icon: "warning",
               title: "Subgrupo já está em promoção ativa",
-              html: `
-                IDs em conflito: <b>${conflitos.join(", ")}</b><br/>
-                Ajuste os subgrupos para continuar.
-              `,
+              html: htmlMessage,
               customClass: { container: "custom-swal" },
               confirmButtonText: "OK"
             });
@@ -1531,18 +1543,33 @@ export const useCreatePromocaoAtiva = ({ }) => {
       if (aplicacaoDestinoSelecionada == 0 || aplicacaoDestinoSelecionada == 3) {
         const origem = produtoSelecionadoEstProdOrigem;
         const destino = produtoSelecionadoEstProdDestino;
-        const iguais = origem.length == destino.length &&
-          origem.every((v, i) => {
-            const idOrigem = typeof v === 'object' && v !== null ? v.IDPRODUTO : v;
-            const idDestino = typeof destino[i] === 'object' && destino[i] !== null ? destino[i].IDPRODUTO : destino[i];
-            return idOrigem === idDestino;
-          });
-
+        console.log("Origem:", produtoSelecionadoEstProdOrigem);
+        console.log("Destino:", produtoSelecionadoEstProdDestino);
+        
+        // Extrair IDs dos produtos, independente da estrutura
+        const idsOrigem = origem.map(v => {
+          const id = typeof v === 'object' && v !== null ? v.IDPRODUTO : v;
+          return String(id);
+        }).sort();
+        
+        const idsDestino = destino.map(v => {
+          const id = typeof v === 'object' && v !== null ? v.IDPRODUTO : v;
+          return String(id);
+        }).sort();
+        
+        console.log("IDs Origem ordenados:", idsOrigem);
+        console.log("IDs Destino ordenados:", idsDestino);
+        
+        // Comparar se os conjuntos de IDs são iguais (independente da ordem)
+        const iguais = idsOrigem.length === idsDestino.length && 
+          idsOrigem.every((id, i) => id === idsDestino[i]);
+          
+        console.log("Produtos de origem e destino são iguais?", iguais);
         if (!iguais) {
           Swal.fire({
             position: 'center',
             icon: 'error',
-            title: 'Erro Produtos Origem e Destino',
+            title: 'Erro Produtos Origem e Destino AQUI',
             text: 'Para Mecânica por pares ou menos na primeira, os produtos de origem e destino devem ser iguais.',
             customClass: {
               container: 'custom-swal',
@@ -1659,15 +1686,15 @@ export const useCreatePromocaoAtiva = ({ }) => {
 
       const produtosDestino = normalizeToArray(produtoSelecionadoEstProdDestino);
       const produtosOrigem = normalizeToArray(produtoSelecionadoEstProdOrigem);
-
+      console.log("Produtos Destino:", produtosDestino);
+      console.log("Produtos Origem:", produtosOrigem);
       const subgruposDestino = normalizeToArray(subGrupoProdutoDestino).map(Number);
       const subgruposOrigem = normalizeToArray(subGrupoProdutoOrigem).map(Number);
 
-      // Nova estrutura de dados baseada em arrays de objetos separados
+
       const gerarDetalhesDestino = () => {
         const detalhesDestino = [];
 
-        // Agrupar produtos por subgrupo
         const produtosPorSubgrupo = {};
         produtosDestino.forEach(p => {
           if (!p) return;
@@ -1684,20 +1711,18 @@ export const useCreatePromocaoAtiva = ({ }) => {
           const produtosDoSubgrupo = produtosPorSubgrupo[subDestino] || [];
           
           if (produtosDoSubgrupo.length > 0) {
-            // Criar um objeto para cada produto individual
             produtosDoSubgrupo.forEach(idProduto => {
               const objetoDestino = {
                 IDGRUPOEMDESTINO: grupoSelecionadoDestino || -1,
                 IDSUBGRUPOEMDESTINO: -1,
                 IDMARCAEMDESTINO: marcaDestino || -1,
                 IDFORNECEDOREMDESTINO: fornecedorSelecionado || -1,
-                IDPRODUTODESTINO: String(idProduto), // Produto individual, não array
+                IDPRODUTODESTINO: String(idProduto),
                 STDETPROMODESTINO: "True"
               };
               detalhesDestino.push(objetoDestino);
             });
           } else {
-            // Subgrupo sem produtos
             const objetoDestino = {
               IDGRUPOEMDESTINO: grupoSelecionadoDestino || -1,
               IDSUBGRUPOEMDESTINO: subDestino,
@@ -1716,7 +1741,6 @@ export const useCreatePromocaoAtiva = ({ }) => {
       const gerarDetalhesOrigem = () => {
         const detalhesOrigem = [];
 
-        // Agrupar produtos por subgrupo
         const produtosPorSubgrupo = {};
         produtosOrigem.forEach(p => {
           if (!p) return;
@@ -1731,22 +1755,20 @@ export const useCreatePromocaoAtiva = ({ }) => {
           if (!subOrigem || subOrigem === -1) return;
 
           const produtosDoSubgrupo = produtosPorSubgrupo[subOrigem] || [];
-          
+         
           if (produtosDoSubgrupo.length > 0) {
-            // Criar um objeto para cada produto individual
             produtosDoSubgrupo.forEach(idProduto => {
               const objetoOrigem = {
                 IDGRUPOEMORIGEM: grupoSelecionadoOrigem || -1,
                 IDSUBGRUPOEMORIGEM: -1,
                 IDMARCAEMORIGEM: marcaOrigem || -1,
                 IDFORNECEDOREMORIGEM: fornecedorSelecionado || -1,
-                IDPRODUTOORIGEM: String(idProduto), // Produto individual, não array
+                IDPRODUTOORIGEM: String(idProduto), 
                 STDETPROMOORIGEM: "True"
               };
               detalhesOrigem.push(objetoOrigem);
             });
           } else {
-            // Subgrupo sem produtos
             const objetoOrigem = {
               IDGRUPOEMORIGEM: grupoSelecionadoOrigem || -1,
               IDSUBGRUPOEMORIGEM: subOrigem,
@@ -1785,35 +1807,28 @@ export const useCreatePromocaoAtiva = ({ }) => {
         (item.IDSUBGRUPOEMORIGEM && item.IDSUBGRUPOEMORIGEM !== -1)
       );
 
-      // Definir flags conforme a proposta:
-      // se for só por grupo: STESTRUTURA: "True", STESTRUTURAPRODUTO: "False", STPRODUTO: "False"
-      // se for por produto: STESTRUTURA: "False", STESTRUTURAPRODUTO: "False", STPRODUTO: "True"
-      // se for por estrutura e produto: STESTRUTURA: "True", STESTRUTURAPRODUTO: "True", STPRODUTO: "True"
+
       let status = {};
       
       if (temEstrutura && temProdutos) {
-        // Estrutura + Produto
         status = {
           STESTRUTURA: "False",
           STESTRUTURAPRODUTO: "True",
           STPRODUTO: "False"
         };
       } else if (temProdutos && !temEstrutura) {
-        // Apenas Produto
         status = {
           STESTRUTURA: "False",
           STESTRUTURAPRODUTO: "False",
           STPRODUTO: "True"
         };
       } else if (temEstrutura && !temProdutos) {
-        // Apenas Estrutura (só por grupo)
         status = {
           STESTRUTURA: "True",
           STESTRUTURAPRODUTO: "False",
           STPRODUTO: "False"
         };
       } else {
-        // Fallback (não deveria acontecer devido à validação acima)
         status = {
           STESTRUTURA: "False",
           STESTRUTURAPRODUTO: "False",
@@ -1832,31 +1847,16 @@ export const useCreatePromocaoAtiva = ({ }) => {
         VLPRECOPRODUTO: Number(precoProduto),
         DTHORAINICIO: dataInicio,
         DTHORAFIM: dataFim ,
-        DSPROMOCAOMARKETING: descricao.toUpperCase(),
+        DSPROMOCAOMARKETING: descricao,
         IDEMPRESA: empresaSelecionada,
         STATIVO: "True",
         STEMPRESAPROMO: "True",
-        
-        // Flags baseadas no conteúdo dos detalhes
         ...status,
         STDETPROMOORIGEM: detalhesOrigem.length > 0 ? "True" : "False",
         STDETPROMODESTINO: detalhesDestino.length > 0 ? "True" : "False",
-        
-        // Arrays de detalhes estruturados conforme sugestão
         detalhesDestino: detalhesDestino,
         detalhesOrigem: detalhesOrigem
       };
-      // IDSUBGRUPOEMDESTINO: subGrupoProdutoDestino,
-      // IDSUBGRUPOEMORIGEM: subGrupoProdutoOrigem,
-      // IDPRODUTO: Array.from(new Set([
-      //   ...extractIds(produtoSelecionadoEstProdDestino),
-      // ])),
-      // IDPRODUTODESTINO: Array.from(new Set([
-      //   ...extractIds(produtoSelecionadoEstProdDestino),
-      // ])),
-      // IDPRODUTOORIGEM: Array.from(new Set([
-      //   ...extractIds(produtoSelecionadoEstProdOrigem),
-      // ].filter(Boolean))),
 
       let timerInterval;
       Swal.fire({
@@ -2120,11 +2120,6 @@ export const useCreatePromocaoAtiva = ({ }) => {
     setSubGrupoDestino,
     subGrupoOrigem,
     setSubGrupoOrigem,
-
-    produtosSubGrupoDestino,
-    setProdutosSubGrupoDestino,
-    produtosSubGrupoOrigem,
-    setProdutosSubGrupoOrigem,
     downloadPlanilhaModelo,
     onSubmitEstrutura,
     onSubmitEstruturaProduto

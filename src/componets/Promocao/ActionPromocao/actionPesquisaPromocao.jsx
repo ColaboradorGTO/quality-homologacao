@@ -160,10 +160,6 @@ export const ActionPesquisaPromocao = ({ }) => {
     setSubGrupoDestino,
     subGrupoOrigem,
     setSubGrupoOrigem,
-    produtosSubGrupoDestino,
-    setProdutosSubGrupoDestino,
-    produtosSubGrupoOrigem,
-    setProdutosSubGrupoOrigem,
     onSubmit,
     downloadPlanilhaModelo,
     onSubmitEstrutura,
@@ -405,9 +401,9 @@ export const ActionPesquisaPromocao = ({ }) => {
     setSubGrupoOrigem(selectedSubGrupo);
     setSubGrupoProdutoOrigem(selectedSubGrupo);
     
-    if (subGrupoOrigem.length > 0) {
-      refetchProdutoSubGrupoOrigem();
-    }
+    // if (subGrupoOrigem.length > 0) {
+    //   refetchProdutoSubGrupoOrigem();
+    // }
   };
 
   const handleProdutoSubGrupoDestinoChange = (e) => {
@@ -433,10 +429,11 @@ export const ActionPesquisaPromocao = ({ }) => {
     setGrupoSelecionado(selectedGrupo);
     setSubGrupoDestino(selectedSubGrupo);
     setSubGrupoProdutoDestino(selectedSubGrupo);
-    if (subGrupoDestino.length > 0) {
-      refetchProdutoSubGrupoDestino();
-    }
+    // if (subGrupoDestino.length > 0) {
+    //   refetchProdutoSubGrupoDestino();
+    // }
   };
+  
 
   const fetchProdutoSubGrupoDestino = async () => {
     const urlBase = `/produto-subGrupo?idSubGrupo=${subGrupoDestino.join(',')}`;
@@ -513,7 +510,7 @@ export const ActionPesquisaPromocao = ({ }) => {
   const { data: dadosProdutoSubGrupoOrigem = [], error: errorProdutoSubGrupoOrigem, isLoading: isLoadingProdutoSubGrupoOrigem, refetch: refetchProdutoSubGrupoOrigem } = useQuery(
     ['produto-subGrupo', subGrupoOrigem],
     async () => fetchProdutoSubGrupoOrigem(),
-    { enabled: false, staleTime: 1000 * 60 * 60, cacheTime: 1000 * 60 * 60, }
+    { enabled: Boolean(subGrupoOrigem.length), staleTime: 1000 * 60 * 60, cacheTime: 1000 * 60 * 60, }
   );
 
   const handleChangeGrupo = (e) => {
@@ -1105,4 +1102,19 @@ export const ActionPesquisaPromocao = ({ }) => {
   IDPRODUTO: "11797"
   IDSUBGRUPO: 138
 
+
+  15516
+  15515
+
+  31592
+   31597
+    31596
+
+    NOVOS
+    15518
+    15517
+
+    31593
+    31594
+    31595
 */
