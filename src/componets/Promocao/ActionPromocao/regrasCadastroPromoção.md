@@ -157,3 +157,74 @@ ESTA PROMOÇÃO NÃO FUNCIONOU PROMOÇÃO POR EM UM PRODUTO // QUANTIDADE VALOR 
 
 
 -->
+
+<!-- 
+/* 
+  o usuario seleciona o subGrupo ai ele traz todos os produtos, deste subgrupo
+  se o usuario não selecionar nem um produto,  IDSUBGRUPOEMDESTINO: subGrupoProdutoDestino, IDSUBGRUPOEMORIGEM: subGrupoProdutoOrigem,
+  e o IDPRODUTOEMDESTINO: null, IDPRODUTOEMORIGEM: null, IDPRODUTO: null,
+  se o usuario selecionar o subgrupo e selecionar os produtos, deste subGrupo
+  IDSUBGRUPOEMDESTINO: -1, IDSUBGRUPOEMORIGEM: -1,
+  IDPRODUTOEMDESTINO: produtoSelecionadoEstProdDestino, IDPRODUTOEMORIGEM: produtoSelecionadoEstProdOrigem, IDPRODUTO: produtoSelecionadoEstProdDestino,
+  se tem produto ele pricisa esta no destino e na origem o mesmo, produto.
+   
+  precisar verificar se o produto selecionado já existe em outra promoção ativa, se sim, não permitir cadastrar a promoção, com este produto
+  se for por subgGrupo, verificar se o subgrupo selecionado, já existe em outra promoção ativa, se sim, não permitir cadastrar a promoção, com este subgrupo
+  estas verificações precisam ser feitas no detalhe destino e origem
+
+  O usuario pode selecionar o subGrupo e não selecionar os produtos,
+  neste caso o IDPRODUTO: null, IDPRODUTOEMORIGEM: null, IDPRODUTO: null, IDSUBGRUPOEMDESTINO: subGrupoProdutoDestino, IDSUBGRUPOEMORIGEM: subGrupoProdutoOrigem,
+  ou usuario pode selecionar o subGrupo e selecionar os produtos, se o produto pertencer ao subgrupo, neste caso o 
+  IDPRODUTOEMORIGEM: produtoSelecionadoEstProdOrigem, IDPRODUTO: produtoSelecionadoEstProdDestino, IDSUBGRUPOEMDESTINO: -1, IDSUBGRUPOEMORIGEM: -1
+  mais o usuario pode selecionar. vários subgrupos e vários produtos, neste caso se o usuario selecionar 2 subgrupos e selecionar diversoso produtos
+  mais os produtos selecionados pertencem a apenas um dos subgrupos, neste caso o IDPRODUTOEMORIGEM: produtoSelecionadoEstProdOrigem, IDPRODUTO: produtoSelecionadoEstProdDestino, IDSUBGRUPOEMDESTINO: -1, IDSUBGRUPOEMORIGEM: -1 do subGrupo que os produtos selecionados pertencem, 
+  e o outro subgrupo selecionado que não tem produto selecionado, fica com IDPRODUTOEMORIGEM: null, IDPRODUTO: null, IDSUBGRUPOEMDESTINO: subGrupoProdutoDestino, IDSUBGRUPOEMORIGEM: subGrupoProdutoOrigem
+
+  para verificar se o produtos selecionados pertencem ao subgrupo, eles vem estes aqui   
+  console.log(produtoSelecionadoEstProdDestino, 'produtoSelecionadoEstProdDestino');
+  console.log(produtoSelecionadoEstProdOrigem, 'produtoSelecionadoEstProdOrigem');
+  que tras os retorno que contem as informações abaixo
+  IDPRODUTO: "11797"
+  IDSUBGRUPO: 138
+
+
+  15516
+  15515
+
+  31592
+   31597
+    31596
+
+    NOVOS
+    15518
+    15517
+
+    31593
+    31594
+    31595
+*/
+
+
+/*
+os campos IDSUBGRUPOEMDESTINO, IDSUBGRUPOEMORIGEM,  IDPRODUTODESTINO IDPRODUTOORIGEM e IDPRODUTO
+permite arrays de objetos e null ?
+exemplo de um payload no post,
+
+por que a seguinte lógica poderá acontecer
+ O usuario pode selecionar o subGrupo e não selecionar os produtos,
+  neste caso o IDPRODUTO: null, IDPRODUTOEMORIGEM: null, IDPRODUTO: null, IDSUBGRUPOEMDESTINO: subGrupoProdutoDestino, IDSUBGRUPOEMORIGEM: subGrupoProdutoOrigem,
+  ou usuario pode selecionar o subGrupo e selecionar os produtos, se o produto pertencer ao subgrupo, neste caso o 
+  IDPRODUTOEMORIGEM: produtoSelecionadoEstProdOrigem, IDPRODUTO: produtoSelecionadoEstProdDestino, IDSUBGRUPOEMDESTINO: -1, IDSUBGRUPOEMORIGEM: -1
+  mais o usuario pode selecionar. vários subgrupos e vários produtos, neste caso se o usuario selecionar 2 subgrupos e selecionar diversoso produtos
+  mais os produtos selecionados pertencem a apenas um dos subgrupos, neste caso o IDPRODUTOEMORIGEM: produtoSelecionadoEstProdOrigem, IDPRODUTO: produtoSelecionadoEstProdDestino, IDSUBGRUPOEMDESTINO: -1, IDSUBGRUPOEMORIGEM: -1 do subGrupo que os produtos selecionados pertencem, 
+  e o outro subgrupo selecionado que não tem produto selecionado, fica com IDPRODUTOEMORIGEM: null, IDPRODUTO: null, IDSUBGRUPOEMDESTINO: subGrupoProdutoDestino, IDSUBGRUPOEMORIGEM: subGrupoProdutoOrigem
+
+  NÃO ALTERE NADA APENAS EXPLIQUE SE É POSSIVEL ENVIAR DESTA FORMA SENÃO ME MOSTRE COMO ADEQUEAR O MEU CÓDIGO E O PAYLOAD DA MANEIRA CORRETA.
+
+  Vamos montar uma estratégia, mais assertiva, neste caso preciso da seguinte lógica primeiro salvar o ResumoPromoção
+  com o IDRESUMOPROMOCAOMARKETING
+  e depois salvando os detalhes da promoção, onde o IDRESUMOPROMOCAOMARKETING é a chave para relacionar os detalhes com o resumo,
+  e assim enviando os objetos de detalhes um a um por que eles podem ser varios objetos detalhes
+  mandando o objeto de destino e origem seprados, dentro de um array de objetos
+*/
+ -->

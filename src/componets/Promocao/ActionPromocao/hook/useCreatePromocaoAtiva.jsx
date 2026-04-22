@@ -1127,8 +1127,8 @@ export const useCreatePromocaoAtiva = ({ }) => {
         }
       });
 
-      const response = await post('/criar', postData);
-      // const response = await post('/criar-promocoes-ativas', postData);
+    
+      const response = await post('/criar-promocoes-ativas', postData);
 
       Swal.fire({
         position: 'center',
@@ -1448,8 +1448,8 @@ export const useCreatePromocaoAtiva = ({ }) => {
         }
       });
 
-      const response = await post('/criar', postData);
-      // const response = await post('/criar-promocoes-ativas-subGrupo', postData);
+      
+      const response = await post('/criar-promocoes-ativas-subGrupo', postData);
 
       Swal.fire({
         position: 'center',
@@ -1900,7 +1900,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
                 IDMARCAEMDESTINO: marcaDestino || -1,
                 IDFORNECEDOREMDESTINO: fornecedorSelecionado || -1,
                 IDPRODUTODESTINO: String(idProduto),
-                STDETPROMODESTINO: "True"
+                STATIVO: "True"
               };
               detalhesDestino.push(objetoDestino);
             });
@@ -1911,7 +1911,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
               IDMARCAEMDESTINO: marcaDestino || -1,
               IDFORNECEDOREMDESTINO: fornecedorSelecionado || -1,
               IDPRODUTODESTINO: null,
-              STDETPROMODESTINO: "True"
+              STATIVO: "True"
             };
             detalhesDestino.push(objetoDestino);
           }
@@ -1946,7 +1946,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
                 IDMARCAEMORIGEM: marcaOrigem || -1,
                 IDFORNECEDOREMORIGEM: fornecedorSelecionado || -1,
                 IDPRODUTOORIGEM: String(idProduto), 
-                STDETPROMOORIGEM: "True"
+                STATIVO: "True"
               };
               detalhesOrigem.push(objetoOrigem);
             });
@@ -1957,7 +1957,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
               IDMARCAEMORIGEM: marcaOrigem || -1,
               IDFORNECEDOREMORIGEM: fornecedorSelecionado || -1,
               IDPRODUTOORIGEM: null,
-              STDETPROMOORIGEM: "True"
+              STATIVO: "True"
             };
             detalhesOrigem.push(objetoOrigem);
           }
@@ -2306,25 +2306,3 @@ export const useCreatePromocaoAtiva = ({ }) => {
   }
 }
 
-/*
-os campos IDSUBGRUPOEMDESTINO, IDSUBGRUPOEMORIGEM,  IDPRODUTODESTINO IDPRODUTOORIGEM e IDPRODUTO
-permite arrays de objetos e null ?
-exemplo de um payload no post,
-
-por que a seguinte lógica poderá acontecer
- O usuario pode selecionar o subGrupo e não selecionar os produtos,
-  neste caso o IDPRODUTO: null, IDPRODUTOEMORIGEM: null, IDPRODUTO: null, IDSUBGRUPOEMDESTINO: subGrupoProdutoDestino, IDSUBGRUPOEMORIGEM: subGrupoProdutoOrigem,
-  ou usuario pode selecionar o subGrupo e selecionar os produtos, se o produto pertencer ao subgrupo, neste caso o 
-  IDPRODUTOEMORIGEM: produtoSelecionadoEstProdOrigem, IDPRODUTO: produtoSelecionadoEstProdDestino, IDSUBGRUPOEMDESTINO: -1, IDSUBGRUPOEMORIGEM: -1
-  mais o usuario pode selecionar. vários subgrupos e vários produtos, neste caso se o usuario selecionar 2 subgrupos e selecionar diversoso produtos
-  mais os produtos selecionados pertencem a apenas um dos subgrupos, neste caso o IDPRODUTOEMORIGEM: produtoSelecionadoEstProdOrigem, IDPRODUTO: produtoSelecionadoEstProdDestino, IDSUBGRUPOEMDESTINO: -1, IDSUBGRUPOEMORIGEM: -1 do subGrupo que os produtos selecionados pertencem, 
-  e o outro subgrupo selecionado que não tem produto selecionado, fica com IDPRODUTOEMORIGEM: null, IDPRODUTO: null, IDSUBGRUPOEMDESTINO: subGrupoProdutoDestino, IDSUBGRUPOEMORIGEM: subGrupoProdutoOrigem
-
-  NÃO ALTERE NADA APENAS EXPLIQUE SE É POSSIVEL ENVIAR DESTA FORMA SENÃO ME MOSTRE COMO ADEQUEAR O MEU CÓDIGO E O PAYLOAD DA MANEIRA CORRETA.
-
-  Vamos montar uma estratégia, mais assertiva, neste caso preciso da seguinte lógica primeiro salvar o ResumoPromoção
-  com o IDRESUMOPROMOCAOMARKETING
-  e depois salvando os detalhes da promoção, onde o IDRESUMOPROMOCAOMARKETING é a chave para relacionar os detalhes com o resumo,
-  e assim enviando os objetos de detalhes um a um por que eles podem ser varios objetos detalhes
-  mandando o objeto de destino e origem seprados, dentro de um array de objetos
-*/

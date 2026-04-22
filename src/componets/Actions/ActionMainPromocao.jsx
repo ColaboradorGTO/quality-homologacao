@@ -745,17 +745,6 @@ export const ActionMainPromocao = ({
                     <div className="row mt-3 "  >
 
                       <div className="col-sm-6 col-md-6 col-xl-6">
-                          {/* {InputSelectSubGrupoOrigemComponentAync && (
-                            <InputSelectSubGrupoOrigemComponentAync
-                            label={labelSelectSubGrupoOrigemAsync}
-                            // defaultValue={defaultOptionsSubGrupoAsync}
-                            value={valueSelectSubGrupoOrigemAsync}
-                            optionsMultSelect={optionsSubGrupoOrigemAsync}
-                            onChange={onChangeSelectSubGrupoOrigemAsync}
-                    
-                            isMulti={true}
-                            />
-                          )} */}
                         {MenuTreeSelectOrigemComponent && (
                           <MenuTreeSelectOrigemComponent
                             valueMenuSelect={valueTreeSelectOrigem}
@@ -771,19 +760,6 @@ export const ActionMainPromocao = ({
                       </div>
 
                       <div className="col-sm-6 col-md-6 col-xl-6">
-                          {/* {InputSelectSubGrupoDestinoComponentAync && (
-                            <InputSelectSubGrupoDestinoComponentAync
-                            label={labelSelectSubGrupoDestinoAsync}
-                            // defaultValue={defaultOptionsSubGrupoAsync}
-                            value={valueSelectSubGrupoDestinoAsync}
-                            optionsMultSelect={optionsSubGrupoDestinoAsync}
-                            onChange={onChangeSelectSubGrupoDestinoAsync}
-                    
-                            isMulti={true}
-                            />
-                          )} */}
-                          
-                          {/* <p htmlFor="">Sub Grupo Destino</p> */}
                         {MenuTreeSelectDestinoComponent && (
                           <MenuTreeSelectDestinoComponent
                             valueMenuSelect={valueTreeSelectDestino}

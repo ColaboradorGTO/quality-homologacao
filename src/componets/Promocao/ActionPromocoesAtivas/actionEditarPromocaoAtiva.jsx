@@ -20,7 +20,6 @@ import { InputFieldActionRadio } from "../../Buttons/InputActionRadio";
 import { FaDownload } from "react-icons/fa6";
 
 
-
 export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, actionEditarVisivel, setActionEditarVisivel }) => {
 
   const {
@@ -136,6 +135,24 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
     setIsCheckedGrupo,
     isCheckedProduto,
     setIsCheckedProduto,
+    isCheckedGrupoProduto,
+    setIsCheckedGrupoProduto,
+    produtoSelecionadoEstProdDestino,
+    setProdutoSelecionadoEstProdutoDestino,
+    produtoSelecionadoEstProdOrigem,
+    setProdutoSelecionadoEstProdutoOrigem,
+    novoProdutoEstProdOrigem,
+    setNovoProdutoEstProdOrigem,
+    novoProdutoEstProdDestino,
+    setNovoProdutoEstProdDestino,
+    modalEstProdOrigem,
+    setModalEstProdOrigem,
+    modalEstProdDestino,
+    setModalEstProdDestino,
+    subGrupoProdutoDestino,
+    setSubGrupoProdutoDestino,
+    subGrupoProdutoOrigem,
+    setSubGrupoProdutoOrigem,
     subGrupoDestino,
     setSubGrupoDestino,
     subGrupoOrigem,
@@ -145,7 +162,8 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
     grupoSelecionadoDestino,
     setGrupoSelecionadoDestino,
     downloadPlanilhaModelo,
-    onSubmitEstrutura
+    onSubmitEstrutura,
+    onSubmitEstruturaProduto
   } = useUpdatePromocaoAtiva({ dadosPromocao });
 
   const customStyles = {
@@ -344,14 +362,14 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
       if (!gruposMap.has(grupoId)) {
         gruposMap.set(grupoId, {
           key: `grupo_${grupoId}`,
-          label: subgrupo.DSGRUPOESTRUTURA,
+          label: `${subgrupo.DSGRUPOESTRUTURA}`,
           children: [],
         });
       }
 
       gruposMap.get(grupoId).children.push({
         key: `subgrupo_${subgrupo.IDSUBGRUPOESTRUTURA}`,
-        label: subgrupo.DSSUBGRUPOESTRUTURA,
+        label: `${subgrupo.IDSUBGRUPOESTRUTURA} - ${subgrupo.DSSUBGRUPOESTRUTURA}`,
         data: subgrupo
       });
     });
@@ -458,6 +476,98 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
       .filter(key => key.startsWith("subgrupo_"))      .map(key => key.replace("subgrupo_", ""));
     setSubGrupoOrigem(subgrupos); // 🔥 ESSENCIAL
   };
+
+  const handleProdutoSubGrupoOrigemChange = (e) => {
+    const selectedValue = e.value;
+    setSelectedNodesOrigem(selectedValue);
+
+    const selectedGrupo = [];
+    const selectedSubGrupo = [];
+
+    // Processar as chaves selecionadas
+    Object.keys(selectedValue).forEach(key => {
+      if (key.startsWith('grupo_')) {
+        // Extrair o ID do grupo (remove o prefixo 'grupo_')
+        const grupoId = key.replace('grupo_', '');
+        selectedGrupo.push(grupoId);
+      } else if (key.startsWith('subgrupo_')) {
+        // Extrair o ID do subgrupo (remove o prefixo 'subgrupo_')
+        const subgrupoId = Number(key.replace('subgrupo_', ''));
+        selectedSubGrupo.push(subgrupoId);
+      }
+    });
+
+    setGrupoSelecionado(selectedGrupo);
+    setSubGrupoOrigem(selectedSubGrupo);
+    setSubGrupoProdutoOrigem(selectedSubGrupo);
+    
+    // if (subGrupoOrigem.length > 0) {
+    //   refetchProdutoSubGrupoOrigem();
+    // }
+  };
+
+  const handleProdutoSubGrupoDestinoChange = (e) => {
+    const selectedValue = e.value;
+    setSelectedNodesDestino(selectedValue);
+
+    const selectedGrupo = [];
+    const selectedSubGrupo = [];
+
+    // Processar as chaves selecionadas
+    Object.keys(selectedValue).forEach(key => {
+      if (key.startsWith('grupo_')) {
+        // Extrair o ID do grupo (remove o prefixo 'grupo_')
+        const grupoId = key.replace('grupo_', '');
+        selectedGrupo.push(grupoId);
+      } else if (key.startsWith('subgrupo_')) {
+        // Extrair o ID do subgrupo (remove o prefixo 'subgrupo_')
+        const subgrupoId = Number(key.replace('subgrupo_', ''));
+        selectedSubGrupo.push(subgrupoId);
+      }
+    });
+
+    setGrupoSelecionado(selectedGrupo);
+    setSubGrupoDestino(selectedSubGrupo);
+    setSubGrupoProdutoDestino(selectedSubGrupo);
+    // if (subGrupoDestino.length > 0) {
+    //   refetchProdutoSubGrupoDestino();
+    // }
+  };
+  
+  const handleChangeGrupo = (e) => {
+    const checked = e.checked;
+    setIsCheckedGrupo(checked);
+    if (checked) {
+      setIsCheckedGrupoProduto(false);
+      setIsCheckedProduto(false);
+    }
+  }
+
+  const handleChangeProduto = (e) => {
+    const checked = e.checked;
+    setIsCheckedProduto(checked);
+    if (checked) {
+      setIsCheckedGrupo(false);
+      setIsCheckedGrupoProduto(false);
+    }
+  }
+
+  const handleChangeGrupoProduto = (e) => {
+    const checked = e.checked;
+    setIsCheckedGrupoProduto(checked);
+    if (checked) {
+      setIsCheckedGrupo(false);
+      setIsCheckedProduto(false);
+    }
+  }
+
+  const mostrarModalEstruturaDestino = () => {
+    setModalEstProdDestino(true);
+  }
+
+  const mostrarModalEstruturaOrigem = () => {
+    setModalEstProdOrigem(true);
+  }
 
   return (
     <Fragment>
@@ -634,43 +744,62 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
         optionsTreeSelectOrigem={treeData}
         placeholderTreeSelectOrigem={"Selecione"}
 
-        labelSelectSubGrupoDestinoAsync={"Sub Grupo Destino"}
         MenuTreeSelectDestinoComponent={MenuTreeSelect}
         valueTreeSelectDestino={selectedNodesDestino}
         onChangeTreeSelectDestino={handleTreeSelectDestinoChange}
         optionsTreeSelectDestino={treeData}
         placeholderTreeSelectDestino={"Selecione"}
+        labelSelectSubGrupoDestinoAsync={"Sub Grupo Destino"}
 
+        MenuTreeSelectOrigemComponentEstProd={MenuTreeSelect}
+        valueTreeSelectOrigemEstProd={selectedNodesOrigem}
+        onChangeTreeSelectOrigemEstProd={handleProdutoSubGrupoOrigemChange}
+        optionsTreeSelectOrigemEstProd={treeData}
+        placeholderTreeSelectOrigemEstProd="Selecione"
+        labelSelectSubGrupoOrigemAsyncEstProd={"Sub Grupo Origem"}
 
+        ButtonTypeProdutoEstruturaOrigem={ButtonType}
+        linkNomeProdutoEstruturaOrigem={"Visualizar Estrutura / Produto Origem"}
+        onButtonClickProdutoEstruturaOrigem={mostrarModalEstruturaOrigem}
+        corProdutoEstruturaOrigem={"warning"}
+        IconProdutoEstruturaOrigem={GrView}
+
+        MenuTreeSelectDestinoComponentEstProd={MenuTreeSelect}
+        valueTreeSelectDestinoEstProd={selectedNodesDestino}
+        onChangeTreeSelectDestinoEstProd={handleProdutoSubGrupoDestinoChange}
+        optionsTreeSelectDestinoEstProd={treeData}
+        placeholderTreeSelectDestinoEstProd="Selecione"
+        labelSelectSubGrupoDestinoAsyncEstProd={"Sub Grupo Destino"}
+
+        ButtonTypeProdutoEstruturaDestino={ButtonType}
+        linkNomeProdutoEstruturaDestino={"Visualizar Estrutura / Produto Destino"}
+        onButtonClickProdutoEstruturaDestino={mostrarModalEstruturaDestino}
+        corProdutoEstruturaDestino={"info"}
+        IconProdutoEstruturaDestino={GrView}
+        
         InputGrupoEstrutura={InputFieldActionRadio}
         labelInputGrupoEstrutura={"Estrutura Mercadológica"}
         valueInputGrupoEstrutura={isCheckedGrupo}
-        onChangeInputGrupoEstrutura={(e) => {
-          if (e.checked) {
-            setIsCheckedGrupo(true);
-            setIsCheckedProduto(false); // Desmarca o outro
-          } else {
-            setIsCheckedGrupo(false);
-          }
-        }}
+        onChangeInputGrupoEstrutura={handleChangeGrupo}
         readOnlyGrupoEstrutura={isCheckedGrupo ? false : true}
+
+        InputGrupoEstruturaProduto={InputFieldActionRadio}
+        labelInputGrupoEstruturaProduto={"Estrutura / Produto"}
+        valueInputGrupoEstruturaProduto={isCheckedGrupoProduto}
+        onChangeInputGrupoEstruturaProduto={handleChangeGrupoProduto}
+        readOnlyGrupoEstruturaProduto={isCheckedGrupoProduto ? false : true}
 
         InputProduto={InputFieldActionRadio}
         labelInputProduto={"Por Produtos"}
         valueInputProduto={isCheckedProduto}
-        onChangeInputProduto={(e) => {
-          if (e.checked) {
-            setIsCheckedProduto(true);
-            setIsCheckedGrupo(false); // Desmarca o outro
-          } else {
-            setIsCheckedProduto(false);
-          }
-        }}
+        onChangeInputProduto={handleChangeProduto}
         readOnlyProduto={isCheckedProduto ? false : true}
 
-        styleProduto={{ display: isCheckedGrupo ? 'none' : 'block' }}
-        styleEstrutura={{ display: isCheckedProduto ? 'none' : 'block' }}
+        styleProduto={{ display: isCheckedProduto ? 'block' : 'none' }}
+        styleEstrutura={{ display: isCheckedGrupo ? 'block' : 'none' }}
+        styleEstruturaProduto={{ display: isCheckedGrupoProduto ? 'block' : 'none' }}
 
+       
         InputFieldProdutoOigem={InputFieldAction}
         labelInputFieldProdutoOigem={"Produto Origem"}
         valueInputFieldProdutoOigem={produtoOrigem}
@@ -753,14 +882,21 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
         IconCadastro={GrView}
 
         ButtonSearchComponent={ButtonType}
-        linkNomeSearch={"Atualizar Promoção Ativa"}
+        linkNomeSearch={"Atualizar Por Produto"}
         onButtonClickSearch={handleCadastrar}
         corSearch={"primary"}
         IconSearch={IoIosSend}
         styleButtonSearch={isCheckedProduto ? false : true}
 
+        ButtonTypeEstruturaProduto={ButtonType}
+        linkEstruturaProduto={"Atualizar Por Estrutura / Produto"}
+        onButtonClickEstruturaProduto={onSubmitEstruturaProduto}
+        corEstruturaProduto={"success"}
+        IconEstruturaProduto={IoIosSend}
+        disabledBTEstruturaProduto={isCheckedGrupoProduto ? false : true}
+        
         ButtonTypePedido={ButtonType}
-        linkPedido={"Atualizar Promoção Mercadologica"}
+        linkPedido={"Atualizar Por Estrutura"}
         onButtonClickPedido={handleCadastrarEstrutura}
         corPedido={"info"}
         IconPedido={IoIosSend}
@@ -795,7 +931,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
         IconDownload={FaDownload}
 
       />
-
+    
       <ActionProdutoDestinoModal
         show={modalProdutoDestino}
         handleClose={() => setModalProdutoDestino(false)}
@@ -860,6 +996,9 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
         setFileProdutoDestino={setFileProdutoDestino}
       />
 
+      {console.log(isCheckedGrupoProduto, 'GRUPO PRODUTO')}
+        {console.log(isCheckedGrupo, 'GRUPO' )}
+        {console.log(isCheckedProduto, 'PRODUTO')}
     </Fragment>
   )
 }
