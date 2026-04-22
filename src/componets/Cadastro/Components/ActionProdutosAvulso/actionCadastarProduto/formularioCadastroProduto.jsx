@@ -2,12 +2,16 @@ import { Fragment } from "react"
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal"
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal"
 import { InputFieldModal } from "../../../../Buttons/InputFieldModal"
-import { useForm } from "react-hook-form"
 import Select from 'react-select';
 import { useCadastroProdutoAvulso } from "../../../hooks/useCadastroProdutoAvulso"
+import { Controller, useForm } from "react-hook-form";
+import FormField from "../../../../Formularios/FormField";
+import { AlertError } from "../../../../Inputs/alertError";
 
 export const FormularioCadastroProduto = ({ handleClose }) => {
-    const { register, handleSubmit, formState: { errors } } = useForm();
+    const { handleSubmit, formState: { errors }, clearErrors, control, setError, setValue } = useForm({
+        mode: "onChange"
+    });
     const {
         quantidade,
         setQuantidade,
@@ -77,7 +81,7 @@ export const FormularioCadastroProduto = ({ handleClose }) => {
         enviarPagamento
     } = useCadastroProdutoAvulso()
 
-    
+
 
     const optionsCategoriaProduto = [
         { value: 'VESTUARIO', label: 'VESTUARIO' },
@@ -91,6 +95,35 @@ export const FormularioCadastroProduto = ({ handleClose }) => {
         { value: 'False', label: 'NÃO' }
     ]
 
+    const handleValidatedSubmit = async () => {
+        try {
+            const dadosParaValidar = {
+                descricaoPedido: descricao,
+            };
+
+            await schema.validate(dadosParaValidar, { abortEarly: false });
+            await onSubmit();
+        } catch (validationError) {
+            console.error('❌ Erro de validação:', validationError);
+
+            clearErrors();
+
+            if (validationError.inner && validationError.inner.length > 0) {
+                validationError.inner.forEach(error => {
+                    if (error.path) {
+                        setError(error.path, {
+                            type: 'manual',
+                            message: error.message
+                        });
+                    }
+                });
+            }
+
+            const errorMessages = validationError.errors || [validationError.message];
+            console.log(`Erro de validação:\n${errorMessages.join('\n')}`);
+        }
+
+    }
 
     return (
         <Fragment>
@@ -98,65 +131,82 @@ export const FormularioCadastroProduto = ({ handleClose }) => {
 
 
                 <div className="form-group">
-                    
+
                     <div className="row">
                         <div className="col-sm-6 col-xl-2">
-                            <InputFieldModal
-                                label={"Quantidade "}
-                                type={"text"}
-                                id={"qtdProdPedidoEdit"}
-                                value={quantidade}
-                                onChangeModal={(e) => setQuantidade(e.target.value)}
-                                {...register("qtdProdPedidoEdit", { required: "Campo obrigatório Informe a Quantidade.", })}
-                                required={true}
-                                placeholder={"Informe a Quantidade."}
-                                readOnly={false}
+                            <Controller
+                                name="qtdProduto"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        name="qtdProduto"
+                                        label={"Informe a Quantidade *"}
+                                        type="text"
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        value={quantidade}
+                                        onChangeModal={(e) => setQuantidade(e.target.value)}
+                                    />
+                                )}
                             />
                         </div>
                         <div className="col-sm-6 col-xl-2">
-                            <InputFieldModal
-                                label={"Referência"}
-                                type={"text"}
-                                id={"refProdutoEdit"}
-                                value={referencia}
-                                onChangeModal={(e) => setReferencia(e.target.value)}
-                                {...register("refProdutoEdit", { required: "Campo obrigatório Informe a Referência.", })}
-                                required={true}
-                                placeholder={"Informe a Referência."}
-                                readOnly={false}
+                            <Controller
+                                name="refProduto"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        name="refProduto"
+                                        label={"Informe a Referência *"}
+                                        type="text"
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        value={referencia}
+                                        onChangeModal={(e) => setReferencia(e.target.value)}
+                                    />
+                                )}
                             />
                         </div>
                         <div className="col-sm-6 col-xl-2">
-                            <InputFieldModal
-                                label={"Cod. Barras"}
-                                type={"text"}
-                                id={"codbProdutoEdit"}
-                                value={codBarras}
-                                onChangeModal={(e) => setCodBarras(e.target.value)}
-                                {...register("codbProdutoEdit", { required: "Campo obrigatório Informe o Código de Barras", })}
-                                required={true}
-                                placeholder={"Informe o Código de Barras."}
-                                readOnly={false}
+                            <Controller
+                                name="codProduto"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        name="codProduto"
+                                        label={"Cod. Barras*"}
+                                        type="text"
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        value={codBarras}
+                                        onChangeModal={(e) => setCodBarras(e.target.value)}
+                                    />
+                                )}
                             />
                         </div>
                         <div className="col-sm-6 col-xl-4">
-                            <InputFieldModal
-                                label={"Descrição Produto"}
-                                type={"text"}
-                                id={"dsProdPedidoEdit"}
-                                value={descricao}
-                                onChangeModal={(e) => setDescricao(e.target.value)}
-                                {...register("dsProdPedidoEdit", { required: "Campo obrigatório Informe a Descrição de Produto", })}
-                                required={true}
-                                placeholder={"Informe a Descrição do Produto."}
-                                readOnly={false}
+                            <Controller
+                                name="descProduto"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        name="descProduto"
+                                        label={"Descrição Produto*"}
+                                        type="text"
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        value={descricao}
+                                        onChangeModal={(e) => setDescricao(e.target.value)}
+                                    />
+                                )}
                             />
                         </div>
                         <div className="col-sm-6 col-xl-2">
                             <label className="form-label" htmlFor="tppedido">Categoria Produto</label>
                             <Select
-                                id={"idtipopedido"}
-                                defaultValue={categoriaProdutoSelecionado}
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="categoriaProduto"
                                 options={[
                                     { value: '', label: 'Selecione...' },
                                     ...optionsCategoriaProduto.map((item) => {
@@ -165,8 +215,19 @@ export const FormularioCadastroProduto = ({ handleClose }) => {
                                             label: item.label
                                         }
                                     })]}
-                                onChange={handleCategoriaProduto}
+                                value={categoriaProdutoSelecionado}
+                                onChange={(e) => {
+                                    setCategoriaProdutoSelecionado(e)
+                                    clearErrors('categoriaProduto')
+                                }}
                             />
+                            {errors.categoriaProduto && (
+                                <AlertError
+                                    error={errors.categoriaProduto}
+                                    onClose={clearErrors}
+                                    fieldName="categoriaProduto"
+                                />
+                            )}
                         </div>
                     </div>
                 </div>
@@ -175,8 +236,9 @@ export const FormularioCadastroProduto = ({ handleClose }) => {
                         <div className="col-sm-6 col-xl-2">
                             <label className="form-label" htmlFor="notam">Tamanho</label>
                             <Select
-                                id={"tamprod"}
-                                defaultValue={tamanhoSelecionado}
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="tamanhoProduto"
                                 options={[
                                     { value: '', label: 'Selecione...' },
                                     ...optionsCategoriaProduto.map((item) => {
@@ -185,40 +247,60 @@ export const FormularioCadastroProduto = ({ handleClose }) => {
                                             label: item.label
                                         }
                                     })]}
-                                onChange={handleTamanho}
+                                value={tamanhoSelecionado}
+                                onChange={(e) => {
+                                    setTamanhoSelecionado(e)
+                                    clearErrors('tamanhoProduto')
+                                }}
                             />
+                            {errors.tamanhoProduto && (
+                                <AlertError
+                                    error={errors.tamanhoProduto}
+                                    onClose={clearErrors}
+                                    fieldName="tamanhoProduto"
+                                />
+                            )}
                         </div>
                         <div className="col-sm-6 col-xl-5">
-                            <InputFieldModal
-                                label={"Fornecedor"}
-                                type={"text"}
-                                id={"dsFornEdit"}
-                                value={fornecedor}
-                                onChangeModal={(e) => setFornecedor(e.target.value)}
-                                {...register("dsFornEdit", { required: "Campo obrigatório Informe o Fornecedor", })}
-                                required={true}
-                                placeholder={"Informe o Fornecedor."}
-                                readOnly={false}
+                            <Controller
+                                name="fornecedorProduto"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        name="fornecedorProduto"
+                                        label={"Fornecedor*"}
+                                        type="text"
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        value={fornecedor}
+                                        onChangeModal={(e) => setFornecedor(e.target.value)}
+                                    />
+                                )}
                             />
                         </div>
                         <div className="col-sm-6 col-xl-3">
-                            <InputFieldModal
-                                label={"Fabricante"}
-                                type={"text"}
-                                id={"dsFabEdit"}
-                                value={fabricante}
-                                onChangeModal={(e) => setFabricante(e.target.value)}
-                                {...register("dsFabEdit", { required: "Campo obrigatório Informe o Fabricante", })}
-                                required={true}
-                                placeholder={"Informe o Fabricante."}
-                                readOnly={false}
+                            <Controller
+                                name="fabricanteProduto"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        name="fabricanteProduto"
+                                        label={"Fabricante*"}
+                                        type="text"
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        value={fabricante}
+                                        onChangeModal={(e) => setFabricante(e.target.value)}
+                                    />
+                                )}
                             />
                         </div>
                         <div className="col-sm-6 col-xl-2">
                             <label className="form-label" htmlFor="tpunid">Unidade</label>
                             <Select
-                                id={"unidProd"}
-                                defaultValue={unidadeSelecionada}
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="unidadeProduto"
                                 options={[
                                     { value: '', label: 'Selecione...' },
                                     ...optionsCategoriaProduto.map((item) => {
@@ -227,8 +309,19 @@ export const FormularioCadastroProduto = ({ handleClose }) => {
                                             label: item.label
                                         }
                                     })]}
-                                onChange={handleUnidade}
+                                value={unidadeSelecionada}
+                                onChange={(e) => {
+                                    setUnidadeSelecionada(e)
+                                    clearErrors('unidadeProduto')
+                                }}
                             />
+                            {errors.unidadeProduto && (
+                                <AlertError
+                                    error={errors.unidadeProduto}
+                                    onClose={clearErrors}
+                                    fieldName="unidadeProduto"
+                                />
+                            )}
                         </div>
                     </div>
                 </div>
@@ -237,8 +330,9 @@ export const FormularioCadastroProduto = ({ handleClose }) => {
                         <div className="col-sm-6 col-xl-2">
                             <label className="form-label" htmlFor="tpcor">Cor</label>
                             <Select
-                                id={"corProdCad"}
-                                defaultValue={corSelecionada}
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="corProduto"
                                 options={[
                                     { value: '', label: 'Selecione...' },
                                     ...optionsCategoriaProduto.map((item) => {
@@ -247,14 +341,27 @@ export const FormularioCadastroProduto = ({ handleClose }) => {
                                             label: item.label
                                         }
                                     })]}
-                                onChange={handleCor}
+                                value={corSelecionada}
+                                onChange={(e) => {
+                                    setCorSelecionada(e)
+                                    clearErrors('corProduto')
+                                }}
                             />
+                            {errors.corProduto && (
+                                <AlertError
+                                    error={errors.corProduto}
+                                    onClose={clearErrors}
+                                    fieldName="corProduto"
+                                />
+                            )}
                         </div>
                         <div className="col-sm-6 col-xl-2">
                             <label className="form-label" htmlFor="tptecidoav">Tipo de Tecido</label>
                             <Select
-                                id={"tpTecidoProdCad"}
-                                defaultValue={tipoTecidoSelecionado}
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="tipoTecidoProduto"
+                                value={tipoTecidoSelecionado}
                                 options={[
                                     { value: '', label: 'Selecione...' },
                                     ...optionsCategoriaProduto.map((item) => {
@@ -263,40 +370,59 @@ export const FormularioCadastroProduto = ({ handleClose }) => {
                                             label: item.label
                                         }
                                     })]}
-                                onChange={handleTipoTecido}
+                                onChange={(e) => {
+                                    setTipoTecidoSelecionado(e)
+                                    clearErrors('tipoTecidoProduto')
+                                }}
                             />
+                            {errors.tipoTecidoProduto && (
+                                <AlertError
+                                    error={errors.tipoTecidoProduto}
+                                    onClose={clearErrors}
+                                    fieldName="tipoTecidoProduto"
+                                />
+                            )}
                         </div>
                         <div className="col-sm-6 col-xl-3">
-                            <InputFieldModal
-                                label={"Estrutura"}
-                                type={"text"}
-                                id={"dsEstruturaEdit"}
-                                value={estrutura}
-                                onChangeModal={(e) => setEstrutura(e.target.value)}
-                                {...register("dsEstruturaEdit", { required: "Campo obrigatório Informe a Estrutura", })}
-                                required={true}
-                                placeholder={"Informe a Estrutura."}
-                                readOnly={false}
+                            <Controller
+                                name="EstruturaProduto"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        name="EstruturaProduto"
+                                        label={"Estrutura*"}
+                                        type="text"
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        value={estrutura}
+                                        onChangeModal={(e) => setEstrutura(e.target.value)}
+                                    />
+                                )}
                             />
                         </div>
                         <div className="col-sm-6 col-xl-2">
-                            <InputFieldModal
-                                label={"Estilos"}
-                                type={"text"}
-                                id={"dsEstiloEdit"}
-                                value={estilo}
-                                onChangeModal={(e) => setEstilo(e.target.value)}
-                                {...register("dsEstiloEdit", { required: "Campo obrigatório Informe o Estilo", })}
-                                required={true}
-                                placeholder={"Informe o Estilo."}
-                                readOnly={false}
+                            <Controller
+                                name="estiloProduto"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        name="estiloProduto"
+                                        label={"Estilos*"}
+                                        type="text"
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        value={estilo}
+                                        onChangeModal={(e) => setEstilo(e.target.value)}
+                                    />
+                                )}
                             />
                         </div>
                         <div className="col-sm-6 col-xl-3">
                             <label className="form-label" htmlFor="tpcats">Categorias</label>
                             <Select
-                                id={"categoriasProd"}
-                                defaultValue={categoriaSelecionada}
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="categoriaProduto"
                                 options={[
                                     { value: '', label: 'Selecione...' },
                                     ...optionsCategoriaProduto.map((item) => {
@@ -305,8 +431,19 @@ export const FormularioCadastroProduto = ({ handleClose }) => {
                                             label: item.label
                                         }
                                     })]}
-                                onChange={handleCategoria}
+                                value={categoriaSelecionada}
+                                onChange={(e) => {
+                                    setCategoriaSelecionada(e)
+                                    clearErrors('categoriaProduto')
+                                }}
                             />
+                            {errors.categoriaProduto && (
+                                <AlertError
+                                    error={errors.categoriaProduto}
+                                    onClose={clearErrors}
+                                    fieldName="categoriaProduto"
+                                />
+                            )}
                         </div>
                     </div>
                 </div>
@@ -315,8 +452,9 @@ export const FormularioCadastroProduto = ({ handleClose }) => {
                         <div className="col-sm-6 col-xl-4">
                             <label className="form-label" htmlFor="locexp">Local Exposição</label>
                             <Select
-                                id={"localexp"}
-                                defaultValue={localExposicaoSelecionado}
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="localExposicaoProduto"
                                 options={[
                                     { value: '', label: 'Selecione...' },
                                     ...optionsCategoriaProduto.map((item) => {
@@ -325,14 +463,26 @@ export const FormularioCadastroProduto = ({ handleClose }) => {
                                             label: item.label
                                         }
                                     })]}
-                                onChange={handleLocalExposicao}
+                                value={localExposicaoSelecionado}
+                                onChange={(e) => {
+                                    setLocalExposicaoSelecionado(e)
+                                    clearErrors('localExposicaoProduto')
+                                }}
                             />
+                            {errors.localExposicaoProduto && (
+                                <AlertError
+                                    error={errors.localExposicaoProduto}
+                                    onClose={clearErrors}
+                                    fieldName="localExposicaoProduto"
+                                />
+                            )}
                         </div>
                         <div className="col-sm-6 col-xl-2">
                             <label className="form-label" htmlFor="ecommercest">E-commerce</label>
                             <Select
-                                id={"stecommerce"}
-                                defaultValue={ecommerceSelecionado}
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="ecommerceProduto"
                                 options={[
                                     { value: '', label: 'Selecione...' },
                                     ...optionsEcommerce.map((item) => {
@@ -341,14 +491,26 @@ export const FormularioCadastroProduto = ({ handleClose }) => {
                                             label: item.label
                                         }
                                     })]}
-                                onChange={handleEcommerce}
+                                value={ecommerceSelecionado}
+                                onChange={(e) => {
+                                    setEcommerceSelecionado(e)
+                                    clearErrors('ecommerceProduto')
+                                }}
                             />
+                            {errors.ecommerceProduto && (
+                                <AlertError
+                                    error={errors.ecommerceProduto}
+                                    onClose={clearErrors}
+                                    fieldName="ecommerceProduto"
+                                />
+                            )}
                         </div>
                         <div className="col-sm-6 col-xl-2">
                             <label className="form-label" htmlFor="redesocialst">Rede Social</label>
                             <Select
-                                id={"stredesocial"}
-                                defaultValue={redeSocialSelecionado}
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="redeSocialProduto"
                                 options={[
                                     { value: '', label: 'Selecione...' },
                                     ...optionsEcommerce.map((item) => {
@@ -357,33 +519,52 @@ export const FormularioCadastroProduto = ({ handleClose }) => {
                                             label: item.label
                                         }
                                     })]}
-                                onChange={handleRedeSocial}
+                                value={redeSocialSelecionado}
+                                onChange={(e) => {
+                                    setRedeSocialSelecionado(e)
+                                    clearErrors('redeSocialProduto')
+                                }}
+                            />
+                            {errors.redeSocialProduto && (
+                                <AlertError
+                                    error={errors.redeSocialProduto}
+                                    onClose={clearErrors}
+                                    fieldName="redeSocialProduto"
+                                />
+                            )}
+                        </div>
+                        <div className="col-sm-6 col-xl-2">
+                            <Controller
+                                name="vrCustoProduto"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        name="vrCustoProduto"
+                                        label={"Vr Custo"}
+                                        type="text"
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        value={vrCusto}
+                                        onChangeModal={(e) => setVrCusto(e.target.value)}
+                                    />
+                                )}
                             />
                         </div>
                         <div className="col-sm-6 col-xl-2">
-                            <InputFieldModal
-                                label={"Vr Custo"}
-                                type={"text"}
-                                id={"vrUnitCustoEdit"}
-                                value={vrCusto}
-                                onChangeModal={(e) => setVrCusto(e.target.value)}
-                                {...register("vrUnitCustoEdit", { required: "Campo obrigatório Informe o Valor Custo", })}
-                                required={true}
-                                placeholder={"Informe o Valor Custo."}
-                                readOnly={false}
-                            />
-                        </div>
-                        <div className="col-sm-6 col-xl-2">
-                            <InputFieldModal
-                                label={"Vr Venda"}
-                                type={"text"}
-                                id={"vrUnitVendaEdit"}
-                                value={vrVenda}
-                                onChangeModal={(e) => setVrVenda(e.target.value)}
-                                {...register("vrUnitCustoEdit", { required: "Campo obrigatório Informe o Valor Venda", })}
-                                required={true}
-                                placeholder={"Informe o Valor da Venda."}
-                                readOnly={false}
+                            <Controller
+                                name="vrVendaProduto"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        name="vrVendaProduto"
+                                        label={"Vr Venda"}
+                                        type="text"
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        value={vrVenda}
+                                        onChangeModal={(e) => setVrVenda(e.target.value)}
+                                    />
+                                )}
                             />
                         </div>
                     </div>
@@ -393,8 +574,9 @@ export const FormularioCadastroProduto = ({ handleClose }) => {
                         <div className="col-sm-6 col-xl-3">
                             <label className="form-label" htmlFor="tpncm">NCM</label>
                             <Select
-                                id={"idNcm"}
-                                defaultValue={ncmSelecionado}
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="ncmProduto"
                                 options={[
                                     { value: '', label: 'Selecione...' },
                                     ...optionsEcommerce.map((item) => {
@@ -403,14 +585,26 @@ export const FormularioCadastroProduto = ({ handleClose }) => {
                                             label: item.label
                                         }
                                     })]}
-                                onChange={handleNcm}
+                                value={ncmSelecionado}
+                                onChange={(e) => {
+                                    setNcmSelecionado(e)
+                                    clearErrors('ncmProduto')
+                                }}
                             />
+                            {errors.ncmProduto && (
+                                <AlertError
+                                    error={errors.ncmProduto}
+                                    onClose={clearErrors}
+                                    fieldName="ncmProduto"
+                                />
+                            )}
                         </div>
                         <div className="col-sm-6 col-xl-3">
                             <label className="form-label" htmlFor="tpprod">Tipo Produto</label>
                             <Select
-                                id={"idTipoProd"}
-                                defaultValue={tipoProdutoSelecionado}
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="tipoProduto"
                                 options={[
                                     { value: '', label: 'Selecione...' },
                                     ...optionsEcommerce.map((item) => {
@@ -419,14 +613,26 @@ export const FormularioCadastroProduto = ({ handleClose }) => {
                                             label: item.label
                                         }
                                     })]}
-                                onChange={handleTipoProduto}
+                                value={tipoProdutoSelecionado}
+                                onChange={(e) => {
+                                    setTipoProdutoSelecionado(e)
+                                    clearErrors('tipoProduto')
+                                }}
                             />
+                            {errors.tipoProduto && (
+                                <AlertError
+                                    error={errors.tipoProduto}
+                                    onClose={clearErrors}
+                                    fieldName="tipoProduto"
+                                />
+                            )}
                         </div>
                         <div className="col-sm-6 col-xl-6">
                             <label className="form-label" htmlFor="tpfiscal">Tipo Fiscal</label>
                             <Select
-                                id={"idTipoFiscal"}
-                                defaultValue={tipoFiscalSelecionado}
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="tipoFiscalProduto"
                                 options={[
                                     { value: '', label: 'Selecione...' },
                                     ...optionsEcommerce.map((item) => {
@@ -435,8 +641,19 @@ export const FormularioCadastroProduto = ({ handleClose }) => {
                                             label: item.label
                                         }
                                     })]}
-                                onChange={handleTipoFiscal}
+                                value={tipoFiscalSelecionado}
+                                onChange={(e) => {
+                                    setTipoFiscalSelecionado(e)
+                                    clearErrors('tipoFiscalProduto')
+                                }}
                             />
+                            {errors.tipoFiscalProduto && (
+                                <AlertError
+                                    error={errors.tipoFiscalProduto}
+                                    onClose={clearErrors}
+                                    fieldName="tipoFiscalProduto"
+                                />
+                            )}
                         </div>
                     </div>
                 </div>

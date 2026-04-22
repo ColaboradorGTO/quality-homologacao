@@ -1,10 +1,8 @@
 import { Fragment, useEffect, useState } from "react"
 import { get } from "../../../../api/funcRequest";
-
 import { AiOutlineSearch } from "react-icons/ai";
 import { MdAdd } from "react-icons/md";
 import { ActionListaProdutoAvulso } from "./actionListaProdutoAvulso";
-
 import { ActionEditarProodutodPedidoAvulsoModal } from "./actionEditarProdutoPedidoAvulsoModal";
 import { ActionMain } from "../../../Actions/actionMain";
 import { InputField } from "../../../Buttons/Input";
@@ -14,8 +12,7 @@ import { useQuery } from "react-query";
 import { getDataAtual } from "../../../../utils/dataAtual";
 
 
-
-export const ActionPesquisaProdutosAvulso = () => {
+export const ActionPesquisaProdutosAvulso = ({ usuarioLogado }) => {
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('')
   const [dataPesquisaFim, setDataPesquisaFim] = useState('')
   const [descricao, setDescricao] = useState('')
@@ -25,82 +22,76 @@ export const ActionPesquisaProdutosAvulso = () => {
   const [clickContador, setClickContador] = useState(0);
   const [pageSize, setPageSize] = useState(1000);
   const [currentPage, setCurrentPage] = useState(1);
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
   useEffect(() => {
     const dataInicial = getDataAtual()
     const dataFinal = getDataAtual()
     setDataPesquisaInicio(dataInicial)
     setDataPesquisaFim(dataFinal)
-  
+
   }, [])
 
+  useEffect(() => {
+    const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
+    if (menuSalvo) {
+      const menuParsed = JSON.parse(menuSalvo);
+      setMenuFilhoAtual(menuParsed);
+    }
+  }, []);
+
+  const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
+    ['menus-usuario-excecao', menuFilhoAtual?.ID],
+    async () => {
+      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
+
+      return response.data;
+    },
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
+  );
 
   const fetchListaProdutos = async () => {
+    const urlBase = `/produtoAvulso?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&descricao=${descricao}&codigoBarra=${codBarra}`;
+    let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
+    urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
-      const urlApi = `/produtoAvulso?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&descricao=${descricao}&codigoBarra=${codBarra}`;
-      const response = await get(urlApi);
-      
-      if (response.data.length && response.data.length === pageSize) {
-        let allData = [...response.data];
-        animacaoCarregamento(`Carregando... Página ${currentPage} de ${response.data.length}`, true);
-  
-        async function fetchNextPage(currentPage) {
-          try {
-            currentPage++;
-            const responseNextPage = await get(`${urlApi}&page=${currentPage}`);
-            if (responseNextPage.length) {
-              allData.push(...responseNextPage.data);
-              return fetchNextPage(currentPage);
-            } else {
-              return allData;
-            }
-          } catch (error) {
-            console.error('Erro ao buscar próxima página:', error);
-            throw error;
-          }
+      animacaoCarregamento('Carregando dados...', true);
+
+      const primeiraPagina = 1;
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const page = primeiraResposta.page || primeiraPagina;
+      const pageSize = primeiraResposta.pageSize || 1000;
+      const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
+      const totalPages = Math.ceil(totalRows / pageSize);
+
+      let allData = [...(primeiraResposta.data || [])];
+
+      if (totalPages > 1) {
+        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          allData.push(...(responsePage.data || []));
         }
-  
-        await fetchNextPage(currentPage);
-        return allData;
-      } else {
-       
-        return response.data;
       }
-  
+
+      return allData;
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Erro ao buscar dados da api:', error);
       throw error;
     } finally {
       fecharAnimacaoCarregamento();
     }
   };
-   
+
   const { data: dadosProdutosAvulso = [], error: errorProdutos, isLoading: isLoadingProdutos, refetch: refetchProdutos } = useQuery(
-    ['produtoAvulso',  dataPesquisaInicio, dataPesquisaFim, descricao, codBarra,  currentPage, pageSize],
-    () => fetchListaProdutos( dataPesquisaInicio, dataPesquisaFim, descricao, codBarra, currentPage, pageSize),
-    {
-      enabled: Boolean(dataPesquisaInicio && dataPesquisaFim),
-    }
+    ['produtoAvulso', ],
+    () => fetchListaProdutos(),
+    { enabled: false, staleTime: 60 * 60 * 1000, }
   );
 
-  
-  // const getTabelas = async () => {
-  //   try {
-  //     const response = await get(`/cadastrarProdutoAvulso?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&descricao=${descricao}&codigoBarra=${codBarra}`)
-  //     if (response.data) {
-  //       setDadosProdutosAvulso(response.data)
-  //     }
-  //   } catch (error) {
-  //     console.log(error, "não foi possivel pegar os dados da tabela ")
-  //   }
-    
-  // }
-
   const handleClick = () => {
-    
     setTabelaVisivel(true)
     refetchProdutos()
-    
   }
 
 
@@ -157,7 +148,7 @@ export const ActionPesquisaProdutosAvulso = () => {
 
 
       {tabelaVisivel &&
-        <ActionListaProdutoAvulso dadosProdutosAvulso={dadosProdutosAvulso} /> 
+        <ActionListaProdutoAvulso dadosProdutosAvulso={dadosProdutosAvulso} />
       }
 
       <ActionEditarProodutodPedidoAvulsoModal
