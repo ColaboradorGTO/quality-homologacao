@@ -319,6 +319,7 @@ export const ActionMainPromocao = ({
   styleProduto,
   styleButtonSearch,
   disabledBTBPedido,
+  disabledBTEstruturaProduto
 }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -1050,6 +1051,7 @@ export const ActionMainPromocao = ({
                         iconColor="#fff"
                         iconSize={25}
                         style={{ color: 'white' }}
+                        disabledBTN={disabledBTEstruturaProduto}
                       />
                     )}
 

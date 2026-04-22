@@ -954,21 +954,21 @@ export const ActionPesquisaPromocao = ({ }) => {
 
 
         ButtonSearchComponent={ButtonType}
-        linkNomeSearch={"Cadastrar Promoção"}
+        linkNomeSearch={"Cadastrar Por Produto"}
         onButtonClickSearch={handleCadastrar}
         corSearch={"primary"}
         IconSearch={IoIosSend}
         styleButtonSearch={isCheckedProduto ? false : true}
 
         ButtonTypeEstruturaProduto={ButtonType}
-        linkEstruturaProduto={"Cadastrar Promoção Estrutura / Produto"}
+        linkEstruturaProduto={"Cadastrar Por Estrutura / Produto"}
         onButtonClickEstruturaProduto={onSubmitEstruturaProduto}
         corEstruturaProduto={"success"}
         IconEstruturaProduto={IoIosSend}
         disabledBTEstruturaProduto={isCheckedGrupoProduto ? false : true}
 
         ButtonTypePedido={ButtonType}
-        linkPedido={"Cadastrar Promoção Mercadologica"}
+        linkPedido={"Cadastrar Por Estrutura"}
         onButtonClickPedido={handleCadastrarEstrutura}
         corPedido={"info"}
         IconPedido={IoIosSend}
