@@ -6,7 +6,12 @@ import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal"
 import { FormularioCadastroProduto } from "./formularioCadastroProduto"
 
 
-export const ActionCadastrarProodutodPedidoAvulsoModal = ({ show, handleClose }) => {
+export const ActionCadastrarProodutodPedidoAvulsoModal = ({ 
+  show, 
+  handleClose,
+  usuarioLogado,
+  optionsModulos, 
+}) => {
 
   return (
 
@@ -25,8 +30,12 @@ export const ActionCadastrarProodutodPedidoAvulsoModal = ({ show, handleClose })
           handleClose={handleClose}
         />
 
-          <FormularioCadastroProduto />
         <Modal.Body>
+          <FormularioCadastroProduto 
+            handleClose={handleClose}
+            usuarioLogado={usuarioLogado}
+            optionsModulos={optionsModulos}
+          />
           
         </Modal.Body>
       </Modal>

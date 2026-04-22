@@ -11,7 +11,7 @@ import { FaCashRegister, FaCheck } from "react-icons/fa";
 import { SiSap } from "react-icons/si";
 import { BsTrash3 } from "react-icons/bs";
 import { toFloat } from "../../../../utils/toFloat";
-import { ActionEditarProodutodPedidoAvulsoModal } from "./actionEditarProdutoPedidoAvulsoModal";
+import { ActionEditarProodutodPedidoAvulsoModal } from "./actionEditarProduto/actionEditarProdutoPedidoAvulsoModal";
 import Swal from "sweetalert2";
 import HeaderTable from "../../../Tables/headerTable";
 import { useReactToPrint } from "react-to-print";

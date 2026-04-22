@@ -3,15 +3,17 @@ import { FooterModal } from "../../../../Modais/FooterModal/footerModal"
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal"
 import { InputFieldModal } from "../../../../Buttons/InputFieldModal"
 import Select from 'react-select';
-import { useCadastroProdutoAvulso } from "../../../hooks/useCadastroProdutoAvulso"
 import { Controller, useForm } from "react-hook-form";
 import FormField from "../../../../Formularios/FormField";
 import { AlertError } from "../../../../Inputs/alertError";
+import { schema } from "./Schema/schemaValidation";
+import { useCadastroProdutoAvulso } from "../hooks/useCadastroProdutoAvulso"
 
-export const FormularioCadastroProduto = ({ handleClose }) => {
+export const FormularioCadastroProduto = ({ handleClose, usuarioLogado, optionsModulos }) => {
     const { handleSubmit, formState: { errors }, clearErrors, control, setError, setValue } = useForm({
         mode: "onChange"
     });
+
     const {
         quantidade,
         setQuantidade,
@@ -56,6 +58,8 @@ export const FormularioCadastroProduto = ({ handleClose }) => {
         tipoProdutoSelecionado,
         setTipoProdutoSelecionado,
         tipoFiscalSelecionado,
+        estoque, 
+        setEstoque,
         setTipoFiscalSelecionado,
         dadosUnidadeMedida,
         dadosTamanhos,
@@ -66,20 +70,9 @@ export const FormularioCadastroProduto = ({ handleClose }) => {
         dadosExposicao,
         dadosTipoProdutos,
         dadosTipoFiscalProdutos,
-        handleCategoriaProduto,
-        handleTamanho,
-        handleUnidade,
-        handleCor,
-        handleTipoTecido,
-        handleCategoria,
-        handleLocalExposicao,
-        handleEcommerce,
-        handleRedeSocial,
-        handleNcm,
-        handleTipoProduto,
-        handleTipoFiscal,
-        enviarPagamento
-    } = useCadastroProdutoAvulso()
+        dadosFornecedores,
+        onSubmit
+    } = useCadastroProdutoAvulso({usuarioLogado, optionsModulos, handleClose})
 
 
 
@@ -125,6 +118,58 @@ export const FormularioCadastroProduto = ({ handleClose }) => {
 
     }
 
+     const menuHeaderStyle = {
+        padding: "8px 12px",
+        background: "#7a59ad",
+        color: "#ffffff",
+        fontSize: "14px",
+    };
+
+    const formatSelectGroup = (data) => {
+        const grupos = {};
+
+        data.forEach((item) => {
+            if (!grupos[item.DS_GRUPO]) {
+            grupos[item.DS_GRUPO] = {
+                label: item.DS_GRUPO,
+                options: []
+            };
+            }
+
+            grupos[item.DS_GRUPO].options.push({
+            value: item.ID_ESTRUTURA,
+            label: item.ESTRUTURA,
+            original: item
+            });
+        });
+
+        return Object.values(grupos);
+    };
+
+    const formatSelectCor = (data) => {
+        const grupos = {};
+
+        data.forEach((item) => {
+            if (!grupos[item.DS_GRUPOCOR]) {
+            grupos[item.DS_GRUPOCOR] = {
+                label: item.DS_GRUPOCOR,
+                options: []
+            };
+            }
+
+            grupos[item.DS_GRUPOCOR].options.push({
+            value: item.ID_COR,
+            label: item.DS_COR,
+            original: item
+            });
+        });
+
+        return Object.values(grupos);
+    };
+
+    /*
+        Voltar daqui amanhã para finalizar esta modal e todos os select relacionada a ela.
+    */
     return (
         <Fragment>
             <form>
@@ -241,10 +286,10 @@ export const FormularioCadastroProduto = ({ handleClose }) => {
                                 name="tamanhoProduto"
                                 options={[
                                     { value: '', label: 'Selecione...' },
-                                    ...optionsCategoriaProduto.map((item) => {
+                                    ...dadosTamanhos?.map((item) => {
                                         return {
-                                            value: item.value,
-                                            label: item.label
+                                            value: item.IDTAMANHO,
+                                            label: item.DSTAMANHO
                                         }
                                     })]}
                                 value={tamanhoSelecionado}
@@ -262,38 +307,60 @@ export const FormularioCadastroProduto = ({ handleClose }) => {
                             )}
                         </div>
                         <div className="col-sm-6 col-xl-5">
-                            <Controller
+                            <label className="form-label" htmlFor="notam">Fornecedor</label>
+                            <Select
+                                className="basic-single"
+                                classNamePrefix="select"
                                 name="fornecedorProduto"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormField
-                                        name="fornecedorProduto"
-                                        label={"Fornecedor*"}
-                                        type="text"
-                                        errors={errors}
-                                        clearErrors={clearErrors}
-                                        value={fornecedor}
-                                        onChangeModal={(e) => setFornecedor(e.target.value)}
-                                    />
-                                )}
+                                options={[
+                                    { value: '', label: 'Selecione...' },
+                                    ...dadosFornecedores?.map((item) => {
+                                        return {
+                                            value: item.IDFORNECEDOR,
+                                            label: `${item.NOFANTASIA} // ${item.NUCNPJ} // ${item.NORAZAOSOCIAL}`
+                                        }
+                                    })]}
+                                value={fornecedor}
+                                onChange={(e) => {
+                                    setFornecedor(e)
+                                    clearErrors('fornecedorProduto')
+                                }}
                             />
+                            {errors.fornecedorProduto && (
+                                <AlertError
+                                    error={errors.fornecedorProduto}
+                                    onClose={clearErrors}
+                                    fieldName="fornecedorProduto"
+                                />
+                            )}
                         </div>
                         <div className="col-sm-6 col-xl-3">
-                            <Controller
+                            <label className="form-label" htmlFor="notam">Fabricante</label>
+                            <Select
+                                className="basic-single"
+                                classNamePrefix="select"
                                 name="fabricanteProduto"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormField
-                                        name="fabricanteProduto"
-                                        label={"Fabricante*"}
-                                        type="text"
-                                        errors={errors}
-                                        clearErrors={clearErrors}
-                                        value={fabricante}
-                                        onChangeModal={(e) => setFabricante(e.target.value)}
-                                    />
-                                )}
+                                options={[
+                                    { value: '', label: 'Selecione...' },
+                                    ...dadosFornecedores?.map((item) => {
+                                        return {
+                                            value: item.IDFORNECEDOR,
+                                            label: `${item.NOFANTASIA} // ${item.NUCNPJ} // ${item.NORAZAOSOCIAL}`
+                                        }
+                                    })]}
+                                value={fabricante}
+                                onChange={(e) => {
+                                    setFabricante(e)
+                                    clearErrors('fabricanteProduto')
+                                }}
                             />
+                            {errors.fabricanteProduto && (
+                                <AlertError
+                                    error={errors.fabricanteProduto}
+                                    onClose={clearErrors}
+                                    fieldName="fabricanteProduto"
+                                />
+                            )}
                         </div>
                         <div className="col-sm-6 col-xl-2">
                             <label className="form-label" htmlFor="tpunid">Unidade</label>
@@ -303,10 +370,10 @@ export const FormularioCadastroProduto = ({ handleClose }) => {
                                 name="unidadeProduto"
                                 options={[
                                     { value: '', label: 'Selecione...' },
-                                    ...optionsCategoriaProduto.map((item) => {
+                                    ...dadosUnidadeMedida?.map((item) => {
                                         return {
-                                            value: item.value,
-                                            label: item.label
+                                            value: item.IDUNIDADEMEDIDA,
+                                            label: item.DSSIGLA
                                         }
                                     })]}
                                 value={unidadeSelecionada}
@@ -335,10 +402,10 @@ export const FormularioCadastroProduto = ({ handleClose }) => {
                                 name="corProduto"
                                 options={[
                                     { value: '', label: 'Selecione...' },
-                                    ...optionsCategoriaProduto.map((item) => {
+                                    ...dadosCores?.map((item) => {
                                         return {
-                                            value: item.value,
-                                            label: item.label
+                                            value: item.ID_COR,
+                                            label: item.DS_COR
                                         }
                                     })]}
                                 value={corSelecionada}
@@ -356,7 +423,7 @@ export const FormularioCadastroProduto = ({ handleClose }) => {
                             )}
                         </div>
                         <div className="col-sm-6 col-xl-2">
-                            <label className="form-label" htmlFor="tptecidoav">Tipo de Tecido</label>
+                            <label className="form-label" htmlFor="tptecidoav">Tipo de Material</label>
                             <Select
                                 className="basic-single"
                                 classNamePrefix="select"
@@ -364,10 +431,10 @@ export const FormularioCadastroProduto = ({ handleClose }) => {
                                 value={tipoTecidoSelecionado}
                                 options={[
                                     { value: '', label: 'Selecione...' },
-                                    ...optionsCategoriaProduto.map((item) => {
+                                    ...dadosTipoTecidos?.map((item) => {
                                         return {
-                                            value: item.value,
-                                            label: item.label
+                                            value: item.IDTIPOTECIDO,
+                                            label: item.DSTIPOTECIDO
                                         }
                                     })]}
                                 onChange={(e) => {
@@ -399,6 +466,32 @@ export const FormularioCadastroProduto = ({ handleClose }) => {
                                     />
                                 )}
                             />
+                             <label className="form-label" htmlFor="tptecidoav">Estrutura</label>
+                            <Select
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="estruturaProduto"
+                                value={estrutura}
+                                options={[
+                                    { value: '', label: 'Selecione...' },
+                                    ...dadosEstruturas?.map((item) => {
+                                        return {
+                                            value: item.IDESTILO ,
+                                            label: `${item.IDESTILO} - ${item.DSESTILO}`
+                                        }
+                                    })]}
+                                onChange={(e) => {
+                                    setEstrutura(e)
+                                    clearErrors('estruturaProduto')
+                                }}
+                            />
+                            {errors.estruturaProduto && (
+                                <AlertError
+                                    error={errors.estruturaProduto}
+                                    onClose={clearErrors}
+                                    fieldName="estruturaProduto"
+                                />
+                            )}
                         </div>
                         <div className="col-sm-6 col-xl-2">
                             <Controller
@@ -664,7 +757,7 @@ export const FormularioCadastroProduto = ({ handleClose }) => {
                     corFechar={"secondary"}
 
                     ButtonTypeCadastrar={ButtonTypeModal}
-                    onClickButtonCadastrar
+                    onClickButtonCadastrar={handleValidatedSubmit}
                     textButtonCadastrar={"Salvar"}
                     corCadastrar={"success"}
                     loadingTextCadastrar={"Cadastrando..."}

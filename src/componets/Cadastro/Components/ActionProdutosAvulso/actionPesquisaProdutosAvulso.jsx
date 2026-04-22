@@ -3,13 +3,13 @@ import { get } from "../../../../api/funcRequest";
 import { AiOutlineSearch } from "react-icons/ai";
 import { MdAdd } from "react-icons/md";
 import { ActionListaProdutoAvulso } from "./actionListaProdutoAvulso";
-import { ActionEditarProodutodPedidoAvulsoModal } from "./actionEditarProdutoPedidoAvulsoModal";
 import { ActionMain } from "../../../Actions/actionMain";
 import { InputField } from "../../../Buttons/Input";
 import { ButtonType } from "../../../Buttons/ButtonType";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
 import { useQuery } from "react-query";
 import { getDataAtual } from "../../../../utils/dataAtual";
+import { ActionCadastrarProodutodPedidoAvulsoModal } from "./actionCadastarProduto/actionCadastroProdutoPedidoAvulsoModal";
 
 
 export const ActionPesquisaProdutosAvulso = ({ usuarioLogado }) => {
@@ -151,9 +151,11 @@ export const ActionPesquisaProdutosAvulso = ({ usuarioLogado }) => {
         <ActionListaProdutoAvulso dadosProdutosAvulso={dadosProdutosAvulso} />
       }
 
-      <ActionEditarProodutodPedidoAvulsoModal
+      <ActionCadastrarProodutodPedidoAvulsoModal
         show={modalVisivel}
         handleClose={handleCloseModal}
+        usuarioLogado={usuarioLogado}
+        optionsModulos={optionsModulos}
       />
 
 

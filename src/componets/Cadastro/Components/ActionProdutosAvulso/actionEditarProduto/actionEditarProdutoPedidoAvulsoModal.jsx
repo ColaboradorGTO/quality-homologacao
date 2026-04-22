@@ -1,13 +1,13 @@
 import { Fragment, useEffect, useState } from "react"
-import { HeaderModal } from "../../../Modais/HeaderModal/HeaderModal"
+import { HeaderModal } from "../../../../Modais/HeaderModal/HeaderModal"
 import { Modal } from "react-bootstrap"
-import { FooterModal } from "../../../Modais/FooterModal/footerModal"
-import { ButtonTypeModal } from "../../../Buttons/ButtonTypeModal"
-import { InputFieldModal } from "../../../Buttons/InputFieldModal"
+import { FooterModal } from "../../../../Modais/FooterModal/footerModal"
+import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal"
+import { InputFieldModal } from "../../../../Buttons/InputFieldModal"
 import { useForm } from "react-hook-form"
 import Select from 'react-select';
-import { get } from "../../../../api/funcRequest"
-import { useFetchData } from "../../../../hooks/useFetchData"
+import { get } from "../../../../../api/funcRequest"
+import { useFetchData } from "../../../../../hooks/useFetchData"
 
 
 export const ActionEditarProodutodPedidoAvulsoModal = ({ show, handleClose }) => {
