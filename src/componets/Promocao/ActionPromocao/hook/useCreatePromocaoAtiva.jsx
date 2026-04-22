@@ -1162,6 +1162,10 @@ export const useCreatePromocaoAtiva = ({ }) => {
   const onSubmitEstrutura = async (data) => {
 
     try {
+      const responsePromocao = await get(`/promocoes-ativas?dataPesquisaFim=${dataFim}`);
+      const promocoesAtivas = responsePromocao.data;
+      setDadosPromocoesAtivas(promocoesAtivas);
+
       if (!mecanicaSelecionada) {
         Swal.fire({
           position: 'center',
@@ -1218,6 +1222,173 @@ export const useCreatePromocaoAtiva = ({ }) => {
         return;
       }
 
+      const normalizeToArray = (value) => {
+        if (Array.isArray(value)) return value;
+        if (value === null || value === undefined || value === "") return [];
+        return [value];
+      };
+
+      if(promocoesAtivas && promocoesAtivas.length > 0) {
+        const subGrupoProdutoOrigemArray = Array.isArray(subGrupoOrigem) ? subGrupoOrigem : [subGrupoOrigem];
+        const subGrupoProdutoDestinoArray = Array.isArray(subGrupoDestino) ? subGrupoDestino : [subGrupoDestino];
+        const idsResumo = promocoesAtivas.map(p => p.IDRESUMOPROMOCAOMARKETING).filter(Boolean);
+
+        if (idsResumo && idsResumo.length > 0) {
+          const idResumo = idsResumo.join(',');
+          const responseProdutoExistente = await get(`/detalhe-promocoes-ativas?idResumoPromocao=${idResumo}&dataPesquisaFim=${dataFim}`);
+
+
+          const subgruposDestinoSelecionados = normalizeToArray(subGrupoDestino)
+            .map(v => Number(v))
+            .filter(v => !Number.isNaN(v) && v !== -1);
+
+          const subgruposOrigemSelecionados = normalizeToArray(subGrupoOrigem)
+            .map(v => Number(v))
+            .filter(v => !Number.isNaN(v) && v !== -1);
+
+          const subgruposDestinoAtivos = responseProdutoExistente.data.flatMap((promo) =>
+            (promo.empresaPromocaoDestino || [])
+              .map(item => Number(item?.det?.IDSUBGRUPOEMDESTINO))
+              .filter(v => !Number.isNaN(v) && v !== -1)
+          );
+
+          const subgruposOrigemAtivos = responseProdutoExistente.data.flatMap((promo) =>
+            (promo.empresaPromocaoOrigem || [])
+              .map(item => Number(item?.det?.IDSUBGRUPOEMORIGEM))
+              .filter(v => !Number.isNaN(v) && v !== -1)
+          );
+
+          const conflitosDestino = subgruposDestinoSelecionados.filter(id => subgruposDestinoAtivos.includes(id));
+          const conflitosOrigem = subgruposOrigemSelecionados.filter(id => subgruposOrigemAtivos.includes(id));
+  
+
+          let conflitos = Array.from(new Set([...conflitosDestino, ...conflitosOrigem]));
+          console.log(conflitos, 'conflitos');
+          if (conflitos.length > 0) {        
+            const conflitosString = conflitos
+              .filter(c => !Number.isNaN(c)) 
+              .map(c => String(c)) 
+              .join(", ");
+              
+            
+            const htmlMessage = "Nº em conflito: <b>" + conflitosDestino + "</b><br/>Ajuste os subgrupos para continuar.";
+            
+            Swal.fire({
+              icon: "warning",
+              title: "Subgrupo já está em promoção ativa",
+              html: htmlMessage,
+              customClass: { container: "custom-swal" },
+              confirmButtonText: "OK"
+            });
+            return;
+          }
+
+          const promocoesValidas = responseProdutoExistente.data;
+          const promocaoPorParesAtiva = promocoesValidas.some(promo => promo.TPAPARTIRDE == 0);
+          const promocaoPorMenosNaPrimeira = promocoesValidas.some(promo => promo.TPAPARTIRDE == 3 && promo.TPAPARTIRDE == 0);
+          const promocaoPorParesEmUmProduto = promocoesValidas.some(promo => promo.TPAPARTIRDE == 0 && promo.TPAPARTIRDE == 4);
+          const descontoAtivoPromocaoPorEmpresa = promocoesValidas.some(promo => promo.TPFATORPROMO == tipoDescontoSelecionado)
+
+          if (promocaoPorParesEmUmProduto) {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Promoção por pares e em um produto não podem ser usadas juntas!',
+              text: 'Não é permitido cadastrar uma promoção por pares e em um produto ao mesmo tempo.',
+              customClass: { container: 'custom-swal' },
+              confirmButtonText: 'OK'
+            });
+            return;
+          }
+
+          if (descontoAtivoPromocaoPorEmpresa) {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Tipo Desconto já ativo nesta empresa!',
+              text: 'Já existe um desconto ativo com o mesmo tipo de desconto nesta empresa. Não é permitido cadastrar outro.',
+              customClass: { container: 'custom-swal' },
+              confirmButtonText: 'OK'
+            });
+            return;
+          }
+
+          const promocoesValidasNaEmpresaSelecionada = [];
+          responseProdutoExistente.data.forEach(item => {
+            if (Array.isArray(item.empresaPromocaoMarketing)) {
+              item.empresaPromocaoMarketing.forEach(empresa => {
+                if (empresa.det.IDEMPRESA == empresaSelecionada) {
+                  promocoesValidasNaEmpresaSelecionada.push(empresa.det.IDEMPRESA);
+                }
+              });
+            }
+          })
+
+          if (promocaoPorParesAtiva) {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Promoção por pares já existente!',
+              text: 'Já existe uma promoção ativa com aplicação destino por pares. Não é permitido cadastrar outra.',
+              customClass: { container: 'custom-swal' },
+              confirmButtonText: 'OK'
+            });
+            return;
+          }
+
+          if (promocaoPorMenosNaPrimeira) {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Promoção menos na primeira já existente!',
+              text: 'Já existe uma promoção ativa com aplicação destino menos na primeira. Não é permitido cadastrar outra.',
+              customClass: { container: 'custom-swal' },
+              confirmButtonText: 'OK'
+            });
+            return;
+          }
+
+          if (promocoesValidasNaEmpresaSelecionada.length >= 3) {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Limite atingido',
+              text: 'Já existem 3 promoções ativas nesta empresa. Não é permitido cadastrar outra..',
+              customClass: { container: 'custom-swal' },
+              confirmButtonText: 'OK'
+            });
+            return;
+          }
+        }
+      }
+
+      if (aplicacaoDestinoSelecionada == 0 || aplicacaoDestinoSelecionada == 3) {
+        const origem = produtoSelecionadoEstProdOrigem;
+        const destino = produtoSelecionadoEstProdDestino;
+        
+        const idsOrigem = origem.map(v => {
+          const id = typeof v === 'object' && v !== null ? v.IDPRODUTO : v;
+          return String(id);
+        }).sort();
+        
+        const idsDestino = destino.map(v => {
+          const id = typeof v === 'object' && v !== null ? v.IDPRODUTO : v;
+          return String(id);
+        }).sort();
+        
+        const iguais = idsOrigem.length === idsDestino.length && 
+          idsOrigem.every((id, i) => id === idsDestino[i]);
+          
+        if (!iguais) {
+          Swal.fire({
+            position: 'center',
+            icon: 'error',
+            title: 'Erro Produtos Origem e Destino AQUI',
+            text: 'Para Mecânica por pares ou menos na primeira, os produtos de origem e destino devem ser iguais.',
+            customClass: {
+              container: 'custom-swal',
+            },
+            showConfirmButton: false,
+            timer: 15000,
+          });
+          return;
+        }
+      }
 
       const postData = {
         TPAPARTIRDE: aplicacaoDestinoSelecionada,
@@ -1277,7 +1448,8 @@ export const useCreatePromocaoAtiva = ({ }) => {
         }
       });
 
-      const response = await post('/criar-promocoes-ativas-subGrupo', postData);
+      const response = await post('/criar', postData);
+      // const response = await post('/criar-promocoes-ativas-subGrupo', postData);
 
       Swal.fire({
         position: 'center',
@@ -1612,7 +1784,6 @@ export const useCreatePromocaoAtiva = ({ }) => {
       }
 
       if (aplicacaoDestinoSelecionada == 4) {
-
         if (produtoSelecionadoEstProdDestino.length !== 1 || produtoSelecionadoEstProdOrigem.length !== 1) {
           Swal.fire({
             position: 'center',
@@ -1625,8 +1796,6 @@ export const useCreatePromocaoAtiva = ({ }) => {
           });
           return;
         }
-
-
 
         const origemId = typeof produtoSelecionadoEstProdOrigem[0] === 'object' && produtoSelecionadoEstProdOrigem[0] !== null ? produtoSelecionadoEstProdOrigem[0].IDPRODUTO : produtoSelecionadoEstProdOrigem[0];
         const destinoId = typeof produtoSelecionadoEstProdDestino[0] === 'object' && produtoSelecionadoEstProdDestino[0] !== null ? produtoSelecionadoEstProdDestino[0].IDPRODUTO : produtoSelecionadoEstProdDestino[0];
