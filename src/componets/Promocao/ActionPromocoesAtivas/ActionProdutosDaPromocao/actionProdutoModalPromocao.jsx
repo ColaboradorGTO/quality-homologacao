@@ -30,7 +30,7 @@ export const ActionProdutoModalPromocao = ({
 
                 <HeaderModal
                     title={"Lista de Produtos"}
-                    subTitle={"Pesquisados para Promoção"}
+                    subTitle={"Produtos Da Promoção"}
                     handleClose={handleClose}
                 />
 

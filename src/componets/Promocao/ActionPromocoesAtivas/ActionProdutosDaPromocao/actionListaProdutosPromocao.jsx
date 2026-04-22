@@ -200,7 +200,7 @@ export const ActionListaProdutosPromocao = ({
     {
       field: 'IDPRODUTODESTINO',
       header: 'N.Item',
-      body: row => <th>{row.IDPRODUTODESTINO}</th>,
+      body: row => <th>{row.IDPRODUTODESTINO == null ? 'Por Subgrupo' : row.IDPRODUTODESTINO}</th>,
       sortable: true,
     },
     {
@@ -276,7 +276,7 @@ export const ActionListaProdutosPromocao = ({
     {
       field: 'IDPRODUTOORIGEM',
       header: 'N.Item',
-      body: row => <th>{row.IDPRODUTOORIGEM}</th>,
+      body: row => <th>{row.IDPRODUTOORIGEM == null ? 'Por Subgrupo' : row.IDPRODUTOORIGEM}</th>,
       sortable: true,
     },
     {
