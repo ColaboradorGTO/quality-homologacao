@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import { adicionarMeses, getDataAtual } from "../../../../../utils/dataAtual";
-import { post, put } from "../../../../../api/funcRequest";
+import { get, post, put } from "../../../../../api/funcRequest";
 import { useNavigate } from "react-router-dom";
 import { toFloat } from "../../../../../utils/toFloat";
 import { useFetchData } from "../../../../../hooks/useFetchData";
 import { optionsTipoPedido, optionsReposicao } from "../../../../../../parceiro.json"
 import axios from "axios"
+import { useQuery } from "react-query";
 
 export const useCadastroProdutoAvulso = ({ usuarioLogado, optionsModulos, handleClose}) => {
     const [quantidade, setQuantidade] = useState('')
@@ -33,6 +34,10 @@ export const useCadastroProdutoAvulso = ({ usuarioLogado, optionsModulos, handle
     const [tipoFiscalSelecionado, setTipoFiscalSelecionado] = useState('')
     const [estoque, setEstoque] = useState('')
     const [observacao, setObservacao] = useState('')
+    const [compradorSelecionado, setCompradorSelecionado] = useState(null);
+    const [marcaSelecionada, setMarcaSelecionada] = useState('');
+    const [referenciaProduto, setReferenciaProduto] = useState('');
+    const [produtoPesquisado, setProdutoPesquisado] = useState('');
     const [ipUsuario, setIpUsuario] = useState('');
     
     const getIPUsuario = async () => {
@@ -56,49 +61,104 @@ export const useCadastroProdutoAvulso = ({ usuarioLogado, optionsModulos, handle
         setIpUsuario(usuarioIP);
         return usuarioIP;
     };
+   
+    const { data: dadosUnidadeMedida  = [], error: errorUnidadeMedida, isLoading: isLoadingUnidadeMedida, refetch: refetchUnidadeMedida } = useQuery(
+        'unidadeMedida',
+        async () => { const response = await get(`/unidadeMedida`);  return response.data},
+        { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    );
+   
+    const { data: dadosTamanhos  = [], error: errorTamanhos, isLoading: isLoadingTamanhos, refetch: refetchTamanhos } = useQuery(
+        'tamanhos',
+        async () => { const response = await get(`/tamanhos`);  return response.data},
+        { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    );
+  
+    const { data: dadosCores  = [], error: errorCores, isLoading: isLoadingCores, refetch: refetchCores } = useQuery(
+        'listaCores',
+        async () => { const response = await get(`/listaCores`);  return response.data},
+        { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    );
 
+    const { data: dadosTipoTecidos  = [], error: errorTipoTecidos, isLoading: isLoadingTipoTecidos, refetch: refetchTipoTecidos } = useQuery(
+        'tipoTecidos',
+        async () => { const response = await get(`/tipoTecidos`);  return response.data},
+        { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    );
 
-    const { data: dadosUnidadeMedida = [] } = useFetchData('unidadeMedida', '/unidadeMedida');
-    const { data: dadosTamanhos = [] } = useFetchData('tamanhos', '/tamanhos');
-    const { data: dadosCores = [] } = useFetchData('listaCores', '/listaCores');
-    const { data: dadosTipoTecidos = [] } = useFetchData('tipoTecidos', '/tipoTecidos');
-    const { data: dadosCategoriaPedidos = [] } = useFetchData('categoriaPedidos', '/categoriaPedidos');
-    const { data: dadosCategoriasProdutos = [] } = useFetchData('categoriasProdutos', '/categoriasProdutos');
-    const { data: dadosExposicao = [] } = useFetchData('localExposicao', '/localExposicao');
-    const { data: dadosTipoProdutos = [] } = useFetchData('tipoProduto', '/tipoProduto');
-    const { data: dadosTipoFiscalProdutos = [] } = useFetchData('tipoFiscalProduto', '/tipoFiscalProduto');
+    const { data: dadosCategoriasProdutos  = [], error: errorCategoriasProdutos, isLoading: isLoadingCategoriasProdutos, refetch: refetchCategoriasProdutos } = useQuery(
+        'categoriasProdutos',
+        async () => { const response = await get(`/categoriasProdutos?idTipoPedido=`);  return response.data},
+        { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    );
     
-    const { data: dadosProdutos = [] } = useFetchData('consultaProdutos', '/consultaProdutos');
-    const { data: dadosFornecedores = [] } = useFetchData('fornecedor-produto', '/fornecedor-produto');
-    const { data: dadosFabricantes = [] } = useFetchData('vincularFabricanteFornecedor', '/vincularFabricanteFornecedor');
+    const { data: dadosLocalExposicao  = [], error: errorLocalExposicao, isLoading: isLoadingLocalExposicao, refetch: refetchLocalExposicao } = useQuery(
+        'localExposicao',
+        async () => { const response = await get(`/localExposicao`);  return response.data},
+        { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    );
+
+    const { data: dadosTipoProdutos  = [], error: errorTipoProdutos, isLoading: isLoadingTipoProdutos, refetch: refetchTipoProdutos } = useQuery(
+        'tipoProduto',
+        async () => { const response = await get(`/tipoProduto`);  return response.data},
+        { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    );
+  
+    const { data: dadosTipoFiscalProdutos  = [], error: errorTipoFiscalProdutos, isLoading: isLoadingTipoFiscalProdutos, refetch: refetchTipoFiscalProdutos } = useQuery(
+        'tipoFiscalProduto',
+        async () => { const response = await get(`/tipoFiscalProduto`);  return response.data},
+        { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    );
+
+    const { data: dadosProdutos  = [], error: errorProdutos, isLoading: isLoadingProdutos, refetch: refetchProdutos } = useQuery(
+        'consultaProdutos',
+        async () => { const response = await get(`/consultaProdutos`);  return response.data},
+        { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    );
+    
+    const { data: dadosFornecedores  = [], error: errorFornecedores, isLoading: isLoadingFornecedores, refetch: refetchFornecedores } = useQuery(
+        'fornecedor-produto',
+        async () => { const response = await get(`/fornecedor-produto`);  return response.data},
+        { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    );
+
+    const { data: dadosFabricantes  = [], error: errorFabricantes, isLoading: isLoadingFabricantes, refetch: refetchFabricantes } = useQuery(
+        'vincularFabricanteFornecedor',
+        async () => { const response = await get(`/vincularFabricanteFornecedor`);  return response.data},
+        { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    );
+
+    const { data: dadosSubGrupoProduto  = [], error: errorSubGrupoProduto, isLoading: isLoadingSubGrupoProduto, refetch: refetchSubGrupoProduto } = useQuery(
+        'subgrupo-produto',
+        async () => { const response = await get(`/subgrupo-produto`);  return response.data},
+        { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    );
+  
+    const { data: dadosNCM  = [], error: errorNCM, isLoading: isLoadingNCM, refetch: refetchNCM } = useQuery(
+        'ncm',
+        async () => { const response = await get(`/ncm`);  return response.data},
+        { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    );
+
+    const { data: dadosVinculoEstiloGrupo  = [], error: errorVinculoEstiloGrupo, isLoading: isLoadingVinculoEstiloGrupo, refetch: refetchVinculoEstiloGrupo } = useQuery(
+        'vinculo-estilo-grupo',
+        async () => { const response = await get(`/vinculo-estilo-grupo`);  return response.data},
+        { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    );
+    const { data: dadosMarcas  = [], error: errorMarcas, isLoading: isLoadingMarcas, refetch: refetchMarcas } = useQuery(
+        'marcasLista',
+        async () => { const response = await get(`/marcasLista`);  return response.data},
+        { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    );
+
+    const { data: dadosProdutosPedido  = [], error: errorProdutosPedido, isLoading: isLoadingProdutosPedido, refetch: refetchProdutosPedido } = useQuery(
+        'produtos-pedido',
+        async () => { const response = await get(`/produtos-pedido?referenciaProduto=${referenciaProduto}`);  return response.data},
+        { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    );
+    
     
     const onSubmit = async () => {
-        // Validações movidas para dentro da função onSubmit
-        if(fornecedor == '') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Erro!',
-                text: 'O campo Fornecedor é obrigatório!',
-            })
-            return
-
-        } else if(tamanhoSelecionado == '') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Erro!',
-                text: 'O campo Tamanho é obrigatório!',
-            })
-            return
-
-        } else if(fabricante == '') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Erro!',
-                text: 'O campo Fabricante é obrigatório!',
-            })
-            return
-
-        }
         
         Swal.fire({
             icon: 'question',
@@ -110,41 +170,49 @@ export const useCadastroProdutoAvulso = ({ usuarioLogado, optionsModulos, handle
         }).then(async (result) => {
             if(result.isConfirmed) {
                 try {
+                    // const response = await get(`/consultaProdutos?descricaoProduto=${referenciaProduto}`);
+                    // const vrTotalCusto = toFloat(vrCusto) * parseFloat(quantidade);
                     const dataAtual = getDataAtual();
                     const data = {
-                        "QTDPRODUTO": parseFloat(quantidade) || 0,
-                        "NUREF": referencia || '',
-                        "CODBARRAS": codBarras || '',
-                        "DSPRODUTO": descricao || '',
-                        "DSFORNECEDOR": fornecedor || '',
-                        "DSFABRICANTE": fabricante || '',
-                        "DSESTRUTURA": estrutura || '',
-                        "DSESTILO": estilo || '',
-                        "VRCUSTO": parseFloat(vrCusto) || 0,
-                        "VRVENDA": parseFloat(vrVenda) || 0,
-                        "CATEGORIAPRODUTO": categoriaProdutoSelecionado?.value || '',
-                        "IDTAMANHO": tamanhoSelecionado?.value || 0,
-                        "UND": unidadeSelecionada?.value || '',
-                        "IDCOR": corSelecionada?.value || 0,
-                        "IDTIPOTECIDO": tipoTecidoSelecionado?.value || 0,
-                        "IDCATEGORIAS": categoriaSelecionada?.value || 0,
-                        "IDLOCALEXPOSICAO": localExposicaoSelecionado?.value || 0,
-                        "STECOMMERCE": ecommerceSelecionado?.value || 'False',
-                        "STREDESOCIAL": redeSocialSelecionado?.value || 'False',
-                        "IDNCM": ncmSelecionado?.value || 0,
-                        "IDTIPOPRODUTOFISCAL": tipoProdutoSelecionado?.value || 0,
-                        "IDFONTEPRODUTOFISAL": tipoFiscalSelecionado?.value || 0,
-                        "DTCADASTRO": dataAtual,
-                        "DTULTATUALIZACAO": dataAtual,
-                        "STATIVO": "True",
-                        "STCANCELADO": "False",
-                        "STAVULSO": "True",
-                        "IDUSUARIO": usuarioLogado?.IDUSUARIO || 0,
-                        "IP": ipUsuario || '127.0.0.1'
+                        IDGRUPOEMPRESARIAL: parseInt(marcaSelecionada?.value),
+                        IDSUBGRUPOESTRUTURA: parseInt(estrutura?.value),
+                        IDCOR: parseInt(corSelecionada?.value),
+                        IDTIPOTECIDO: parseInt(tipoTecidoSelecionado?.value),
+                        IDESTILO: parseInt(estilo?.value),
+                        IDFABRICANTE: parseInt(fabricante?.value),
+                        IDTAMANHO: parseInt(tamanhoSelecionado?.value),
+                        DSTAMANHO: tamanhoSelecionado,
+                        IDLOCALEXPOSICAO: parseInt(localExposicaoSelecionado?.value),
+                        IDCATEGORIAS: parseInt(categoriaSelecionada?.value),
+                        IDCATEGORIAPEDIDO: parseInt(categoriaProdutoSelecionado?.value),
+                        IDNCM: 0,
+                        NUNCM: ncmSelecionado?.value,
+                        IDTIPOPRODUTOFISCAL: parseInt(tipoProdutoSelecionado?.value),
+                        IDFONTEPRODUTOFISAL: parseInt(tipoFiscalSelecionado?.value),
+                        NUREF: referencia,
+                        UND: unidadeSelecionada?.value,
+                        DTCADASTRO: dataAtual,
+                        DTULTATUALIZACAO: dataAtual,
+                        STECOMMERCE: ecommerceSelecionado?.value,
+                        STREDESOCIAL: redeSocialSelecionado?.value,
+                        STATIVO: "True",
+                        STCANCELADO: "False",
+                        STAVULSO: "True",
+                        QTDPRODUTO: parseFloat(quantidade),
+                        CODBARRAS: codBarras,
+                        DSPRODUTO: descricao,
+                        QTDESTOQUEIDEAL: parseFloat(estoque),
+                        VRCUSTO: parseFloat(vrCusto),
+                        VRVENDA: parseFloat(vrVenda),
+                        VRTOTALCUSTO: parseFloat(vrTotalCusto),
+                        NUCONTADOR: '',
+                        STMIGRADOSAP: "False",
+                        IDFORNECEDOR: parseInt(fornecedor?.value),
+                        IDRESPCADASTRO: usuarioLogado?.id,
                     };
 
                     // Aqui você pode fazer a requisição POST para salvar o produto
-                    // const response = await post('/cadastrar-produto-avulso', data);
+                    const response = await post('/cadastrar-produto-avulso', data);
                     
                     console.log('Dados para cadastro:', data);
                     
@@ -216,17 +284,27 @@ export const useCadastroProdutoAvulso = ({ usuarioLogado, optionsModulos, handle
         estoque, 
         setEstoque,
         setTipoFiscalSelecionado,
+        marcaSelecionada,
+        setMarcaSelecionada,
+        referenciaProduto,
+        setReferenciaProduto,
+        produtoPesquisado,
+        setProdutoPesquisado,
         dadosUnidadeMedida,
         dadosTamanhos,
         dadosCores,
         dadosTipoTecidos,
-        dadosCategoriaPedidos,
         dadosCategoriasProdutos,
-        dadosExposicao,
+        dadosLocalExposicao,
         dadosTipoProdutos,
         dadosTipoFiscalProdutos,
         dadosFornecedores,
         dadosFabricantes,
+        dadosSubGrupoProduto,
+        dadosNCM,
+        dadosVinculoEstiloGrupo,
+        dadosMarcas,
+        dadosProdutosPedido,
         onSubmit
 
     };
