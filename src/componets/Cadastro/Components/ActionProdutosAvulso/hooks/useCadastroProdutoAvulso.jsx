@@ -213,24 +213,39 @@ export const useCadastroProdutoAvulso = ({ usuarioLogado, optionsModulos, handle
 
                     // Aqui você pode fazer a requisição POST para salvar o produto
                     const response = await post('/cadastrar-produto-avulso', data);
-                    
-                    console.log('Dados para cadastro:', data);
-                    
+                    const textDados = JSON.stringify(data);
+                    const textFuncao = 'CADASTRO / CADASTRAR PRODUTO AVULSO';
+                    const ipUsuario = await getIPUsuario();
+                 
+                    const createtLog = {
+                        IDFUNCIONARIO: String(usuarioLogado.id),
+                        PATHFUNCAO: textFuncao,
+                        DADOS: textDados,
+                        IP: ipUsuario || 'Indisponível'
+                    }
+
+                    await post('/log-web', createtLog)
                     Swal.fire({
                         icon: 'success',
                         title: 'Produto cadastrado com sucesso!',
-                        timer: 2000,
-                        showConfirmButton: false
+                        timer: 5000,
+                        showConfirmButton: false,
+                        customClass: {
+                            container: 'custom-swal'
+                        }
                     });
                     
                     handleClose();
-                    
+                    return response.data;
                 } catch (error) {
                     console.error('Erro ao cadastrar produto:', error);
                     Swal.fire({
                         icon: 'error',
                         title: 'Erro!',
                         text: 'Falha ao cadastrar o produto. Tente novamente.',
+                        customClass: {
+                            container: 'custom-swal'
+                        }
                     });
                 }
             }
