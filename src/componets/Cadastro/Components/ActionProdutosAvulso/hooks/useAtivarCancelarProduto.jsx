@@ -36,185 +36,141 @@ export const useCancelarPedido = ({ usuarioLogado, optionsModulos, handleClick }
         return usuarioIP;
     };
 
-    
-    const handleCancelarPedido = async (row, status) => {
-        if(optionsModulos[0]?.ALTERAR == 'False') {
+    const handleCancelar = async (row, status) => {
+        if (optionsModulos[0]?.ALTERAR == 'False') {
             Swal.fire({
                 icon: "error",
                 title: "Permissão Negada!",
-                html: `${usuarioLogado?.NOFUNCIONARIO} <br/>  Você não tem permissão para cancelar pedidos.`,
-                customClass: {
-                    container: 'custom-swal',
-                }
-            })
-            return; 
+                html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão.`,
+            });
+            return;
         }
 
         let motivoCancelamento = '';
-        let msgtitulo, textoCancelaPedido, idAndamento;
-        
-        if (status == 'True') {
-            msgtitulo = 'Cancelar';
-            textoCancelaPedido = "CANCELADO PELO DEP COMPRAS ADM";
-            idAndamento = 13;
-        } else {
-            msgtitulo = 'Ativar';
-            textoCancelaPedido = "ATIVADO PELO DEP COMPRAS ADM";
-            idAndamento = 6;
-        }
+        let msgtitulo = status == 'True' ? 'Cancelar' : 'Ativar';
 
         try {
+            // ✅ 1º modal (igual ao jQuery)
             const confirmacao = await Swal.fire({
-                title: `Certeza que Deseja Cancelar o ${row?.IDRESUMOPEDIDO} o Produto ?`,
+                title: `Certeza que Deseja ${msgtitulo} o Produto?`,
                 text: "Você não poderá reverter esta ação!",
                 icon: "warning",
                 showCancelButton: true,
-                confirmButtonText: "Confirmar",
-                cancelButtonText: "Cancelar",
+                buttonsStyling: false,
                 customClass: {
-                    confirmButton: "btn btn-primary btn-lg",
-                    cancelButton: "btn btn-danger btn-lg",
-                },
+                    confirmButton: 'btn btn-primary btn-lg',
+                    cancelButton: 'btn btn-danger btn-lg',
+                }
             });
 
             if (!confirmacao.isConfirmed) return;
 
+            // ✅ 2º modal (motivo)
             const motivoModal = await Swal.fire({
-                type: 'question', 
-                title: `Motivo para ${msgtitulo.toLowerCase()} o produto?`,
+                icon: 'question',
+                title: `Motivo para ${msgtitulo} o Produto?`,
                 html: `
-                    <div>
-                        <div class="input-group pt-0">
-                            <input type="text" id="motivoCancelPedido" class="swal2-input m-0" 
-                                placeholder="Motivo do Cancelamento do Pedido!" 
-                                style="text-transform: uppercase">
-                            <small class="fw-700">*Mínimo 10 caracteres</small>
-                        </div>
-                    </div>
-                `,
+                <div class="input-group pt-0">
+                    <input type="text" id="motivoCancelItem" 
+                        class="swal2-input m-0"
+                        placeholder="Motivo para ${msgtitulo} o produto!"
+                        style="text-transform: uppercase">
+                </div>
+            `,
                 width: '25rem',
                 focusConfirm: false,
                 showCancelButton: true,
                 confirmButtonText: 'Confirmar',
                 cancelButtonText: 'Voltar',
-                cancelButtonColor: '#3085d6',
                 showLoaderOnConfirm: true,
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                backdrop: true,
-                
-                onOpen: () => {
-                    const input = document.getElementById('motivoCancelPedido');
-                    
-                    // ✅ Filtro de caracteres como no jQuery
-                    input.addEventListener('keyup', (e) => {
-                        input.value = e.target.value?.replace(/[^a-zA-Z0-9\s]/g, '')?.replace(/\s{2,}/g, ' ');
-                    });
+
+                didOpen: () => {
+                    const input = document.getElementById('motivoCancelItem');
 
                     input.focus();
-                    input.addEventListener('keypress', (e) => {
-                        if (e.keyCode === 13) Swal.clickConfirm();
-                    });
 
-                    const validationMsg = document.getElementById('swal2-validation-message');
-                    if (validationMsg) {
-                        validationMsg.classList.add('text-danger', 'fw-700');
-                    }
+                    // igual ao jQuery (enter confirma)
+                    input.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') Swal.clickConfirm();
+                    });
                 },
 
                 preConfirm: () => {
-                    const input = document.getElementById('motivoCancelPedido');
+                    const input = document.getElementById('motivoCancelItem');
                     motivoCancelamento = input.value?.trim();
 
-                    // ✅ Validações separadas como no jQuery
                     if (!motivoCancelamento) {
                         input.focus();
-                        return Swal.showValidationMessage('Coloque o Motivo da Cancelamento do Pedido!');
-                        
+                        Swal.showValidationMessage(
+                            `Coloque o Motivo para ${msgtitulo} o Produto!`
+                        );
+                        return false;
+
                     } else if (motivoCancelamento.length < 10) {
-                        // ✅ Limpa campo como no jQuery
-                        input.value = '';
+                        input.value = ''; // ✅ igual jQuery
                         input.focus();
-                        return Swal.showValidationMessage('Motivo Muito Curto, O Motivo Deve Conter no Minímo 10 Caracteres!');
-                        
-                    } else if (motivoCancelamento.length > 200) {
-                        input.focus();
-                        return Swal.showValidationMessage('Motivo do Cancelamento Está Muito Grande, Abrevie!');
+
+                        Swal.showValidationMessage(
+                            `Motivo Muito Curto, mínimo 10 caracteres!`
+                        );
+                        return false;
                     }
 
                     return motivoCancelamento;
                 }
             });
 
-            if (!motivoModal.isConfirmed || !motivoCancelamento) return;
-            
-            const putData = {
+            if (!motivoModal.isConfirmed) return;
+
+            const dados = {
                 IDDETALHEPRODUTOPEDIDO: parseInt(row?.IDDETALHEPRODUTOPEDIDO),
                 IDRESPCANCELAMENTO: parseInt(usuarioLogado.id),
-                DSMOTIVOCANCELAMENTO: motivoCancelamento.toString(), 
+                DSMOTIVOCANCELAMENTO: motivoCancelamento,
                 DTCANCELAMENTO: data,
                 STCANCELADO: status
             };
 
-            const response = await put("/cancelar-pedido/:id", putData);
-            const textDados = JSON.stringify(putData)
-            const textoFuncao = "COMPRASADM/CANCELAR PEDIDO"
-            const ipUsuario = await getIPUsuario();
-
-            const postData  = {
-                IDFUNCIONARIO: String(usuarioLogado?.id), 
-                PATHFUNCAO: textoFuncao,
-                DADOS: textDados,
-                IP: ipUsuario || 'Indisponível'
-            }
-  
-            await post("/log-web", postData);
-            await Swal.fire({
-                icon: "success",
-                title: "Sucesso!",
-                text: "Cancelamento Realizado Com Sucesso!",
-                timer: 5000,
-                customClass: {
-                    container: 'custom-swal',
-                },
+            // 🔄 equivalente ao animationLoadingStart
+            Swal.fire({
+                title: `${status == 'True' ? 'Cancelando' : 'Reativando'} produto...`,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
             });
-            
-            handleClick();
-            return response.data;
-        } catch (error) {
-            const putData = {
-                IDRESUMOPEDIDO: parseInt(row?.IDRESUMOPEDIDO),
-                IDANDAMENTO: parseInt(idAndamento),
-                IDRESPCANCELAMENTO: parseInt(usuarioLogado.id),
-                DSMOTIVOCANCELAMENTO: motivoCancelamento?.toUpperCase(),
-                DTCANCELAMENTO: data,
-                STCANCELADO: status
-            };
-            const textDados = JSON.stringify(putData)
-            let textoFuncao =  'COMPRASADM/ERRO AO CANCELAR PEDIDO';
-            const ipUsuario = await getIPUsuario();
-            const postData = {
-                IDFUNCIONARIO: String(usuarioLogado?.id), 
-                PATHFUNCAO: textoFuncao,
-                DADOS: textDados,
-                IP: ipUsuario || 'Indisponível'
+
+            const response = await put("/status-produto-avulso/:id", dados);
+
+            Swal.close(); // 🔄 equivalente ao animationLoadingStop
+
+            if (response?.data?.type === 'success') {
+                await Swal.fire({
+                    icon: "success",
+                    title: "Sucesso!",
+                    text: `${msgtitulo} realizado com sucesso!`,
+                });
+
+                handleClick();
+            } else {
+                Swal.fire({
+                    icon: "warning",
+                    text: response?.data?.msg || "Erro ao processar",
+                });
             }
 
-            const responsePost = await post('/log-web', postData)
+        } catch (error) {
+            Swal.close();
+
+            console.error(error);
+
             Swal.fire({
                 icon: "error",
                 title: "Erro!",
-                text: `Erro ao cancelar o pedido`,
-                timer: 5000,
-                customClass: {
-                    container: 'custom-swal',
-                },
+                text: `Erro ao ${msgtitulo.toLowerCase()} o produto`,
             });
-            return responsePost.data;
-        } 
+        }
     };
 
- 
 
-    return { handleCancelarPedido };
+    return { handleCancelar };
 }

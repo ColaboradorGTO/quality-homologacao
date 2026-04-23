@@ -19,8 +19,9 @@ import { jsPDF } from 'jspdf';
 import * as XLSX from 'xlsx';
 import 'jspdf-autotable';
 import { get } from "../../../../api/funcRequest";
+import { useCancelarPedido } from "./hooks/useAtivarCancelarProduto";
 
-export const ActionListaProdutoAvulso = ({ 
+export const ActionListaProdutoAvulso = ({
   dadosProdutosAvulso,
   usuarioLogado,
   optionsModulos
@@ -30,61 +31,64 @@ export const ActionListaProdutoAvulso = ({
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
-  
-    const onGlobalFilterChange = (e) => {
-      setGlobalFilterValue(e.target.value);
-    };
-  
-    const handlePrint = useReactToPrint({
-      content: () => dataTableRef.current,
-      documentTitle: 'Produtos Avulso',
+
+  const {
+    handleCancelar
+  } = useCancelarPedido({ usuarioLogado, optionsModulos });
+  const onGlobalFilterChange = (e) => {
+    setGlobalFilterValue(e.target.value);
+  };
+
+  const handlePrint = useReactToPrint({
+    content: () => dataTableRef.current,
+    documentTitle: 'Produtos Avulso',
+  });
+
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+    doc.autoTable({
+      head: [['Data', 'Cod. Barras', 'Descrição', 'Ref', 'QTD', 'Fabricante', 'Vl. Custo', 'Vl. Venda', 'Status', 'Situação']],
+      body: dados.map(item => [
+
+        item.DTCADASTROFORMAT,
+        item.CODBARRAS,
+        item.DSPRODUTO,
+        item.NUREF,
+        toFloat(item.QTDPRODUTO),
+        item.DSFABRICANTE,
+        formatMoeda(item.VRCUSTO),
+        formatMoeda(item.VRVENDA),
+        item.STCANCELADO == 'True' ? 'CANCELADO' : 'ATIVO',
+        item.STMIGRADOSAP == 'True' ? (item.STCADASTRADO == 'True' ? 'INCLUIDO PDV / MIGRADO SAP' : 'NÃO INCLUIDO PDV / MIGRADO SAP') : (item.STCADASTRADO == 'True' ? 'INCLUIDO PDV / NÃO MIGRADO SAP' : 'NÃO INCLUIDO PDV / NÃO MIGRADO SAP')
+
+
+      ]),
+      horizontalPageBreak: true,
+      horizontalPageBreakBehaviour: 'immediately'
     });
-  
-    const exportToPDF = () => {
-      const doc = new jsPDF();
-      doc.autoTable({
-        head: [['Data', 'Cod. Barras', 'Descrição', 'Ref', 'QTD', 'Fabricante', 'Vl. Custo', 'Vl. Venda', 'Status', 'Situação']],
-        body: dados.map(item => [
-  
-          item.DTCADASTROFORMAT,
-          item.CODBARRAS,
-          item.DSPRODUTO,
-          item.NUREF,
-          toFloat(item.QTDPRODUTO),
-          item.DSFABRICANTE,
-          formatMoeda(item.VRCUSTO),
-          formatMoeda(item.VRVENDA),
-          item.STCANCELADO == 'True' ? 'CANCELADO' : 'ATIVO',
-          item.STMIGRADOSAP == 'True' ? (item.STCADASTRADO == 'True' ? 'INCLUIDO PDV / MIGRADO SAP' : 'NÃO INCLUIDO PDV / MIGRADO SAP') : (item.STCADASTRADO == 'True' ? 'INCLUIDO PDV / NÃO MIGRADO SAP' : 'NÃO INCLUIDO PDV / NÃO MIGRADO SAP')
-          
-  
-        ]),
-        horizontalPageBreak: true,
-        horizontalPageBreakBehaviour: 'immediately'
-      });
-      doc.save('produtos_avulso.pdf');
-    };
-  
-    const exportToExcel = () => {
-      const worksheet = XLSX.utils.json_to_sheet(dados);
-      const workbook = XLSX.utils.book_new();
-      const header = ['Data', 'Cod. Barras', 'Descrição', 'Ref', 'QTD', 'Fabricante', 'Vl. Custo', 'Vl. Venda', 'Status', 'Situação'];
-      worksheet['!cols'] = [
-        { wpx: 150, caption: 'Data' },
-        { wpx: 100, caption: 'Cod. Barras' },
-        { wpx: 250, caption: 'Descrição' },
-        { wpx: 100, caption: 'Ref' },
-        { wpx: 50, caption: 'QTD' },
-        { wpx: 150, caption: 'Fabricante' },
-        { wpx: 100, caption: 'Vl. Custo' },
-        { wpx: 100, caption: 'Vl. Venda' },
-        { wpx: 100, caption: 'Status' },
-        { wpx: 200, caption: 'Situação' },
-      ];
-      XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Produtos Avulso');
-      XLSX.writeFile(workbook, 'produtos_avulso.xlsx');
-    };
+    doc.save('produtos_avulso.pdf');
+  };
+
+  const exportToExcel = () => {
+    const worksheet = XLSX.utils.json_to_sheet(dados);
+    const workbook = XLSX.utils.book_new();
+    const header = ['Data', 'Cod. Barras', 'Descrição', 'Ref', 'QTD', 'Fabricante', 'Vl. Custo', 'Vl. Venda', 'Status', 'Situação'];
+    worksheet['!cols'] = [
+      { wpx: 150, caption: 'Data' },
+      { wpx: 100, caption: 'Cod. Barras' },
+      { wpx: 250, caption: 'Descrição' },
+      { wpx: 100, caption: 'Ref' },
+      { wpx: 50, caption: 'QTD' },
+      { wpx: 150, caption: 'Fabricante' },
+      { wpx: 100, caption: 'Vl. Custo' },
+      { wpx: 100, caption: 'Vl. Venda' },
+      { wpx: 100, caption: 'Status' },
+      { wpx: 200, caption: 'Situação' },
+    ];
+    XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Produtos Avulso');
+    XLSX.writeFile(workbook, 'produtos_avulso.xlsx');
+  };
 
   const dados = dadosProdutosAvulso.map((item, index) => {
 
@@ -163,8 +167,9 @@ export const ActionListaProdutoAvulso = ({
       body: row => {
         return (
           <div>
-            <th style={{ color: 
-              row.STCANCELADO == 'CANCELADO' ? 'red' : 'blue' 
+            <th style={{
+              color:
+                row.STCANCELADO == 'CANCELADO' ? 'red' : 'blue'
             }}
             >
               {row.STCANCELADO}
@@ -177,62 +182,62 @@ export const ActionListaProdutoAvulso = ({
     {
       field: 'STMIGRADOSAP',
       header: 'Situação',
-      body: (row) => { 
-        if(row.STMIGRADOSAP == 'True') {
-          if(row.STCADASTRADO == 'True') {
-            return ( 
-              <th style={{color: 'blue' }}>
+      body: (row) => {
+        if (row.STMIGRADOSAP == 'True') {
+          if (row.STCADASTRADO == 'True') {
+            return (
+              <th style={{ color: 'blue' }}>
                 INCLUIDO PDV / MIGRADO SAP
               </th>
             )
-      
-          }else {
+
+          } else {
             return (
-              <div style={{display: 'flex', justifyContent: 'space-around'}}>
-                <th style={{color: 'red' }} >
+              <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+                <th style={{ color: 'red' }} >
                   NÃO INCLUIDO PDV
                 </th>
                 <th> / </th>
-                <th style={{color: 'blue' }}>
+                <th style={{ color: 'blue' }}>
                   MIGRADO SAP
                 </th>
               </div>
             )
           }
-          
+
         } else {
-          if(row.STCADASTRADO == 'True') {
-            return ( 
-              <div style={{display: 'flex', justifyContent: 'space-around'}}>
-                <th style={{color: 'blue' }} >
-                  INCLUIDO PDV  
+          if (row.STCADASTRADO == 'True') {
+            return (
+              <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+                <th style={{ color: 'blue' }} >
+                  INCLUIDO PDV
                 </th>
                 <th>/</th>
-                <th style={{color: 'red' }}>
+                <th style={{ color: 'red' }}>
                   NÃO MIGRADO SAP
                 </th>
               </div>
             )
-      
+
           } else {
-            return ( 
+            return (
               <div>
-                 <th style={{color: 'red' }}>
-                   NÃO INCLUIDO PDV NÃO MIGRADO SAP
-                 </th>
-               </div>
-             )
-           }
-      
-         }
-       },
+                <th style={{ color: 'red' }}>
+                  NÃO INCLUIDO PDV NÃO MIGRADO SAP
+                </th>
+              </div>
+            )
+          }
+
+        }
+      },
       sortable: true
     },
     {
       field: 'IDDETALHEPRODUTOPEDIDO',
       header: 'Opções',
       body: (row) => {
-        if(row.STCANCELADO == 'TRUE') {
+        if (row.STCANCELADO == 'TRUE') {
           return (
             <div className="p-1 "
               style={{ justifyContent: "space-between", display: "flex" }}
@@ -250,13 +255,13 @@ export const ActionListaProdutoAvulso = ({
                 />
               </div>
             </div>
-          ) 
+          )
         } else {
-          if(row.STCADASTRADO == 'True') {
-            if(row.STMIGRADOSAP == 'True') {
+          if (row.STCADASTRADO == 'True') {
+            if (row.STMIGRADOSAP == 'True') {
               return (
                 <div className="p-1 "
-                  style={{ justifyContent: "space-between",  display: "flex" }}
+                  style={{ justifyContent: "space-between", display: "flex" }}
                 >
                   <div className="p-1">
                     <ButtonTable
@@ -272,11 +277,11 @@ export const ActionListaProdutoAvulso = ({
                   </div>
                 </div>
               )
-              
+
             } else {
               return (
                 <div className="p-1 "
-                  style={{ justifyContent: "space-between",  display: "flex" }}
+                  style={{ justifyContent: "space-between", display: "flex" }}
                 >
                   <div className="p-1">
                     <ButtonTable
@@ -291,7 +296,7 @@ export const ActionListaProdutoAvulso = ({
                     />
                   </div>
                   <div className="p-1">
-                  <ButtonTable
+                    <ButtonTable
                       titleButton={"Cancelar Produto Avulso"}
                       onClickButton
                       Icon={BsTrash3}
@@ -307,10 +312,10 @@ export const ActionListaProdutoAvulso = ({
 
             }
           } else {
-            if(row.STMIGRADOSAP == 'True') {
+            if (row.STMIGRADOSAP == 'True') {
               return (
                 <div className="p-1 "
-                  style={{ justifyContent: "space-between",  display: "flex" }}
+                  style={{ justifyContent: "space-between", display: "flex" }}
                 >
                   <div className="p-1">
                     <ButtonTable
@@ -326,11 +331,11 @@ export const ActionListaProdutoAvulso = ({
                   </div>
                 </div>
               )
-              
+
             } else {
               return (
                 <div className="p-1 "
-                  style={{ justifyContent: "space-between",  display: "flex" }}
+                  style={{ justifyContent: "space-between", display: "flex" }}
                 >
                   <div className="p-1">
                     <ButtonTable
@@ -345,7 +350,7 @@ export const ActionListaProdutoAvulso = ({
                     />
                   </div>
                   <div className="p-1">
-                  <ButtonTable
+                    <ButtonTable
                       titleButton={"Cancelar Produto Avulso"}
                       onClickButton
                       Icon={BsTrash3}
@@ -357,7 +362,7 @@ export const ActionListaProdutoAvulso = ({
                     />
                   </div>
                   <div className="p-1">
-                  <ButtonTable
+                    <ButtonTable
                       titleButton={"Incluir para PDV"}
                       onClickButton
                       Icon={FaCashRegister}
@@ -373,7 +378,7 @@ export const ActionListaProdutoAvulso = ({
 
             }
           }
-        }  
+        }
       },
     },
 
@@ -382,11 +387,11 @@ export const ActionListaProdutoAvulso = ({
   const handleEdit = async (IDDETALHEPRODUTOPEDIDO) => {
     try {
       const response = await get(`/produtoAvulso?idDetalhePedidoProduto=${IDDETALHEPRODUTOPEDIDO}`)
- 
+
       if (response.data && response.data.length > 0) {
         setDadosDetalheProduto(response.data)
         setModalEditar(true)
-  
+
       } else {
         Swal.fire({
           icon: 'error',
@@ -415,13 +420,13 @@ export const ActionListaProdutoAvulso = ({
 
         </div>
         <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
-            <HeaderTable
-              globalFilterValue={globalFilterValue}
-              onGlobalFilterChange={onGlobalFilterChange}
-              handlePrint={handlePrint}
-              exportToExcel={exportToExcel}
-              exportToPDF={exportToPDF}
-            />
+          <HeaderTable
+            globalFilterValue={globalFilterValue}
+            onGlobalFilterChange={onGlobalFilterChange}
+            handlePrint={handlePrint}
+            exportToExcel={exportToExcel}
+            exportToPDF={exportToPDF}
+          />
 
         </div>
         <div className="card" ref={dataTableRef}>
@@ -461,7 +466,7 @@ export const ActionListaProdutoAvulso = ({
           </DataTable>
         </div>
       </div>
-      
+
       <ActionEditarProodutodPedidoAvulsoModal
         show={modalEditar}
         handleClose={() => setModalEditar(false)}
