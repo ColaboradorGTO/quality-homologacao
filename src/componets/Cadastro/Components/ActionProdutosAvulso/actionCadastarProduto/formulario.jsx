@@ -7,10 +7,10 @@ import { Controller, useForm } from "react-hook-form";
 import FormField from "../../../../Formularios/FormField";
 import { AlertError } from "../../../../Inputs/alertError";
 import { schema } from "./Schema/schemaValidation";
-import { useCadastroProdutoAvulso } from "../hooks/useCadastroProdutoAvulso"
+import { useCadastrarProdutoAvulso } from "../hooks/useCadastrarProdutoAvulso"
 import { SelectList } from "../../../../Buttons/menuList";
 
-export const FormularioCadastroProduto = ({ handleClose, usuarioLogado, optionsModulos }) => {
+export const Formulario = ({ handleClose, usuarioLogado, optionsModulos }) => {
     const { handleSubmit, formState: { errors }, clearErrors, control, setError, setValue } = useForm({
         mode: "onChange"
     });
@@ -84,7 +84,7 @@ export const FormularioCadastroProduto = ({ handleClose, usuarioLogado, optionsM
         dadosMarcas,
         dadosProdutosPedido,
         onSubmit
-    } = useCadastroProdutoAvulso({usuarioLogado, optionsModulos, handleClose})
+    } = useCadastrarProdutoAvulso({usuarioLogado, optionsModulos, handleClose})
 
 
 

@@ -9,7 +9,7 @@ import { optionsTipoPedido, optionsReposicao } from "../../../../../../parceiro.
 import axios from "axios"
 import { useQuery } from "react-query";
 
-export const useCadastroProdutoAvulso = ({ usuarioLogado, optionsModulos, handleClose}) => {
+export const useCadastrarProdutoAvulso = ({ usuarioLogado, optionsModulos, handleClose}) => {
     const [quantidade, setQuantidade] = useState('')
     const [referencia, setReferencia] = useState('')
     const [codBarras, setCodBarras] = useState('')

@@ -148,7 +148,11 @@ export const ActionPesquisaProdutosAvulso = ({ usuarioLogado }) => {
 
 
       {tabelaVisivel &&
-        <ActionListaProdutoAvulso dadosProdutosAvulso={dadosProdutosAvulso} />
+        <ActionListaProdutoAvulso 
+          dadosProdutosAvulso={dadosProdutosAvulso} 
+          usuarioLogado={usuarioLogado}
+          optionsModulos={optionsModulos}  
+        />
       }
 
       <ActionCadastrarProodutodPedidoAvulsoModal

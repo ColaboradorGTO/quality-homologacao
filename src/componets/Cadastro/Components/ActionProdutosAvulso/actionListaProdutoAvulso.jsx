@@ -20,7 +20,11 @@ import * as XLSX from 'xlsx';
 import 'jspdf-autotable';
 import { get } from "../../../../api/funcRequest";
 
-export const ActionListaProdutoAvulso = ({ dadosProdutosAvulso }) => {
+export const ActionListaProdutoAvulso = ({ 
+  dadosProdutosAvulso,
+  usuarioLogado,
+  optionsModulos
+}) => {
   const [modalEditar, setModalEditar] = useState(false);
   const [dadosDetalheProduto, setDadosDetalheProduto] = useState([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
@@ -457,10 +461,13 @@ export const ActionListaProdutoAvulso = ({ dadosProdutosAvulso }) => {
           </DataTable>
         </div>
       </div>
+      
       <ActionEditarProodutodPedidoAvulsoModal
         show={modalEditar}
         handleClose={() => setModalEditar(false)}
         dadosDetalheProduto={dadosDetalheProduto}
+        usuarioLogado={usuarioLogado}
+        optionsModulos={optionsModulos}
       />
     </Fragment>
   )

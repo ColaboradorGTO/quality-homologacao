@@ -3,7 +3,7 @@ import { HeaderModal } from "../../../../Modais/HeaderModal/HeaderModal"
 import { Modal } from "react-bootstrap"
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal"
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal"
-import { FormularioCadastroProduto } from "./formularioCadastroProduto"
+import { Formulario } from "./formulario"
 
 
 export const ActionCadastrarProodutodPedidoAvulsoModal = ({ 
@@ -31,7 +31,7 @@ export const ActionCadastrarProodutodPedidoAvulsoModal = ({
         />
 
         <Modal.Body>
-          <FormularioCadastroProduto 
+          <Formulario 
             handleClose={handleClose}
             usuarioLogado={usuarioLogado}
             optionsModulos={optionsModulos}
