@@ -11,10 +11,10 @@ import { useQuery } from "react-query";
 import { useFetchData } from "../../../../hooks/useFetchData";
 import { ActionCadastrarEstilosModal } from "./ActionCadastrar/actionCadastrarEstilosModal";
 import { MdAdd } from "react-icons/md";
+import Swal from "sweetalert2";
 
 
-export const ActionPesquisaEstilos = () => {
-  // const [dadosEstilos, setDadosEstilos] = useState([])
+export const ActionPesquisaEstilos = ({ usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [modalVisivel, setModalVisivel] = useState(false);
   const [clickContador, setClickContador] = useState(0);
@@ -22,96 +22,91 @@ export const ActionPesquisaEstilos = () => {
   const [estiloSelecionado, setEstiloSelecionado] = useState("")
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(1000);
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
+
+  useEffect(() => {
+    const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
+    if (menuSalvo) {
+      const menuParsed = JSON.parse(menuSalvo);
+      setMenuFilhoAtual(menuParsed);
+    }
+  }, []);
+
+  const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
+    ['menus-usuario-excecao', menuFilhoAtual?.ID],
+    async () => {
+      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
+
+      return response.data;
+    },
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
+  );
 
   const { data: dadosEstilos = [] } = useFetchData('listaEstilos', '/listaEstilos');
   const fetchListaEstilos = async () => {
+    const urlBase = `/listaEstilos?idEstilo=${estiloSelecionado}&descricao=${descricao}`;
+    let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
+    urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
-      const urlApi = `/listaEstilos?idEstilo=${estiloSelecionado}&descricao=${descricao}`;
-      const response = await get(urlApi);
-      
-      if (response.data.length && response.data.length === pageSize) {
-        let allData = [...response.data];
-        animacaoCarregamento(`Carregando... Página ${currentPage} de ${response.data.length}`, true);
-  
-        async function fetchNextPage(currentPage) {
-          try {
-            currentPage++;
-            const responseNextPage = await get(`${urlApi}&page=${currentPage}`);
-            if (responseNextPage.length) {
-              allData.push(...responseNextPage.data);
-              return fetchNextPage(currentPage);
-            } else {
-              return allData;
-            }
-          } catch (error) {
-            console.error('Erro ao buscar próxima página:', error);
-            throw error;
-          }
+      animacaoCarregamento('Carregando dados...', true);
+
+      const primeiraPagina = 1;
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const page = primeiraResposta.page || primeiraPagina;
+      const pageSize = primeiraResposta.pageSize || 1000;
+      const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
+      const totalPages = Math.ceil(totalRows / pageSize);
+
+      let allData = [...(primeiraResposta.data || [])];
+
+      if (totalPages > 1) {
+        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          allData.push(...(responsePage.data || []));
         }
-  
-        await fetchNextPage(currentPage);
-        return allData;
-      } else {
-       
-        return response.data;
       }
-  
+
+      return allData;
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Erro ao buscar dados da api:', error);
       throw error;
     } finally {
       fecharAnimacaoCarregamento();
     }
   };
-   
+
   const { data: dadosListaEstilos = [], error: errorEstilos, isLoading: isLoadingEstilos, refetch: refetchListaEstilos } = useQuery(
-    ['listaTodosPedidos',  estiloSelecionado, descricao,  currentPage, pageSize],
-    () => fetchListaEstilos( estiloSelecionado, descricao, currentPage, pageSize),
-    {
-      enabled: Boolean(estiloSelecionado),
-    }
+    ['listaTodosPedidos', ],
+    () => fetchListaEstilos(),
+    { enabled: false, staleTime: 5 * 60 * 1000,}
   );
-
-  // useEffect(() => {
-  //   getListaEstilos()
-  // }, [])
-
-  // const getListaEstilos = async () => {
-  //   try {
-  //     const response = await get(`/listaEstilos?idEstilo=${estiloSelecionado}&descricao=${descricao}`)
-  //     if (response.data) {
-  //       setDadosEstilos(response.data)
-  //     }
-  //   } catch (error) {
-  //     console.log(error, "não foi possivel pegar os dados da tabela ")
-  //   }
-  // }
-
 
   const handleChangeEstilo = (e) => {
     setEstiloSelecionado(e.value)
   }
 
-  const handlePesquisar = () => {
-    setCurrentPage(prevPage => prevPage + 1);
+  const handleClick = () => {
     refetchListaEstilos()
     setTabelaVisivel(true)
   }
 
   const handleModal = () => {
-    setModalVisivel(true)
+    if(optionsModulos[0]?.CRIAR === 'True') {
+      setModalVisivel(true)
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Atenção',
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para cadastrar um novo estilo.`,
+      });
+      return;
+    }
   }
 
   const handleClose = () => {
     setModalVisivel(false)
   }
-
-
-  const optionsF = [
-    { value: '1', label: 'Ativo' },
-    { value: '2', label: 'Inativo' }
-  ]
-
 
   return (
 
@@ -145,7 +140,7 @@ export const ActionPesquisaEstilos = () => {
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}
-        onButtonClickSearch={handlePesquisar}
+        onButtonClickSearch={handleClick}
         IconSearch={AiOutlineSearch}
         corSearch={"primary"}
 
@@ -157,12 +152,20 @@ export const ActionPesquisaEstilos = () => {
       />
 
       {tabelaVisivel && (
-        <ActionListaEstilos dadosListaEstilos={dadosListaEstilos} />
+        <ActionListaEstilos 
+          dadosListaEstilos={dadosListaEstilos} 
+          usuarioLogado={usuarioLogado}
+          optionsModulos={optionsModulos}
+          handleClick={handleClick}    
+        />
       )}
 
       <ActionCadastrarEstilosModal
         show={modalVisivel}
         handleClose={handleClose}
+        usuarioLogado={usuarioLogado}
+        optionsModulos={optionsModulos}
+        handleClick={handleClick}
       />
     </Fragment>
   )

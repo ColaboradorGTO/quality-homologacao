@@ -21,6 +21,7 @@ import 'jspdf-autotable';
 import { get } from "../../../../api/funcRequest";
 import { useAtivarCancelarProduto } from "./hooks/useAtivarCancelarProduto";
 import { useIncluirProduto } from "./hooks/useIncluirProduto";
+import { useMigrarProduto } from "./hooks/useMigrarProduto";
 
 export const ActionListaProdutoAvulso = ({
   dadosProdutosAvulso,
@@ -41,6 +42,10 @@ export const ActionListaProdutoAvulso = ({
   const {
     handleIncluirProduto
   } = useIncluirProduto({ usuarioLogado, optionsModulos, handleClick });
+
+  const {
+    handleMigrarProduto
+  } = useMigrarProduto({ usuarioLogado, optionsModulos, handleClick });
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -293,7 +298,7 @@ export const ActionListaProdutoAvulso = ({
                   <div className="p-1">
                     <ButtonTable
                       titleButton={"Migrar para SAP"}
-                      onClickButton
+                      onClickButton={() => handleMigrarProduto(row)}
                       Icon={SiSap}
                       cor={"primary"}
                       iconColor={"white"}
@@ -404,6 +409,9 @@ export const ActionListaProdutoAvulso = ({
           icon: 'error',
           title: 'Erro',
           text: 'Não foi possível obter os detalhes do produto avulso.',
+          customClass: {
+            container: 'custom-swal',
+          }
         })
       }
     } catch (error) {

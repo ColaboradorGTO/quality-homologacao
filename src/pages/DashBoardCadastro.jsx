@@ -89,7 +89,7 @@ export const DashBoardCadastro = () => {
     case "/cadastro/ActionPesquisaProdutosAvulso":
       component = <ActionPesquisaProdutosAvulso usuarioLogado={usuarioLogado} />;
       break;
-    case "/cadastro/ActionPesquisaEstilos":
+    case "/cadastro/ActionPesquisaEstilo":
       component = <ActionPesquisaEstilos usuarioLogado={usuarioLogado} />;
       break;
     case "/cadastro/ActionPesquisaNFE":
