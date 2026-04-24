@@ -3,7 +3,7 @@ import { FooterModal } from "../../../../Modais/FooterModal/footerModal"
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal"
 import Select from 'react-select';
 import { Controller, useForm } from "react-hook-form";
-import { useCadastrarEstilos } from "../Hooks/useCadastrarEstilos"
+import { useCadastrarEstilos } from "../hooks/useCadastrarEstilos"
 import { InputFieldModal } from "../../../../Buttons/InputFieldModal";
 import { AlertError } from "../../../../Inputs/alertError";
 import FormField from "../../../../Formularios/FormField";
