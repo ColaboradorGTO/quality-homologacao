@@ -14,7 +14,7 @@ import { useFetchData } from "../../../../../hooks/useFetchData";
 import { MultSelectActionAsync } from "../../../../Select/MultSelectActionAsync";
 import { FaDownload, FaUpload } from "react-icons/fa";
 import { MultSelectAction } from "../../../../Select/MultSelectAction";
-
+import * as XLSX from 'xlsx';
 
 export const ActionManualAlteracaoPreco = ({ usuarioLogado }) => {
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
@@ -49,51 +49,51 @@ export const ActionManualAlteracaoPreco = ({ usuarioLogado }) => {
       setMenuFilhoAtual(menuParsed);
     }
   }, []);
-  
+
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
     ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
       const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
-      
+
       return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
   );
 
   const { data: dadosGrupoEstrutura = [], error: errorGrupoEstrutura, isLoading: isLoadingGrupoEstrutura, refetch: refetchGrupoEstrutura } = useQuery(
     ['grupo-estrutura-mercadologica'],
     async () => {
       const response = await get(`/grupo-estrutura-mercadologica`);
-      
+
       return response.data;
     },
-    { enabled: true, staleTime: 60 * 60 * 1000,}
+    { enabled: true, staleTime: 60 * 60 * 1000, }
   );
- 
+
   const { data: dadosSubGrupoEstrutura = [], error: errorSubGrupoEstrutura, isLoading: isLoadingSubGrupoEstrutura, refetch: refetchSubGrupoEstrutura } = useQuery(
     ['subgrupo-estrutura-mercadologica'],
     async () => {
       const response = await get(`/subgrupo-estrutura-mercadologica?idSubGrupo=${subGrupoSelecionado}`);
-      
+
       return response.data;
     },
-    { enabled: Boolean(subGrupoSelecionado), staleTime: 60 * 60 * 1000,}
+    { enabled: Boolean(subGrupoSelecionado), staleTime: 60 * 60 * 1000, }
   );
-     
+
 
   const { data: dadosResponsaveisAlteracao = [] } = useFetchData('responsaveisAlteracaoPrecos', '/responsaveisAlteracaoPrecos');
   // const { data: dadosMarcas = [] } = useFetchData('listaMarcaProduto', '/listaMarcaProduto');
   const { data: dadosListaPreco = [] } = useFetchData('lista-de-preco', '/lista-de-preco');
-  
+
   const fetchListaPreco = async () => {
     try {
       const urlApi = `/alteracoes-de-precos-resumo?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idLista=${listaPrecoSelecionada}&idUsuario=${responsavelSelcionado}&descproduto${descricaoProduto}`;
       const response = await get(urlApi);
-      
+
       if (response.data.length && response.data.length === pageSize) {
         let allData = [...response.data];
         animacaoCarregamento(`Carregando... Página ${currentPage} de ${response.data.length}`, true);
-  
+
         async function fetchNextPage(currentPage) {
           try {
             currentPage++;
@@ -109,14 +109,14 @@ export const ActionManualAlteracaoPreco = ({ usuarioLogado }) => {
             throw error;
           }
         }
-  
+
         await fetchNextPage(currentPage);
         return allData;
       } else {
-       
+
         return response.data;
       }
-  
+
     } catch (error) {
       console.error('Error fetching data:', error);
       throw error;
@@ -124,9 +124,9 @@ export const ActionManualAlteracaoPreco = ({ usuarioLogado }) => {
       fecharAnimacaoCarregamento();
     }
   };
-   
+
   const { data: dadosAlteracaoPreco = [], error: errorEstilos, isLoading: isLoadingEstilos, refetch: refetchListaPreco } = useQuery(
-    ['alteracoes-de-precos-resumo', ],
+    ['alteracoes-de-precos-resumo',],
     () => fetchListaPreco(),
     {
       enabled: false,
@@ -151,10 +151,8 @@ export const ActionManualAlteracaoPreco = ({ usuarioLogado }) => {
 
 
   const handleTabelaVisivel = () => {
-    setCurrentPage(prevPage => prevPage + 1);
     refetchListaPreco();
     setTabelaVisivel(false);
-
   };
 
   const handleActionVisivel = () => {
@@ -168,8 +166,39 @@ export const ActionManualAlteracaoPreco = ({ usuarioLogado }) => {
   const optionsEmpresas = dadosListaPreco.map((item) => ({
     value: item.IDRESUMOLISTAPRECO,
     label: item.NOMELISTA,
-    title: item.TITLE, // Presumo que "title" está nos dados originais.
+    title: item.TITLE, 
   }));
+
+  const exportToExcel = () => {
+
+    const dadosModelo = [
+      {
+        'Lista de Preço': '',
+        'Loja': '',
+        'Id Produto': '',
+        'Descrição': '',
+        'Código de Barras': '',
+        'Preço Antigo': '',
+        'Preço Novo': ''
+      }
+    ];
+
+    const worksheet = XLSX.utils.json_to_sheet(dadosModelo);
+    const workbook = XLSX.utils.book_new();
+    
+    worksheet['!cols'] = [
+      { wch: 10 }, 
+      { wch: 15 },  
+      { wch: 30 },  
+      { wch: 25 },  
+      { wch: 15 },  
+      { wch: 20 },  
+      { wch: 20 }   
+    ];
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Modelo Alteração Preço');
+    XLSX.writeFile(workbook, 'template_alteracao_preco.xlsx');
+  };
 
   return (
 
@@ -247,16 +276,16 @@ export const ActionManualAlteracaoPreco = ({ usuarioLogado }) => {
           value: item.IDGRUPOESTRUTURA,
           label: item.DSGRUPOESTRUTURA,
         })
-      )}
+        )}
         valueMultSelectGrupo={estruturaSelecionada}
         onChangeMultSelectGrupo={(e) => setEstruturaSelecionada(e.value)}
 
         MultSelectSubGrupoComponent={MultSelectAction}
         labelMultSelectSubGrupo={"Lista de SubEstruturas"}
         optionsMultSelectSubGrupo={dadosSubGrupoEstrutura.map((item) => ({
-            value: item.IDSUBGRUPOESTRUTURA,
-            label: item.DSSUBGRUPOESTRUTURA,
-          })
+          value: item.IDSUBGRUPOESTRUTURA,
+          label: item.DSSUBGRUPOESTRUTURA,
+        })
         )}
         valueMultSelectSubGrupo={subEstruturaSelecionada}
         onChangeMultSelectSubGrupo={(e) => setSubEstruturaSelecionada(e.value)}
@@ -269,7 +298,7 @@ export const ActionManualAlteracaoPreco = ({ usuarioLogado }) => {
 
         ButtonTypeCadastro={ButtonType}
         linkNome={"Exportar"}
-        // onButtonClickCadastro
+        onButtonClickCadastro={exportToExcel}
         corCadastro={"info"}
         IconCadastro={FaDownload}
 
