@@ -13,6 +13,7 @@ import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../..
 import { useFetchData } from "../../../../../hooks/useFetchData";
 import { MultSelectActionAsync } from "../../../../Select/MultSelectActionAsync";
 import { FaDownload, FaUpload } from "react-icons/fa";
+import { MultSelectAction } from "../../../../Select/MultSelectAction";
 
 
 export const ActionManualAlteracaoPreco = ({ usuarioLogado }) => {
@@ -28,6 +29,8 @@ export const ActionManualAlteracaoPreco = ({ usuarioLogado }) => {
   const [idProduto, setIdProduto] = useState('');
   const [precoInicial, setPrecoInicial] = useState('');
   const [precoFinal, setPrecoFinal] = useState('');
+  const [estruturaSelecionada, setEstruturaSelecionada] = useState([]);
+  const [subEstruturaSelecionada, setSubEstruturaSelecionada] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(1000);
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
@@ -55,6 +58,26 @@ export const ActionManualAlteracaoPreco = ({ usuarioLogado }) => {
       return response.data;
     },
     { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
+  );
+
+  const { data: dadosGrupoEstrutura = [], error: errorGrupoEstrutura, isLoading: isLoadingGrupoEstrutura, refetch: refetchGrupoEstrutura } = useQuery(
+    ['grupo-estrutura-mercadologica'],
+    async () => {
+      const response = await get(`/grupo-estrutura-mercadologica`);
+      
+      return response.data;
+    },
+    { enabled: true, staleTime: 60 * 60 * 1000,}
+  );
+ 
+  const { data: dadosSubGrupoEstrutura = [], error: errorSubGrupoEstrutura, isLoading: isLoadingSubGrupoEstrutura, refetch: refetchSubGrupoEstrutura } = useQuery(
+    ['subgrupo-estrutura-mercadologica'],
+    async () => {
+      const response = await get(`/subgrupo-estrutura-mercadologica?idSubGrupo=${subGrupoSelecionado}`);
+      
+      return response.data;
+    },
+    { enabled: Boolean(subGrupoSelecionado), staleTime: 60 * 60 * 1000,}
   );
      
 
@@ -218,17 +241,25 @@ export const ActionManualAlteracaoPreco = ({ usuarioLogado }) => {
         // valueSelectGrupo={responsavelSelcionado}
         // onChangeSelectGrupo={(e) => setResponsavelSelecionado(e.value)}
 
-        MultSelectGrupoComponent={MultSelectActionAsync}
+        MultSelectGrupoComponent={MultSelectAction}
         labelMultSelectGrupo={"Lista de Estruturas"}
-        optionsMultSelectGrupo
-        valueMultSelectGrupo
-        onChangeMultSelectGrupo
+        optionsMultSelectGrupo={dadosGrupoEstrutura.map((item) => ({
+          value: item.IDGRUPOESTRUTURA,
+          label: item.DSGRUPOESTRUTURA,
+        })
+      )}
+        valueMultSelectGrupo={estruturaSelecionada}
+        onChangeMultSelectGrupo={(e) => setEstruturaSelecionada(e.value)}
 
-        MultSelectSubGrupoComponent={MultSelectActionAsync}
+        MultSelectSubGrupoComponent={MultSelectAction}
         labelMultSelectSubGrupo={"Lista de SubEstruturas"}
-        optionsMultSelectSubGrupo
-        valueMultSelectSubGrupo
-        onChangeMultSelectSubGrupo
+        optionsMultSelectSubGrupo={dadosSubGrupoEstrutura.map((item) => ({
+            value: item.IDSUBGRUPOESTRUTURA,
+            label: item.DSSUBGRUPOESTRUTURA,
+          })
+        )}
+        valueMultSelectSubGrupo={subEstruturaSelecionada}
+        onChangeMultSelectSubGrupo={(e) => setSubEstruturaSelecionada(e.value)}
 
         ButtonSearchComponent={ButtonType}
         onButtonClickSearch={handleTabelaVisivel}
