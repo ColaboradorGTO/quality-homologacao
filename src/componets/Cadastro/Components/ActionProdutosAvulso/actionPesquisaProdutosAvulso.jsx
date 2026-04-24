@@ -151,7 +151,8 @@ export const ActionPesquisaProdutosAvulso = ({ usuarioLogado }) => {
         <ActionListaProdutoAvulso 
           dadosProdutosAvulso={dadosProdutosAvulso} 
           usuarioLogado={usuarioLogado}
-          optionsModulos={optionsModulos}  
+          optionsModulos={optionsModulos} 
+          handleClick={handleClick} 
         />
       }
 

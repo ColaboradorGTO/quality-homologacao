@@ -5,7 +5,7 @@ import axios from "axios";
 import { useEffect } from "react";
 import { getDataAtual } from "../../../../../utils/dataAtual";
 
-export const useCancelarPedido = ({ usuarioLogado, optionsModulos, handleClick }) => {
+export const useAtivarCancelarProduto = ({ usuarioLogado, optionsModulos, handleClick }) => {
     const [ipUsuario, setIpUsuario] = useState('');
     const [data, setData] = useState('');
 
@@ -50,7 +50,7 @@ export const useCancelarPedido = ({ usuarioLogado, optionsModulos, handleClick }
         let msgtitulo = status == 'True' ? 'Cancelar' : 'Ativar';
 
         try {
-            // ✅ 1º modal (igual ao jQuery)
+ 
             const confirmacao = await Swal.fire({
                 title: `Certeza que Deseja ${msgtitulo} o Produto?`,
                 text: "Você não poderá reverter esta ação!",
@@ -65,7 +65,7 @@ export const useCancelarPedido = ({ usuarioLogado, optionsModulos, handleClick }
 
             if (!confirmacao.isConfirmed) return;
 
-            // ✅ 2º modal (motivo)
+            
             const motivoModal = await Swal.fire({
                 icon: 'question',
                 title: `Motivo para ${msgtitulo} o Produto?`,
@@ -89,7 +89,6 @@ export const useCancelarPedido = ({ usuarioLogado, optionsModulos, handleClick }
 
                     input.focus();
 
-                    // igual ao jQuery (enter confirma)
                     input.addEventListener('keypress', (e) => {
                         if (e.key === 'Enter') Swal.clickConfirm();
                     });
@@ -107,7 +106,7 @@ export const useCancelarPedido = ({ usuarioLogado, optionsModulos, handleClick }
                         return false;
 
                     } else if (motivoCancelamento.length < 10) {
-                        input.value = ''; // ✅ igual jQuery
+                        input.value = ''; 
                         input.focus();
 
                         Swal.showValidationMessage(
@@ -130,7 +129,6 @@ export const useCancelarPedido = ({ usuarioLogado, optionsModulos, handleClick }
                 STCANCELADO: status
             };
 
-            // 🔄 equivalente ao animationLoadingStart
             Swal.fire({
                 title: `${status == 'True' ? 'Cancelando' : 'Reativando'} produto...`,
                 allowOutsideClick: false,
@@ -141,7 +139,7 @@ export const useCancelarPedido = ({ usuarioLogado, optionsModulos, handleClick }
 
             const response = await put("/status-produto-avulso/:id", dados);
 
-            Swal.close(); // 🔄 equivalente ao animationLoadingStop
+            Swal.close();
 
             if (response?.data?.type === 'success') {
                 await Swal.fire({

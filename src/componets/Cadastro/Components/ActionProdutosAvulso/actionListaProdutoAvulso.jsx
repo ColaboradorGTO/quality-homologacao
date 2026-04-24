@@ -19,12 +19,13 @@ import { jsPDF } from 'jspdf';
 import * as XLSX from 'xlsx';
 import 'jspdf-autotable';
 import { get } from "../../../../api/funcRequest";
-import { useCancelarPedido } from "./hooks/useAtivarCancelarProduto";
+import { useAtivarCancelarProduto } from "./hooks/useAtivarCancelarProduto";
 
 export const ActionListaProdutoAvulso = ({
   dadosProdutosAvulso,
   usuarioLogado,
-  optionsModulos
+  optionsModulos,
+  handleClick
 }) => {
   const [modalEditar, setModalEditar] = useState(false);
   const [dadosDetalheProduto, setDadosDetalheProduto] = useState([]);
@@ -34,7 +35,8 @@ export const ActionListaProdutoAvulso = ({
 
   const {
     handleCancelar
-  } = useCancelarPedido({ usuarioLogado, optionsModulos });
+  } = useAtivarCancelarProduto({ usuarioLogado, optionsModulos, handleClick });
+
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
   };
