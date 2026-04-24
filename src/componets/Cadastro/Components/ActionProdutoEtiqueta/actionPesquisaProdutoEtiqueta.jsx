@@ -14,19 +14,23 @@ import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../ut
 
 
 export const ActionPesquisaProdutoEtiqueta = ({ usuarioLogado }) => {
-  const [empresaSelecionada, setEmpresaSelecionada] = useState('')
-  const [produtoPesquisado, setProdutoPesquisado] = useState('')
   const [descricaoProduto, setDescricaoProduto] = useState('')
   const [codBarrasProduto, setCodBarrasProduto] = useState('')
-  const [dadosEmpresas, setDadosEmpresas] = useState([])
   const [idProduto, setIDProduto] = useState('')
+  const [empresaSelecionada, setEmpresaSelecionada] = useState('');
+  const [btnVisivel, setBtnVisivel] = useState(false);
+  const [modalImprimir, setModalImprimir] = useState(false);
+  const [produtosSelecionados, setProdutosSelecionados] = useState([]);
+  const [dadosAcumuladorEtiquetas, setDadosAcumuladorEtiquetas] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
+  const [selectedIds, setSelectedIds] = useState([]);
 
   useEffect(() => {
 
     getListaEmpresas()
   }, [])
 
-  const { data: dadosEmpresa = [] } = useFetchData('empresas', '/empresas');
+  const { data: dadosEmpresas = [] } = useFetchData('empresas', '/empresas');
   // const { data: dadosListaPrecos = [] } = useFetchData('lista-de-preco', '/lista-de-preco');
 
   const { data: dadosListaPrecos = [], error: errorListaPrecos, isLoading: isLoadingListaPrecos, refetch } = useQuery(
@@ -162,6 +166,19 @@ export const ActionPesquisaProdutoEtiqueta = ({ usuarioLogado }) => {
 
       <ActionListaProdutoEtiqueta 
         dadosListaPrecosSap={dadosListaPrecosSap} 
+          btnVisivel={btnVisivel}
+        setBtnVisivel={setBtnVisivel}
+        setModalImprimir={setModalImprimir}
+        modalImprimir={modalImprimir}
+        produtosSelecionados={produtosSelecionados}
+        setProdutosSelecionados={setProdutosSelecionados}
+        dadosAcumuladorEtiquetas={dadosAcumuladorEtiquetas}
+
+        setDadosAcumuladorEtiquetas={setDadosAcumuladorEtiquetas}
+        selectAll={selectAll}
+        setSelectAll={setSelectAll}
+        selectedIds={selectedIds}
+        setSelectedIds={setSelectedIds}
       />
     </Fragment>
   )

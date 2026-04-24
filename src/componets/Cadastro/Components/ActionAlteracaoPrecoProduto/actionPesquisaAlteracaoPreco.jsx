@@ -11,6 +11,7 @@ import { get } from "../../../../api/funcRequest";
 import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
 import { useFetchData } from "../../../../hooks/useFetchData";
+import { ActionManualAlteracaoPreco } from "./ManualAlteracaoPreco/actionManualAlteracaoPreco";
 
 
 export const ActionPesquisaAlteracaoPreco = ({ usuarioLogado }) => {
@@ -27,6 +28,9 @@ export const ActionPesquisaAlteracaoPreco = ({ usuarioLogado }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(1000);
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
+  const [tabelaVisivel, setTabelaVisivel] = useState(true);
+  const [actionMainVisivel, setActionMainVisivel] = useState(true);
+  const [actionSecundariaVisivel, setActionSecundariaVisivel] = useState(false);
 
   useEffect(() => {
     const dataInicial = getDataAtual()
@@ -131,11 +135,11 @@ export const ActionPesquisaAlteracaoPreco = ({ usuarioLogado }) => {
   };
 
   const handleActionVisivel = () => {
-    setContadorClickAction((prevClickCount) => prevClickCount + 1);
-    if (contadorClickAction % 2 === 0) {
-      setActionVisivel(false);
-
-    }
+    console.log('chegou')
+    setActionMainVisivel(false);
+    setTabelaVisivel(false);
+    setActionSecundariaVisivel(true);
+    
   };
 
   const optionsEmpresas = dadosListaPreco.map((item) => ({
@@ -148,90 +152,99 @@ export const ActionPesquisaAlteracaoPreco = ({ usuarioLogado }) => {
 
     <Fragment>
 
+      {actionMainVisivel && (
 
-      <ActionMain
-        linkComponentAnterior={["Home"]}
-        linkComponent={["Alteração de Preços"]}
-        title="Alteração de Preços"
-        subTitle="Nome da Loja"
+        <ActionMain
+          linkComponentAnterior={["Home"]}
+          linkComponent={["Alteração de Preços"]}
+          title="Alteração de Preços"
+          subTitle="Nome da Loja"
 
-        InputFieldDTInicioComponent={InputField}
-        labelInputFieldDTInicio={"Data Início"}
-        valueInputFieldDTInicio={dataPesquisaInicio}
-        onChangeInputFieldDTInicio={e => setDataPesquisaInicio(e.target.value)}
+          InputFieldDTInicioComponent={InputField}
+          labelInputFieldDTInicio={"Data Início"}
+          valueInputFieldDTInicio={dataPesquisaInicio}
+          onChangeInputFieldDTInicio={e => setDataPesquisaInicio(e.target.value)}
 
-        InputFieldDTFimComponent={InputField}
-        labelInputFieldDTFim={"Data Fim"}
-        valueInputFieldDTFim={dataPesquisaFim}
-        onChangeInputFieldDTFim={e => setDataPesquisaFim(e.target.value)}
-
-
-        InputFieldCodBarraComponent={InputField}
-        labelInputFieldCodBarra={"Cód.Barras "}
-        valueInputFieldCodBarra={codBarra}
-        onChangeInputFieldCodBarra={e => setCodBarra(e.target.value)}
-        placeHolderInputFieldCodBarra={"Digite o Código de Barras"}
-
-        InputFieldComponent={InputField}
-        labelInputField={"N° Alteração"}
-        valueInputField={numeroAlteracao}
-        onChangeInputField={(e) => setNumeroAlteracao(e.target.value)}
-        placeHolderInputFieldComponent={"Digite o Número da Alteração"}
-
-        InputFieldNumeroNFComponent={InputField}
-        labelInputFieldNumeroNF={"Id. Produto"}
-        valueInputFieldNumeroNF={idProduto}
-        onChangeInputFieldNumeroNF={(e) => setIdProduto(e.target.value)}
-        placeHolderInputFieldNumeroNF={"Digite o Id. do Produto"}
-
-        InputFieldDescricaoComponent={InputField}
-        labelInputFieldDescricao={"Descrição do Produto"}
-        placeHolderInputFieldDescricao={"Digite a descrição do produto"}
-        valueInputFieldDescricao={descricaoProduto}
-        onChangeInputFieldDescricao={(e) => setDescricaoProduto(e.target.value)}
-
-        InputSelectEmpresaComponent={InputSelectAction}
-        labelSelectEmpresa={"Lista de Preço"}
-        optionsEmpresas={dadosListaPreco.map((item) => ({
-          value: item.listaPreco.IDRESUMOLISTAPRECO,
-          label: item.listaPreco.NOMELISTA,
-        }))}
-        valueSelectEmpresa={listaPrecoSelecionada}
-        onChangeSelectEmpresa={(e) => setListaPrecoSelecionada(e.value)}
-
-        InputSelectGrupoComponent={InputSelectAction}
-        labelSelectGrupo={"Responsável Alt."}
-        optionsGrupos={dadosResponsaveisAlteracao.map((item) => ({
-          value: item.IDFUNCIONARIO,
-          label: item.NOFUNCIONARIO,
-        }))}
-        valueSelectGrupo={responsavelSelcionado}
-        onChangeSelectGrupo={(e) => setResponsavelSelecionado(e.value)}
+          InputFieldDTFimComponent={InputField}
+          labelInputFieldDTFim={"Data Fim"}
+          valueInputFieldDTFim={dataPesquisaFim}
+          onChangeInputFieldDTFim={e => setDataPesquisaFim(e.target.value)}
 
 
-        ButtonSearchComponent={ButtonType}
-        onButtonClickSearch={handleTabelaVisivel}
-        linkNomeSearch={"Pesquisar"}
-        IconSearch={AiOutlineSearch}
-        corSearch={"primary"}
+          InputFieldCodBarraComponent={InputField}
+          labelInputFieldCodBarra={"Cód.Barras "}
+          valueInputFieldCodBarra={codBarra}
+          onChangeInputFieldCodBarra={e => setCodBarra(e.target.value)}
+          placeHolderInputFieldCodBarra={"Digite o Código de Barras"}
 
-        ButtonTypeCadastro={ButtonType}
-        linkNome={"Inserir Alteração"}
-        onButtonClickCadastro
-        corCadastro={"success"}
-        IconCadastro={MdAdd}
+          InputFieldComponent={InputField}
+          labelInputField={"N° Alteração"}
+          valueInputField={numeroAlteracao}
+          onChangeInputField={(e) => setNumeroAlteracao(e.target.value)}
+          placeHolderInputFieldComponent={"Digite o Número da Alteração"}
 
-      />
+          InputFieldNumeroNFComponent={InputField}
+          labelInputFieldNumeroNF={"Id. Produto"}
+          valueInputFieldNumeroNF={idProduto}
+          onChangeInputFieldNumeroNF={(e) => setIdProduto(e.target.value)}
+          placeHolderInputFieldNumeroNF={"Digite o Id. do Produto"}
 
-      <ActionListaAlteracaoPreco 
-        dadosAlteracaoPreco={dadosAlteracaoPreco} 
-        optionsModulos={optionsModulos}
-        usuarioLogado={usuarioLogado} 
-      />
+          InputFieldDescricaoComponent={InputField}
+          labelInputFieldDescricao={"Descrição do Produto"}
+          placeHolderInputFieldDescricao={"Digite a descrição do produto"}
+          valueInputFieldDescricao={descricaoProduto}
+          onChangeInputFieldDescricao={(e) => setDescricaoProduto(e.target.value)}
+
+          InputSelectEmpresaComponent={InputSelectAction}
+          labelSelectEmpresa={"Lista de Preço"}
+          optionsEmpresas={dadosListaPreco.map((item) => ({
+            value: item.listaPreco.IDRESUMOLISTAPRECO,
+            label: item.listaPreco.NOMELISTA,
+          }))}
+          valueSelectEmpresa={listaPrecoSelecionada}
+          onChangeSelectEmpresa={(e) => setListaPrecoSelecionada(e.value)}
+
+          InputSelectGrupoComponent={InputSelectAction}
+          labelSelectGrupo={"Responsável Alt."}
+          optionsGrupos={dadosResponsaveisAlteracao.map((item) => ({
+            value: item.IDFUNCIONARIO,
+            label: item.NOFUNCIONARIO,
+          }))}
+          valueSelectGrupo={responsavelSelcionado}
+          onChangeSelectGrupo={(e) => setResponsavelSelecionado(e.value)}
 
 
+          ButtonSearchComponent={ButtonType}
+          onButtonClickSearch={handleTabelaVisivel}
+          linkNomeSearch={"Pesquisar"}
+          IconSearch={AiOutlineSearch}
+          corSearch={"primary"}
+
+          ButtonTypeCadastro={ButtonType}
+          linkNome={"Inserir Alteração"}
+          onButtonClickCadastro={handleActionVisivel}
+          corCadastro={"success"}
+          IconCadastro={MdAdd}
+
+        />
+      )}
+
+      {tabelaVisivel && (
+
+        <ActionListaAlteracaoPreco 
+          dadosAlteracaoPreco={dadosAlteracaoPreco} 
+          optionsModulos={optionsModulos}
+          usuarioLogado={usuarioLogado} 
+        />
+      )}
+
+      {actionSecundariaVisivel && (
+
+        <ActionManualAlteracaoPreco 
+          usuarioLogado={usuarioLogado}
+          optionsModulos={optionsModulos}
+        />
+      )}
     </Fragment>
   )
 }
-
-

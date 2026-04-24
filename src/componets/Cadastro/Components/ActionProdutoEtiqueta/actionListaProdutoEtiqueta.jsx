@@ -1,139 +1,367 @@
-import { Fragment, useEffect, useState } from "react"
+import { Fragment, useEffect, useRef, useState } from "react"
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { InputNumber } from 'primereact/inputnumber';
 import { TriStateCheckbox } from 'primereact/tristatecheckbox';
+import HeaderTable from "../../../Tables/headerTable";
+import Swal from "sweetalert2";
+import { useReactToPrint } from "react-to-print";
+import jsPDF from "jspdf";
+import * as XLSX from 'xlsx';
+import { isValidEAN13 } from "../../../../utils/isValidEAN13";  
+import { formatMoeda } from "../../../../utils/formatMoeda";
 
-// 1070561136301
+export const ActionListaProdutoEtiqueta = ({
+  dadosListaPrecosSap,
+  setBtnVisivel,
+  modalImprimir,
+  setModalImprimir,
+  produtosSelecionados,
+  setProdutosSelecionados,
+  dadosAcumuladorEtiquetas,
+  setDadosAcumuladorEtiquetas,
+  setSelectAll,
+  selectedIds,
+}) => {
+  const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [selectAllChecked, setSelectAllChecked] = useState(false);
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [first, setFirst] = useState(0);
+  const [rows, setRows] = useState(10);
+  const dataTableRef = useRef();
 
-export const ActionListaProdutoEtiqueta = ({ dadosListaPrecosSap }) => {
-  const [qtdProduto, setQtdProduto] = useState(1);
-  const [produtoSelecionado, setProdutoSelecionado] = useState(null);
-  const [rowClick, setRowClick] = useState(true);
+  const setQtdProduto = (idProduto, novaQuantidade) => {
+    setProdutosSelecionados((prevProdutos) => {
+      const produtoExiste = prevProdutos.some((produto) => produto.IDPRODUTO === idProduto);
+
+      if (!produtoExiste) {
+        return [...prevProdutos, { IDPRODUTO: idProduto, quantidade: Number(novaQuantidade) }];
+      }
+
+      return prevProdutos.map((produto) =>
+        produto.IDPRODUTO === idProduto
+          ? { ...produto, quantidade: Number(novaQuantidade) }
+          : produto
+      );
+    });
+  };
+
+  const onGlobalFilterChange = (e) => {
+    setGlobalFilterValue(e.target.value);
+  };
+
+  const handlePrint = useReactToPrint({
+    content: () => dataTableRef.current,
+    documentTitle: 'Lista de Produtos',
+  });
+
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+    doc.autoTable({
+      head: [['Nº', 'Cod Barras', 'Produto', 'Tamanho', 'Quantidade', 'PR. Venda', 'Grupo', 'Estilo', 'Marca']],
+      body: dados.map(item => [
+        item.contador,
+        item.NUCODBARRAS,
+        item.DSNOME,
+        item.TAMANHO,
+        item.quantidade,
+        formatMoeda(item.PRECOVENDA),
+        item.DSLISTAPRECO,
+        item.DSESTILO,
+        item.MARCA
+      ]),
+      horizontalPageBreak: true,
+      horizontalPageBreakBehaviour: 'immediately'
+    });
+    doc.save('lista_produtos.pdf');
+  };
+
+  const exportToExcel = () => {
+    const worksheet = XLSX.utils.json_to_sheet(dados);
+    const workbook = XLSX.utils.book_new();
+    const header = ['Nº', 'Cod Barras', 'Produto', 'Tamanho', 'Quantidade', 'PR. Venda', 'Grupo', 'Estilo', 'Marca'];
+    worksheet['!cols'] = [
+      { wpx: 70, caption: 'Nº' },
+      { wpx: 100, caption: 'Cod Barras' },
+      { wpx: 200, caption: 'Produto' },
+      { wpx: 70, caption: 'Tamanho' },
+      { wpx: 50, caption: 'Quantidade' },
+      { wpx: 100, caption: 'PR. Venda' },
+      { wpx: 200, caption: 'Grupo' },
+      { wpx: 200, caption: 'Estilo' },
+      { wpx: 100, caption: 'Marca' },
+    ];
+    XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Lista de Produtos');
+    XLSX.writeFile(workbook, 'lista_produtos.xlsx');
+  };
+
+  const onPageChange = (event) => {
+    setFirst(event.first);
+    setRows(event.rows);
+  };
+
 
   const dados = dadosListaPrecosSap.map((item, index) => {
     let contador = index + 1;
+    let quantidade = 1;
+    const arrayGrupos = [
+      'Todos',
+      'Tesoura',
+      'Magazine',
+      'Yorus',
+      'Free Center'
+    ];
+    let grupo = item.DSLISTAPRECO || arrayGrupos[item.IDSUBGRUPOEMPRESARIAL] || 'Todos';
+    let estilo = item.DSESTILO || '';
+    if (item.STTRANSFORMADO === 'True') {
+      let subgrupo = item.SUBGRUPO ? item.SUBGRUPO.split('-') : [];
 
-    return {
-      IDPRODUTO: item.IDPRODUTO,
-      DSNOME: item.DSNOME,
-    
- 
-      NUCODBARRAS: item.NUCODBARRAS,
-      MARCA: item.MARCA,
-      // TAMANHO: item.TAMANHO,  (dsProd.split(' ')).pop()).toUpperCase().replace(/[^\w\s]/gi, '')
-      TAMANHO: item.TAMANHO,
-      PRECOVENDA: item.PRECOVENDA,
-      IDGRUPOEMPRESARIAL: item.IDGRUPOEMPRESARIAL,
-      IDEMPRESA: item.IDEMPRESA,
-      DSLISTAPRECO: item.DSLISTAPRECO,
-      NOFANTASIA: item.NOFANTASIA,
-      
+      if (subgrupo.length > 0) {
+        subgrupo = subgrupo.pop()?.split(' ')?.join(' - ') || '';
+      }
 
-      // ----------------------
-      
-      DSPRODUTO: item.DSPRODUTO,
-      SUBGRUPO: item.SUBGRUPO,
-      DSESTILO: item.DSESTILO,
-      DSTAMANHO: item.DSTAMANHO,
-      CODBARRAS: item.CODBARRAS,
-      VRUNITLIQDETALHEPEDIDO: item.VRUNITLIQDETALHEPEDIDO,
-      IDSUBGRUPOEMPRESARIAL: item.IDSUBGRUPOEMPRESARIAL,
-      DSLOCALEXPOSICAO: item.DSLOCALEXPOSICAO,
-      contador
+      grupo = arrayGrupos[item.IDSUBGRUPOEMPRESARIAL] || grupo;
+
+      if (estilo.length > 0) {
+        estilo = subgrupo.length > 0 ? `${subgrupo} - ${estilo}` : estilo;
+      } else {
+        estilo = subgrupo;
+      }
     }
+
+    // Ajuste para TAMANHO conforme solicitado
+    let dsProd = item.DSNOME || '';
+    let tamanho = (item.TAMANHO || item.DSTAMANHO || ((dsProd.split(' ')).pop()).replace(/[^\w\s]/gi, ''))?.toUpperCase();
+    let codBarras = item.NUCODBARRAS || item.CODBARRAS;
+    let stCodBarrasValid = isValidEAN13(codBarras) ? 'True' : 'False';
+    let stDisabled = item.STATIVO !== 'True' || stCodBarrasValid !== 'True' ? 'disabled' : '';
+    let subGrupo = item.SUBGRUPO ? (item.SUBGRUPO).split('-') : '';
+    return {
+      contador,
+      NUCODBARRAS: codBarras,
+      DSNOME: item.DSNOME,
+      TAMANHO: tamanho,
+      stCodBarrasValid,
+      stDisabled,
+      quantidade,
+      subGrupo,
+      PRECOVENDA: item.PRECOVENDA,
+      DSESTILO: item.DSESTILO ? item.DSESTILO : item.SUBGRUPO,
+      MARCA: item.MARCA || '',
+      IDPRODUTO: item.IDPRODUTO,
+      STRANSFRMADO: item.STTRANSFORMADO,
+      DSLISTAPRECO: item.DSLISTAPRECO || item.IDSUBGRUPOEMPRESARIAL || 0,
+      DSLOCALEXPOSICAO: item.DSLOCALEXPOSICAO,
+      STATIVO: item.STATIVO === 'True' ? 'Ativo' : 'Inativo',
+      arrayGrupos,
+    };
+
   });
+
+  useEffect(() => {
+    const itensSelecionaveis = dados.filter(item => item.stDisabled !== 'disabled');
+
+    const dadosPaginaAtual = dados.slice(first, first + rows);
+    const itensSelecionaveisPaginaAtual = dadosPaginaAtual.filter(item => item.stDisabled !== 'disabled');
+
+    if (selectedItems.length === 0) {
+      setSelectAllChecked(false);
+    } else if (
+      selectedItems.length === itensSelecionaveis.length ||
+      (selectedItems.length === itensSelecionaveisPaginaAtual.length &&
+        itensSelecionaveisPaginaAtual.length > 0 &&
+        itensSelecionaveisPaginaAtual.every(item =>
+          selectedItems.some(selected => selected.IDPRODUTO === item.IDPRODUTO)
+        ))
+    ) {
+      setSelectAllChecked(true);
+    } else {
+      setSelectAllChecked(false);
+    }
+
+  }, [selectedItems, dados, first, rows]);
+
+  const onSelectAllChange = (checked) => {
+    if (checked) {
+      Swal.fire({
+        icon: 'question',
+        title: 'Selecione o modo de seleção',
+        text: 'Deseja selecionar todos da tabela ou somente o que está em tela?',
+        showConfirmButton: true,
+        showCancelButton: true,
+        showCloseButton: true,
+        customClass: { container: 'custom-class' },
+        confirmButtonText: 'Todos os registros',
+        cancelButtonText: 'Apenas o que está tela',
+        cancelButtonColor: '#2196F3',
+        allowOutsideClick: false,
+      }).then((result) => {
+
+        if (result.isConfirmed) {
+          const itensSelecionaveis = dados.filter(item => item.stDisabled !== 'disabled');
+          setBtnVisivel(true);
+          setSelectedItems([...itensSelecionaveis]);
+          setSelectedIds(itensSelecionaveis.map(item => item.IDPRODUTO));
+          setProdutosSelecionados(itensSelecionaveis.map(item => ({ ...item, quantidade: 1 })));
+          setSelectAll(true);
+
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+          const itensSelecionaveisPaginaAtual = dados.slice(first, first + rows).filter(item => item.stDisabled !== 'disabled');
+          setBtnVisivel(true);
+          setSelectedItems([...itensSelecionaveisPaginaAtual]);
+          setSelectedIds(itensSelecionaveisPaginaAtual.map(item => item.IDPRODUTO));
+          setProdutosSelecionados(itensSelecionaveisPaginaAtual.map(item => ({ ...item, quantidade: 1 })));
+          setSelectAll(true);
+
+        } else {
+          setBtnVisivel(false);
+          setSelectedItems([]);
+          setSelectedIds([]);
+          setProdutosSelecionados([]);
+          setSelectAll(false);
+        }
+      });
+    } else {
+      setBtnVisivel(false);
+      setSelectedItems([]);
+      setSelectedIds([]);
+      setProdutosSelecionados([]);
+      setSelectAll(false);
+    }
+  }
 
   const colunasListaProdEtiquetas = [
     {
+      field: 'IDPRODUTO',
+      header: (
+        <div>
+          <label>{selectAllChecked ? 'Desmarcar Todos' : 'Marcar Todos'}</label>
+          <input
+            type="checkbox"
+            checked={selectAllChecked}
+            onChange={(e) => onSelectAllChange(e.target.checked)}
+          />
+        </div>
+      ),
+      body: (rowData) => {
+        return (
+          <div>
+            <input
+              type="checkbox"
+              checked={selectedIds.includes(rowData.IDPRODUTO)}
+              onChange={(e) => {
+                const isChecked = e.target.checked
+                const updatedSelectedIds = e.target.checked
+                  ? [...selectedIds, rowData.IDPRODUTO]
+                  : selectedIds.filter(id => id !== rowData.IDPRODUTO);
+                setSelectedIds(updatedSelectedIds);
+                setQtdProduto(rowData.IDPRODUTO, isChecked)
+                setSelectAll(updatedSelectedIds.length === dados.length);
+                setProdutosSelecionados(isChecked ? [...produtosSelecionados, rowData] : produtosSelecionados.filter(item => item.IDPRODUTO !== rowData.IDPRODUTO));
+                if (isChecked) {
+                  setBtnVisivel(true);
+
+                } else {
+                  setBtnVisivel(false);
+
+                }
+              }}
+              disabled={rowData.stDisabled === 'disabled'}
+            />
+          </div>
+        );
+      }
+    },
+    {
       field: 'contador',
       header: 'Nº',
-      body: (row) => row.contador,
+      body: (row) => <th style={{ color: row.stDisabled === 'disabled' ? 'red' : 'blue' }}>{row.contador}</th>,
       sortable: true
     },
     {
-      field: 'DSLOCALEXPOSICAO',
-      header: 'Opções',
-      selectionMode: "multiple",
-      body: (row) => {
-        return (
-          <div style={{ background: '', }}>
-            <TriStateCheckbox variant="filled" value={produtoSelecionado} onChange={(e) => setProdutoSelecionado(e.value)} />
-          </div>
-        )
-      }
-    },
-    {
-      field: 'IDPRODUTO',
-      header: 'Quantidade',
-      body: (row) => {
-        return (
-          <div style={{ background: '', }}>
-            <InputNumber
-              value={qtdProduto}
-              onValueChange={(e) => row.IDPRODUTO.editorCallback(e.value)}
-              style={{ width: '10%' }}
-            />
-          </div>
-        )
-      }
-    },
-    {
       field: 'NUCODBARRAS',
-      header: 'Código de Barras',
-      body: row => row.NUCODBARRAS,
+      header: 'Cód Barras',
+      body: row => <th style={{ color: row.stDisabled === 'disabled' ? 'red' : 'blue' }}>{row.NUCODBARRAS}</th>,
       sortable: true
     },
     {
       field: 'DSNOME',
       header: 'Produto',
-      body: row => row.DSNOME,
+      body: row => <th style={{ color: row.stDisabled === 'disabled' ? 'red' : 'blue' }}>{row.DSNOME}</th>,
       sortable: true
     },
     {
       field: 'TAMANHO',
       header: 'Tamanho',
-      body: row => row.TAMANHO,
+      body: row => <th style={{ color: row.stDisabled === 'disabled' ? 'red' : 'blue' }}>{row.TAMANHO}</th>,
       sortable: true
+    },
+    {
+      field: 'quantidade',
+      header: 'Quantidade',
+      body: (row) => {
+        return (
+          <div style={{ background: '', width: '50%' }}>
+            <input
+              type="number"
+              value={produtosSelecionados.find(p => p.IDPRODUTO === row.IDPRODUTO)?.quantidade || 1}
+              onChange={(e) => {
+                const novaQuantidade = parseInt(e.target.value, 10) || 1;
+                setProdutosSelecionados(prevProdutos =>
+                  prevProdutos.map(prod =>
+                    prod.IDPRODUTO === row.IDPRODUTO
+                      ? { ...prod, quantidade: novaQuantidade }
+                      : prod
+                  )
+                );
+              }}
+              style={{ width: '100%' }}
+            />
+
+          </div>
+        );
+      }
     },
     {
       field: 'PRECOVENDA',
       header: 'PR. Venda',
-      body: row => row.PRECOVENDA,
+      body: row => <th style={{ color: row.stDisabled === 'disabled' ? 'red' : 'blue' }}>{formatMoeda(row.PRECOVENDA)}</th>,
       sortable: true
     },
     {
       field: 'DSLISTAPRECO',
       header: 'Grupo',
-      body: row => row.DSLISTAPRECO,
+      body: row => <th style={{ color: row.stDisabled === 'disabled' ? 'red' : 'blue' }}>{row.DSLISTAPRECO}</th>,
       sortable: true
     },
     {
       field: 'DSESTILO',
       header: 'Estilo',
-      body: row => row.DSESTILO,
+      body: row => <th style={{ color: row.stDisabled === 'disabled' ? 'red' : 'blue' }}>{row.DSESTILO}</th>,
       sortable: true
     },
     {
       field: 'MARCA',
       header: 'Marca',
-      body: row => row.MARCA,
+      body: row => <th style={{ color: row.stDisabled === 'disabled' ? 'red' : 'blue' }}>{row.MARCA}</th>,
       sortable: true
     },
+    {
+      field: 'STATIVO',
+      header: 'Status',
+      body: row => <th style={{ color: row.STATIVO === 'Ativo' ? 'blue' : 'red' }}>{row.STATIVO}</th>,
+      sortable: true
+    },
+  ];
 
-  ]
-
-  const bodyQuantidade = (row) => {
-    return (
-      <div style={{ background: '', }}>
-        <InputNumber
-          value={qtdProduto}
-          onValueChange={(e) => row.IDPRODUTO.editorCallback(e.value)}
-          style={{ width: '10%' }}
-        />
-      </div>
-    )
-  }
+  useEffect(() => {
+    if (selectedIds.length > 0) {
+      setBtnVisivel(true);
+    } else {
+      setBtnVisivel(false);
+    }
+  }, [selectedIds, setBtnVisivel]);
 
   return (
 
@@ -143,97 +371,51 @@ export const ActionListaProdutoEtiqueta = ({ dadosListaPrecosSap }) => {
           <h2>Lista de Produtos</h2>
         </div>
 
-        <div className="card">
+        <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
+          <HeaderTable
+            globalFilterValue={globalFilterValue}
+            onGlobalFilterChange={onGlobalFilterChange}
+            handlePrint={handlePrint}
+            exportToExcel={exportToExcel}
+            exportToPDF={exportToPDF}
+          />
+        </div>
+
+        <div className="card" ref={dataTableRef}>
           <DataTable
             title="Vendas por Loja"
             value={dados}
-           
+            globalFilter={globalFilterValue}
+            size="small"
+            paginator={true}
+            rows={rows}
+            first={first}
+            onPage={onPageChange}
             selectionMode={'single'}
             sortField="VRTOTALPAGO"
             sortOrder={-1}
             paginator={true}
             rows={10}
-            rowsPerPageOptions={[5, 10, 20, 50, 100]}
+            rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+            filterDisplay="menu"
             showGridlines
             stripedRows
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado </div>}
           >
 
-            <Column
-              field="contador"
-              header="Nº"
-              headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
-              footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
-              bodyStyle={{ fontSize: '0.8rem' }}
-            />
-            <Column
-              selectionMode="single"
-              field="DSLOCALEXPOSICAO"
-              header="Opções"
-              headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem', width: '10rem' }}
-              footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
-              bodyStyle={{ fontSize: '0.8rem' }}
-            />
-            <Column
-
-              field="DSLOCALEXPOSICAO"
-              header="Quantidade"
-              body={bodyQuantidade}
-              headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
-              footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
-              bodyStyle={{ fontSize: '0.8rem' }}
-            />
-            <Column
-
-              field="NUCODBARRAS"
-              header="Cod. Barras"
-              headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
-              footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
-              bodyStyle={{ fontSize: '0.8rem' }}
-            />
-            <Column
-              field="DSNOME"
-              header="Produto"
-              headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
-              footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
-              bodyStyle={{ fontSize: '0.8rem' }}
-            />
-            <Column
-              field="TAMANHO"
-              header="Tamanho"
-              headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
-              footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
-              bodyStyle={{ fontSize: '0.8rem' }}
-            />
-            <Column
-              field="PRECOVENDA"
-              header="PR. Venda"
-              headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
-              footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
-              bodyStyle={{ fontSize: '0.8rem' }}
-            />
-            <Column
-              field="DSLISTAPRECO"
-              header="Grupo"
-              headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
-              footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
-              bodyStyle={{ fontSize: '0.8rem' }}
-            />
-            <Column
-              field="DSESTILO"
-              header="Estilo"
-              headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
-              footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
-              bodyStyle={{ fontSize: '0.8rem' }}
-            />
-            <Column
-              field="MARCA"
-              header="Marca"
-              headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
-              footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
-              bodyStyle={{ fontSize: '0.8rem' }}
-            />
-
+            {colunasListaProdEtiquetas.map(coluna => (
+              <Column
+                key={coluna.field}
+                field={coluna.field}
+                header={coluna.header}
+                body={coluna.body}
+                sortable={coluna.sortable}
+                headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+                bodyStyle={{ fontSize: '0.8rem' }}
+              />
+            ))}
           </DataTable>
         </div>
       </div>
