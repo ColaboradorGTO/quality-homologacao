@@ -20,6 +20,7 @@ import * as XLSX from 'xlsx';
 import 'jspdf-autotable';
 import { get } from "../../../../api/funcRequest";
 import { useAtivarCancelarProduto } from "./hooks/useAtivarCancelarProduto";
+import { useIncluirProduto } from "./hooks/useIncluirProduto";
 
 export const ActionListaProdutoAvulso = ({
   dadosProdutosAvulso,
@@ -36,6 +37,10 @@ export const ActionListaProdutoAvulso = ({
   const {
     handleCancelar
   } = useAtivarCancelarProduto({ usuarioLogado, optionsModulos, handleClick });
+
+  const {
+    handleIncluirProduto
+  } = useIncluirProduto({ usuarioLogado, optionsModulos, handleClick });
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -247,7 +252,7 @@ export const ActionListaProdutoAvulso = ({
               <div className="p-1">
                 <ButtonTable
                   titleButton={"Ativar Produto Avulso"}
-                  onClickButton
+                  onClickButton={() => handleCancelar(row, 'False')}
                   Icon={FaCheck}
                   cor={"success"}
                   iconColor={"white"}
@@ -268,7 +273,7 @@ export const ActionListaProdutoAvulso = ({
                   <div className="p-1">
                     <ButtonTable
                       titleButton={"Cancelar Produto Avulso"}
-                      onClickButton
+                      onClickButton={() => handleCancelar(row, 'True')}
                       Icon={BsTrash3}
                       cor={"danger"}
                       iconColor={"white"}
@@ -300,7 +305,7 @@ export const ActionListaProdutoAvulso = ({
                   <div className="p-1">
                     <ButtonTable
                       titleButton={"Cancelar Produto Avulso"}
-                      onClickButton
+                      onClickButton={() => handleCancelar(row, 'True')}
                       Icon={BsTrash3}
                       cor={"danger"}
                       iconColor={"white"}
@@ -322,7 +327,7 @@ export const ActionListaProdutoAvulso = ({
                   <div className="p-1">
                     <ButtonTable
                       titleButton={"Cancelar Produto Avulso"}
-                      onClickButton
+                      onClickButton={() => handleCancelar(row, 'True')}
                       Icon={BsTrash3}
                       cor={"danger"}
                       iconColor={"white"}
@@ -354,7 +359,7 @@ export const ActionListaProdutoAvulso = ({
                   <div className="p-1">
                     <ButtonTable
                       titleButton={"Cancelar Produto Avulso"}
-                      onClickButton
+                      onClickButton={() => handleCancelar(row, 'True')}
                       Icon={BsTrash3}
                       cor={"danger"}
                       iconColor={"white"}
@@ -366,7 +371,7 @@ export const ActionListaProdutoAvulso = ({
                   <div className="p-1">
                     <ButtonTable
                       titleButton={"Incluir para PDV"}
-                      onClickButton
+                      onClickButton={() => handleIncluirProduto(row)}
                       Icon={FaCashRegister}
                       cor={"success"}
                       iconColor={"white"}

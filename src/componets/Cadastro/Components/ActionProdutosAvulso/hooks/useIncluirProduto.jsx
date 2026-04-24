@@ -86,4 +86,6 @@ export const useIncluirProduto = ({ usuarioLogado, optionsModulos, handleClick }
             });
         }
     }
+
+    return { handleIncluirProduto };
 }
