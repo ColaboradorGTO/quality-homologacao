@@ -9,6 +9,7 @@ import { useEditarEstilos } from "../hooks/useEditarEstilos";
 import { AlertError } from "../../../../Inputs/alertError";
 import FormField from "../../../../Formularios/FormField";
 import { schema } from "./schemaValidarEstilos";
+import { situacao } from "../../../../../../parceiro.json" 
 
 export const FormularioEditarEstilos = ({ dadosDetalheEstilos, handleClose, handleClick, usuarioLogado, optionsModulos }) => {
     const { handleSubmit, formState: { errors }, clearErrors, control, setError, setValue } = useForm({

@@ -8,11 +8,12 @@ import { InputSelectAction } from "../../../Inputs/InputSelectAction"
 import { ActionListaProdutoEtiqueta } from "./actionListaProdutoEtiqueta"
 import { ButtonType } from "../../../Buttons/ButtonType"
 import { useFetchData } from "../../../../hooks/useFetchData"
+import { useQuery } from "react-query"
+import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento"
 
 
 
-export const ActionPesquisaProdutoEtiqueta = () => {
-  const [dadosListaPrecosSap, setDadosListaPrecosSap] = useState([])
+export const ActionPesquisaProdutoEtiqueta = ({ usuarioLogado }) => {
   const [empresaSelecionada, setEmpresaSelecionada] = useState('')
   const [produtoPesquisado, setProdutoPesquisado] = useState('')
   const [descricaoProduto, setDescricaoProduto] = useState('')
@@ -21,57 +22,90 @@ export const ActionPesquisaProdutoEtiqueta = () => {
   const [idProduto, setIDProduto] = useState('')
 
   useEffect(() => {
-    
+
     getListaEmpresas()
   }, [])
 
   const { data: dadosEmpresa = [] } = useFetchData('empresas', '/empresas');
-  const { data: dadosListaPrecos = [] } = useFetchData('lista-de-preco', '/lista-de-preco');
+  // const { data: dadosListaPrecos = [] } = useFetchData('lista-de-preco', '/lista-de-preco');
 
-  // const groupedCores = dadosListaPrecos.reduce((acc, item) => {
-  //   const group = item.listaPreco.NOMELISTA || "Outras Marcas"; r
-  //   const option = { value: item.detalheLista.loja.IDEMPRESA, label: item.detalheLista.loja.NOFANTASIA };
+  const { data: dadosListaPrecos = [], error: errorListaPrecos, isLoading: isLoadingListaPrecos, refetch } = useQuery(
+    'listas-de-precos-sap',
+    async () => {
+      const response = await get(`/listas-de-precos-sap`);
 
-  //   const groupIndex = acc.findIndex((g) => g.label === group);
-  //   if (groupIndex !== -1) {
-  //     acc[groupIndex].options.push(option);
-  //   } else {
-  //     acc.push({ label: group, options: [option] });
-  //   }
-  //   return acc;
-  // }, []);
+      return response.data;
+    },
+    { enabled: true, staleTime: 60 * 60 * 1000, }
+  );
+
+  useEffect(() => {
+    if (dadosListaPrecos && usuarioLogado?.IDEMPRESA) {
+      const empresa = dadosListaPrecos.find(
+        item => item.listaPreco?.IDEMPRESA === usuarioLogado.IDEMPRESA
+      );
+      if (empresa) {
+        setEmpresaSelecionada(empresa.listaPreco?.IDRESUMOLISTAPRECO);
+      }
+    }
+  }, [dadosListaPrecos, usuarioLogado]);
 
   const getListaEmpresas = async () => {
     try {
-        const response = await get(`/lista-de-preco`);
-        if (response.data && response.data.length > 0) {
-            const empresas = response.data.map(item => ({
-                value: item.listaPreco && item.listaPreco.IDRESUMOLISTAPRECO,
-                label: item.listaPreco && item.listaPreco.NOMELISTA
-            })).filter(item => item.value && item.label); // Filtrar itens com valores válidos
-            setDadosEmpresas(empresas);
-           
-        }
-        return response.data;
-    } catch (error) {
-        console.log('Erro ao buscar empresas: ', error);
-    }
-};
+      const response = await get(`/lista-de-preco`);
+      if (response.data && response.data.length > 0) {
+        const empresas = response.data.map(item => ({
+          value: item.listaPreco && item.listaPreco.IDRESUMOLISTAPRECO,
+          label: item.listaPreco && item.listaPreco.NOMELISTA
+        })).filter(item => item.value && item.label); // Filtrar itens com valores válidos
+        setDadosEmpresas(empresas);
 
-
-  const getListaProdutosSAP = async () => {
-    try {
-      const response = await get(`/lista-produtos-etiqueta-sap?idLista=${empresaSelecionada}&idProduto=${idProduto}&descricao=${descricaoProduto}&codeBars=${codBarrasProduto}`)
-      if (response.data) {
-       
-        setDadosListaPrecosSap(response.data)
-        console.log(response.data)
       }
       return response.data;
     } catch (error) {
-      console.log('Erro ao buscar empresas: ', error)
+      console.log('Erro ao buscar empresas: ', error);
     }
-  }
+  };
+
+
+  const fetchListaPrecosSap = async () => {
+    const urlBase = `/lista-produtos-etiqueta-sap?idLista=${empresaSelecionada}&idProduto=${idProduto}&descricao=${descricaoProduto}&codBarras=${codBarrasProduto}`;
+    let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
+    urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+    try {
+      animacaoCarregamento('Carregando dados...', true);
+
+      const primeiraPagina = 1;
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const page = primeiraResposta.page || primeiraPagina;
+      const pageSize = primeiraResposta.pageSize || 1000;
+      const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
+      const totalPages = Math.ceil(totalRows / pageSize);
+
+      let allData = [...(primeiraResposta.data || [])];
+
+      if (totalPages > 1) {
+        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          allData.push(...(responsePage.data || []));
+        }
+      }
+
+      return allData;
+    } catch (error) {
+      console.error('Erro ao buscar dados:', error);
+      throw error;
+    } finally {
+      fecharAnimacaoCarregamento();
+    }
+  };
+
+  const { data: dadosListaPrecosSap = [], error: errorMalotes, isLoading: isLoadingMalotes, refetch: refetchListaPrecosSap } = useQuery(
+    ['lista-produtos-etiqueta-sap',],
+    () => fetchListaPrecosSap(),
+    { enabled: false, staleTime: 60 * 60 * 1000, }
+  );
 
 
   const handleChangeEmpresa = (e) => {
@@ -79,7 +113,7 @@ export const ActionPesquisaProdutoEtiqueta = () => {
   }
 
   const handleClick = () => {
-    getListaProdutosSAP()
+    refetchListaPrecosSap();
   }
 
   return (
@@ -95,7 +129,7 @@ export const ActionPesquisaProdutoEtiqueta = () => {
         InputSelectEmpresaComponent={InputSelectAction}
         labelSelectEmpresa={"Lista de Preço"}
         optionsEmpresas={[
-          {value: '', label: 'Selecione uma empresa'},
+          { value: '', label: 'Selecione uma empresa' },
           ...dadosEmpresas
         ]}
         valueSelectEmpresa={empresaSelecionada}
@@ -118,15 +152,17 @@ export const ActionPesquisaProdutoEtiqueta = () => {
         valueInputFieldCodBarra={codBarrasProduto}
         onChangeInputFieldCodBarra={(e) => setCodBarrasProduto(e.target.value)}
         placeHolderInputFieldCodBarra={"Cód.Barras / Nome Produto"}
-        
+
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}
         onButtonClickSearch={handleClick}
         corSearch={"primary"}
         IconSearch={AiOutlineSearch}
       />
-   
-      <ActionListaProdutoEtiqueta dadosListaPrecosSap={dadosListaPrecosSap} />
+
+      <ActionListaProdutoEtiqueta 
+        dadosListaPrecosSap={dadosListaPrecosSap} 
+      />
     </Fragment>
   )
 }

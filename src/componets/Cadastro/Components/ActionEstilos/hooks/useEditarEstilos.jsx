@@ -55,7 +55,7 @@ export const useEditarEstilos = ({dadosDetalheEstilos, handleClose, handleClick,
         if(optionsModulos[0]?.ALTERAR == 'False') {
             Swal.fire({
                 title: 'Erro!',
-                text: `${usuarioLogado?.NOFUNCIONARIO},\nVocê não tem permissão para alterar o Estilo!`,
+                html: `${usuarioLogado?.NOFUNCIONARIO}, <br/> Você não tem permissão para alterar o Estilo!`,
                 icon: 'error',
                 customClass: {
                     container: 'custom-swal',
@@ -78,7 +78,7 @@ export const useEditarEstilos = ({dadosDetalheEstilos, handleClose, handleClick,
 
             const response = await put('/listaEstilos/:id', postData)
             const textDados = JSON.stringify(postData)
-            let textFuncao = 'COMPRAS / ATUALIZAÇÃO DE ESTILOS';
+            let textFuncao = 'CADASTRO / ATUALIZAÇÃO DE ESTILOS';
             const ip = await getIPUsuario();
 
             const createtLog = {
@@ -106,7 +106,7 @@ export const useEditarEstilos = ({dadosDetalheEstilos, handleClose, handleClick,
 
         } catch (error) {
             const textDados = JSON.stringify(postData)
-            let textFuncao = 'COMPRAS / ERRO AO ATUALIZAR ESTILOS';
+            let textFuncao = 'CADASTRO / ERRO AO ATUALIZAR ESTILOS';
             const ip = await getIPUsuario();
             const createtLog = {
                 IDFUNCIONARIO: String(usuarioLogado.id),

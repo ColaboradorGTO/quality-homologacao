@@ -102,8 +102,8 @@ export const DashBoardCadastro = () => {
     case "/cadastro/ActionPesquisaAlteracaoPreco":
       component = <ActionPesquisaAlteracaoPreco usuarioLogado={usuarioLogado} />;
       break;
-    case "/cadastro/ActionPesquisaPreco":
-      component = <ActionPesquisaPreco usuarioLogado={usuarioLogado} />;
+    case "/cadastro/ActionPesquisaProdutoEtiqueta":
+      component = <ActionPesquisaProdutoEtiqueta usuarioLogado={usuarioLogado} />;
       break;
     default:
       component = null;

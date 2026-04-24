@@ -138,7 +138,7 @@ export const ActionListaProdutoEtiqueta = ({ dadosListaPrecosSap }) => {
   return (
 
     <Fragment>
-      <div className="panel" style={{ marginTop: "10rem" }}>
+      <div className="panel" >
         <div className="panel-hdr">
           <h2>Lista de Produtos</h2>
         </div>
@@ -147,7 +147,7 @@ export const ActionListaProdutoEtiqueta = ({ dadosListaPrecosSap }) => {
           <DataTable
             title="Vendas por Loja"
             value={dados}
-            // header={header}
+           
             selectionMode={'single'}
             sortField="VRTOTALPAGO"
             sortOrder={-1}
