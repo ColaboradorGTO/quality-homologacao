@@ -1,9 +1,9 @@
 import { Fragment } from "react"
 import { Modal } from "react-bootstrap"
 import { HeaderModal } from "../../../../Modais/HeaderModal/HeaderModal";
-import { FormularioCadastrarEstilos} from "./formularioCadastrar";
+import { Formulario } from "./formulario";
 
-export const ActionCadastrarEstilosModal = ({ show, handleClose }) => {
+export const ActionCadastrarEstilosModal = ({ show, handleClose, usuarioLogado, optionsModulos, handleClick }) => {
  
   return (
     <Fragment>
@@ -16,12 +16,17 @@ export const ActionCadastrarEstilosModal = ({ show, handleClose }) => {
       >
         <HeaderModal
           title={"Estilos"}
-          subTitle={" Alteração"}
+          subTitle={"Cadastrar Estilos"}
           handleClose={handleClose}
         />
 
         <Modal.Body>
-          <FormularioCadastrarEstilos   />
+          <Formulario
+            handleClose={handleClose}
+            handleClick={handleClick}
+            usuarioLogado={usuarioLogado}
+            optionsModulos={optionsModulos}
+          />
         </Modal.Body>
 
       </Modal>

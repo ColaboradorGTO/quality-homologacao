@@ -10,11 +10,13 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../../Tables/headerTable";
+import Swal from "sweetalert2";
 
-export const ActionListaEstilos = ({ dadosListaEstilos }) => {
+export const ActionListaEstilos = ({ dadosListaEstilos, handleClick, usuarioLogado, optionsModulos }) => {
   const [modalEditar, setModalEditar] = useState(false);
   const [dadosDetalheEstilos, setDadosDetalheEstilos] = useState([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
 
 
@@ -66,7 +68,7 @@ export const ActionListaEstilos = ({ dadosListaEstilos }) => {
       contador,
       DS_ESTILOS: item.DS_ESTILOS,
       COD_GRUPOESTILOS: `${item.COD_GRUPOESTILOS} - ${item.DS_GRUPOESTILOS}`,
-      STATIVO: item.STATIVO,
+      STATIVO: item.STATIVO == 'True' ? 'ATIVO' : 'INATIVO',
       ID_ESTILOS: item.ID_ESTILOS,
     }
   })
@@ -99,7 +101,7 @@ export const ActionListaEstilos = ({ dadosListaEstilos }) => {
       header: 'Situação',
       body: row => {
         return (
-          <th style={{ color: row.STATIVO == 'True' ? 'blue' : 'red' }} >{row.STATIVO == 'True' ? 'ATIVO' : 'INATIVO'}</th>
+          <th style={{ color: row.STATIVO == 'ATIVO' ? 'blue' : 'red' }} >{row.STATIVO}</th>
         )
       },
       sortable: true,
@@ -118,7 +120,8 @@ export const ActionListaEstilos = ({ dadosListaEstilos }) => {
               Icon={CiEdit}
               iconSize={22}
               iconColor={"#fff"}
-
+              width="35px"
+              height="35px"
             />
           </div>
         )
@@ -136,8 +139,16 @@ export const ActionListaEstilos = ({ dadosListaEstilos }) => {
   const handleEditar = async (ID_ESTILOS) => {
     try {
       const response = await get(`/listaEstilos?idEstilo=${ID_ESTILOS}`);
-      setDadosDetalheEstilos(response.data);
-      setModalEditar(true)
+      if (response.data && response.data.length > 0) {
+        setDadosDetalheEstilos(response.data);
+        setModalEditar(true)
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Atenção',
+          text: 'Detalhes do estilo não encontrados.',
+        });
+      }
     } catch (error) {
       console.error(error);
     }
@@ -146,9 +157,9 @@ export const ActionListaEstilos = ({ dadosListaEstilos }) => {
   return (
     <Fragment>
       <div className="panel">
-      <div className="panel-hdr">
-        <h2>Lista de Estilos</h2>
-      </div>
+        <div className="panel-hdr">
+          <h2>Lista de Estilos</h2>
+        </div>
         <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
           <HeaderTable
             globalFilterValue={globalFilterValue}
@@ -163,11 +174,18 @@ export const ActionListaEstilos = ({ dadosListaEstilos }) => {
           <DataTable
             title="Vendas por Loja"
             value={dados}
+            globalFilter={globalFilterValue}
             size="small"
+            selectionMode="single"
+            selection={rowSelection}
+            onSelectionChange={(e) => setRowSelection(e.value)}
             sortOrder={-1}
             paginator={true}
             rows={10}
             rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+            filterDisplay="menu"
             showGridlines
             stripedRows
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado </div>}
@@ -181,19 +199,22 @@ export const ActionListaEstilos = ({ dadosListaEstilos }) => {
                 body={coluna.body}
                 footer={coluna.footer}
                 sortable={coluna.sortable}
-                headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+                headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '1rem' }}
                 footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
-                bodyStyle={{ fontSize: '0.8rem' }}
+                bodyStyle={{ fontSize: '1rem' }}
 
               />
             ))}
           </DataTable>
+        </div>
       </div>
-    </div>
       <ActionEditarEstilosModal
         show={modalEditar}
         handleClose={() => setModalEditar(false)}
         dadosDetalheEstilos={dadosDetalheEstilos}
+        usuarioLogado={usuarioLogado}
+        optionsModulos={optionsModulos}
+        handleClick={handleClick}
       />
     </Fragment>
   )

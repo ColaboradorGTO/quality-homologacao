@@ -162,7 +162,7 @@ export const ActionPesquisaEstilos = ({ usuarioLogado }) => {
 
       <ActionCadastrarEstilosModal
         show={modalVisivel}
-        handleClose={handleClose}
+        handleClose={() => setModalVisivel(false)}
         usuarioLogado={usuarioLogado}
         optionsModulos={optionsModulos}
         handleClick={handleClick}
