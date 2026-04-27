@@ -267,5 +267,10 @@
     { "value": "True", "label": "CANCELADA" },
     { "value": "False", "label": "EM ESPERA" },
     { "value": "FINALIZADA", "label": "FINALIZADA" }
+  ],
+  "optionsSap": [
+    { "value": "0", "label": "Todas" },
+    { "value": "1", "label": "Migradas SAP" },
+    { "value": "2", "label": "Não Migradas SAP" }
   ]
 }

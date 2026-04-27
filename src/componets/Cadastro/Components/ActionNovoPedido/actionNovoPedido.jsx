@@ -450,17 +450,15 @@ export const ActionNovoPedido = ({dadosVisualizarPedido, dadosDetalhePedido}) =>
 
 
 
-      <div id="resultadoListaPdido"
-        style={{ backgroundColor: "#fff", padding: "15px" }}
-      >
+      <div id="resultadoListaPdido">
 
         <ActionListaNovoPedido dadosVisualizarPedido={dadosVisualizarPedido} dadosDetalhe={dadosDetalhe} />
 
       </div>
 
-      {tabelaCadastroProduto && (
+      {/* {tabelaCadastroProduto && (
         <ActionListaProdutosParaCadastro dadosProdutosPedidos={dadosProdutosPedidos}/>
-      )}
+      )} */}
 
       
       <ActionPDFPedido 

@@ -116,6 +116,7 @@ export const useIncluirProduto = ({
         async () => { const response = await get(`/localExposicao`);  return response.data},
         { enabled: true }
     );
+    
     const { data: dadosGrade  = [], error: errorGrade, isLoading: isLoadingGrade, refetch: refetchGrade } = useQuery(
         'vinculo-tamanho-categoria',
         async () => { 

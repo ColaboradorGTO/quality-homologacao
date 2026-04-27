@@ -5,6 +5,8 @@ import { post, put } from "../api/funcRequest";
 import { useNavigate } from "react-router-dom";
 import { toFloat } from "../utils/toFloat";
 import { useFetchData } from "../../../hooks/useFetchData";
+import { get } from "../../../../../api/funcRequest";
+import { useQuery } from "react-query";
 
 
 export const useEditarProdutoPedido = (dadosDetalheRecebimentos) => {
@@ -33,17 +35,98 @@ export const useEditarProdutoPedido = (dadosDetalheRecebimentos) => {
     const [estoque, setEstoque] = useState('')
     const [observacao, setObservacao] = useState('')
 
-    const { data: dadosUnidadeMedida = [] } = useFetchData('unidadeMedida', '/unidadeMedida');
-    const { data: dadosTamanhos = [] } = useFetchData('tamanhos', '/tamanhos');
-    const { data: dadosCores = [] } = useFetchData('listaCores', '/listaCores');
-    const { data: dadosTipoTecidos = [] } = useFetchData('tipoTecidos', '/tipoTecidos');
-    const { data: dadosCategoriaPedidos = [] } = useFetchData('categoriaPedidos', '/categoriaPedidos');
-    const { data: dadosCategoriasProdutos = [] } = useFetchData('categoriasProdutos', '/categoriasProdutos');
-    const { data: dadosExposicao = [] } = useFetchData('localExposicao', '/localExposicao');
-    const { data: dadosTipoProdutos = [] } = useFetchData('tipoProduto', '/tipoProduto');
-    const { data: dadosTipoFiscalProdutos = [] } = useFetchData('tipoFiscalProduto', '/tipoFiscalProduto');
+   
+    const { data: dadosUnidadeMedida = [], error: errorUnidadeMedida, isLoading: isLoadingUnidadeMedida, refetch: refetchUnidadeMedida } = useQuery(
+        'unidadeMedida',
+        async () => { 
+            const response = await get(`/unidadeMedida`); 
+            return response.data
+        },
+        { enabled: true }
+    );
     
-    const { data: dadosProdutos = [] } = useFetchData('consultaProdutos', '/consultaProdutos');
+    const { data: dadosCores = [], error: errorCores, isLoading: isLoadingCores, refetch: refetchCores } = useQuery(
+        'listaCores',
+        async () => { 
+            const response = await get(`/listaCores`); 
+            return response.data 
+        },
+        { enabled: true }
+    );
+    
+    const { data: dadosLocalExposicao  = [], error: errorLocalExposicao, isLoading: isLoadingLocalExposicao, refetch: refetchLocalExposicao } = useQuery(
+        'localExposicao',
+        async () => { 
+            const response = await get(`/localExposicao`);  
+            return response.data
+        },
+        { enabled: true }
+    );
+
+    const { data: dadosTamanho  = [], error: errorTamanho, isLoading: isLoadingTamanho, refetch: refetchTamanho } = useQuery(
+        'tamanho',
+        async () => { 
+            const response = await get(`/tamanho`);  
+            return response.data
+        },
+        { enabled: true }
+    );
+  
+    const { data: dadosTipoTecidos  = [], error: errorTipoTecidos, isLoading: isLoadingTipoTecidos, refetch: refetchTipoTecidos } = useQuery(
+        'tipoTecidos',
+        async () => { 
+            const response = await get(`/tipoTecidos`);  
+            return response.data
+        },
+        { enabled: true }
+    );
+    
+    const { data: dadosCategoriaPedidos  = [], error: errorCategoriaPedidos, isLoading: isLoadingCategoriaPedidos, refetch: refetchCategoriaPedidos } = useQuery(
+        'categoriaPedidos',
+        async () => { 
+            const response = await get(`/categoriaPedidos`);  
+            return response.data
+        },
+        { enabled: true }
+    );
+
+    const { data: dadosCategoriasProdutos  = [], error: errorCategoriasProdutos, isLoading: isLoadingCategoriasProdutos, refetch: refetchCategoriasProdutos } = useQuery(
+        'categoriasProdutos',
+        async () => { 
+            const response = await get(`/categoriasProdutos`);  
+            return response.data
+        },
+        { enabled: true }
+    );
+
+    const { data: dadosTipoProdutos  = [], error: errorTipoProdutos, isLoading: isLoadingTipoProdutos, refetch: refetchTipoProdutos } = useQuery(
+        'tipoProdutos',
+        async () => { 
+            const response = await get(`/tipoProdutos`);  
+            return response.data
+        },
+        { enabled: true }
+    );
+    
+    const { data: dadosTipoFiscalProdutos  = [], error: errorTipoFiscalProdutos, isLoading: isLoadingTipoFiscalProdutos, refetch: refetchTipoFiscalProdutos } = useQuery(
+        'tipoFiscalProduto',
+        async () => { 
+            const response = await get(`/tipoFiscalProduto`);  
+            return response.data
+        },
+        { enabled: true }
+    );
+   
+    const { data: dadosProdutos  = [], error: errorConsultaProdutos, isLoading: isLoadingConsultaProdutos, refetch: refetchConsultaProdutos } = useQuery(
+        'consultaProdutos',
+        async () => { 
+            const response = await get(`/consultaProdutos`);  
+            return response.data
+        },
+        { enabled: true }
+    );
+
+
     
     const handleCategoriaProduto = (e) => {
         setCategoriaProdutoSelecionado(e.value)

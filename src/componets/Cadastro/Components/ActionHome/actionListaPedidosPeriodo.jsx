@@ -23,20 +23,35 @@ import { useEnviarPedidoCompras } from "./hooks/useEnviarPedidoCompras";
 import { useMigrarPedidoSap } from "./hooks/useMigrarPedidoSap";
 import { ActionEditarNovoPedido } from "../ActionNovoPedido/actionEditarNovoPedido";
 
-export const ActionListaPedidosPeriodo = ({ dadosListaPedidos, tabelaPedidoPeriodo, setTabelaPedidoPeriodo }) => {
+export const ActionListaPedidosPeriodo = ({ 
+  dadosListaPedidos, 
+  dadosVisualizarPedido,
+  setDadosVisualizarPedido,
+  setDadosDetalhePedido,
+  dadosDetalhePedido, 
+  setActionVisualizarPedido,
+  setActionPedidoResumido,
+  actionHome,
+  setActionHome,
+  actionVisualizarPedido,
+  actionEditarPedido,
+  setActionEditarPedido,
+  actionPedidoResumido,
+}) => {
   const [modalPedidoNota, setModalPedidoNota] = useState(false);
   const [modalPedidoNotaSemPreco, setModalPedidoNotaSemPreco] = useState(false);
   const [dadosPedido, setDadosPedido] = useState([]);
   const [dadosPedidoSemPreco, setDadosPedidoSemPreco] = useState([]);
-  const [dadosDetalhePedido, setDadosDetalhePedido] = useState([]);
+
   const [dadosDetalheProdutoPedido, setDadosDetalheProdutoPedido] = useState([]);
-  const [dadosVisualizarPedido, setDadosVisualizarPedido] = useState([]);
+
   const [dadosEditarPedido, setDadosEditarPedido] = useState([]);
   const [dadosReceberPedido, setDadosReceberPedido] = useState([]);
   const [dadosEnviarComprasADM, setDadosEnviarComprasADM] = useState([]);
-  const [actionVsualizarPedido, setActionVisualizarPedido] = useState(false);
-  const [actionEditarPedido, setActionEditarPedido] = useState(false);
+ 
+ 
   const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
 
   const { enviarPedidoComprasADM } = useEnviarPedidoComprasADM();
@@ -276,6 +291,8 @@ export const ActionListaPedidosPeriodo = ({ dadosListaPedidos, tabelaPedidoPerio
                     iconSize={20}
                     onClickButton={() => handleClickEditarPedido(row)}
                     titleButton={"Editar Pedido"}
+                    width="30px"
+                    height="30px"
                   />
                 </div>
                 <div className="p-1">
@@ -286,6 +303,8 @@ export const ActionListaPedidosPeriodo = ({ dadosListaPedidos, tabelaPedidoPerio
                     iconSize={20}
                     onClickButton={() => handleClickImprimir(row)}
                     titleButton={"Imprimir Pedido Com Preço de Venda"}
+                    width="30px"
+                    height="30px"
                   />
                 </div>
                 <div className="p-1">
@@ -296,6 +315,8 @@ export const ActionListaPedidosPeriodo = ({ dadosListaPedidos, tabelaPedidoPerio
                     iconSize={20}
                     onClickButton={() => handleClickImprimirSempreco(row)}
                     titleButton={"Imprimir Pedido Sem Preço de Venda"}
+                    width="30px"
+                    height="30px"
                   />
                 </div>
                 <div className="p-1">
@@ -306,6 +327,8 @@ export const ActionListaPedidosPeriodo = ({ dadosListaPedidos, tabelaPedidoPerio
                     iconSize={20}
                     onClickButton={() => handleClickEnviarCompras(row)}
                     titleButton={"Enviar Compras para Ajuste"}
+                    width="30px"
+                    height="30px"
                   />
                 </div>
               </div>
@@ -324,6 +347,8 @@ export const ActionListaPedidosPeriodo = ({ dadosListaPedidos, tabelaPedidoPerio
                     iconSize={20}
                     onClickButton={() => handleClickVisualizarPedido(row)}
                     titleButton={"Visualizar Pedido"}
+                    width="30px"
+                    height="30px"
                   />
                 </div>
                 <div className="p-1">
@@ -334,6 +359,8 @@ export const ActionListaPedidosPeriodo = ({ dadosListaPedidos, tabelaPedidoPerio
                     iconSize={20}
                     onClickButton={() => handleClickEnviarComprasADM(row)}
                     titleButton={"Enviar Compras Adm para Cancelar"}
+                    width="30px"
+                    height="30px"
                   />
                 </div>
                 <div className="p-1">
@@ -344,6 +371,8 @@ export const ActionListaPedidosPeriodo = ({ dadosListaPedidos, tabelaPedidoPerio
                     iconSize={20}
                     onClickButton={() => handleClickImprimir(row)}
                     titleButton={"Imprimir Pedido Com Preço de Venda"}
+                    width="30px"
+                    height="30px"
                   />
                 </div>
                 <div className="p-1">
@@ -354,6 +383,8 @@ export const ActionListaPedidosPeriodo = ({ dadosListaPedidos, tabelaPedidoPerio
                     iconSize={20}
                     onClickButton={() => handleClickImprimirSempreco(row)}
                     titleButton={"Imprimir Pedido Sem Preço de Venda"}
+                    width="30px"
+                    height="30px"
                   />
                 </div>
                 <div className="p-1">
@@ -364,6 +395,8 @@ export const ActionListaPedidosPeriodo = ({ dadosListaPedidos, tabelaPedidoPerio
                     iconSize={20}
                     onClickButton={() => handleClickReceberPedido(row)}
                     titleButton={"Recepção de Mercadoria do Pedido"}
+                    width="30px"
+                    height="30px"
                   />
                 </div>
                 <div className="p-1">
@@ -374,6 +407,8 @@ export const ActionListaPedidosPeriodo = ({ dadosListaPedidos, tabelaPedidoPerio
                     iconSize={20}
                     onClickButton={() => handleClickEnviarCompras(row)}
                     titleButton={"Enviar Compras para Ajuste"}
+                    width="30px"
+                    height="30px"
                   />
                 </div>
                 <div className="p-1">
@@ -384,6 +419,8 @@ export const ActionListaPedidosPeriodo = ({ dadosListaPedidos, tabelaPedidoPerio
                     iconSize={20}
                     onClickButton={() => handleClickMigrarPedido(row)}
                     titleButton={"Migrar Pedido SAP"}
+                    width="30px"
+                    height="30px"
                   />
                 </div>
               </div>
@@ -402,6 +439,8 @@ export const ActionListaPedidosPeriodo = ({ dadosListaPedidos, tabelaPedidoPerio
                   iconSize={20}
                   onClickButton={() => handleClickVisualizarPedido(row)}
                   titleButton={"Visualizar o Pedido"}
+                  width="30px"
+                  height="30px"
                 />
               </div>
               <div className="p-1">
@@ -412,6 +451,8 @@ export const ActionListaPedidosPeriodo = ({ dadosListaPedidos, tabelaPedidoPerio
                   iconSize={20}
                   onClickButton={() => handleClickImprimir(row)}
                   titleButton={"Imprimir Pedido Com Preço de Venda"}
+                  width="30px"
+                  height="30px"
                 />
               </div>
               <div className="p-1">
@@ -422,6 +463,8 @@ export const ActionListaPedidosPeriodo = ({ dadosListaPedidos, tabelaPedidoPerio
                   iconSize={20}
                   onClickButton={() => handleClickImprimirSempreco(row)}
                   titleButton={"Imprimir Pedido Sem Preço de Venda"}
+                  width="30px"
+                  height="30px"
                 />
               </div>
             </div>
@@ -440,6 +483,8 @@ export const ActionListaPedidosPeriodo = ({ dadosListaPedidos, tabelaPedidoPerio
                   iconSize={20}
                   onClickButton={() => handleClickVisualizarPedido(row)}
                   titleButton={"Visualizar o Pedido"}
+                  width="30px"
+                  height="30px"
                 />
               </div>
               <div className="p-1">
@@ -450,6 +495,8 @@ export const ActionListaPedidosPeriodo = ({ dadosListaPedidos, tabelaPedidoPerio
                   iconSize={20}
                   onClickButton={() => handleClickImprimir(row)}
                   titleButton={"Imprimir Pedido Com Preço de Venda"}
+                  width="30px"
+                  height="30px"
                 />
               </div>
               <div className="p-1">
@@ -460,6 +507,8 @@ export const ActionListaPedidosPeriodo = ({ dadosListaPedidos, tabelaPedidoPerio
                   iconSize={20}
                   onClickButton={() => handleClickImprimirSempreco(row)}
                   titleButton={"Imprimir Pedido Sem Preço de Venda"}
+                  width="30px"
+                  height="30px"
                 />
               </div>
             </div>
@@ -551,7 +600,9 @@ export const ActionListaPedidosPeriodo = ({ dadosListaPedidos, tabelaPedidoPerio
         setDadosVisualizarPedido(response.data)
         setDadosDetalhePedido(responseDetlhe.data)
         setActionVisualizarPedido(true)
-        setTabelaPedidoPeriodo(false)
+        setActionEditarPedido(false)
+        setActionHome(false)
+        setActionPedidoResumido(false)
       }
     } catch (error) {
       console.log(error, "não foi possivel pegar os dados da tabela ")
@@ -561,21 +612,20 @@ export const ActionListaPedidosPeriodo = ({ dadosListaPedidos, tabelaPedidoPerio
   const handleClickVisualizarPedido = async (row) => {
     if (row.IDPEDIDO) {
       handleVisualizarPedido(row.IDPEDIDO)
-      setActionVisualizarPedido(true)
     }
   }
 
   const handleEditarPedido = async (IDPEDIDO) => {
     try {
-      // const response = await get(`/lista-pedidos?idPedido=${IDPEDIDO}`)
+      const response = await get(`/lista-pedidos?idPedido=${IDPEDIDO}`)
       const responseDetlhe = await get(`/lista-detalhe-pedidos?idPedido=${IDPEDIDO}`)
-      if (responseDetlhe.data) {
-        // setDadosEditarPedido(response.data)
+      if (response.data && responseDetlhe.data) {
+        setDadosVisualizarPedido(response.data)
         setDadosDetalhePedido(responseDetlhe.data)
         setActionEditarPedido(true)
-        setTabelaPedidoPeriodo(false)
-        console.log(response.data, "responseDetalhe.data")
-
+        setActionVisualizarPedido(false)
+        setActionHome(false)
+        setActionPedidoResumido(false)
       }
     } catch (error) {
       console.log(error, "não foi possivel pegar os dados da tabela ")
@@ -585,7 +635,6 @@ export const ActionListaPedidosPeriodo = ({ dadosListaPedidos, tabelaPedidoPerio
   const handleClickEditarPedido = async (row) => {
     if (row && row.IDPEDIDO) {
       handleEditarPedido(row.IDPEDIDO)
-      setActionEditarPedido(true)
     }
   }
 
@@ -671,54 +720,59 @@ export const ActionListaPedidosPeriodo = ({ dadosListaPedidos, tabelaPedidoPerio
 
   return (
     <Fragment>
-      {tabelaPedidoPeriodo && (
-
-        <div className="panel">
-
-          <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
-            <HeaderTable
-              globalFilterValue={globalFilterValue}
-              onGlobalFilterChange={onGlobalFilterChange}
-              handlePrint={handlePrint}
-              exportToExcel={exportToExcel}
-              exportToPDF={exportToPDF}
-            />
-
-          </div>
-          <div className="card mb-4" ref={dataTableRef}>
-
-          <DataTable
-            title="Vendas por Loja"
-            value={dadosPedidos}
-            globalFilter={globalFilterValue}
-            size="small"
-            sortOrder={-1}
-            paginator={true}
-            rows={10}
-            rowsPerPageOptions={[5, 10, 20, 50]}
-            showGridlines
-            stripedRows
-            emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
-          >
-            {colunasPedidos.map(coluna => (
-              <Column
-                key={coluna.field}
-                field={coluna.field}
-                header={coluna.header}
-                body={coluna.body}
-                footer={coluna.footer}
-                sortable={coluna.sortable}
-                headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
-                footerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
-                bodyStyle={{ fontSize: '0.8rem' }}
-
-              />
-            ))}
-          </DataTable>
-          </div>
+      <div className="panel">
+        <div className="panel-hdr">
+          <h2>Pedidos por Período</h2>
         </div>
+        <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
+          <HeaderTable
+            globalFilterValue={globalFilterValue}
+            onGlobalFilterChange={onGlobalFilterChange}
+            handlePrint={handlePrint}
+            exportToExcel={exportToExcel}
+            exportToPDF={exportToPDF}
+          />
 
-      )}
+        </div>
+        <div className="card mb-4" ref={dataTableRef}>
+
+        <DataTable
+          title="Pedidos por Período"
+          value={dadosPedidos}
+          globalFilter={globalFilterValue}
+          size="small"
+          selectionMode="single"
+          selection={rowSelection}
+          onSelectionChange={(e) => setRowSelection(e.value)}
+          sortOrder={-1}
+          paginator={true}
+          rows={10}
+          rowsPerPageOptions={[10, 20, 30, 50, 100, dadosPedidos.length]}
+          paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+          currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+          filterDisplay="menu"
+          showGridlines
+          stripedRows
+          emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
+        >
+          {colunasPedidos.map(coluna => (
+            <Column
+              key={coluna.field}
+              field={coluna.field}
+              header={coluna.header}
+              body={coluna.body}
+              footer={coluna.footer}
+              sortable={coluna.sortable}
+              headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+              footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem' }}
+              bodyStyle={{ fontSize: '0.8rem' }}
+
+            />
+          ))}
+        </DataTable>
+        </div>
+      </div>
+
       <ActionPDFPedido 
         show={modalPedidoNota}
         handleClose={() => setModalPedidoNota(false)}
@@ -734,18 +788,6 @@ export const ActionListaPedidosPeriodo = ({ dadosListaPedidos, tabelaPedidoPerio
         dadosDetalhePedido={dadosDetalhePedido}
       />
 
-      {actionVsualizarPedido && (
-        
-        <ActionNovoPedido dadosVisualizarPedido={dadosVisualizarPedido} dadosDetalhePedido={dadosDetalhePedido} />
-      )}
-
-      {actionEditarPedido && (
-
-        <ActionEditarNovoPedido
-          dadosEditarPedido={dadosEditarPedido}
-          dadosDetalhePedido={dadosDetalhePedido}
-        />
-      )}
     
     </Fragment >
   )

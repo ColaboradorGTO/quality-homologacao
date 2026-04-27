@@ -25,22 +25,32 @@ export const useMigrarPedidoSap = (dadosDetalheProdutoPedido) => {
     }
   }, [navigate]);
 
-  useEffect(() => {
-    getIPUsuario();
-  }, [usuarioLogado]);
-  
   const getIPUsuario = async () => {
-    const response = await axios.get('http://ipwho.is/')
-    if (response.data) {
-      setIpUsuario(response.data.ip);
+    let usuarioIP = null;
+
+    try {
+      const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+      usuarioIP = ipWhoisData?.ip;
+    } catch (error) {
+      console.error("Erro ao buscar IP via ifconfig.me:", error);
     }
-    return response.data;
-  }
+
+    if (!usuarioIP) {
+      try {
+        const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+        usuarioIP = ipifyData?.ip;
+      } catch (error) {
+        console.error("Erro ao buscar IP via ipify.org:", error);
+      }
+    }
+    setIpUsuario(usuarioIP);
+    return usuarioIP;
+  };
 
 
   const migrarPedidoSap = async (IDRESUMOPEDIDIO) => {
-  
-    if(dadosDetalheProdutoPedido.data.length >  0) {
+
+    if (dadosDetalheProdutoPedido.data.length > 0) {
       Swal.fire({
         title: `Existe Produtos do Pedido: ${dadosDetalheProdutoPedido[0]?.IDPEDIDO} que não foram Migrados para o SAP`,
         icon: "warning",
@@ -48,7 +58,7 @@ export const useMigrarPedidoSap = (dadosDetalheProdutoPedido) => {
         timer: 3000
       });
 
-    } 
+    }
 
     try {
       Swal.fire({
@@ -68,7 +78,7 @@ export const useMigrarPedidoSap = (dadosDetalheProdutoPedido) => {
       }).then(async (result) => {
         if (result.isConfirmed) {
           try {
-            const putData = {  
+            const putData = {
               IDRESUMOPEDIDIO: parseInt(IDRESUMOPEDIDIO),
             }
 
@@ -76,33 +86,33 @@ export const useMigrarPedidoSap = (dadosDetalheProdutoPedido) => {
 
             const textDados = JSON.stringify(putData)
             let textoFuncao = 'CADASTRO/MIGRAR PEDIDO SAP';
-          
-            const postData = {  
+
+            const postData = {
               IDFUNCIONARIO: usuarioLogado.id,
-              PATHFUNCAO:  textoFuncao,
+              PATHFUNCAO: textoFuncao,
               DADOS: textDados,
               IP: ipUsuario
             }
-    
+
             const responsePost = await post('/log-web', postData)
-        
+
             Swal.fire({
-              title: 'Sucesso', 
-              text: 'Pedido Migrado com Sucesso', 
+              title: 'Sucesso',
+              text: 'Pedido Migrado com Sucesso',
               icon: 'success'
             })
-  
+
             return responsePost;
-          } catch(error) {
+          } catch (error) {
             let textoFuncao = 'CADASTRO/ERRO AO MIGRAR PEDIDO SAP';
-          
-            const postData = {  
+
+            const postData = {
               IDFUNCIONARIO: usuarioLogado.id,
-              PATHFUNCAO:  textoFuncao,
+              PATHFUNCAO: textoFuncao,
               DADOS: 'ERRO AO MIGRAR PEDIDO SAP',
               IP: ipUsuario
             }
-  
+
             const responsePost = await post('/log-web', postData)
 
             return responsePost.data;
@@ -110,19 +120,19 @@ export const useMigrarPedidoSap = (dadosDetalheProdutoPedido) => {
 
         }
       })
-        
-      
+
+
     } catch (error) {
       Swal.fire({
-          icon: "error",
-          title: "Erro ao Enviar Pedido para o SAP!",
-          text: "Erro ao subir o pedido para o SAP, tente novamente!",
+        icon: "error",
+        title: "Erro ao Enviar Pedido para o SAP!",
+        text: "Erro ao subir o pedido para o SAP, tente novamente!",
       });
     }
     // try {
-        
-        
-        
+
+
+
     //   const response = await post(`/incluir-atualizar-produto-pedido?codProdutoPedido=${dadosDetalheProdutoPedido[0]?.IDPEDIDO}`);
 
     //   const postData  = {
@@ -133,13 +143,13 @@ export const useMigrarPedidoSap = (dadosDetalheProdutoPedido) => {
     //   }
     //   // Registra o log da ação
     //   const responsePost = await post("/log-web", postData);
-      
+
     //   await Swal.fire({
     //       icon: "success",
     //       title: "Pedido Enviado!",
     //       text: "O pedido Migrado com sucesso.",
     //   });
-      
+
     //   return responsePost.data;
     // } catch (error) {
     //     Swal.fire({
