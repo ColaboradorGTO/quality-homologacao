@@ -27,17 +27,27 @@ export const useEnviarPedidoCompras = () => {
         }
       }, [navigate]);
     
-      useEffect(() => {
-        getIPUsuario();
-      }, [usuarioLogado]);
-    
-      const getIPUsuario = async () => {
-        const response = await axios.get('http://ipwho.is/')
-        if (response.data) {
-            setIpUsuario(response.data.ip);
+    const getIPUsuario = async () => {
+        let usuarioIP = null;
+
+        try {
+        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+        usuarioIP = ipWhoisData?.ip;
+        } catch (error) {
+        console.error("Erro ao buscar IP via ifconfig.me:", error);
         }
-        return response.data;
-    }
+
+        if (!usuarioIP) {
+        try {
+            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+            usuarioIP = ipifyData?.ip;
+        } catch (error) {
+            console.error("Erro ao buscar IP via ipify.org:", error);
+        }
+        }
+        setIpUsuario(usuarioIP);
+        return usuarioIP;
+    };
 
 
     const enviarPedidoCompras = async (IDPEDIDO) => {

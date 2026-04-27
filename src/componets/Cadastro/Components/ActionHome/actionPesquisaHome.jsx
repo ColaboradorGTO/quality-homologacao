@@ -197,9 +197,9 @@ export const ActionPesquisaHome = ({ usuarioLogado }) => {
   };
 
   const { data: dadosListaPedidos = [], error: errorPedido, isLoading: isLoadingPedido, refetch: refetchListaPedidos } = useQuery(
-    ['listaTodosPedidos',],
+    ['lista-pedidos',],
     () => fetchListaPedidos(),
-    { enabled: false, cacheTime: 5 * 60 * 1000 }
+    { enabled: true, cacheTime: 5 * 60 * 1000 }
   );
 
   const fetchPedidosResumido = async () => {
@@ -499,6 +499,7 @@ export const ActionPesquisaHome = ({ usuarioLogado }) => {
         <ActionListaProdutosCriados dadosListaProdutosCriados={dadosListaProdutosCriados} />
       )}
 
+      
       {actionVisualizarPedido && (
         
         <ActionNovoPedido 
@@ -520,6 +521,8 @@ export const ActionPesquisaHome = ({ usuarioLogado }) => {
           dadosDetalhePedido={dadosDetalhePedido}
         />
       )}
+
+     
     </Fragment>
   )
 }

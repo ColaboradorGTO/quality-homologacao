@@ -4,7 +4,7 @@ import { formatMoeda } from "../../../../../utils/formatMoeda"
 import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
 import { ActionListaDetalhe } from "./actionListaDetalhe";
 
-export const ActionNotaPDF = ({ dadosPedido, dadosDetalhesPedidos }) => {
+export const ActionNotaPDF = ({ dadosPedidos, dadosDetalhesPedidos }) => {
 
     const styles = StyleSheet.create({
         page: { padding: 30 },
@@ -13,7 +13,7 @@ export const ActionNotaPDF = ({ dadosPedido, dadosDetalhesPedidos }) => {
     });
 
  
-    const dados = dadosPedido.map((item, index) => {
+    const dados = dadosPedidos?.map((item, index) => {
         let dsTipoFretePedido = '';
         let dsTipoFiscalPedido = '';
         let dsTipoArquivoPedido = '';
@@ -259,7 +259,7 @@ export const ActionNotaPDF = ({ dadosPedido, dadosDetalhesPedidos }) => {
                     </tbody>
                 </table>
 
-                 <ActionListaDetalhe dadosPedido={dadosPedido} />
+                 <ActionListaDetalhe dadosPedidos={dadosPedidos} />
             </div>
         </Fragment>
     )

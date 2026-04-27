@@ -70,7 +70,7 @@ export const ActionProdutoPedidoModal = ({ show, handleClose, dadosItemPedido })
   const { data: dadosUnidadeMedida = [] } = useFetchData('unidadeMedida', '/unidadeMedida');
   const { data: dadosCores = [] } = useFetchData('listaCores', '/listaCores');
   const { data: dadosTipoTecido = [] } = useFetchData('tipo-tecido', '/tipo-tecido');
-  const { data: dadosCategorias = [] } = useFetchData('categorias', '/categorias');
+  const { data: dadosCategorias = [] } = useFetchData('categoriasProdutos', '/categoriasProdutos');
   const { data: dadosLocalExposicao = [] } = useFetchData('localExposicao', '/localExposicao');
 
   const groupedCores = dadosCores.reduce((acc, item) => {

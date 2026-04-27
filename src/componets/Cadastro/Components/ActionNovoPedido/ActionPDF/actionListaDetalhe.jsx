@@ -7,10 +7,10 @@ import { ColumnGroup } from "primereact/columngroup";
 import { Row } from "primereact/row";
 
 //  ERRO RETORNAR AQUI PARA FAZER A TABELA DA FORMA CORRETA
-export const ActionListaDetalhe = ({ dadosPedido }) => {
+export const ActionListaDetalhe = ({ dadosPedidos }) => {
+  console.log(dadosPedidos, 'dadosPedidos') // DEBUG
 
-
-  const dados = dadosPedido.map((item, index) => {
+  const dados = dadosPedidos?.map((item, index) => {
     let contador = index + 1;
  
     return {

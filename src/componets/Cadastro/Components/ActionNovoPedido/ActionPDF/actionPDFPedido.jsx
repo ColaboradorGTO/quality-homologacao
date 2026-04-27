@@ -6,7 +6,7 @@ import { FooterModal } from "../../../../Modais/FooterModal/footerModal";
 import { ActionNotaPDF } from "./actionNotaPDF";
 import { useReactToPrint } from "react-to-print";
 
-export const ActionPDFPedido = ({ show, handleClose, dadosPedido, dadosDetalhesPedidos }) => {
+export const ActionPDFPedido = ({ show, handleClose, dadosPedidos, dadosDetalhesPedidos }) => {
 
   const dataTableRef = useRef(null);
   
@@ -43,7 +43,7 @@ export const ActionPDFPedido = ({ show, handleClose, dadosPedido, dadosDetalhesP
           </div> */}
           <div ref={dataTableRef} style={{ marginTop: "1rem" }}>
 
-            <ActionNotaPDF dadosPedido={dadosPedido} dadosDetalhesPedidos={dadosDetalhesPedidos} />
+            <ActionNotaPDF dadosPedidos={dadosPedidos} dadosDetalhesPedidos={dadosDetalhesPedidos} />
            
             {/* <div className="row" style={{ 
                 marginTop: "3.1rem", 

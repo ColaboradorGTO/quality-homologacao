@@ -24,7 +24,7 @@ export const ActionNotaPDF = ({ dadosPedido, dadosDetalhePedido }) => {
     const dadosArray = Array.isArray(dadosPedido) 
         ? dadosPedido 
         : [dadosPedido[0] || dadosPedido];
-    
+
     const logosEmpresas = [
         '../img/tesoura.png',      
         '../img/magazine.png',     

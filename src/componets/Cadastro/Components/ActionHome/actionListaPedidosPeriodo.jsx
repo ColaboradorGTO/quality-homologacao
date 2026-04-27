@@ -22,6 +22,7 @@ import { useEnviarPedidoComprasADM } from "./hooks/useEnviarPedidoComprasADM";
 import { useEnviarPedidoCompras } from "./hooks/useEnviarPedidoCompras";
 import { useMigrarPedidoSap } from "./hooks/useMigrarPedidoSap";
 import { ActionEditarNovoPedido } from "../ActionNovoPedido/actionEditarNovoPedido";
+import { toFloat } from "../../../../utils/toFloat";
 
 export const ActionListaPedidosPeriodo = ({ 
   dadosListaPedidos, 
@@ -145,6 +146,15 @@ export const ActionListaPedidosPeriodo = ({
     }
   });
 
+  const calcularTotal = (field) => {
+    return dadosPedidos.reduce((total, item) => total + toFloat(item[field]), 0);
+  };
+
+  const calcularTotalVrPedido = () => {
+    const total = calcularTotal('VRTOTALLIQUIDO');
+    return total;
+  }
+
   const colunasPedidos = [
     {
       field: 'contador',
@@ -194,7 +204,7 @@ export const ActionListaPedidosPeriodo = ({
       field: 'VRTOTALLIQUIDO',
       header: 'Vr Pedido',
       body: row => <th>{formatMoeda(row.VRTOTALLIQUIDO)}</th>,
-      footer: formatMoeda(calcularTotalFabricante()),
+      footer: formatMoeda(calcularTotalVrPedido()),
       sortable: true,
     },
     {
@@ -207,10 +217,16 @@ export const ActionListaPedidosPeriodo = ({
               <th style={{ color: 'blue' }} > COMPRAS </th>
             </div>
           )
-        } else if(row.DSSETOR == 'CADASTRO' || row.DSSETOR == 'COMPRASADM') {
+        } else if(row.DSSETOR == 'CADASTRO') {
           return (
             <div>
               <th style={{ color: 'green' }} > CADASTRO </th>
+            </div>
+          )
+        } else if(row.DSSETOR == 'COMPRASADM') {
+          return (
+            <div>
+              <th style={{ color: 'gray' }} > COMPRAS ADM </th>
             </div>
           )
         }
@@ -322,7 +338,7 @@ export const ActionListaPedidosPeriodo = ({
                 <div className="p-1">
                   <ButtonTable
                     Icon={MdOutlineSend}
-                    cor={"success"}
+                    cor={"secondary"}
                     iconColor={"white"}
                     iconSize={20}
                     onClickButton={() => handleClickEnviarCompras(row)}
@@ -334,97 +350,179 @@ export const ActionListaPedidosPeriodo = ({
               </div>
             )
           } else if (row.DSANDAMENTO == 'PRODUTOS/INCLUSÃO FINALIZADA') {
-            return (
-              <div className="p-1 "
-                style={{ justifyContent: "space-between", display: "flex" }}
-              >
-                <h2>testettsts</h2>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={GrView}
-                    cor={"primary"}
-                    iconColor={"white"}
-                    iconSize={20}
-                    onClickButton={() => handleClickVisualizarPedido(row)}
-                    titleButton={"Visualizar Pedido"}
-                    width="30px"
-                    height="30px"
-                  />
+            if (row.STMIGRADOSAP == null || row.STMIGRADOSAP != 'True') {
+              // Não migrado SAP - mostra botão Migrar
+              return (
+                <div className="p-1 "
+                  style={{ justifyContent: "space-between", display: "flex" }}
+                >
+                  <div className="p-1">
+                    <ButtonTable
+                      Icon={GrView}
+                      cor={"primary"}
+                      iconColor={"white"}
+                      iconSize={20}
+                      onClickButton={() => handleClickVisualizarPedido(row)}
+                      titleButton={"Visualizar Pedido"}
+                      width="30px"
+                      height="30px"
+                    />
+                  </div>
+                  <div className="p-1">
+                    <ButtonTable
+                      Icon={MdOutlineSend}
+                      cor={"danger"}
+                      iconColor={"white"}
+                      iconSize={20}
+                      onClickButton={() => handleClickEnviarComprasADM(row)}
+                      titleButton={"Enviar Compras Adm para Cancelar"}
+                      width="30px"
+                      height="30px"
+                    />
+                  </div>
+                  <div className="p-1">
+                    <ButtonTable
+                      Icon={MdOutlineLocalPrintshop}
+                      cor={"warning"}
+                      iconColor={"white"}
+                      iconSize={20}
+                      onClickButton={() => handleClickImprimir(row)}
+                      titleButton={"Imprimir Pedido Com Preço de Venda"}
+                      width="30px"
+                      height="30px"
+                    />
+                  </div>
+                  <div className="p-1">
+                    <ButtonTable
+                      Icon={MdOutlineLocalPrintshop}
+                      cor={"dark"}
+                      iconColor={"white"}
+                      iconSize={20}
+                      onClickButton={() => handleClickImprimirSempreco(row)}
+                      titleButton={"Imprimir Pedido Sem Preço de Venda"}
+                      width="30px"
+                      height="30px"
+                    />
+                  </div>
+                  <div className="p-1">
+                    <ButtonTable
+                      Icon={CiEdit}
+                      cor={"secondary"}
+                      iconColor={"white"}
+                      iconSize={20}
+                      onClickButton={() => handleClickReceberPedido(row)}
+                      titleButton={"Recepção de Mercadoria do Pedido"}
+                      width="30px"
+                      height="30px"
+                    />
+                  </div>
+                  <div className="p-1">
+                    <ButtonTable
+                      Icon={MdOutlineSend}
+                      cor={"info"}
+                      iconColor={"white"}
+                      iconSize={20}
+                      onClickButton={() => handleClickEnviarCompras(row)}
+                      titleButton={"Enviar Compras para Ajuste"}
+                      width="30px"
+                      height="30px"
+                    />
+                  </div>
+                  <div className="p-1">
+                    <ButtonTable
+                      Icon={SiSap}
+                      cor={"primary"}
+                      iconColor={"white"}
+                      iconSize={20}
+                      onClickButton={() => handleClickMigrarPedido(row)}
+                      titleButton={"Migrar Pedido SAP"}
+                      width="30px"
+                      height="30px"
+                    />
+                  </div>
                 </div>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={MdOutlineSend}
-                    cor={"danger"}
-                    iconColor={"white"}
-                    iconSize={20}
-                    onClickButton={() => handleClickEnviarComprasADM(row)}
-                    titleButton={"Enviar Compras Adm para Cancelar"}
-                    width="30px"
-                    height="30px"
-                  />
+              )
+            } else {
+              // Migrado SAP - não mostra botão Migrar
+              return (
+                <div className="p-1 "
+                  style={{ justifyContent: "space-between", display: "flex" }}
+                >
+                  <div className="p-1">
+                    <ButtonTable
+                      Icon={GrView}
+                      cor={"primary"}
+                      iconColor={"white"}
+                      iconSize={20}
+                      onClickButton={() => handleClickVisualizarPedido(row)}
+                      titleButton={"Visualizar Pedido"}
+                      width="30px"
+                      height="30px"
+                    />
+                  </div>
+                  <div className="p-1">
+                    <ButtonTable
+                      Icon={MdOutlineSend}
+                      cor={"danger"}
+                      iconColor={"white"}
+                      iconSize={20}
+                      onClickButton={() => handleClickEnviarComprasADM(row)}
+                      titleButton={"Enviar Compras Adm para Cancelar"}
+                      width="30px"
+                      height="30px"
+                    />
+                  </div>
+                  <div className="p-1">
+                    <ButtonTable
+                      Icon={MdOutlineLocalPrintshop}
+                      cor={"warning"}
+                      iconColor={"white"}
+                      iconSize={20}
+                      onClickButton={() => handleClickImprimir(row)}
+                      titleButton={"Imprimir Pedido Com Preço de Venda"}
+                      width="30px"
+                      height="30px"
+                    />
+                  </div>
+                  <div className="p-1">
+                    <ButtonTable
+                      Icon={MdOutlineLocalPrintshop}
+                      cor={"dark"}
+                      iconColor={"white"}
+                      iconSize={20}
+                      onClickButton={() => handleClickImprimirSempreco(row)}
+                      titleButton={"Imprimir Pedido Sem Preço de Venda"}
+                      width="30px"
+                      height="30px"
+                    />
+                  </div>
+                  <div className="p-1">
+                    <ButtonTable
+                      Icon={CiEdit}
+                      cor={"secondary"}
+                      iconColor={"white"}
+                      iconSize={20}
+                      onClickButton={() => handleClickReceberPedido(row)}
+                      titleButton={"Recepção de Mercadoria do Pedido"}
+                      width="30px"
+                      height="30px"
+                    />
+                  </div>
+                  <div className="p-1">
+                    <ButtonTable
+                      Icon={MdOutlineSend}
+                      cor={"info"}
+                      iconColor={"white"}
+                      iconSize={20}
+                      onClickButton={() => handleClickEnviarCompras(row)}
+                      titleButton={"Enviar Compras para Ajuste"}
+                      width="30px"
+                      height="30px"
+                    />
+                  </div>
                 </div>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={MdOutlineLocalPrintshop}
-                    cor={"warning"}
-                    iconColor={"white"}
-                    iconSize={20}
-                    onClickButton={() => handleClickImprimir(row)}
-                    titleButton={"Imprimir Pedido Com Preço de Venda"}
-                    width="30px"
-                    height="30px"
-                  />
-                </div>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={MdOutlineLocalPrintshop}
-                    cor={"dark"}
-                    iconColor={"white"}
-                    iconSize={20}
-                    onClickButton={() => handleClickImprimirSempreco(row)}
-                    titleButton={"Imprimir Pedido Sem Preço de Venda"}
-                    width="30px"
-                    height="30px"
-                  />
-                </div>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={CiEdit}
-                    cor={"secondary"}
-                    iconColor={"white"}
-                    iconSize={20}
-                    onClickButton={() => handleClickReceberPedido(row)}
-                    titleButton={"Recepção de Mercadoria do Pedido"}
-                    width="30px"
-                    height="30px"
-                  />
-                </div>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={MdOutlineSend}
-                    cor={"success"}
-                    iconColor={"white"}
-                    iconSize={20}
-                    onClickButton={() => handleClickEnviarCompras(row)}
-                    titleButton={"Enviar Compras para Ajuste"}
-                    width="30px"
-                    height="30px"
-                  />
-                </div>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={SiSap}
-                    cor={"primary"}
-                    iconColor={"white"}
-                    iconSize={20}
-                    onClickButton={() => handleClickMigrarPedido(row)}
-                    titleButton={"Migrar Pedido SAP"}
-                    width="30px"
-                    height="30px"
-                  />
-                </div>
-              </div>
-            )
+              )
+            }
           }
         } else if (row.DSSETOR == 'COMPRAS') {
           return (
@@ -434,7 +532,7 @@ export const ActionListaPedidosPeriodo = ({
               <div className="p-1">
                 <ButtonTable
                   Icon={GrView}
-                  cor={"success"}
+                  cor={"info"}
                   iconColor={"white"}
                   iconSize={20}
                   onClickButton={() => handleClickVisualizarPedido(row)}
@@ -478,7 +576,7 @@ export const ActionListaPedidosPeriodo = ({
               <div className="p-1">
                 <ButtonTable
                   Icon={GrView}
-                  cor={"success"}
+                  cor={"info"}
                   iconColor={"white"}
                   iconSize={20}
                   onClickButton={() => handleClickVisualizarPedido(row)}
@@ -532,32 +630,28 @@ export const ActionListaPedidosPeriodo = ({
   }
 
   const handleImprimir = async (IDPEDIDO) => {
-    let stOutlet = false;
+    const confirmacao = await Swal.fire({
+      icon: 'question',
+      title: '',
+      text: 'Este pedido é para o Outlet Família?',
+      showCancelButton: true,
+      confirmButtonText: 'Sim',
+      cancelButtonText: 'Não',
+    })
+
+    const stImprimir = confirmacao.value === true || confirmacao.dismiss === 'cancel';
+    const stOutlet = confirmacao.value === true;
+
+    if (!stImprimir) {
+      return; // Sai se usuário não quer imprimir
+    }
     try {
-       const result = await Swal.fire({
-         icon: "question",
-         text: 'Este pedido é para o Outlet Família?',
-         showDenyButton: true,
-         confirmButtonText: 'Sim',
-         denyButtonText: 'Não',
-         customClass: {
-           container: 'custom-swal', 
-         }
-       });
- 
-       if (result.isConfirmed) {
-         stOutlet = true;
-       } else if (result.isDenied) {
-         stOutlet = false;
-       } else {
-         return; 
-       }
- 
+
        const response = await get(`/lista-pedidos?idPedido=${IDPEDIDO}`);
-       const responseDetlhe = await get(`/lista-detalhe-pedidos-grade?idPedido=${IDPEDIDO}`);
+       const responseDetlhe = await get(`/listaDetalhePedidos?idPedido=${IDPEDIDO}`);
  
        if (response.data && responseDetlhe.data) {
-         setDadosPedido([{ ...response.data, stOutlet }]);
+         setDadosPedido({ ...response.data, STOUTLET: stOutlet ? 'True' : 'False'  });
          setDadosDetalhePedido(responseDetlhe.data);
          setModalPedidoNota(true); 
        }
@@ -573,12 +667,29 @@ export const ActionListaPedidosPeriodo = ({
   };
  
   const handleImprimirSemPreco = async (IDPEDIDO) => {
+    const confirmacao = await Swal.fire({
+      icon: 'question',
+      title: '',
+      text: 'Este pedido é para o Outlet Família?',
+      showCancelButton: true,
+      confirmButtonText: 'Sim',
+      cancelButtonText: 'Não',
+    })
+  
+    const stImprimir = confirmacao.value === true || confirmacao.dismiss === 'cancel';
+    const stOutlet = confirmacao.value === true;
+
+    if (!stImprimir) {
+      return; // Sai se usuário não quer imprimir
+    }
+
     try {
       const response = await get(`/lista-pedidos?idPedido=${IDPEDIDO}`)
-      const responseDetlhe = await get(`/lista-detalhe-pedidos-grade?idPedido=${IDPEDIDO}`)
+      const responseDetlhe = await get(`/listaDetalhePedidos?idPedido=${IDPEDIDO}`)
       if (response.data && responseDetlhe.data) {
-        setDadosPedidoSemPreco(response.data)
+        setDadosPedidoSemPreco({ ...response.data,   STOUTLET: stOutlet ? 'True' : 'False' })
         setDadosDetalhePedido(responseDetlhe.data)
+        setModalPedidoNotaSemPreco(true)
       }
     } catch (error) {
       console.log(error, "não foi possivel pegar os dados da tabela ")
@@ -588,7 +699,6 @@ export const ActionListaPedidosPeriodo = ({
   const handleClickImprimirSempreco = async (row) => {
     if (row.IDPEDIDO) {
       handleImprimirSemPreco(row.IDPEDIDO)
-      setModalPedidoNotaSemPreco(true)
     }
   }
 
@@ -612,6 +722,7 @@ export const ActionListaPedidosPeriodo = ({
   const handleClickVisualizarPedido = async (row) => {
     if (row.IDPEDIDO) {
       handleVisualizarPedido(row.IDPEDIDO)
+       setActionVisualizarPedido(true)
     }
   }
 
@@ -780,7 +891,7 @@ export const ActionListaPedidosPeriodo = ({
         dadosDetalhePedido={dadosDetalhePedido}
         
       />
-
+   
       <ActionPDFPedidoSemPreco
         show={modalPedidoNotaSemPreco}
         handleClose={() => setModalPedidoNotaSemPreco(false)}

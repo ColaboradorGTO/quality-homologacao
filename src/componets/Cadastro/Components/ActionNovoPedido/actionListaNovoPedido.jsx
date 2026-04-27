@@ -16,10 +16,17 @@ import { CiEdit } from "react-icons/ci";
 import { ActionEditarItemPedidoModal } from "./ActionEditarItemDoPedidoModal/actionEditarItemPedidoModal";
 import { get } from "../../../../api/funcRequest";
 
-export const ActionListaNovoPedido = ({ dadosVisualizarPedido, dadosDetalhe }) => {
+export const ActionListaNovoPedido = ({ 
+  dadosVisualizarPedido, 
+  dadosDetalhe,
+  setModalIncluirProdutoPedido,
+  usuarioLogado,
+  optionsModulos 
+}) => {
   const [modalEditarItemPedido, setModalEditarItemPedido] = useState(false);
   const [dadosItemPedido, setDadosItemPedido] = useState([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
 
   const onGlobalFilterChange = (e) => {
@@ -276,7 +283,7 @@ export const ActionListaNovoPedido = ({ dadosVisualizarPedido, dadosDetalhe }) =
     <Fragment>
       <div className="panel">
         <div className="panel-hdr">
-          <h2>Lista dos Produtos do Pedido</h2>
+          <h2>LISTA DOS ITENS DO PEDIDO Nº: {dadosVisualizarPedido[0]?.IDPEDIDO}</h2>
         </div>
         <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
           <HeaderTable
@@ -297,6 +304,12 @@ export const ActionListaNovoPedido = ({ dadosVisualizarPedido, dadosDetalhe }) =
             paginator={true}
             rows={10}
             rowsPerPageOptions={[10, 100, 500, 1000, dados.length]}
+            selectionMode="single"
+            selection={rowSelection}
+            onSelectionChange={(e) => setRowSelection(e.value)}
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+            filterDisplay="menu"
             sortOrder={-1}
             showGridlines
             stripedRows
@@ -311,8 +324,8 @@ export const ActionListaNovoPedido = ({ dadosVisualizarPedido, dadosDetalhe }) =
               footer={coluna.footer}
               sortable={coluna.sortable}
               headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
-              footerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
-              bodyStyle={{ fontSize: '0.688rem' }}
+              footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
+              bodyStyle={{ fontSize: '0.8rem' }}
             />
           ))}
           </DataTable>
