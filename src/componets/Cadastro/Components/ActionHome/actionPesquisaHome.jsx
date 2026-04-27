@@ -459,10 +459,35 @@ export const ActionPesquisaHome = () => {
           onButtonClickSearch={handleClick}
           corSearch={"primary"}
           IconSearch={AiOutlineSearch}
+
+          ButtonTypeCadastro={ButtonType}
+          linkNome={"Relatório Resumido"}
+          onButtonClickCadastro={handleClickRelatorioResumido}
+          corCadastro={"success"}
+          IconCadastro={AiOutlineSearch}
+
+          ButtonTypeCancelar={ButtonType}
+          linkCancelar={"Relatório Detalhado"}
+          onButtonClickCancelar={handleClickRelatorioDetalhado}
+          corCancelar={"warning"}
+          IconCancelar={AiOutlineSearch}
+
+          ButtonTypeVendasEstrutura={ButtonType}
+          linkNomeVendasEstrutura={"Relatório Produtos Criados"}
+          onButtonClickVendasEstrutura={handleClickRelatorioProdutosCriados}
+          corVendasEstrutura={"info"}
+          iconVendasEstrutura={AiOutlineSearch}
+
+          ButtonTypeVendasVendedor={ButtonType}
+          linkNomeVendasVendedor={"Voltar"}
+          onButtonClickVendasVendedor={handleClickRelatorioProdutosCriadosReturn}
+          corVendasVendedor={"danger"}
+          iconVendasVendedor={AiOutlineArrowLeft}
+
         />
 
-    
-        <div className="panel"
+
+        {/* <div className="panel"
           style={{ backgroundColor: "#fff", padding: "15px" }}
         >
           <div className="panel-hdr">
@@ -499,13 +524,13 @@ export const ActionPesquisaHome = () => {
           </div>
           <ActionListaPedidosPeriodo dadosListaPedidos={dadosListaPedidos} tabelaPedidoPeriodo={tabelaPedidoPeriodo} setTabelaPedidoPeriodo={setTabelaPedidoPeriodo} />
           
-        </div>
+        </div> */}
       </Fragment>
       
 
       {actionPedidoResumido && (
         <Fragment>
-          <div>
+          {/* <div>
             <ButtonType
               Icon={AiOutlineArrowLeft}
               iconSize="16px"
@@ -514,14 +539,14 @@ export const ActionPesquisaHome = () => {
               tipo="button"
               onClickButtonType={() => handleClickRelatorioProdutosCriadosReturn()}
             />
-          </div>
+          </div> */}
           <ActionPDFPedidoResumido dadosPedidoResumido={dadosPedidoResumido} />
         </Fragment>
       )}
 
       {actionPedidoDetalhado && (
         <Fragment>
-          <div>
+          {/* <div>
             <ButtonType
               Icon={AiOutlineArrowLeft}
               iconSize="16px"
@@ -530,7 +555,7 @@ export const ActionPesquisaHome = () => {
               tipo="button"
               onClickButtonType={handleClickRelatorioDetalhadoReturn}
             />
-          </div>
+          </div> */}
           <ActionPDFPedidoDetalhado dadosPedidosDetalhados={dadosPedidosDetalhados} />
         </Fragment>
       )}

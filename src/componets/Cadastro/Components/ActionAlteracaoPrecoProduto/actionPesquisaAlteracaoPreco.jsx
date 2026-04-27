@@ -110,42 +110,23 @@ export const ActionPesquisaAlteracaoPreco = ({ usuarioLogado }) => {
     }
   );
 
-
-  // const getListaAlteraPreco = async () => {
-
-  //   try {
-  //     // idEmpresa=${idEmpresa}&idgrupo=${idGrupo}&idsubgrupo=${idSubGrupo}&descproduto${descricaoProduto}&dtinicial=${dataPesquisa}
-  //     const response = await get(`/listaPreco`)
-  //     if (response.data) {
-  //       setDadosAlteracaoPreco(response.data)
-  //     }
-  //     return response.data;
-
-  //   } catch (error) {
-  //     console.log('Erro ao buscar empresas: ', error)
-  //   }
-  // }
-
-
   const handleTabelaVisivel = () => {
     setCurrentPage(prevPage => prevPage + 1);
     refetchListaPreco();
     setTabelaVisivel(false);
-
   };
 
   const handleActionVisivel = () => {
-    console.log('chegou')
     setActionMainVisivel(false);
     setTabelaVisivel(false);
     setActionSecundariaVisivel(true);
-    
+  
   };
 
   const optionsEmpresas = dadosListaPreco.map((item) => ({
     value: item.IDRESUMOLISTAPRECO,
     label: item.NOMELISTA,
-    title: item.TITLE, // Presumo que "title" está nos dados originais.
+    title: item.TITLE, 
   }));
 
   return (

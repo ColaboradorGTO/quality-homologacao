@@ -8,7 +8,6 @@ import { AiOutlineSearch } from "react-icons/ai";
 import { ActionListaEstilos } from "./actionListaEstilos";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
 import { useQuery } from "react-query";
-import { useFetchData } from "../../../../hooks/useFetchData";
 import { ActionCadastrarEstilosModal } from "./ActionCadastrar/actionCadastrarEstilosModal";
 import { MdAdd } from "react-icons/md";
 import Swal from "sweetalert2";
@@ -41,8 +40,18 @@ export const ActionPesquisaEstilos = ({ usuarioLogado }) => {
     },
     { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
   );
+ 
+  const { data: dadosEstilos = [], error: errorDadosEstilos, isLoading: isLoadingDadosEstilos, refetch: refetchEstilos } = useQuery(
+    ['listaEstilos'],
+    async () => {
+      const response = await get(`/listaEstilos`);
 
-  const { data: dadosEstilos = [] } = useFetchData('listaEstilos', '/listaEstilos');
+      return response.data;
+    },
+    { enabled: true, staleTime: 60 * 60 * 1000 }
+  );
+
+
   const fetchListaEstilos = async () => {
     const urlBase = `/listaEstilos?idEstilo=${estiloSelecionado}&descricao=${descricao}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';

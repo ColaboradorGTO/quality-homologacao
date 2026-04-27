@@ -48,7 +48,7 @@ export const useCadastrarEstilos = ({ handleClose, handleClick, usuarioLogado, o
         if(optionsModulos[0]?.CRIAR == 'False') {
             Swal.fire({
                 title: 'Erro!',
-                text: `${usuarioLogado?.NOFUNCIONARIO},\nVocê não tem permissão para cadastrar o Estilo!`,
+                html: `${usuarioLogado?.NOFUNCIONARIO}, <br/> Você não tem permissão para cadastrar o Estilo!`,
                 icon: 'error',
                 customClass: {
                     container: 'custom-swal',
@@ -69,7 +69,7 @@ export const useCadastrarEstilos = ({ handleClose, handleClick, usuarioLogado, o
 
             const response = await post('/criarlistaEstilos', putData)
             const textDados = JSON.stringify(putData)
-            let textFuncao = 'COMPRAS / CADASTRO DE ESTILOS';
+            let textFuncao = 'CADASTRO / CADASTRANDO ESTILOS';
             const ip = await getIPUsuario();
             const createtLog = {
                 IDFUNCIONARIO: String(usuarioLogado.id),
@@ -83,7 +83,7 @@ export const useCadastrarEstilos = ({ handleClose, handleClick, usuarioLogado, o
             Swal.fire({
                 position: 'top-end',
                 icon: 'success',
-                title: 'Atualizado com sucesso!',
+                title: 'Cadastrado com sucesso!',
                 showConfirmButton: false,
                 timer: 3000,
                 customClass: {
@@ -97,7 +97,7 @@ export const useCadastrarEstilos = ({ handleClose, handleClick, usuarioLogado, o
         } catch (error) {
               
             const textDados = JSON.stringify(putData)
-            let textFuncao = 'CADASTRO / CADASTRO DE ESTILOS';
+            let textFuncao = 'CADASTRO / ERRO AO CADASTRAR ESTILOS';
             const ip = await getIPUsuario();
             const createtLog = {
                 IDFUNCIONARIO: String(usuarioLogado.id),

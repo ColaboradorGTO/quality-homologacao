@@ -78,7 +78,7 @@ export const useEditarEstilos = ({dadosDetalheEstilos, handleClose, handleClick,
 
             const response = await put('/listaEstilos/:id', postData)
             const textDados = JSON.stringify(postData)
-            let textFuncao = 'CADASTRO / ATUALIZAÇÃO DE ESTILOS';
+            let textFuncao = 'CADASTRO / ATUALIZANDO ESTILOS';
             const ip = await getIPUsuario();
 
             const createtLog = {
