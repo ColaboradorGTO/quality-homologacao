@@ -19,7 +19,7 @@ export const ActionPesquisaNfce = ({usuarioLogado, ID}) => {
   const [dataInicio, setDataInicio] = useState('');
   const [dataFim, setDataFim] = useState('');
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(100);
+  const [pageSize, setPageSize] = useState(1000);
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
   useEffect(() => {
@@ -48,11 +48,11 @@ export const ActionPesquisaNfce = ({usuarioLogado, ID}) => {
   );
 
   const { data: dadosVendas = [], error: errorVendas, isLoading: isLoadingVendas, refetch: refetchListaVendas } = useQuery(
-    'https://gto.api.br/validarConsulta',
+    'validarConsulta',
     async () => {
-      const response = await axios.get(`https://gto.api.br/validarConsulta?dataInicio=${dataInicio}&dataFim=${dataFim}&page=${page}&pageSize=${pageSize}`);
+      const response = await get(`/validarConsulta?dataInicio=${dataInicio}&dataFim=${dataFim}&page=${page}&pageSize=${pageSize}`);
       
-      return response.data.data;
+      return response.data;
     },
     { enabled: false }
   );
@@ -66,7 +66,7 @@ export const ActionPesquisaNfce = ({usuarioLogado, ID}) => {
   } = useAtualizarVendasContigencia({dadosVendas, usuarioLogado, optionsModulos}); 
   
   const handleAtualizarVendas = async () => {
-    get(`/validarConsulta`).then((response) => {
+    get(`/validarConsulta?dataInicio=${dataInicio}&dataFim=${dataFim}&page=${page}&pageSize=${pageSize}`).then((response) => {
       console.log('Resposta da validação:', response.data);
       // Aqui você pode adicionar lógica adicional com base na resposta
     }).catch((error) => {

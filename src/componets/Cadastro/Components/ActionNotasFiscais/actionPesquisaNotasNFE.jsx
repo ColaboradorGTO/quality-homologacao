@@ -11,12 +11,12 @@ import { useFetchData } from "../../../../hooks/useFetchData"
 import { ActionListaNotasNFE } from "./actionListaNotasNFE"
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento"
 import { get } from "../../../../api/funcRequest"
+import { ActionCadastrarNFE } from "./ActionCadastrarNFE/actionCadastrarNFE"
 
 
-export const ActionPesquisaNFE = () => {
+export const ActionPesquisaNFE = ({ usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [clickContador, setClickContador] = useState(0);
-  const [modalVisivel, setModalVisivel] = useState(false);
   const [actionVisivel, setActionVisivel] = useState(false);
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState("")
   const [dataPesquisaFim, setDataPesquisaFim] = useState("")
@@ -24,7 +24,8 @@ export const ActionPesquisaNFE = () => {
   const [numSerie, setNumSerie] = useState("")
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(1000);
-
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
+  const [modalVisivel, setModalVisivel] = useState(false);
 
   useEffect(() => {
     const dataAtual = getDataAtual()
@@ -32,41 +33,53 @@ export const ActionPesquisaNFE = () => {
     setDataPesquisaFim(dataAtual)
   }, [])
 
+  useEffect(() => {
+    const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
+    if (menuSalvo) {
+      const menuParsed = JSON.parse(menuSalvo);
+      setMenuFilhoAtual(menuParsed);
+    }
+  }, []);
+
+  const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
+    ['menus-usuario-excecao', menuFilhoAtual?.ID],
+    async () => {
+      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
+
+      return response.data;
+    },
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
+  );
+
+
   const { data: dadosFornecedores = [] } = useFetchData('fornecedores', '/fornecedores');
   const fetchListaNFE = async () => {
+    const urlBase = `/nfPedido?idFornecedor=${fornecedorSelecionado}&numSerie=${numSerie}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
+    let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
+    urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
-      const urlApi = `/nfPedido?idFornecedor=${fornecedorSelecionado}&numSerie=${numSerie}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
-      const response = await get(urlApi);
-      
-      if (response.data.length && response.data.length === pageSize) {
-        let allData = [...response.data];
-        animacaoCarregamento(`Carregando... Página ${currentPage} de ${response.data.length}`, true);
-  
-        async function fetchNextPage(currentPage) {
-          try {
-            currentPage++;
-            const responseNextPage = await get(`${urlApi}&page=${currentPage}`);
-            if (responseNextPage.length) {
-              allData.push(...responseNextPage.data);
-              return fetchNextPage(currentPage);
-            } else {
-              return allData;
-            }
-          } catch (error) {
-            console.error('Erro ao buscar próxima página:', error);
-            throw error;
-          }
+      animacaoCarregamento('Carregando dados...', true);
+
+      const primeiraPagina = 1;
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const page = primeiraResposta.page || primeiraPagina;
+      const pageSize = primeiraResposta.pageSize || 1000;
+      const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
+      const totalPages = Math.ceil(totalRows / pageSize);
+
+      let allData = [...(primeiraResposta.data || [])];
+
+      if (totalPages > 1) {
+        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          allData.push(...(responsePage.data || []));
         }
-  
-        await fetchNextPage(currentPage);
-        return allData;
-      } else {
-       
-        return response.data;
       }
-  
+
+      return allData;
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Erro ao buscar dados da api:', error);
       throw error;
     } finally {
       fecharAnimacaoCarregamento();
@@ -74,27 +87,19 @@ export const ActionPesquisaNFE = () => {
   };
    
   const { data: dadosNFE = [], error: errorEstilos, isLoading: isLoadingEstilos, refetch: refetchListaNFE } = useQuery(
-    ['nfPedido',  fornecedorSelecionado, numSerie,  currentPage, pageSize],
-    () => fetchListaNFE(fornecedorSelecionado, numSerie, currentPage, pageSize),
-    {
-      enabled: Boolean(dataPesquisaFim && dataPesquisaInicio)
-    }
+    ['nfPedido',],
+    () => fetchListaNFE(),
+    { enabled: false }
   );
 
   const handleClick = () => {
-    setCurrentPage(prevPage => prevPage + 1);
     refetchListaNFE();
     setTabelaVisivel(true)
-    
-
   }
+
   const handleClickAction = () => {
     setClickContador(prevContador => prevContador + 1);
-
-
     setActionVisivel(true)
-
-
   }
 
   return (
@@ -136,7 +141,7 @@ export const ActionPesquisaNFE = () => {
         IconSearch={AiOutlineSearch}
 
         ButtonTypeCadastro={ButtonType}
-        onButtonClickModal={handleClickAction}
+        onButtonClickCadastro={() => setModalVisivel(true)}
         linkNome={"Cadastrar NFE"}
         corCadastro={"success"}
         IconCadastro={MdAdd}
@@ -146,6 +151,14 @@ export const ActionPesquisaNFE = () => {
       {tabelaVisivel &&
         <ActionListaNotasNFE dadosNFE={dadosNFE} />
       }
+
+      <ActionCadastrarNFE 
+        show={modalVisivel}
+        handleClose={() => setModalVisivel(false)}
+        usuarioLogado={usuarioLogado}
+        optionsModulos={optionsModulos}
+        handleClick={handleClick}
+      />
     </Fragment>
   )
 }
