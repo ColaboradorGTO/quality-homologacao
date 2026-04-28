@@ -291,6 +291,7 @@ export const ActionListaPrecos = ({
           </DataTable>
         </div>
       </div>
+      
       <ActionListaLojaModal
         show={modalVisualizar}
         handleClose={() => setModalVisualizar(false)}

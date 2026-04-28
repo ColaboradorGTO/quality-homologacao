@@ -69,15 +69,15 @@ export const useCriarListaPrecos = ({optionsModulos, usuarioLogado }) => {
       return;
     }
 
-    // ✅ DADOS PRINCIPAIS: Para criação (modo create)
+    
     const NOMELISTA = nomeListaPreco;
-    const IDUSERCRIACAO = usuarioLogado?.id; // Para criação
+    const IDUSERCRIACAO = usuarioLogado?.id; 
     const STATIVO = statusSelecionado?.value;
 
-    // ✅ MAPEAMENTO DAS LOJAS: Equivale ao map do jQuery
+   
     let dadosDetalheLista = [];
 
-    // Mapear as empresas selecionadas
+   
     if (empresaSelecionada && empresaSelecionada.length > 0) {
       empresaSelecionada.forEach((empresa) => {
         const IDGRUPOEMPRESARIAL = empresa.IDGRUPOEMPRESARIAL ? Number(empresa.IDGRUPOEMPRESARIAL) : '';
@@ -85,8 +85,8 @@ export const useCriarListaPrecos = ({optionsModulos, usuarioLogado }) => {
         const STATIVOLOJA = empresa.STATIVO;
 
         dadosDetalheLista.push({
-          IDDETALHELISTAPRECO: '', // Vazio para criação
-          IDRESUMOLISTAPRECO: '', // Será gerado pelo backend
+          IDDETALHELISTAPRECO: '', 
+          IDRESUMOLISTAPRECO: '',
           IDGRUPOEMPRESARIAL,
           IDEMPRESA,
           STATIVO: STATIVOLOJA
@@ -94,17 +94,17 @@ export const useCriarListaPrecos = ({optionsModulos, usuarioLogado }) => {
       });
     }
 
-    // ✅ ESTRUTURA FINAL: Exatamente igual ao jQuery para modo 'create'
+   
     const dadosLista = [{
-      IDRESUMOLISTAPRECO: '', // Vazio para criação
+      IDRESUMOLISTAPRECO: '', 
       NOMELISTA,
       IDUSERCRIACAO,
-      IDUSERALTERACAO: '', // Vazio para criação
+      IDUSERALTERACAO: '', 
       STATIVO,
       lojas: dadosDetalheLista
     }];
 
-    // ✅ VALIDAÇÕES: Mesma lógica do jQuery
+   
     if (!dadosLista[0]?.NOMELISTA.length || dadosLista[0]?.NOMELISTA.length < 10) {
       Swal.fire({
         icon: 'warning',
@@ -133,7 +133,7 @@ export const useCriarListaPrecos = ({optionsModulos, usuarioLogado }) => {
       return;
     }
 
-    // ✅ LOADING: Equivale ao setTimeout do jQuery
+   
     const loadingAlert = Swal.fire({
       title: 'Criando...',
       text: 'Por favor aguarde.',
@@ -144,12 +144,11 @@ export const useCriarListaPrecos = ({optionsModulos, usuarioLogado }) => {
     });
 
     try {
-      // ✅ CHAMADA POST: Equivale ao ajaxPost do jQuery para modo 'create'
+
       const response = await post('/listas-de-precos', dadosLista);
 
       Swal.close();
 
-      // ✅ TRATAMENTO DE SUCESSO: Mesma lógica do jQuery
       if (response.typeMsg === "success") {
         await Swal.fire({
           icon: 'success',
@@ -160,7 +159,6 @@ export const useCriarListaPrecos = ({optionsModulos, usuarioLogado }) => {
           }
         });
 
-        // Limpar formulário após criação bem-sucedida
         setNomeListaPreco('');
         setEmpresaSelecionada([]);
         setSelectedIds([]);
@@ -183,7 +181,6 @@ export const useCriarListaPrecos = ({optionsModulos, usuarioLogado }) => {
       console.error('Erro ao criar lista de preço:', error);
       Swal.close();
 
-      // ✅ TRATAMENTO DE ERRO: Mesma lógica do jQuery
       Swal.fire({
         icon: 'error',
         title: 'Erro',
@@ -194,7 +191,7 @@ export const useCriarListaPrecos = ({optionsModulos, usuarioLogado }) => {
       });
     }
 
-    // Log da operação (mantendo o log original)
+    
     try {
       const textDados = JSON.stringify(dadosLista);
       let textFuncao = 'CADASTRO / CRIAÇÃO DE LISTA DE PREÇOS';

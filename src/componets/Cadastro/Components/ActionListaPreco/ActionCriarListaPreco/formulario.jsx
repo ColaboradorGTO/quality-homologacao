@@ -160,9 +160,9 @@ export const Formulario = ({handleClose, optionsModulos, usuarioLogado}) => {
 
           ButtonTypeCadastrar={ButtonTypeModal}
           onClickButtonCadastrar={handleSubmit(handleValidatedSubmit)}
-          textButtonCadastrar={"Atualizar Lista"}
+          textButtonCadastrar={"Criar Lista"}
           corCadastrar={"success"}
-          loadingTextCadastrar={"Atualizando..."}
+          loadingTextCadastrar={"Cadastrando..."}
           autoLoadingCadastrar={true}
         />
 

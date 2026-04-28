@@ -11,11 +11,8 @@ export const ActionCriarListasPrecosModal = ({
   usuarioLogado
 }) => {
 
-
   return (
-
     <Fragment>
-
       <Modal
         show={show}
         onHide={handleClose}
@@ -23,13 +20,11 @@ export const ActionCriarListasPrecosModal = ({
         size="xl"
         centered
       >
-
         <HeaderModal
           title={"Criação de Lista de Preços"}
           subTitle={`Lista de Lojas - Criar Lista de Preços`}
           handleClose={handleClose}
         />
-
 
         <Modal.Body>
           <Formulario 
