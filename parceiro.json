@@ -41,6 +41,24 @@
       "label": "A PAGAR - FOB"
     }
   ],
+  "optionsTipoFreteComercial": [
+    {
+      "value": "0",
+      "label": "Emitente"
+    },
+    {
+      "value": "1",
+      "label": "Destinatário"
+    },
+    {
+      "value": "2",
+      "label": "Terceiros"
+    },
+    {
+      "value": "9",
+      "label": "Sem Frete"
+    }
+  ],
   "optionsTipoPedido": [
     {
       "value": "VESTUARIO",

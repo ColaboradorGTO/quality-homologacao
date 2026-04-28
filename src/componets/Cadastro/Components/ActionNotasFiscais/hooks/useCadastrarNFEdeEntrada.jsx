@@ -6,7 +6,7 @@ import { get, post, put } from "../../../../../api/funcRequest"
 import { useQuery } from "react-query"
 import { useFetchData } from "../../../../../hooks/useFetchData"
 import { validarCNPJ } from "../../../../../utils/mascaraCNPJ"
-import { optionsTipoFrete } from "../../../../../../parceiro.json"
+import { optionsReposicao, optionsTipoFreteComercial } from "../../../../../../parceiro.json"
 
 export const useCadastrarNFEdeEntrada = ({ handleClose, usuarioLogado, optionsModulos, handleClick }) => {
     
@@ -143,6 +143,16 @@ export const useCadastrarNFEdeEntrada = ({ handleClose, usuarioLogado, optionsMo
             return response.data;
         },
         { enabled: false }
+    );
+
+    const { data: dadosFabricantes = [], error: errorFabricantes, isLoading: isLoadingFabricantes } = useQuery(
+        ['fabricantes'],
+        async () => {
+            const response = await get(`/fabricantes`);
+
+            return response.data;
+        },
+        { enabled: true, staleTime: 60 * 60 * 1000, }
     );
 
     const { data: dadosCNPJ = [], error: errorCNPJ, isLoading: isLoadingCNPJ } = useQuery(
@@ -305,8 +315,10 @@ export const useCadastrarNFEdeEntrada = ({ handleClose, usuarioLogado, optionsMo
         dadosEmpresas,
         dadosUsoPrincipal,
         dadosFornecedores,
-        dadosNfePedido,
-        optionsTipoFrete, 
+        dadosNfePedido, 
+        dadosFabricantes,
+        optionsTipoFreteComercial,
+        optionsReposicao,
         handleFechar,
         onSubmit,
     }

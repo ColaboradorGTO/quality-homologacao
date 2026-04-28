@@ -78,7 +78,9 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
         dadosUsoPrincipal,
         dadosFornecedores,
         dadosNfePedido,
-        optionsTipoFrete, 
+        optionsReposicao, 
+        optionsTipoFreteComercial,
+        dadosFabricantes,
         handleFechar,
         onSubmit,
     } = useCadastrarNFEdeEntrada({ handleClose, usuarioLogado, optionsModulos, handleClick });
@@ -113,6 +115,10 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
             console.log(`Erro de validação:\n${errorMessages.join('\n')}`);
         }
     }
+
+    const optionsUsoPrincipal = [
+        { value: '10', label: 'Compra Comercial' },
+    ]
     return (
         <Fragment>
             <form onSubmit={handleSubmit(handleValidatedSubmit)}>
@@ -210,7 +216,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                             classNamePrefix="select"
                                             name="marcaPedido"
                                             options={
-                                                dadosCondicoesPagamento.map((item) => {
+                                                dadosFabricantes?.map((item) => {
                                                     return {
                                                         value: item.IDFABRICANTE,
                                                         label: `${item.IDFABRICANTE} - ${item.DSFABRICANTE}`
@@ -245,10 +251,10 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                             classNamePrefix="select"
                                             name="compradorPedido"
                                             options={
-                                                dadosCondicoesPagamento.map((item) => {
+                                                dadosComprador?.map((item) => {
                                                     return {
-                                                        value: item.IDCONDICAOPAGAMENTO,
-                                                        label: item.DSCONDICAOPAG
+                                                        value: item.IDFUNCIONARIO,
+                                                        label: item.NOFUNCIONARIO
                                                     }
                                                 })
                                             }
@@ -274,10 +280,10 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                             classNamePrefix="select"
                                             name="usoPrincipalPedido"
                                             options={
-                                                dadosCondicoesPagamento.map((item) => {
+                                                optionsUsoPrincipal?.map((item) => {
                                                     return {
-                                                        value: item.IDCONDICAOPAGAMENTO,
-                                                        label: item.DSCONDICAOPAG
+                                                        value: item.value,
+                                                        label: item.label
                                                     }
                                                 })
                                             }
@@ -307,7 +313,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                             className="basic-single"
                                             classNamePrefix="select"
                                             name="tipoFretePedido"
-                                            options={optionsTipoFrete.map((item) => {
+                                            options={optionsTipoFreteComercial?.map((item) => {
                                                 return {
                                                     value: item.value,
                                                     label: item.label
@@ -327,34 +333,24 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                             />
                                         )}
                                     </div>
-                                    <div className="col-sm-6 col-xl-6">
-                                        <label>Status</label>
-
-                                        <Select
-                                            className="basic-single"
-                                            classNamePrefix="select"
+                                    <div className="col-sm-6 col-xl-6">                              
+                                        <Controller
                                             name="statusPedido"
-                                            options={
-                                                dadosCondicoesPagamento.map((item) => {
-                                                    return {
-                                                        value: item.IDCONDICAOPAGAMENTO,
-                                                        label: item.DSCONDICAOPAG
-                                                    }
-                                                })
-                                            }
-                                            value={statusSelecionado}
-                                            onChange={(e) => {
-                                                setStatusSelecionado(e)
-                                                clearErrors("statusPedido")
-                                            }}
+                                            control={control}
+                                            render={({ field }) => (
+                                                <FormField
+                                                    label={"Status"}
+                                                    name="statusPedido"
+                                                    type="text"
+                                                    placeholder={"Aberta"}
+                                                    value={statusSelecionado}
+                                                    onChange={(e) => setStatusSelecionado(e.target.value)}
+                                                    errors={errors}
+                                                    clearErrors={clearErrors}
+                                                    readOnly={true}
+                                                />
+                                            )}
                                         />
-                                        {errors.statusPedido && (
-                                            <AlertError
-                                                error={errors.statusPedido}
-                                                onClose={clearErrors}
-                                                fieldName="statusPedido"
-                                            />
-                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -368,7 +364,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                             className="basic-single"
                                             classNamePrefix="select"
                                             name="saldoPedido"
-                                            options={optionsTipoFrete.map((item) => {
+                                            options={optionsReposicao?.map((item) => {
                                                 return {
                                                     value: item.value,
                                                     label: item.label
@@ -436,10 +432,10 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                             className="basic-single"
                                             classNamePrefix="select"
                                             name="filialPedido"
-                                            options={optionsTipoFrete.map((item) => {
+                                            options={dadosEmpresas.map((item) => {
                                                 return {
-                                                    value: item.value,
-                                                    label: item.label
+                                                    value: item.IDEMPRESA,
+                                                    label: `${item.NOFANTASIA} - ${item.NORAZAOSOCIAL}`
                                                 }
                                             })}
                                             value={filialSelecionada}
@@ -485,7 +481,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                             className="basic-single"
                                             classNamePrefix="select"
                                             name="tipoNFEPedido"
-                                            options={optionsTipoFrete.map((item) => {
+                                            options={optionsTipoFreteComercial.map((item) => {
                                                 return {
                                                     value: item.value,
                                                     label: item.label
@@ -554,7 +550,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                             className="basic-single"
                                             classNamePrefix="select"
                                             name="modeloNFEPedido"
-                                            options={optionsTipoFrete.map((item) => {
+                                            options={optionsTipoFreteComercial.map((item) => {
                                                 return {
                                                     value: item.value,
                                                     label: item.label
