@@ -89,6 +89,17 @@ export const useCadastrarAlterarFornecedor = ({ handleClose, usuarioLogado, opti
     const { data: dadosTransportadora = [], error: errorTransportadora, isLoading: isLoadingTransportadora } = useFetchData('/transportadoras', '/transportadoras');
     const { data: dadosCondicoesPagamento = [], error: errorPagamento, isLoading: isLoadingPagamento } = useFetchData('/condicaoPagamento', '/condicaoPagamento');
 
+    const { data: dadosNfePedido = [], error: errorNFE, isLoading: isLoadingNFE } = useQuery(
+        ['cadastro-nfpedido'],
+        async () => {
+            const response = await get(`/cadastro-nfpedido?idPedido`);
+            setFornecedorExistente(response.data);
+            console.log(cnpj, 'cnpj')
+            return response.data;
+        },
+        { enabled: false }
+    );
+
     const { data: dadosCNPJ = [], error: errorCNPJ, isLoading: isLoadingCNPJ } = useQuery(
         ['fornecedores', cnpj],
         async () => {
@@ -99,7 +110,7 @@ export const useCadastrarAlterarFornecedor = ({ handleClose, usuarioLogado, opti
         },
         { enabled: cnpj.length > 13  }
     );
-    console.log(cnpj, 'cnpj fora')
+    
 
     async function getDadosEnderecoViaCep_API_redundancia(cep) {
         const URL_VIA_CEP = 'https://viacep.com.br/ws/{CEP}/json/';
@@ -534,6 +545,7 @@ export const useCadastrarAlterarFornecedor = ({ handleClose, usuarioLogado, opti
         dadosCondicoesPagamento,
         handleFechar,
         dadosFornecedores,
+        dadosNfePedido,
         onSubmit,
     }
 }

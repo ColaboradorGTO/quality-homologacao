@@ -80,6 +80,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
         dadosCondicoesPagamento,
         handleFechar,
         dadosFornecedores,
+        dadosNfePedido,
         onSubmit,
     } = useCadastrarAlterarFornecedor({ handleClose, usuarioLogado, optionsModulos, handleClick });
     const [marcaSelecionada, setMarcaSelecionada] = useState('');

@@ -8,7 +8,7 @@ import * as XLSX from 'xlsx';
 import HeaderTable from "../../../../Tables/headerTable";
 import { get } from "../../../../../api/funcRequest";
 
-export const ActionListaNotasNFE = ({ dadosNFE }) => {
+export const ActionListaNotasNFE = ({ dadosNfePedido }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const dataTableRef = useRef();
 
@@ -18,42 +18,50 @@ export const ActionListaNotasNFE = ({ dadosNFE }) => {
 
   const handlePrint = useReactToPrint({
     content: () => dataTableRef.current,
-    documentTitle: 'Pedidos Periodo',
+    documentTitle: 'Produtos Pedido',
   });
 
   const exportToPDF = () => {
     const doc = new jsPDF();
     doc.autoTable({
-      head: [['Nº', 'Descrição', 'Grupo Estrutura', 'Situação']],
+      head: [['Nº', 'ID Produto', 'Produto', 'Cód.Barras', 'Quantidade', 'Depósito', 'Vr. Unitário', 'Vr. Total']],
       body: dados.map(item => [
         item.contador,
-        item.DS_ESTILOS,
-        `${item.COD_GRUPOESTILOS} - ${item.DS_GRUPOESTILOS}`,
-        item.STATIVO == 'True' ? 'ATIVO' : 'INATIVO'
+        item.IDPRODUTO,
+        item.DSPRODUTO,
+        item.NUCODBARRAS,
+        item.QTD,
+        item.EMPDESTINO,
+        item.VRUNITARIO,
+        item.VRTOTALPROD
       ]),
       horizontalPageBreak: true,
       horizontalPageBreakBehaviour: 'immediately'
     });
-    doc.save('lista_estilos.pdf');
+    doc.save('produtos_pedido.pdf');
   };
 
   const exportToExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(dados);
     const workbook = XLSX.utils.book_new();
-    const header = ['Nº', 'Descrição', 'Grupo Estrutura', 'Situação']
+    const header = ['Nº', 'ID Produto', 'Produto', 'Cód.Barras', 'Quantidade', 'Depósito', 'Vr. Unitário', 'Vr. Total']
     worksheet['!cols'] = [
       { wpx: 70, caption: 'Nº' },
-      { wpx: 100, caption: 'Descrição' },
-      { wpx: 100, caption: 'Grupo Estrutura' },
-      { wpx: 100, caption: 'Situação' },
+      { wpx: 100, caption: 'ID Produto' },
+      { wpx: 100, caption: 'Produto' },
+      { wpx: 100, caption: 'Cód.Barras' },
+      { wpx: 100, caption: 'Quantidade' },
+      { wpx: 100, caption: 'Depósito' },
+      { wpx: 100, caption: 'Vr. Unitário' },
+      { wpx: 100, caption: 'Vr. Total' },
     ];
     XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Pedidos Periodo');
-    XLSX.writeFile(workbook, 'lista_estilos.xlsx');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Produtos Pedido');
+    XLSX.writeFile(workbook, 'produtos_pedido.xlsx');
   };
 
 
-  const dados = dadosNFE.map((item, index) => {
+  const dados = dadosNfePedido?.map((item, index) => {
     let contador = index + 1;
 
     return {
