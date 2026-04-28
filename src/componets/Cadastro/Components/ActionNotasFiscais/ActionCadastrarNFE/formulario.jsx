@@ -212,8 +212,8 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                             options={
                                                 dadosCondicoesPagamento.map((item) => {
                                                     return {
-                                                        value: item.IDCONDICAOPAGAMENTO,
-                                                        label: item.DSCONDICAOPAG
+                                                        value: item.IDFABRICANTE,
+                                                        label: `${item.IDFABRICANTE} - ${item.DSFABRICANTE}`
                                                     }
                                                 })
                                             }
