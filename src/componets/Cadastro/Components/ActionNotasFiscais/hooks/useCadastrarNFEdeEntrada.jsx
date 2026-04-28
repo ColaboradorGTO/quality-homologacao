@@ -6,44 +6,41 @@ import { get, post, put } from "../../../../../api/funcRequest"
 import { useQuery } from "react-query"
 import { useFetchData } from "../../../../../hooks/useFetchData"
 import { validarCNPJ } from "../../../../../utils/mascaraCNPJ"
-import { situacao, optionsTipoFrete, optionsTipoCategoria, optionsEnviar, optionsFiscal } from "../../../../../../parceiro.json"
+import { optionsTipoFrete } from "../../../../../../parceiro.json"
 
-export const useCadastrarAlterarFornecedor = ({ handleClose, usuarioLogado, optionsModulos, handleClick }) => {
-    const [cnpj, setCnpj] = useState('');
-    const [inscricaoEstadual, setInscricaoEstadual] = useState('');
-    const [inscricaoMunicipal, setInscricaoMunicipal] = useState('');
-    const [razaoSocial, setRazaoSocial] = useState('');
-    const [nomeFantasia, setNomeFantasia] = useState('');
-    const [cep, setCep] = useState('');
-    const [endereco, setEndereco] = useState('');
-    const [numero, setNumero] = useState('');
-    const [complemento, setComplemento] = useState('');
-    const [bairro, setBairro] = useState('');
-    const [cidade, setCidade] = useState('');
-    const [uf, setUf] = useState('');
-    const [numeroIBGE, setNumeroIBGE] = useState('');
-    const [nomeRepresentante, setNomeRepresentante] = useState('');
-    const [email, setEmail] = useState('');
-    const [telefone1, setTelefone1] = useState('');
-    const [telefone2, setTelefone2] = useState('');
-    const [telefone3, setTelefone3] = useState('');
-    const [situacaoSelecionada, setSituacaoSelecionada] = useState('');
-    const [fiscal, setFiscal] = useState('');
-    const [enviar, setEnviar] = useState('');
+export const useCadastrarNFEdeEntrada = ({ handleClose, usuarioLogado, optionsModulos, handleClick }) => {
+    
     const [condicaoPagamento, setCondicaoPagamento] = useState('');
-    const [tipoPedido, setTipoPedido] = useState('');
-    const [vendedor, setVendedor] = useState('');
-    const [emailVendedor, setEmailVendedor] = useState('');
-    const [transportadora, setTransportadora] = useState('');
     const [tipoFrete, setTipoFrete] = useState('');
-    const [data, setData] = useState('')
-    const [statusSelecionado, setStatusSelecionado] = useState('');
-    const [idFornecedor, setIdFornecedor] = useState(null);
     const [fornecedorExistente, setFornecedorExistente] = useState([]);
     const [ipUsuario, setIpUsuario] = useState('');
-
     const [fornecedorSelecionado, setFornecedorSelecionado] = useState("")
-    
+    const [marcaSelecionada, setMarcaSelecionada] = useState('');
+    const [compradorSelecionado, setCompradorSelecionado] = useState('');
+    const [usoPrincipalSelecionado, setUsoPrincipalSelecionado] = useState('');
+    const [statusSelecionado, setStatusSelecionado] = useState('');
+    const [saldoSelecionado, setSaldoSelecionado] = useState('');
+    const [dataCadastro, setDataCadastro] = useState('');
+    const [dataEmissao, setDataEmissao] = useState('');
+    const [filialSelecionada, setFilialSelecionada] = useState('');
+    const [cnpjFilial, setCnpjFilial] = useState('');
+    const [tipoNFESelecionada, setTipoNFESelecionada] = useState('');
+    const [numeroNFE, setNumeroNFE] = useState('');
+    const [serieNFE, setSerieNFE] = useState('');
+    const [modeloNFE, setModeloNFE] = useState('');
+    const [chaveNFE, setChaveNFE] = useState('');
+    const [numeroPedido, setNumeroPedido] = useState('');
+    const [observacao, setObservacao] = useState('');
+    const [totalAntesDesconto, setTotalAntesDesconto] = useState('');
+    const [desconto, setDesconto] = useState('');
+    const [adiantamentoTotal, setAdiantamentoTotal] = useState('');
+    const [despesasAdicionais, setDespesasAdicionais] = useState('');
+    const [impostos, setImpostos] = useState('');
+    const [impostoRetido, setImpostoRetido] = useState('');
+    const [totalPagar, setTotalPagar] = useState('');
+    const [valorAplicado, setValorAplicado] = useState('');
+    const [saldo, setSaldo] = useState('');
+
     const URL_PUBLICAWS = 'https://publica.cnpj.ws/cnpj/{CNPJ}';
     const URL_MINHA_RECEITA = 'https://minhareceita.org/{CNPJ}';
     const URL_RECEITAWS = 'https://www.receitaws.com.br/v1/cnpj/{CNPJ}';
@@ -76,6 +73,56 @@ export const useCadastrarAlterarFornecedor = ({ handleClose, usuarioLogado, opti
         return usuarioIP;
     };
     
+    
+    const { data: dadosCondicoesPagamento = [], error: errorPagamento, isLoading: isLoadingPagamento } = useQuery(
+        'condicaoPagamento',
+        async () => {
+        const response = await get(`/condicaoPagamento`);
+
+        return response.data;
+        },
+        { enabled: true, staleTime: 60 * 60 * 1000, }
+    );
+
+    const { data: dadosTransportadora = [], error: errorTransportadora, isLoading: isLoadingTransportadora } = useQuery(
+        'transportadoras',
+        async () => {
+        const response = await get(`/transportadoras`);
+
+        return response.data;
+        },
+        { enabled: true, staleTime: 60 * 60 * 1000, }
+    );
+
+    const { data: dadosComprador = [], error: errorComprador, isLoading: isLoadingComprador, refetch: refetchComprador } = useQuery(
+        'compradores',
+        async () => {
+            const response = await get(`/compradores`);
+            return response.data;
+        },
+        { staleTime: 60 * 60 * 1000, enabled: true, cacheTime: 60 * 60 * 1000 }
+    );
+
+    const { data: dadosEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas } = useQuery(
+        'listaEmpresaComercial',
+        async () => {
+          const response = await get(`/listaEmpresaComercial`);
+    
+          return response.data;
+        },
+        { enabled: true, staleTime: 60 * 60 * 1000, }
+    );
+
+    const { data: dadosUsoPrincipal = [], error: errorUsoPrincipal, isLoading: isLoadingUsoPrincipal, refetch: refetchUsoPrincipal } = useQuery(
+        'uso-principal',
+        async () => {
+          const response = await get(`/uso-principal`);
+    
+          return response.data;
+        },
+        { enabled: true, staleTime: 60 * 60 * 1000, }
+    );
+
     const { data: dadosFornecedores = [], error: errorFornecedor, isLoading: isLoadingFornecedo } = useQuery(
         'fornecedores',
         async () => {
@@ -86,15 +133,12 @@ export const useCadastrarAlterarFornecedor = ({ handleClose, usuarioLogado, opti
         { enabled: true, staleTime: 60 * 60 * 1000, }
     );
 
-    const { data: dadosTransportadora = [], error: errorTransportadora, isLoading: isLoadingTransportadora } = useFetchData('/transportadoras', '/transportadoras');
-    const { data: dadosCondicoesPagamento = [], error: errorPagamento, isLoading: isLoadingPagamento } = useFetchData('/condicaoPagamento', '/condicaoPagamento');
 
     const { data: dadosNfePedido = [], error: errorNFE, isLoading: isLoadingNFE } = useQuery(
         ['cadastro-nfpedido'],
         async () => {
             const response = await get(`/cadastro-nfpedido?idPedido`);
-            setFornecedorExistente(response.data);
-            console.log(cnpj, 'cnpj')
+
             return response.data;
         },
         { enabled: false }
@@ -105,7 +149,6 @@ export const useCadastrarAlterarFornecedor = ({ handleClose, usuarioLogado, opti
         async () => {
             const response = await get(`/fornecedores?CNPJFornecedor=${cnpj}`);
             setFornecedorExistente(response.data);
-            console.log(cnpj, 'cnpj')
             return response.data;
         },
         { enabled: cnpj.length > 13  }
@@ -230,18 +273,6 @@ export const useCadastrarAlterarFornecedor = ({ handleClose, usuarioLogado, opti
 
             if(dadosMapeados) {
                 setNomeFantasia(dadosMapeados.fantasia || '');
-                setInscricaoEstadual(dadosMapeados.inscricaoEstadual || '');
-                setRazaoSocial(dadosMapeados.razao || '');
-                setCep(dadosMapeados.cep || '');
-                setEndereco(dadosMapeados.endereco || '');
-                setNumero(dadosMapeados.numeroEndereco || '');
-                setComplemento(dadosMapeados.complemento || '');
-                setBairro(dadosMapeados.bairro || '');
-                setCidade(dadosMapeados.cidade || '');
-                setUf(dadosMapeados.uf || '');
-                setNumeroIBGE(dadosMapeados.codigoIbge || '');
-                setEmail(dadosMapeados.email || '');
-                setTelefone1(dadosMapeados.tel1 || '');
             }
             await getDadosEnderecoViaCep_API_redundancia(dadosMapeados.cep);
             return dadosMapeados;
@@ -308,64 +339,11 @@ export const useCadastrarAlterarFornecedor = ({ handleClose, usuarioLogado, opti
 
     useEffect(() => {
         if(dadosCNPJ && dadosCNPJ.length > 0) {
-            setCnpj(dadosCNPJ[0]?.NUCNPJ || '')
-            setRazaoSocial(dadosCNPJ[0]?.NORAZAOSOCIAL || '')
-            setNomeFantasia(dadosCNPJ[0]?.NOFANTASIA || '')
-            setInscricaoEstadual(dadosCNPJ[0]?.NUINSCESTADUAL || '')
-            setInscricaoMunicipal(dadosCNPJ[0]?.NUINSCMUNICIPAL || '')
-            setEndereco(dadosCNPJ[0]?.EENDERECO || '')
-            setNumero(dadosCNPJ[0]?.ENUMERO || '')
-            setComplemento(dadosCNPJ[0]?.ECOMPLEMENTO || '')
-            setBairro(dadosCNPJ[0]?.EBAIRRO || '')
-            setCidade(dadosCNPJ[0]?.ECIDADE || '')
-            setUf(dadosCNPJ[0]?.SGUF || '')
-            setCep(dadosCNPJ[0]?.NUCEP || '')
-            setNumeroIBGE(dadosCNPJ[0]?.NUIBGE || '')
-            setNomeRepresentante(dadosCNPJ[0]?.NOREPRESENTANTE || '')
-            setEmail(dadosCNPJ[0]?.EEMAIL || '')
-            setTelefone1(dadosCNPJ[0]?.NUTELEFONE1 || '')
-            setTelefone2(dadosCNPJ[0]?.NUTELEFONE2 || '')
-            setTelefone3(dadosCNPJ[0]?.NUTELEFONE3 || '')
-            setStatusSelecionado({value: dadosCNPJ[0]?.STATIVO || 'True', label: dadosCNPJ[0]?.STATIVO == 'True' ? 'ATIVO' : 'INATIVO' })
-            setFiscal({value: dadosCNPJ[0]?.TPFISCALPADRAO || 'S', label: dadosCNPJ[0]?.TPFISCALPADRAO == 'S' ? 'Simples Nacional' : dadosCNPJ[0]?.TPFISCALPADRAO == 'N' ? 'Lucro Presumido' : 'Lucro Real' })
-            setEnviar({value: dadosCNPJ[0]?.TPARQUIVOPADRAO || 'NE', label: dadosCNPJ[0]?.TPARQUIVOPADRAO == 'NE' ? 'NÃO ENVIAR' : dadosCNPJ[0]?.TPARQUIVOPADRAO == 'ET' ? 'ETIQUETA' : 'ARQUIVO' })
-            setCondicaoPagamento({value: dadosCNPJ[0]?.IDCONDICAOPAGAMENTO, label: dadosCNPJ[0]?.DSCONDICAOPAG })
-            setTipoPedido({value: dadosCNPJ[0]?.TPPEDIDOPADRAO || 'VESTUARIO', label: dadosCNPJ[0]?.TPPEDIDOPADRAO == 'VESTUARIO' ? 'VESTUARIO' : dadosCNPJ[0]?.TPPEDIDOPADRAO == 'CALCADOS' ? 'CALÇADOS' : 'ARTIGOS' })
-            setTransportadora({value: dadosCNPJ[0]?.IDTRANSPORTADORAPADRAO, label: dadosCNPJ[0]?.NOMETRANSPORTADORA })
-            setTipoFrete({value: dadosCNPJ[0]?.TPFRETEPADRAO || 'PAGO', label: dadosCNPJ[0]?.TPFRETEPADRAO == 'PAGO' ? 'PAGO - CIF' : 'A PAGAR - FOB' })
-            setIdFornecedor(dadosCNPJ[0]?.IDFORNECEDOR)
+
         }
     }, [dadosCNPJ])
      
     const handleFechar = () => {
-        setCnpj('');
-        setInscricaoEstadual('');
-        setInscricaoMunicipal('');
-        setRazaoSocial('');
-        setNomeFantasia('');
-        setCep('');
-        setEndereco('');
-        setNumero('');
-        setComplemento('');
-        setBairro('');
-        setCidade('');
-        setUf('');
-        setNumeroIBGE('');
-        setNomeRepresentante('');
-        setEmail('');
-        setTelefone1('');
-        setTelefone2('');
-        setTelefone3('');   
-        setSituacaoSelecionada('');
-        setFiscal('');
-        setEnviar('');
-        setCondicaoPagamento('');
-        setTipoPedido('');
-        setVendedor('');
-        setEmailVendedor('');
-        setTransportadora('');
-        setTipoFrete('');
-        setIdFornecedor('');
         handleClose();
     }
 
@@ -481,71 +459,69 @@ export const useCadastrarAlterarFornecedor = ({ handleClose, usuarioLogado, opti
     return {
         fornecedorSelecionado, 
         setFornecedorSelecionado,
-
-        cnpj,
-        setCnpj,
-        inscricaoEstadual,
-        setInscricaoEstadual,
-        inscricaoMunicipal,
-        setInscricaoMunicipal,
-        razaoSocial,
-        setRazaoSocial,
-        nomeFantasia,
-        setNomeFantasia,
-        cep,
-        setCep,
-        endereco,
-        setEndereco,
-        numero,
-        setNumero,
-        complemento,
-        setComplemento,
-        bairro,
-        setBairro,
-        cidade,
-        setCidade,
-        uf,
-        setUf,
-        numeroIBGE,
-        setNumeroIBGE,
-        nomeRepresentante,
-        setNomeRepresentante,
-        email,
-        setEmail,
-        telefone1,
-        setTelefone1,
-        telefone2,
-        setTelefone2,
-        telefone3,
-        setTelefone3,
-        situacaoSelecionada,
-        setSituacaoSelecionada,
-        fiscal,
-        setFiscal,
-        enviar,
-        setEnviar,
         condicaoPagamento,
         setCondicaoPagamento,
-        tipoPedido,
-        setTipoPedido,
-        vendedor,
-        setVendedor,
-        emailVendedor,
-        setEmailVendedor,
-        transportadora,
-        setTransportadora,
+        numeroPedido,
+        setNumeroPedido,
+        marcaSelecionada,
+        setMarcaSelecionada,
+        compradorSelecionado,
+        setCompradorSelecionado,
+        usoPrincipalSelecionado,
+        setUsoPrincipalSelecionado,
         tipoFrete,
         setTipoFrete,
-        situacao, 
-        optionsTipoFrete, 
-        optionsTipoCategoria, 
-        optionsEnviar, 
-        optionsFiscal,
-        dadosTransportadora,
+        statusSelecionado,
+        setStatusSelecionado,
+        saldoSelecionado,
+        setSaldoSelecionado,
+        dataCadastro,
+        setDataCadastro,
+        dataEmissao,
+        setDataEmissao,
+        filialSelecionada,
+        setFilialSelecionada,
+        cnpjFilial,
+        setCnpjFilial,
+        tipoNFESelecionada,
+        setTipoNFESelecionada,
+        numeroNFE,
+        setNumeroNFE,
+        serieNFE,
+        setSerieNFE,
+        modeloNFE,
+        setModeloNFE,
+        chaveNFE,
+        setChaveNFE,
+        observacao,
+        setObservacao,
+        totalAntesDesconto,
+        setTotalAntesDesconto,
+        desconto,
+        setDesconto,
+        adiantamentoTotal,
+        setAdiantamentoTotal,
+        despesasAdicionais,
+        setDespesasAdicionais,
+        impostos,
+        setImpostos,
+        impostoRetido,
+        setImpostoRetido,
+        totalPagar,
+        setTotalPagar,
+        valorAplicado,
+        setValorAplicado,
+        saldo,
+        setSaldo,
         dadosCondicoesPagamento,
-        handleFechar,
+        dadosTransportadora,
+        dadosComprador,
+        dadosEmpresas,
+        dadosUsoPrincipal,
         dadosFornecedores,
         dadosNfePedido,
+        optionsTipoFrete, 
+        handleFechar,
         onSubmit,
     }
 }

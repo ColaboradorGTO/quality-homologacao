@@ -10,6 +10,7 @@ import { get } from "../../../../../api/funcRequest";
 
 export const ActionListaNotasNFE = ({ dadosNfePedido }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
 
   const onGlobalFilterChange = (e) => {
@@ -154,7 +155,7 @@ export const ActionListaNotasNFE = ({ dadosNfePedido }) => {
 
   return (
     <Fragment>
-      <div className="panel">
+      <div className="panel" style={{width: '100%', marginBottom: '2rem', marginTop: '2rem'}}>
         <div className="panel-hdr">
           <h2>LISTA DOS PRODUTOS DA NOTA</h2>
         </div>
@@ -170,14 +171,20 @@ export const ActionListaNotasNFE = ({ dadosNfePedido }) => {
         </div>
         <div className="card mb-4" ref={dataTableRef}>
           <DataTable
-            title="Notas Fiscais"
+            title="Produtos da Nota"
             value={dados}
             globalFilter={globalFilterValue}
+            selectionMode="single"
+            selection={rowSelection}
+            onSelectionChange={(e) => setRowSelection(e.value)}
             size="small"
             sortOrder={-1}
             paginator={true}
             rows={10}
             rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+            filterDisplay="menu"
             showGridlines
             stripedRows
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado </div>}

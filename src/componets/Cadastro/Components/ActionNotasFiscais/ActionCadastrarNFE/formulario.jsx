@@ -5,8 +5,9 @@ import Select from 'react-select';
 import { Controller, useForm } from "react-hook-form";
 import { AlertError } from "../../../../Inputs/alertError";
 import FormField from "../../../../Formularios/FormField";
-import { useCadastrarAlterarFornecedor } from "../hooks/useCadastrarAlterarFornecedor";
+import { useCadastrarNFEdeEntrada } from "../hooks/useCadastrarNFEdeEntrada";
 import { schema } from "./schema/useCadastrarSchema"
+import { ActionListaNotasNFE } from "./actionListaProduto";
 
 export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleClick }) => {
     const { register, handleSubmit, formState: { errors }, clearErrors, setError, control } = useForm({
@@ -14,121 +15,79 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
     });
 
     const {
-        fornecedorSelecionado, 
+                fornecedorSelecionado, 
         setFornecedorSelecionado,
-
-        cnpj,
-        setCnpj,
-        inscricaoEstadual,
-        setInscricaoEstadual,
-        inscricaoMunicipal,
-        setInscricaoMunicipal,
-        razaoSocial,
-        setRazaoSocial,
-        nomeFantasia,
-        setNomeFantasia,
-        cep,
-        setCep,
-        endereco,
-        setEndereco,
-        numero,
-        setNumero,
-        complemento,
-        setComplemento,
-        bairro,
-        setBairro,
-        cidade,
-        setCidade,
-        uf,
-        setUf,
-        numeroIBGE,
-        setNumeroIBGE,
-        nomeRepresentante,
-        setNomeRepresentante,
-        email,
-        setEmail,
-        telefone1,
-        setTelefone1,
-        telefone2,
-        setTelefone2,
-        telefone3,
-        setTelefone3,
-        situacaoSelecionada,
-        setSituacaoSelecionada,
-        fiscal,
-        setFiscal,
-        enviar,
-        setEnviar,
         condicaoPagamento,
         setCondicaoPagamento,
-        tipoPedido,
-        setTipoPedido,
-        vendedor,
-        setVendedor,
-        emailVendedor,
-        setEmailVendedor,
-        transportadora,
-        setTransportadora,
+        numeroPedido,
+        setNumeroPedido,
+        marcaSelecionada,
+        setMarcaSelecionada,
+        compradorSelecionado,
+        setCompradorSelecionado,
+        usoPrincipalSelecionado,
+        setUsoPrincipalSelecionado,
         tipoFrete,
         setTipoFrete,
-        situacao,
-        optionsTipoFrete,
-        optionsTipoCategoria,
-        optionsEnviar,
-        optionsFiscal,
-        dadosTransportadora,
+        statusSelecionado,
+        setStatusSelecionado,
+        saldoSelecionado,
+        setSaldoSelecionado,
+        dataCadastro,
+        setDataCadastro,
+        dataEmissao,
+        setDataEmissao,
+        filialSelecionada,
+        setFilialSelecionada,
+        cnpjFilial,
+        setCnpjFilial,
+        tipoNFESelecionada,
+        setTipoNFESelecionada,
+        numeroNFE,
+        setNumeroNFE,
+        serieNFE,
+        setSerieNFE,
+        modeloNFE,
+        setModeloNFE,
+        chaveNFE,
+        setChaveNFE,
+        observacao,
+        setObservacao,
+        totalAntesDesconto,
+        setTotalAntesDesconto,
+        desconto,
+        setDesconto,
+        adiantamentoTotal,
+        setAdiantamentoTotal,
+        despesasAdicionais,
+        setDespesasAdicionais,
+        impostos,
+        setImpostos,
+        impostoRetido,
+        setImpostoRetido,
+        totalPagar,
+        setTotalPagar,
+        valorAplicado,
+        setValorAplicado,
+        saldo,
+        setSaldo,
         dadosCondicoesPagamento,
-        handleFechar,
+        dadosTransportadora,
+        dadosComprador,
+        dadosEmpresas,
+        dadosUsoPrincipal,
         dadosFornecedores,
         dadosNfePedido,
+        optionsTipoFrete, 
+        handleFechar,
         onSubmit,
-    } = useCadastrarAlterarFornecedor({ handleClose, usuarioLogado, optionsModulos, handleClick });
-    const [marcaSelecionada, setMarcaSelecionada] = useState('');
-    const [compradorSelecionado, setCompradorSelecionado] = useState('');
-    const [usoPrincipalSelecionado, setUsoPrincipalSelecionado] = useState('');
-    const [statusSelecionado, setStatusSelecionado] = useState('');
-    const [saldoSelecionado, setSaldoSelecionado] = useState('');
-    const [dataCadastro, setDataCadastro] = useState('');
-    const [dataEmissao, setDataEmissao] = useState('');
-    const [filialSelecionada, setFilialSelecionada] = useState('');
-    const [cnpjFilial, setCnpjFilial] = useState('');
-    const [tipoNFESelecionada, setTipoNFESelecionada] = useState('');
-    const [numeroNFE, setNumeroNFE] = useState('');
-    const [serieNFE, setSerieNFE] = useState('');
-    const [modeloNFE, setModeloNFE] = useState('');
-    const [chaveNFE, setChaveNFE] = useState('');
+    } = useCadastrarNFEdeEntrada({ handleClose, usuarioLogado, optionsModulos, handleClick });
+   
 
     const handleValidatedSubmit = async () => {
         try {
             const dadosParaValidar = {
-                cnpjFornecedor: cnpj,
-                inscricaoEstadualFornecedor: inscricaoEstadual,
-                inscricaoMunicipalFornecedor: inscricaoMunicipal,
-                razaoSocialFornecedor: razaoSocial,
-                nomeFantasiaFornecedor: nomeFantasia,
-                cepFornecedor: cep,
-                enderecoFornecedor: endereco,
-                numeroFornecedor: numero,
-                complementoFornecedor: complemento,
-                bairroFornecedor: bairro,
-                cidadeFornecedor: cidade,
-                ufFornecedor: uf,
-                numeroIBGEFornecedor: numeroIBGE,
-                nomeRepresentanteFornecedor: nomeRepresentante,
-                emailFornecedor: email,
-                telefone1Fornecedor: telefone1,
-                telefone2Fornecedor: telefone2,
-                telefone3Fornecedor: telefone3,
-                vendedorFornecedor: vendedor,
-                emailVendedorFornecedor: emailVendedor,
-                situacaoFornecedor: situacaoSelecionada,
-                fiscalFornecedor: fiscal,
-                enviarFornecedor: enviar,
-                condicaoPagamentoFornecedor: condicaoPagamento,
-                tipoPedidoFornecedor: tipoPedido,
-                transportadoraFornecedor: transportadora,
-                tipoFreteFornecedor: tipoFrete,
-
+                
             }
 
             await schema.validate(dadosParaValidar, { abortEarly: false });
@@ -228,15 +187,15 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                 <div className="row">
                                     <div className="col-sm-6 col-xl-6">
                                         <Controller
-                                            name="razaoSocialFornecedor"
+                                            name="nPedido"
                                             control={control}
                                             render={({ field }) => (
                                                 <FormField
                                                     label={"Nº Pedido "}
-                                                    name="razaoSocialFornecedor"
+                                                    name="nPedido"
                                                     type="text"
-                                                    value={razaoSocial}
-                                                    onChange={(e) => setRazaoSocial(e.target.value)}
+                                                    value={numeroPedido}
+                                                    onChange={(e) => setNumeroPedido(e.target.value)}
                                                     errors={errors}
                                                     clearErrors={clearErrors}
                                                 />
@@ -249,7 +208,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                         <Select
                                             className="basic-single"
                                             classNamePrefix="select"
-                                            name="condicaoPagamentoFornecedor"
+                                            name="marcaPedido"
                                             options={
                                                 dadosCondicoesPagamento.map((item) => {
                                                     return {
@@ -258,17 +217,17 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                                     }
                                                 })
                                             }
-                                            value={condicaoPagamento}
+                                            value={marcaSelecionada}
                                             onChange={(e) => {
-                                                setCondicaoPagamento(e)
-                                                clearErrors("condicaoPagamentoFornecedor")
+                                                setMarcaSelecionada(e)
+                                                clearErrors("marcaPedido")
                                             }}
                                         />
-                                        {errors.condicaoPagamentoFornecedor && (
+                                        {errors.marcaPedido && (
                                             <AlertError
-                                                error={errors.condicaoPagamentoFornecedor}
+                                                error={errors.marcaPedido}
                                                 onClose={clearErrors}
-                                                fieldName="condicaoPagamentoFornecedor"
+                                                fieldName="marcaPedido"
                                             />
                                         )}
                                     </div>
@@ -284,7 +243,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                         <Select
                                             className="basic-single"
                                             classNamePrefix="select"
-                                            name="condicaoPagamentoFornecedor"
+                                            name="compradorPedido"
                                             options={
                                                 dadosCondicoesPagamento.map((item) => {
                                                     return {
@@ -293,17 +252,17 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                                     }
                                                 })
                                             }
-                                            value={condicaoPagamento}
+                                            value={compradorSelecionado}
                                             onChange={(e) => {
-                                                setCondicaoPagamento(e)
-                                                clearErrors("condicaoPagamentoFornecedor")
+                                                setCompradorSelecionado(e)
+                                                clearErrors("compradorPedido")
                                             }}
                                         />
-                                        {errors.condicaoPagamentoFornecedor && (
+                                        {errors.compradorPedido && (
                                             <AlertError
-                                                error={errors.condicaoPagamentoFornecedor}
+                                                error={errors.compradorPedido}
                                                 onClose={clearErrors}
-                                                fieldName="condicaoPagamentoFornecedor"
+                                                fieldName="compradorPedido"
                                             />
                                         )}
                                     </div>
@@ -313,7 +272,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                         <Select
                                             className="basic-single"
                                             classNamePrefix="select"
-                                            name="condicaoPagamentoFornecedor"
+                                            name="usoPrincipalPedido"
                                             options={
                                                 dadosCondicoesPagamento.map((item) => {
                                                     return {
@@ -322,17 +281,17 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                                     }
                                                 })
                                             }
-                                            value={condicaoPagamento}
+                                            value={usoPrincipalSelecionado}
                                             onChange={(e) => {
-                                                setCondicaoPagamento(e)
-                                                clearErrors("condicaoPagamentoFornecedor")
+                                                setUsoPrincipalSelecionado(e)
+                                                clearErrors("usoPrincipalPedido")
                                             }}
                                         />
-                                        {errors.condicaoPagamentoFornecedor && (
+                                        {errors.usoPrincipalPedido && (
                                             <AlertError
-                                                error={errors.condicaoPagamentoFornecedor}
+                                                error={errors.usoPrincipalPedido}
                                                 onClose={clearErrors}
-                                                fieldName="condicaoPagamentoFornecedor"
+                                                fieldName="usoPrincipalPedido"
                                             />
                                         )}
                                     </div>
@@ -347,7 +306,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                         <Select
                                             className="basic-single"
                                             classNamePrefix="select"
-                                            name="tipoFreteFornecedor"
+                                            name="tipoFretePedido"
                                             options={optionsTipoFrete.map((item) => {
                                                 return {
                                                     value: item.value,
@@ -357,14 +316,14 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                             value={tipoFrete}
                                             onChange={(e) => {
                                                 setTipoFrete(e)
-                                                clearErrors("tipoFreteFornecedor")
+                                                clearErrors("tipoFretePedido")
                                             }}
                                         />
-                                        {errors.tipoFreteFornecedor && (
+                                        {errors.tipoFretePedido && (
                                             <AlertError
-                                                error={errors.tipoFreteFornecedor}
+                                                error={errors.tipoFretePedido}
                                                 onClose={clearErrors}
-                                                fieldName="tipoFreteFornecedor"
+                                                fieldName="tipoFretePedido"
                                             />
                                         )}
                                     </div>
@@ -374,7 +333,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                         <Select
                                             className="basic-single"
                                             classNamePrefix="select"
-                                            name="condicaoPagamentoFornecedor"
+                                            name="statusPedido"
                                             options={
                                                 dadosCondicoesPagamento.map((item) => {
                                                     return {
@@ -383,17 +342,17 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                                     }
                                                 })
                                             }
-                                            value={condicaoPagamento}
+                                            value={statusSelecionado}
                                             onChange={(e) => {
-                                                setCondicaoPagamento(e)
-                                                clearErrors("condicaoPagamentoFornecedor")
+                                                setStatusSelecionado(e)
+                                                clearErrors("statusPedido")
                                             }}
                                         />
-                                        {errors.condicaoPagamentoFornecedor && (
+                                        {errors.statusPedido && (
                                             <AlertError
-                                                error={errors.condicaoPagamentoFornecedor}
+                                                error={errors.statusPedido}
                                                 onClose={clearErrors}
-                                                fieldName="condicaoPagamentoFornecedor"
+                                                fieldName="statusPedido"
                                             />
                                         )}
                                     </div>
@@ -408,38 +367,38 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                         <Select
                                             className="basic-single"
                                             classNamePrefix="select"
-                                            name="tipoFreteFornecedor"
+                                            name="saldoPedido"
                                             options={optionsTipoFrete.map((item) => {
                                                 return {
                                                     value: item.value,
                                                     label: item.label
                                                 }
                                             })}
-                                            value={tipoFrete}
+                                            value={saldoSelecionado}
                                             onChange={(e) => {
-                                                setTipoFrete(e)
-                                                clearErrors("tipoFreteFornecedor")
+                                                setSaldoSelecionado(e)
+                                                clearErrors("saldoPedido")
                                             }}
                                         />
-                                        {errors.tipoFreteFornecedor && (
+                                        {errors.saldoPedido && (
                                             <AlertError
-                                                error={errors.tipoFreteFornecedor}
+                                                error={errors.saldoPedido}
                                                 onClose={clearErrors}
-                                                fieldName="tipoFreteFornecedor"
+                                                fieldName="saldoPedido"
                                             />
                                         )}
                                     </div>
                                     <div className="col-sm-3 col-xl-3">
                                         <Controller
-                                            name="razaoSocialFornecedor"
+                                            name="dataCadastroPedido"
                                             control={control}
                                             render={({ field }) => (
                                                 <FormField
                                                     label={"Data Cadastro "}
-                                                    name="razaoSocialFornecedor"
+                                                    name="dataCadastroPedido"
                                                     type="date"
-                                                    value={razaoSocial}
-                                                    onChange={(e) => setRazaoSocial(e.target.value)}
+                                                    value={dataCadastro}
+                                                    onChange={(e) => setDataCadastro(e.target.value)}
                                                     errors={errors}
                                                     clearErrors={clearErrors}
                                                 />
@@ -449,15 +408,15 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                     </div>
                                     <div className="col-sm-3 col-xl-3">
                                         <Controller
-                                            name="razaoSocialFornecedor"
+                                            name="dataEmissaoPedido"
                                             control={control}
                                             render={({ field }) => (
                                                 <FormField
                                                     label={"Data Emissão "}
-                                                    name="razaoSocialFornecedor"
+                                                    name="dataEmissaoPedido"
                                                     type="date"
-                                                    value={razaoSocial}
-                                                    onChange={(e) => setRazaoSocial(e.target.value)}
+                                                    value={dataEmissao}
+                                                    onChange={(e) => setDataEmissao(e.target.value)}
                                                     errors={errors}
                                                     clearErrors={clearErrors}
                                                 />
@@ -476,38 +435,38 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                         <Select
                                             className="basic-single"
                                             classNamePrefix="select"
-                                            name="tipoFreteFornecedor"
+                                            name="filialPedido"
                                             options={optionsTipoFrete.map((item) => {
                                                 return {
                                                     value: item.value,
                                                     label: item.label
                                                 }
                                             })}
-                                            value={tipoFrete}
+                                            value={filialSelecionada}
                                             onChange={(e) => {
-                                                setTipoFrete(e)
-                                                clearErrors("tipoFreteFornecedor")
+                                                setFilialSelecionada(e)
+                                                clearErrors("filialPedido")
                                             }}
                                         />
-                                        {errors.tipoFreteFornecedor && (
+                                        {errors.filialPedido && (
                                             <AlertError
-                                                error={errors.tipoFreteFornecedor}
+                                                error={errors.filialPedido}
                                                 onClose={clearErrors}
-                                                fieldName="tipoFreteFornecedor"
+                                                fieldName="filialPedido"
                                             />
                                         )}
                                     </div>
                                     <div className="col-sm-6 col-xl-6">
                                         <Controller
-                                            name="razaoSocialFornecedor"
+                                            name="cnpjFilialPedido"
                                             control={control}
                                             render={({ field }) => (
                                                 <FormField
                                                     label={"CNPJ Filial "}
-                                                    name="razaoSocialFornecedor"
+                                                    name="cnpjFilialPedido"
                                                     type="text"
-                                                    value={razaoSocial}
-                                                    onChange={(e) => setRazaoSocial(e.target.value)}
+                                                    value={cnpjFilial}
+                                                    onChange={(e) => setCnpjFilial(e.target.value)}
                                                     errors={errors}
                                                     clearErrors={clearErrors}
                                                 />
@@ -525,38 +484,38 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                         <Select
                                             className="basic-single"
                                             classNamePrefix="select"
-                                            name="tipoFreteFornecedor"
+                                            name="tipoNFEPedido"
                                             options={optionsTipoFrete.map((item) => {
                                                 return {
                                                     value: item.value,
                                                     label: item.label
                                                 }
                                             })}
-                                            value={tipoFrete}
+                                            value={tipoNFESelecionada}
                                             onChange={(e) => {
-                                                setTipoFrete(e)
-                                                clearErrors("tipoFreteFornecedor")
+                                                setTipoNFESelecionada(e)
+                                                clearErrors("tipoNFEPedido")
                                             }}
                                         />
-                                        {errors.tipoFreteFornecedor && (
+                                        {errors.tipoNFEPedido && (
                                             <AlertError
-                                                error={errors.tipoFreteFornecedor}
+                                                error={errors.tipoNFEPedido}
                                                 onClose={clearErrors}
-                                                fieldName="tipoFreteFornecedor"
+                                                fieldName="tipoNFEPedido"
                                             />
                                         )}
                                     </div>
                                     <div className="col-sm-6 col-xl-6">
                                         <Controller
-                                            name="razaoSocialFornecedor"
+                                            name="numeroNFEPedido"
                                             control={control}
                                             render={({ field }) => (
                                                 <FormField
                                                     label={"Nº NF "}
-                                                    name="razaoSocialFornecedor"
+                                                    name="numeroNFEPedido"
                                                     type="text"
-                                                    value={razaoSocial}
-                                                    onChange={(e) => setRazaoSocial(e.target.value)}
+                                                    value={numeroNFE}
+                                                    onChange={(e) => setNumeroNFE(e.target.value)}
                                                     errors={errors}
                                                     clearErrors={clearErrors}
                                                 />
@@ -573,15 +532,15 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                      
 
                                         <Controller
-                                            name="razaoSocialFornecedor"
+                                            name="serieNFEPedido"
                                             control={control}
                                             render={({ field }) => (
                                                 <FormField
                                                     label={"Série NF "}
-                                                    name="razaoSocialFornecedor"
+                                                    name="serieNFEPedido"
                                                     type="text"
-                                                    value={razaoSocial}
-                                                    onChange={(e) => setRazaoSocial(e.target.value)}
+                                                    value={serieNFE}
+                                                    onChange={(e) => setSerieNFE(e.target.value)}
                                                     errors={errors}
                                                     clearErrors={clearErrors}
                                                 />
@@ -594,38 +553,38 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                         <Select
                                             className="basic-single"
                                             classNamePrefix="select"
-                                            name="tipoFreteFornecedor"
+                                            name="modeloNFEPedido"
                                             options={optionsTipoFrete.map((item) => {
                                                 return {
                                                     value: item.value,
                                                     label: item.label
                                                 }
                                             })}
-                                            value={tipoFrete}
+                                            value={modeloNFE}
                                             onChange={(e) => {
-                                                setTipoFrete(e)
-                                                clearErrors("tipoFreteFornecedor")
+                                                setModeloNFE(e)
+                                                clearErrors("modeloNFEPedido")
                                             }}
                                         />
-                                        {errors.tipoFreteFornecedor && (
+                                        {errors.modeloNFEPedido && (
                                             <AlertError
-                                                error={errors.tipoFreteFornecedor}
+                                                error={errors.modeloNFEPedido}
                                                 onClose={clearErrors}
-                                                fieldName="tipoFreteFornecedor"
+                                                fieldName="modeloNFEPedido"
                                             />
                                         )}
                                     </div>
                                     <div className="col-sm-3 col-xl-4">
                                         <Controller
-                                            name="razaoSocialFornecedor"
+                                            name="chaveNFEPedido"
                                             control={control}
                                             render={({ field }) => (
                                                 <FormField
                                                     label={"Chave NF "}
-                                                    name="razaoSocialFornecedor"
+                                                    name="chaveNFEPedido"
                                                     type="text"
-                                                    value={razaoSocial}
-                                                    onChange={(e) => setRazaoSocial(e.target.value)}
+                                                    value={chaveNFE}
+                                                    onChange={(e) => setChaveNFE(e.target.value)}
                                                     errors={errors}
                                                     clearErrors={clearErrors}
                                                 />
@@ -636,19 +595,22 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                 </div>
                             </div>
 
+                            <div className="row">
+                                <ActionListaNotasNFE dadosNfePedido={dadosNfePedido} />
+                            </div>
                             <div className="form-group">
                                 <div className="row">
                                     <div className="col-sm-6 col-xl-6">
                                         <Controller
-                                            name="razaoSocialFornecedor"
+                                            name="observacaoPedido"
                                             control={control}
                                             render={({ field }) => (
                                                 <FormField
                                                     label={"Observações "}
-                                                    name="razaoSocialFornecedor"
+                                                    name="observacaoPedido"
                                                     type="textarea"
-                                                    value={razaoSocial}
-                                                    onChange={(e) => setRazaoSocial(e.target.value)}
+                                                    value={observacao}
+                                                    onChange={(e) => setObservacao(e.target.value)}
                                                     errors={errors}
                                                     clearErrors={clearErrors}
                                                 />
@@ -660,15 +622,15 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                         <div className="col-sm-6 col-xl-6">
                                             <div className="col-sm-12 col-xl-12">
                                                 <Controller
-                                                    name="razaoSocialFornecedor"
+                                                    name="totalAntesDescontoPedido"
                                                     control={control}
                                                     render={({ field }) => (
                                                         <FormField
                                                             label={"Total Antes do Desconto"}
-                                                            name="razaoSocialFornecedor"
+                                                            name="totalAntesDescontoPedido"
                                                             type="text"
-                                                            value={razaoSocial}
-                                                            onChange={(e) => setRazaoSocial(e.target.value)}
+                                                            value={totalAntesDesconto}
+                                                            onChange={(e) => setTotalAntesDesconto(e.target.value)}
                                                             errors={errors}
                                                             clearErrors={clearErrors}
                                                         />
@@ -678,15 +640,15 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                             </div>
                                             <div className="col-sm-12 col-xl-12">
                                                 <Controller
-                                                    name="razaoSocialFornecedor"
+                                                    name="descontoPedido"
                                                     control={control}
                                                     render={({ field }) => (
                                                         <FormField
                                                             label={"Desconto "}
-                                                            name="razaoSocialFornecedor"
+                                                            name="descontoPedido"
                                                             type="text"
-                                                            value={razaoSocial}
-                                                            onChange={(e) => setRazaoSocial(e.target.value)}
+                                                            value={desconto}
+                                                            onChange={(e) => setDesconto(e.target.value)}
                                                             errors={errors}
                                                             clearErrors={clearErrors}
                                                         />
@@ -696,15 +658,15 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                             </div>
                                             <div className="col-sm-12 col-xl-12">
                                                 <Controller
-                                                    name="razaoSocialFornecedor"
+                                                    name="adiantamentoTotalPedido"
                                                     control={control}
                                                     render={({ field }) => (
                                                         <FormField
                                                             label={"Adiantamento Total "}
-                                                            name="razaoSocialFornecedor"
+                                                            name="adiantamentoTotalPedido"
                                                             type="text"
-                                                            value={razaoSocial}
-                                                            onChange={(e) => setRazaoSocial(e.target.value)}
+                                                            value={adiantamentoTotal}
+                                                            onChange={(e) => setAdiantamentoTotal(e.target.value)}
                                                             errors={errors}
                                                             clearErrors={clearErrors}
                                                         />
@@ -714,15 +676,15 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                             </div>
                                             <div className="col-sm-12 col-xl-12">
                                                 <Controller
-                                                    name="razaoSocialFornecedor"
+                                                    name="despesasAdicionaisPedido"
                                                     control={control}
                                                     render={({ field }) => (
                                                         <FormField
                                                             label={"Despesas Adicionais "}
-                                                            name="razaoSocialFornecedor"
+                                                            name="despesasAdicionaisPedido"
                                                             type="text"
-                                                            value={razaoSocial}
-                                                            onChange={(e) => setRazaoSocial(e.target.value)}
+                                                            value={despesasAdicionais}
+                                                            onChange={(e) => setDespesasAdicionais(e.target.value)}
                                                             errors={errors}
                                                             clearErrors={clearErrors}
                                                         />
@@ -735,15 +697,15 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                         <div className="col-sm-6 col-xl-6">
                                             <div className="col-sm-12 col-xl-12">
                                                 <Controller
-                                                    name="razaoSocialFornecedor"
+                                                    name="impostosPedido"
                                                     control={control}
                                                     render={({ field }) => (
                                                         <FormField
                                                             label={"Imposto"}
-                                                            name="razaoSocialFornecedor"
+                                                            name="impostosPedido"
                                                             type="text"
-                                                            value={razaoSocial}
-                                                            onChange={(e) => setRazaoSocial(e.target.value)}
+                                                            value={impostos}
+                                                            onChange={(e) => setImpostos(e.target.value)}
                                                             errors={errors}
                                                             clearErrors={clearErrors}
                                                         />
@@ -754,15 +716,15 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
 
                                             <div className="col-sm-12 col-xl-12">
                                                 <Controller
-                                                    name="razaoSocialFornecedor"
+                                                    name="impostoRetidoPedido"
                                                     control={control}
                                                     render={({ field }) => (
                                                         <FormField
                                                             label={"Valor de Imposto Retido"}
-                                                            name="razaoSocialFornecedor"
+                                                            name="impostoRetidoPedido"
                                                             type="text"
-                                                            value={razaoSocial}
-                                                            onChange={(e) => setRazaoSocial(e.target.value)}
+                                                            value={impostoRetido}
+                                                            onChange={(e) => setImpostoRetido(e.target.value)}
                                                             errors={errors}
                                                             clearErrors={clearErrors}
                                                         />
@@ -773,15 +735,15 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
 
                                             <div className="col-sm-12 col-xl-12">
                                                 <Controller
-                                                    name="razaoSocialFornecedor"
+                                                    name="totalPagarPedido"
                                                     control={control}
                                                     render={({ field }) => (
                                                         <FormField
                                                             label={"Total a Pagar"}
-                                                            name="razaoSocialFornecedor"
+                                                            name="totalPagarPedido"
                                                             type="text"
-                                                            value={razaoSocial}
-                                                            onChange={(e) => setRazaoSocial(e.target.value)}
+                                                            value={totalPagar}
+                                                            onChange={(e) => setTotalPagar(e.target.value)}
                                                             errors={errors}
                                                             clearErrors={clearErrors}
                                                         />
@@ -792,15 +754,15 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
 
                                             <div className="col-sm-12 col-xl-12">
                                                 <Controller
-                                                    name="razaoSocialFornecedor"
+                                                    name="valorAplicadoPedido"
                                                     control={control}
                                                     render={({ field }) => (
                                                         <FormField
                                                             label={"Valor Aplicado"}
-                                                            name="razaoSocialFornecedor"
+                                                            name="valorAplicadoPedido"
                                                             type="text"
-                                                            value={razaoSocial}
-                                                            onChange={(e) => setRazaoSocial(e.target.value)}
+                                                            value={valorAplicado}
+                                                            onChange={(e) => setValorAplicado(e.target.value)}
                                                             errors={errors}
                                                             clearErrors={clearErrors}
                                                         />
@@ -811,15 +773,15 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
 
                                             <div className="col-sm-12 col-xl-12">
                                                 <Controller
-                                                    name="razaoSocialFornecedor"
+                                                    name="saldoPedido"
                                                     control={control}
                                                     render={({ field }) => (
                                                         <FormField
                                                             label={"Saldo"}
-                                                            name="razaoSocialFornecedor"
+                                                            name="saldoPedido"
                                                             type="text"
-                                                            value={razaoSocial}
-                                                            onChange={(e) => setRazaoSocial(e.target.value)}
+                                                            value={saldo}
+                                                            onChange={(e) => setSaldo(e.target.value)}
                                                             errors={errors}
                                                             clearErrors={clearErrors}
                                                         />
