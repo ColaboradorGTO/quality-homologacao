@@ -8,6 +8,8 @@ import FormField from "../../../../Formularios/FormField";
 import { useCadastrarNFEdeEntrada } from "../hooks/useCadastrarNFEdeEntrada";
 import { schema } from "./schema/useCadastrarSchema"
 import { ActionListaNotasNFE } from "./actionListaProduto";
+import { mascaraCNPJ } from "../../../../../utils/mascaraCNPJ";
+import Swal from "sweetalert2";
 
 export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleClick }) => {
     const { register, handleSubmit, formState: { errors }, clearErrors, setError, control } = useForm({
@@ -15,7 +17,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
     });
 
     const {
-                fornecedorSelecionado, 
+        fornecedorSelecionado, 
         setFornecedorSelecionado,
         condicaoPagamento,
         setCondicaoPagamento,
@@ -89,7 +91,30 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
     const handleValidatedSubmit = async () => {
         try {
             const dadosParaValidar = {
-                
+                fornecedorPedido: fornecedorSelecionado?.value,
+                condicaoPagamentoPedido: condicaoPagamento?.value,
+                marcaPedido: marcaSelecionada?.value,
+                compradorPedido: compradorSelecionado?.value,
+                usoPrincipalPedido: usoPrincipalSelecionado?.value,
+                tipoFretePedido: tipoFrete?.value,
+                saldoPedido: saldoSelecionado?.value,
+                filialPedido: filialSelecionada?.value,
+                cnpjFilialPedido: cnpjFilial,
+                tipoNFEPedido: tipoNFESelecionada?.value,
+                numeroNFEPedido: numeroNFE,
+                serieNFEPedido: serieNFE,
+                modeloNFEPedido: modeloNFE,
+                chaveNFEPedido: chaveNFE,
+                observacaoPedido: observacao,
+                totalAntesDescontoPedido: totalAntesDesconto,
+                descontoPedido: desconto,
+                adiantamentoTotalPedido: adiantamentoTotal,
+                despesasAdicionaisPedido: despesasAdicionais,
+                impostoPedido: impostos,
+                impostoRetidoPedido: impostoRetido,
+                totalPagarPedido: totalPagar,
+                valorAplicadoPedido: valorAplicado,
+                saldoPedido: saldoSelecionado?.value
             }
 
             await schema.validate(dadosParaValidar, { abortEarly: false });
@@ -119,6 +144,49 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
     const optionsUsoPrincipal = [
         { value: '10', label: 'Compra Comercial' },
     ]
+
+    const optionsTipoNFE = [
+        { value: '2', label: 'Externo' },
+    ]
+
+    const optionsModeloNFE = [
+        { value: '55', label: 'NFe(55)' },
+    ]
+
+    const preencheDadosComCHNFE = (chaveNFE) => {
+        chaveNFE = chaveNFE.replace(/\D/g, ''); 
+        setChaveNFE(chaveNFE);
+
+        if(chaveNFE.length === 44) {
+            let cnpjFornecedor = fornecedorSelecionado?.cnpj || '';
+            let cnpjNota = chaveNFE.substring(6, 20);
+        
+            if(cnpjNota !== cnpjFornecedor) {
+                return Swal.fire({
+                    icon: 'warning',
+                    title: 'CNPJ inválido',
+                    text: 'Está nota não Pertence ao Fornecedor Selecionado, favor verificar a nota fiscal!',
+                    customClass: {
+                        container:  'custom-swal',
+                    }
+                })
+            }
+
+            setModeloNFE(chaveNFE.substring(20, 22));
+            setSerieNFE(chaveNFE.substring(22, 25));
+            setNumeroNFE(chaveNFE.substring(25, 34));
+        } else if(chaveNFE.length > 1 && chaveNFE.length < 44 || chaveNFE.length > 44) {
+            return Swal.fire({
+                icon: 'warning',
+                title: 'Chave de NFE inválida',
+                text: `Chave incompleta ou maior que 44 caracteres, favor verifique a chave da nota fiscal! Nº DE CARACTERES DIGITADOS: ${chaveNFE.length}`,
+                customClass: {
+                    container:  'custom-swal',
+                }
+            })
+        }
+    }
+   
     return (
         <Fragment>
             <form onSubmit={handleSubmit(handleValidatedSubmit)}>
@@ -133,7 +201,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                         <Select
                                             className="basic-single"
                                             classNamePrefix="select"
-                                            name="fornecedorProduto"
+                                            name="fornecedorPedido"
                                             options={[
                                                 { value: '', label: 'Selecione...' },
                                                 ...dadosFornecedores?.map((item) => {
@@ -145,14 +213,14 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                             value={fornecedorSelecionado}
                                             onChange={(e) => {
                                                 setFornecedorSelecionado(e)
-                                                clearErrors('fornecedorProduto')
+                                                clearErrors('fornecedorPedido')
                                             }}
                                         />
-                                        {errors.fornecedorProduto && (
+                                        {errors.fornecedorPedido && (
                                             <AlertError
-                                                error={errors.fornecedorProduto}
+                                                error={errors.fornecedorPedido}
                                                 onClose={clearErrors}
-                                                fieldName="fornecedorProduto"
+                                                fieldName="fornecedorPedido"
                                             />
                                         )}
                                     </div>
@@ -163,7 +231,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                         <Select
                                             className="basic-single"
                                             classNamePrefix="select"
-                                            name="condicaoPagamentoFornecedor"
+                                            name="condicaoPagamentoPedido"
                                             options={
                                                 dadosCondicoesPagamento.map((item) => {
                                                     return {
@@ -175,14 +243,14 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                             value={condicaoPagamento}
                                             onChange={(e) => {
                                                 setCondicaoPagamento(e)
-                                                clearErrors("condicaoPagamentoFornecedor")
+                                                clearErrors("condicaoPagamentoPedido")
                                             }}
                                         />
-                                        {errors.condicaoPagamentoFornecedor && (
+                                        {errors.condicaoPagamentoPedido && (
                                             <AlertError
-                                                error={errors.condicaoPagamentoFornecedor}
+                                                error={errors.condicaoPagamentoPedido}
                                                 onClose={clearErrors}
-                                                fieldName="condicaoPagamentoFornecedor"
+                                                fieldName="condicaoPagamentoPedido"
                                             />
                                         )}
                                     </div>
@@ -426,7 +494,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                             <div className="form-group">
                                 <div className="row">
                                 
-                                    <div className="col-sm-6 col-xl-6">
+                                    <div className="col-sm-6 col-xl-7">
                                         <label htmlFor="">Filial</label>
                                         <Select
                                             className="basic-single"
@@ -435,15 +503,18 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                             options={dadosEmpresas.map((item) => {
                                                 return {
                                                     value: item.IDEMPRESA,
-                                                    label: `${item.NOFANTASIA} - ${item.NORAZAOSOCIAL}`
+                                                    label: `${item.NOFANTASIA} - ${item.NORAZAOSOCIAL}`,
+                                                    cnpj: item.NUCNPJ
                                                 }
                                             })}
                                             value={filialSelecionada}
                                             onChange={(e) => {
                                                 setFilialSelecionada(e)
+                                                setCnpjFilial(e?.cnpj || '')
                                                 clearErrors("filialPedido")
                                             }}
                                         />
+                                        
                                         {errors.filialPedido && (
                                             <AlertError
                                                 error={errors.filialPedido}
@@ -452,7 +523,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                             />
                                         )}
                                     </div>
-                                    <div className="col-sm-6 col-xl-6">
+                                    <div className="col-sm-6 col-xl-5">
                                         <Controller
                                             name="cnpjFilialPedido"
                                             control={control}
@@ -461,10 +532,11 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                                     label={"CNPJ Filial "}
                                                     name="cnpjFilialPedido"
                                                     type="text"
-                                                    value={cnpjFilial}
+                                                    value={mascaraCNPJ(cnpjFilial)}
                                                     onChange={(e) => setCnpjFilial(e.target.value)}
                                                     errors={errors}
                                                     clearErrors={clearErrors}
+                                                    readOnly={true}
                                                 />
                                             )}
                                         />
@@ -481,7 +553,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                             className="basic-single"
                                             classNamePrefix="select"
                                             name="tipoNFEPedido"
-                                            options={optionsTipoFreteComercial.map((item) => {
+                                            options={optionsTipoNFE.map((item) => {
                                                 return {
                                                     value: item.value,
                                                     label: item.label
@@ -550,7 +622,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                             className="basic-single"
                                             classNamePrefix="select"
                                             name="modeloNFEPedido"
-                                            options={optionsTipoFreteComercial.map((item) => {
+                                            options={optionsModeloNFE?.map((item) => {
                                                 return {
                                                     value: item.value,
                                                     label: item.label
@@ -580,7 +652,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                                                     name="chaveNFEPedido"
                                                     type="text"
                                                     value={chaveNFE}
-                                                    onChange={(e) => setChaveNFE(e.target.value)}
+                                                    onChange={(e) => preencheDadosComCHNFE(e.target.value)}
                                                     errors={errors}
                                                     clearErrors={clearErrors}
                                                 />
@@ -803,7 +875,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
                     ButtonTypeCadastrar={ButtonTypeModal}
                     onClickButtonCadastrar={handleSubmit(handleValidatedSubmit)}
                     tipoBtnCadastrar={"submit"}
-                    textButtonCadastrar={"Salvar"}
+                    textButtonCadastrar={"Cadastrar"}
                     corCadastrar={"success"}
                     loadingTextCadastrar={"Cadastrando..."}
                     autoLoadingCadastrar={true}

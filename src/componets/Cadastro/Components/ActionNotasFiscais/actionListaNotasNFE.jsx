@@ -18,7 +18,11 @@ import { GrFormView } from "react-icons/gr";
 import { SiSap } from "react-icons/si";
 import { ActionDesvincularNotasNFEModal } from "./actionDesvincularNotasNFEModal";
 
-export const ActionListaNotasNFE = ({ dadosNFE }) => {
+export const ActionListaNotasNFE = ({ 
+  dadosNFE, 
+  usuarioLogado, 
+  optionsModulos
+ }) => {
   const [modalDesvincular, setModalDesvincular] = useState(false);
   const [dadosPedidosVinculados, setDadosPedidosVinculados] = useState([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');

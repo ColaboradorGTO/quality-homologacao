@@ -149,7 +149,11 @@ export const ActionPesquisaNFE = ({ usuarioLogado }) => {
       />
 
       {tabelaVisivel &&
-        <ActionListaNotasNFE dadosNFE={dadosNFE} />
+        <ActionListaNotasNFE 
+          dadosNFE={dadosNFE} 
+          usuarioLogado={usuarioLogado}
+          optionsModulos={optionsModulos}
+        />
       }
 
       <ActionCadastrarNFE 
