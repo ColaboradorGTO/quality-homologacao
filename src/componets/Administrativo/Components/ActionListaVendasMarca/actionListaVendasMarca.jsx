@@ -9,8 +9,9 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
-export const ActionListaVendasMarca = ({dadosVendasMarca}) => {
+export const ActionListaVendasMarca = ({ dadosVendasMarca }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
 
   const onGlobalFilterChange = (e) => {
@@ -44,12 +45,12 @@ export const ActionListaVendasMarca = ({dadosVendasMarca}) => {
     const workbook = XLSX.utils.book_new();
     const header = ['IDEMPRESA', 'Loja', 'QTD Clientes', 'Total Vendas', 'Ticket Médio'];
     worksheet['!cols'] = [
-      { wpx: 50, caption: 'IDEMPRESA' }, 
-      { wpx: 200, caption: 'Loja' }, 
-      { wpx: 100, caption: 'QTD Clientes' }, 
-      { wpx: 100, caption: 'Total Vendas' }, 
+      { wpx: 50, caption: 'IDEMPRESA' },
+      { wpx: 200, caption: 'Loja' },
+      { wpx: 100, caption: 'QTD Clientes' },
+      { wpx: 100, caption: 'Total Vendas' },
       { wpx: 100, caption: 'Ticket Médio' },
-    ]; 
+    ];
     XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Vendas por Marcas');
     XLSX.writeFile(workbook, 'vendas_marca.xlsx');
@@ -87,7 +88,7 @@ export const ActionListaVendasMarca = ({dadosVendasMarca}) => {
     const vrDisponivelBrutoVoucher = toFloat(item.VRTOTALPAGO) - toFloat(item.VOUCHER);
     const valorTicketM = (vrDisponivelBrutoVoucher / parseFloat(item.QTDVENDA));
     const totalTicketM = (vrDisponivelBrutoVoucher / parseFloat(item.QTDVENDA));
-  
+
     return {
       IDEMPRESA: item.IDEMPRESA,
       NOFANTASIA: item.NOFANTASIA,
@@ -133,7 +134,7 @@ export const ActionListaVendasMarca = ({dadosVendasMarca}) => {
       field: 'valorTicketM',
       header: 'Ticket Médio',
       body: row => <th>{formatMoeda(row.valorTicketM)}</th>,
-      footer: row =>  calcularTotalTicketMedio(),
+      footer: row => calcularTotalTicketMedio(),
       sortable: true,
     },
   ];
@@ -141,57 +142,60 @@ export const ActionListaVendasMarca = ({dadosVendasMarca}) => {
 
   return (
 
-      <div className="panel">
-        <div className="panel-hdr">
-          <h2>Vendas por Loja</h2>
-        </div>
-        <Fragment>
-            <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
-            <HeaderTable
-              globalFilterValue={globalFilterValue}
-              onGlobalFilterChange={onGlobalFilterChange}
-              handlePrint={handlePrint}
-              exportToExcel={exportToExcel}
-              exportToPDF={exportToPDF}
-            />
-            
-          </div>
-          <div className="card" ref={dataTableRef}>
-            <DataTable
-              title="Vendas por Loja"
-              value={dados}
-              globalFilter={globalFilterValue}
-              size="small"
-              sortOrder={-1}
-              // paginator={true}
-              // rows={10}
-              // rowsPerPageOptions={[5, 10, 20, 50]}
-              paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-              currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
-              filterDisplay="menu"
-              showGridlines
-              stripedRows
-              emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
-            >
-              {colunasVendas.map(coluna => (
-                <Column
-                  key={coluna.field}
-                  field={coluna.field}
-                  header={coluna.header}
-                  body={coluna.body}
-                  footer={coluna.footer}
-                  sortable={coluna.sortable}
-                  headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '1rem' }}
-                  footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem' }}
-                  bodyStyle={{ fontSize: '1rem' }}
-
-                />
-              ))}
-            </DataTable>
-          </div>
-
-        </Fragment>
+    <div className="panel">
+      <div className="panel-hdr">
+        <h2>Vendas por Loja</h2>
       </div>
+      <Fragment>
+        <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
+          <HeaderTable
+            globalFilterValue={globalFilterValue}
+            onGlobalFilterChange={onGlobalFilterChange}
+            handlePrint={handlePrint}
+            exportToExcel={exportToExcel}
+            exportToPDF={exportToPDF}
+          />
+
+        </div>
+        <div className="card" ref={dataTableRef}>
+          <DataTable
+            title="Vendas por Loja"
+            value={dados}
+            globalFilter={globalFilterValue}
+            size="small"
+            sortOrder={-1}
+            selectionMode="single"
+            selection={rowSelection}
+
+            // paginator={true}
+            // rows={10}
+            // rowsPerPageOptions={[5, 10, 20, 50]}
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+            filterDisplay="menu"
+            showGridlines
+            stripedRows
+            emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
+          >
+            {colunasVendas.map(coluna => (
+              <Column
+                key={coluna.field}
+                field={coluna.field}
+                header={coluna.header}
+                body={coluna.body}
+                footer={coluna.footer}
+                sortable={coluna.sortable}
+                headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '1rem' }}
+                footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem' }}
+                bodyStyle={{ fontSize: '1rem' }}
+
+              />
+            ))}
+          </DataTable>
+        </div>
+
+      </Fragment>
+    </div>
   )
 }
 

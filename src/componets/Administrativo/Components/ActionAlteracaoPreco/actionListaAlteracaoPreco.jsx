@@ -254,8 +254,6 @@ export const ActionListaAlteracaoPreco = ({ dadosAlteracaoPreco }) => {
     },
   ]
 
-
-
   return (
 
     <Fragment>

@@ -289,7 +289,7 @@ export const ActionListaFechamentoDosCaixas = ({
       sortable: true,
     },
     {
-      field: 'STCONFERIDO',
+      field: 'OPTIONS',
       header: 'Opções',
       body: row => {
         if (row.STCONFERIDO > 0) {

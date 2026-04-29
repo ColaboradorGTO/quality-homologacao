@@ -130,26 +130,26 @@ export const ActionListaMovimentacaoCaixaDia = ({
   const calcularTotalVendido = (item) => {
 
     return (
-      toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDODINHEIRO) +
-      toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOCARTAO) +
-      toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOPOS) +
-      toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOCONVENIO) +
-      toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOPIX) +
-      toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOVOUCHER) +
-      toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOMOOVPAY)
+      toFloat(item.venda?.[0]?.['venda-movimento']?.TOTALVENDIDODINHEIRO) +
+      toFloat(item.venda?.[0]?.['venda-movimento']?.TOTALVENDIDOCARTAO) +
+      toFloat(item.venda?.[0]?.['venda-movimento']?.TOTALVENDIDOPOS) +
+      toFloat(item.venda?.[0]?.['venda-movimento']?.TOTALVENDIDOCONVENIO) +
+      toFloat(item.venda?.[0]?.['venda-movimento']?.TOTALVENDIDOPIX) +
+      toFloat(item.venda?.[0]?.['venda-movimento']?.TOTALVENDIDOVOUCHER) +
+      toFloat(item.venda?.[0]?.['venda-movimento']?.TOTALVENDIDOMOOVPAY)
 
     );
   }
   const calcularTotalCaixa = (item) => {
 
     return (
-      toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDODINHEIRO) +
-      toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOCARTAO) +
-      toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOPOS) +
-      toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOCONVENIO) +
-      toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOPIX) +
-      toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOVOUCHER) +
-      toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOMOOVPAY)
+      toFloat(item.venda?.[0]?.['venda-movimento']?.TOTALVENDIDODINHEIRO) +
+      toFloat(item.venda?.[0]?.['venda-movimento']?.TOTALVENDIDOCARTAO) +
+      toFloat(item.venda?.[0]?.['venda-movimento']?.TOTALVENDIDOPOS) +
+      toFloat(item.venda?.[0]?.['venda-movimento']?.TOTALVENDIDOCONVENIO) +
+      toFloat(item.venda?.[0]?.['venda-movimento']?.TOTALVENDIDOPIX) +
+      toFloat(item.venda?.[0]?.['venda-movimento']?.TOTALVENDIDOVOUCHER) +
+      toFloat(item.venda?.[0]?.['venda-movimento']?.TOTALVENDIDOMOOVPAY)
 
     );
   }
@@ -157,8 +157,8 @@ export const ActionListaMovimentacaoCaixaDia = ({
   const calcularTotalVrDisponivel = (item) => {
 
     return (
-      toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDODINHEIRO) +
-      toFloat(item.fatura[0]['fatura-movimento'].TOTALRECEBIDOFATURA)
+      toFloat(item.venda?.[0]?.['venda-movimento']?.TOTALVENDIDODINHEIRO) +
+      toFloat(item.fatura?.[0]?.['fatura-movimento']?.TOTALRECEBIDOFATURA)
     )
   }
 
@@ -168,8 +168,8 @@ export const ActionListaMovimentacaoCaixaDia = ({
     //   (toFloat(item.vendapcj[0]['venda-pcj'].TOTALPCJ18) /
     //   toFloat(item.vendapcj[0]['venda-pcj'].TOTALPCJ78)) * 100
     // )
-    const vrPCJ18 = toFloat(item.vendapcj[0]['venda-pcj'].TOTALPCJ18);
-    const vrPCJ78 = toFloat(item.vendapcj[0]['venda-pcj'].TOTALPCJ78);
+    const vrPCJ18 = toFloat(item.vendapcj?.[0]?.['venda-pcj']?.TOTALPCJ18);
+    const vrPCJ78 = toFloat(item.vendapcj?.[0]?.['venda-pcj']?.TOTALPCJ78);
     const totalPCJ = vrPCJ18 !== 0 ? (vrPCJ78 / vrPCJ18) * 100 : 0;
     return totalPCJ;
 
@@ -177,45 +177,44 @@ export const ActionListaMovimentacaoCaixaDia = ({
 
   const calcularValorTotalFatura = (item) => {
     return (
-      toFloat(item.fatura[0]['fatura-movimento'].TOTALRECEBIDOFATURA) +
-      toFloat(item.faturapix[0]['fatura-movimento-pix'].TOTALRECEBIDOFATURAPIX)
+      toFloat(item.fatura?.[0]?.['fatura-movimento']?.TOTALRECEBIDOFATURA) +
+      toFloat(item.faturapix?.[0]?.['fatura-movimento-pix']?.TOTALRECEBIDOFATURAPIX)
     )
   }
-
+  
   const dadosMovLojaDia = dadosMovimentacaoCaixaDoDia.map((item, index) => {
     const totalVendido = calcularTotalVendido(item);
     const vrDisponivel = calcularTotalVrDisponivel(item);
     const pcjTotal = calcularTotalPCJTotal(item)
     const vrTotalFatura = calcularValorTotalFatura(item);
     const vrTotalCaixa = calcularTotalCaixa(item);
-
-  
+    
     return {
-      IDCAIXAWEB: item.caixa.IDCAIXAWEB,
-      ID: item.caixa.ID,
-      DSCAIXA: item.caixa.DSCAIXA,
-      DTABERTURA: item.caixa.DTABERTURA,
-      NOFUNCIONARIO: item.caixa.NOFUNCIONARIO,
-      NUCPF: item.caixa.NUCPF,
-      STFECHADO: item.caixa.STFECHADO,
-      VRRECDINHEIRO: item.caixa.VRRECDINHEIRO,
+      IDCAIXAWEB: item.caixa?.IDCAIXAWEB,
+      ID: item.caixa?.ID,
+      DSCAIXA: item.caixa?.DSCAIXA,
+      DTABERTURA: item.caixa?.DTABERTURA,
+      NOFUNCIONARIO: item.caixa?.NOFUNCIONARIO,
+      NUCPF: item.caixa?.NUCPF,
+      STFECHADO: item.caixa?.STFECHADO,
+      VRRECDINHEIRO: item.caixa?.VRRECDINHEIRO,
+      
+      
+      TOTALRECEBIDOFATURA: item.fatura?.[0]?.['fatura-movimento']?.TOTALRECEBIDOFATURA,
+      TOTALRECEBIDOFATURAPIX: item.faturapix?.[0]?.['fatura-movimento-pix']?.TOTALRECEBIDOFATURAPIX,
+      
+      TOTALVENDIDODINHEIRO: toFloat(item.venda?.[0]?.['venda-movimento']?.TOTALVENDIDODINHEIRO),
+      TOTALVENDIDOCARTAO: toFloat(item.venda?.[0]?.['venda-movimento']?.TOTALVENDIDOCARTAO),
+      TOTALVENDIDOPOS: toFloat(item.venda?.[0]?.['venda-movimento']?.TOTALVENDIDOPOS),
+      TOTALVENDIDOPIX: toFloat(item.venda?.[0]?.['venda-movimento']?.TOTALVENDIDOPIX),
+      TOTALVENDIDOMOOVPAY: toFloat(item.venda?.[0]?.['venda-movimento']?.TOTALVENDIDOMOOVPAY),
+      TOTALVENDIDOVOUCHER: item.venda?.[0]?.['venda-movimento']?.TOTALVENDIDOVOUCHER,
+      TOTALVENDIDOCONVENIO: toFloat(item.venda?.[0]?.['venda-movimento']?.TOTALVENDIDOCONVENIO),
+      TOTALVENDIDO: item.venda?.[0]?.['venda-movimento']?.TOTALVENDIDO,
+      TOTALNOTA: item.venda?.[0]?.['venda-movimento']?.TOTALNOTA,
 
-
-      TOTALRECEBIDOFATURA: item.fatura[0]['fatura-movimento'].TOTALRECEBIDOFATURA,
-      TOTALRECEBIDOFATURAPIX: item.faturapix[0]['fatura-movimento-pix'].TOTALRECEBIDOFATURAPIX,
-
-      TOTALVENDIDODINHEIRO: toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDODINHEIRO),
-      TOTALVENDIDOCARTAO: toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOCARTAO),
-      TOTALVENDIDOPOS: toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOPOS),
-      TOTALVENDIDOPIX: toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOPIX),
-      TOTALVENDIDOMOOVPAY: toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOMOOVPAY),
-      TOTALVENDIDOVOUCHER: item.venda[0]['venda-movimento'].TOTALVENDIDOVOUCHER,
-      TOTALVENDIDOCONVENIO: toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOCONVENIO),
-      TOTALVENDIDO: item.venda[0]['venda-movimento'].TOTALVENDIDO,
-      TOTALNOTA: item.venda[0]['venda-movimento'].TOTALNOTA,
-
-      TOTALPCJ18: item.vendapcj[0]['venda-pcj'].TOTALPCJ18,
-      TOTALPCJ78: item.vendapcj[0]['venda-pcj'].TOTALPCJ78,
+      TOTALPCJ18: item.vendapcj?.[0]?.['venda-pcj']?.TOTALPCJ18,
+      TOTALPCJ78: item.vendapcj?.[0]?.['venda-pcj']?.TOTALPCJ78,
 
       totalVendido: totalVendido,
       vrDisponivel: vrDisponivel,
@@ -224,6 +223,8 @@ export const ActionListaMovimentacaoCaixaDia = ({
       vrTotalCaixa: vrTotalCaixa,
     };
   });
+
+  //console.log(dadosMovimentacaoCaixaDoDia, "dadosMovimentacaoCaixaDoDia")
 
   const colunaCaixaDoDia = [
     {
