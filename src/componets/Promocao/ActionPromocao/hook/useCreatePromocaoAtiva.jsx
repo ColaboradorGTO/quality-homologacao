@@ -979,20 +979,20 @@ export const useCreatePromocaoAtiva = ({ }) => {
         const destino = fileProdutoDestino && fileProdutoDestino.length > 0 ? JSON.parse(fileProdutoDestino) : produtoDestino ? [produtoDestino] : [];
         const iguais = origem.length === destino.length && origem.every((v, i) => v === destino[i]);
 
-        if (!iguais) {
-          Swal.fire({
-            position: 'center',
-            icon: 'error',
-            title: 'Erro Produtos Origem e Destino',
-            text: 'Para Mecânica por pares ou menos na primeira, os produtos de origem e destino devem ser iguais.',
-            customClass: {
-              container: 'custom-swal',
-            },
-            showConfirmButton: false,
-            timer: 5000,
-          });
-          return;
-        }
+        // if (!iguais) {
+        //   Swal.fire({
+        //     position: 'center',
+        //     icon: 'error',
+        //     title: 'Erro Produtos Origem e Destino',
+        //     text: 'Para Mecânica por pares ou menos na primeira, os produtos de origem e destino devem ser iguais.',
+        //     customClass: {
+        //       container: 'custom-swal',
+        //     },
+        //     showConfirmButton: false,
+        //     timer: 5000,
+        //   });
+        //   return;
+        // }
       }
 
       if (aplicacaoDestinoSelecionada == 1) {
@@ -1374,20 +1374,20 @@ export const useCreatePromocaoAtiva = ({ }) => {
         const iguais = idsOrigem.length === idsDestino.length && 
           idsOrigem.every((id, i) => id === idsDestino[i]);
           
-        if (!iguais) {
-          Swal.fire({
-            position: 'center',
-            icon: 'error',
-            title: 'Erro Produtos Origem e Destino AQUI',
-            text: 'Para Mecânica por pares ou menos na primeira, os produtos de origem e destino devem ser iguais.',
-            customClass: {
-              container: 'custom-swal',
-            },
-            showConfirmButton: false,
-            timer: 15000,
-          });
-          return;
-        }
+        // if (!iguais) {
+        //   Swal.fire({
+        //     position: 'center',
+        //     icon: 'error',
+        //     title: 'Erro Produtos Origem e Destino AQUI',
+        //     text: 'Para Mecânica por pares ou menos na primeira, os produtos de origem e destino devem ser iguais.',
+        //     customClass: {
+        //       container: 'custom-swal',
+        //     },
+        //     showConfirmButton: false,
+        //     timer: 15000,
+        //   });
+        //   return;
+        // }
       }
 
       const postData = {
@@ -1752,20 +1752,20 @@ export const useCreatePromocaoAtiva = ({ }) => {
         const iguais = idsOrigem.length === idsDestino.length && 
           idsOrigem.every((id, i) => id === idsDestino[i]);
           
-        if (!iguais) {
-          Swal.fire({
-            position: 'center',
-            icon: 'error',
-            title: 'Erro Produtos Origem e Destino AQUI',
-            text: 'Para Mecânica por pares ou menos na primeira, os produtos de origem e destino devem ser iguais.',
-            customClass: {
-              container: 'custom-swal',
-            },
-            showConfirmButton: false,
-            timer: 15000,
-          });
-          return;
-        }
+        // if (!iguais) {
+        //   Swal.fire({
+        //     position: 'center',
+        //     icon: 'error',
+        //     title: 'Erro Produtos Origem e Destino AQUI',
+        //     text: 'Para Mecânica por pares ou menos na primeira, os produtos de origem e destino devem ser iguais.',
+        //     customClass: {
+        //       container: 'custom-swal',
+        //     },
+        //     showConfirmButton: false,
+        //     timer: 15000,
+        //   });
+        //   return;
+        // }
       }
 
       if (aplicacaoDestinoSelecionada == 1) {
