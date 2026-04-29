@@ -995,20 +995,20 @@ export const useCreatePromocaoAtiva = ({ }) => {
       //   // }
       // }
 
-      if (aplicacaoDestinoSelecionada == 1) {
-        if (produtosDestino.length !== produtosOrigem.length) {
-          Swal.fire({
-            position: 'center',
-            icon: 'error',
-            title: 'Erro Aplicação Destino',
-            text: 'Para Mecânica por todos os produtos, os produtos de origem e destino devem ser iguais.',
-            customClass: { container: 'custom-swal' },
-            showConfirmButton: false,
-            timer: 8000,
-          });
-          return;
-        }
-      }
+      // if (aplicacaoDestinoSelecionada == 1) {
+      //   if (produtosDestino.length !== produtosOrigem.length) {
+      //     Swal.fire({
+      //       position: 'center',
+      //       icon: 'error',
+      //       title: 'Erro Aplicação Destino',
+      //       text: 'Para Mecânica por todos os produtos, os produtos de origem e destino devem ser iguais.',
+      //       customClass: { container: 'custom-swal' },
+      //       showConfirmButton: false,
+      //       timer: 8000,
+      //     });
+      //     return;
+      //   }
+      // }
 
       if (aplicacaoDestinoSelecionada == 4) {
 
@@ -1768,20 +1768,20 @@ export const useCreatePromocaoAtiva = ({ }) => {
       //   }
       // }
 
-      if (aplicacaoDestinoSelecionada == 1) {
-        if (produtoSelecionadoEstProdDestino.length !== produtoSelecionadoEstProdOrigem.length) {
-          Swal.fire({
-            position: 'center',
-            icon: 'error',
-            title: 'Erro Aplicação Destino',
-            text: 'Para Mecânica por todos os produtos, os produtos de origem e destino devem ser iguais.',
-            customClass: { container: 'custom-swal' },
-            showConfirmButton: false,
-            timer: 8000,
-          });
-          return;
-        }
-      }
+      // if (aplicacaoDestinoSelecionada == 1) {
+      //   if (produtoSelecionadoEstProdDestino.length !== produtoSelecionadoEstProdOrigem.length) {
+      //     Swal.fire({
+      //       position: 'center',
+      //       icon: 'error',
+      //       title: 'Erro Aplicação Destino',
+      //       text: 'Para Mecânica por todos os produtos, os produtos de origem e destino devem ser iguais.',
+      //       customClass: { container: 'custom-swal' },
+      //       showConfirmButton: false,
+      //       timer: 8000,
+      //     });
+      //     return;
+      //   }
+      // }
 
       if (aplicacaoDestinoSelecionada == 4) {
         if (produtoSelecionadoEstProdDestino.length !== 1 || produtoSelecionadoEstProdOrigem.length !== 1) {

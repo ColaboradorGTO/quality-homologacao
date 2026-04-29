@@ -26,6 +26,8 @@ export const ActionPesquisaNFE = ({ usuarioLogado }) => {
   const [pageSize, setPageSize] = useState(1000);
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
   const [modalVisivel, setModalVisivel] = useState(false);
+  const [dadosListaPedidosSemVinculoNFE, setDadosListaPedidosSemVinculoNFE] = useState([])
+  const [tabelaPedido, setTabelaPedido] = useState(false)
 
   useEffect(() => {
     const dataAtual = getDataAtual()
@@ -155,6 +157,14 @@ export const ActionPesquisaNFE = ({ usuarioLogado }) => {
           optionsModulos={optionsModulos}
         />
       }
+{/* 
+      {tabelaPedido &&
+        <ActionListaNotasNFE 
+          dadosNFE={dadosNFE} 
+          usuarioLogado={usuarioLogado}
+          optionsModulos={optionsModulos}
+        />
+      } */}
 
       <ActionCadastrarNFE 
         show={modalVisivel}
