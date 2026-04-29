@@ -12,11 +12,12 @@ import * as XLSX from 'xlsx';
 import HeaderTable from "../../../Tables/headerTable";
 import { BsTrash3 } from "react-icons/bs";
 import { MdOutlineCreateNewFolder } from "react-icons/md";
-import { FaUnlink } from "react-icons/fa";
+import { FaLink, FaUnlink } from "react-icons/fa";
 import { GiPadlock, GiPadlockOpen } from "react-icons/gi";
-import { GrFormView } from "react-icons/gr";
+import { GrFormView, GrView } from "react-icons/gr";
 import { SiSap } from "react-icons/si";
 import { ActionDesvincularNotasNFEModal } from "./actionDesvincularNotasNFEModal";
+import { IoMdAdd } from "react-icons/io";
 
 export const ActionListaNotasNFE = ({ 
   dadosNFE, 
@@ -26,6 +27,7 @@ export const ActionListaNotasNFE = ({
   const [modalDesvincular, setModalDesvincular] = useState(false);
   const [dadosPedidosVinculados, setDadosPedidosVinculados] = useState([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
 
 
@@ -176,13 +178,38 @@ export const ActionListaNotasNFE = ({
       
             <div className="p-1">
               <ButtonTable
+                titleButton={"Migrar Para o SAP"}
+                onClickButton={() => clickVincular(row)}
+                cor={"primary"}
+                Icon={SiSap}
+                iconSize={25}
+                iconColor={"#fff"}
+                width="30px"
+                height="30px"
+              />
+            </div>
+            <div className="p-1">
+              <ButtonTable
+                titleButton={"Visualizar Nota"}
+                onClickButton={() => clickVincular(row)}
+                cor={"info"}
+                Icon={GrView}
+                iconSize={25}
+                iconColor={"#fff"}
+                width="30px"
+                height="30px"
+              />
+            </div>
+            <div className="p-1">
+              <ButtonTable
                 titleButton={"Vincular Nota Fiscal a Pedidos"}
                 onClickButton={() => clickVincular(row)}
                 cor={"success"}
-                Icon={GiPadlock}
-                iconSize={22}
+                Icon={FaLink}
+                iconSize={25}
                 iconColor={"#fff"}
-  
+                width="30px"
+                height="30px"
               />
             </div>
             <div className="p-1">
@@ -190,22 +217,36 @@ export const ActionListaNotasNFE = ({
                 titleButton={"Desvincular Pedidos Desta Nota Fiscal"}
                 onClickButton={() => clickDesvincular(row)}
                 cor={"warning"}
-                Icon={GiPadlockOpen}
-                iconSize={22}
+                Icon={FaUnlink}
+                iconSize={25}
                 iconColor={"#fff"}
-  
+                width="30px"
+                height="30px"
               />
             </div>
 
+            <div className="p-1">
+              <ButtonTable
+                titleButton={"Criar Nota Fiscal de Devolução"}
+                onClickButton={() => clickCriarNota(row)}
+                cor={"secondary"}
+                Icon={IoMdAdd}
+                iconSize={25}
+                iconColor={"#fff"}
+                width="30px"
+                height="30px"
+              />
+            </div>
             <div className="p-1">
               <ButtonTable
                 titleButton={"Cancelar Nota Fiscal"}
                 onClickButton={() => clickCriarNota(row)}
                 cor={"danger"}
                 Icon={BsTrash3}
-                iconSize={22}
+                iconSize={25}
                 iconColor={"#fff"}
-  
+                width="30px"
+                height="30px"
               />
             </div>
           
@@ -248,16 +289,22 @@ export const ActionListaNotasNFE = ({
           />
 
         </div>
-        <div className="card mb-4" ref={dataTableRef}>
+        <div className="card" ref={dataTableRef}>
           <DataTable
             title="Notas Fiscais"
             value={dados}
             globalFilter={globalFilterValue}
             size="small"
+            selectionMode="single"
+            selection={rowSelection}
+            onSelectionChange={(e) => setRowSelection(e.value)}
             sortOrder={-1}
             paginator={true}
             rows={10}
             rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+            filterDisplay="menu"
             showGridlines
             stripedRows
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado </div>}
