@@ -74,10 +74,11 @@ export const ActionListaNotasNFE = ({
 
   const dados = dadosNFE.map((item, index) => {
     let contador = index + 1;
-
+    let numSerieNota = `${item.SERIE} - ${item.NNF}`;
+    console.log(item, 'item')
     return {
       contador,
-      DATACADASTRO: item.DATACADASTRO,
+      DTCADASTRO: item.DTCADASTRO,
       DEMI: item.DEMI,
       EMIT_XNOME: item.EMIT_XNOME,
       SERIE: item.SERIE,
@@ -86,6 +87,7 @@ export const ActionListaNotasNFE = ({
       STCANCELADO: item.STCANCELADO,
       STMIGRADOSAP: item.STMIGRADOSAP,
       LOGSAP: item.LOGSAP,
+      numSerieNota
     }
   })
 
@@ -97,9 +99,9 @@ export const ActionListaNotasNFE = ({
       sortable: true,
     },
     {
-      field: 'DATACADASTRO',
+      field: 'DTCADASTRO',
       header: 'Data Cadastro',
-      body: row => <th>{row.DATACADASTRO}</th>,
+      body: row => <th>{row.DTCADASTRO}</th>,
       sortable: true,
     },
     {
@@ -173,21 +175,25 @@ export const ActionListaNotasNFE = ({
       field: 'IDRESUMOENTRADA',
       header: 'Opções',
       body: row => {
+        const stCancelado = row.STCANCELADO === 'True';
+        const stSAP = row.STMIGRADOSAP === 'True';
         return (
           <div style={{ justifyContent: "space-between", display: "flex" }}>
-      
-            <div className="p-1">
-              <ButtonTable
-                titleButton={"Migrar Para o SAP"}
-                onClickButton={() => clickVincular(row)}
-                cor={"primary"}
-                Icon={SiSap}
-                iconSize={25}
-                iconColor={"#fff"}
-                width="30px"
-                height="30px"
-              />
-            </div>
+            {!stSAP && !stCancelado && (
+              <div className="p-1">
+                <ButtonTable
+                  titleButton={"Migrar Para o SAP"}
+                  onClickButton={() => clickVincular(row)}
+                  cor={"primary"}
+                  Icon={SiSap}
+                  iconSize={25}
+                  iconColor={"#fff"}
+                  width="30px"
+                  height="30px"
+                />
+              </div>
+            )}
+
             <div className="p-1">
               <ButtonTable
                 titleButton={"Visualizar Nota"}
@@ -200,55 +206,66 @@ export const ActionListaNotasNFE = ({
                 height="30px"
               />
             </div>
-            <div className="p-1">
-              <ButtonTable
-                titleButton={"Vincular Nota Fiscal a Pedidos"}
-                onClickButton={() => clickVincular(row)}
-                cor={"success"}
-                Icon={FaLink}
-                iconSize={25}
-                iconColor={"#fff"}
-                width="30px"
-                height="30px"
-              />
-            </div>
-            <div className="p-1">
-              <ButtonTable
-                titleButton={"Desvincular Pedidos Desta Nota Fiscal"}
-                onClickButton={() => clickDesvincular(row)}
-                cor={"warning"}
-                Icon={FaUnlink}
-                iconSize={25}
-                iconColor={"#fff"}
-                width="30px"
-                height="30px"
-              />
-            </div>
 
-            <div className="p-1">
-              <ButtonTable
-                titleButton={"Criar Nota Fiscal de Devolução"}
-                onClickButton={() => clickCriarNota(row)}
-                cor={"secondary"}
-                Icon={IoMdAdd}
-                iconSize={25}
-                iconColor={"#fff"}
-                width="30px"
-                height="30px"
-              />
-            </div>
-            <div className="p-1">
-              <ButtonTable
-                titleButton={"Cancelar Nota Fiscal"}
-                onClickButton={() => clickCriarNota(row)}
-                cor={"danger"}
-                Icon={BsTrash3}
-                iconSize={25}
-                iconColor={"#fff"}
-                width="30px"
-                height="30px"
-              />
-            </div>
+            {!stCancelado && (
+              <div className="p-1">
+                <ButtonTable
+                  titleButton={"Vincular Nota Fiscal a Pedidos"}
+                  onClickButton={() => clickVincular(row)}
+                  cor={"success"}
+                  Icon={FaLink}
+                  iconSize={25}
+                  iconColor={"#fff"}
+                  width="30px"
+                  height="30px"
+                />
+              </div> 
+            )}
+
+            {/* {!stCancelado && (
+              <div className="p-1">
+                <ButtonTable
+                  titleButton={"Desvincular Pedidos Desta Nota Fiscal"}
+                  onClickButton={() => clickDesvincular(row)}
+                  cor={"warning"}
+                  Icon={FaUnlink}
+                  iconSize={25}
+                  iconColor={"#fff"}
+                  width="30px"
+                  height="30px"
+                />
+              </div>
+            )} */}
+
+            {!stCancelado && (
+              <div className="p-1">
+                <ButtonTable
+                  titleButton={"Criar Nota Fiscal de Devolução"}
+                  onClickButton={() => clickCriarNota(row)}
+                  cor={"secondary"}
+                  Icon={IoMdAdd}
+                  iconSize={25}
+                  iconColor={"#fff"}
+                  width="30px"
+                  height="30px"
+                />
+              </div>
+            )}
+
+            {!stCancelado && (
+              <div className="p-1">
+                <ButtonTable
+                  titleButton={"Cancelar Nota Fiscal"}
+                  onClickButton={() => clickCriarNota(row)}
+                  cor={"danger"}
+                  Icon={BsTrash3}
+                  iconSize={25}
+                  iconColor={"#fff"}
+                  width="30px"
+                  height="30px"
+                />
+              </div>
+            )}
           
           </div>
         )
