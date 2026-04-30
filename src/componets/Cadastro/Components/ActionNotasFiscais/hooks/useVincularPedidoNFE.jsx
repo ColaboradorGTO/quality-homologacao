@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import axios from "axios"
 import Swal from 'sweetalert2'
-import { post, put } from "../../../../../api/funcRequest"
+import { post } from "../../../../../api/funcRequest"
 
 
 export const useVincularPedidoNFE = ({ 
@@ -58,7 +58,7 @@ export const useVincularPedidoNFE = ({
 
         try {
             
-            const response = await put('/nf-avulsa/:id', putData)
+            const response = await post('/vincular-nf-pedido', putData)
 
             const textDados = JSON.stringify(putData)
             let textFuncao = 'CADASTRO / VINCULANDO PEDIDOS';
