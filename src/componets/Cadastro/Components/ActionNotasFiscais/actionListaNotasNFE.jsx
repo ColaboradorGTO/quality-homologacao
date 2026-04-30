@@ -290,9 +290,17 @@ export const ActionListaNotasNFE = ({
 
   const handleDesvincular = async (IDRESUMOENTRADA) => {
     try {
-      const response = await get(`/vinculo-nfPedidos?idNota=${IDRESUMOENTRADA}`);
-      setDadosPedidosVinculados(response.data);
-      setModalDesvincular(true);
+      const response = await get(`/desvincular-pedidos-nfe?idNota=${IDRESUMOENTRADA}`);
+      if(response.data && response.data.length > 0) {
+        setDadosPedidosVinculados({ data: response.data, idNotaFiscal: IDRESUMOENTRADA });
+        setModalDesvincular(true);
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Nenhum pedido encontrado',
+          text: 'Não foi possível encontrar pedidos vinculados para esta nota fiscal.',
+        });
+      }
     } catch (error) {
       console.error(error);
     }
@@ -411,6 +419,9 @@ export const ActionListaNotasNFE = ({
           show={modalDesvincular}
           handleClose={() => setModalDesvincular(false)}
           dadosPedidosVinculados={dadosPedidosVinculados}
+          optionsModulos={optionsModulos}
+          usuarioLogado={usuarioLogado}
+          handleClick={handleClick}
         />
 
         <ActionVisualizarNFE 

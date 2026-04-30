@@ -190,15 +190,14 @@ export const ActionDesvincularNotasNFEModal = ({ show, handleClose, dadosPedidos
         }
     }, [show]);
 
-    //  Voltar aqui para finalizar a função de desvincular pedidos
+   
 
     const handleVincularPedidos = async () => {
-        console.log(selectedIds);
-        // vinculo-nfPedido/:id
-        const postData = [{
+   
+        const postData = {
             IDRESUMOPEDIDO: selectedIds,
             IDRESUMOENTRDA: dadosPedidosVinculados[0].IDRESUMOENTRADA
-        }]
+        }
         try {
 
             const response = await put('/vinculo-nfPedido/:id', postData)
