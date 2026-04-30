@@ -82,13 +82,13 @@ export const ActionListaPedidosSemVinculoNFE = ({
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Pedidos Sem Vínculo');
     XLSX.writeFile(workbook, 'pedidos_sem_vinculo.xlsx');
   };
-
-  const dados = dadosListaPedidosSemVinculoNFE
+ 
+  const dados = dadosListaPedidosSemVinculoNFE?.data
     .filter((item) => {
       const statusVinc = item.STATUSVINC;
       const idNota = item.NOTAVINC;
       return (!statusVinc || statusVinc === 'False') && 
-        (!idNota || idNota !== idNotaFiscal);
+        (!idNota || idNota !== dadosListaPedidosSemVinculoNFE.idNotaFiscal);
     }).map((item, index) => {
     let contador = index + 1;
 
@@ -109,13 +109,13 @@ export const ActionListaPedidosSemVinculoNFE = ({
   useEffect(() => {
     const itensSelecionaveis = dados.filter(item => {
     return (!item.STATUSVINC || item.STATUSVINC === 'False') && 
-            (!item.NOTAVINC || item.NOTAVINC !== item.idNotaFiscal) &&
+            (!item.NOTAVINC || item.NOTAVINC !== dadosListaPedidosSemVinculoNFE.idNotaFiscal) &&
             item.stDisabled !== 'disabled';
     });
     const dadosPaginaAtual = dados.slice(first, first + rows);
     const itensSelecionaveisPaginaAtual = dadosPaginaAtual.filter(item => {
       return (!item.STATUSVINC || item.STATUSVINC === 'False') && 
-             (!item.NOTAVINC || item.NOTAVINC !== item.idNotaFiscal) &&
+             (!item.NOTAVINC || item.NOTAVINC !== dadosListaPedidosSemVinculoNFE.idNotaFiscal) &&
              item.stDisabled !== 'disabled';
     });
 
@@ -136,7 +136,7 @@ export const ActionListaPedidosSemVinculoNFE = ({
       setSelectAllChecked(false);
     }
   }, [selectedItems, dados, first, rows]);
-
+  console.log(selectedItems, 'selectedItems')
   const onSelectAllChange = (checked) => {
     if (checked) {
       Swal.fire({
@@ -156,18 +156,18 @@ export const ActionListaPedidosSemVinculoNFE = ({
         if (result.isConfirmed) {
           const itensSelecionaveis = dados.filter(item => item.stDisabled !== 'disabled');
           setBtnVisivel(true);
-          setSelectedItems([...itensSelecionaveis]);
+          setSelectedItems(itensSelecionaveis.map(item => ({ ...item, idNotaFiscal: dadosListaPedidosSemVinculoNFE.idNotaFiscal })));
           setSelectedIds(itensSelecionaveis.map(item => item.IDPEDIDO));
-          setPedidosSelecionados(itensSelecionaveis.map(item => ({ ...item, quantidade: 1 })));
+          setPedidosSelecionados(itensSelecionaveis.map(item => ({ ...item, quantidade: 1, idNotaFiscal: dadosListaPedidosSemVinculoNFE.idNotaFiscal })));
           setSelectAll(true);
 
         } else if (result.dismiss === Swal.DismissReason.cancel) {
           const itensSelecionaveisPaginaAtual = dados.slice(first, first + rows).filter(item => item.stDisabled !== 'disabled');
 
           setBtnVisivel(true);
-          setSelectedItems([...itensSelecionaveisPaginaAtual]);
+          setSelectedItems(itensSelecionaveisPaginaAtual.map(item => ({ ...item, idNotaFiscal: dadosListaPedidosSemVinculoNFE.idNotaFiscal })));
           setSelectedIds(itensSelecionaveisPaginaAtual.map(item => item.IDPEDIDO));
-          setPedidosSelecionados(itensSelecionaveisPaginaAtual.map(item => ({ ...item, quantidade: 1 })));
+          setPedidosSelecionados(itensSelecionaveisPaginaAtual.map(item => ({ ...item, quantidade: 1, idNotaFiscal: dadosListaPedidosSemVinculoNFE.idNotaFiscal })));
           setSelectAll(true);
 
         } else {
@@ -274,19 +274,19 @@ export const ActionListaPedidosSemVinculoNFE = ({
                 setSelectedIds(updatedSelectedIds);
 
                 const updatedSelectedItems = checked
-                  ? [...selectedItems, row]
+                  ? [...selectedItems, { ...row, idNotaFiscal: dadosListaPedidosSemVinculoNFE.idNotaFiscal }]
                   : selectedItems.filter(item => item.IDPEDIDO !== row.IDPEDIDO);
                 setSelectedItems(updatedSelectedItems);
 
                 const updatedPedidosSelecionados = checked
-                  ? [...pedidosSelecionados, { ...row, quantidade: 1 }]
+                  ? [...pedidosSelecionados, { ...row, quantidade: 1, idNotaFiscal: dadosListaPedidosSemVinculoNFE.idNotaFiscal }]
                   : pedidosSelecionados.filter(item => item.IDPEDIDO !== row.IDPEDIDO);
                 setPedidosSelecionados(updatedPedidosSelecionados);
                 setBtnVisivel(updatedSelectedIds.length > 0);
                 
               }}
             />
-
+            {/* {console.log(selectedItems, 'selectedItems')} */}
           </div>
         )
       },

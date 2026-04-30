@@ -26,6 +26,7 @@ export const ActionListaNotasNFE = ({
   usuarioLogado, 
   optionsModulos,
   setDadosListaPedidosSemVinculoNFE,
+  dadosListaPedidosSemVinculoNFE,
   setTabelaPedido,
   setTabelaVisivel
  }) => {
@@ -307,7 +308,8 @@ export const ActionListaNotasNFE = ({
     try {
       const response = await get(`/pedidos-sem-vinculo-nfe?idNota=${IDRESUMOENTRADA}`);
       if(response.data && response.data.length > 0) {
-        setDadosListaPedidosSemVinculoNFE(response.data);
+        setDadosListaPedidosSemVinculoNFE({ data: response.data, idNotaFiscal: IDRESUMOENTRADA });
+        // console.log(dadosListaPedidosSemVinculoNFE, 'dadosListaPedidosSemVinculoNFE')
         setTabelaPedido(true);
         setTabelaVisivel(false);
       } else {

@@ -158,6 +158,7 @@ export const ActionPesquisaNFE = ({ usuarioLogado }) => {
           usuarioLogado={usuarioLogado}
           optionsModulos={optionsModulos}
           setDadosListaPedidosSemVinculoNFE={setDadosListaPedidosSemVinculoNFE}
+          dadosListaPedidosSemVinculoNFE={dadosListaPedidosSemVinculoNFE}
           setTabelaPedido={setTabelaPedido}
           setTabelaVisivel={setTabelaVisivel}
         />
