@@ -1,8 +1,4 @@
-import { Fragment, useRef, useState } from "react"
-import { ButtonTable } from "../../../ButtonsTabela/ButtonTable";
-import { CiEdit } from "react-icons/ci";
-import { get } from "../../../../api/funcRequest";
-
+import { Fragment, useRef, useState, useEffect } from "react"
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { useReactToPrint } from "react-to-print";
@@ -10,30 +6,36 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../../Tables/headerTable";
-import { BsTrash3 } from "react-icons/bs";
-import { MdOutlineCreateNewFolder } from "react-icons/md";
-import { FaLink, FaUnlink } from "react-icons/fa";
-import { GiPadlock, GiPadlockOpen } from "react-icons/gi";
-import { GrFormView, GrView } from "react-icons/gr";
-import { SiSap } from "react-icons/si";
-import { ActionDesvincularNotasNFEModal } from "./actionDesvincularNotasNFEModal";
-import { IoMdAdd } from "react-icons/io";
 import Swal from "sweetalert2";
-import { ActionVisualizarNFE } from "./ActionVisualizarNota/actionVisualizarNFE";
+import { formatMoeda } from "../../../../utils/formatMoeda";
 
-export const ActionListaPedidosSemVinculoNFE = ({ 
-  dadosNFE, 
-  usuarioLogado, 
-  optionsModulos
- }) => {
+
+export const ActionListaPedidosSemVinculoNFE = ({
+  dadosListaPedidosSemVinculoNFE,
+  usuarioLogado,
+  optionsModulos,
+  setSelectedIds,
+  selectedIds
+}) => {
   const [modalDesvincular, setModalDesvincular] = useState(false);
   const [modalVisualizar, setModalVisualizar] = useState(false);
   const [dadosPedidosVinculados, setDadosPedidosVinculados] = useState([]);
   const [dadosVisualizarNFE, setDadosVisualizarNFE] = useState([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowSelection, setRowSelection] = useState(null);
+  const [selectAllChecked, setSelectAllChecked] = useState(false);
+  const [btnVisivel, setBtnVisivel] = useState(false);
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
+  const [pedidosSelecionados, setPedidosSelecionados] = useState([]);
+  const [first, setFirst] = useState(0);
+  const [rows, setRows] = useState(10);
   const dataTableRef = useRef();
 
+  const onPageChange = (event) => {
+    setFirst(event.first);
+    setRows(event.rows);
+  };
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -41,59 +43,150 @@ export const ActionListaPedidosSemVinculoNFE = ({
 
   const handlePrint = useReactToPrint({
     content: () => dataTableRef.current,
-    documentTitle: 'Pedidos Periodo',
+    documentTitle: 'Pedidos Sem Vínculo',
   });
 
   const exportToPDF = () => {
     const doc = new jsPDF();
     doc.autoTable({
-      head: [['Nº', 'Descrição', 'Grupo Estrutura', 'Situação']],
+      head: [['Nº', 'Nº Pedido', 'Marca', 'Comprador', 'Fornecedor', 'Valor Pedido', 'Data']],
       body: dados.map(item => [
         item.contador,
-        item.DS_ESTILOS,
-        `${item.COD_GRUPOESTILOS} - ${item.DS_GRUPOESTILOS}`,
-        item.STATIVO == 'True' ? 'ATIVO' : 'INATIVO'
+        item.IDPEDIDO,
+        item.NOFORNECEDOR,
+        item.NOMECOMPRADOR,
+        item.NOFANTASIA,
+        formatMoeda(item.VRTOTALLIQUIDO),
+        item.DTPEDIDO
       ]),
       horizontalPageBreak: true,
       horizontalPageBreakBehaviour: 'immediately'
     });
-    doc.save('lista_estilos.pdf');
+    doc.save('pedidos_sem_vinculo.pdf');
   };
 
   const exportToExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(dados);
     const workbook = XLSX.utils.book_new();
-    const header = ['Nº', 'Descrição', 'Grupo Estrutura', 'Situação']
+    const header = ['Nº', 'Nº Pedido', 'Marca', 'Comprador', 'Fornecedor', 'Valor Pedido', 'Data']
     worksheet['!cols'] = [
-      { wpx: 70, caption: 'Nº' },
-      { wpx: 100, caption: 'Descrição' },
-      { wpx: 100, caption: 'Grupo Estrutura' },
-      { wpx: 100, caption: 'Situação' },
+      { wpx: 50, caption: 'Nº' },
+      { wpx: 100, caption: 'Nº Pedido' },
+      { wpx: 200, caption: 'Marca' },
+      { wpx: 250, caption: 'Comprador' },
+      { wpx: 250, caption: 'Fornecedor' },
+      { wpx: 100, caption: 'Valor Pedido' },
+      { wpx: 200, caption: 'Data' },
     ];
     XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Pedidos Periodo');
-    XLSX.writeFile(workbook, 'lista_estilos.xlsx');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Pedidos Sem Vínculo');
+    XLSX.writeFile(workbook, 'pedidos_sem_vinculo.xlsx');
   };
 
-
-  const dados = dadosNFE.map((item, index) => {
+  const dados = dadosListaPedidosSemVinculoNFE
+    .filter((item) => {
+      const statusVinc = item.STATUSVINC;
+      const idNota = item.NOTAVINC;
+      return (!statusVinc || statusVinc === 'False') && 
+        (!idNota || idNota !== idNotaFiscal);
+    }).map((item, index) => {
     let contador = index + 1;
-    let numSerieNota = `${item.SERIE} - ${item.NNF}`;
 
     return {
       contador,
-      DTCADASTRO: item.DTCADASTRO,
-      DEMI: item.DEMI,
-      EMIT_XNOME: item.EMIT_XNOME,
-      SERIE: item.SERIE,
-      NNF: item.NNF,
-      IDRESUMOENTRADA: item.IDRESUMOENTRADA,
-      STCANCELADO: item.STCANCELADO,
-      STMIGRADOSAP: item.STMIGRADOSAP,
+      IDPEDIDO: item.IDPEDIDO,
+      NOFANTASIA: item.NOFANTASIA,
+      NOMECOMPRADOR: item.NOMECOMPRADOR,
+      NOFORNECEDOR: item.NOFORNECEDOR,
+      VRTOTALLIQUIDO: formatMoeda(item.VRTOTALLIQUIDO),
+      DTPEDIDO: item.DTPEDIDO,
+      STATUSVINC: item.STATUSVINC,
+      NOTAVINC: item.NOTAVINC,
       LOGSAP: item.LOGSAP,
-      numSerieNota
     }
   })
+
+  useEffect(() => {
+    const itensSelecionaveis = dados.filter(item => {
+    return (!item.STATUSVINC || item.STATUSVINC === 'False') && 
+            (!item.NOTAVINC || item.NOTAVINC !== item.idNotaFiscal) &&
+            item.stDisabled !== 'disabled';
+    });
+    const dadosPaginaAtual = dados.slice(first, first + rows);
+    const itensSelecionaveisPaginaAtual = dadosPaginaAtual.filter(item => {
+      return (!item.STATUSVINC || item.STATUSVINC === 'False') && 
+             (!item.NOTAVINC || item.NOTAVINC !== item.idNotaFiscal) &&
+             item.stDisabled !== 'disabled';
+    });
+
+    if (selectedItems.length === 0) {
+      setSelectAllChecked(false);
+    } else if (selectedItems.length === itensSelecionaveis.length) {
+      
+      setSelectAllChecked(true);
+    } else if (
+      itensSelecionaveisPaginaAtual.length > 0 &&
+      itensSelecionaveisPaginaAtual.every(item =>
+        selectedItems.some(selected => selected.IDPEDIDO === item.IDPEDIDO)
+      )
+    ) {
+      
+      setSelectAllChecked(true);
+    } else {
+      setSelectAllChecked(false);
+    }
+  }, [selectedItems, dados, first, rows]);
+
+  const onSelectAllChange = (checked) => {
+    if (checked) {
+      Swal.fire({
+        icon: 'question',
+        title: 'Selecione o modo de seleção',
+        text: 'Deseja selecionar todos da tabela ou somente o que está em tela?',
+        showConfirmButton: true,
+        showCancelButton: true,
+        showCloseButton: true,
+        customClass: { container: 'custom-class' },
+        confirmButtonText: 'Todos os registros',
+        cancelButtonText: 'Apenas o que está tela',
+        cancelButtonColor: '#2196F3',
+        allowOutsideClick: false,
+      }).then((result) => {
+
+        if (result.isConfirmed) {
+          const itensSelecionaveis = dados.filter(item => item.stDisabled !== 'disabled');
+          setBtnVisivel(true);
+          setSelectedItems([...itensSelecionaveis]);
+          setSelectedIds(itensSelecionaveis.map(item => item.IDPEDIDO));
+          setPedidosSelecionados(itensSelecionaveis.map(item => ({ ...item, quantidade: 1 })));
+          setSelectAll(true);
+
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+          const itensSelecionaveisPaginaAtual = dados.slice(first, first + rows).filter(item => item.stDisabled !== 'disabled');
+
+          setBtnVisivel(true);
+          setSelectedItems([...itensSelecionaveisPaginaAtual]);
+          setSelectedIds(itensSelecionaveisPaginaAtual.map(item => item.IDPEDIDO));
+          setPedidosSelecionados(itensSelecionaveisPaginaAtual.map(item => ({ ...item, quantidade: 1 })));
+          setSelectAll(true);
+
+        } else {
+          setBtnVisivel(false);
+          setSelectedItems([]);
+          setSelectedIds([]);
+          setPedidosSelecionados([]);
+          setSelectAll(false);
+        }
+      });
+    } else {
+
+      setBtnVisivel(false);
+      setSelectedItems([]);
+      setSelectedIds([]);
+      setPedidosSelecionados([]);
+      setSelectAll(false);
+    }
+  }
 
   const colunasUnidadeMedida = [
     {
@@ -103,174 +196,97 @@ export const ActionListaPedidosSemVinculoNFE = ({
       sortable: true,
     },
     {
-      field: 'DTCADASTRO',
-      header: 'Data Cadastro',
-      body: row => <th>{row.DTCADASTRO}</th>,
+      field: 'IDPEDIDO',
+      header: 'Nº Pedido',
+      body: row => <th>{row.IDPEDIDO}</th>,
       sortable: true,
     },
     {
-      field: 'DEMI',
-      header: 'Data Emissão',
+      field: 'NOFANTASIA',
+      header: 'Marca',
+      body: row => <th>{row.NOFANTASIA}</th>,
+      sortable: true,
+    },
+    {
+      field: 'NOMECOMPRADOR',
+      header: 'Comprador',
       body: row => {
         return (
-          <th>{row.DEMI}</th>
+          <th>{row.NOMECOMPRADOR}</th>
         )
       },
       sortable: true,
     },
     {
-      field: 'EMIT_XNOME',
+      field: 'NOFORNECEDOR',
       header: 'Fornecedor',
       body: row => {
         return (
-          <th>{row.EMIT_XNOME}</th>
+          <th>{row.NOFORNECEDOR}</th>
         )
       },
       sortable: true,
     },
     {
-      field: 'SERIE',
-      header: 'Série',
+      field: 'VRTOTALLIQUIDO',
+      header: 'Valor Pedido',
       body: row => {
         return (
-          <th>{row.SERIE}</th>
+          <th>{row.VRTOTALLIQUIDO}</th>
         )
       },
       sortable: true,
     },
     {
-      field: 'NNF',
-      header: 'NFE',
+      field: 'DTPEDIDO',
+      header: 'Data',
       body: row => {
         return (
-          <th>{row.NNF}</th>
+          <th>{row.DTPEDIDO}</th>
         )
       },
       sortable: true,
     },
-    {
-      field: 'STCANCELADO',
-      header: 'Status SAP',
-      body: row => {
-        if(row.STCANCELADO == 'True') {
-          return (
-            <th style={{ color: 'red', textTransform: 'uppercase'  }} >
-              CANCELADA  
-            </th>
-          )
-        } else if(row.LOGSAP) {
-          return (
-            <th style={{ color: row.STMIGRADOSAP == 'True' ? '#2196F3' : '#FD3995',textTransform: 'uppercase'  }} >
-              {row.LOGSAP }
-            </th>
-          )
-        } else {
-          return (
-            <th style={{ textTransform: 'uppercase'  }} >
-              SEM RETORNO SAP 
-            </th>
-          )
-        }
-      },
-      sortable: true,
-    },
-
     {
       field: 'IDRESUMOENTRADA',
-      header: 'Opções',
+      header: (
+        <div>
+          <label>{selectAllChecked ? 'Desmarcar Todos' : 'Marcar Todos'}</label>
+          <input
+            type="checkbox"
+            checked={selectAllChecked}
+            onChange={(e) => onSelectAllChange(e.target.checked)}
+          />
+        </div>
+      ),
       body: row => {
-        const stCancelado = row.STCANCELADO === 'True';
-        const stSAP = row.STMIGRADOSAP === 'True';
         return (
           <div style={{ justifyContent: "space-between", display: "flex" }}>
-            {!stSAP && !stCancelado && (
-              <div className="p-1">
-                <ButtonTable
-                  titleButton={"Migrar Para o SAP"}
-                  onClickButton={() => clickVincular(row)}
-                  cor={"primary"}
-                  Icon={SiSap}
-                  iconSize={25}
-                  iconColor={"#fff"}
-                  width="30px"
-                  height="30px"
-                />
-              </div>
-            )}
 
-            <div className="p-1">
-              <ButtonTable
-                titleButton={"Visualizar Nota"}
-                onClickButton={() => clickVisualizar(row)}
-                cor={"info"}
-                Icon={GrView}
-                iconSize={25}
-                iconColor={"#fff"}
-                width="30px"
-                height="30px"
-              />
-            </div>
+            <input
+              type="checkbox"
+              checked={selectedIds.includes(row.IDPEDIDO)}
+              onChange={(e) => {
+                const checked = e.target.checked;
+                const updatedSelectedIds = checked
+                  ? [...selectedIds, row.IDPEDIDO]
+                  : selectedIds.filter(id => id !== row.IDPEDIDO);
+                setSelectedIds(updatedSelectedIds);
 
-            {!stCancelado && (
-              <div className="p-1">
-                <ButtonTable
-                  titleButton={"Vincular Nota Fiscal a Pedidos"}
-                  onClickButton={() => clickVincular(row)}
-                  cor={"success"}
-                  Icon={FaLink}
-                  iconSize={25}
-                  iconColor={"#fff"}
-                  width="30px"
-                  height="30px"
-                />
-              </div> 
-            )}
+                const updatedSelectedItems = checked
+                  ? [...selectedItems, row]
+                  : selectedItems.filter(item => item.IDPEDIDO !== row.IDPEDIDO);
+                setSelectedItems(updatedSelectedItems);
 
-            {/* {!stCancelado && (
-              <div className="p-1">
-                <ButtonTable
-                  titleButton={"Desvincular Pedidos Desta Nota Fiscal"}
-                  onClickButton={() => clickDesvincular(row)}
-                  cor={"warning"}
-                  Icon={FaUnlink}
-                  iconSize={25}
-                  iconColor={"#fff"}
-                  width="30px"
-                  height="30px"
-                />
-              </div>
-            )} */}
+                const updatedPedidosSelecionados = checked
+                  ? [...pedidosSelecionados, { ...row, quantidade: 1 }]
+                  : pedidosSelecionados.filter(item => item.IDPEDIDO !== row.IDPEDIDO);
+                setPedidosSelecionados(updatedPedidosSelecionados);
+                setBtnVisivel(updatedSelectedIds.length > 0);
+                
+              }}
+            />
 
-            {!stCancelado && (
-              <div className="p-1">
-                <ButtonTable
-                  titleButton={"Criar Nota Fiscal de Devolução"}
-                  onClickButton={() => clickCriarNota(row)}
-                  cor={"secondary"}
-                  Icon={IoMdAdd}
-                  iconSize={25}
-                  iconColor={"#fff"}
-                  width="30px"
-                  height="30px"
-                />
-              </div>
-            )}
-
-            {!stCancelado && (
-              <div className="p-1">
-                <ButtonTable
-                  titleButton={"Cancelar Nota Fiscal"}
-                  onClickButton={() => clickCriarNota(row)}
-                  cor={"danger"}
-                  Icon={BsTrash3}
-                  iconSize={25}
-                  iconColor={"#fff"}
-                  width="30px"
-                  height="30px"
-                />
-              </div>
-            )}
-          
           </div>
         )
       },
@@ -278,50 +294,11 @@ export const ActionListaPedidosSemVinculoNFE = ({
     }
   ]
 
-  const clickDesvincular = (row) => {
-    if (row && row.IDRESUMOENTRADA) {
-      handleDesvincular(row.IDRESUMOENTRADA);
-    }
-  };
-
-  const handleDesvincular = async (IDRESUMOENTRADA) => {
-    try {
-      const response = await get(`/vinculo-nfPedidos?idNota=${IDRESUMOENTRADA}`);
-      setDadosPedidosVinculados(response.data);
-      setModalDesvincular(true);
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  const clickVisualizar = (row) => {
-    if (row && row.IDRESUMOENTRADA) {
-      handleVisualizar(row.IDRESUMOENTRADA);
-    }
-  }
-
-  const handleVisualizar = async (IDRESUMOENTRADA) => {
-    try {
-      const response = await get(`/cadastro-nfpedido?idPedido=${IDRESUMOENTRADA}`);
-      if(response.data && response.data.length > 0) {
-        setDadosVisualizarNFE(response.data);
-        setModalVisualizar(true);
-      } else {
-        Swal.fire({
-          icon: 'info',
-          title: 'Nenhum detalhe encontrado',
-          text: 'Não foi possível encontrar os detalhes para esta nota fiscal.',
-        });
-      }
-    }catch (error) {
-      console.error(error);
-    }
-  }
   return (
     <Fragment>
       <div className="panel">
         <div className="panel-hdr">
-          <h2>Lista de Notas Fiscais</h2>
+          <h2>Lista de Pedidos Sem Vínculo</h2>
         </div>
         <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
           <HeaderTable
@@ -335,16 +312,15 @@ export const ActionListaPedidosSemVinculoNFE = ({
         </div>
         <div className="card" ref={dataTableRef}>
           <DataTable
-            title="Notas Fiscais"
+            title="Pedidos Sem Vínculo"
             value={dados}
             globalFilter={globalFilterValue}
             size="small"
-            selectionMode="single"
-            selection={rowSelection}
-            onSelectionChange={(e) => setRowSelection(e.value)}
+            first={first}
+            onPage={onPageChange}
             sortOrder={-1}
             paginator={true}
-            rows={10}
+            rows={rows}
             rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
@@ -371,19 +347,7 @@ export const ActionListaPedidosSemVinculoNFE = ({
           </DataTable>
         </div>
 
-        <ActionDesvincularNotasNFEModal 
-          show={modalDesvincular}
-          handleClose={() => setModalDesvincular(false)}
-          dadosPedidosVinculados={dadosPedidosVinculados}
-        />
-
-        <ActionVisualizarNFE 
-          show={modalVisualizar}
-          handleClose={() => setModalVisualizar(false)}
-          dadosVisualizarNFE={dadosVisualizarNFE}
-        /> 
       </div>
-
     </Fragment>
   )
 }

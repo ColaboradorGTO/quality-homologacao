@@ -24,7 +24,10 @@ import { ActionVisualizarNFE } from "./ActionVisualizarNota/actionVisualizarNFE"
 export const ActionListaNotasNFE = ({ 
   dadosNFE, 
   usuarioLogado, 
-  optionsModulos
+  optionsModulos,
+  setDadosListaPedidosSemVinculoNFE,
+  setTabelaPedido,
+  setTabelaVisivel
  }) => {
   const [modalDesvincular, setModalDesvincular] = useState(false);
   const [modalVisualizar, setModalVisualizar] = useState(false);
@@ -289,6 +292,31 @@ export const ActionListaNotasNFE = ({
       const response = await get(`/vinculo-nfPedidos?idNota=${IDRESUMOENTRADA}`);
       setDadosPedidosVinculados(response.data);
       setModalDesvincular(true);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  const clickVincular = (row) => {
+    if (row && row.IDRESUMOENTRADA) {
+      handleVincular(row.IDRESUMOENTRADA);
+    }
+  };
+
+  const handleVincular = async (IDRESUMOENTRADA) => {
+    try {
+      const response = await get(`/pedidos-sem-vinculo-nfe?idNota=${IDRESUMOENTRADA}`);
+      if(response.data && response.data.length > 0) {
+        setDadosListaPedidosSemVinculoNFE(response.data);
+        setTabelaPedido(true);
+        setTabelaVisivel(false);
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Nenhum pedido encontrado',
+          text: 'Não foi possível encontrar pedidos sem vínculo para esta nota fiscal.',
+        });
+      }
     } catch (error) {
       console.error(error);
     }

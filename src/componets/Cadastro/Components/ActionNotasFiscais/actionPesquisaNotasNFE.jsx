@@ -12,6 +12,7 @@ import { ActionListaNotasNFE } from "./actionListaNotasNFE"
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento"
 import { get } from "../../../../api/funcRequest"
 import { ActionCadastrarNFE } from "./ActionCadastrarNFE/actionCadastrarNFE"
+import { ActionListaPedidosSemVinculoNFE } from "./actionListaPedidosSemVinculoNF"
 
 
 export const ActionPesquisaNFE = ({ usuarioLogado }) => {
@@ -28,6 +29,7 @@ export const ActionPesquisaNFE = ({ usuarioLogado }) => {
   const [modalVisivel, setModalVisivel] = useState(false);
   const [dadosListaPedidosSemVinculoNFE, setDadosListaPedidosSemVinculoNFE] = useState([])
   const [tabelaPedido, setTabelaPedido] = useState(false)
+  const [selectedIds, setSelectedIds] = useState([]);
 
   useEffect(() => {
     const dataAtual = getDataAtual()
@@ -155,16 +157,22 @@ export const ActionPesquisaNFE = ({ usuarioLogado }) => {
           dadosNFE={dadosNFE} 
           usuarioLogado={usuarioLogado}
           optionsModulos={optionsModulos}
+          setDadosListaPedidosSemVinculoNFE={setDadosListaPedidosSemVinculoNFE}
+          setTabelaPedido={setTabelaPedido}
+          setTabelaVisivel={setTabelaVisivel}
         />
       }
-{/* 
+
+
       {tabelaPedido &&
-        <ActionListaNotasNFE 
-          dadosNFE={dadosNFE} 
+        <ActionListaPedidosSemVinculoNFE
+          dadosListaPedidosSemVinculoNFE={dadosListaPedidosSemVinculoNFE} 
           usuarioLogado={usuarioLogado}
           optionsModulos={optionsModulos}
+          selectedIds={selectedIds}
+          setSelectedIds={setSelectedIds}
         />
-      } */}
+      } 
 
       <ActionCadastrarNFE 
         show={modalVisivel}
