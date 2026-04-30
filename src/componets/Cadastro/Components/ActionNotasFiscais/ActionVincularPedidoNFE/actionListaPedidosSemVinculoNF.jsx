@@ -5,32 +5,30 @@ import { useReactToPrint } from "react-to-print";
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
-import HeaderTable from "../../../Tables/headerTable";
+import HeaderTable from "../../../../Tables/headerTable";
 import Swal from "sweetalert2";
-import { formatMoeda } from "../../../../utils/formatMoeda";
+import { formatMoeda } from "../../../../../utils/formatMoeda";
 
 
 export const ActionListaPedidosSemVinculoNFE = ({
   dadosListaPedidosSemVinculoNFE,
   usuarioLogado,
   optionsModulos,
-  setSelectedIds,
-  selectedIds
+  handleClose,
+  selectedItems,
+  setSelectedItems
 }) => {
-  const [modalDesvincular, setModalDesvincular] = useState(false);
-  const [modalVisualizar, setModalVisualizar] = useState(false);
-  const [dadosPedidosVinculados, setDadosPedidosVinculados] = useState([]);
-  const [dadosVisualizarNFE, setDadosVisualizarNFE] = useState([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowSelection, setRowSelection] = useState(null);
   const [selectAllChecked, setSelectAllChecked] = useState(false);
   const [btnVisivel, setBtnVisivel] = useState(false);
-  const [selectedItems, setSelectedItems] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
+  const [selectedIds, setSelectedIds] = useState([]);
   const [pedidosSelecionados, setPedidosSelecionados] = useState([]);
   const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(10);
   const dataTableRef = useRef();
+
 
   const onPageChange = (event) => {
     setFirst(event.first);
@@ -136,7 +134,7 @@ export const ActionListaPedidosSemVinculoNFE = ({
       setSelectAllChecked(false);
     }
   }, [selectedItems, dados, first, rows]);
-  console.log(selectedItems, 'selectedItems')
+  
   const onSelectAllChange = (checked) => {
     if (checked) {
       Swal.fire({
@@ -146,7 +144,7 @@ export const ActionListaPedidosSemVinculoNFE = ({
         showConfirmButton: true,
         showCancelButton: true,
         showCloseButton: true,
-        customClass: { container: 'custom-class' },
+        customClass: { container: 'custom-swal' },
         confirmButtonText: 'Todos os registros',
         cancelButtonText: 'Apenas o que está tela',
         cancelButtonColor: '#2196F3',
@@ -155,7 +153,7 @@ export const ActionListaPedidosSemVinculoNFE = ({
 
         if (result.isConfirmed) {
           const itensSelecionaveis = dados.filter(item => item.stDisabled !== 'disabled');
-          setBtnVisivel(true);
+  
           setSelectedItems(itensSelecionaveis.map(item => ({ ...item, idNotaFiscal: dadosListaPedidosSemVinculoNFE.idNotaFiscal })));
           setSelectedIds(itensSelecionaveis.map(item => item.IDPEDIDO));
           setPedidosSelecionados(itensSelecionaveis.map(item => ({ ...item, quantidade: 1, idNotaFiscal: dadosListaPedidosSemVinculoNFE.idNotaFiscal })));
@@ -164,14 +162,12 @@ export const ActionListaPedidosSemVinculoNFE = ({
         } else if (result.dismiss === Swal.DismissReason.cancel) {
           const itensSelecionaveisPaginaAtual = dados.slice(first, first + rows).filter(item => item.stDisabled !== 'disabled');
 
-          setBtnVisivel(true);
           setSelectedItems(itensSelecionaveisPaginaAtual.map(item => ({ ...item, idNotaFiscal: dadosListaPedidosSemVinculoNFE.idNotaFiscal })));
           setSelectedIds(itensSelecionaveisPaginaAtual.map(item => item.IDPEDIDO));
           setPedidosSelecionados(itensSelecionaveisPaginaAtual.map(item => ({ ...item, quantidade: 1, idNotaFiscal: dadosListaPedidosSemVinculoNFE.idNotaFiscal })));
           setSelectAll(true);
 
         } else {
-          setBtnVisivel(false);
           setSelectedItems([]);
           setSelectedIds([]);
           setPedidosSelecionados([]);
@@ -180,14 +176,13 @@ export const ActionListaPedidosSemVinculoNFE = ({
       });
     } else {
 
-      setBtnVisivel(false);
       setSelectedItems([]);
       setSelectedIds([]);
       setPedidosSelecionados([]);
       setSelectAll(false);
     }
   }
-
+  console.log(selectedItems, 'Lista selectedItems');
   const colunasUnidadeMedida = [
     {
       field: 'contador',

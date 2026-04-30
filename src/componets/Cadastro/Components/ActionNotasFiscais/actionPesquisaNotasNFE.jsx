@@ -12,7 +12,7 @@ import { ActionListaNotasNFE } from "./actionListaNotasNFE"
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento"
 import { get } from "../../../../api/funcRequest"
 import { ActionCadastrarNFE } from "./ActionCadastrarNFE/actionCadastrarNFE"
-import { ActionListaPedidosSemVinculoNFE } from "./actionListaPedidosSemVinculoNF"
+
 
 
 export const ActionPesquisaNFE = ({ usuarioLogado }) => {
@@ -157,23 +157,11 @@ export const ActionPesquisaNFE = ({ usuarioLogado }) => {
           dadosNFE={dadosNFE} 
           usuarioLogado={usuarioLogado}
           optionsModulos={optionsModulos}
-          setDadosListaPedidosSemVinculoNFE={setDadosListaPedidosSemVinculoNFE}
-          dadosListaPedidosSemVinculoNFE={dadosListaPedidosSemVinculoNFE}
-          setTabelaPedido={setTabelaPedido}
-          setTabelaVisivel={setTabelaVisivel}
+          handleClick={handleClick}
         />
       }
 
 
-      {tabelaPedido &&
-        <ActionListaPedidosSemVinculoNFE
-          dadosListaPedidosSemVinculoNFE={dadosListaPedidosSemVinculoNFE} 
-          usuarioLogado={usuarioLogado}
-          optionsModulos={optionsModulos}
-          selectedIds={selectedIds}
-          setSelectedIds={setSelectedIds}
-        />
-      } 
 
       <ActionCadastrarNFE 
         show={modalVisivel}

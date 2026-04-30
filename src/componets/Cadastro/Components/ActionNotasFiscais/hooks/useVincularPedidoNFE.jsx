@@ -9,12 +9,10 @@ export const useVincularPedidoNFE = ({
     usuarioLogado,
     optionsModulos,
     handleClick,
-    selectedIds,
-    setSelectedIds,
     dadosListaPedidosSemVinculoNFE
 }) => {
     const [ipUsuario, setIpUsuario] = useState('');
-
+    const [selectedItems, setSelectedItems] = useState([]);
     const getIPUsuario = async () => {
         let usuarioIP = null;
 
@@ -38,7 +36,8 @@ export const useVincularPedidoNFE = ({
     };
 
 
-    const onSubmit = async (selectedItems) => {
+  
+    const onSubmit = async () => {
         if (optionsModulos[0]?.CRIAR == 'False') {
             Swal.fire({
                 icon: 'error',
@@ -65,7 +64,6 @@ export const useVincularPedidoNFE = ({
 
         // Extrair todos os IDPEDIDOs
         const idsPedidos = selectedItems.map(item => item.IDPEDIDO);
-        console.log('IDs dos pedidos a serem vinculados:', idsPedidos);
 
         let sucessos = [];
         let erros = [];
@@ -74,25 +72,28 @@ export const useVincularPedidoNFE = ({
         Swal.fire({
             title: 'Vinculando pedidos...',
             text: `Processando ${idsPedidos.length} pedido(s)`,
+            customClass: {
+                container: 'custom-swal',
+            },
             allowOutsideClick: false,
             didOpen: () => {
                 Swal.showLoading();
             }
         });
 
-        // Processar cada IDPEDIDO individualmente
-        for (const item of selectedItems) {
+
+        for (let index = 0; index < selectedItems.length; index++) {
+            const item = selectedItems[index];
+            
             const putData = {
-                IDRESUMOPEDIDO: item.IDPEDIDO,
-                IDRESUMOENTRADA: item.idNotaFiscal || dadosListaPedidosSemVinculoNFE.idNotaFiscal
+                IDRESUMOPEDIDO: parseInt(item.IDPEDIDO),
+                IDRESUMOENTRADA: parseInt(dadosListaPedidosSemVinculoNFE.idNotaFiscal)
             };
 
+
             try {
-                console.log(`Vinculando pedido ${item.IDPEDIDO}...`);
-
                 const response = await post('/vincular-nf-pedido', putData);
-
-                // Log de sucesso
+        
                 const textDados = JSON.stringify(putData);
                 let textFuncao = 'CADASTRO / VINCULANDO PEDIDOS';
                 const ipUsuario = await getIPUsuario();
@@ -111,10 +112,7 @@ export const useVincularPedidoNFE = ({
                     response: response.data
                 });
 
-                console.log(`✅ Pedido ${item.IDPEDIDO} vinculado com sucesso`);
-
             } catch (error) {
-                // Log de erro
                 const textDados = JSON.stringify(putData);
                 let textFuncao = 'CADASTRO / ERRO AO VINCULAR PEDIDOS';
                 const ipUsuario = await getIPUsuario();
@@ -133,16 +131,12 @@ export const useVincularPedidoNFE = ({
                     error: error.response?.data?.message || error.message
                 });
 
-                console.error(`❌ Erro ao vincular pedido ${item.IDPEDIDO}:`, error);
+                console.error(`❌ Detalhes do erro para pedido ${item.IDPEDIDO}:`, error);
             }
         }
-
-        // Fechar loading
         Swal.close();
 
-        // Mostrar resultado final
         if (erros.length === 0) {
-            // Todos os pedidos foram vinculados com sucesso
             Swal.fire({
                 position: 'center',
                 icon: 'success',
@@ -155,7 +149,6 @@ export const useVincularPedidoNFE = ({
                 }
             });
         } else if (sucessos.length === 0) {
-            // Todos falharam
             Swal.fire({
                 position: 'center',
                 icon: 'error',
@@ -167,7 +160,6 @@ export const useVincularPedidoNFE = ({
                 }
             });
         } else {
-            // Parcialmente sucesso
             Swal.fire({
                 position: 'center',
                 icon: 'warning',
@@ -188,7 +180,7 @@ export const useVincularPedidoNFE = ({
         }
 
         handleClick();
-
+        handleClose();
         return {
             sucessos,
             erros,
@@ -197,6 +189,8 @@ export const useVincularPedidoNFE = ({
     }
     
     return {
+        selectedItems,
+        setSelectedItems,
         onSubmit,
     }
 }

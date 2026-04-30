@@ -20,22 +20,22 @@ import { ActionDesvincularNotasNFEModal } from "./actionDesvincularNotasNFEModal
 import { IoMdAdd } from "react-icons/io";
 import Swal from "sweetalert2";
 import { ActionVisualizarNFE } from "./ActionVisualizarNota/actionVisualizarNFE";
+import { ActionVincularPedidoNFE } from "./ActionVincularPedidoNFE/actionVincularPedidoNFE";
 
 export const ActionListaNotasNFE = ({ 
   dadosNFE, 
   usuarioLogado, 
   optionsModulos,
-  setDadosListaPedidosSemVinculoNFE,
-  dadosListaPedidosSemVinculoNFE,
-  setTabelaPedido,
-  setTabelaVisivel
+  handleClick
  }) => {
   const [modalDesvincular, setModalDesvincular] = useState(false);
+  const [modalVincular, setModalVincular] = useState(false);
   const [modalVisualizar, setModalVisualizar] = useState(false);
   const [dadosPedidosVinculados, setDadosPedidosVinculados] = useState([]);
   const [dadosVisualizarNFE, setDadosVisualizarNFE] = useState([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowSelection, setRowSelection] = useState(null);
+  const [dadosListaPedidosSemVinculoNFE, setDadosListaPedidosSemVinculoNFE] = useState([]);
   const dataTableRef = useRef();
 
 
@@ -230,7 +230,7 @@ export const ActionListaNotasNFE = ({
               </div> 
             )}
 
-            {/* {!stCancelado && (
+            {!stCancelado && (
               <div className="p-1">
                 <ButtonTable
                   titleButton={"Desvincular Pedidos Desta Nota Fiscal"}
@@ -243,7 +243,7 @@ export const ActionListaNotasNFE = ({
                   height="30px"
                 />
               </div>
-            )} */}
+            )} 
 
             {!stCancelado && (
               <div className="p-1">
@@ -309,9 +309,7 @@ export const ActionListaNotasNFE = ({
       const response = await get(`/pedidos-sem-vinculo-nfe?idNota=${IDRESUMOENTRADA}`);
       if(response.data && response.data.length > 0) {
         setDadosListaPedidosSemVinculoNFE({ data: response.data, idNotaFiscal: IDRESUMOENTRADA });
-        // console.log(dadosListaPedidosSemVinculoNFE, 'dadosListaPedidosSemVinculoNFE')
-        setTabelaPedido(true);
-        setTabelaVisivel(false);
+        setModalVincular(true);
       } else {
         Swal.fire({
           icon: 'info',
@@ -401,6 +399,14 @@ export const ActionListaNotasNFE = ({
           </DataTable>
         </div>
 
+        <ActionVincularPedidoNFE 
+          show={modalVincular}
+          handleClose={() => setModalVincular(false)}
+          dadosListaPedidosSemVinculoNFE={dadosListaPedidosSemVinculoNFE}
+          optionsModulos={optionsModulos}
+          usuarioLogado={usuarioLogado}
+          handleClick={handleClick}
+        />
         <ActionDesvincularNotasNFEModal 
           show={modalDesvincular}
           handleClose={() => setModalDesvincular(false)}

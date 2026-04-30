@@ -193,7 +193,7 @@ export const ActionListaProdutoEtiqueta = ({
         showConfirmButton: true,
         showCancelButton: true,
         showCloseButton: true,
-        customClass: { container: 'custom-class' },
+        customClass: { container: 'custom-swal' },
         confirmButtonText: 'Todos os registros',
         cancelButtonText: 'Apenas o que está tela',
         cancelButtonColor: '#2196F3',
