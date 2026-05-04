@@ -2,38 +2,23 @@ import React, { Fragment, useEffect, useRef, useState } from "react"
 import Swal from "sweetalert2";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { get, post, put } from "../../../api/funcRequest";
+import { get, post, put } from "../../../../../api/funcRequest";
 import { useQuery } from "react-query";
 
-export const useCriarMenuFilho = () => {
+export const useCriarMenuFilho = ({
+  usuarioLogado,
+  optionsModulos,
+  refetchMenuFilho
+}) => {
+  
   const [moduloSelecionado, setModuloSelecionado] = useState(null);
   const [complementoUrl, setComplementoUrl] = useState("");
   const [urlFinal, setUrlFinal] = useState("");
   const [nomeMenu, setNomeMenu] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(1000);
   const [selectedModule, setSelectedModule] = useState(null)
   const [moduloUsuario, setModuloUsuario] = useState(null);
-  const menuLeft = useRef(null);
-  const [usuarioLogado, setUsuarioLogado] = useState(null);
   const [ipUsuario, setIpUsuario] = useState('');
-  const navigate = useNavigate();
-
-
-  useEffect(() => {
-    const usuarioArmazenado = localStorage.getItem('usuario');
-
-    if (usuarioArmazenado) {
-      try {
-        const parsedUsuario = JSON.parse(usuarioArmazenado);
-        setUsuarioLogado(parsedUsuario);
-      } catch (error) {
-        console.error('Erro ao parsear o usuário do localStorage:', error);
-      }
-    } else {
-      navigate('/');
-    }
-  }, [navigate]);
 
   const getIPUsuario = async () => {
     let usuarioIP = null;
@@ -56,17 +41,6 @@ export const useCriarMenuFilho = () => {
     setIpUsuario(usuarioIP);
     return usuarioIP;
   };
-
-  const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
-    'menus-usuario',
-    async () => {
-      const response = await get(`/menus-usuario?idUsuario=${usuarioLogado?.id}`);
-
-      return response.data;
-    },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
-  );
-
 
   const onSubmit = async () => {
 
@@ -140,7 +114,11 @@ export const useCriarMenuFilho = () => {
       setComplementoUrl("");
       setUrlFinal("");
       setModuloSelecionado(null);
+
+      refetchMenuFilho()
+
       return createData.data;
+
     } catch (error) {
 
       const textDados = JSON.stringify(postData);
@@ -185,17 +163,10 @@ export const useCriarMenuFilho = () => {
     setNomeMenu,
     currentPage,
     setCurrentPage,
-    pageSize,
-    setPageSize,
     selectedModule,
     setSelectedModule,
     moduloUsuario,
     setModuloUsuario,
-    menuLeft,
-    usuarioLogado,
-    setUsuarioLogado,
-    navigate,
-    optionsModulos,
     onSubmit
   }
 }
