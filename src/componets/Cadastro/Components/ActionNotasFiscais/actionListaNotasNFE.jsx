@@ -359,7 +359,6 @@ export const ActionListaNotasNFE = ({
 
   const clickCriarDevolucao = (row) => {
     if (row && row.IDRESUMOENTRADA && row.EMIT_XNOME && row.numSerieNota) {
-
       handleCriarDevolucao(row.IDRESUMOENTRADA, row.EMIT_XNOME, row.numSerieNota);
     }
   }
@@ -471,7 +470,7 @@ export const ActionListaNotasNFE = ({
           dadosCriarDevolucao={dadosCriarDevolucao}
         />
 
-        {console.log("dadosCriarDevolucao", dadosCriarDevolucao)}
+  
       </div>
 
     </Fragment>
