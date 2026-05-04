@@ -7,8 +7,10 @@ import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../../../Tables/headerTable";
 import { get } from "../../../../../api/funcRequest";
+import { formatMoeda } from "../../../../../utils/formatMoeda";
+import { toFloat } from "../../../../../utils/toFloat";
 
-export const ActionListaNotasNFE = ({ dadosNfePedido }) => {
+export const ActionListaNotasNFE = ({ dadosCriarDevolucao }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
@@ -25,16 +27,16 @@ export const ActionListaNotasNFE = ({ dadosNfePedido }) => {
   const exportToPDF = () => {
     const doc = new jsPDF();
     doc.autoTable({
-      head: [['Nº', 'ID Produto', 'Produto', 'Cód.Barras', 'Quantidade', 'Depósito', 'Vr. Unitário', 'Vr. Total']],
+      head: [['Nº', 'Produto', 'Referência', 'NCM', 'Vr. Unitário', 'QTD Nota', 'QTD Devolução', 'Vr. Total']],
       body: dados.map(item => [
         item.contador,
-        item.IDPRODUTO,
-        item.DSPRODUTO,
-        item.NUCODBARRAS,
-        item.QTD,
-        item.EMPDESTINO,
-        item.VRUNITARIO,
-        item.VRTOTALPROD
+        item.XPROD,
+        item.CPROD,
+        item.NCM,
+        item.VUNCOM,
+        item.QCOM,
+        item.QCOM,
+        item.VPROD
       ]),
       horizontalPageBreak: true,
       horizontalPageBreakBehaviour: 'immediately'
@@ -45,15 +47,15 @@ export const ActionListaNotasNFE = ({ dadosNfePedido }) => {
   const exportToExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(dados);
     const workbook = XLSX.utils.book_new();
-    const header = ['Nº', 'ID Produto', 'Produto', 'Cód.Barras', 'Quantidade', 'Depósito', 'Vr. Unitário', 'Vr. Total']
+    const header = ['Nº', 'Produto', 'Referência', 'NCM', 'Vr. Unitário', 'QTD Nota', 'QTD Devolução', 'Vr. Total']
     worksheet['!cols'] = [
       { wpx: 70, caption: 'Nº' },
-      { wpx: 100, caption: 'ID Produto' },
       { wpx: 100, caption: 'Produto' },
-      { wpx: 100, caption: 'Cód.Barras' },
-      { wpx: 100, caption: 'Quantidade' },
-      { wpx: 100, caption: 'Depósito' },
+      { wpx: 100, caption: 'Referência' },
+      { wpx: 100, caption: 'NCM' },
       { wpx: 100, caption: 'Vr. Unitário' },
+      { wpx: 100, caption: 'QTD Nota' },
+      { wpx: 100, caption: 'QTD Devolução' },
       { wpx: 100, caption: 'Vr. Total' },
     ];
     XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
@@ -62,7 +64,7 @@ export const ActionListaNotasNFE = ({ dadosNfePedido }) => {
   };
 
 
-  const dados = dadosNfePedido?.map((item, index) => {
+  const dados = dadosCriarDevolucao?.map((item, index) => {
     let contador = index + 1;
 
     return {
@@ -72,9 +74,9 @@ export const ActionListaNotasNFE = ({ dadosNfePedido }) => {
       CPROD: item.CPROD,
       NCM: item.NCM,
       EMPDESTINO: item.EMPDESTINO,
-      VUNCOM: item.VUNCOM,
-      QCOM: item.QCOM,
-      VPROD: item.VPROD,
+      VUNCOM: formatMoeda(item.VUNCOM),
+      QCOM: toFloat(item.QCOM),
+      VPROD: formatMoeda(item.VPROD),
     }
   })
 
@@ -160,7 +162,7 @@ export const ActionListaNotasNFE = ({ dadosNfePedido }) => {
 
   return (
     <Fragment>
-      <div className="panel" style={{width: '100%', marginBottom: '2rem', marginTop: '2rem'}}>
+      <div className="panel" style={{width: '100%', marginTop: '2rem'}}>
         <div className="panel-hdr">
           <h2>LISTA DOS PRODUTOS DA NOTA</h2>
         </div>
@@ -174,7 +176,7 @@ export const ActionListaNotasNFE = ({ dadosNfePedido }) => {
           />
 
         </div>
-        <div className="card mb-4" ref={dataTableRef}>
+        <div className="card" ref={dataTableRef}>
           <DataTable
             title="Produtos da Nota"
             value={dados}

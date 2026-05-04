@@ -252,7 +252,7 @@ export const ActionListaNotasNFE = ({
               <div className="p-1">
                 <ButtonTable
                   titleButton={"Criar Nota Fiscal de Devolução"}
-                  onClickButton={() => clickCriarNota(row)}
+                  onClickButton={() => clickCriarDevolucao(row)}
                   cor={"secondary"}
                   Icon={IoMdAdd}
                   iconSize={25}
@@ -365,10 +365,10 @@ export const ActionListaNotasNFE = ({
 
   const handleCriarDevolucao = async (IDRESUMOENTRADA) => {
     try {
-      const response = await get(`/cadastro-nfpedido?idPedido=${IDRESUMOENTRADA}`);
+      const response = await get(`/produto-nf-pedidos?idNota=${IDRESUMOENTRADA}`);
       if(response.data && response.data.length > 0) {
-        setDadosVisualizarNFE(response.data);
-        setModalVisualizar(true);
+        setDadosCriarDevolucao(response.data);
+        setModalCriarDevolucao(true);
       } else {
         Swal.fire({
           icon: 'info',
@@ -460,10 +460,16 @@ export const ActionListaNotasNFE = ({
         /> 
 
         <ActionCriarDevolucaoNFE 
-        
+          show={modalCriarDevolucao}
+          handleClose={() => setModalCriarDevolucao(false)}
+          dadosCriarDevolucao={dadosCriarDevolucao}
         />
       </div>
 
     </Fragment>
   )
 }
+/*
+  irmã tive um sonho muito maluco, ontem a noite,
+  sonhei que tinha duas mulheres
+*/

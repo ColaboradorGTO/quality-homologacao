@@ -4,7 +4,14 @@ import { HeaderModal } from "../../../../Modais/HeaderModal/HeaderModal";
 import { Formulario } from "./formulario";
 
 
-export const ActionCriarDevolucaoNFE = ({ show, handleClose, usuarioLogado, optionsModulos, handleClick }) => {
+export const ActionCriarDevolucaoNFE = ({ 
+    show, 
+    handleClose, 
+    usuarioLogado, 
+    optionsModulos, 
+    handleClick,
+    dadosCriarDevolucao
+}) => {
  
   return (
     <Fragment>
@@ -27,6 +34,7 @@ export const ActionCriarDevolucaoNFE = ({ show, handleClose, usuarioLogado, opti
             usuarioLogado={usuarioLogado}
             optionsModulos={optionsModulos}
             handleClick={handleClick}
+            dadosCriarDevolucao={dadosCriarDevolucao}
           />
         </Modal.Body>
 

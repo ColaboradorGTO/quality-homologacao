@@ -5,13 +5,16 @@ import Select from 'react-select';
 import { Controller, useForm } from "react-hook-form";
 import { AlertError } from "../../../../Inputs/alertError";
 import FormField from "../../../../Formularios/FormField";
-import { useCadastrarNFEdeEntrada } from "../hooks/useCadastrarNFEdeEntrada";
-import { schema } from "./schema/useCadastrarSchema"
 import { ActionListaNotasNFE } from "./actionListaProduto";
-import { mascaraCNPJ } from "../../../../../utils/mascaraCNPJ";
 import Swal from "sweetalert2";
 
-export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleClick }) => {
+export const Formulario = ({ 
+    handleClose, 
+    usuarioLogado, 
+    optionsModulos, 
+    handleClick,
+    dadosCriarDevolucao 
+}) => {
     const { register, handleSubmit, formState: { errors }, clearErrors, setError, control } = useForm({
         mode: "onChange"
     });
@@ -20,7 +23,11 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, handleC
     return (
         <Fragment>
             <form onSubmit>
-            
+
+                <ActionListaNotasNFE
+                    dadosCriarDevolucao={dadosCriarDevolucao}
+                />
+                
                 <FooterModal
                     ButtonTypeFechar={ButtonTypeModal}
                     onClickButtonFechar={handleClose}
