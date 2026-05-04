@@ -34,13 +34,13 @@ export const Formulario = ({
                     textButtonFechar={"Fechar"}
                     corFechar={"secondary"}
 
-                    ButtonTypeCadastrar={ButtonTypeModal}
+                    // ButtonTypeCadastrar={ButtonTypeModal}
                     // onClickButtonCadastrar={handleSubmit(handleValidatedSubmit)}
-                    tipoBtnCadastrar={"submit"}
-                    textButtonCadastrar={"Cadastrar"}
-                    corCadastrar={"success"}
-                    loadingTextCadastrar={"Cadastrando..."}
-                    autoLoadingCadastrar={true}
+                    // tipoBtnCadastrar={"submit"}
+                    // textButtonCadastrar={"Cadastrar"}
+                    // corCadastrar={"success"}
+                    // loadingTextCadastrar={"Cadastrando..."}
+                    // autoLoadingCadastrar={true}
                 />
             </form>
         </Fragment>

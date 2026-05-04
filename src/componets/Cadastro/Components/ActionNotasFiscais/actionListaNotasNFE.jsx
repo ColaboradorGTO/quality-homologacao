@@ -358,16 +358,22 @@ export const ActionListaNotasNFE = ({
   }
 
   const clickCriarDevolucao = (row) => {
-    if (row && row.IDRESUMOENTRADA) {
-      handleCriarDevolucao(row.IDRESUMOENTRADA);
+    if (row && row.IDRESUMOENTRADA && row.EMIT_XNOME && row.numSerieNota) {
+
+      handleCriarDevolucao(row.IDRESUMOENTRADA, row.EMIT_XNOME, row.numSerieNota);
     }
   }
 
-  const handleCriarDevolucao = async (IDRESUMOENTRADA) => {
+  const handleCriarDevolucao = async (IDRESUMOENTRADA, EMIT_XNOME, numSerieNota) => {
+
     try {
       const response = await get(`/produto-nf-pedidos?idNota=${IDRESUMOENTRADA}`);
       if(response.data && response.data.length > 0) {
-        setDadosCriarDevolucao(response.data);
+        setDadosCriarDevolucao({
+          data: response.data,
+          fornecedor: EMIT_XNOME,
+          numSerieNota,
+        });
         setModalCriarDevolucao(true);
       } else {
         Swal.fire({
@@ -464,12 +470,10 @@ export const ActionListaNotasNFE = ({
           handleClose={() => setModalCriarDevolucao(false)}
           dadosCriarDevolucao={dadosCriarDevolucao}
         />
+
+        {console.log("dadosCriarDevolucao", dadosCriarDevolucao)}
       </div>
 
     </Fragment>
   )
 }
-/*
-  irmã tive um sonho muito maluco, ontem a noite,
-  sonhei que tinha duas mulheres
-*/
