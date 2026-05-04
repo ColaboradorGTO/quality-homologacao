@@ -16,7 +16,7 @@ import { FaLink, FaUnlink } from "react-icons/fa";
 import { GiPadlock, GiPadlockOpen } from "react-icons/gi";
 import { GrFormView, GrView } from "react-icons/gr";
 import { SiSap } from "react-icons/si";
-import { ActionDesvincularNotasNFEModal } from "./actionDesvincularNotasNFEModal";
+import { ActionDesvincularNotasNFEModal } from "./ActionDesvincular/actionDesvincularNotasNFEModal";
 import { IoMdAdd } from "react-icons/io";
 import Swal from "sweetalert2";
 import { ActionVisualizarNFE } from "./ActionVisualizarNota/actionVisualizarNFE";
@@ -293,6 +293,7 @@ export const ActionListaNotasNFE = ({
       const response = await get(`/desvincular-pedidos-nfe?idNota=${IDRESUMOENTRADA}`);
       if(response.data && response.data.length > 0) {
         setDadosPedidosVinculados({ data: response.data, idNotaFiscal: IDRESUMOENTRADA });
+        console.log('dadosPedidosVinculados', dadosPedidosVinculados);
         setModalDesvincular(true);
       } else {
         Swal.fire({
@@ -415,6 +416,7 @@ export const ActionListaNotasNFE = ({
           usuarioLogado={usuarioLogado}
           handleClick={handleClick}
         />
+        
         <ActionDesvincularNotasNFEModal 
           show={modalDesvincular}
           handleClose={() => setModalDesvincular(false)}
