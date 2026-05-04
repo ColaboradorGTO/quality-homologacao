@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import axios from "axios"
 import Swal from 'sweetalert2'
-import { post } from "../../../../../api/funcRequest"
+import { post, put } from "../../../../../api/funcRequest"
 
 
 export const useDesvincularPedidoNFE = ({
@@ -93,7 +93,7 @@ export const useDesvincularPedidoNFE = ({
 
 
             try {
-                const response = await post('/desvincular-nf-pedido', putData);
+                const response = await put('/desvincular-nf-pedido', putData);
         
                 const textDados = JSON.stringify(putData);
                 let textFuncao = 'CADASTRO / DESVINCULANDO PEDIDOS';

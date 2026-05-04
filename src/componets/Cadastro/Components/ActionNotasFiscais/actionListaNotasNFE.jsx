@@ -21,6 +21,7 @@ import { IoMdAdd } from "react-icons/io";
 import Swal from "sweetalert2";
 import { ActionVisualizarNFE } from "./ActionVisualizarNota/actionVisualizarNFE";
 import { ActionVincularPedidoNFE } from "./ActionVincularPedidoNFE/actionVincularPedidoNFE";
+import { ActionCriarDevolucaoNFE } from "./CriarNFEDevolucao/actionCriarDevolucao";
 
 export const ActionListaNotasNFE = ({ 
   dadosNFE, 
@@ -31,8 +32,10 @@ export const ActionListaNotasNFE = ({
   const [modalDesvincular, setModalDesvincular] = useState(false);
   const [modalVincular, setModalVincular] = useState(false);
   const [modalVisualizar, setModalVisualizar] = useState(false);
+  const [modalCriarDevolucao, setModalCriarDevolucao] = useState(false);
   const [dadosPedidosVinculados, setDadosPedidosVinculados] = useState([]);
   const [dadosVisualizarNFE, setDadosVisualizarNFE] = useState([]);
+  const [dadosCriarDevolucao, setDadosCriarDevolucao] = useState([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowSelection, setRowSelection] = useState(null);
   const [dadosListaPedidosSemVinculoNFE, setDadosListaPedidosSemVinculoNFE] = useState([]);
@@ -293,7 +296,6 @@ export const ActionListaNotasNFE = ({
       const response = await get(`/desvincular-pedidos-nfe?idNota=${IDRESUMOENTRADA}`);
       if(response.data && response.data.length > 0) {
         setDadosPedidosVinculados({ data: response.data, idNotaFiscal: IDRESUMOENTRADA });
-        console.log('dadosPedidosVinculados', dadosPedidosVinculados);
         setModalDesvincular(true);
       } else {
         Swal.fire({
@@ -354,6 +356,31 @@ export const ActionListaNotasNFE = ({
       console.error(error);
     }
   }
+
+  const clickCriarDevolucao = (row) => {
+    if (row && row.IDRESUMOENTRADA) {
+      handleCriarDevolucao(row.IDRESUMOENTRADA);
+    }
+  }
+
+  const handleCriarDevolucao = async (IDRESUMOENTRADA) => {
+    try {
+      const response = await get(`/cadastro-nfpedido?idPedido=${IDRESUMOENTRADA}`);
+      if(response.data && response.data.length > 0) {
+        setDadosVisualizarNFE(response.data);
+        setModalVisualizar(true);
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Nenhum detalhe encontrado',
+          text: 'Não foi possível encontrar os detalhes para esta nota fiscal.',
+        });
+      }
+    }catch (error) {
+      console.error(error);
+    }
+  }
+
   return (
     <Fragment>
       <div className="panel">
@@ -416,7 +443,7 @@ export const ActionListaNotasNFE = ({
           usuarioLogado={usuarioLogado}
           handleClick={handleClick}
         />
-        
+
         <ActionDesvincularNotasNFEModal 
           show={modalDesvincular}
           handleClose={() => setModalDesvincular(false)}
@@ -431,6 +458,10 @@ export const ActionListaNotasNFE = ({
           handleClose={() => setModalVisualizar(false)}
           dadosVisualizarNFE={dadosVisualizarNFE}
         /> 
+
+        <ActionCriarDevolucaoNFE 
+        
+        />
       </div>
 
     </Fragment>
