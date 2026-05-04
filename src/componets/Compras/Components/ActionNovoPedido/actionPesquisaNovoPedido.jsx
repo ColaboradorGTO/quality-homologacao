@@ -30,16 +30,16 @@ export const ActionPesquisaNovoPedido = ({
 }) => {
   
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
-      'menus-usuario-excecao',
-      async () => {
-        const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${ID}`);
-  
-        return response.data;
-      },
-      { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
+    'menus-usuario-excecao',
+    async () => {
+      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${ID}`);
+
+      return response.data;
+    },
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
   );
   
-   const {
+  const {
     tabelaVisivel,
     setTabelaVisivel,
     tabelaCadastroProduto,
@@ -419,9 +419,9 @@ export const ActionPesquisaNovoPedido = ({
  const handleVerificar = async () => {
     const existe = await verificaDadosDoFornecedorSelecionado ();
     if (existe) {
-        console.log('Fornecedor válido!');
+      console.log('Fornecedor válido!');
     } else {
-        console.log('Fornecedor não existe!');
+      console.log('Fornecedor não existe!');
     }
 };
 
@@ -653,7 +653,7 @@ export const ActionPesquisaNovoPedido = ({
         IconCadastro={MdOutlineCheck}
 
         ButtonTypePedido={ButtonType}
-        linkPedido={"Clonar Peidido"}
+        linkPedido={"Clonar Cabeçalho Pedido"}
         onButtonClickPedido={() =>  handleClonarCabecalhoPedido()}
         corPedido={"warning"}
         IconPedido={MdOutlinePictureAsPdf}

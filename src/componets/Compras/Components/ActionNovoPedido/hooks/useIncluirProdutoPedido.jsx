@@ -64,6 +64,8 @@ export const useIncluirProutoPedido = ({
 
     useEffect(() => {
         const data = getDataAtual();
+        setDataPesquisaInicio(data);
+        setDataPesquisaFim(data);
         setDataAtual(data);
     }, [])
 

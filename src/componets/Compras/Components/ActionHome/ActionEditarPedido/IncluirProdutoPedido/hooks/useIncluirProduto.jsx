@@ -119,15 +119,16 @@ export const useIncluirProduto = ({
     const { data: dadosGrade  = [], error: errorGrade, isLoading: isLoadingGrade, refetch: refetchGrade } = useQuery(
         'vinculo-tamanho-categoria',
         async () => { 
-            const response = await get(`/vinculo-tamanho-categoria?idCategoriaPedido=${categoriaGradeSelecionada?.value}`);  
+            const response = await get(`/vinculo-tamanho-categoria?idCategoriaPedido=${categoriaSelecionada?.value}`);  
 
             return response.data
         },
-        { enabled: true }
+        { enabled: Boolean(categoriaSelecionada?.value) }
     );
 
+
     const { data: dadosPedidoGrade  = [], error: errorPedidoGrade, isLoading: isLoadingPedidoGrade, refetch: refetchPedidoGrade } = useQuery(
-        'vinculo-tamanho-categoria',
+        'lista-detalhe-pedidos-grade',
         async () => { 
             const response = await get(`/lista-detalhe-pedidos-grade?idDetalhePedido=${dadosDetalhePedido[0]?.IDDETPEDIDO}`);  
             // setProdutoDadosGrade(response.data)
@@ -245,8 +246,13 @@ export const useIncluirProduto = ({
     useEffect(() => {
         if(dadosDetalhePedido && dadosDetalhePedido.length > 0) {
             
-            console.log(dadosVisualizarPedido[0], 'dataVisualizarPedido[0] - useEffect do Modal')
-            setNomeMarca(dadosDetalhePedido[0]?.NOFANTASIA)
+            
+            setNomeMarca(
+                dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL == 1 ? 'TO - TESOURA DE OURO' : 
+                dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL == 2 ? 'MG - MAGAZINE' : 
+                dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL == 3 ? 'YO - YORUS' : 
+                'FC - FREE CENTER'
+            )
             setStReposicaoSelecionado({
                 value: dadosDetalhePedido[0]?.STREPOSICAO, 
                 label:  dadosDetalhePedido[0]?.STREPOSICAO == 'True' ? 'SIM' : 'NÃO'
@@ -266,6 +272,7 @@ export const useIncluirProduto = ({
             setUnidadeSelecionada({value: dadosDetalhePedido[0]?.IDUNIDADEMEDIDA, label: dadosDetalhePedido[0]?.DSSIGLA})
             setCorSelecionada({value: dadosDetalhePedido[0]?.IDCOR, label: dadosDetalhePedido[0]?.DSCOR})
             setTipoTecidoSelecionado({value: dadosDetalhePedido[0]?.IDTIPOTECIDO, label: dadosDetalhePedido[0]?.DSTIPOTECIDO})
+            // IDCATEGORIAPEDIDO
             setCategoriaGradeSelecionada({
                 value: dadosDetalhePedido[0]?.IDCATEGORIAGRADE, 
                 label: `${dadosDetalhePedido[0]?.TPCATEGORIAPRODPEDIDO} - ${dadosDetalhePedido[0]?.DSCATEGORIAPEDIDO}`
@@ -288,17 +295,17 @@ export const useIncluirProduto = ({
             setObsFornecedor(dadosDetalhePedido[0]?.OBSPEDIDO)
             setRascunho(dadosDetalhePedido[0]?.STRASCUNHO)
             // setProdutoDadosGrade(dadosDetalhePedido[0]?.DETALHEGRADE.map((item) => ({
-            //     IDTAMANHO: item.IDTAMANHO,
-            //     DSTAMANHO: item.DSTAMANHO,
-            // })))
+                //     IDTAMANHO: item.IDTAMANHO,
+                //     DSTAMANHO: item.DSTAMANHO,
+                // })))
             // console.log(dadosDetalhePedido[0]?.DETALHEGRADE.map((item) => ({
-            //     IDTAMANHO: item.IDTAMANHO,
-            //     DSTAMANHO: item.DSTAMANHO,
-            //     INDICETAMANHO: item.INDICETAMANHO
+                //     IDTAMANHO: item.IDTAMANHO,
+                //     DSTAMANHO: item.DSTAMANHO,
+                //     INDICETAMANHO: item.INDICETAMANHO
             // })), 'dadosDetalhePedido[0]?.DETALHEGRADE - Campos selecionados')
         }
-    }, [dadosDetalhePedido]);
-    // console.log(dadosDetalheGradePedido, 'dadosDetalheGradePedido')
+        }, [dadosDetalhePedido]);
+
 
     // Inicializa os valores quando dadosGrade muda
     useEffect(() => {

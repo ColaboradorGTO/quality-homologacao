@@ -22,6 +22,7 @@ import Swal from "sweetalert2";
 import { ActionVisualizarNFE } from "./ActionVisualizarNota/actionVisualizarNFE";
 import { ActionVincularPedidoNFE } from "./ActionVincularPedidoNFE/actionVincularPedidoNFE";
 import { ActionCriarDevolucaoNFE } from "./CriarNFEDevolucao/actionCriarDevolucao";
+import { useCancelarNFEntrada } from "./hooks/useCancelarNFEntrada";
 
 export const ActionListaNotasNFE = ({ 
   dadosNFE, 
@@ -41,7 +42,13 @@ export const ActionListaNotasNFE = ({
   const [dadosListaPedidosSemVinculoNFE, setDadosListaPedidosSemVinculoNFE] = useState([]);
   const dataTableRef = useRef();
 
-
+  const {
+    handleCancelar
+  } = useCancelarNFEntrada({
+    handleClick,
+    optionsModulos,
+    usuarioLogado,
+  });
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
   };
@@ -218,7 +225,7 @@ export const ActionListaNotasNFE = ({
               />
             </div>
 
-            {!stCancelado && (
+            {/* {!stCancelado && (
               <div className="p-1">
                 <ButtonTable
                   titleButton={"Vincular Nota Fiscal a Pedidos"}
@@ -231,7 +238,7 @@ export const ActionListaNotasNFE = ({
                   height="30px"
                 />
               </div> 
-            )}
+            )} */}
 
             {!stCancelado && (
               <div className="p-1">
@@ -267,7 +274,7 @@ export const ActionListaNotasNFE = ({
               <div className="p-1">
                 <ButtonTable
                   titleButton={"Cancelar Nota Fiscal"}
-                  onClickButton={() => clickCriarNota(row)}
+                  onClickButton={() =>  handleCancelar(row)}
                   cor={"danger"}
                   Icon={BsTrash3}
                   iconSize={25}

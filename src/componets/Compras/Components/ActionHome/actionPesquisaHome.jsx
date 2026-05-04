@@ -200,6 +200,7 @@ export const ActionPesquisaHome = ({ usuarioLogado }) => {
     refetchListaPedidosDetalhados();
   }
 
+  
   return (
     <Fragment>
 

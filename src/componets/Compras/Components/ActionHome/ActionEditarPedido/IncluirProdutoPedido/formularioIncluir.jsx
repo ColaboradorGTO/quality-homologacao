@@ -236,27 +236,14 @@ export const FormularioIncluirProdutoPedido = ({
 
                                 )}
                             />
-
+                            
+                            
                         </div>
                     </div>
                 </div>
-                <div className="form-group">
+                {/* <div className="form-group">
                     <div className="row">
-                        <div className="col-sm-6 col-xl-3">
-                            <label className="form-label" htmlFor="strep">Reposição</label>
-                            <Select
-                                id={"stReposicao"}
-                                value={stReposicaoSelecionado}
-                                options={optionsReposicao.map((item) => {
-                                    return {
-                                        value: item.value,
-                                        label: item.label
-                                    }
-                                })}
-                                onChange={(e) => setStReposicaoSelecionado(e)}
-                                isDisabled={true}
-                            />
-                        </div>
+                  
                         <div className="col-sm-6 col-xl-3">
                             <label className="form-label" htmlFor="strep">Tipo de Cadastro</label>
                             <Select
@@ -273,7 +260,7 @@ export const FormularioIncluirProdutoPedido = ({
                             />
                         </div>
                     </div>
-                </div>
+                </div> */}
                 <div className="form-group">
                     <div className="row">
                         <div className="col-sm-6 col-xl-6">
@@ -312,8 +299,22 @@ export const FormularioIncluirProdutoPedido = ({
                 </div>
                 <hr />
                 <div className="form-group">
-                    <div className="row">
-
+                    <div className="row">   
+                        <div className="col-sm-6 col-xl-2">
+                            <label className="form-label" htmlFor="strep">Reposição</label>
+                            <Select
+                                id={"stReposicao"}
+                                value={stReposicaoSelecionado}
+                                options={optionsReposicao.map((item) => {
+                                    return {
+                                        value: item.value,
+                                        label: item.label
+                                    }
+                                })}
+                                onChange={(e) => setStReposicaoSelecionado(e)}
+                                isDisabled={true}
+                            />
+                        </div>
                         <div className="col-sm-6 col-xl-6">
                             <Controller
                                 name="descricaoProdutoPedido"
@@ -327,6 +328,7 @@ export const FormularioIncluirProdutoPedido = ({
                                         onChange={(e) => setDescricaoProduto(e.target.value)}
                                         errors={errors}
                                         clearErrors={clearErrors}
+                                        readOnly={true}
                                     />
 
                                 )}
@@ -387,6 +389,7 @@ export const FormularioIncluirProdutoPedido = ({
                                             setQuantidade(e.target.value);
                                             atualiza_valor_QtdUnit();
                                         }}
+                                        
                                         errors={errors}
                                         clearErrors={clearErrors}
                                     />
@@ -424,6 +427,7 @@ export const FormularioIncluirProdutoPedido = ({
                                         onChange={(e) => setReferencia(e.target.value)}
                                         errors={errors}
                                         clearErrors={clearErrors}
+                                        readOnly={true}
                                     />
                                 )}
                             />
@@ -459,6 +463,7 @@ export const FormularioIncluirProdutoPedido = ({
                                     }
                                 })}
                                 onChange={(e) => setUnidadeSelecionada(e)}
+                                isDisabled={true}
                             />
                         </div>
                         <div className="col-sm-4 col-xl-4">
@@ -470,11 +475,11 @@ export const FormularioIncluirProdutoPedido = ({
                                 menuHeaderTitle={"Selecione"}
                                 menuHeaderStyle={menuHeaderStyle}
                                 onChange={(e) => setCorSelecionada(e)}
-                                
+                                isDisabled={true}
                             />
                         </div>
                         <div className="col-sm-4 col-xl-4">
-                            <label className="form-label" htmlFor="tptecido">Tipo de Tecido</label>
+                            <label className="form-label" htmlFor="tptecido">Tipo de Material</label>
                             <Select
                                 id={"tpTecidoProduto"}
                                 value={tipoTecidoSelecionado}
@@ -485,6 +490,7 @@ export const FormularioIncluirProdutoPedido = ({
                                     }
                                 })}
                                 onChange={(e) => setTipoTecidoSelecionado(e)}
+                                isDisabled={true}
                             />
                         </div>
                     </div>
@@ -503,6 +509,7 @@ export const FormularioIncluirProdutoPedido = ({
                                     }
                                 })}
                                 onChange={(e) => setCategoriaGradeSelecionada(e)}
+                                isDisabled={true}
                             />
         
                         </div>
@@ -516,7 +523,7 @@ export const FormularioIncluirProdutoPedido = ({
                                 menuHeaderTitle={"Selecione"}
                                 menuHeaderStyle={menuHeaderStyle}
                                 onChange={(e) => setEstruturaSelecionada(e)}
-                                
+                                isDisabled={true}
                             />
                         </div>
                         <div className="col-sm-4 col-xl-4">
@@ -531,6 +538,7 @@ export const FormularioIncluirProdutoPedido = ({
                                     }
                                 })}
                                 onChange={(e) => setEstiloSelecionado(e)}
+                                isDisabled={true}
                             />
 
                         </div>
@@ -550,6 +558,7 @@ export const FormularioIncluirProdutoPedido = ({
                                     }
                                 })}
                                 onChange={(e) => setCategoriaSelecionada(e)}
+                                isDisabled={true}
                             />
                         </div>
                         <div className="col-sm-3 col-xl-3">
@@ -565,6 +574,7 @@ export const FormularioIncluirProdutoPedido = ({
                                     }
                                 })}
                                 onChange={(e) => setLocalExposicaoSelecionado(e)}
+                                isDisabled={true}
                             />
                         </div>
                         <div className="col-sm-3 col-xl-3">
@@ -790,16 +800,10 @@ export const FormularioIncluirProdutoPedido = ({
                                     const stDisabled = stDiversos;
                                     const valorAtual = quantidadePorTamanho[idTamanho] || 0;
                                     const qtdDistribuida = distribuicao[idTamanho];
-                                    // console.log(idTamanho, 'idTamanho');
-                                    // console.log(stDiversos, 'stDiversos');
-                                    // console.log(titleGrade, 'titleGrade');
-                                    // console.log(stDisabled, 'stDisabled');
-                                    // console.log(valorAtual, 'valorAtual');
                                    
-
                                     return (
-                                        <div key={item.IDTAMANHO} className="d-flex flex-column align-items-center">
-                                            {/* Label do tamanho */}
+                                        <div key={item.IDTAMANHO} className="d-flex flex-column align-items-center p-1">
+                     
                                             <label
                                                 className="form-label text-center mb-1"
                                                 htmlFor={idTamanho}
@@ -808,7 +812,7 @@ export const FormularioIncluirProdutoPedido = ({
                                                 {item.DSTAMANHO}
                                             </label>
 
-                                            {/* Input da quantidade/índice */}
+       
                                             <input
                                                 type="text"
                                                 id={idTamanho}
@@ -825,10 +829,10 @@ export const FormularioIncluirProdutoPedido = ({
                                                 }}
                                                 disabled={stDisabled}
                                                 onChange={(e) => handleChangeQuantidade(idTamanho, e.target.value)}
-                                                onBlur={() => validarGradeamento()} // Valida ao perder foco
+                                                onBlur={() => validarGradeamento()}
                                             />
 
-                                            {/* Exibe quantidade calculada */}
+                                     
                                             {qtdDistribuida !== undefined && valorAtual > 0 && (
                                                 <small
                                                     className="text-muted mt-1"
