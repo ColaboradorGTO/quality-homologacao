@@ -11,7 +11,8 @@ export const ActionIncluirProdutoPedidoModal = ({
   dadosDetalheGradePedido,
   dadosDetalhePedido,
   dadosPedidosDetalhe,
-  dadosVisualizarPedido
+  dadosVisualizarPedido,
+  dadosUltimosPedidos
 }) => {
   
   return (
@@ -26,16 +27,13 @@ export const ActionIncluirProdutoPedidoModal = ({
       >
         
         <HeaderModal
-          title={`Pedido para Produtos de  VESTUARIO Nº ${dadosVisualizarPedido[0]?.IDPEDIDO}`}
+          title={`Pedido de Produtos de REPOSIÇÃO para VESTUARIO Nº ${dadosVisualizarPedido[0]?.IDPEDIDO}`}
           subTitle={"Edição de Itens do Pedido"}
           handleClose={handleClose}
         />
-        {console.log(dadosVisualizarPedido[0], 'dadosVisualizarPedido')}
-
-        {console.log(dadosDetalhePedido[0], 'dadosDetalhePedido')}
 
 
-        <header
+        {/* <header
           className="p-1"
         >
             <h5 
@@ -46,7 +44,7 @@ export const ActionIncluirProdutoPedidoModal = ({
               para tipoPedido Nº <b> {dadosVisualizarPedido[0]?.IDPEDIDO}</b>
             <small class="m-0 text-muted"> Inclusão de Itens do Pedido </small>
             </h5>
-        </header>
+        </header> */}
         <Modal.Body>  
 
           <FormularioIncluirProdutoPedido 

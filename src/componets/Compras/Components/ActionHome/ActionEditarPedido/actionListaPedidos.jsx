@@ -23,7 +23,8 @@ export const ActionListaPedidos = ({
   dadosVisualizarPedido,
   setModalIncluirProdutoPedido,
   usuarioLogado,
-  optionsModulos
+  optionsModulos,
+  dadosUltimosPedidos
 }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowSelection, setRowSelection] = useState(null);
@@ -433,6 +434,7 @@ export const ActionListaPedidos = ({
         dadosPedidosDetalhe={dadosPedidosDetalhe}
         dadosDetalhePedido={dadosDetalhePedido}
         dadosVisualizarPedido={dadosVisualizarPedido}
+        dadosUltimosPedidos={dadosUltimosPedidos}
       />
     </Fragment>
   )

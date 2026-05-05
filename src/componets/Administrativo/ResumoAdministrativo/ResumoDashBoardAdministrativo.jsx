@@ -70,6 +70,7 @@ export const ResumoDashBoardAdministrativo = ({ usuarioLogado }) => {
     { enabled: false, staleTime: 60 * 60 * 1000, }
   );
 
+  
   const { data: dadosQuebraCaixa = [], error: errorQuebra, isLoading: isLoadingQuebra, refetch: refetchQuebra } = useQuery(
     'quebra-caixa-loja-resumo',
     async () => {

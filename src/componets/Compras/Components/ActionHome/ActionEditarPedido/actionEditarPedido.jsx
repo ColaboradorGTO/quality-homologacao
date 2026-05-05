@@ -555,6 +555,7 @@ export const ActionEditarPedido = ({
           setModalIncluirProdutoPedido={setModalIncluirProdutoPedido}
           usuarioLogado={usuarioLogado}
           optionsModulos={optionsModulos}
+          dadosUltimosPedidos={dadosUltimosPedidos}
       />
     
       <ActionIncluirProdutoPedidoModal

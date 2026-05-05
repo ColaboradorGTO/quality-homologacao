@@ -115,7 +115,7 @@ export const FormularioIncluirProdutoPedido = ({
     } = useIncluirProduto({ usuarioLogado, optionsModulos, dadosDetalhePedido, dadosDetalheGradePedido, dadosPedidosDetalhe, dadosVisualizarPedido });
 
     const distribuicao = calcularDistribuicao();
-    
+
     const handleValidatedSubmit = async () => {
         try {
             const dadosParaValidar = {
@@ -162,7 +162,7 @@ export const FormularioIncluirProdutoPedido = ({
             console.log(`Erro de validação:\n${errorMessages.join('\n')}`);
         }
     }
-    
+
     const menuHeaderStyle = {
         padding: "8px 12px",
         background: "#7a59ad",
@@ -175,43 +175,47 @@ export const FormularioIncluirProdutoPedido = ({
 
         data.forEach((item) => {
             if (!grupos[item.DS_GRUPO]) {
-            grupos[item.DS_GRUPO] = {
-                label: item.DS_GRUPO,
-                options: []
-            };
+                grupos[item.DS_GRUPO] = {
+                    label: item.DS_GRUPO,
+                    options: []
+                };
             }
 
             grupos[item.DS_GRUPO].options.push({
-            value: item.ID_ESTRUTURA,
-            label: item.ESTRUTURA,
-            original: item
+                value: item.ID_ESTRUTURA,
+                label: item.ESTRUTURA,
+                original: item
             });
         });
 
         return Object.values(grupos);
     };
-    
+
     const formatSelectCor = (data) => {
         const grupos = {};
 
         data.forEach((item) => {
             if (!grupos[item.DS_GRUPOCOR]) {
-            grupos[item.DS_GRUPOCOR] = {
-                label: item.DS_GRUPOCOR,
-                options: []
-            };
+                grupos[item.DS_GRUPOCOR] = {
+                    label: item.DS_GRUPOCOR,
+                    options: []
+                };
             }
 
             grupos[item.DS_GRUPOCOR].options.push({
-            value: item.ID_COR,
-            label: item.DS_COR,
-            original: item
+                value: item.ID_COR,
+                label: item.DS_COR,
+                original: item
             });
         });
 
         return Object.values(grupos);
     };
 
+
+    // console.log(dadosDetalheGradePedido, 'dadosDetalheGradePedido')
+    // console.log(dadosPedidosDetalhe, 'dadosPedidosDetalhe')
+    // console.log(dadosVisualizarPedido, 'dadosVisualizarPedido')
     return (
         <Fragment>
             <form onSubmit={handleSubmit(handleValidatedSubmit)}>
@@ -236,8 +240,8 @@ export const FormularioIncluirProdutoPedido = ({
 
                                 )}
                             />
-                            
-                            
+
+
                         </div>
                     </div>
                 </div>
@@ -299,7 +303,7 @@ export const FormularioIncluirProdutoPedido = ({
                 </div>
                 <hr />
                 <div className="form-group">
-                    <div className="row">   
+                    <div className="row">
                         <div className="col-sm-6 col-xl-2">
                             <label className="form-label" htmlFor="strep">Reposição</label>
                             <Select
@@ -389,7 +393,7 @@ export const FormularioIncluirProdutoPedido = ({
                                             setQuantidade(e.target.value);
                                             atualiza_valor_QtdUnit();
                                         }}
-                                        
+
                                         errors={errors}
                                         clearErrors={clearErrors}
                                     />
@@ -511,11 +515,11 @@ export const FormularioIncluirProdutoPedido = ({
                                 onChange={(e) => setCategoriaGradeSelecionada(e)}
                                 isDisabled={true}
                             />
-        
+
                         </div>
                         <div className="col-sm-4 col-xl-4">
                             <label className="form-label" htmlFor="estruturaProduto">Estrutura</label>
-       
+
                             <SelectList
                                 id={"categoriaProduto"}
                                 value={estruturaSelecionada}
@@ -794,16 +798,40 @@ export const FormularioIncluirProdutoPedido = ({
                             <div className="d-flex flex-wrap gap-2 mt-2" style={{ maxWidth: "100%" }}>
                                 {dadosGrade?.map((item) => {
                                     const idTamanho = item.IDTAMANHO.toString();
+
+                                    // Lógica para DIVERSOS (original)
                                     const stDiversos = item.DSTAMANHO?.toUpperCase() === 'DIVERSOS' ||
                                         item.DSTAMANHO?.toUpperCase() === 'U-DIVERSOS';
-                                    const titleGrade = stDiversos ? 'A Grade Diversos Possuí Gradeamento Único!' : '';
-                                    const stDisabled = stDiversos;
+
                                     const valorAtual = quantidadePorTamanho[idTamanho] || 0;
+
+                                    // NOVA LÓGICA: Implementar a mesma regra do jQuery
+                                    const stTransformado = dadosDetalhePedido[0]?.STTRANSFORMADO; // ← VOCÊ PRECISA DESSA VARIÁVEL
+                                    // console.log(dadosDetalhePedido[0]?.STTRANSFORMADO, 'STTRANSFORMADO')
+                                    // console.log(dadosDetalheGradePedido[0]?.STTRANSFORMADO, 'dadosDetalheGradePedido')
+                                    let stDisabled = false;
+
+                                    if (stTransformado === 'True') {
+                                        // Se transformado, desabilita campos com quantidade zero
+                                        stDisabled = !valorAtual || valorAtual == 0;
+                                    }
+
+                                    // Se é DIVERSOS, sempre desabilita (exceto se valor = 1)
+                                    if (stDiversos) {
+                                        stDisabled = true;
+                                    }
+
+                                    const titleGrade = stDiversos ? 'A Grade Diversos Possuí Gradeamento Único!' : '';
                                     const qtdDistribuida = distribuicao[idTamanho];
-                                   
+                                    console.log({
+                                        idTamanho,
+                                        valorAtual,
+                                        stTransformado,
+                                        stDiversos,
+                                        stDisabled
+                                    });
                                     return (
                                         <div key={item.IDTAMANHO} className="d-flex flex-column align-items-center p-1">
-                     
                                             <label
                                                 className="form-label text-center mb-1"
                                                 htmlFor={idTamanho}
@@ -812,12 +840,11 @@ export const FormularioIncluirProdutoPedido = ({
                                                 {item.DSTAMANHO}
                                             </label>
 
-       
                                             <input
                                                 type="text"
                                                 id={idTamanho}
                                                 name={idTamanho}
-                                                value={valorAtual}
+                                                value={stDiversos && valorAtual === 0 ? 1 : valorAtual} // ← DIVERSOS sempre valor 1
                                                 title={titleGrade}
                                                 className="form-control class_grade text-center"
                                                 style={{
@@ -827,12 +854,12 @@ export const FormularioIncluirProdutoPedido = ({
                                                     flex: "0 0 auto",
                                                     fontSize: '0.9rem'
                                                 }}
-                                                disabled={stDisabled}
+                                                disabled={stDisabled}  // ← USAR A LÓGICA COMPLETA
+                                                readOnly={stDisabled}
                                                 onChange={(e) => handleChangeQuantidade(idTamanho, e.target.value)}
                                                 onBlur={() => validarGradeamento()}
                                             />
 
-                                     
                                             {qtdDistribuida !== undefined && valorAtual > 0 && (
                                                 <small
                                                     className="text-muted mt-1"
@@ -890,3 +917,5 @@ export const FormularioIncluirProdutoPedido = ({
         </Fragment>
     )
 }
+
+
