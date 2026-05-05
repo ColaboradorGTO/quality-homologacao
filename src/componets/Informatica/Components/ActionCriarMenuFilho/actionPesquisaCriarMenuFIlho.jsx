@@ -14,7 +14,7 @@ import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../ut
 import { get } from "../../../../api/funcRequest";
 import { useState } from "react";
 import { ActionMain } from "../../../Actions/actionMain";
-import { ActionListaMenuFilho } from "./actionListaMenuFIlho";
+
 
 export const ActionPesquisaCriarMenuFilho = ({
 
@@ -118,12 +118,6 @@ export const ActionPesquisaCriarMenuFilho = ({
 
             />
 
-            <ActionListaMenuFilho
-                dadosMenuFilho={dadosMenuFilho}
-                usuarioLogado={usuarioLogado}
-                optionsModulos={optionsModulos}
-                refetchMenuFilho={refetchMenuFilho}
-            />
 
         </Fragment>
     )
