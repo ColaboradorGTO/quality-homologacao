@@ -26,7 +26,7 @@ export const ActionImprimirEtiquetaModal = ({
 
   const handlePrintZPL = async () => {
     try {
-      
+      // Início da página ZPL
       let startPageLabel = `
         ^XA
         ^MD10
@@ -39,7 +39,7 @@ export const ActionImprimirEtiquetaModal = ({
       let dataLabelsZPLToPrint = startPageLabel;
       let contador = 0;
 
-    
+      // Processa cada etiqueta do acumulador
       for (let i = 0; i < etiquetas.length; i++) {
         let {
           DSNOME: descricaoProd,
@@ -53,7 +53,7 @@ export const ActionImprimirEtiquetaModal = ({
           MARCA: marcaProd
         } = etiquetas[i];
 
-      
+        // Limpa e converte dados para ZPL (remove acentos e caracteres especiais)
         descricaoProd = descricaoProd?.toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "") || '';
         estiloProd = estiloProd?.toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "") || '';
         localExpProd = localExpProd?.toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "") || '';
@@ -62,28 +62,27 @@ export const ActionImprimirEtiquetaModal = ({
         codBarras = codBarras?.toString() || '';
         qtdEtiqueta = parseInt(qtdEtiqueta || 1);
 
-        
+        // Valida código de barras EAN13
         if (!isValidEAN13(`${codBarras}`)) {
           console.error(`❌ Código de barras inválido: ${codBarras}`);
           throw new Error(`O código de barras(${codBarras}) do produto(${descricaoProd}) da linha: ${i + 1} está em formato inválido, entre em contato com o departamento de cadastro de produtos`);
         }
 
-        
+        // Para cada quantidade de etiqueta solicitada
         for (let j = 0; j < qtdEtiqueta; j++) {
           let priceLength = precoVenda.length;
           let ajustePositionPrice = priceLength > 7 ? (priceLength - 7) * 15 : 0;
           let ajusteFontSizePrice = priceLength <= 11 ? 0 : 5;
-          let offsetDireita = 55; 
-          let positionDefault = offsetDireita + (contador * 280);
-          let positionPrice = offsetDireita + 135 + (contador * 280) - ajustePositionPrice;
-          let positionTamanho = offsetDireita + 10 + (contador * 280);
-          let positionCodBars = offsetDireita + 30 + (contador * 280);
+          let positionDefault = (contador * 280);
+          let positionPrice = 135 + (contador * 280) - ajustePositionPrice;
+          let positionTamanho = 10 + (contador * 280);
+          let positionCodBars = 30 + (contador * 280);
           let fontSizePrice = 35 - ajusteFontSizePrice;
           let widthBorder = tamanhoProd.length > 3 ? '75' : '50';
           let abrirMaisUmaPagina = (j + 1) < qtdEtiqueta || (i + 1) < etiquetas.length;
 
 
-          
+          // Adiciona comandos ZPL para a etiqueta (sem quebras de linha desnecessárias)
           dataLabelsZPLToPrint += `^FO${positionDefault},120^A0N,20,30^FB255,4,2,L,0^FD${descricaoProd}^FS`;
           dataLabelsZPLToPrint += `^FO${positionDefault},205^A0N,20,25^FB255,3,2,L,0^FD${estiloProd}^FS`;
           dataLabelsZPLToPrint += `^FO${positionDefault},245^A0N,20,25^FB255,3,2,L,0^FD${localExpProd}^FS`;
@@ -98,7 +97,7 @@ export const ActionImprimirEtiquetaModal = ({
 
           contador++;
 
-          
+          // Se completou 3 etiquetas por página, finaliza página
           if (contador === 3) {
             dataLabelsZPLToPrint += endPageLabel;
 
@@ -111,19 +110,19 @@ export const ActionImprimirEtiquetaModal = ({
         }
       }
 
-      
+      // Finaliza última página se necessário
       if (contador !== 0) {
         dataLabelsZPLToPrint += endPageLabel;
       }
 
-      
+      // Limpa formatação e cria comandos finais
       const comandosZPLFinais = dataLabelsZPLToPrint
         .replace(/^[ \t]+/gm, '')
         .replace(/^\s*$/gm, '')
-        .replace(/\n+/g, '\n')  
+        .replace(/\n+/g, '\n')  // Remove múltiplas quebras de linha
         .trim();
 
-     
+      // Validação final antes de enviar
       if (comandosZPLFinais.length < 10) {
         throw new Error('Comandos ZPL muito curtos - possível erro na geração');
       }
@@ -132,7 +131,7 @@ export const ActionImprimirEtiquetaModal = ({
         throw new Error('Estrutura ZPL inválida - faltam comandos de início/fim');
       }
 
-      
+      // Envia para impressora via WebSocket
       await enviarZPLParaImpressora(comandosZPLFinais);
 
     } catch (error) {

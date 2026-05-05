@@ -70,7 +70,6 @@ export const ActionPesquisaEtiquetasVolumes = ({ usuarioLogado }) => {
   return (
 
     <Fragment>
-
       <ActionMain
         linkComponentAnterior={["Home"]}
         linkComponent={["Etiquetas Volumes"]}

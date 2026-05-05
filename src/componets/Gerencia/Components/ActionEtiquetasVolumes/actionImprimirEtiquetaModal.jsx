@@ -40,43 +40,44 @@ export const ActionImprimirEtiquetaModal = ({ show, handleClose, dadosAcumulador
           quantidade
         } = dadosAcumuladorEtiquetas[itemIndex]
         etiquetasZPL += `
-                ^XA~TA000~JSN^LT0^MNW^MTT^PON^PMN^LH0,0^JMA^PR2,2~SD15^JUS^LRN^CI0^XZ
-                ^XA
-                ^MMT
-                ^FWR
-                ^PW660
-                ^LL980
-                ^LS0
-                ^CI28
-                
-                ^FO560,0
-                ^GB150,1000,150^FS
+             ^XA~TA000~JSN^LT0^MNW^MTT^PON^PMN^LH0,0^JMA^PR2,2~SD15^JUS^LRN^CI0^XZ
+              ^XA
+              ^MMT
+              ^FWR
+              ^PW660
+              ^LL980
+              ^LS30
+              ^CI28
+              
+              ^FO560,0
+              ^GB150,1000,150^FS
 
-                ^FO550,${titulo == 'REMANEJAMENTO' ? '120' : '250'}
-                ^FR
-                ^CF0,100
-                ^FD${titulo}^FS
+              ^FO550,${titulo == 'REMANEJAMENTO' ? '120' : '250'}
+              ^FR
+              ^CF0,100
+              ^FD${titulo}^FS
 
-                ^CF0,60
-                ^FO430,20^FB480,2,1,L,0^FDOR: ${numeroOR}^FS
-                ^FO430,520^FB480,2,1,L,0^FDOT: ${numeroOT}^FS
+              ^CF0,60
+              ^FO430,20^FB480,2,1,L,0^FDOR: ${numeroOR}^FS
+              ^FO430,520^FB480,2,1,L,0^FDOT: ${numeroOT}^FS
 
-                ^CF0,45
-                ^FO420,20^FDDESCRICAO: ${descricao}^FS
+              ^CF0,45
+              ^FO420,20^FDDESCRICAO: ${descricao}^FS
 
-                ^FO360,20^FDCATEGORIA: ${categoria}^FS
+              ^FO360,20^FDCATEGORIA: ${categoria}^FS
 
-                ${solicitanteSelecionado && `^FO300,20^FDSOLICITANTE: ${solicitanteSelecionado}^FS`}
+              ${solicitanteSelecionado && `^FO300,20^FDSOLICITANTE: ${solicitanteSelecionado}^FS`}
 
-                ^FO180,20^FB980,2,1,L,0^FDREMETENTE: ${empresaOrigem}^FS
+              ^FO180,20^FB980,2,1,L,0^FDREMETENTE: ${empresaOrigem}^FS
 
-                ^FO80,20^FB980,2,1,L,0^FDDESTINATÁRIO: ${empresaDestino}^FS
+              ^FO80,20^FB980,2,1,L,0^FDDESTINATÁRIO: ${empresaDestino}^FS
 
-                ^CF0,40
-                ^FO40,750^FDQTD: ${itemIndex + 1}/${quantidade}^FS
-
-                ^XZ
-            `;
+              ^CF0,40
+              ^FO150,700^FDQTD: ${itemIndex + 1}/${quantidade}^FS
+              
+              ^XZ      
+              `;
+              // ^FO350,500^FDQTD: ${itemIndex + 1}/${quantidade}^FS
       }
 
 
@@ -138,9 +139,10 @@ export const ActionImprimirEtiquetaModal = ({ show, handleClose, dadosAcumulador
 
           <div ref={dataTableRef}>
             {etiquetasPorPagina.map((pagina, pageIndex) => (
-              <div key={pageIndex} className="etiqueta-page" style={{ display: 'block', margin: '30px' }}>
+              // <div key={pageIndex} className="etiqueta-page" style={{ display: 'block', margin: '30px' }}>
+              <div key={pageIndex} className="etiqueta-page" style={{ display: 'block', margin: '0px' }}>
                 {pagina.map((etiqueta, etiquetaIndex) => (
-                  <div className="etiqueta-page-remanejamento" style={{ marginBottom: '30px' }} key={etiquetaIndex}>
+                  <div className="etiqueta-page-remanejamento" style={{ marginBottom: '30px', width: '100%' }} key={etiquetaIndex}>
                     <div className="card border-dark w-100 p-0">
                       <div className="text-center pt-1">
                         <h1 className="title-etiqueta d-inline bg-dark text-white pt-2 pl-3 pb-1 pr-3 fw-900">
