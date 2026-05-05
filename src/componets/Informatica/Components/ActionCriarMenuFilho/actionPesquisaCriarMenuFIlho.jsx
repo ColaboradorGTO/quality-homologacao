@@ -14,7 +14,7 @@ import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../ut
 import { get } from "../../../../api/funcRequest";
 import { useState } from "react";
 import { ActionMain } from "../../../Actions/actionMain";
-import { ActionListaMenuFilho } from "./actionListaMenuFIlho";
+import { ActionListaMenuFilho } from "./ActionListaMenuFilho";
 
 
 export const ActionPesquisaCriarMenuFilho = ({
