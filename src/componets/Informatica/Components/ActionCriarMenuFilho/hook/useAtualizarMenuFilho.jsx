@@ -5,10 +5,14 @@ import { useNavigate } from "react-router-dom";
 import { get, post, put } from "../../../../../api/funcRequest";
 import { useQuery } from "react-query";
 
-export const useCriarMenuFilho = ({
+export const useAtualizarMenuFilho = ({
   usuarioLogado,
   optionsModulos,
-  refetchMenuFilho
+  refetchMenuFilho,
+  dadosAtualizarMenu,
+  dadosMenuPai,
+  handleClose
+
 }) => {
 
   const [moduloSelecionado, setModuloSelecionado] = useState(null);
@@ -19,6 +23,7 @@ export const useCriarMenuFilho = ({
   const [selectedModule, setSelectedModule] = useState(null)
   const [moduloUsuario, setModuloUsuario] = useState(null);
   const [ipUsuario, setIpUsuario] = useState('');
+  const [prefixoEdit, setPrefixoEdit] = useState('');
 
   const getIPUsuario = async () => {
     let usuarioIP = null;
@@ -42,36 +47,9 @@ export const useCriarMenuFilho = ({
     return usuarioIP;
   };
 
-  const limparTexto = (texto) => {
-    return texto
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-zA-Z0-9]/g, "")
-      .toLowerCase();
-  };
-
-  const nomeModuloLimpo = moduloSelecionado?.label
-    ? limparTexto(moduloSelecionado.label)
-    : "";
-
-  const prefixo = `/${nomeModuloLimpo}/ActionPesquisa`;
-
-  const valorFinal = moduloSelecionado ? `${prefixo}${complementoUrl}` : "";
-
   const handleChange = (e) => {
     const texto = e.target.value;
-
-    if (!texto.startsWith(prefixo)) return;
-    if (texto.includes(' ')) return;
-
-    let complemento = texto.slice(prefixo.length);
-
-    if (complemento.length > 0) {
-      complemento = complemento.charAt(0).toUpperCase() + complemento.slice(1);
-    }
-
-    setComplementoUrl(complemento);
-    setUrlFinal(`${prefixo}${complemento}`)
+    setUrlFinal(texto)
   };
 
   const showAlert = (text) => {
@@ -86,6 +64,22 @@ export const useCriarMenuFilho = ({
       },
     });
   };
+
+  useEffect(() => {
+    if (dadosAtualizarMenu[0]) {
+
+      setNomeMenu(dadosAtualizarMenu[0]?.DSNOME);
+
+      const modulo = dadosMenuPai.find(
+        (item) => item.IDMENU === dadosAtualizarMenu[0]?.IDMENUPAI
+      );
+      setModuloSelecionado({ value: dadosAtualizarMenu[0]?.IDMENUPAI, label: modulo?.DSMENU });
+    }
+    setUrlFinal(dadosAtualizarMenu[0]?.URL);
+
+
+  }, [dadosAtualizarMenu]);
+
 
   const onSubmit = async () => {
 
@@ -110,7 +104,7 @@ export const useCriarMenuFilho = ({
       return;
     }
 
-    if (!complementoUrl) {
+    if (!urlFinal) {
       showAlert('Digite uma URL para o menu filho');
       return;
     }
@@ -124,7 +118,8 @@ export const useCriarMenuFilho = ({
       }
     });
 
-    const postData = {
+    const putData = {
+      ID: Number(dadosAtualizarMenu[0]?.ID),
       DSNOME: String(nomeMenu),
       IDMENUPAI: Number(moduloSelecionado?.value),
       URL: String(urlFinal)
@@ -132,7 +127,7 @@ export const useCriarMenuFilho = ({
 
     try {
 
-      const response = await post(`/criar-menu-filho`, postData);
+      const response = await put(`/menu-filho/:id`, putData);
 
       Swal.fire({
         position: 'center',
@@ -145,7 +140,7 @@ export const useCriarMenuFilho = ({
         timer: 1500,
       });
 
-      const textDados = JSON.stringify(postData);
+      const textDados = JSON.stringify(putData);
       const textoFuncao = `MENU FILHO/ NOVO MENU FILHO`;
       const ipUsuario = await getIPUsuario();
 
@@ -158,17 +153,14 @@ export const useCriarMenuFilho = ({
 
       const responsePost = await post('/log-web', createData);
 
-      setNomeMenu("");
-      setComplementoUrl("");
-      setUrlFinal("");
-
+      handleClose();
       refetchMenuFilho()
 
       return createData.data;
 
     } catch (error) {
 
-      const textDados = JSON.stringify(postData);
+      const textDados = JSON.stringify(putData);
       const textoFuncao = `MENU FILHO/ NOVO MENU FILHO`;
       const ipUsuario = await getIPUsuario();
 
@@ -213,7 +205,6 @@ export const useCriarMenuFilho = ({
     setSelectedModule,
     moduloUsuario,
     setModuloUsuario,
-    valorFinal,
     handleChange,
     onSubmit
   }

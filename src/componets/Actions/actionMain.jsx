@@ -470,7 +470,7 @@ export const ActionMain = ({
   placeHolderInputFieldComissao,
   placeHolderInputFieldObsFornecedor,
   placeHolderInputFieldVendedor,
-  
+
   labelMultSelectGrupo,
   labelMultSelectSubGrupo,
   labelMultSelectMarca,
@@ -573,6 +573,8 @@ export const ActionMain = ({
   styleInputFieldOT,
   stylesGrupo,
   styleProdutoVendido,
+  styleInputField,
+  styleInputFieldVendaCPFCNPJ,
   // Funções
 
   onButtonClickSearch,
@@ -1348,6 +1350,7 @@ export const ActionMain = ({
                         value={valueInputField}
                         onChange={onChangeInputField}
                         onKeyDow={onKeyDownInputField}
+                        style={styleInputField}
                       />
                     )}
 
@@ -1396,6 +1399,7 @@ export const ActionMain = ({
                         value={valueInputFieldVendaCPFCNPJ}
                         placeHolder={placeHolderInputFieldVendaCPFCNPJ}
                         readOnly={readOnlyVendaCPFCNPJ}
+                        style={styleInputFieldVendaCPFCNPJ}
                       />
                     )}
                     {InputFieldTelefoneComponent && (

@@ -11,17 +11,21 @@ import { Fragment, useRef, useState } from "react"
 import { get } from "../../../../api/funcRequest";
 import HeaderTable from "../../../Tables/headerTable";
 import { ButtonTable } from "../../../ButtonsTabela/ButtonTable";
+import { ActionEditarMenuFilhoModal } from './ActionAtualizarMenuFilho/actionEditarDescontoFuncionarioModal';
 
 export const ActionListaMenuFilho = ({
     dadosEmpresas,
     optionsModulos,
     usuarioLogado,
     dadosMenuFilho,
-    refetchMenuFilho
+    refetchMenuFilho,
+    dadosMenuPai
 }) => {
 
     const [modalVisivel, setModalVisivel] = useState(false)
     const [dadosDetalhesEmpresa, setDadosDetalhesEmpresa] = useState([])
+    const [dadosAtualizarMenu, setDadosAtualizarMenu] = useState([])
+    const [modalAlterarMenu, setModalAlterarMenu] = useState(false)
     const [globalFilterValue, setGlobalFilterValue] = useState("")
     const [modalEditar, setModalEditar] = useState(false)
     const [dadosEditarEmpresa, setDadosEditarEmpresa] = useState([])
@@ -46,8 +50,8 @@ export const ActionListaMenuFilho = ({
                 item.DSNOME,
                 item.IDMENUPAI,
                 item.URL,
-
             ]),
+
             horizontalPageBreak: true,
             horizontalPageBreakBehaviour: "immediately"
         });
@@ -103,8 +107,73 @@ export const ActionListaMenuFilho = ({
             header: 'URL',
             body: row => <th>{row.URL}</th>,
             sortable: true,
+        },
+        {
+            field: 'opcoes',
+            header: 'Opções',
+            body: (row) => {
+
+                return (
+                    <div style={{ display: "flex", justifyContent: "start", width: "100%" }}>
+                        <div className="p-1">
+                            <ButtonTable
+                                titleButton={"Alterar"}
+                                onClickButton={() => handleClickEdit(row)}
+                                Icon={CiEdit}
+                                iconSize={30}
+                                iconColor={"#fff"}
+                                cor={"primary"}
+                                width="35px"
+                                height="35px"
+                            />
+                        </div>
+                    </div>
+                )
+            },
+            sortable: true,
         }
     ]
+
+  const handleEdit = async (ID) => {
+    try {
+      const response = await get(`/listaMenusFilhos?idMenuFilho=${ID}`)
+      if (response.data && response.data.length > 0) {
+        setDadosAtualizarMenu(response.data)
+        setModalAlterarMenu(true);
+      } else {
+        Swal.fire({
+          title: 'Erro',
+          text: 'Dados não encontrado.',
+          icon: 'error',
+          timer: 3000,
+          customClass: {
+            container: 'custom-swal',
+          }
+        })
+        return;
+      }
+    } catch (error) {
+      console.error('Erro ao buscar detalhes: ', error);
+    }
+  };
+
+  const handleClickEdit = (row) => {
+    if (optionsModulos[0]?.ALTERAR == 'True') {
+      if (row && row.ID) {
+        handleEdit(row.ID);
+      }
+    } else {
+      Swal.fire({
+        title: 'Acesso Negado',
+        text: 'Você não tem permissão para acessar esta funcionalidade.',
+        icon: 'warning',
+        timer: 3000,
+        customClass: {
+          container: 'custom-swal',
+        }
+      })
+    }
+  };
 
     return (
         <Fragment>
@@ -150,16 +219,25 @@ export const ActionListaMenuFilho = ({
                                 body={coluna.body}
                                 footer={coluna.footer}
                                 sortable={coluna.sortable}
-                                headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
-                                footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
-                                bodyStyle={{ fontSize: '0.8rem' }}
-
+                                headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.9rem' }}
+                                footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.9rem' }}
+                                bodyStyle={{ fontSize: '0.9rem' }}
                             />
                         ))}
                     </DataTable>
                 </div>
-
             </div>
+
+                 <ActionEditarMenuFilhoModal
+                    show={modalAlterarMenu}
+                    handleClose={() => setModalAlterarMenu(false)}
+                    dadosAtualizarMenu={dadosAtualizarMenu}
+                    optionsModulos={optionsModulos} 
+                    usuarioLogado={usuarioLogado}
+                    refetchMenuFilho={refetchMenuFilho}
+                    dadosMenuPai={dadosMenuPai}
+                  />
+
         </Fragment>
     )
 }
