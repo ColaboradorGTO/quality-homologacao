@@ -1480,7 +1480,6 @@ export const useCreatePromocaoAtiva = ({ }) => {
     }
   };
 
-
   const onSubmitEstruturaProduto = async (data) => {
 
     try {

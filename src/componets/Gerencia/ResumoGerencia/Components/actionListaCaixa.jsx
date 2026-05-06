@@ -424,8 +424,9 @@ export const ActionListaCaixa = ({ dadosListaCaixa, dadosDespesas, dadosAdiantam
       field: 'STFECHADO',
       header: 'Situação',
       body: row => (
-        <th style={{ color: row.STFECHADO === 'FALSE' ? 'blue' : 'red' }}>
-          {row.STFECHADO === 'FALSE' ? 'ABERTO' : 'FECHADO'}
+        <th style={{ color: row.STFECHADO == 'False' ? 'blue' : 'red' }}>
+          {row.STFECHADO == 'False' ? 'ABERTO' : 'FECHADO'}
+         
         </th>
       ),
       sortable: true,

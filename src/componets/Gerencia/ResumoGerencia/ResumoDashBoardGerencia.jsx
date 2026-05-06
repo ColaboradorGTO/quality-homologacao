@@ -229,11 +229,12 @@ export const ResumoDashBoardGerencia = ({ usuarioLogado }) => {
   );
 
   const { data: dadosVendasAtivas = [], error: errorVendasAtivas, isLoading: isLoadingVendasAtivas, refetch: refetchVendasAtivas } = useQuery(
-    'resumo-venda-caixa',
+    ['resumo-venda-caixa', 'ativas'],
     async () => {
+      
       const idEmpresa = optionsModulos[0]?.ADMINISTRADOR == "False" ? usuarioLogado?.IDEMPRESA : empresaSelecionada;
       if (idEmpresa) {
-        const response = await get(`/resumo-venda-caixa?idEmpresa=${idEmpresa}&dataFechamento=${dataPesquisa}&statusCancelado=False`);
+        const response = await get(`/resumo-venda-caixa?idEmpresa=${idEmpresa}&dataFechamento=${dataPesquisa}&status=False`);
         return response.data;
       }
     },
@@ -241,11 +242,12 @@ export const ResumoDashBoardGerencia = ({ usuarioLogado }) => {
   );
 
   const { data: dadosVendasCanceladas = [], error: errorVendasCanceladas, isLoading: isLoadingVendasCanceladas, refetch: refetchVendasCanceladas } = useQuery(
-    'resumo-venda-caixa',
+    ['resumo-venda-caixa', 'canceladas'],
     async () => {
+     
       const idEmpresa = optionsModulos[0]?.ADMINISTRADOR == "False" ? usuarioLogado?.IDEMPRESA : empresaSelecionada;
       if (idEmpresa) {
-        const response = await get(`/resumo-venda-caixa?idEmpresa=${idEmpresa}&dataFechamento=${dataPesquisa}&statusCancelado=True`);
+        const response = await get(`/resumo-venda-caixa?idEmpresa=${idEmpresa}&dataFechamento=${dataPesquisa}&status=True`);
         return response.data;
       }
     },
@@ -325,6 +327,12 @@ export const ResumoDashBoardGerencia = ({ usuarioLogado }) => {
     }
   }
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
 
   return (
     <Fragment>

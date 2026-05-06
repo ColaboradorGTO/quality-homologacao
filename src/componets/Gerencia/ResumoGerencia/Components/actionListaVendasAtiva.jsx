@@ -90,7 +90,7 @@ export const ActionListaVendasAtiva = ({ dadosVendasAtivas, empresa }) => {
       NOFUNCIONARIO: item.NOFUNCIONARIO,
       VRTOTALPAGO: toFloat(item.VRTOTALPAGO),
       STCONFERIDO: item.STCONFERIDO,
-      STCONTINGENCIA: item.STCONTINGENCIA == 'False' ? 'Contigência' : 'Emitida',
+      STCONTINGENCIA: item.STCONTINGENCIA == 'false' ? 'Contigência' : 'Emitida',
     };
   });
 

@@ -327,6 +327,17 @@ export const ActionMain = ({
   TextAreaFieldComponent,
 
   onKeyDownInputField,
+  onKeyDownInputFieldCodBarra,
+  onKeyDownInputFieldNumeroNF,
+  onKeyDownInputFieldDescricao,
+  onKeyDownInputFieldComissao,
+  onKeyDownInputFieldObsFornecedor,
+  onKeyDownInputFieldVendedor,
+  onKeyDownInputFieldEmailVendedor,
+  onKeyDownInputFieldDesconto1,
+  onKeyDownInputFieldDesconto2,
+  onKeyDownInputFieldDesconto3,
+  onKeyDownInputFieldLojaOrigem,
 
   // Inputs Selects
   InputSelectEmpresaComponent,
@@ -648,10 +659,10 @@ export const ActionMain = ({
           nomeLoja={subTitle}
           linkComponentAnterior={linkComponentAnterior}
           linkComponent={linkComponent}
-          buttonHeader={buttonHeader}
-          onClickButtonTypeHeader={onClickButtonTypeHeader}
-          textButtonHeader={textButtonHeader}
-          disabledBTNHeader={disabledBTNHeader}
+          // buttonHeader={buttonHeader}
+          // onClickButtonTypeHeader={onClickButtonTypeHeader}
+          // textButtonHeader={textButtonHeader}
+          // disabledBTNHeader={disabledBTNHeader}
           iconSize={iconSizeHeader}
           Icon={iconHeader}
           cor={corHeader}
@@ -828,6 +839,7 @@ export const ActionMain = ({
                         value={valueInputFieldComissao}
                         onChange={onChangeInputFieldComissao}
                         placeHolder={placeHolderInputFieldComissao}
+                        onKeyDown={onKeyDownInputFieldComissao}
                       />
                     )}
 
@@ -840,6 +852,7 @@ export const ActionMain = ({
                         value={valueInputFieldObsFornecedor}
                         onChange={onChangeInputFieldObsFornecedor}
                         placeHolder={placeHolderInputFieldObsFornecedor}
+                        onKeyDown={onKeyDownInputFieldObsFornecedor}
                       />
 
                     )}
@@ -863,6 +876,7 @@ export const ActionMain = ({
                         value={valueInputFieldVendedor}
                         onChange={onChangeInputFieldVendedor}
                         placeHolder={placeHolderInputFieldVendedor}
+                        onKeyDown={onKeyDownInputFieldVendedor}
                       />
                     )}
 
@@ -873,6 +887,7 @@ export const ActionMain = ({
                         id={id}
                         name="dtconsultafim"
                         value=""
+                        onKeyDown={onKeyDownInputFieldEmailVendedor}
                       />
                     )}
 
@@ -884,6 +899,7 @@ export const ActionMain = ({
                         id={id}
                         name="dtconsultafim"
                         value=""
+                        onKeyDown={onKeyDownInputFieldDesconto1}
                       />
                     )}
                     {InputFieldDescontoComponent2 && (
@@ -893,6 +909,7 @@ export const ActionMain = ({
                         id={id}
                         name="dtconsultafim"
                         value=""
+                        onKeyDown={onKeyDownInputFieldDesconto2}
                       />
                     )}
 
@@ -903,6 +920,7 @@ export const ActionMain = ({
                         id={id}
                         name="dtconsultafim"
                         value=""
+                        onKeyDown={onKeyDownInputFieldDesconto3}
                       />
                     )}
 
@@ -915,6 +933,7 @@ export const ActionMain = ({
                         value={valueInputFieldLojaOrigem}
                         onChange={onChangeInputFieldLojaOrigem}
                         readOnly={true}
+                        onKeyDown={onKeyDownInputFieldLojaOrigem}
                       />
                     )}
 
@@ -1336,6 +1355,7 @@ export const ActionMain = ({
                         value={valueInputFieldCodBarra}
                         onChange={onChangeInputFieldCodBarra}
                         readOnly={isDisabledCodBarra}
+                        onKeyDown={onKeyDownInputFieldCodBarra}
                       />
                     )}
 
@@ -1347,7 +1367,7 @@ export const ActionMain = ({
                         placeHolder={placeHolderInputFieldComponent}
                         value={valueInputField}
                         onChange={onChangeInputField}
-                        onKeyDow={onKeyDownInputField}
+                        onKeyDown={onKeyDownInputField}
                       />
                     )}
 
@@ -1360,6 +1380,7 @@ export const ActionMain = ({
                         value={valueInputFieldNumeroNF}
                         onChange={onChangeInputFieldNumeroNF}
                         placeHolder={placeHolderInputFieldNumeroNF}
+                        onKeyDown={onKeyDownInputFieldNumeroNF}
                       />
                     )}
 
@@ -1373,6 +1394,7 @@ export const ActionMain = ({
                         readOnly={readOnlyDescricao}
                         value={valueInputFieldDescricao}
                         onChange={onChangeInputFieldDescricao}
+                        onKeyDown={onKeyDownInputFieldDescricao}
                       />
                     )}
                     {InputFieldQuantidadeComponent && (
