@@ -90,6 +90,13 @@ export const ActionPesquisaFaturaLoja = ({usuarioLogado, optionsEmpresas}) => {
     setTabelaVisivel(true);
   }
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
+
   return (
 
     <Fragment>
@@ -117,11 +124,13 @@ export const ActionPesquisaFaturaLoja = ({usuarioLogado, optionsEmpresas}) => {
         valueInputFieldDTInicioA={dataPesquisaInicio}
         labelInputDTInicioA={"Data Início"}
         onChangeInputFieldDTInicioA={(e) => setDataPesquisaInicio(e.target.value)}
+        onKeyDownInputFieldDTInicioA={handleKeyPress}
         
         InputFieldDTFimAComponent={InputField}
         labelInputDTFimA={"Data Fim"}
         valueInputFieldDTFimA={dataPesquisaFim}
         onChangeInputFieldDTFimA={(e) => setDataPesquisaFim(e.target.value)}
+        onKeyDownInputFieldDTFimA={handleKeyPress}
 
         onButtonClickSearch={handleClick}
         ButtonSearchComponent={ButtonType}

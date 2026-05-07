@@ -19,7 +19,6 @@ export const ActionPesquisaOT = ({usuarioLogado}) => {
   const [dataPesquisaFim, setDataPesquisaFim] = useState('')
   const [empresaSelecionada, setEmpresaSelecionada] = useState('')
   const [valueLojaOrigem, setValueLojaOrigem] = useState('')
-  const [currentPage, setCurrentPage] = useState(1);
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
   useEffect(() => {
@@ -104,15 +103,19 @@ export const ActionPesquisaOT = ({usuarioLogado}) => {
   }
 
   const handleClick = () => {
-    setCurrentPage(prevPage => prevPage + 1);
     refetchListaConferencia()
     setTabelaVisivel(true);
-  
   }
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
 
   const showModal = () => {
     if(optionsModulos[0]?.CRIAR == 'True') {
-
       setModalVisivel(true)
     } else {
       Swal.fire({
@@ -137,11 +140,13 @@ export const ActionPesquisaOT = ({usuarioLogado}) => {
         labelInputFieldDTInicio={"Data Inicio"}
         valueInputFieldDTInicio={dataPesquisaInicio}
         onChangeInputFieldDTInicio={e => setDataPesquisaInicio(e.target.value)}
+        onKeyDownInputFieldDTInicio={handleKeyPress}
 
         InputFieldDTFimComponent={InputField}
         labelInputFieldDTFim={"Data Fim"}
         valueInputFieldDTFim={dataPesquisaFim}
-        onChangeInputFieldDTFim={e => setDataPesquisaFim(e.target.value)}       
+        onChangeInputFieldDTFim={e => setDataPesquisaFim(e.target.value)}    
+        onKeyDownInputFieldDTFim={handleKeyPress}   
         
         InputFieldLojaOrigemComponent={InputField}
         labelInputFieldLojaOrigem={"Loja Origem"}

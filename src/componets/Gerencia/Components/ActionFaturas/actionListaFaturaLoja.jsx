@@ -234,7 +234,7 @@ export const ActionListaFaturaLoja = ({ dadosFaturas, usuarioLogado, optionsModu
                   <div className="p-1">
                     <ButtonTable
                       titleButton={"Editar Fatura"}
-                      cor={"primary"}
+                      cor={"success"}
                       Icon={CiEdit}
                       onClickButton={() => handleClickEditar(row)}
                       iconSize={25}
@@ -277,7 +277,7 @@ export const ActionListaFaturaLoja = ({ dadosFaturas, usuarioLogado, optionsModu
               <div className="p-1">
                 <ButtonTable
                   titleButton={"Incluir Recompra"}
-                  cor={"info"}
+                  cor={"danger"}
                   Icon={MdOutlineRemoveShoppingCart}
                   onClickButton={() => handleIncluirRecompra(row)}
                   iconSize={25}
@@ -298,7 +298,7 @@ export const ActionListaFaturaLoja = ({ dadosFaturas, usuarioLogado, optionsModu
               <div className="p-1">
                 <ButtonTable
                   titleButton={"Excluir Recompra"}
-                  cor={"danger"}
+                  cor={"success"}
                   Icon={MdOutlineAddShoppingCart}
                   onClickButton={() => handleIncluirRecompra(row)}
                   iconSize={25}
@@ -318,9 +318,17 @@ export const ActionListaFaturaLoja = ({ dadosFaturas, usuarioLogado, optionsModu
   const handleEditar = async (IDDETALHEFATURA) => {
     try {
       const response = await get(`/detalhe-faturas?idDetalheFatura=${IDDETALHEFATURA}`);
-      if (response.data) {
+      if (response.data && response.data.length > 0) {
         setDadosDetalheFatura(response.data);
         setModalDetalheFatura(true);
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro!',
+          text: 'Detalhes da fatura não encontrados.',
+          confirmButtonText: 'OK'
+        });
+        return;
       }
     } catch (error) {
       console.error('Erro ao buscar detalhes da venda: ', error);
@@ -347,9 +355,17 @@ export const ActionListaFaturaLoja = ({ dadosFaturas, usuarioLogado, optionsModu
   const handleCancelar = async (IDDETALHEFATURA) => {
     try {
       const response = await get(`/detalhe-faturas?idDetalheFatura=${IDDETALHEFATURA}`);
-      if (response.data) {
+      if (response.data && response.data.length > 0) {
         setDadosCancelarFatura(response.data);
         setModalCancelarFatura(true);
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro!',
+          text: 'Detalhes da fatura não encontrados.',
+          confirmButtonText: 'OK'
+        });
+        return;
       }
     } catch (error) {
       console.error('Erro ao buscar detalhes da venda: ', error);

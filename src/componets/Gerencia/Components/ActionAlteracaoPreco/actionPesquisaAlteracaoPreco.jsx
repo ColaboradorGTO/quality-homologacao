@@ -146,14 +146,19 @@ export const ActionPesquisaAlteracaoPreco = ({ usuarioLogado }) => {
     setSubGrupoSelecionado(selectedSubGrupo);
   };
 
-  const handleTabelaVisivel = () => {
+  const handleClick = () => {
     if (usuarioLogado && usuarioLogado.IDEMPRESA) {
-      setCurrentPage(+1);
       refetchListaAlteracaoPreco()
       setTabelaVisivel(true);
     }
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
 
   return (
 
@@ -167,23 +172,27 @@ export const ActionPesquisaAlteracaoPreco = ({ usuarioLogado }) => {
 
         InputFieldNomeProdutoComponent={InputField}
         labelInputNomeProduto={"Nome Produto"}
-        onChangeInputFieldNomeProduto={e => setNomeProduto(e.target.value)}
         valueInputFieldNomeProduto={nomeProduto}
+        onChangeInputFieldNomeProduto={e => setNomeProduto(e.target.value)}
+        onKeyDownInputFieldNomeProduto={handleKeyPress}
 
         InputFieldCodBarrasComponent={InputField}
         labelInputCodBarras={"Cód.Barras"}
-        onChangeInputFieldCodBarras={e => setCodBarra(e.target.value)}
         valueInputFieldCodBarras={codBarra}
+        onChangeInputFieldCodBarras={e => setCodBarra(e.target.value)}
+        onKeyDownInputFieldCodBarras={handleKeyPress}
 
         InputFieldDTInicioComponent={InputField}
-        labelInputFieldDTInicio={"Data Início"}
+        labelInputDTInicio={"Data Início"}
         valueInputFieldDTInicio={dataPesquisaInicio}
         onChangeInputFieldDTInicio={e => setDataPesquisaInicio(e.target.value)}
+        onKeyDownInputFieldDTInicio={handleKeyPress}
 
         InputFieldDTFimComponent={InputField}
-        labelInputFieldDTFim={"Data Fim"}
+        labelInputDTFim={"Data Fim"}
         valueInputFieldDTFim={dataPesquisaFim}
         onChangeInputFieldDTFim={e => setDataPesquisaFim(e.target.value)}
+        onKeyDownInputFieldDTFim={handleKeyPress}
 
         MenuTreeSelectComponent={MenuTreeSelect}
         valueTreeSelect={selectedNodes}
@@ -198,7 +207,7 @@ export const ActionPesquisaAlteracaoPreco = ({ usuarioLogado }) => {
         onChangeCheckBox={(e) => setEstoque(e.target.checked)}
 
         ButtonSearchComponent={ButtonType}
-        onButtonClickSearch={handleTabelaVisivel}
+        onButtonClickSearch={handleClick}
         linkNomeSearch={"Alteração Preços"}
         IconSearch={AiOutlineSearch}
         corSearch={"primary"}

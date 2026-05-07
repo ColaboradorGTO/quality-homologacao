@@ -341,6 +341,8 @@ export const ActionMain = ({
   onKeyDownInputFieldSearch,
   onKeyDownInputFieldDTInicioA,
   onKeyDownInputFieldDTFimA,
+  onKeyDownInputFieldDTInicio,
+  onKeyDownInputFieldDTFim,
 
   // Inputs Selects
   InputSelectEmpresaComponent,
@@ -801,6 +803,7 @@ export const ActionMain = ({
                         name="dtconsultainicio"
                         value={valueInputFieldDTInicio}
                         onChange={onChangeInputFieldDTInicio}
+                        onKeyDown={onKeyDownInputFieldDTInicio}
                       />
                     )}
                     {/* {InputFieldDTInicioComponent && (
@@ -819,7 +822,7 @@ export const ActionMain = ({
                         name="dtconsultafim"
                         value={valueInputFieldDTFim}
                         onChange={onChangeInputFieldDTFim}
-
+                        onKeyDown={onKeyDownInputFieldDTFim}
                       />
 
                     )}

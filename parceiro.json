@@ -290,5 +290,18 @@
     { "value": "0", "label": "Todas" },
     { "value": "1", "label": "Migradas SAP" },
     { "value": "2", "label": "Não Migradas SAP" }
+  ],
+  "optionsDataMalote": [
+    { "value": "Malote", "label": "Data Caixa" },
+    { "value": "Conferido", "label": "Data Conferido" }
+  ],
+  "optionsStatusMalote": [
+   { "value": "", "label": "Selecione um Status" },
+    { "value": "Pendente de Envio", "label": "Pendente de Envio" },
+    { "value": "Enviado", "label": "Enviado" },
+    { "value": "Recepcionado", "label": "Recepcionado" },
+    { "value": "Devolvido", "label": "Devolvido"},
+    { "value": "Conferido", "label": "Conferido"},
+    { "value": "Reenviado", "label": "Reenviado"}
   ]
 }

@@ -14,7 +14,6 @@ export const ActionPesquisaQuebraCaixa = ({ usuarioLogado, optionsEmpresas }) =>
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('')
   const [dataPesquisaFim, setDataPesquisaFim] = useState('')
-  const [currentPage, setCurrentPage] = useState(1);
   const [empresaSelecionada, setEmpresaSelecionada] = useState('');
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
@@ -85,11 +84,16 @@ export const ActionPesquisaQuebraCaixa = ({ usuarioLogado, optionsEmpresas }) =>
   );
 
   const handleClick = () => {
-    setCurrentPage(prevPage => prevPage + 1);
     setTabelaVisivel(true);
     refetchQuebraCaixa();
   }
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
 
   return (
 
@@ -121,11 +125,13 @@ export const ActionPesquisaQuebraCaixa = ({ usuarioLogado, optionsEmpresas }) =>
         valueInputFieldDTInicioA={dataPesquisaInicio}
         labelInputDTInicioA={"Data Início"}
         onChangeInputFieldDTInicioA={(e) => setDataPesquisaInicio(e.target.value)}
+        onKeyDownInputFieldDTInicioA={handleKeyPress}
 
         InputFieldDTFimAComponent={InputField}
         labelInputDTFimA={"Data Fim"}
         valueInputFieldDTFimA={dataPesquisaFim}
         onChangeInputFieldDTFimA={(e) => setDataPesquisaFim(e.target.value)}
+        onKeyDownInputFieldDTFimA={handleKeyPress}
 
         onButtonClickSearch={handleClick}
         ButtonSearchComponent={ButtonType}

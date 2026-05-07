@@ -170,6 +170,13 @@ export const ActionPesquisaCreateVoucher = ({usuarioLogado, optionsEmpresas }) =
     refetchListaVouchers()
   }
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
+
   const handleClickCadastro = () => {
     if(optionsModulos[0]?.CRIAR == 'True'){
       setActionPrincipal(false);
@@ -218,11 +225,13 @@ export const ActionPesquisaCreateVoucher = ({usuarioLogado, optionsEmpresas }) =
           valueInputFieldDTInicioA={dataPesquisaInicio}
           labelInputDTInicioA={"Data Início"}
           onChangeInputFieldDTInicioA={(e) => setDataPesquisaInicio(e.target.value)}
+          onKeyDownInputFieldDTInicioA={handleKeyPress}
           
           InputFieldDTFimAComponent={InputField}
           labelInputDTFimA={"Data Fim"}
           valueInputFieldDTFimA={dataPesquisaFim}
           onChangeInputFieldDTFimA={(e) => setDataPesquisaFim(e.target.value)}
+          onKeyDownInputFieldDTFimA={handleKeyPress}
 
           InputFieldNumeroVoucherComponent={InputField}
           valueInputFieldNumeroVoucher={numeroVoucher}

@@ -9,14 +9,13 @@ import { useQuery } from "react-query"
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento"
 import { get } from "../../../../api/funcRequest"
 import { ActionListaConferenciaMalotes } from "./actionListaConferenciaMalotes"
-
+import { optionsStatusMalote } from "../../../../../parceiro.json"
 
 export const ActionPesquisaConferenciaMalote = ({ usuarioLogado }) => {
     const [dataPesquisaInicio, setDataPesquisaInicio] = useState("");
     const [dataPesquisaFim, setDataPesquisaFim] = useState("");
     const [tabelaVisivel, setTabelaVisivel] = useState(false);
     const [statusSelecionado, setStatusSelecionado] = useState("");
-    const [currentPage, setCurrentPage] = useState(1);
     const [empresaSelecionada, setEmpresaSelecionada] = useState("");
     const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
@@ -89,25 +88,18 @@ export const ActionPesquisaConferenciaMalote = ({ usuarioLogado }) => {
    
 
     const handleClick = () => {
-        setCurrentPage(prevPage => prevPage + 1);
         setTabelaVisivel(true);
         refetch();
     }
 
-    const optionsData = [
-        { value: 'Malote', label: 'Data Caixa' },
-        { value: 'Conferido', label: 'Data Conferido' },
-    ]
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+        e.preventDefault();
+        handleClick();
+        }
+    };
 
-    const optionsStatus = [
-        { value: '', label: 'Selecione um Status' },
-        { value: 'Pendente de Envio', label: 'Pendente de Envio' },
-        { value: 'Enviado', label: 'Enviado' },
-        { value: 'Recepcionado', label: 'Recepcionado' },
-        { value: 'Devolvido', label: 'Devolvido'},
-        { value: 'Conferido', label: 'Conferido'},
-        { value: 'Reenviado', label: 'Reenviado'},
-    ]
+
     
     return (
 
@@ -118,22 +110,23 @@ export const ActionPesquisaConferenciaMalote = ({ usuarioLogado }) => {
                 linkComponent={["Envio Malotes"]}
                 title="Lista de Malotes por Período"
 
-
                 InputFieldDTInicioComponent={InputField}
                 labelInputFieldDTInicio={"Data Início"}
                 valueInputFieldDTInicio={dataPesquisaInicio}
                 onChangeInputFieldDTInicio={(e) => setDataPesquisaInicio(e.target.value)}
+                onKeyDownInputFieldDTInicio={handleKeyPress}
 
                 InputFieldDTFimComponent={InputField}
                 labelInputFieldDTFim={"Data Fim"}
                 valueInputFieldDTFim={dataPesquisaFim}
                 onChangeInputFieldDTFim={(e) => setDataPesquisaFim(e.target.value)}
+                onKeyDownInputFieldDTFim={handleKeyPress} 
 
                 InputSelectEmpresaComponent={InputSelectAction}
                 labelSelectEmpresa={"Status"}
                 optionsEmpresas={[
                     //{ value: '0', label: 'Selecione...' },
-                    ...optionsStatus.map((item) => ({
+                    ...optionsStatusMalote?.map((item) => ({
                         value: item.value,
                         label: item.label,
 

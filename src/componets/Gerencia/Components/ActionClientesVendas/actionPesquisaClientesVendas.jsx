@@ -15,7 +15,6 @@ export const ActionPesquisaClientesVendas = ({ usuarioLogado, optionsEmpresas })
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
   const [dataPesquisaFim, setDataPesquisaFim] = useState('');
   const [cpfCliente, setCpfCliente] = useState('');
-  const [currentPage, setCurrentPage] = useState('');
   const [pageSize, setPageSize] = useState(1000);
   const [empresaSelecionada, setEmpresaSelecionada] = useState('');
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
@@ -85,15 +84,21 @@ export const ActionPesquisaClientesVendas = ({ usuarioLogado, optionsEmpresas })
 
   const { data: dadosClientes = [], error: erroQuality, isLoading: isLoadingQuality, refetch: refetchListaVendasClientes } = useQuery(
     'venda-ativa',
-    () => fetchListaVendasClientes(dataPesquisaInicio, dataPesquisaFim, currentPage, pageSize),
+    () => fetchListaVendasClientes(),
     { enabled:false, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
   );
 
 
   const handleClick = () => {
-    setCurrentPage(prevPage => prevPage + 1);
     refetchListaVendasClientes()
     setTabelaVisivel(true);
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
   };
 
 
@@ -125,17 +130,20 @@ export const ActionPesquisaClientesVendas = ({ usuarioLogado, optionsEmpresas })
         valueInputFieldDTInicioA={dataPesquisaInicio}
         labelInputDTInicioA={"Data Início"}
         onChangeInputFieldDTInicioA={(e) => setDataPesquisaInicio(e.target.value)}
+        onKeyDownInputFieldDTInicioA={handleKeyPress}
 
         InputFieldDTFimAComponent={InputField}
         labelInputDTFimA={"Data Fim"}
         valueInputFieldDTFimA={dataPesquisaFim}
         onChangeInputFieldDTFimA={(e) => setDataPesquisaFim(e.target.value)}
+        onKeyDownInputFieldDTFimA={handleKeyPress}
 
         InputFieldComponent={InputField}
         labelInputField={"Nº CPF CLIENTE"}
         onChangeInputField={e => setCpfCliente(e.target.value)}
         valueInputField={cpfCliente}
         placeHolderInputFieldComponent={"Digite o CPF do Cliente"}
+        onKeyDownInputField={handleKeyPress}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}

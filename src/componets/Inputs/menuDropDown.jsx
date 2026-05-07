@@ -8,14 +8,14 @@ export const MenuTreeSelect = ({
   optionsMenuSelect,
   onChangeMenuSelect,
   placeholderMenuSelect,
-
+  label
 }) => {
   
   return (
     <div className="col-sm-6 col-md-3 col-xl-3 mt-4">
 
       <div cclassName="card flex justify-content-center ">
-
+        <label htmlFor="">{label}</label>
         <TreeSelect
           value={valueMenuSelect}
           options={optionsMenuSelect}
@@ -36,5 +36,3 @@ export const MenuTreeSelect = ({
     </div>
   );
 };
-
-

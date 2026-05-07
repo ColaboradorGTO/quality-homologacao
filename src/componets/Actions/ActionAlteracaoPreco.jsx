@@ -80,6 +80,11 @@ export const ActionAlteracaoPreco = ({
   readOnlyNomeProduto,
   readOnlyCodBarras,
 
+  onKeyDownInputFieldDTFim,
+  onKeyDownInputFieldDTInicio,
+  onKeyDownInputFieldNomeProduto,
+  onKeyDownInputFieldCodBarras,
+
   InputCheckBoxAction,
   labelCheckBox,
   nomeCheckBox,
@@ -121,7 +126,7 @@ export const ActionAlteracaoPreco = ({
                         readOnly={readOnlyNomeProduto}
                         value={valueInputFieldNomeProduto}
                         onChange={onChangeInputFieldNomeProduto}
-
+                        onKeyDown={onKeyDownInputFieldNomeProduto}
                       />
                     )}
 
@@ -135,7 +140,7 @@ export const ActionAlteracaoPreco = ({
                         readOnly={readOnlyCodBarras}
                         value={valueInputFieldCodBarras}
                         onChange={onChangeInputFieldCodBarras}
-
+                        onKeyDown={onKeyDownInputFieldCodBarras}
                       />
                     )}
 
@@ -148,7 +153,7 @@ export const ActionAlteracaoPreco = ({
                         readOnly={readOnlyDTInicio}
                         value={valueInputFieldDTInicio}
                         onChange={onChangeInputFieldDTInicio}
-
+                        onKeyDown={onKeyDownInputFieldDTInicio}
                       />
                     )}
 
@@ -160,6 +165,7 @@ export const ActionAlteracaoPreco = ({
                         readOnly={readOnlyDTFim}
                         value={valueInputFieldDTFim}
                         onChange={onChangeInputFieldDTFim}
+                        onKeyDown={onKeyDownInputFieldDTFim}
                       />
                     )}
 
@@ -194,7 +200,9 @@ export const ActionAlteracaoPreco = ({
                   </div>
 
                   <div className="row">
+                    
                     {MenuTreeSelectComponent && (
+                      
                       <MenuTreeSelectComponent
                         valueMenuSelect={valueTreeSelect}
                         onChangeMenuSelect={onChangeTreeSelect}
@@ -202,6 +210,7 @@ export const ActionAlteracaoPreco = ({
                         placeholderMenuSelect={placeholderTreeSelect}
                         onNodeMenuSelect={onNodeTreeSelect}
                         onNodeMenuUnselect={onNodeTreeUnselect}
+                        label={'SubGrupo'}
                       />
                     )}
 
