@@ -61,6 +61,7 @@ export const ActionListaVendasMarca = ({dadosVendasMarca}) => {
       toFloat(item.VOUCHER)
     );
   }
+  
 
   const calcularTotal = (field) => {
     return dados.reduce((total, item) => total + parseFloat(item[field]), 0);

@@ -44,34 +44,15 @@ export const ActionPesquisaValeTransporte = ({ usuarioLogado, ID }) => {
     setDataPesquisaFim(dataAtual)
   }, [])
 
-  const parseData = (dataStr) => {
-    if (!dataStr) return null;
-
-    const [dia, mes, ano] = dataStr.split('-');
-    return new Date(`${ano}-${mes}-${dia}`);
-  };
-
-  const filtrarPorData = (dados) => {
-    const dataInicio = parseData(dataPesquisaInicio);
-    const dataFim = parseData(dataPesquisaFim);
-
-    return dados.filter(item => {
-      if (!item.DTDESPESA) return false;
-
-      const dataItem = parseData(item.DTDESPESA);
-
-      return dataItem >= dataInicio && dataItem <= dataFim;
-    });
-  };
 
   const fetchDespesasLojas = async () => {
     const idEmpresa = empresaSelecionada == '' ? usuarioLogado?.IDEMPRESA : empresaSelecionada;
-    const urlBase = `/despesas-loja-empresa?idEmpresa=${idEmpresa}&dataPesquisa=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
+    const urlBase = `/despesas-loja-empresa?idEmpresa=${idEmpresa}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
-    try {
-      animacaoCarregamento('Carregando dados...', true);
-
+     try {
+     animacaoCarregamento('Carregando dados...', true);
+      
       const primeiraPagina = 1;
       const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
       const page = primeiraResposta.page || primeiraPagina;
@@ -89,11 +70,9 @@ export const ActionPesquisaValeTransporte = ({ usuarioLogado, ID }) => {
         }
       }
 
-      const dadosFiltrados = filtrarPorData(allData);
-      return dadosFiltrados;
-
+      return allData;
     } catch (error) {
-      console.error('Erro ao buscar dados da api', error);
+      console.error('Erro ao buscar dados', error);
       throw error;
     } finally {
       fecharAnimacaoCarregamento();
@@ -124,9 +103,16 @@ export const ActionPesquisaValeTransporte = ({ usuarioLogado, ID }) => {
     }
   };
 
-  const handleTabelaVisivel = () => {
+  const handleClick = () => {
     refetchDadosLoja();
     setTabelaVisivel(true);
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
   };
 
   return (
@@ -143,15 +129,17 @@ export const ActionPesquisaValeTransporte = ({ usuarioLogado, ID }) => {
         valueInputFieldDTInicioA={dataPesquisaInicio}
         labelInputDTInicioA={"Data Início"}
         onChangeInputFieldDTInicioA={(e) => setDataPesquisaInicio(e.target.value)}
+        onKeyDownInputFieldDTInicioA={handleKeyPress}
 
         InputFieldDTFimAComponent={InputField}
         labelInputDTFimA={"Data Fim"}
         valueInputFieldDTFimA={dataPesquisaFim}
         onChangeInputFieldDTFimA={(e) => setDataPesquisaFim(e.target.value)}
+        onKeyDownInputFieldDTFimA={handleKeyPress}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}
-        onButtonClickSearch={handleTabelaVisivel}
+        onButtonClickSearch={handleClick}
         IconSearch={AiOutlineSearch}
         corSearch={"primary"}
 

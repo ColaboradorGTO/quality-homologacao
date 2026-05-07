@@ -94,6 +94,12 @@ export const ActionPesquisaDepositoLoja = ({usuarioLogado, optionsEmpresas}) => 
     setTabelaVisivel(true);    
   }
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
 
   const handleShowModal = () => {
     if(optionsModulos[0]?.CRIAR == 'True') {
@@ -145,12 +151,13 @@ export const ActionPesquisaDepositoLoja = ({usuarioLogado, optionsEmpresas}) => 
         valueInputFieldDTInicioA={dataPesquisaInicio}
         labelInputDTInicioA={"Data Início"}
         onChangeInputFieldDTInicioA={(e) => setDataPesquisaInicio(e.target.value)}
-        
+        onKeyDownInputFieldDTInicioA={handleKeyPress}
+
         InputFieldDTFimAComponent={InputField}
         labelInputDTFimA={"Data Fim"}
         valueInputFieldDTFimA={dataPesquisaFim}
         onChangeInputFieldDTFimA={(e) => setDataPesquisaFim(e.target.value)}
-
+        onKeyDownInputFieldDTFimA={handleKeyPress}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}

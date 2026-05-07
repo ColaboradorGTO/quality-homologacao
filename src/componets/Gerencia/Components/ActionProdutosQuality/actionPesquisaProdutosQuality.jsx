@@ -29,7 +29,7 @@ export const ActionPesquisaProdutosQuality = ({ optionsEmpresas, usuarioLogado }
     ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
       const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
-      console.log('Response :', response.data);
+    
       return response.data;
     },
     { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
@@ -87,6 +87,12 @@ export const ActionPesquisaProdutosQuality = ({ optionsEmpresas, usuarioLogado }
     }
   }
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
 
   return (
 
@@ -115,6 +121,7 @@ export const ActionPesquisaProdutosQuality = ({ optionsEmpresas, usuarioLogado }
         labelInputFieldSearch={"Cód.Barras / Nome Produto"}
         valueInputFieldSearch={descricaoProduto}
         onChangeInputFieldSearch={(e) => setDescricaoProduto(e.target.value)}
+        onKeyDownInputFieldSearch={handleKeyPress}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}

@@ -338,6 +338,9 @@ export const ActionMain = ({
   onKeyDownInputFieldDesconto2,
   onKeyDownInputFieldDesconto3,
   onKeyDownInputFieldLojaOrigem,
+  onKeyDownInputFieldSearch,
+  onKeyDownInputFieldDTInicioA,
+  onKeyDownInputFieldDTFimA,
 
   // Inputs Selects
   InputSelectEmpresaComponent,
@@ -711,6 +714,7 @@ export const ActionMain = ({
                         type="text"
                         value={valueInputFieldSearch}
                         onChange={onChangeInputFieldSearch}
+                        onKeyDown={onKeyDownInputFieldSearch}
                       />
                     )}
 
@@ -722,7 +726,7 @@ export const ActionMain = ({
                         name="dtconsultainicio"
                         value={valueInputFieldDTInicioA}
                         onChange={onChangeInputFieldDTInicioA}
-
+                        onKeyDown={onKeyDownInputFieldDTInicioA}
                       />
                     )}
                     {InputFieldDTFimAComponent && (
@@ -733,6 +737,7 @@ export const ActionMain = ({
                         name="dtconsultafim"
                         value={valueInputFieldDTFimA}
                         onChange={onChangeInputFieldDTFimA}
+                        onKeyDown={onKeyDownInputFieldDTFimA}
                       />
                     )}
 

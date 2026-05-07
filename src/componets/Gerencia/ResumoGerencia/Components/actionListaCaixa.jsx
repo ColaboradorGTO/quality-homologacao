@@ -104,7 +104,7 @@ export const ActionListaCaixa = ({ dadosListaCaixa, dadosDespesas, dadosAdiantam
   const calcularTotalPCJTotal = (item) => {
     const vrPCJ18 = toFloat(item.vendapcj[0]['venda-pcj'].TOTALPCJ18);
     const vrPCJ78 = toFloat(item.vendapcj[0]['venda-pcj'].TOTALPCJ78);
-    const totalPCJ = vrPCJ18 !== 0 ? (vrPCJ78 / vrPCJ18) * 100 : 0;
+    const totalPCJ = (vrPCJ78 / vrPCJ18) * 100;
     return totalPCJ;
   }
 
@@ -200,110 +200,93 @@ export const ActionListaCaixa = ({ dadosListaCaixa, dadosDespesas, dadosAdiantam
     }
   })
   
+  const calcularQuebra = (field) => {
+    return dadosQuebra?.reduce((total, item) => total + toFloat(item[field]), 0);
+  };
+  
   const calcularTotalQuebra = () => {
-    let total = 0;
-    for (let dados of dadosQuebra) {
-      total += toFloat(dados.quebraCaixaOP);
-    }
+    const total = calcularQuebra('quebraCaixaOP');
     return total;
   }
 
-  const calcularTotalFatura = () => {
-    let total = 0;
-    for (let dados of dadoCaixaLista) {
-      total += toFloat(dados.TOTALRECEBIDOFATURA);
-    }
+  const calcularTotal = (field) => {
+    return dadoCaixaLista.reduce((total, item) => total + toFloat(item[field]), 0);
+  };
+
+
+  const calcularTotalvrPCJ18 = () => {
+    const total = calcularTotal('TOTALPCJ18');  
+    return total;
+  }
+
+  const calcularTotalvrPCJ78  = () => {
+    const total = calcularTotal('TOTALPCJ78');
+    return total;
+  }
+
+  const calcularTotalFatura  = () => {
+    const total = calcularTotal('TOTALRECEBIDOFATURA');
     return total;
   }
 
   const calcularTotalFaturaPix = () => {
-    let total = 0;
-    for (let dados of dadoCaixaLista) {
-      total += toFloat(dados.TOTALRECEBIDOFATURAPIX);
-    }
+    const total = calcularTotal('TOTALRECEBIDOFATURAPIX');
     return total;
   }
 
   const calcularTotalFaturaTotal = () => {
-    let total = 0;
-    for (let dados of dadoCaixaLista) {
-      total += toFloat(dados.vrFaturasTotal);
-    }
+    const total = calcularTotal('vrFaturasTotal');
     return total;
   }
 
   const calcularTotalDinehiro = () => {
-    let total = 0;
-    for (let dados of dadoCaixaLista) {
-      total += toFloat(dados.TOTALVENDIDODINHEIRO);
-    }
+    const total = calcularTotal('TOTALVENDIDODINHEIRO');
     return total;
-
   }
 
   const calcularTotalCartao = () => {
-    let total = 0;
-    for (let dados of dadoCaixaLista) {
-      total += toFloat(dados.TOTALVENDIDOCARTAO);
-    }
-    return total;
-  }
-
-  const calcularTotalPCJ = () => {
-    let total = 0;
-    for (let dados of dadoCaixaLista) {
-      total += toFloat(dados.pcjTotal);
-    }
+    const total = calcularTotal('TOTALVENDIDOCARTAO');
     return total;
   }
 
   const calcularTotalPOS = () => {
-    let total = 0;
-    for (let dados of dadoCaixaLista) {
-      total += toFloat(dados.TOTALVENDIDOPOS);
-    }
+    const total = calcularTotal('TOTALVENDIDOPOS');
     return total;
   }
-
+  
   const calcularTotalPIX = () => {
-    let total = 0;
-    for (let dados of dadoCaixaLista) {
-      total += toFloat(dados.TOTALVENDIDOPIX);
-    }
+    const total = calcularTotal('TOTALVENDIDOPIX');
     return total;
   }
-
+  
   const calcularTotalVoucher = () => {
-    let total = 0;
-    for (let dados of dadoCaixaLista) {
-      total += toFloat(dados.TOTALVENDIDOVOUCHER);
-    }
+    const total = calcularTotal('TOTALVENDIDOVOUCHER');
     return total;
   }
 
   const calcularTotalConvenio = () => {
-    let total = 0;
-    for (let dados of dadoCaixaLista) {
-      total += toFloat(dados.TOTALVENDIDOCONVENIO);
-    }
+    const total = calcularTotal('TOTALVENDIDOCONVENIO');
     return total;
   }
 
-  const calcularTotal = () => {
-    let total = 0;
-    for (let dados of dadoCaixaLista) {
-      total += toFloat(dados.totalVendido);
-    }
+  const calcularTotalTotalVendido = () => {
+    const total = calcularTotal('totalVendido');
     return total;
   }
 
   const calcularTotalDisponivel = () => {
-    let total = 0;
-    for (let dados of dadoCaixaLista) {
-      total += toFloat(dados.vrDisponivel);
-    }
+    const total = calcularTotal('vrDisponivel');
     return total;
   }
+
+  const calcularTotalPCJ = () => {
+    const vrPCJ18 = calcularTotalvrPCJ18('TOTALPCJ18');
+    const vrPCJ78 = calcularTotalvrPCJ78('TOTALPCJ78');
+    const total = (vrPCJ78 / vrPCJ18) * 100;
+
+    return parseFloat(total.toFixed(2));
+  }
+
   const colunasListaCaixa = [
     {
       field: 'ID',
@@ -449,7 +432,7 @@ export const ActionListaCaixa = ({ dadosListaCaixa, dadosDespesas, dadosAdiantam
         <Column footer={formatMoeda(calcularTotalPIX())} footerStyle={{ textAlign: 'center', color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
         <Column footer={formatMoeda(calcularTotalVoucher())} footerStyle={{ textAlign: 'center', color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
         <Column footer={formatMoeda(calcularTotalConvenio())} footerStyle={{ textAlign: 'center', color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
-        <Column footer={formatMoeda(calcularTotal())} footerStyle={{ textAlign: 'center', color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
+        <Column footer={formatMoeda(calcularTotalTotalVendido())} footerStyle={{ textAlign: 'center', color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
         <Column footer={formatMoeda(calcularTotalDisponivel())} footerStyle={{ textAlign: 'center', color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
         <Column footer={''} footerStyle={{ textAlign: 'center', color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
       </Row>

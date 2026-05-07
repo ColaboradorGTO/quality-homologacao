@@ -10,7 +10,7 @@ import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
 import { InputSelectAction } from "../../../Inputs/InputSelectAction";
 
-export const ActionPesquisaProdutosSap = ({ ID, optionsEmpresas, usuarioLogado }) => {
+export const ActionPesquisaProdutosSap = ({ optionsEmpresas, usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [descricaoProduto, setDescricaoProduto] = useState('')
   const [currentPage, setCurrentPage] = useState(1);
@@ -89,6 +89,14 @@ export const ActionPesquisaProdutosSap = ({ ID, optionsEmpresas, usuarioLogado }
     }
   }
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
+
+
   return (
 
     <Fragment>
@@ -116,6 +124,7 @@ export const ActionPesquisaProdutosSap = ({ ID, optionsEmpresas, usuarioLogado }
         labelInputFieldSearch={"Cód.Barras / Nome Produto"}
         valueInputFieldSearch={descricaoProduto}
         onChangeInputFieldSearch={(e) => setDescricaoProduto(e.target.value)}
+        onKeyDownInputFieldSearch={handleKeyPress}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}

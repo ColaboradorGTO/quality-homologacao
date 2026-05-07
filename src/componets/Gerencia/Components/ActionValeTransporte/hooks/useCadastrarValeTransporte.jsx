@@ -65,7 +65,7 @@ export const useCadastrarValeTransporte = ({ handleClose, usuarioLogado, options
           container: 'custom-swal',
         },
         showConfirmButton: false,
-        timer: 3000,
+        timer: 5000,
       })
       return;
     }

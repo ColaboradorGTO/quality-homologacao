@@ -67,7 +67,7 @@ export const ActionListaVendasPCJ = ({ dadosVendasPCJ }) => {
   const calcularTotalPCJTotal = (item) => {
     const vrPCJ18 = toFloat(item.vendapcj[0]['venda-pcj'].TOTALPCJ18);
     const vrPCJ78 = toFloat(item.vendapcj[0]['venda-pcj'].TOTALPCJ78);
-    const totalPCJ = vrPCJ18 !== 0 ? (vrPCJ78 / vrPCJ18) * 100 : 0;
+    const totalPCJ =  (vrPCJ78 / vrPCJ18) * 100;
     return totalPCJ;
   }
 
@@ -85,26 +85,30 @@ export const ActionListaVendasPCJ = ({ dadosVendasPCJ }) => {
     };
   });
 
+  const calcularTotal = (field) => {
+    return dadoCaixaLista.reduce((total, item) => total + toFloat(item[field]), 0);
+  };
+
+
   const calcularTotalPCJ18 = () => {
-    let total = 0;
-    for (let dados of dadoCaixaLista) {
-      total += parseFloat(dados.TOTALPCJ18);
-    }
+    const total = calcularTotal('TOTALPCJ18');  
     return total;
   }
 
   const calcularTotalPCJ78 = () => {
-    let total = 0;
-    for (let dados of dadoCaixaLista) {
-      total += parseFloat(dados.TOTALPCJ78);
-    }
+    const total = calcularTotal('TOTALPCJ78');
     return total;
   }
 
+  
   const calcularTotalPCJ = () => {
-    let total = (parseFloat(calcularTotalPCJ78()) / parseFloat(calcularTotalPCJ18())) * 100;
-    return total;
+    const vrPCJ18 = calcularTotalPCJ18('TOTALPCJ18');
+    const vrPCJ78 = calcularTotalPCJ78('TOTALPCJ78');
+    const total = (vrPCJ78 / vrPCJ18) * 100;
+
+    return parseFloat(total.toFixed(2));
   }
+
 
   const colunaVendasPCJ = [
     {
@@ -148,11 +152,16 @@ export const ActionListaVendasPCJ = ({ dadosVendasPCJ }) => {
     {
       field: 'pcjTotal',
       header: '% PCJ',
-      body: row => (
-        <th style={{ color: row.pcjTotal === 0 ? 'red' : 'blue' }}>
-          {formatMoeda(row.pcjTotal)}
-        </th>
-      ),
+      body: row => {
+        const pcj = Number(row.pcjTotal) || 0;
+        const cor = pcj >= 30 ? 'blue' : 'red'; 
+
+        return (
+          <th style={{ color: cor }}>
+            {formatMoeda(pcj)}
+          </th>
+        );
+      },
       sortable: true,
     },
 

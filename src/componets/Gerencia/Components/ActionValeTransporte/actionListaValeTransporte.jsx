@@ -15,6 +15,7 @@ import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { useReactToPrint } from "react-to-print";
 import { useEditarDespesa } from "./hooks/useEditarDespesa";
+import Swal from "sweetalert2";
 
 export const ActionListaValeTransporte = ({ dadosDespesasLoja, optionsModulos, usuarioLogado, refetchDadosLoja }) => {
   const [dadosDetalheDespesas, setDadosDetalheDespesas] = useState([]);
@@ -25,23 +26,10 @@ export const ActionListaValeTransporte = ({ dadosDespesasLoja, optionsModulos, u
   const dataTableRef = useRef();
   const { onSubmit } = useEditarDespesa(usuarioLogado, optionsModulos, refetchDadosLoja, refetchDadosLoja);
 
-  const normalizeToYMD = (value) => {
-    if (!value) return '';
-
-    const str = String(value).trim();
-
-    if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
-      return str.slice(0, 10);
-    }
-
-    const m = str.match(/^(\d{2})[-/](\d{2})[-/](\d{4})/);
-    if (m) {
-      const [, dd, mm, yyyy] = m;
-      return `${yyyy}-${mm}-${dd}`;
-    }
-
-    return '';
-  };
+  useEffect(() => {
+    const data = getDataAtual()
+    setDataHoje(data);
+  }, [])
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -90,11 +78,6 @@ export const ActionListaValeTransporte = ({ dadosDespesasLoja, optionsModulos, u
     XLSX.writeFile(workbook, 'despesas_loja.xlsx');
   };
 
-  useEffect(() => {
-    const data = getDataAtual()
-    setDataHoje(data);
-  }, [])
-
   const dadosExcel = dadosDespesasLoja
     .filter(item => item.IDCATEGORIARECDESP == 248)
     .map((item, index) => {
@@ -109,12 +92,12 @@ export const ActionListaValeTransporte = ({ dadosDespesasLoja, optionsModulos, u
         STCANCELADO: item.STCANCELADO,
       };
     });
-
+   
   const dados = dadosDespesasLoja
     .filter(item => item.IDCATEGORIARECDESP == 248)
     .map((item, index) => {
       let contador = index + 1;
-      const dtdespesaDia = String(item?.DTDESPESA ?? '').slice(0, 10);
+
       return {
         IDCATEGORIARECDESP: item?.IDCATEGORIARECDESP,
         IDDESPESASLOJA: item?.IDDESPESASLOJA,
@@ -128,11 +111,10 @@ export const ActionListaValeTransporte = ({ dadosDespesasLoja, optionsModulos, u
         NUNOTAFISCAL: item?.NUNOTAFISCAL,
         DSPAGOA: item?.DSPAGOA,
         DTDESPESA: item?.DTDESPESA,
-        DTDESPESA_DIA: dtdespesaDia,
         contador
       };
     });
-
+    
   const calcularValor = () => {
     let total = 0;
     for (let dados of dadosDespesasLoja) {
@@ -179,7 +161,7 @@ export const ActionListaValeTransporte = ({ dadosDespesasLoja, optionsModulos, u
     {
       field: 'DSHISTORIO',
       header: 'Histórico',
-      body: row => <th style={{ color: 'blue' }} >{row?.DSHISTORIO}</th>,
+      body: row => <th style={{ color: 'blue' }} >{row.DSHISTORIO}</th>,
       sortable: true,
     },
     {
@@ -188,7 +170,7 @@ export const ActionListaValeTransporte = ({ dadosDespesasLoja, optionsModulos, u
       body: row => {
         return (
           <th style={{ color: row?.STCANCELADO == 'False' ? 'blue' : 'red' }}>
-            {row?.STCANCELADO == 'False' && row?.IDCATEGORIARECDESP == 248 ? 'ATIVO' : 'CANCELADO'}
+            {row?.STCANCELADO == 'False' ? 'ATIVO' : 'CANCELADO'}
           </th>
         )
       },
@@ -199,8 +181,8 @@ export const ActionListaValeTransporte = ({ dadosDespesasLoja, optionsModulos, u
       header: 'Opções',
       body: (row) => {
 
-        if (normalizeToYMD(row?.DTDESPESA_DIA) === dataHoje) {
-          if (row?.STCANCELADO == 'False' && row?.IDCATEGORIARECDESP == 248) {
+        if (row?.DTDESPESA === dataHoje) {
+          if (row?.STCANCELADO == 'False') {
             return (
               <div style={{ display: 'flex', justifyContent: 'space-around' }}  >
 
@@ -218,7 +200,7 @@ export const ActionListaValeTransporte = ({ dadosDespesasLoja, optionsModulos, u
                 <div>
                   <ButtonTable
                     titleButton={"Imprimir Vale Transporte"}
-                    onClickButton={() => handleClickEdit(row)}
+                    onClickButton={() => handleClickImprimir(row)}
                     cor={"primary"}
                     Icon={MdOutlineLocalPrintshop}
                     iconSize={25}
@@ -247,12 +229,12 @@ export const ActionListaValeTransporte = ({ dadosDespesasLoja, optionsModulos, u
             )
           }
         } else {
-          if (row?.STCANCELADO == 'False' && row?.IDCATEGORIARECDESP == 248) {
+          if (row.STCANCELADO == 'False') {
             return (
               <div>
                 <ButtonTable
                   titleButton={"Imprimir Vale Transporte"}
-                  onClickButton={() => handleClickEdit(row)}
+                  onClickButton={() => handleClickImprimir(row)}
                   cor={"primary"}
                   Icon={MdOutlineLocalPrintshop}
                   iconSize={25}
@@ -267,21 +249,28 @@ export const ActionListaValeTransporte = ({ dadosDespesasLoja, optionsModulos, u
     }
   ]
 
-  const handleEdit = async (IDDESPESASLOJA) => {
+  const handleImprimir = async (IDDESPESASLOJA) => {
     try {
       const response = await get(`/despesa-Loja-todos?idDespesas=${IDDESPESASLOJA}`);
       if (response.data && response.data.length > 0) {
         setDadosDetalheDespesas(response.data);
         setModalVisivel(true);
+      } else{
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: 'Detalhes da despesa não encontrados.',
+          confirmButtonText: 'OK'
+        })
       }
     } catch (error) {
       console.error('Erro ao buscar detalhes da venda: ', error);
     }
   };
 
-  const handleClickEdit = (row) => {
+  const handleClickImprimir = (row) => {
     if (row && row.IDDESPESASLOJA) {
-      handleEdit(row.IDDESPESASLOJA);
+      handleImprimir(row.IDDESPESASLOJA);
     }
   };
 

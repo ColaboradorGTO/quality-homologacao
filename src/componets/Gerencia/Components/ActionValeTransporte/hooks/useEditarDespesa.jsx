@@ -34,9 +34,9 @@ export const useEditarDespesa = (usuarioLogado, optionsModulos, refetchDadosLoja
         position: 'center',
         icon: 'error',
         title: 'Acesso Negado!',
-        text: 'Você não tem permissão para alterar esta despesa.',
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para alterar esta despesa.`,
         showConfirmButton: false,
-        timer: 1500,
+        timer: 5000,
         customClass: {
           container: 'custom-swal',
         }
@@ -52,6 +52,19 @@ export const useEditarDespesa = (usuarioLogado, optionsModulos, refetchDadosLoja
 
     try {
       await put('/editar-status-despesa/:id', postData);
+      
+      const textDados = JSON.stringify(postData);
+      const textoFuncao = 'FINANCEIRO/ATUALIZAÇÃO DE ESTATUS DA DESPESA';
+      const ipUsuario = await getIPUsuario()
+      
+      const createData = {
+        IDFUNCIONARIO: String(usuarioLogado.id),
+        PATHFUNCAO: textoFuncao,
+        DADOS: textDados,
+        IP: ipUsuario || "Indisponível"
+      };
+      
+      await post('/log-web', createData);
       Swal.fire({
         title: 'Sucesso',
         text: 'Despesa alterada com Sucesso',
@@ -61,19 +74,6 @@ export const useEditarDespesa = (usuarioLogado, optionsModulos, refetchDadosLoja
           container: 'custom-swal',
         }
       });
-
-      const textDados = JSON.stringify(postData);
-      const textoFuncao = 'FINANCEIRO/ATUALIZAÇÃO DE ESTATUS DA DESPESA';
-      const ipUsuario = await getIPUsuario()
-
-      const createData = {
-        IDFUNCIONARIO: String(usuarioLogado.id),
-        PATHFUNCAO: textoFuncao,
-        DADOS: textDados,
-        IP: ipUsuario || "INDISPONÍVEL"
-      };
-
-      await post('/log-web', createData);
       refetchDadosLoja()
     } catch (error) {
       const textDados = JSON.stringify(postData);
@@ -84,7 +84,7 @@ export const useEditarDespesa = (usuarioLogado, optionsModulos, refetchDadosLoja
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario || "INDISPONÍVEL"
+        IP: ipUsuario || "Indisponível"
       };
 
       await post('/log-web', createData);
