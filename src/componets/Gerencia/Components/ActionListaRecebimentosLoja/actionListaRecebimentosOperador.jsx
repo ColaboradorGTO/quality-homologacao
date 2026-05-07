@@ -16,6 +16,7 @@ export const ActionListaRecebimentosOperador = ({dadosRecebimentosOperador }) =>
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(10);
+  const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
     
   const onPageChange = (event) => {
@@ -197,6 +198,13 @@ export const ActionListaRecebimentosOperador = ({dadosRecebimentosOperador }) =>
             globalFilter={globalFilterValue}
             footerColumnGroup={footerGroup}
             sortField="VRTOTALPAGO"
+            size="small"
+            selectionMode="single"
+            selection={rowSelection}
+            onSelectionChange={(e) => setRowSelection(e.value)}
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+            filterDisplay="menu"
             sortOrder={-1}
             paginator={true}
             first={first}

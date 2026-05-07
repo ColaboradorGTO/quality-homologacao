@@ -16,8 +16,10 @@ export const ActionListaRecebimentos = ({dadosRecebimentos }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(10);
+  const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
     
+
   const onPageChange = (event) => {
     setFirst(event.first);
     setRows(event.rows);
@@ -254,12 +256,18 @@ export const ActionListaRecebimentos = ({dadosRecebimentos }) => {
             globalFilter={globalFilterValue}
             footerColumnGroup={footerGroup}
             size="small"
+             selectionMode="single"
+            selection={rowSelection}
+            onSelectionChange={(e) => setRowSelection(e.value)}
             first={first}
             rows={rows}
             onPage={onPageChange}
             sortOrder={-1}
             paginator={true}
             rowsPerPageOptions={[5, 10, 20, 50, 100, dados.length]}
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+            filterDisplay="menu"
             showGridlines
             stripedRows
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}

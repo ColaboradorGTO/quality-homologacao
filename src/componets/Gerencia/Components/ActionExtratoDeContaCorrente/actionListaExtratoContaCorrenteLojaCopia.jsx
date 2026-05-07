@@ -414,7 +414,7 @@ export const ActionListaExtratoContaCorrenteLoja = ({
             field="pagoA"
             header="Pago A"
             headerStyle={{ backgroundColor: "#7a59ad", color: 'white', fontSize: '1rem', fontWeight: 'bold' }}
-            bodyStyle={{ fontSize: '1rem', fontWeight: 600 }}
+            bodyStyle={{ fontSize: '12px', fontWeight: 600 }}
           />
 
           <Column

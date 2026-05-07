@@ -93,6 +93,13 @@ export const ActionPesquisaExtratoContaCorenteLoja = ({ usuarioLogado, optionsEm
     refetchListaExtrato()
   }
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
+
   return (
     <Fragment>
       <ActionMain
@@ -119,11 +126,13 @@ export const ActionPesquisaExtratoContaCorenteLoja = ({ usuarioLogado, optionsEm
         valueInputFieldDTInicioA={dataPesquisaInicio}
         labelInputDTInicioA={"Data Início"}
         onChangeInputFieldDTInicioA={(e) => setDataPesquisaInicio(e.target.value)}
+        onKeyDownInputFieldDTInicioA={handleKeyPress}
 
         InputFieldDTFimAComponent={InputField}
         labelInputDTFimA={"Data Fim"}
         valueInputFieldDTFimA={dataPesquisaFim}
         onChangeInputFieldDTFimA={(e) => setDataPesquisaFim(e.target.value)}
+        onKeyDownInputFieldDTFimA={handleKeyPress}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}
