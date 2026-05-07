@@ -5,6 +5,8 @@ import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { useReactToPrint } from "react-to-print";
 import HeaderTable from "../../../Tables/headerTable";
+import { formatMoeda } from "../../../../utils/formatMoeda";
+import { toFloat } from "../../../../utils/toFloat";
 
 export const ActionListaVendasDigitais = ({ dadosVendasDigitais }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
@@ -61,16 +63,31 @@ export const ActionListaVendasDigitais = ({ dadosVendasDigitais }) => {
       idVenda: item.idVenda,
       dataVenda: item.dataVenda,
       totalQuantidadeDigital: item.totalQuantidadeDigital,
-      totalVenda: item.totalVenda,
+      totalVenda: toFloat(item.totalVenda),
       nomeVendedor: item.nomeVendedor,
     };
   });
+
+  const calcularTotal = (field) => {
+    return dados.reduce((total, item) => total + parseFloat(item[field]), 0);
+  };
+
+  const calcularTotalVenda = () => {
+    const total = calcularTotal('totalVenda');
+    return formatMoeda(total);
+  };
+
+  const calcularTotalQTD = () => {
+    const total = calcularTotal('totalQuantidadeDigital');
+    return total;
+  };
 
   const colunasVendasDigitais = [
     {
       field: 'filial',
       header: 'Filial',
       body: row => <th >{row.filial}</th>,
+      footer: 'Total',
       sortable: true,
     },
     {
@@ -89,12 +106,14 @@ export const ActionListaVendasDigitais = ({ dadosVendasDigitais }) => {
       field: 'totalQuantidadeDigital',
       header: 'Quantidade de Itens',
       body: row => <th>{row.totalQuantidadeDigital}</th>,
+      footer: calcularTotalQTD(),
       sortable: true,
     },
     {
       field: 'totalVenda',
       header: 'Total de vendas R$',
       body: row => <th>{row.totalVenda}</th>,
+      footer: calcularTotalVenda(),
       sortable: true,
     },
     {
@@ -110,7 +129,7 @@ export const ActionListaVendasDigitais = ({ dadosVendasDigitais }) => {
     <Fragment>
       <div className="panel">
         <div className="panel-hdr">
-          <h2>Vendas por Vendedor</h2>
+          <h2>Lista de Vendas Digitais Por Loja</h2>
         </div>
         <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
           <HeaderTable
@@ -125,7 +144,7 @@ export const ActionListaVendasDigitais = ({ dadosVendasDigitais }) => {
         <div className="card" ref={dataTableRef}>
 
           <DataTable
-            title="Vendas por Vendedor"
+            title="Vendas Digitais"
             value={dados}
             globalFilter={globalFilterValue}
             size="small"
@@ -136,6 +155,9 @@ export const ActionListaVendasDigitais = ({ dadosVendasDigitais }) => {
             paginator={true}
             rows={10}
             rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+            filterDisplay="menu"
             showGridlines
             stripedRows
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado </div>}

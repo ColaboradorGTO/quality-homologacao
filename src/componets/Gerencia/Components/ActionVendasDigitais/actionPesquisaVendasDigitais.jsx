@@ -14,7 +14,6 @@ export const ActionPesquisaVendasDigitais = ({ usuarioLogado, optionsEmpresas })
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
   const [dataPesquisaFim, setDataPesquisaFim] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
   const [empresaSelecionada, setEmpresaSelecionada] = useState('');
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
@@ -84,10 +83,16 @@ export const ActionPesquisaVendasDigitais = ({ usuarioLogado, optionsEmpresas })
     { enabled: false, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
   );
 
-  const handleTabelaVisivel = () => {
-    setCurrentPage(prevPage => prevPage + 1);
+  const handleClick = () => {
     refetchVendasDigitais();
     setTabelaVisivel(true);
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
   };
 
   return (
@@ -115,15 +120,17 @@ export const ActionPesquisaVendasDigitais = ({ usuarioLogado, optionsEmpresas })
         valueInputFieldDTInicioA={dataPesquisaInicio}
         labelInputDTInicioA={"Data Início"}
         onChangeInputFieldDTInicioA={(e) => setDataPesquisaInicio(e.target.value)}
+        onKeyDownInputFieldDTInicioA={handleKeyPress}
 
         InputFieldDTFimAComponent={InputField}
         labelInputDTFimA={"Data Fim"}
         valueInputFieldDTFimA={dataPesquisaFim}
         onChangeInputFieldDTFimA={(e) => setDataPesquisaFim(e.target.value)}
+        onKeyDownInputFieldDTFimA={handleKeyPress}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}
-        onButtonClickSearch={handleTabelaVisivel}
+        onButtonClickSearch={handleClick}
         IconSearch={AiOutlineSearch}
         corSearch={"primary"}
 
