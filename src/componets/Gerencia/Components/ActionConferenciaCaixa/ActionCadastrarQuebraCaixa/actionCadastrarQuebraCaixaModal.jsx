@@ -2,7 +2,7 @@ import { Fragment } from "react"
 import Modal from 'react-bootstrap/Modal';
 import { HeaderModal } from "../../../../Modais/HeaderModal/HeaderModal";
 import { useForm } from "react-hook-form";
-import { FormularioCadastrarQuebraCaixa } from "./formularioActionQuebraCaixa";
+import { Formulario } from "./formulario";
 
 export const ActionCadastrarQuebraCaixaModal = ({ show, handleClose, dadosDetelheCaixa, usuarioLogado, optionsModulos, refetchCaixaMovimento }) => {
   const { register, handleSubmit, errors } = useForm();
@@ -25,7 +25,7 @@ export const ActionCadastrarQuebraCaixaModal = ({ show, handleClose, dadosDetelh
           handleClose={handleClose}
         />
         <Modal.Body>
-          <FormularioCadastrarQuebraCaixa
+          <Formulario
             show={show}
             handleClose={handleClose}
             dadosDetelheCaixa={dadosDetelheCaixa}

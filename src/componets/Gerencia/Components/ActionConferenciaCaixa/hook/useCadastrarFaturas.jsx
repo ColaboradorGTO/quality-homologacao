@@ -62,10 +62,10 @@ export const useCadastroFaturas = ({
         }
 
         const postData = {
-            IDEMPRESA: Number(usuarioLogado.IDEMPRESA),
-            IDFUNCIONARIO: Number(dadosDetelheFatura[0].IDOPERADORFECHAMENTO),
+            IDEMPRESA: parseInt(usuarioLogado.IDEMPRESA),
+            IDFUNCIONARIO: parseInt(dadosDetelheFatura[0].IDOPERADORFECHAMENTO),
             IDDETALHEFATURALOCAL: null,
-            IDCAIXAWEB: Number(dadosDetelheFatura[0].IDCAIXAFECHAMENTO),
+            IDCAIXAWEB: parseInt(dadosDetelheFatura[0].IDCAIXAFECHAMENTO),
             IDCAIXALOCAL: null,
             NUESTABELECIMENTO: "",
             NUCARTAO: "",
@@ -76,7 +76,7 @@ export const useCadastroFaturas = ({
             IDMOVIMENTOCAIXAWEB: String(dadosDetelheFatura[0].ID),
             NUCODAUTORIZACAO: String(codAutorizacao),
             VRRECEBIDO: Number(removerFormatacaoMoeda(valorFatura)),
-            DTHRMIGRACAO: null,
+            DTHRMIGRACAO: '',
             STCANCELADO: 'False',
             IDUSRCACELAMENTO: null,
         }
@@ -91,7 +91,7 @@ export const useCadastroFaturas = ({
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario || "INDISPONÍVEL"
+                IP: ipUsuario || "Indisponível"
             }
 
             await post('/log-web', createData)
@@ -119,7 +119,7 @@ export const useCadastroFaturas = ({
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario || "INDISPONÍVEL"
+                IP: ipUsuario || "Indisponível"
             } 
 
             const responsePost = await post('/log-web', createData)

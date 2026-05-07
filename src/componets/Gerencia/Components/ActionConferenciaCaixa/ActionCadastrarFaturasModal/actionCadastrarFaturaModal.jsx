@@ -1,7 +1,7 @@
 import { Fragment } from "react"
 import Modal from 'react-bootstrap/Modal';
 import { HeaderModal } from "../../../../Modais/HeaderModal/HeaderModal";
-import { FormularioCadastrarFaturas } from "./formularioCadastroFaturas";
+import { Formulario } from "./formulario";
 
 export const ActionCadastrarFaturaModal = ({ show, handleClose, dadosDetelheFatura, usuarioLogado, optionsModulos, refetchCaixaMovimento }) => {
   return (
@@ -21,7 +21,7 @@ export const ActionCadastrarFaturaModal = ({ show, handleClose, dadosDetelheFatu
           handleClose={handleClose}
         />
         <Modal.Body>
-          <FormularioCadastrarFaturas
+          <Formulario
             show={show}
             handleClose={handleClose}
             dadosDetelheFatura={dadosDetelheFatura}

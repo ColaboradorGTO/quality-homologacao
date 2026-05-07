@@ -1,8 +1,7 @@
 import { Fragment } from "react"
 import Modal from 'react-bootstrap/Modal';
 import { HeaderModal } from "../../../../Modais/HeaderModal/HeaderModal";
-
-import { FormularioAjusteMovimentoCaixa } from "./formularioAjusteMovimentoCaixa";
+import { Formulario } from "./formulario";
 
 export const ActionAjusteMovimentoCaixaModal = ({ show, handleClose, dadosDetalheFechamento, usuarioLogado, optionsModulos, refetchCaixaMovimento }) => {
 
@@ -25,7 +24,7 @@ export const ActionAjusteMovimentoCaixaModal = ({ show, handleClose, dadosDetalh
           handleClose={handleClose}
         />
         <Modal.Body>
-          <FormularioAjusteMovimentoCaixa
+          <Formulario
             dadosDetalheFechamento={dadosDetalheFechamento}
             usuarioLogado={usuarioLogado}
             handleClose={handleClose}

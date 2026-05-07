@@ -3,12 +3,12 @@ import { HeaderModal } from "../../../../Modais/HeaderModal/HeaderModal";
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal";
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal";
 import { Controller, useForm } from "react-hook-form";
-import { useCadastroQuebraCaixa } from "../hook/actionCadastrarQuebraCaixa";
+import { useCadastroQuebraCaixa } from "../hook/useCadastrarQuebraCaixa";
 import FormField from "../../../../Formularios/FormField";
 import { schema } from "./schemaCadastrarQuebraCaixa";
 import { formatarMoeda } from "../../../../../utils/formatMoeda";
 
-export const FormularioCadastrarQuebraCaixa = ({ show, handleClose, dadosDetelheCaixa, usuarioLogado, optionsModulos, refetchCaixaMovimento }) => {
+export const Formulario = ({ show, handleClose, dadosDetelheCaixa, usuarioLogado, optionsModulos, refetchCaixaMovimento }) => {
     const { handleSubmit, formState: { errors }, clearErrors, control, setError, register } = useForm({
         mode: "onChange"
     });

@@ -3,13 +3,13 @@ import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal";
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal";
 import { Controller, useForm } from "react-hook-form";
 import { InputFieldModal } from "../../../../Buttons/InputFieldModal";
-import { useAjusteMovimentoCaixa } from "../hook/actionAjusteMovimentoCaixa";
+import { useAjusteMovimentoCaixa } from "../hook/useAjusteMovimentoCaixa";
 import FormField from "../../../../Formularios/FormField";
 import { AlertError } from "../../../../Inputs/alertError";
 import { schema } from "./schemaAjusteMovimentoCaixa";
 import { formatarMoeda } from "../../../../../utils/formatMoeda";
 
-export const FormularioAjusteMovimentoCaixa = ({ handleClose, dadosDetalheFechamento, usuarioLogado, optionsModulos, refetchCaixaMovimento }) => {
+export const Formulario = ({ handleClose, dadosDetalheFechamento, usuarioLogado, optionsModulos, refetchCaixaMovimento }) => {
     const { handleSubmit, formState: { errors }, clearErrors, control, setError, register } = useForm({
         mode: "onChange"
     });

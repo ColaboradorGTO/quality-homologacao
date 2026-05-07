@@ -342,7 +342,7 @@ export const ActionListaConferenciaCaixa = ({ dadosMovimentosCaixa, usuarioLogad
       Swal.fire({
         icon: 'error',
         title: 'Atenção!',
-        text: 'Você não tem permissão para alterar o status de conferência do caixa.',
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para alterar o status de conferência do caixa.`,
         confirmButtonColor: '#7352A5',
         customClass: {
           container: 'custom-swal',
@@ -387,6 +387,13 @@ export const ActionListaConferenciaCaixa = ({ dadosMovimentosCaixa, usuarioLogad
       if (response.data && response.data.length > 0) {
         setDadosDetalheFechamento(response.data);
         setModalAjusteFechamento(true);
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro!',
+          text: 'Não foi possível obter os detalhes do fechamento do caixa.',
+        })
+        return;
       }
     } catch (error) {
       console.error('Erro ao buscar detalhes da venda: ', error);
@@ -402,7 +409,7 @@ export const ActionListaConferenciaCaixa = ({ dadosMovimentosCaixa, usuarioLogad
       Swal.fire({
         icon: 'error',
         title: 'Atenção!',
-        text: 'Você não tem permissão para alterar o status de conferência do caixa.',
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para alterar o status de conferência do caixa.`,
         confirmButtonColor: '#7352A5',
         customClass: {
           container: 'custom-swal',
@@ -417,6 +424,13 @@ export const ActionListaConferenciaCaixa = ({ dadosMovimentosCaixa, usuarioLogad
       if (response.data && response.data.length > 0) {
         setDadosDetelheCaixa(response.data);
         setModalCastroQuebraCaixa(true);
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro!',
+          text: 'Não foi possível obter os detalhes do fechamento do caixa.',
+        })
+        return;
       }
     } catch (error) {
       console.error('Erro ao buscar detalhes da venda: ', error);
@@ -432,7 +446,7 @@ export const ActionListaConferenciaCaixa = ({ dadosMovimentosCaixa, usuarioLogad
       Swal.fire({
         icon: 'error',
         title: 'Atenção!',
-        text: 'Você não tem permissão para alterar o status de conferência do caixa.',
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para alterar o status de conferência do caixa.`,
         confirmButtonColor: '#7352A5',
         customClass: {
           container: 'custom-swal',
@@ -447,6 +461,13 @@ export const ActionListaConferenciaCaixa = ({ dadosMovimentosCaixa, usuarioLogad
       if (response.data && response.data.length > 0) {
         setDadosDetelheFatura(response.data);
         setModalCastroFatura(true);
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro!',
+          text: 'Não foi possível obter os detalhes do fechamento do caixa.',
+        })
+        return;
       }
     } catch (error) {
       console.error('Erro ao buscar detalhes da venda: ', error);
@@ -462,7 +483,7 @@ export const ActionListaConferenciaCaixa = ({ dadosMovimentosCaixa, usuarioLogad
       Swal.fire({
         icon: 'error',
         title: 'Atenção!',
-        text: 'Você não tem permissão para alterar o status de conferência do caixa.',
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para alterar o status de conferência do caixa.`,
         confirmButtonColor: '#7352A5',
         customClass: {
           container: 'custom-swal',
@@ -492,7 +513,7 @@ export const ActionListaConferenciaCaixa = ({ dadosMovimentosCaixa, usuarioLogad
       Swal.fire({
         icon: 'error',
         title: 'Atenção!',
-        text: 'Você não tem permissão para Imprimir.',
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para Imprimir.`,
         confirmButtonColor: '#7352A5',
         customClass: {
           container: 'custom-swal',
@@ -617,4 +638,3 @@ export const ActionListaConferenciaCaixa = ({ dadosMovimentosCaixa, usuarioLogad
     </Fragment>
   )
 }
-

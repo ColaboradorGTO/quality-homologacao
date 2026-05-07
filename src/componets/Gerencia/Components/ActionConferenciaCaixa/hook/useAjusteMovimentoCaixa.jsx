@@ -3,6 +3,7 @@ import { post, put } from "../../../../../api/funcRequest";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { removerFormatacaoMoeda } from "../../../../../utils/formatMoeda";
+import { parse } from "node:path";
 
 export const useAjusteMovimentoCaixa = ({
     handleClose,
@@ -49,9 +50,9 @@ export const useAjusteMovimentoCaixa = ({
         if (optionsModulos[0]?.ALTERAR == 'False') {
             Swal.fire({
                 title: 'Acesso Negado',
-                text: 'Você não tem permissão para alterar este registro.',
+                html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para ajustar o movimento de caixa.`,
                 icon: 'error',
-                timer: 3000,
+                timer: 5000,
                 customClass: {
                     container: 'custom-swal',
                 }
@@ -66,16 +67,16 @@ export const useAjusteMovimentoCaixa = ({
 
         const putData = {
             ID: dadosDetalheFechamento[0]?.ID,
-            VRAJUSTDINHEIRO: Number(removerFormatacaoMoeda(dinheiroAjusteNum)),
-            VRAJUSTTEF: 0,
-            VRAJUSTPOS: 0,
-            VRAJUSTFATURA: Number(removerFormatacaoMoeda(faturaAjuste)),
-            VRAJUSTVOUCHER: 0,
-            VRAJUSTCONVENIO: 0,
-            VRAJUSTPIX: 0,
-            VRAJUSTPL: 0,
+            VRAJUSTDINHEIRO: parseFloat(removerFormatacaoMoeda(dinheiroAjusteNum)),
+            VRAJUSTTEF: parseFloat(0),
+            VRAJUSTPOS: parseFloat(0),
+            VRAJUSTFATURA: parseFloat(removerFormatacaoMoeda(faturaAjuste)),
+            VRAJUSTVOUCHER: parseFloat(0),
+            VRAJUSTCONVENIO: parseFloat(0),
+            VRAJUSTPIX: parseFloat(0),
+            VRAJUSTPL: parseFloat(0),
             TXT_OBS: txtObservacaoAjuste,
-            VRQUEBRACAIXA: vrQuebraNova,
+            VRQUEBRACAIXA: parseFloat(vrQuebraNova),
         }
         try {
             const response = await put('/ajuste-recebimento', putData)
@@ -88,7 +89,7 @@ export const useAjusteMovimentoCaixa = ({
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario || "INDISPONÍVEL"
+                IP: ipUsuario || "Indisponível"
             }
 
             await post('/log-web', postData)
@@ -115,7 +116,7 @@ export const useAjusteMovimentoCaixa = ({
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario || "INDISPONÍVEL"
+                IP: ipUsuario || "Indisponível"
             }
 
             const responsPost = await post('/log-web', postData)

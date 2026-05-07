@@ -77,7 +77,7 @@ export const useCadastroQuebraCaixa = ({
         if (optionsModulos[0]?.ALTERAR == 'False') {
             Swal.fire({
                 title: 'Acesso Negado',
-                text: 'Você não tem permissão para alterar este registro.',
+                html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para cadastrar quebras de caixa.`,
                 icon: 'error',
                 timer: 3000,
                 customClass: {
@@ -88,12 +88,12 @@ export const useCadastroQuebraCaixa = ({
         }
         const TxTHistorico = 'Quebra de Caixa Automático';
         const postData = {
-            IDCAIXAWEB: dadosDetelheCaixa[0].IDCAIXAFECHAMENTO,
+            IDCAIXAWEB: parseInt(dadosDetelheCaixa[0].IDCAIXAFECHAMENTO),
             IDMOVIMENTOCAIXA: dadosDetelheCaixa[0].ID,
-            IDGERENTE: usuarioLogado.id,
-            IDFUNCIONARIO: dadosDetelheCaixa[0].IDOPERADORFECHAMENTO,
+            IDGERENTE: parseInt(usuarioLogado.id),
+            IDFUNCIONARIO: parseInt(dadosDetelheCaixa[0].IDOPERADORFECHAMENTO),
             DTLANCAMENTO: dataLancamento,
-            VRQUEBRASISTEMA: Number(dadosDetelheCaixa[0].TOTALFECHAMENTOVRQUEBRACAIXA),
+            VRQUEBRASISTEMA: parseFloat(dadosDetelheCaixa[0].TOTALFECHAMENTOVRQUEBRACAIXA),
             VRQUEBRAEFETIVADO: removerFormatacaoMoeda(dinheiroAjuste),
             TXTHISTORICO: motivoAjuste == '' ? TxTHistorico : motivoAjuste,
             STATIVO: 'True'
@@ -110,7 +110,7 @@ export const useCadastroQuebraCaixa = ({
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario || "INDISPONÍVEL"
+                IP: ipUsuario || "Indisponível"
             }
 
             await post('/log-web', createData)
@@ -138,7 +138,7 @@ export const useCadastroQuebraCaixa = ({
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario || "INDISPONÍVEL"
+                IP: ipUsuario || "Indisponível"
             }
 
             const responsePost = await post('/log-web', createData)

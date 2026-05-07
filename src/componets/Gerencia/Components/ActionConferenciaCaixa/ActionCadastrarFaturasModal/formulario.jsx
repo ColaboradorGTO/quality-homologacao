@@ -2,12 +2,12 @@ import { Fragment } from "react"
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal";
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal";
 import { Controller, useForm } from "react-hook-form";
-import { useCadastroFaturas } from "../hook/actionCadastrarFaturas";
+import { useCadastroFaturas } from "../hook/useCadastrarFaturas";
 import FormField from "../../../../Formularios/FormField";
 import { schema } from "./schemaCadastroFatura";
 import { formatarMoeda } from "../../../../../utils/formatMoeda";
 
-export const FormularioCadastrarFaturas = ({ show, handleClose, dadosDetelheFatura, usuarioLogado, optionsModulos, refetchCaixaMovimento }) => {
+export const Formulario = ({ show, handleClose, dadosDetelheFatura, usuarioLogado, optionsModulos, refetchCaixaMovimento }) => {
     const { handleSubmit, formState: { errors }, clearErrors, control, setError, register } = useForm({
         mode: "onChange"
     });
