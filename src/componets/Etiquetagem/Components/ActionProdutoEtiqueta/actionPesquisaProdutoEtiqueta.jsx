@@ -117,6 +117,13 @@ export const ActionPesquisaProdutoEtiqueta = ({ usuarioLogado }) => {
     }
   }
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
+
   const handleCancelar = async (isChecked) => {
     const result = await Swal.fire({
       icon: 'question',
@@ -228,21 +235,24 @@ export const ActionPesquisaProdutoEtiqueta = ({ usuarioLogado }) => {
 
         InputFieldComponent={InputField}
         labelInputField={"Cód.Barras "}
+        placeHolderInputFieldComponent={"Cód.Barras / Nome Produto"}
         valueInputField={codBarrasProduto}
         onChangeInputField={(e) => setCodBarrasProduto(e.target.value)}
-        placeHolderInputFieldComponent={"Cód.Barras / Nome Produto"}
+        onKeyDownInputField={handleKeyPress}
 
         InputFieldNumeroNFComponent={InputField}
         labelInputFieldNumeroNF={"Id. Produto"}
+        placeHolderInputFieldNumeroNF={"Id. Produto"}
         valueInputFieldNumeroNF={idProduto}
         onChangeInputFieldNumeroNF={(e) => setIDProduto(e.target.value)}
-        placeHolderInputFieldNumeroNF={"Id. Produto"}
+        onKeyDownInputFieldNumeroNF={handleKeyPress}
 
         InputFieldDescricaoComponent={InputField}
         labelInputFieldDescricao={"Descrição"}
+        placeHolderInputFieldDescricao={"Descrição do Produto"}
         valueInputFieldDescricao={descricaoProduto}
         onChangeInputFieldDescricao={(e) => setDescricaoProduto(e.target.value)}
-        placeHolderInputFieldDescricao={"Descrição do Produto"}
+        onKeyDownInputFieldDescricao={handleKeyPress}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}
@@ -266,7 +276,7 @@ export const ActionPesquisaProdutoEtiqueta = ({ usuarioLogado }) => {
 
         ButtonTypeCancelar={ButtonType}
         onButtonClickCancelar={handleImprimirEtiqueta}
-        linkCancelar={"Imprimir"}
+        linkCancelar={"Imprimir Etiqueta Padrão"}
         corCancelar={"info"}
         IconCancelar={MdOutlineLocalPrintshop}
         styleCancelar={{ display: btnVisivel || dadosAcumuladorEtiquetas.length > 0 ? 'block' : 'none' }}
@@ -277,7 +287,14 @@ export const ActionPesquisaProdutoEtiqueta = ({ usuarioLogado }) => {
         corVendasEstrutura={"danger"}
         iconVendasEstrutura={BsTrash3}
         styleVendasEstrutura={{ display: dadosAcumuladorEtiquetas.length > 0 ? 'block' : 'none' }}
-      />
+     
+        ButtonTypeVendasVendedor={ButtonType}
+        linkNomeVendasVendedor={"Imprimir Etiqueta Oculos"}
+        onButtonClickVendasVendedor
+        corVendasVendedor={"warning"}
+        iconVendasVendedor={MdOutlineLocalPrintshop}
+        styleVendedor={{ display: btnVisivel || dadosAcumuladorEtiquetas.length > 0 ? 'block' : 'none' }}
+     />
 
       <ActionListaProdutoEtiqueta
         dadosListaPrecosSap={dadosListaPrecosSap}

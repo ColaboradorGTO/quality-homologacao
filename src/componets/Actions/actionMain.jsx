@@ -589,6 +589,7 @@ export const ActionMain = ({
   styleInputFieldOT,
   stylesGrupo,
   styleProdutoVendido,
+  styleVendedor,
   // Funções
 
   onButtonClickSearch,
@@ -1912,6 +1913,7 @@ export const ActionMain = ({
                         Icon={iconVendasVendedor}
                         iconColor="#fff"
                         iconSize={16}
+                        style={styleVendedor}
                       />
                     )}
                     {ButtonTypeProdutoVendidos && (

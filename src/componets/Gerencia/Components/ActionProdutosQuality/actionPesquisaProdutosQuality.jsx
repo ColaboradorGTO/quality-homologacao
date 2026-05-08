@@ -13,7 +13,6 @@ import { InputSelectAction } from "../../../Inputs/InputSelectAction";
 export const ActionPesquisaProdutosQuality = ({ optionsEmpresas, usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [descricaoProduto, setDescricaoProduto] = useState('')
-  const [currentPage, setCurrentPage] = useState(1);
   const [empresaSelecionada, setEmpresaSelecionada] = useState('');
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
@@ -79,7 +78,6 @@ export const ActionPesquisaProdutosQuality = ({ optionsEmpresas, usuarioLogado }
   const handleClick = () => {
 
     if (usuarioLogado && usuarioLogado.IDEMPRESA && usuarioLogado.ID_LISTA_LOJA) {
-      setCurrentPage(prevPage => prevPage + 1);
       refetchProdutosQuality();
       setTabelaVisivel(true);
     } else {
