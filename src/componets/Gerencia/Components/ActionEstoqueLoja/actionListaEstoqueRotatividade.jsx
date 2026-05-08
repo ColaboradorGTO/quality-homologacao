@@ -207,8 +207,8 @@ export const ActionListaEstoqueRotatividade = ({ dadosEstoqueRotatividade }) => 
 
   const HeaderTemplate = (rowData) => {
     return (
-      <div className="flex align-items-center gap-2" style={{ alignContent: 'center' }}>
-        <span className="font-bold" style={{ fontWeight: 600 }}>
+      <div className="flex align-items-center " style={{ alignContent: 'center', border: '1px solid #e9e9e9',  backgroundColor: '#f5f5f5', width: '100%' }}>
+        <span className="font-bold" style={{ fontWeight: 600,  }}>
           {`${rowData.NUCODBARRAS} - ${rowData.DSPRODUTO} / Custo R$ ${formatMoeda(rowData.PRECOCUSTO)}  - Venda R$ ${formatMoeda(rowData.PRECOVENDA)}`}
         </span>
       </div>
@@ -219,14 +219,15 @@ export const ActionListaEstoqueRotatividade = ({ dadosEstoqueRotatividade }) => 
     <ColumnGroup>
 
       <Row>
-        <Column footer="Total " colSpan={3} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem', textAlign: 'center' }} />
+        <Column footer="Total " colSpan={2} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem', textAlign: 'center' }} />
         <Column footer={calcularQtdEntrada()} colSpan={1} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem' }} />
         <Column footer={calcularQtdEntradaVoucher()} colSpan={1} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem' }} />
         <Column footer={calcularQtdSaida()} colSpan={1} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem' }} />
         <Column footer={calcularQtdSaidaTransferencia()} colSpan={1} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem' }} />
-        <Column footer={calcularQtdRetornoAjustePedido()} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem' }} />
-        <Column footer={calcularQtdAjusteBalanco()} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem' }} />
-        {/* <Column footer={""} colSpan={''} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem' }} /> */}
+        <Column footer={calcularQtdRetornoAjustePedido()} colSpan={1} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem' }} />
+        <Column footer={calcularQtdAjusteBalanco()} colSpan={1} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem' }} />
+        <Column footer={""} colSpan={1} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem' }} />
+        <Column footer={""} colSpan={1} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem' }} />
       </Row>
     </ColumnGroup>
   )
@@ -283,9 +284,9 @@ export const ActionListaEstoqueRotatividade = ({ dadosEstoqueRotatividade }) => 
                 body={coluna.body}
                 footer={coluna.footer}
                 sortable={coluna.sortable}
-                headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '1rem' }}
+                headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
                 footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
-                bodyStyle={{ fontSize: '1rem' }}
+                bodyStyle={{ fontSize: '1rem', border: '1px solid #e9e9e9' }}
 
               />
             ))}
