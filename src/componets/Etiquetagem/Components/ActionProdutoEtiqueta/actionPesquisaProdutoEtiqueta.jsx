@@ -28,6 +28,7 @@ export const ActionPesquisaProdutoEtiqueta = ({ usuarioLogado }) => {
   const [produtosSelecionados, setProdutosSelecionados] = useState([]);
   const [dadosAcumuladorEtiquetas, setDadosAcumuladorEtiquetas] = useState([]);
   const [modalImprimirEtiqueta, setModalImprimirEtiqueta] = useState(false);
+  const [modalImprimirEtiquetaOculos, setModalImprimirEtiquetaOculos] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
 
@@ -314,17 +315,17 @@ export const ActionPesquisaProdutoEtiqueta = ({ usuarioLogado }) => {
         setSelectedIds={setSelectedIds}
       />
 
-      {/* <ActionImprimirEtiquetaModal
+      <ActionImprimirEtiquetaModal
         show={modalImprimirEtiqueta}
         handleClose={() => setModalImprimirEtiqueta(false)}
         dadosAcumuladorEtiquetas={dadosAcumuladorEtiquetas}
         produtosSelecionados={produtosSelecionados}
         copia={copia}
-      /> */}
+      />
 
       <ActionEtiquetaOculosModal 
-        show={modalImprimirEtiqueta}
-        handleClose={() => setModalImprimirEtiqueta(false)}
+        show={modalImprimirEtiquetaOculos}
+        handleClose={() => setModalImprimirEtiquetaOculos(false)}
         dadosAcumuladorEtiquetas={dadosAcumuladorEtiquetas}
         produtosSelecionados={produtosSelecionados}
         copia={copia}

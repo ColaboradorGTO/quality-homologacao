@@ -114,7 +114,7 @@ export const ActionImprimirEtiquetaModal = ({
           }
         }
       }
-
+  
       // Finaliza última página se necessário
       if (contador !== 0) {
         dataLabelsZPLToPrint += endPageLabel;

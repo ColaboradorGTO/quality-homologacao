@@ -34,7 +34,7 @@ export const ActionEtiquetaOculosModal = ({
   copia
 }) => {
 
-  
+
   const dataTableRef = useRef();
   const handlePrintZPL = async () => {
     try {
