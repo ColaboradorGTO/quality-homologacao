@@ -135,7 +135,7 @@ export const ActionListaTransacoesLojas = ({ dadosTransacoesEmpresas, dataPesqui
       <div className="panel">
         <div className="panel-hdr mb-4">
 
-          <h3>Lista de Transações Por Loja QTD Cupons</h3>
+          <h>Lista de Transações Por Loja QTD Cupons</h>
         </div>
 
         <div style={{ marginBottom: "1rem" }}>

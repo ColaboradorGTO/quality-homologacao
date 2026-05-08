@@ -10,6 +10,8 @@ import { InputSelectAction } from "../../../Inputs/InputSelectAction";
 import { useQuery } from 'react-query';
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento"
 import { useFetchData } from "../../../../hooks/useFetchData"
+import { MdOutlineCloudUpload } from "react-icons/md"
+import { useMigrarTodasDespesasSAP } from "./hooks/useMigrarTodasDespesas"
 
 export const ActionPesquisaDespesaLoja = ({ usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
@@ -18,6 +20,8 @@ export const ActionPesquisaDespesaLoja = ({ usuarioLogado }) => {
   const [empresaSelecionada, setEmpresaSelecionada] = useState('')
   const [empresaSelecionadaNome, setEmpresaSelecionadaNome] = useState('')
   const [categoriaSelecionada, setCategoriaSelecionada] = useState('')
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [btnVisivel, setBtnVisivel] = useState(false);
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
   useEffect(() => {
@@ -104,6 +108,13 @@ export const ActionPesquisaDespesaLoja = ({ usuarioLogado }) => {
     refetchListaDespesasLoja()
   }
 
+  const {handleMigrarDespesa} = useMigrarTodasDespesasSAP({optionsModulos, usuarioLogado, selectedItems, handleClick})
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
 
   return (
 
@@ -118,11 +129,13 @@ export const ActionPesquisaDespesaLoja = ({ usuarioLogado }) => {
         labelInputFieldDTInicio={"Data Início"}
         valueInputFieldDTInicio={dataPesquisaInicio}
         onChangeInputFieldDTInicio={e => setDataPesquisaInicio(e.target.value)}
+        onKeyDownInputFieldDTInicio={handleKeyPress}
 
         InputFieldDTFimComponent={InputField}
         labelInputFieldDTFim={"Data Fim"}
         valueInputFieldDTFim={dataPesquisaFim}
         onChangeInputFieldDTFim={e => setDataPesquisaFim(e.target.value)}
+        onKeyDownInputFieldDTFim={handleKeyPress}
 
         InputSelectEmpresaComponent={InputSelectAction}
         labelSelectEmpresa={"Empresa"}
@@ -153,6 +166,13 @@ export const ActionPesquisaDespesaLoja = ({ usuarioLogado }) => {
         IconSearch={AiOutlineSearch}
         corSearch={"primary"}
 
+        ButtonTypeCancelar={ButtonType}
+        linkCancelar={"Integrar Todos"}
+        onButtonClickCancelar={handleMigrarDespesa}
+        corCancelar={"warning"}
+        IconCancelar={MdOutlineCloudUpload}
+        styleCancelar={{ display: btnVisivel ? 'block' : 'none' }}
+
       />
 
       {tabelaVisivel && (
@@ -162,6 +182,9 @@ export const ActionPesquisaDespesaLoja = ({ usuarioLogado }) => {
           usuarioLogado={usuarioLogado}
           optionsModulos={optionsModulos}
           handleClick={handleClick}
+          selectedItems={selectedItems}
+          setSelectedItems={setSelectedItems}
+          setBtnVisivel={setBtnVisivel}
         />
 
       )}

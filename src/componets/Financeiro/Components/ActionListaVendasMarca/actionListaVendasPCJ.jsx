@@ -63,19 +63,6 @@ export const ActionListaVendasPCJ = ({ dadosVendasPCJ }) => {
     );
   };
 
-  const calcularTotalPCJ18 = () => {
-    return dadosVendasPCJ.reduce((total, vendas) => total + toFloat(vendas.vendapcj[0]['venda-pcj'].TOTALPCJ18), 0);
-  };
-
-  const calcularTotalPCJ78 = () => {
-    return dadosVendasPCJ.reduce((total, vendas) => total + toFloat(vendas.vendapcj[0]['venda-pcj'].TOTALPCJ78), 0);
-  };
-
-  const calcularTotalPCJ = () => {
-    const totalPCJ18 = calcularTotalPCJ18();
-    const totalPCJ78 = calcularTotalPCJ78();
-    return totalPCJ18 ? (totalPCJ78 / totalPCJ18) * 100 : 0;
-  };
 
   const dados = dadosVendasPCJ.map((item) => {
     const pcjTotal = calcularPCJ(item);
@@ -90,10 +77,32 @@ export const ActionListaVendasPCJ = ({ dadosVendasPCJ }) => {
       TOTALPCJ18: toFloat(item.vendapcj[0]['venda-pcj'].TOTALPCJ18),
       TOTALPCJ78: toFloat(item.vendapcj[0]['venda-pcj'].TOTALPCJ78),
       pcjTotal: toFloat(pcjTotal),
-      // STFECHADO: item.caixa.STFECHADO,
-      // VRRECDINHEIRO: formatMoeda(item.caixa.VRRECDINHEIRO),
+    
     };
   });
+
+  const calcularTotal = (field) => {
+    return dados.reduce((total, item) => total + toFloat(item[field]), 0);
+  };
+
+  const calcularTotalPCJ18 = () => {
+    const total = calcularTotal('TOTALPCJ18');  
+    return total;
+  }
+
+  const calcularTotalPCJ78 = () => {
+    const total = calcularTotal('TOTALPCJ78');
+    return total;
+  }
+
+  
+  const calcularTotalPCJ = () => {
+    const vrPCJ18 = calcularTotalPCJ18('TOTALPCJ18');
+    const vrPCJ78 = calcularTotalPCJ78('TOTALPCJ78');
+    const total = (vrPCJ78 / vrPCJ18) * 100;
+
+    return parseFloat(total.toFixed(2));
+  }
 
   const renderPcjTotal = (rowData) => {
     const pcjValue = toFloat(rowData.pcjTotal);

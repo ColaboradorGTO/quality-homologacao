@@ -75,7 +75,7 @@ export const ActionPesquisaDepositosLoja = () => {
   };
 
   const { data: dadosListaDepositosLoja = [], error: errorListaDepositosLoja, isLoading: isLoadingListaDepositosLoja, refetch: refetchListaDepositosLoja } = useQuery(
-    ['depositoLoja'],
+    ['deposito-loja'],
     () => fetchListaDepositosLoja(),
     { enabled: false, staleTime: 60 * 60 * 1000 }
   );
@@ -93,8 +93,14 @@ export const ActionPesquisaDepositosLoja = () => {
   const handleClick = () => {
     refetchListaDepositosLoja();
     setTabelaVisivel(true)
-
   }
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
 
   return (
     <Fragment>
@@ -109,11 +115,13 @@ export const ActionPesquisaDepositosLoja = () => {
         labelInputFieldDTInicio={"Data Início"}
         valueInputFieldDTInicio={dataPesquisaInicio}
         onChangeInputFieldDTInicio={(e) => setDataPesquisaInicio(e.target.value)}
+        onKeyDownInputFieldDTInicio={handleKeyPress}
 
         InputFieldDTFimComponent={InputField}
         labelInputFieldDTFim={"Data Fim"}
         valueInputFieldDTFim={dataPesquisaFim}
         onChangeInputFieldDTFim={(e) => setDataPesquisaFim(e.target.value)}
+        onKeyDownInputFieldDTFim={handleKeyPress}
 
         InputSelectEmpresaComponent={InputSelectAction}
         labelSelectEmpresa={"Empresa"}

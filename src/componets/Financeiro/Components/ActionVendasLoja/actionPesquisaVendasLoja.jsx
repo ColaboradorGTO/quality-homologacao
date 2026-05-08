@@ -89,6 +89,13 @@ export const ActionPesquisaVendasLoja = () => {
     setTabelaVisivel(true);
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
+
   return (
     <Fragment>
       <ActionMain
@@ -96,14 +103,18 @@ export const ActionPesquisaVendasLoja = () => {
         linkComponent={["Lista de Vendas"]}
         title="Vendas por Lojas e Período"
         subTitle={empresaSelecionadaNome}
+
         InputFieldDTInicioComponent={InputField}
         labelInputFieldDTInicio={"Data Início"}
         valueInputFieldDTInicio={dataPesquisaInicio}
         onChangeInputFieldDTInicio={(e) => setDataPesquisaInicio(e.target.value)}
+        onKeyDownInputFieldDTInicio={handleKeyPress}
+
         InputFieldDTFimComponent={InputField}
         labelInputFieldDTFim={"Data Fim"}
         valueInputFieldDTFim={dataPesquisaFim}
         onChangeInputFieldDTFim={(e) => setDataPesquisaFim(e.target.value)}
+        onKeyDownInputFieldDTFim={handleKeyPress}
 
         InputSelectEmpresaComponent={InputSelectAction}
         optionsEmpresas={[

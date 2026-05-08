@@ -28,15 +28,15 @@ export const useEditarDespesa = (usuarioLogado,  optionsModulos, handleClick) =>
     return usuarioIP;
   };
 
-  const onSubmit = async (row, status) => {
+  const handleAtivar = async (row, status) => {
     if (optionsModulos[0]?.ALTERAR !== 'True') {
       Swal.fire({
         position: 'center',
         icon: 'error',
         title: 'Acesso Negado!',
-        text: 'Você não tem permissão para alterar esta despesa.',
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para alterar esta despesa.`,
         showConfirmButton: false,
-        timer: 1500,
+        timer: 5000,
         customClass: {
           container: 'custom-swal',
         }
@@ -47,26 +47,26 @@ export const useEditarDespesa = (usuarioLogado,  optionsModulos, handleClick) =>
 
     const postData = {
       IDDESPESASLOJA: row.IDDESPESASLOJA,
-      STCANCELADO: status ? 'True' : 'False'
+      STCANCELADO: 'False'
     };
 
     try {
       await put('/editar-status-despesa/:id', postData);
       
       const textDados = JSON.stringify(postData);
-      const textoFuncao = 'FINANCEIRO/ATUALIZAÇÃO DE ESTATUS DA DESPESA';
+      const textoFuncao = 'FINANCEIRO/ATIVAR DESPESA';
       const ipUsuario = await getIPUsuario();
       const createData = {
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario || 'IP não disponível'
+        IP: ipUsuario || 'Indisponível'
       };
       
       await post('/log-web', createData);
       Swal.fire({
         title: 'Sucesso',
-        text: 'Despesa alterada com Sucesso',
+        text: 'Despesa ativada com Sucesso',
         icon: 'success',
         timer: 3000,
         customClass: {
@@ -76,20 +76,20 @@ export const useEditarDespesa = (usuarioLogado,  optionsModulos, handleClick) =>
       handleClick();
     } catch (error) {
       const textDados = JSON.stringify(postData);
-      const textoFuncao = 'FINANCEIRO/ERRO AO ATUALIZAR ESTATUS DA DESPESA';
+      const textoFuncao = 'FINANCEIRO/ERRO AO ATIVAR DESPESA';
       const ipUsuario = await getIPUsuario();
       const createData = {
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario || 'IP não disponível'
+        IP: ipUsuario || 'Indisponível'
       };
 
       await post('/log-web', createData);
 
       Swal.fire({
         title: 'Erro',
-        text: 'Erro ao Tentar Editar Despesa',
+        text: 'Erro ao Tentar Ativar Despesa',
         icon: 'error',
         timer: 3000,
         customClass: {
@@ -99,5 +99,76 @@ export const useEditarDespesa = (usuarioLogado,  optionsModulos, handleClick) =>
     }
   };
 
-  return { onSubmit };
+  const handleCancelar = async (row, status) => {
+    if (optionsModulos[0]?.ALTERAR !== 'True') {
+      Swal.fire({
+        position: 'center',
+        icon: 'error',
+        title: 'Acesso Negado!',
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para alterar esta despesa.`,
+        showConfirmButton: false,
+        timer: 5000,
+        customClass: {
+          container: 'custom-swal',
+        }
+      });
+      return;
+    }
+    
+
+    const postData = {
+      IDDESPESASLOJA: row.IDDESPESASLOJA,
+      STCANCELADO: 'True'
+    };
+
+    try {
+      await put('/editar-status-despesa/:id', postData);
+      
+      const textDados = JSON.stringify(postData);
+      const textoFuncao = 'FINANCEIRO/CANCELAR DESPESA';
+      const ipUsuario = await getIPUsuario();
+      const createData = {
+        IDFUNCIONARIO: String(usuarioLogado.id),
+        PATHFUNCAO: textoFuncao,
+        DADOS: textDados,
+        IP: ipUsuario || 'Indisponível'
+      };
+      
+      await post('/log-web', createData);
+      Swal.fire({
+        title: 'Sucesso',
+        text: 'Despesa cancelada com Sucesso',
+        icon: 'success',
+        timer: 3000,
+        customClass: {
+          container: 'custom-swal',
+        }
+      });
+      handleClick();
+    } catch (error) {
+      const textDados = JSON.stringify(postData);
+      const textoFuncao = 'FINANCEIRO/ERRO AO CANCELAR DESPESA';
+      const ipUsuario = await getIPUsuario();
+      const createData = {
+        IDFUNCIONARIO: String(usuarioLogado.id),
+        PATHFUNCAO: textoFuncao,
+        DADOS: textDados,
+        IP: ipUsuario || 'Indisponível'
+      };
+
+      await post('/log-web', createData);
+
+      Swal.fire({
+        title: 'Erro',
+        text: 'Erro ao Tentar Cancelar Despesa',
+        icon: 'error',
+        timer: 3000,
+        customClass: {
+          container: 'custom-swal',
+        }
+      });
+    }
+  };
+
+  return { handleAtivar, handleCancelar };
 };

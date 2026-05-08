@@ -1,4 +1,4 @@
-import { Fragment, useRef, useState } from "react"
+import { Fragment, useEffect, useRef, useState } from "react"
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { AiOutlineDelete } from "react-icons/ai"
@@ -16,14 +16,44 @@ import HeaderTable from "../../../Tables/headerTable";
 import Swal from "sweetalert2";
 import { FaCheck } from "react-icons/fa";
 import { useEditarDespesa } from "./hooks/useEditarDespesa";
+import { BsCloudUpload, BsEye, BsTrash3 } from "react-icons/bs";
+import { Checkbox } from "primereact/checkbox";
+import { useMigrarDespesaSAP } from "./hooks/useMigrarDespesaSAP";
 
-export const ActionListaDespesaLoja = ({ dadosDespesasLoja, usuarioLogado, optionsModulos, handleClick }) => {
-  const { onSubmit } = useEditarDespesa(usuarioLogado, optionsModulos, handleClick);
+export const ActionListaDespesaLoja = ({
+  dadosDespesasLoja,
+  usuarioLogado,
+  optionsModulos,
+  handleClick,
+  selectedItems,
+  setSelectedItems,
+  setBtnVisivel
+}) => {
+  const { handleAtivar, handleCancelar } = useEditarDespesa(usuarioLogado, optionsModulos, handleClick);
+  const { handleMigrarDespesa } = useMigrarDespesaSAP({optionsModulos, usuarioLogado, selectedItems, handleClick});
   const [modalDespesasVisivel, setModalDespesasVisivel] = useState(false);
   const [dadosDespesasLojaDetalhe, setDadosDespesasLojaDetalhe] = useState([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowSelection, setRowSelection] = useState(null);
+  const [selectAllChecked, setSelectAllChecked] = useState(false);
+  const [first, setFirst] = useState(0);
+  const [rows, setRows] = useState(10);
   const dataTableRef = useRef();
+  const arraySituacao = [
+    { color: 'info', txt: 'Pronto para Integrar SAP' },
+    { color: 'primary', txt: 'Em Fila' },
+    { color: 'success', txt: 'Integrado' },
+    { color: 'danger', txt: 'Erro ao Tentar Integrar' },
+    { color: 'danger', txt: 'Cancelada' }
+  ];
+
+  const arrayMsgStatusIntegracao = [
+    'Despesa Pronta Para Integrar',
+    'Integração Em Andamento, Aguarde...',
+    'Despesa Integrada Com Sucesso!',
+    'Erro ao Tentar Integrar',
+    'Cancelada'
+  ];
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -80,6 +110,14 @@ export const ActionListaDespesaLoja = ({ dadosDespesasLoja, usuarioLogado, optio
 
   const dados = Array.isArray(dadosDespesasLoja) ? dadosDespesasLoja.map((item, index) => {
     let contador = index + 1;
+    const stDespesaLoja = item.STCANCELADO === 'False';
+    const stMigrado = Number(item.DOCENTRY_SAP_CONTAS_A_PAGAR || 0) > 0;
+    const stAguardandoEmFila = item.STATUS_BLOQUEIO_ATUALIZACAO === 'True';
+    const logErrorIntegracao = item.ERROR_LOG_SAP || '';
+    const indexSituacao = !stDespesaLoja ? 4 : logErrorIntegracao.length ? 3 : stMigrado ? 2 : stAguardandoEmFila ? 1 : 0;
+
+    const msgTitleIntegracao = logErrorIntegracao.length ? 'MOTIVO:' : arraySituacao[indexSituacao].txt;
+    const msgTextIntegracao = (logErrorIntegracao || arrayMsgStatusIntegracao[indexSituacao]).replaceAll("'", "");
 
     return {
       contador,
@@ -88,16 +126,99 @@ export const ActionListaDespesaLoja = ({ dadosDespesasLoja, usuarioLogado, optio
       IDDESPESASLOJA: item.IDDESPESASLOJA,
       DSCATEGORIA: item.DSCATEGORIA,
       VRDESPESA: item.VRDESPESA,
-      DSPAGOA: item.DSPAGOA,
+      DSPAGOA: item.IDCATEGORIARECEITADESPESA == 248 ? item.NOFUNCVALE : item.DSPAGOA,
       DSHISTORIO: item.DSHISTORIO,
       TPNOTA: item.TPNOTA,
       NUNOTAFISCAL: item.NUNOTAFISCAL,
       STCANCELADO: item.STCANCELADO,
-
       IDCATEGORIARECDESP: item.IDCATEGORIARECEITADESPESA,
-
+      stDespesaLoja,
+      stMigrado,
+      stAguardandoEmFila,
+      logErrorIntegracao,
+      indexSituacao,
+      colorSituacao: arraySituacao[indexSituacao].color,
+      txtSituacao: arraySituacao[indexSituacao].txt,
+      msgTitleIntegracao,
+      msgTextIntegracao,
     }
   }) : [];
+
+  useEffect(() => {
+    const itensSelecionaveis = dados.filter(item =>
+      item.stDespesaLoja && !item.stAguardandoEmFila && !item.stMigrado && item.IDDESPESASLOJA
+    );
+
+    setBtnVisivel(selectedItems.length > 0);
+
+    const dadosPaginaAtual = dados.slice(first, first + rows);
+    const itensSelecionaveisPaginaAtual = dadosPaginaAtual.filter(item =>
+      item.stDespesaLoja && !item.stAguardandoEmFila && !item.stMigrado && item.IDDESPESASLOJA
+    );
+
+    if (selectedItems.length === 0) {
+      setSelectAllChecked(false);
+    } else if (
+      selectedItems.length === itensSelecionaveis.length ||
+      (selectedItems.length === itensSelecionaveisPaginaAtual.length &&
+        itensSelecionaveisPaginaAtual.length > 0 &&
+        itensSelecionaveisPaginaAtual.every(item =>
+          selectedItems.some(selected => selected.IDDESPESASLOJA === item.IDDESPESASLOJA)
+        ))
+    ) {
+      setSelectAllChecked(true);
+    } else {
+      setSelectAllChecked(false);
+    }
+
+  }, [selectedItems, dados, first, rows]);
+
+  const onSelectAllChange = (e) => {
+    if (e.checked) {
+      Swal.fire({
+        icon: 'question',
+        title: 'Selecione o modo de seleção',
+        text: 'Deseja selecionar todos da tabela ou somente o que está em tela?',
+        showConfirmButton: true,
+        showCancelButton: true,
+        showCloseButton: true,
+        confirmButtonText: 'Todos os registros',
+        cancelButtonText: 'Apenas o que está tela',
+        cancelButtonColor: '#2196F3',
+        allowOutsideClick: false,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const itensSelecionaveis = dados.filter(item =>
+            item.stDespesaLoja && !item.stAguardandoEmFila && !item.stMigrado && item.IDDESPESASLOJA
+          );
+          setBtnVisivel(true);
+          setSelectedItems([...itensSelecionaveis]);
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+          const dadosPaginaAtual = dados.slice(first, first + rows);
+
+          const itensSelecionaveisPaginaAtual = dadosPaginaAtual.filter(item =>
+            item.stDespesaLoja && !item.stAguardandoEmFila && !item.stMigrado && item.IDDESPESASLOJA
+          );
+          setBtnVisivel(true);
+          setSelectedItems([...itensSelecionaveisPaginaAtual]);
+        } else {
+          setBtnVisivel(false);
+          setSelectedItems([]);
+        }
+      });
+    } else {
+      setBtnVisivel(false);
+      setSelectedItems([]);
+    }
+  };
+
+  const calcularTotal = (field) => {
+    return dados.reduce((total, item) => total + parseFloat(item[field]), 0);
+  };
+
+  const calcularTotalDespesa = () => {
+    return calcularTotal('VRDESPESA');
+  }
 
   const colunasEmpresas = [
     {
@@ -105,6 +226,31 @@ export const ActionListaDespesaLoja = ({ dadosDespesasLoja, usuarioLogado, optio
       header: 'Nº',
       body: row => <th style={{ color: 'blue' }}>{row.contador}</th>,
       sortable: true,
+    },
+    {
+      field: 'Selecao',
+      header: 'Seleção',
+      body: (rowData) => {
+        if (rowData.stDespesaLoja && !rowData.stAguardandoEmFila && !rowData.stMigrado) {
+          return (
+            <Checkbox
+              checked={selectedItems.some(item => item.IDDESPESASLOJA === rowData.IDDESPESASLOJA)}
+              onChange={(e) => {
+                let _selectedItems = [...selectedItems];
+                if (e.checked) {
+                  _selectedItems.push(rowData);
+                } else {
+                  _selectedItems = _selectedItems.filter(item => item.IDDESPESASLOJA !== rowData.IDDESPESASLOJA);
+                }
+                setSelectedItems(_selectedItems);
+                setBtnVisivel(_selectedItems.length > 0);
+              }}
+            />
+          );
+        }
+        return null;
+      },
+      sortable: false,
     },
     {
       field: 'NOFANTASIA',
@@ -122,12 +268,14 @@ export const ActionListaDespesaLoja = ({ dadosDespesasLoja, usuarioLogado, optio
       field: 'DSCATEGORIA',
       header: 'Descrição',
       body: row => <th style={{ color: 'blue' }}> {row.DSCATEGORIA} </th>,
+      footer: () => <th style={{ fontSize: '1rem', fontWeight: 700 }}> Total </th>,
       sortable: true,
     },
     {
       field: 'VRDESPESA',
       header: 'Valor',
       body: row => <th style={{ color: 'blue' }}> {formatMoeda(row.VRDESPESA)} </th>,
+      footer: () => <th style={{ fontSize: '1rem', fontWeight: 700 }}> {formatMoeda(calcularTotalDespesa())} </th>,
       sortable: true,
     },
     {
@@ -155,89 +303,181 @@ export const ActionListaDespesaLoja = ({ dadosDespesasLoja, usuarioLogado, optio
       sortable: true,
     },
     {
-      field: 'STCANCELADO',
+      field: 'Situacao',
       header: 'Situação',
-      body: row => (
-        <div style={{ color: row.STCANCELADO == 'False' ? 'blue' : 'red' }}>
-          {row.STCANCELADO == 'False' ? 'Ativo' : 'Cancelado'}
-        </div>
-      ),
+      body: row => {
+        return (
+          <span style={{ color: getColorByClass(row.colorSituacao), fontWeight: 900 }}>
+            {row.txtSituacao}
+          </span>
+        );
+      },
       sortable: true,
     },
     {
-      field: 'STCANCELADO',
-      header: 'Opções',
-      width: '250px',
-      body: row => {
-        if (row.STCANCELADO == 'False') {
+      field: 'Opcoes',
+      header: 'Opção',
+      body: (rowData) => {
+        const msgStatus = rowData.msgTextIntegracao;
+        const txtSituacao = rowData.msgTitleIntegracao;
+
+        // Botão Visualizar Status - sempre aparece
+        const btnVisualizarStatus = (
+          <div className="p-1">
+
+            <ButtonTable
+              key="status"
+              titleButton="Visualizar Status de Integração do Adiantamento Salarial"
+              // className={"btn-sm"}
+              textButton={"Status"}
+              textFontSize="11px"
+              cor="primary"
+              Icon={BsEye}
+              iconSize={15}
+              onClickButton={() => handleVisualizarStatus(txtSituacao, msgStatus)}
+              width="50px"
+              height="40px"
+            />
+          </div>
+        );
+
+        if (!rowData.stDespesaLoja) {
+          if (rowData.stMigrado) {
+            return null;
+          }
+
           return (
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-around",
-                alignItems: "center",
-                width: '100px'
-
-              }}
-            >
-              <div>
-
+            <div className="d-flex justify-content-start P-1">
+              <div className="p-1">
                 <ButtonTable
-                  titleButton={"Editar Despesa"}
-                  onClickButton={() => handleClickEditar(row)}
-                  Icon={CiEdit}
-                  iconColor={"#fff"}
-                  cor={"primary"}
-                  iconSize={25}
-                  width="30px"
-                  height="30px"
-                />
-
-              </div>
-              <div>
-
-                <ButtonTable
-                  titleButton={"Cancelar Despesa"}
-                  onClickButton={() => onSubmit(row, true)}
-                  Icon={AiOutlineDelete}
-                  iconColor={"#fff"}
-                  cor={"danger"}
-                  iconSize={25}
-                  width="30px"
-                  height="30px"
+                  key="ativar"
+                  titleButton="Ativar Despesa"
+                  textButton={"Ativar"}
+                  cor="success"
+                  Icon={FaCheck}
+                  onClickButton={() => handleClickAtivar(rowData)}
+                  width="50px"
+                  height="40px"
                 />
               </div>
             </div>
-          )
-
-        } else {
-          return (
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-around",
-                alignItems: "center",
-
-              }}
-            >
-              <ButtonTable
-                titleButton={"Ativar Despesa"}
-                onClickButton={() => onSubmit(row, false)}
-                Icon={FaCheck}
-                iconSize={25}
-                width="30px"
-                height="30px"
-                iconColor={"#fff"}
-                cor={"success"}
-              />
-
-
-            </div>
-          )
+          );
         }
-      }
+
+        if (rowData.stMigrado) {
+          return null;
+        }
+
+        if (rowData.stAguardandoEmFila) {
+          return (
+            <div className="d-flex justify-content-start P-1">
+              {btnVisualizarStatus}
+            </div>
+          );
+        }
+
+        // Caso contrário, mostra todos os botões
+        const btnIntegrar = (
+          <div className="p-1">
+
+            <ButtonTable
+              key="integrar"
+              titleButton="Integrar Adiantamento Salarial no SAP"
+              textButton={"Integrar"}
+              cor="info"
+              Icon={BsCloudUpload}
+              onClickButton={() => {
+                setSelectedItems([rowData]);
+                handleMigrarDespesa(rowData)
+              }}
+              width="50px"
+              height="40px"
+            />
+          </div>
+        );
+
+        const btnCancelar = (
+          <div className="p-1">
+
+            <ButtonTable
+              key="cancelar"
+              titleButton="Cancelar Despesa"
+              textButton={"Cancelar"}
+              cor="danger"
+              Icon={BsTrash3}
+              onClickButton={() => handleClickCancelar(rowData)}
+              width="50px"
+              height="40px"
+            />
+          </div>
+
+        );
+
+        const btnEditar = (
+          <div className="p-1">
+
+            <ButtonTable
+              titleButton={"Editar Despesa"}
+              textButton={"Editar"}
+              onClickButton={() => handleClickEditar(rowData)}
+              Icon={CiEdit}
+              iconColor={"#fff"}
+              cor={"warning"}
+              iconSize={25}
+              width="50px"
+              height="40px"
+            />
+
+          </div>
+        )
+        return (
+          <div className="d-flex justify-content-start P-1">
+            {btnVisualizarStatus}
+            {btnIntegrar}
+            {btnEditar}
+            {btnCancelar}
+          </div>
+        );
+      },
+      sortable: false,
     }
   ]
+
+  const getColorByClass = (colorClass) => {
+    const colors = {
+      info: '#17a2b8',
+      primary: '#007bff',
+      success: '#28a745',
+      danger: '#dc3545'
+    };
+    return colors[colorClass] || '#000';
+  };
+
+  const handleVisualizarStatus = (title, text) => {
+    Swal.fire({
+      position: 'center',
+      icon: title === 'Integrado' ? 'success' : title === 'Pronto para Integrar SAP' ? 'info' : 'warning',
+      title,
+      html: text,
+      showConfirmButton: true,
+      customClass: {
+        container: 'custom-swal',
+      }
+    });
+  };
+
+  const confirmar = (row) => {
+    Swal.fire({
+      position: 'center',
+      icon: 'info',
+      title: 'Integração',
+      text: `Integrar despesa ${row.IDDESPESASLOJA} no SAP`,
+      showConfirmButton: true,
+      customClass: {
+        container: 'custom-swal',
+      }
+    });
+  };
 
   const handleEditar = async (IDDESPESASLOJA) => {
     try {
@@ -286,6 +526,18 @@ export const ActionListaDespesaLoja = ({ dadosDespesasLoja, usuarioLogado, optio
     }
   };
 
+  const handleClickAtivar = (row) => {
+    if (row?.IDDESPESASLOJA) {
+      handleAtivar(row);
+    }
+  };
+
+  const handleClickCancelar = (row) => {
+    if (row?.IDDESPESASLOJA) {
+      handleCancelar(row);
+    }
+  };
+
   return (
 
     <Fragment>
@@ -304,6 +556,18 @@ export const ActionListaDespesaLoja = ({ dadosDespesasLoja, usuarioLogado, optio
           />
         </div>
 
+        <div style={{ width: "100%", display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+          <div className="custom-control custom-checkbox">
+            <Checkbox
+              checked={selectAllChecked}
+              onChange={onSelectAllChange}
+            />
+            <span style={{ marginLeft: '8px' }}>
+              {selectAllChecked ? "Desmarcar Todos" : "Marcar Todos"}
+            </span>
+          </div>
+      </div>
+
         <div className="card" ref={dataTableRef}>
 
           <DataTable
@@ -316,7 +580,12 @@ export const ActionListaDespesaLoja = ({ dadosDespesasLoja, usuarioLogado, optio
             onSelectionChange={(e) => setRowSelection(e.value)}
             sortOrder={-1}
             paginator={true}
-            rows={10}
+            first={first}
+            rows={rows}
+            onPage={(event) => {
+              setFirst(event.first);
+              setRows(event.rows);
+            }}
             rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"

@@ -150,6 +150,7 @@ export const ActionListaVendasMarca = ({dadosListaVendasMarca}) => {
     const valorDespesaTotal = calcularTotalValorDespesaTotal(item);
     const valorTotalVendido = calcularValorTotalVendido(item);
     const valorDisponivelBruto = calcularValorDisponivelBruto(item);
+    const valorTotalDisponivelBruto = calcularValorDisponivelBruto(item) - valorDespesaTotal;
     const valorQuebraCaixa = calcularValorQuebraCaixa(item);
     const valorFaturaTotal = calcularValorFaturaTotal(item);
     const valorTotalQuebraMarca = valorDisponivelBruto - valorDespesaTotal;
@@ -204,6 +205,7 @@ export const ActionListaVendasMarca = ({dadosListaVendasMarca}) => {
       percentualPosVenda: percentualPosVenda,
       percentualPixVenda: percentualPixVenda,
       percentualVoucherVenda: percentualVoucherVenda,
+      valorTotalDisponivelBruto:valorTotalDisponivelBruto,
 
       valorDisponivelBrutoTiketM: valorDisponivelBrutoTiketM,
       valorDisponivelBrutoVoucherTiketM: valorDisponivelBrutoVoucherTiketM,
@@ -231,12 +233,12 @@ export const ActionListaVendasMarca = ({dadosListaVendasMarca}) => {
   }
 
   const calcularTotalDespesa = () => {
-    const total = calcularTotal('VRDESPESA');
+    const total = calcularTotal('valorDespesaTotal');
     return total;
   }
 
   const calcularTotalDisponivelBruto = () => {
-    const total = calcularTotal('valorDisponivelBruto'); 
+    const total = calcularTotal('valorTotalDisponivelBruto'); 
     return total;
   }
 

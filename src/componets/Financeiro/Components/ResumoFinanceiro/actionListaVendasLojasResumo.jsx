@@ -12,6 +12,7 @@ import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../../Tables/headerTable";
 import { ActionFechamentoLojaModal } from "../actionFechamentoLojaModal";
+import Swal from "sweetalert2";
 
 
 export const ActionListaVendasLojasResumo = ({ dadosTotalVendasEmpresa, dataPesquisa }) => {
@@ -299,6 +300,13 @@ export const ActionListaVendasLojasResumo = ({ dadosTotalVendasEmpresa, dataPesq
       if (response.data && response.data.length > 0) {
         setDadosDetalheFechamento(response.data);
         setModalVisivel(true);
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Nenhum detalhe encontrado',
+          text: 'Não foram encontrados detalhes para o fechamento selecionado.',
+        })
+        return;
       }
     } catch (error) {
       console.error('Erro ao buscar detalhes da venda: ', error);
@@ -317,7 +325,7 @@ export const ActionListaVendasLojasResumo = ({ dadosTotalVendasEmpresa, dataPesq
       <div className="panel">
         <div className="panel-hdr mb-4">
 
-          <h3>Lista de Vendas Por Loja</h3>
+          <h>Lista de Vendas Por Loja</h>
         </div>
         <div style={{ marginBottom: "1rem" }}>
           <HeaderTable
