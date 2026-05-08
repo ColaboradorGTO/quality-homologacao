@@ -14,6 +14,7 @@ import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../ut
 import Swal from "sweetalert2"
 import { CiEdit } from "react-icons/ci"
 import { ActionImprimirEtiquetaModal } from "./actionImprimirEtiquetaModal"
+import { ActionEtiquetaOculosModal } from "./ActionEtiquetaOculos/actionEtiquetaOculosModal"
 
 export const ActionPesquisaProdutoEtiqueta = ({ usuarioLogado }) => {
   const [descricaoProduto, setDescricaoProduto] = useState('')
@@ -290,7 +291,7 @@ export const ActionPesquisaProdutoEtiqueta = ({ usuarioLogado }) => {
      
         ButtonTypeVendasVendedor={ButtonType}
         linkNomeVendasVendedor={"Imprimir Etiqueta Oculos"}
-        onButtonClickVendasVendedor
+        onButtonClickVendasVendedor={handleImprimirEtiqueta}
         corVendasVendedor={"warning"}
         iconVendasVendedor={MdOutlineLocalPrintshop}
         styleVendedor={{ display: btnVisivel || dadosAcumuladorEtiquetas.length > 0 ? 'block' : 'none' }}
@@ -313,7 +314,15 @@ export const ActionPesquisaProdutoEtiqueta = ({ usuarioLogado }) => {
         setSelectedIds={setSelectedIds}
       />
 
-      <ActionImprimirEtiquetaModal
+      {/* <ActionImprimirEtiquetaModal
+        show={modalImprimirEtiqueta}
+        handleClose={() => setModalImprimirEtiqueta(false)}
+        dadosAcumuladorEtiquetas={dadosAcumuladorEtiquetas}
+        produtosSelecionados={produtosSelecionados}
+        copia={copia}
+      /> */}
+
+      <ActionEtiquetaOculosModal 
         show={modalImprimirEtiqueta}
         handleClose={() => setModalImprimirEtiqueta(false)}
         dadosAcumuladorEtiquetas={dadosAcumuladorEtiquetas}
