@@ -18,7 +18,7 @@ export const ActionPesquisaAdiantamentoSalarioLoja = ({usuarioLogado, ID }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
   const [dataPesquisaFim, setDataPesquisaFim] = useState('');
-  const [empresaSelecionada, setEmpresaSelecionada] = useState('0');
+  const [empresaSelecionada, setEmpresaSelecionada] = useState('');
   const [empresaSelecionadaNome, setEmpresaSelecionadaNome] = useState('');
   const [marcaSelecionada, setMarcaSelecionada] = useState('');
   const [ufSelecionado, setUfSelecionado] = useState('0')
@@ -73,7 +73,7 @@ export const ActionPesquisaAdiantamentoSalarioLoja = ({usuarioLogado, ID }) => {
   );
   
 
-  const fetchListaVendasPCJ = async () => {
+  const fetchListaAdiantamento = async () => {
     const urlBase = `/adiantamento-loja?idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idMarca=${marcaSelecionada}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
@@ -108,7 +108,7 @@ export const ActionPesquisaAdiantamentoSalarioLoja = ({usuarioLogado, ID }) => {
 
   const { data: dadosAdiantamentoFuncionarios = [], error: errorAdiantamento, isLoading: isLoadingAdiantamento, refetch } = useQuery(
     ['adiantamento-loja'],
-    () => fetchListaVendasPCJ(),
+    () => fetchListaAdiantamento(),
     { enabled: false, staleTime: 60 * 60 * 1000,}
   )
 
@@ -127,21 +127,13 @@ export const ActionPesquisaAdiantamentoSalarioLoja = ({usuarioLogado, ID }) => {
     setTabelaVisivel(true)
   }
 
-  // const optionsUF = [
-  //   {
-  //     value: "0",
-  //     label: 'Todos'
-  //   },
-  //   {
-  //     value: "DF",
-  //     label: 'DF'
-  //   },
-  //   {
-  //     value: "GO",
-  //     label: 'GO'
-  //   },
-  // ]
-
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
+  
   const {
     integrarTodos
   } = useIntegrarTodosAdiantamento({
@@ -150,6 +142,7 @@ export const ActionPesquisaAdiantamentoSalarioLoja = ({usuarioLogado, ID }) => {
     handleClick,
     selectedItems,
   })
+
   const integrarTodasSelecionadas = () => {
     
     if (selectedItems.length === 0) {
@@ -196,11 +189,13 @@ export const ActionPesquisaAdiantamentoSalarioLoja = ({usuarioLogado, ID }) => {
         valueInputFieldDTInicio={dataPesquisaInicio}
         labelInputFieldDTInicio={"Data Início"}
         onChangeInputFieldDTInicio={(e) => setDataPesquisaInicio(e.target.value)}
+        onKeyDownInputFieldDTInicio={handleKeyPress}
         
         InputFieldDTFimComponent={InputField}
         labelInputFieldDTFim={"Data Fim"}
         valueInputFieldDTFim={dataPesquisaFim}
         onChangeInputFieldDTFim={(e) => setDataPesquisaFim(e.target.value)}
+        onKeyDownInputFieldDTFim={handleKeyPress}
 
         InputSelectEmpresaComponent={InputSelectAction}
         onChangeSelectEmpresa={handleChangeEmpresa}

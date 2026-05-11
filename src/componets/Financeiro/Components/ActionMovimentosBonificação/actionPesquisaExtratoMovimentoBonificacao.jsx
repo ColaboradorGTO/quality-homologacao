@@ -116,6 +116,7 @@ export const ActionPesquisaExtratoMovimentoBonificacao = ({ usuarioLogado }) => 
     refetchDadosExtratoBoniFicacao()
   }
 
+  
   const handleChangeFuncionario = (e) => {
     setFuncionarioSelecionado(e.value);
     setFuncionario(e);
@@ -142,7 +143,7 @@ export const ActionPesquisaExtratoMovimentoBonificacao = ({ usuarioLogado }) => 
     <Fragment>
       <ActionMain
         linkComponentAnterior={["Home"]}
-        linkComponent={["Extrato de Contas Correntes das Lojas"]}
+        linkComponent={["Extrato de Bonificações"]}
         title="Extrato de Bonificações Funcionários"
 
         InputSelectEmpresaComponent={InputSelectAction}

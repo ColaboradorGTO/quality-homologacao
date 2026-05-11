@@ -243,6 +243,13 @@ export const ActionPesquisaQuebraCaixaIntegracao = ({usuarioLogado }) => {
     }
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
+
   const optionsQuebraDeCaixa = [
     {
       id: 0,
@@ -327,11 +334,13 @@ export const ActionPesquisaQuebraCaixaIntegracao = ({usuarioLogado }) => {
         valueInputFieldDTInicio={dataPesquisaInicio}
         labelInputFieldDTInicio={"Data Início"}
         onChangeInputFieldDTInicio={(e) => setDataPesquisaInicio(e.target.value)}
+        onKeyDownInputFieldDTInicio={handleKeyPress}
 
         InputFieldDTFimComponent={InputField}
         labelInputFieldDTFim={"Data Fim"}
         valueInputFieldDTFim={dataPesquisaFim}
         onChangeInputFieldDTFim={(e) => setDataPesquisaFim(e.target.value)}
+        onKeyDownInputFieldDTFim={handleKeyPress}
 
         InputFieldComponent={InputField}
         labelInputField={"CPF Operador"}

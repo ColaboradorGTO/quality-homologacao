@@ -28,7 +28,7 @@ export const useMigrarTodasDespesasSAP = ({optionsModulos, usuarioLogado, select
         return usuarioIP;
     };
 
-    
+
     const handleMigrarDespesa = async (data) => {
         if (optionsModulos[0]?.CRIAR !== 'True') {
             Swal.fire({

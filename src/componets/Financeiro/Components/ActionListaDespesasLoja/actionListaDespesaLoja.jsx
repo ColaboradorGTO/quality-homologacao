@@ -212,12 +212,18 @@ export const ActionListaDespesaLoja = ({
     }
   };
 
-  const calcularTotal = (field) => {
-    return dados.reduce((total, item) => total + parseFloat(item[field]), 0);
+  const calcularTotal = (field, condition = null) => {
+    return dados.reduce((total, item) => {
+      if (condition && !condition(item)) {
+        return total;
+      }
+
+      return total + parseFloat(item[field] || 0);
+    }, 0);
   };
 
   const calcularTotalDespesa = () => {
-    return calcularTotal('VRDESPESA');
+    return calcularTotal('VRDESPESA', item => item.stDespesaLoja);
   }
 
   const colunasEmpresas = [

@@ -482,7 +482,7 @@ export const ActionListaQuebraCaixaIntegracao = ({
 
       <div className="panel">
         <div className="panel-hdr">
-          <h4>Lista de Quebras de Caixa</h4>
+          <h2>Lista de Quebras de Caixa</h2>
         </div>
         <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
           <HeaderTable

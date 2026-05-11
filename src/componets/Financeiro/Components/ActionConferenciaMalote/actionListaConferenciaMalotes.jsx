@@ -143,6 +143,51 @@ export const ActionListaConferenciaMalotes = ({ dadosMalotes, handleClick, optio
   });
 
 
+  const calcularTotalDinheiro = () => {
+    return dados.reduce((total, dados) => total + toFloat(dados.VALORTOTALDINHEIRO), 0);
+  }
+
+  const calcularTotalCartao = () => {
+    return dados.reduce((total, dados) => total + toFloat(dados.VALORTOTALCARTAO), 0);
+  }
+
+  const calcularTotalPos = () => {
+    return dados.reduce((total, dados) => total + toFloat(dados.VALORTOTALPOS), 0);
+  }
+
+  const calcularTotalPix = () => {
+    return dados.reduce((total, dados) => total + toFloat(dados.VALORTOTALPIX), 0);
+  }
+
+  const calcularTotalConvenio = () => {
+    return dados.reduce((total, dados) => total + toFloat(dados.VALORTOTALCONVENIO), 0);
+  }
+  
+  const calcularTotalVoucher = () => {
+    return dados.reduce((total, dados) => total + toFloat(dados.VALORTOTALVOUCHER), 0);
+  }
+
+  const calcularTotalFatura = () => {
+    return dados.reduce((total, dados) => total + toFloat(dados.VALORTOTALFATURA), 0);
+  }
+  
+  const calcularTotalFaturaPix = () => {
+    return dados.reduce((total, dados) => total + toFloat(dados.VALORTOTALFATURAPIX), 0);
+  }
+
+  const calcularTotalDespesa = () => {
+    return dados.reduce((total, dados) => total + toFloat(dados.vrTotalDespesa), 0);
+  }
+  
+  const calcularTotalRecebido = () => {
+    return dados.reduce((total, dados) => total + toFloat(dados.vrTotalVendido), 0);
+  }
+
+  const calcularTotalDisponivel = () => {
+    return dados.reduce((total, dados) => total + toFloat(dados.vrDisponivel), 0);
+  }
+
+
 
   const colunasMovimentoCixa = [
     {
@@ -161,6 +206,7 @@ export const ActionListaConferenciaMalotes = ({ dadosMalotes, handleClick, optio
       field: 'NOFANTASIA',
       header: 'Loja',
       body: row => <p style={{ width: '250px', margin: 0, fontWeight: 600 }}>{row.NOFANTASIA}</p>,
+      footer: 'Total',
       sortable: true,
     },
     {
@@ -171,30 +217,35 @@ export const ActionListaConferenciaMalotes = ({ dadosMalotes, handleClick, optio
           {formatMoeda(row.VALORTOTALDINHEIRO)}
         </th>
       ),
+      footer: formatMoeda(calcularTotalDinheiro()),
       sortable: true,
     },
     {
       field: 'VALORTOTALCARTAO',
       header: 'Cartão',
       body: row => <th>{formatMoeda(row.VALORTOTALCARTAO)}</th>,
+      footer: formatMoeda(calcularTotalCartao()),
       sortable: true,
     },
     {
       field: 'VALORTOTALPOS',
       header: 'POS',
       body: row => <th>{formatMoeda(row.VALORTOTALPOS)}</th>,
+      footer: formatMoeda(calcularTotalPos()),
       sortable: true,
     },
     {
       field: 'VALORTOTALPIX',
       header: 'PIX',
       body: row => <th>{formatMoeda(row.VALORTOTALPIX)}</th>,
+      footer: formatMoeda(calcularTotalPix()),
       sortable: true,
     },
     {
       field: 'VALORTOTALCONVENIO',
       header: 'Convênio',
       body: row => <th>{formatMoeda(row.VALORTOTALCONVENIO)}</th>,
+      footer: formatMoeda(calcularTotalConvenio()),
       sortable: true,
     },
     {
@@ -203,30 +254,35 @@ export const ActionListaConferenciaMalotes = ({ dadosMalotes, handleClick, optio
       body: row => (
         <th style={{ color: '#008000' }}> {formatMoeda(row.VALORTOTALVOUCHER)} </th>
       ),
+      footer: formatMoeda(calcularTotalVoucher()),
       sortable: true,
     },
     {
       field: 'VALORTOTALFATURA',
       header: 'Fatura',
       body: row => <th>{formatMoeda(row.VALORTOTALFATURA)}</th>,
+      footer: formatMoeda(calcularTotalFatura()),
       sortable: true,
     },
     {
       field: 'VALORTOTALFATURAPIX',
       header: 'Fatura PIX',
       body: row => <th>{formatMoeda(row.VALORTOTALFATURAPIX)}</th>,
+      footer: formatMoeda(calcularTotalFaturaPix()),
       sortable: true,
     },
     {
       field: 'vrTotalDespesa',
       header: 'Despesa',
       body: row => <th>{formatMoeda(row.vrTotalDespesa)}</th>,
+      footer: formatMoeda(calcularTotalDespesa()),
       sortable: true,
     },
     {
       field: 'vrTotalVendido',
       header: 'Total Recebido',
       body: row => <th>{formatMoeda(row.vrTotalVendido)}</th>,
+      footer: formatMoeda(calcularTotalRecebido()),
       sortable: true,
     },
     {
@@ -237,6 +293,7 @@ export const ActionListaConferenciaMalotes = ({ dadosMalotes, handleClick, optio
           {formatMoeda(row.vrDisponivel)}
         </th>
       ),
+      footer: formatMoeda(calcularTotalDisponivel()),
       sortable: true,
     },
     {

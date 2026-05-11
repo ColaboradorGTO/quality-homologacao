@@ -15,7 +15,6 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
-
 export const ActionListaVendasRecebidoEletronico = ({ 
   dadosDespesas,
   dadosAdiantamentoSalarial,
@@ -76,51 +75,48 @@ export const ActionListaVendasRecebidoEletronico = ({
     XLSX.writeFile(workbook, 'vendas_recebimentos.xlsx');
   };
 
-  const calcularTotalDinheiro = () => {
-    let total = 0;
-    for (let i = 0; i < dadosTotalRecebidoPeriodo.length; i++) {
-      const valor = parseFloat(dadosTotalRecebidoPeriodo[i].VALORTOTALDINHEIRO || 0);
-      total = parseFloat(total) + valor;  // ← DIFERENÇA CRÍTICA
-    }
-    return parseFloat(total).toFixed(2);
-  }
-
   const calcularTotalConvenio = () => {
-    let total = 0;
-    for (let i = 0; i < dadosPeriodo.length; i++) {
-      const valor = parseFloat(dadosPeriodo[i].VALORTOTALCONVENIO || 0);
-      total = parseFloat(total) + valor;  // ← DIFERENÇA CRÍTICA
-    }
-    return parseFloat(total).toFixed(2);
+    return dadosPeriodo.reduce((total, dados) => total + parseFloat(dados.VALORTOTALCONVENIO ), 0);
   }
-
+  const calcularTotalDinheiro = () => {
+    return dadosPeriodo.reduce((total, dados) => total + parseFloat(dados.VALORTOTALDINHEIRO ), 0);
+  }
   const calcularTotalFatura = () => {
     return dadosTotalRecebidoPeriodo.reduce((total, item) =>
       total + parseFloat(item.VALORTOTALFATURA), 0
     );
   }
 
+  const calcularTotalPagamentoDespesas = () =>
+  dadosTotalRecebidoPeriodo.reduce(
+    (total, item) =>
+      total +
+      parseFloat(item.VALORTOTALDESPESA || 0) +
+      parseFloat(item.VALORTOTALADIANTAMENTOSALARIAL || 0),
+    0
+  );
   const dadosPeriodo = Array.isArray(dadosTotalRecebidoPeriodo) ? dadosTotalRecebidoPeriodo.map((item, index) => {
-    const calcularTotalDinheiro = () => {
-      let total = 0;
-      for (let i = 0; i < dadosTotalRecebidoPeriodo.length; i++) {
-        const valor = parseFloat(dadosTotalRecebidoPeriodo[i].VALORTOTALDINHEIRO || 0);
-        total = parseFloat(total) + valor;  // ← DIFERENÇA CRÍTICA
-      }
-      return parseFloat(total).toFixed(2);
+
+    const calcularTotalConvenio = () => {
+      return dadosTotalRecebidoPeriodo.reduce((total, dados) => total + parseFloat(dados.VALORTOTALCONVENIO ), 0);
     }
-    
-    const valorTotalRecebidoMapaVenda = parseFloat(item.VALORTOTALCONVENIO) + parseFloat(item.VALORTOTALDINHEIRO)
+    const calcularTotalDinheiro = () => {
+      return dadosTotalRecebidoPeriodo.reduce((total, dados) => total + parseFloat(dados.VALORTOTALDINHEIRO ), 0);
+    }
+    const valorTotalRecebidoMapaVenda = parseFloat(item.VALORTOTALCONVENIO) + parseFloat(item.VALORTOTALDINHEIRO);
     const valorTotalPagamentoMapaDespesas = parseFloat(item.VALORTOTALDESPESA) + parseFloat(item.VALORTOTALADIANTAMENTOSALARIAL)
-    const valorTotalDisponivelMapaDinheiro = calcularTotalDinheiro() - parseFloat(item.VALORTOTALDESPESA) + parseFloat(item.VALORTOTALADIANTAMENTOSALARIAL);
+    const valorTotalDisponivelMapaDinheiro = calcularTotalDinheiro() - valorTotalPagamentoMapaDespesas;
     const valorTotalDisponivelMapaDinheiroFatura = valorTotalDisponivelMapaDinheiro + calcularTotalFatura();
-    
+    const totalDinheiro = calcularTotalDinheiro();
+    const totalConvenio = calcularTotalConvenio();
+
     return {
 
       VALORTOTALCONVENIO: item.VALORTOTALCONVENIO,
       VALORTOTALDINHEIRO: item.VALORTOTALDINHEIRO,
       VALORTOTALFATURA: item.VALORTOTALFATURA,
       VALORTOTALDESPESA: item.VALORTOTALDESPESA,
+      VALORRECEBIDO: item.VALORRECEBIDO,
       VALORTOTALADIANTAMENTOSALARIAL: item.VALORTOTALADIANTAMENTOSALARIAL,
       valorTotalPagamentoMapaDespesas: valorTotalPagamentoMapaDespesas,
       valorTotalRecebidoMapaVenda: valorTotalRecebidoMapaVenda,
@@ -133,7 +129,7 @@ export const ActionListaVendasRecebidoEletronico = ({
 
 
   const dados = Array.isArray(dadosTotalRecebidoEletronico) ?   dadosTotalRecebidoEletronico
-    .filter(item => item.DSTIPOPAGAMENTO !== 'VALE FUNCIONÁRIO')  // ← FILTRO
+    .filter(item => item.DSTIPOPAGAMENTO !== 'VALE FUNCIONÁRIO')  
     .map((item, index) => ({
       NOTEF: item.NOTEF,
       NPARCELAS: item.NPARCELAS,
@@ -145,12 +141,36 @@ export const ActionListaVendasRecebidoEletronico = ({
     })) 
   : [];
 
+  const dadosTodosCartoes = Array.isArray(dadosTotalRecebidoEletronico)
+  ? dadosTotalRecebidoEletronico
+  : [];
+
+  const calcularTotalCartoes = () =>
+  dadosTotalRecebidoEletronico
+    .filter(item => item.DSTIPOPAGAMENTO !== 'VALE FUNCIONÁRIO')
+    .reduce(
+      (total, item) =>
+        total + parseFloat(item.VALORRECEBIDO || 0),
+      0
+    );
+
+ const calcularTotalVendas = () =>
+  calcularTotalConvenio() +
+  calcularTotalDinheiro() +
+  calcularTotalCartoes();
+
+const calcularTotalDisponivelDinheiro = () =>
+  calcularTotalDinheiro() - calcularTotalPagamentoDespesas();
+
+const calcularTotalDisponivelDinheiroFatura = () =>
+  calcularTotalDisponivelDinheiro() + calcularTotalFatura();
+
   const calcularTotalValorRecebido = () => {
     let total = 0;
     for (let resultado of dados) {
-      total += parseFloat(resultado.VALORRECEBIDO);
+      total += toFloat(resultado.VALORRECEBIDO);
     }
-    return parseFloat(total).toFixed(2);
+    return toFloat(total).toFixed(2);
   }
 
   const calcularValorTotalRecebidoMapaVenda = () => {
@@ -177,12 +197,14 @@ export const ActionListaVendasRecebidoEletronico = ({
     return total;
   }
 
+  
+  const calcularTotalMapaVenda = () =>
+  dadosPeriodo.reduce(
+    (total, item) => total + toFloat(item.valorTotalRecebidoMapaVenda || 0), 0
+  );
 
-  const calculoValorTotalRecebidoMapaVenda = 
-  parseFloat(
-    (parseFloat(dadosPeriodo[0]?.valorTotalRecebidoMapaVenda || 0) + 
-     parseFloat(calcularTotalValorRecebido() || 0))
-  ).toFixed(2);
+  const calculoValorTotalRecebidoMapaVenda = (calcularTotalMapaVenda() + toFloat(dadosPeriodo[0]?.VALORRECEBIDO));
+
   const headerGroup = (
     <ColumnGroup style={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}>
 
@@ -218,18 +240,15 @@ export const ActionListaVendasRecebidoEletronico = ({
 
       <Row>
         <Column footer="Total das Vendas:" colSpan={4} style={{ textAlign: 'right' }} />
-        <Column footer={formatMoeda(calculoValorTotalRecebidoMapaVenda)} />
-
+          <Column footer={formatMoeda(calcularTotalVendas())} />
       </Row>
       <Row>
         <Column footer="Recebimento Cartões:" colSpan={4} style={{ textAlign: 'right' }} />
-        <Column footer={formatMoeda(calcularTotalValorRecebido())} />
-
+        <Column footer={formatMoeda(calcularTotalCartoes())} />
       </Row>
       <Row>
         <Column footer="Recebimento Convênio:" colSpan={4} style={{ textAlign: 'right' }} />
         <Column footer={formatMoeda(calcularTotalConvenio())} />
-
       </Row>
       <Row>
         <Column footer="Recebimento Dinheiro:" colSpan={4} style={{ textAlign: 'right' }} />
@@ -238,13 +257,11 @@ export const ActionListaVendasRecebidoEletronico = ({
       </Row>
       <Row>
         <Column footer="Pagamento das Despesas:" colSpan={4} style={{ textAlign: 'right' }} />
-        <Column footer={formatMoeda(calcularTotalDespesas())} />
-
+        <Column footer={formatMoeda(calcularTotalPagamentoDespesas())} />
       </Row>
       <Row>
         <Column footer="Total Dispónivel em Dinheiro:" colSpan={4} style={{ textAlign: 'right' }} />
-        <Column footer={formatMoeda(dadosPeriodo[0]?.valorTotalDisponivelMapaDinheiro)} />
-
+        <Column footer={formatMoeda(calcularTotalDisponivelDinheiro())} />
       </Row>
       <Row>
         <Column footer="Recebimento Faturas:" colSpan={4} style={{ textAlign: 'right' }} />
@@ -253,8 +270,7 @@ export const ActionListaVendasRecebidoEletronico = ({
       </Row>
       <Row>
         <Column footer="Total Dispónivel (Dinheiro + Fatura):" colSpan={4} style={{ textAlign: 'right' }} />
-        <Column footer={formatMoeda(dadosPeriodo[0]?.valorTotalDisponivelMapaDinheiroFatura)} />
-
+         <Column footer={formatMoeda(calcularTotalDisponivelDinheiroFatura())} />
       </Row>
     </ColumnGroup>
   )

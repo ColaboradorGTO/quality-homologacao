@@ -10,6 +10,7 @@ import { useQuery } from "react-query"
 import { ActionListaConferenciaMalotes } from "./actionListaConferenciaMalotes"
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento"
 import { get } from "../../../../api/funcRequest"
+import { optionsDataMalote, optionsStatusMalote } from "../../../../../parceiro.json"
 
 export const ActionPesquisaConferenciaMalote = ({ usuarioLogado }) => {
     const [dataPesquisaInicio, setDataPesquisaInicio] = useState("");
@@ -47,10 +48,36 @@ export const ActionPesquisaConferenciaMalote = ({ usuarioLogado }) => {
         },
         { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
     );
-   
-    const { data: optionsMarcas = [] } = useFetchData('marcasLista', '/marcasLista');
-    const { data: optionsEmpresas = [], refetch: refetchEmpresas } = useFetchEmpresas(marcaSelecionada);
-    const { data: optionsPendenciasMalotes = [] } = useFetchData('pendencias-malotes', '/pendencias-malotes');
+
+    const { data: optionsMarcas = [], error: errorMarcas, isLoading: isLoadingMarcas, refetch: refetchMarcas } = useQuery(
+        ['marcasLista'],
+        async () => {
+        const response = await get(`/marcasLista`);
+
+        return response.data;
+        },
+        { enabled: true, staleTime: 60 * 60 * 1000, }
+    );
+
+    const { data: optionsEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas } = useQuery(
+        ['listaEmpresaComercial', marcaSelecionada],
+        async () => {
+        const response = await get(`/listaEmpresaComercial?idMarca=${marcaSelecionada}`);
+        
+        return response.data;
+        },
+        {enabled: Boolean(marcaSelecionada), staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000,}
+    );
+
+    const { data: optionsPendenciasMalotes = [], error: errorPendenciasMalotes, isLoading: isLoadingPendenciasMalotes, refetch: refetchPendenciasMalotes } = useQuery(
+        ['pendencias-malotes'],
+        async () => {
+        const response = await get(`/pendencias-malotes`);
+
+        return response.data;
+        },
+        { enabled: true, staleTime: 60 * 60 * 1000, }
+    );
 
     const fetchListaMalotes = async () => {
         const urlBase = `/malotes-loja?idEmpresa=${empresaSelecionada}&idMarca=${marcaSelecionada}&statusMalote=${statusSelecionado}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idPendenciaMalote=${pendenciaSelecionada}`;
@@ -103,39 +130,35 @@ export const ActionPesquisaConferenciaMalote = ({ usuarioLogado }) => {
         refetch();
     }
 
-    const optionsData = [
-        { value: 'Malote', label: 'Data Caixa' },
-        { value: 'Conferido', label: 'Data Conferido' },
-    ]
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+        e.preventDefault();
+        handleClick();
+        }
+    };
 
-    const optionsStatus = [
-        { value: '0', label: 'Selecione um Status' },
-        { value: 'Pendente de Envio', label: 'Pendente de Envio' },
-        { value: 'Enviado', label: 'Enviado' },
-        { value: 'Recepcionado', label: 'Recepcionado' },
-        { value: 'Devolvido', label: 'Devolvido' },
-        { value: 'Conferido', label: 'Conferido' },
-        { value: 'Reenviado', label: 'Reenviado' },
-    ]
+
     return (
 
         <Fragment>
 
             <ActionMain
                 linkComponentAnterior={["Home"]}
-                linkComponent={["Lista de Vendas"]}
-                title="Vendas por Marcas e Período"
+                linkComponent={["Lista de Malotes por Período"]}
+                title="Lista de Malotes por Período"
                 subTitle={empresaSelecionadaNome}
 
                 InputFieldDTInicioComponent={InputField}
                 labelInputFieldDTInicio={"Data Início"}
                 valueInputFieldDTInicio={dataPesquisaInicio}
                 onChangeInputFieldDTInicio={(e) => setDataPesquisaInicio(e.target.value)}
+                onKeyDownInputFieldDTInicio={handleKeyPress}
 
                 InputFieldDTFimComponent={InputField}
                 labelInputFieldDTFim={"Data Fim"}
                 valueInputFieldDTFim={dataPesquisaFim}
                 onChangeInputFieldDTFim={(e) => setDataPesquisaFim(e.target.value)}
+                onKeyDownInputFieldDTFim={handleKeyPress}
 
                 InputSelectEmpresaComponent={InputSelectAction}
                 labelSelectEmpresa={"Grupo Empresarial"}
@@ -169,7 +192,7 @@ export const ActionPesquisaConferenciaMalote = ({ usuarioLogado }) => {
                 labelSelectSubGrupo={"Status"}
                 optionsSubGrupos={[
                     { value: '0', label: 'Selecione...' },
-                    ...optionsStatus.map((item) => ({
+                    ...optionsStatusMalote?.map((item) => ({
                         value: item.value,
                         label: item.label,
 
@@ -194,7 +217,7 @@ export const ActionPesquisaConferenciaMalote = ({ usuarioLogado }) => {
                 InputSelectPendenciaComponent={InputSelectAction}
                 labelSelectPendencia={"Modo Pesquisa"}
                 optionsPendencia={[           
-                    ...optionsData.map((item) => ({
+                    ...optionsDataMalote?.map((item) => ({
                         value: item.value,
                         label: item.label,
 
