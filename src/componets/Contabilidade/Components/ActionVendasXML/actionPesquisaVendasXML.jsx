@@ -50,7 +50,7 @@ export const ActionPesquisaVendasXML = ({ usuarioLogado }) => {
 
   const { data: marcas = [], error: errorMarcas, isLoading: isLoadingMarcas } = useFetchData('marcasLista', '/marcasLista');
   const { data: empresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas } = useQuery(
-    ['empresasLista', marcaSelecionada],
+    ['todas-empresas', marcaSelecionada],
     async () => {
       const response = await get(`/todas-empresas?idSubGrupoEmpresa=${marcaSelecionada}`);
 
@@ -272,6 +272,13 @@ export const ActionPesquisaVendasXML = ({ usuarioLogado }) => {
     setTabelaVisivel(true);
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
+
   const optionsStatus = [
     { value: '', label: 'Todas', color: 'grey' },
     { value: 'AUTORIZADA', label: 'Autorizadas', color: 'green' },
@@ -304,11 +311,14 @@ export const ActionPesquisaVendasXML = ({ usuarioLogado }) => {
         labelInputFieldDTInicio={"Data Início"}
         valueInputFieldDTInicio={dataPesquisaInicio}
         onChangeInputFieldDTInicio={e => setDataPesquisaInicio(e.target.value)}
+        onKeyDownInputFieldDTInicio={handleKeyPress}
+
 
         InputFieldDTFimComponent={InputField}
         labelInputFieldDTFim={"Data Fim"}
         valueInputFieldDTFim={dataPesquisaFim}
         onChangeInputFieldDTFim={e => setDataPesquisaFim(e.target.value)}
+        onKeyDownInputFieldDTFim={handleKeyPress}
 
         InputSelectMarcasComponent={InputSelectAction}
         optionsMarcas={[

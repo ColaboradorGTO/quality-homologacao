@@ -17,7 +17,6 @@ import { useQuery } from 'react-query';
 export const ResumoDashBoardContabilidade = ({usuarioLogado}) => {
   const [resumoVisivel, setResumoVisivel] = useState(false);
   const [dataPesquisa, setDataPesquisa] = useState('');
-  const [currentPage, setCurrentPage] = useState(1)
   const [isLoadingPesquisa, setIsLoadingPesquisa] = useState(true)
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
@@ -120,12 +119,17 @@ export const ResumoDashBoardContabilidade = ({usuarioLogado}) => {
   const handleClick = () => {
     setResumoVisivel(true);
     setIsLoadingPesquisa(true);
-    setCurrentPage(+1);
     refetchResumoVendas()
     refetchTotalVendasEmpresa()
     refetch()
-
   }
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
 
   return (
     <Fragment>
@@ -139,6 +143,7 @@ export const ResumoDashBoardContabilidade = ({usuarioLogado}) => {
         labelInputFieldDTInicio={"Data Consulta"}
         valueInputFieldDTInicio={dataPesquisa}
         onChangeInputFieldDTInicio={(e) => setDataPesquisa(e.target.value)}
+        onKeyDownInputFieldDTInicio={handleKeyPress}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Atualizar Dados"}

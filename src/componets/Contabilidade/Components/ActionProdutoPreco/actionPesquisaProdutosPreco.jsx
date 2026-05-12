@@ -70,18 +70,13 @@ export const ActionPesquisaProductoPreco = () => {
     }
   }
 
-  useEffect(() => {
-    const handleKeyPress = (e) => {
-      if (e.key === 'Enter') {
-        handleClick();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyPress);
-    return () => {
-      window.removeEventListener('keydown', handleKeyPress);
-    };
-  }, []);
+  
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
 
 
   return (
@@ -98,6 +93,7 @@ export const ActionPesquisaProductoPreco = () => {
         placeHolderInputFieldComponent={'Código de Barras / Nome Produto'}
         valueInputField={produto}
         onChangeInputField={(e) => setProduto(e.target.value)}
+        onKeyDownInputField={handleKeyPress}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}
