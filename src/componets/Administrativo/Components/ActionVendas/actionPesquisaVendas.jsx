@@ -73,6 +73,13 @@ export const ActionPesquisaVendas = () => {
     }
   }
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
+
   return (
 
     <Fragment>
@@ -87,6 +94,7 @@ export const ActionPesquisaVendas = () => {
         onChangeInputField={handleInputChange}
         valueInputField={idVenda}
         labelInputField={"Venda"}
+        onKeyDownInputField={handleKeyPress}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}

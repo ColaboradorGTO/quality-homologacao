@@ -108,6 +108,12 @@ export const ActionPesquisaAlterarVendaVendedor = ({ usuarioLogado }) => {
     refetchVendasAtiva()
   }
 
+    const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
 
   return (
 
@@ -123,11 +129,13 @@ export const ActionPesquisaAlterarVendaVendedor = ({ usuarioLogado }) => {
         valueInputFieldDTInicio={dataPesquisaInicio}
         labelInputFieldDTInicio={"Data Início"}
         onChangeInputFieldDTInicio={(e) => setDataPesquisaInicio(e.target.value)}
+        onKeyDownInputFieldDTInicio={handleKeyPress}
 
         InputFieldDTFimComponent={InputField}
         labelInputFieldDTFim={"Data Fim"}
         valueInputFieldDTFim={dataPesquisaFim}
         onChangeInputFieldDTFim={(e) => setDataPesquisaFim(e.target.value)}
+        onKeyDownInputFieldDTFim={handleKeyPress}
 
         InputSelectEmpresaComponent={InputSelectAction}
         onChangeSelectEmpresa={handleSelectEmpresa}

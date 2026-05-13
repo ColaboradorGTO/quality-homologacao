@@ -116,6 +116,12 @@ export const ActionPesquisaVendasContigencia = ({ usuarioLogado }) => {
     setTabelaVisivel(true);
   };
 
+    const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
 
   return (
 
@@ -130,11 +136,13 @@ export const ActionPesquisaVendasContigencia = ({ usuarioLogado }) => {
         labelInputFieldDTInicio={"Data Início"}
         valueInputFieldDTInicio={dataPesquisaInicio}
         onChangeInputFieldDTInicio={e => setDataPesquisaInicio(e.target.value)}
+        onKeyDownInputFieldDTInicio={handleKeyPress}
 
         InputFieldDTFimComponent={InputField}
         labelInputFieldDTFim={"Data Fim"}
         valueInputFieldDTFim={dataPesquisaFim}
         onChangeInputFieldDTFim={e => setDataPesquisaFim(e.target.value)}
+        onKeyDownInputFieldDTFim={handleKeyPress}
 
         InputSelectEmpresaComponent={InputSelectAction}
         labelSelectEmpresa={"Empresa"}
@@ -146,6 +154,7 @@ export const ActionPesquisaVendasContigencia = ({ usuarioLogado }) => {
           }))]}
         valueSelectEmpresa={empresaSelecionada}
         onChangeSelectEmpresa={handleSelectEmpresa}
+        onKeyDownSelectEmpresa={handleKeyPress}
 
         InputSelectMarcasComponent={InputSelectAction}
         labelSelectMarcas={"Marcas"}
@@ -156,6 +165,7 @@ export const ActionPesquisaVendasContigencia = ({ usuarioLogado }) => {
         }))}
         valueSelectMarca={marcaSelecionada}
         onChangeSelectMarcas={handleSelectMarca}
+        onKeyDownSelectMarcas={handleKeyPress}
 
         InputSelectUFComponent={InputSelectAction}
         labelSelectUF={"UF"}
@@ -165,6 +175,7 @@ export const ActionPesquisaVendasContigencia = ({ usuarioLogado }) => {
         }))}
         onChangeSelectUF={e => setUfSelecionado(e.value)}
         valueSelectUF={ufSelecionado}
+        onKeyDownSelectUF={handleKeyPress}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}

@@ -220,6 +220,13 @@ export const ActionPesquisaAlteracaoPreco = ({ }) => {
     }
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
+
 
   return (
 
@@ -236,11 +243,13 @@ export const ActionPesquisaAlteracaoPreco = ({ }) => {
         labelInputFieldDTInicio={"Data Início"}
         valueInputFieldDTInicio={dataPesquisaInicio}
         onChangeInputFieldDTInicio={e => setDataPesquisaInicio(e.target.value)}
+        onKeyDownInputFieldDTInicio={handleKeyPress}
 
         InputFieldDTFimComponent={InputField}
         labelInputFieldDTFim={"Data Fim"}
         valueInputFieldDTFim={dataPesquisaFim}
         onChangeInputFieldDTFim={e => setDataPesquisaFim(e.target.value)}
+        onKeyDownInputFieldDTFim={handleKeyPress}
 
         InputSelectEmpresaComponent={InputSelectAction}
         labelSelectEmpresa={"Empresa"}
@@ -282,12 +291,14 @@ export const ActionPesquisaAlteracaoPreco = ({ }) => {
         labelInputFieldCodBarra={"Cód.Barras / Nome Produto"}
         valueInputFieldCodBarra={codBarra}
         onChangeInputFieldCodBarra={e => setCodBarra(e.target.value)}
+        onKeyDownInputFieldCodBarra={handleKeyPress}
 
         InputFieldComponent={InputField}
         labelInputField={"Nome Produto"}
         valueInputField={descricaoProduto}
         onChangeInputField={e => setDescricaoProduto(e.target.value)}
         placeHolderInputFieldComponent={"Nome Produto"}
+        onKeyDownInputField={handleKeyPress}
 
         ButtonSearchComponent={ButtonType}
         onButtonClickSearch={handleClick}
