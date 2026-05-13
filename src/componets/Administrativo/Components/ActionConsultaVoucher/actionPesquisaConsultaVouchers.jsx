@@ -11,7 +11,7 @@ import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
 
 
-export const ActionPesquisaConsultaVouchers = ({usuarioLogado}) => {
+export const ActionPesquisaConsultaVouchers = ({ usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('')
   const [dataPesquisaFim, setDataPesquisaFim] = useState('')
@@ -36,15 +36,15 @@ export const ActionPesquisaConsultaVouchers = ({usuarioLogado}) => {
       setMenuFilhoAtual(menuParsed);
     }
   }, []);
-  
+
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
     ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
       const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
-      
+
       return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
   );
 
   const { data: optionsMarcas = [], error: errorMarcas, isLoading: isLoadingMarcas, refetch: refetchMarcas } = useQuery(
@@ -65,8 +65,8 @@ export const ActionPesquisaConsultaVouchers = ({usuarioLogado}) => {
     },
     { enabled: Boolean(marcaSelecionada), staleTime: 60 * 60 * 1000, }
   );
-  
-  const fetchListaVouchers = async () => {                                          
+
+  const fetchListaVouchers = async () => {
     const urlBase = `/voucher-completo?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idSubGrupoEmpresa=${marcaSelecionada}&idEmpresa=${empresaSelecionada}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
@@ -112,7 +112,7 @@ export const ActionPesquisaConsultaVouchers = ({usuarioLogado}) => {
 
 
   const handleChangeEmpresa = (e) => {
-    if( e.value === '') {
+    if (e.value === '') {
       setEmpresaSelecionada('');
     } else {
       const empresa = optionsEmpresas.find((item) => item.IDEMPRESA === e.value);
@@ -126,6 +126,12 @@ export const ActionPesquisaConsultaVouchers = ({usuarioLogado}) => {
     refetchDetalheVoucherDados()
   }
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
 
   return (
 
@@ -141,11 +147,13 @@ export const ActionPesquisaConsultaVouchers = ({usuarioLogado}) => {
         valueInputFieldDTInicio={dataPesquisaInicio}
         labelInputFieldDTInicio={"Data Início"}
         onChangeInputFieldDTInicio={(e) => setDataPesquisaInicio(e.target.value)}
+        onKeyDownInputFieldDTInicio={handleKeyPress}
 
         InputFieldDTFimComponent={InputField}
         labelInputFieldDTFim={"Data Fim"}
         valueInputFieldDTFim={dataPesquisaFim}
         onChangeInputFieldDTFim={(e) => setDataPesquisaFim(e.target.value)}
+        onKeyDownInputFieldDTFim={handleKeyPress}
 
         InputSelectMarcasComponent={InputSelectAction}
         labelSelectMarcas={"Marca"}
@@ -177,6 +185,7 @@ export const ActionPesquisaConsultaVouchers = ({usuarioLogado}) => {
         labelInputFieldNumeroVoucher={"Voucher - Nº Venda ou CPF/CNPJ"}
         onChangeInputFieldNumeroVoucher={(e) => setNumeroVoucher(e.target.value)}
         valueInputFieldNumeroVoucher={numeroVoucher}
+        onKeyDownInputFieldNumeroVoucher={handleKeyPress}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}
@@ -187,10 +196,10 @@ export const ActionPesquisaConsultaVouchers = ({usuarioLogado}) => {
       />
 
 
-      <ActionListaConsultaVouchers 
-        dadosVoucher={dadosVoucher} 
+      <ActionListaConsultaVouchers
+        dadosVoucher={dadosVoucher}
         usuarioLogado={usuarioLogado}
-        optionsModulos={optionsModulos}  
+        optionsModulos={optionsModulos}
         handleClick={handleClick}
       />
     </Fragment>

@@ -70,7 +70,7 @@ export const ResumoDashBoardAdministrativo = ({ usuarioLogado }) => {
     { enabled: false, staleTime: 60 * 60 * 1000, }
   );
 
-  
+
   const { data: dadosQuebraCaixa = [], error: errorQuebra, isLoading: isLoadingQuebra, refetch: refetchQuebra } = useQuery(
     'quebra-caixa-loja-resumo',
     async () => {
@@ -276,6 +276,13 @@ export const ResumoDashBoardAdministrativo = ({ usuarioLogado }) => {
 
   }
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
+
 
   return (
     <Fragment>
@@ -294,11 +301,13 @@ export const ResumoDashBoardAdministrativo = ({ usuarioLogado }) => {
           label: empresa.NOFANTASIA,
         }))}
         labelSelectEmpresa={"Empresa"}
+        onKeyDownSelectEmpresa={handleKeyPress}
 
         InputFieldDTConsultaComponent={InputField}
         labelInputFieldDTConsulta="Data Consulta"
         valueDTCosulta={dataPesquisa}
         onChangeInputFieldDTConsulta={(e) => setDataPesquisa(e.target.value)}
+        onKeyDownInputFieldDTConsulta={handleKeyPress}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}
