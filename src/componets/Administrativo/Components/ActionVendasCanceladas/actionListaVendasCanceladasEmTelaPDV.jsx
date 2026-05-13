@@ -18,11 +18,12 @@ import { ActionRelacaoRecebimentosModal } from "../ActionsModaisVendas/ActionRec
 import { ActionVendaXMLModal } from "../ActionVendasContigencia/actionVendaXMLModal";
 import { TbFileTypeXml } from "react-icons/tb";
 import Swal from "sweetalert2";
+import { toFloat } from "../../../../utils/toFloat";
 
-export const ActionListaVendasCanceladasEmTelaPDV = ({ 
-  dadosVendasCanceladasEmTelaPDV, 
-  optionsModulos, 
-  usuarioLogado  
+export const ActionListaVendasCanceladasEmTelaPDV = ({
+  dadosVendasCanceladasEmTelaPDV,
+  optionsModulos,
+  usuarioLogado
 }) => {
   const [modalVisivel, setModalVisivel] = useState(false);
   const [modalVendaVisivel, setModalVendaVisivel] = useState(false);
@@ -83,53 +84,37 @@ export const ActionListaVendasCanceladasEmTelaPDV = ({
     XLSX.writeFile(workbook, 'vendas_canceladas_tela_pdv.xlsx');
   };
 
-
+  const calcularTotal = (field) => {
+    return dadosListaVendasCanceladas.reduce((total, item) => total + toFloat(item[field]), 0);
+  };
 
   const calcularTotalValorDinheiro = () => {
-    let total = 0;
-    for (let dados of dadosVendasCanceladasEmTelaPDV) {
-      total += parseFloat(dados.VRRECDINHEIRO)
-    }
+    const total = calcularTotal('VRRECDINHEIRO');
     return total;
   }
 
   const calcularTotalValorCartao = () => {
-    let total = 0;
-    for (let dados of dadosVendasCanceladasEmTelaPDV) {
-      total += parseFloat(dados.VRRECCARTAO)
-    }
+    const total = calcularTotal('VRRECCARTAO');
     return total;
   }
 
   const calcularTotalValorConvenio = () => {
-    let total = 0;
-    for (let dados of dadosVendasCanceladasEmTelaPDV) {
-      total += parseFloat(dados.VRRECCONVENIO)
-    }
+    const total = calcularTotal('VRRECCONVENIO');
     return total;
   }
 
   const calcularTotalValorPos = () => {
-    let total = 0;
-    for (let dados of dadosVendasCanceladasEmTelaPDV) {
-      total += parseFloat(dados.VRRECPOS)
-    }
+    const total = calcularTotal('VRRECPOS');
     return total;
   }
 
   const calcularTotalValorVoucher = () => {
-    let total = 0;
-    for (let dados of dadosVendasCanceladasEmTelaPDV) {
-      total += parseFloat(dados.VRRECVOUCHER)
-    }
+    const total = calcularTotal('VRRECVOUCHER');
     return total;
   }
 
   const calcularTotalValorVenda = () => {
-    let total = 0;
-    for (let dados of dadosVendasCanceladasEmTelaPDV) {
-      total += parseFloat(dados.VRTOTALVENDA)
-    }
+    const total = calcularTotal('VRTOTALVENDA');
     return total;
   }
 
@@ -277,15 +262,20 @@ export const ActionListaVendasCanceladasEmTelaPDV = ({
       field: 'STCONTINGENCIA',
       header: 'ST Nota',
       body: (row) => {
+        let statusNota = '';
+
         if (row.STCONTINGENCIA == 'False' && row.VRTOTALVENDA > 0) {
-          return (
-            <th style={{ color: 'blue' }}> {row.STCONTINGENCIA = 'Contigência'}</th>
-          )
-        } if (row.STCONTINGENCIA = row.VRTOTALVENDA > 0) {
-          return (
-            <th style={{ color: 'blue' }}> {row.STCONTINGENCIA ? 'Emitida' : 'Não Emitida'}</th>
-          )
+          statusNota = 'Contingência';
+        } else {
+          statusNota = row.VRTOTALVENDA > 0
+            ? 'Emitida'
+            : 'Não Emitida';
         }
+        return (
+          <th >
+            {statusNota}
+          </th>
+        )
       },
       sortable: true,
 
@@ -399,7 +389,7 @@ export const ActionListaVendasCanceladasEmTelaPDV = ({
 
 
   const handleClickVenda = async (row) => {
-  
+
     if (row && row.IDVENDA) {
       handleEditVenda(row.IDVENDA)
     }
@@ -449,11 +439,11 @@ export const ActionListaVendasCanceladasEmTelaPDV = ({
     }
   }
   const handleClickPagamento = (row) => {
-    if(optionsModulos[0]?.ALTERAR == 'True') {
+    if (optionsModulos[0]?.ALTERAR == 'True') {
       if (row && row.IDVENDA) {
         handleEditPagamento(row.IDVENDA)
       }
-      
+
     } else {
       Swal.fire({
         icon: 'warning',
@@ -474,7 +464,7 @@ export const ActionListaVendasCanceladasEmTelaPDV = ({
   const handleDetalharVendaXML = async (IDVENDA) => {
     try {
       const response = await get(`/venda-xml?idVenda=${IDVENDA}`);
-      if(response.data && response.data.length > 0) {
+      if (response.data && response.data.length > 0) {
         setModalXmlVisivel(true);
         setDadosVendasXML(response.data)
       } else {
@@ -547,7 +537,7 @@ export const ActionListaVendasCanceladasEmTelaPDV = ({
                 footer={coluna.footer}
                 sortable={coluna.sortable}
                 headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
-                footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
+                footerStyle={{ color: 'blue', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
                 bodyStyle={{ fontSize: '0.8rem' }}
 
               />

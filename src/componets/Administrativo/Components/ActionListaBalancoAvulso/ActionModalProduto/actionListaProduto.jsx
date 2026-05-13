@@ -424,7 +424,6 @@ export const ActionListaProduto = ({
     }
   }
 
-
   const handlePesquisar = async () => {
     if (pesquisarProduto.length < 5) {
       Swal.fire({

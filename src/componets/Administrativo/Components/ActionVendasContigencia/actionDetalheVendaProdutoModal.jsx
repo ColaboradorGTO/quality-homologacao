@@ -27,40 +27,40 @@ export const ActionDetalheVendaProdutoModal = ({ show, handleClose, dadosDetalhe
     {
       field: 'NUCOBARRAS',
       header: 'Código Barras',
-      body: row => <th style={{  }}> {row.NUCODBARRAS}</th>,
+      body: row => <th style={{ 'color': 'blue' }}> {row.NUCODBARRAS}</th>,
       sortable: true,
 
     },
     {
       field: 'DSNOME',
       header: 'Descrição',
-      body: row => <th style={{  }}> {row.DSNOME}</th>,
+      body: row => <th style={{ 'color': 'blue' }}> {row.DSNOME}</th>,
       sortable: true,
 
     },
     {
       field: 'VUNCOM',
       header: 'Vr. Unit',
-      body: row => <th style={{  }}> {formatMoeda(row.VUNCOM)}</th>,
+      body: row => <th style={{ 'color': 'blue' }}> {formatMoeda(row.VUNCOM)}</th>,
       sortable: true,
 
     },
     {
       field: 'QTD',
       header: 'QTD',
-      body: row => <th style={{  }}> {row.QTD}</th>,
+      body: row => <th style={{ 'color': 'blue' }}> {row.QTD}</th>,
       sortable: true,
     },
     {
       field: 'VRTOTALLIQUIDO',
       header: 'Vr Recebido',
-      body: row => <th style={{  }}> {formatMoeda(row.VRTOTALLIQUIDO)}</th>,
+      body: row => <th style={{ 'color': 'blue' }}> {formatMoeda(row.VRTOTALLIQUIDO)}</th>,
       sortable: true,
     },
     {
       field: 'VENDEDOR_NOME',
       header: 'Vendedor',
-      body: row => <th style={{  }}> {row.VENDEDOR_NOME}</th>,
+      body: row => <th style={{ 'color': 'blue' }}> {row.VENDEDOR_NOME}</th>,
       sortable: true,
     },
 
@@ -152,8 +152,6 @@ export const ActionDetalheVendaProdutoModal = ({ show, handleClose, dadosDetalhe
                 </div>
               </div>
             </div>
-
-
 
           </Modal.Body>
 

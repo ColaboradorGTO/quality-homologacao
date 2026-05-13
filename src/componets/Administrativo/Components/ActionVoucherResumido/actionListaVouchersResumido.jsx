@@ -3,7 +3,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { GrFormView } from "react-icons/gr";
 import { get } from "../../../../api/funcRequest";
-import { dataFormatada} from "../../../../utils/dataFormatada";
+import { dataFormatada, dataHoraFormatada} from "../../../../utils/dataFormatada";
 import { formatMoeda } from "../../../../utils/formatMoeda";
 import { ButtonTable } from "../../../ButtonsTabela/ButtonTable";
 import HeaderTable from "../../../Tables/headerTable";
@@ -129,13 +129,13 @@ export const ActionListaVouchersResumido = ({dadosVoucher}) => {
     {
       field: 'DTINVOUCHER',
       header: 'Data Emissão',
-      body: row => <th>{row.DTINVOUCHER}</th>,
+      body: row => <th>{dataHoraFormatada(row.DTINVOUCHER)}</th>,
       sortable: true,
     },
     {
       field: 'VRVOUCHER',
       header: 'Valor',
-      body: row => <th>{formatMoeda(row.VRVOUCHER)}</th>,
+      body: row => <th style={{color: 'green'}}>{formatMoeda(row.VRVOUCHER)}</th>,
       sortable: true,
     },
     {
@@ -153,7 +153,7 @@ export const ActionListaVouchersResumido = ({dadosVoucher}) => {
     {
       field: 'DTOUTVOUCHER',
       header: 'Data Recebida',
-      body: row => <th>{row.DTOUTVOUCHER}</th>,
+      body: row => <th>{dataHoraFormatada(row.DTOUTVOUCHER)}</th>,
       sortable: true,
     },
     {

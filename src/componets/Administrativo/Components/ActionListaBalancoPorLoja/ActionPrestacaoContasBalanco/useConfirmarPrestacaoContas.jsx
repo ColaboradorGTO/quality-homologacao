@@ -4,12 +4,12 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 
 
-export const useConfirmarPrestacaoContas = ({ 
-    optionsModulos, 
-    usuarioLogado, 
+export const useConfirmarPrestacaoContas = ({
+    optionsModulos,
+    usuarioLogado,
     dadosListaContasBalanco,
     handleClose,
-    handleClickResumoBalanco 
+    handleClickResumoBalanco
 }) => {
     const [ipUsuario, setIpUsuario] = useState('');
 
@@ -19,15 +19,29 @@ export const useConfirmarPrestacaoContas = ({
     }, [usuarioLogado]);
 
     const getIPUsuario = async () => {
-        const response = await axios.get('http://ipwho.is/')
-        if (response.data) {
-            setIpUsuario(response.data.ip);
+        let usuarioIP = null;
+
+        try {
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+            usuarioIP = ipWhoisData?.ip;
+        } catch (error) {
+            console.error("Erro ao buscar IP via ipwho.is:", error);
         }
-        return response.data;
-    }
+
+        if (!usuarioIP) {
+            try {
+                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+                usuarioIP = ipifyData?.ip;
+            } catch (error) {
+                console.error("Erro ao buscar IP via ipify.org:", error);
+            }
+        }
+        setIpUsuario(usuarioIP);
+        return usuarioIP;
+    };
 
     const handleSubmit = async () => {
-        if(optionsModulos[0]?.ALTERAR == 'False') {
+        if (optionsModulos[0]?.ALTERAR == 'False') {
             Swal.fire({
                 title: 'Atenção!',
                 text: 'Você não tem permissão para alterar esta prestação de contas.',
@@ -77,7 +91,7 @@ export const useConfirmarPrestacaoContas = ({
             return responsePost.data;
 
         } catch (error) {
-             const putData = {
+            const putData = {
                 IDRESUMOBALANCO: Number(dadosListaContasBalanco[0]?.IDRESUMOBALANCO),
             }
 

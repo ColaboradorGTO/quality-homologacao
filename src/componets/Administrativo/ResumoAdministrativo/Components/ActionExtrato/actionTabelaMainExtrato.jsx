@@ -429,12 +429,7 @@ export const ActionTabelaMainExtrato = ({
             bodyStyle={{ fontSize: '1rem', fontWeight: 600, textAlign: 'center' }}
           />
 
-          <Column
-            field="opcao"
-            header="Opção"
-            headerStyle={{ backgroundColor: "#7a59ad", color: 'white', fontSize: '1rem', fontWeight: 'bold' }}
-            bodyStyle={{ fontSize: '1rem', fontWeight: 600 }}
-          />
+   
         </DataTable>
       </div>
     </div>

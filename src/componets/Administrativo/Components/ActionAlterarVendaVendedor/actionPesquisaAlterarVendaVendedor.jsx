@@ -11,7 +11,6 @@ import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
 import { useFetchData } from "../../../../hooks/useFetchData";
 
-
 export const ActionPesquisaAlterarVendaVendedor = ({ usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('')

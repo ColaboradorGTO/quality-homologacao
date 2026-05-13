@@ -107,8 +107,8 @@ export const ActionListaVendasVouchers = ({
       STCANCELADO: item.venda.STCANCELADO == 'False' ? 'Ativa' : 'Cancelada',
       DTHORAFECHAMENTOFORMATEUA: item.venda.DTHORAFECHAMENTOFORMATEUA,
       diasAposCompra: DIFERENCAEMDIAS,
-      stCortesia: stCortesia = DIFERENCAEMDIAS <= 32 ? 'Ativa' : 'Inativa',
-      stDefeito: stDefeito = DIFERENCAEMDIAS <= 90 ? 'Ativa' : 'Inativa',
+      stCortesia: stCortesia = DIFERENCAEMDIAS <= 32 ? 'Válida' : 'Inválida',
+      stDefeito: stDefeito = DIFERENCAEMDIAS <= 90 ? 'Válida' : 'Inválida',
     }
   });
 

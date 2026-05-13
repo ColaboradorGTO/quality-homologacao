@@ -5,7 +5,7 @@ import { InputFieldModal } from "../../../Buttons/InputFieldModal";
 import { FooterModal } from "../../../Modais/FooterModal/footerModal";
 import { ButtonTypeModal } from "../../../Buttons/ButtonTypeModal";
 import { formatMoeda } from "../../../../utils/formatMoeda";
-import { dataFormatada } from "../../../../utils/dataFormatada";
+import { dataFormatada, dataHoraFormatada } from "../../../../utils/dataFormatada";
 import { toFloat } from "../../../../utils/toFloat";
 
 export const ActionDetalheVendaModal = ({ show, handleClose, dadosVendas }) => {
@@ -34,7 +34,7 @@ export const ActionDetalheVendaModal = ({ show, handleClose, dadosVendas }) => {
             <h3><b> Venda Nº {dadosVendas[0]?.IDVENDA} </b></h3>
             <p>Operador: {dadosVendas[0]?.NOFUNCIONARIO}</p>
             <p>Cliente: Consumidor Final</p>
-            <p>CPF: Não Informado</p>
+            <p>CPF: {dadosVendas[0]?.DEST_CPF}</p>
           </header>
 
 
@@ -78,7 +78,7 @@ export const ActionDetalheVendaModal = ({ show, handleClose, dadosVendas }) => {
                   className="form-control input"
                   readOnly={true}
                   label="Data Abertura"
-                  value={dataFormatada(dadosVendas[0]?.DTHORAABERTURA) || ""}
+                  value={dadosVendas[0]?.DTHORAABERTURA || ""}
                 />
               </div>
               <div class="col-sm-6 col-md-3 col-xl-3">
@@ -87,7 +87,7 @@ export const ActionDetalheVendaModal = ({ show, handleClose, dadosVendas }) => {
                   className="form-control input"
                   readOnly={true}
                   label="Data Fechamento"
-                  value={dataFormatada(dadosVendas[0]?.DTHORAFECHAMENTO) || ""}
+                  value={dadosVendas[0]?.DTHORAFECHAMENTO || ""}
                 />
               </div>
               <div class="col-sm-6 col-md-6 col-xl-6">

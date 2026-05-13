@@ -48,17 +48,17 @@ export const ResumoDashBoardAdministrativo = ({ usuarioLogado }) => {
       setMenuFilhoAtual(menuParsed);
     }
   }, []);
-  
+
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
     ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
       const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
-     
+
       return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 5 * 60 * 1000,}
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 5 * 60 * 1000, }
   );
-  
+
   const { data: dadosEmpresas = [], } = useFetchData('empresas', '/empresas');
 
   const { data: dadosAdiantamentoSalarial = [], error: errorFuncionarios, isLoading: isLoadingFuncionarios, refetch: refetchAdiantamento } = useQuery(
@@ -90,7 +90,7 @@ export const ResumoDashBoardAdministrativo = ({ usuarioLogado }) => {
   );
 
   const { data: dadosVendasAtivas = [], error: errorVendasAtivas, isLoading: isLoadingVendasAtivas, refetch: refetchVendasAtivas } = useQuery(
-    'venda-ativa',
+    ['venda-ativa', 'ativas'],
     async () => {
       const response = await get(`/venda-ativa?idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisa}&dataPesquisaFim=${dataPesquisa}&statusCancelado=False`);
       return response.data;
@@ -99,7 +99,7 @@ export const ResumoDashBoardAdministrativo = ({ usuarioLogado }) => {
   );
 
   const { data: dadosVendasCanceladas = [], error: errorVendasCanceladas, isLoading: isLoadingVendasCanceladas, refetch: refetchVendasCanceladas } = useQuery(
-    'venda-ativa',
+    ['venda-ativa', 'canceladas'],
     async () => {
       const response = await get(`/venda-ativa?statusCancelado=True&idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisa}&dataPesquisaFim=${dataPesquisa}`);
       return response.data;
@@ -120,7 +120,7 @@ export const ResumoDashBoardAdministrativo = ({ usuarioLogado }) => {
   const { data: dadosVendasConvenioDesconto = [], error: errorConvenio, isLoading: isLoadingConvenio, refetch: refetchConvenio } = useQuery(
     'resumo-venda-convenio',
     async () => {
-      const response = await get(`/resumo-venda-convenio?idEmpresa=${empresaSelecionada}&dataFechamento=${dataPesquisa}&statusCancelado=False`);
+      const response = await get(`/resumoVendaConvenio?idEmpresa=${empresaSelecionada}&datapesq=${dataPesquisa}&statusCancelado=False`);
       return response.data;
     },
     { enabled: false, staleTime: 60 * 60 * 1000, }
@@ -179,6 +179,7 @@ export const ResumoDashBoardAdministrativo = ({ usuarioLogado }) => {
     },
     { enabled: false, staleTime: 60 * 60 * 1000, }
   );
+
 
   const { data: dadosVendasPCJ = [], error: errorVendasPCJ, isLoading: isLoadingVendasPCJ, refetch: refetchVendasPCJ } = useQuery(
     'listaCaixasMovimento',
@@ -253,6 +254,7 @@ export const ResumoDashBoardAdministrativo = ({ usuarioLogado }) => {
 
       setResumoVisivel(true)
       getListaSaldoExtratoLoja()
+
       refetchResumoVendas()
 
       refetchDespesaLoja()
@@ -354,10 +356,10 @@ export const ResumoDashBoardAdministrativo = ({ usuarioLogado }) => {
 
           <ActionListaVendasPCJ dadosVendasPCJ={dadosVendasPCJ} />
 
-          <ActionListaFechamentoDosCaixas 
-            dadosCaixaFechados={dadosCaixaFechados} 
+          <ActionListaFechamentoDosCaixas
+            dadosCaixaFechados={dadosCaixaFechados}
             usuarioLogado={usuarioLogado}
-            optionsModulos={optionsModulos}  
+            optionsModulos={optionsModulos}
           />
 
           <ActionListaVendasVendedor dadosVendasVendedor={dadosVendasVendedor} />

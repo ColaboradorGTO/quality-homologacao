@@ -14,6 +14,7 @@ import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../Tables/headerTable";
 import Swal from "sweetalert2";
+import { toFloat } from "../../../utils/toFloat";
 
 export const ActionListaVendasDescontoFuncionario = ({ dadosVendasConvenioFuncionario }) => {
   const [modalPagamentoVisivel, setModalPagamentoVisivel] = useState(false)
@@ -111,27 +112,22 @@ export const ActionListaVendasDescontoFuncionario = ({ dadosVendasConvenioFuncio
     };
   });
 
+  const calcularTotal = (field) => {
+    return dadosConvenioVendasDescontoFuncionario.reduce((total, item) => total + toFloat(item[field]), 0);
+  };
+
   const calcularTotalVrBruto = () => {
-    let total = 0;
-    for (let dados of dadosConvenioVendasDescontoFuncionario) {
-      total += parseFloat(dados.VRBRUTOPAGO);
-    }
+    const total = calcularTotal('VRBRUTOPAGO');
     return total;
   }
 
   const calcularTotalVrDesconto = () => {
-    let total = 0;
-    for (let dados of dadosConvenioVendasDescontoFuncionario) {
-      total += parseFloat(dados.VRDESPAGO);
-    }
+    const total = calcularTotal('VRDESPAGO');
     return total;
   }
 
   const calcularTotalVrLiq = () => {
-    let total = 0;
-    for (let dados of dadosConvenioVendasDescontoFuncionario) {
-      total += parseFloat(dados.VRLIQPAGO);
-    }
+    const total = calcularTotal('VRLIQPAGO');
     return total;
   }
 
@@ -139,70 +135,70 @@ export const ActionListaVendasDescontoFuncionario = ({ dadosVendasConvenioFuncio
     {
       field: 'contador',
       header: 'Nº',
-      body: row => <th> {row.contador}</th>,
+      body: row => <th style={{ color: 'blue' }}> {row.contador}</th>,
       sortable: true,
     },
     {
       field: 'IDCAIXAWEB',
       header: 'Caixa ',
-      body: row => <th> {row.IDCAIXAWEB}</th>,
+      body: row => <th style={{ color: 'blue' }}> {row.IDCAIXAWEB}</th>,
       sortable: true,
     },
     {
       field: 'IDVENDA',
       header: 'Nº Venda ',
-      body: row => <th> {row.IDVENDA}</th>,
+      body: row => <th style={{ color: 'blue' }}> {row.IDVENDA}</th>,
       sortable: true,
     },
     {
       field: 'NFE_INFNFE_IDE_NNF',
       header: 'NFCe ',
-      body: row => <th> {row.NFE_INFNFE_IDE_NNF}</th>,
+      body: row => <th style={{ color: 'blue' }}> {row.NFE_INFNFE_IDE_NNF}</th>,
       sortable: true,
     },
     {
       field: 'DTHORAFECHAMENTO',
       header: 'Abertura',
-      body: row => <th> {row.DTHORAFECHAMENTO}</th>,
+      body: row => <th style={{ color: 'blue' }}> {row.DTHORAFECHAMENTO}</th>,
       sortable: true,
     },
     {
       field: 'NOFUNCIONARIO',
       header: 'Operador',
-      body: row => <th> {row.NOFUNCIONARIO}</th>,
+      body: row => <th style={{ color: 'blue' }}> {row.NOFUNCIONARIO}</th>,
       sortable: true,
     },
     {
       field: 'NOCONVENIADO',
       header: 'Conveniado',
-      body: row => <th> {row.NOCONVENIADO}</th>,
+      body: row => <th style={{ color: 'blue' }}> {row.NOCONVENIADO}</th>,
       footer: 'Total Vendas Convenio Desconto',
       sortable: true,
     },
     {
       field: 'CPFCONVENIADO',
       header: 'CPF',
-      body: row => <th> {row.CPFCONVENIADO}</th>,
+      body: row => <th style={{ color: 'blue' }}> {row.CPFCONVENIADO}</th>,
       sortable: true,
     },
     {
       field: 'VRBRUTOPAGO',
       header: 'Valor Bruto',
-      body: row => <th> {formatMoeda(row.VRBRUTOPAGO)}</th>,
+      body: row => <th style={{ color: 'blue' }}> {formatMoeda(row.VRBRUTOPAGO)}</th>,
       footer: formatMoeda(calcularTotalVrBruto()),
       sortable: true,
     },
     {
       field: 'VRDESPAGO',
       header: 'Desconto',
-      body: row => <th> {formatMoeda(row.VRDESPAGO)}</th>,
+      body: row => <th style={{ color: 'blue' }}> {formatMoeda(row.VRDESPAGO)}</th>,
       footer: formatMoeda(calcularTotalVrDesconto()),
       sortable: true,
     },
     {
       field: 'VRLIQPAGO',
       header: 'Valor Liq',
-      body: row => <th> {formatMoeda(row.VRLIQPAGO)}</th>,
+      body: row => <th style={{ color: 'blue' }}> {formatMoeda(row.VRLIQPAGO)}</th>,
       footer: formatMoeda(calcularTotalVrLiq()),
       sortable: true,
     },
@@ -274,7 +270,7 @@ export const ActionListaVendasDescontoFuncionario = ({ dadosVendasConvenioFuncio
 
         <header className="panel-hdr tituloListVendasCaixa" >
           <h2 id="TituloLoja" >
-            Lista de Vendas Com Desconto Funcionários e PN
+            Lista de Vendas Com Desconto <span className="fw-300">Funcionários e PN</span>
           </h2>
         </header>
         <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>

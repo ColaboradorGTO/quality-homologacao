@@ -355,7 +355,7 @@ export const ActionListaVendasCanceladas = ({ dadosVendasCanceladas, optionsModu
            <div className="p-1">
               <ButtonTable
                 titleButton={`${row.XML_FORMATADO?.length > 0 ? 'Visualizar Xml da Venda' : 'Venda Sem XML'}`}
-                disabledBTN={!row.XML_FORMATADO || row.XML_FORMATADO.length === 0}
+                disabledBTN={!row.XML_FORMATADO || row.XML_FORMATADO.length == 0}
                 onClickButton={() => clickDetalharVendaXML(row)}
                 Icon={TbFileTypeXml}
                 iconSize={20}
@@ -504,12 +504,12 @@ export const ActionListaVendasCanceladas = ({ dadosVendasCanceladas, optionsModu
 
       <Row> 
         <Column footer="Total " colSpan={7} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem', textAlign: 'center' }} />
-        <Column footer={formatMoeda(calcularTotalValorDinheiro())} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
-        <Column footer={formatMoeda(calcularTotalValorCartao())} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
-        <Column footer={formatMoeda(calcularTotalValorConvenio())} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
-        <Column footer={formatMoeda(calcularTotalValorPos())} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
-        <Column footer={formatMoeda(calcularTotalValorVoucher())} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
-        <Column footer={formatMoeda(calcularTotalValorVenda())} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
+        <Column footer={`Total Dinheiro: ${formatMoeda(calcularTotalValorDinheiro())}`} footerStyle={{ color: 'blue', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
+        <Column footer={`Total Cartao: ${formatMoeda(calcularTotalValorCartao())}`} footerStyle={{ color: 'blue', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
+        <Column footer={`Total Convenio: ${formatMoeda(calcularTotalValorConvenio())}`} footerStyle={{ color: 'blue', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
+        <Column footer={`Total POS: ${formatMoeda(calcularTotalValorPos())}`} footerStyle={{ color: 'blue', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
+        <Column footer={`Total Voucher: ${formatMoeda(calcularTotalValorVoucher())}`} footerStyle={{ color: 'blue', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
+        <Column footer={`Total Pago:  ${formatMoeda(calcularTotalValorVenda())}`} footerStyle={{ color: 'blue', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
         <Column footer={""} colSpan={5}  footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}/>
       </Row>
     </ColumnGroup>

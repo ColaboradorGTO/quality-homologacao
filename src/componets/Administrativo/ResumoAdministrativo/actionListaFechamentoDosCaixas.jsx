@@ -17,7 +17,7 @@ import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../Tables/headerTable";
 
-export const ActionListaFechamentoDosCaixas = ({ 
+export const ActionListaFechamentoDosCaixas = ({
   dadosCaixaFechados,
   usuarioLogado,
   optionsModulos
@@ -145,60 +145,42 @@ export const ActionListaFechamentoDosCaixas = ({
     };
   });
 
+  const calcularTotal = (field) => {
+    return dados.reduce((total, item) => total + toFloat(item[field]), 0);
+  };
 
   const calcularTotalDinheiroFisico = () => {
-    let total = 0;
-    for (let resultado of dados) {
-      total += parseFloat(resultado.TOTALFECHAMENTODINHEIROFISICO);
-    }
+    const total = calcularTotal('TOTALFECHAMENTODINHEIROFISICO');
     return total;
   }
 
   const calcularTotalDinheiroInformado = () => {
-    let total = 0;
-    for (let resultado of dados) {
-      total += parseFloat(resultado.TOTALFECHAMENTODINHEIRO);
-    }
+    const total = calcularTotal('TOTALFECHAMENTODINHEIRO');
     return total;
   }
 
   const calcularTotalQuebraCaixaTotal = () => {
-    let total = 0;
-    for (let resultado of dados) {
-      total += parseFloat(resultado.totalQuebraCaixa);
-    }
+    const total = calcularTotal('totalQuebraCaixa');
     return total;
   }
 
   const calcularTotalCartao = () => {
-    let total = 0;
-    for (let resultado of dados) {
-      total += parseFloat(resultado.TOTALFECHAMENTOCARTAO);
-    }
+    const total = calcularTotal('TOTALFECHAMENTOCARTAO');
     return total;
   }
 
   const calcularTotalPos = () => {
-    let total = 0;
-    for (let resultado of dados) {
-      total += parseFloat(resultado.TOTALFECHAMENTOPOS);
-    }
+    const total = calcularTotal('TOTALFECHAMENTOPOS');
     return total;
   }
 
   const calcularTotalVoucher = () => {
-    let total = 0;
-    for (let resultado of dados) {
-      total += parseFloat(resultado.TOTALFECHAMENTOVOUCHER);
-    }
+    const total = calcularTotal('TOTALFECHAMENTOVOUCHER');
     return total;
   }
 
   const calcularTotalFatura = () => {
-    let total = 0;
-    for (let resultado of dados) {
-      total += parseFloat(resultado.TOTALFECHAMENTOFATURA);
-    }
+    const total = calcularTotal('TOTALFECHAMENTOFATURA');
     return total;
   }
   const colunaDetalheDespesas = [
@@ -289,7 +271,7 @@ export const ActionListaFechamentoDosCaixas = ({
       sortable: true,
     },
     {
-      field: 'STCONFERIDO',
+      field: 'OPTIONS',
       header: 'Opções',
       body: row => {
         if (row.STCONFERIDO > 0) {

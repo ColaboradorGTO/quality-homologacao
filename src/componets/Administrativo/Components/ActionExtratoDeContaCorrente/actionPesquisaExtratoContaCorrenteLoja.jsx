@@ -10,6 +10,7 @@ import { ActionListaExtratoContaCorrenteLoja } from "./actionListaExtratoContaCo
 import { useFetchData } from "../../../../hooks/useFetchData"
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento"
 import { useQuery } from "react-query"
+import Swal from "sweetalert2"
 
 export const ActionPesquisaExtratoContaCorenteLoja = () => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
@@ -17,7 +18,7 @@ export const ActionPesquisaExtratoContaCorenteLoja = () => {
   const [dataPesquisaFim, setDataPesquisaFim] = useState('');
   const [empresaSelecionada, setEmpresaSelecionada] = useState('');
   const [empresaSelecionadaNome, setEmpresaSelecionadaNome] = useState('');
-  
+
 
   useEffect(() => {
     const dataInicial = getDataAtual();
@@ -25,7 +26,7 @@ export const ActionPesquisaExtratoContaCorenteLoja = () => {
     setDataPesquisaInicio(dataInicial);
     setDataPesquisaFim(dataFinal);
   }, [])
-  
+
   const { data: optionsEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas } = useFetchData('listaEmpresasIformatica', '/listaEmpresasIformatica');
 
   const fetchListaExtrato = async () => {
@@ -34,7 +35,7 @@ export const ActionPesquisaExtratoContaCorenteLoja = () => {
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
       animacaoCarregamento('Carregando dados...', true);
-                                            
+
       const primeiraPagina = 1;
       const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
       const page = primeiraResposta.page || primeiraPagina;
@@ -45,15 +46,15 @@ export const ActionPesquisaExtratoContaCorenteLoja = () => {
       let allData = [...(primeiraResposta.data || [])];
 
       if (totalPages > 1) {
-      for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
           animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
           const responsePage = await get(`${urlApi}&page=${currentPage}`);
           allData.push(...(responsePage.data || []));
-      }
+        }
       }
 
       return allData;
-  
+
     } catch (error) {
       console.error('Erro ao buscar dados da api', error);
       throw error;
@@ -61,7 +62,7 @@ export const ActionPesquisaExtratoContaCorenteLoja = () => {
       fecharAnimacaoCarregamento();
     }
   };
-   
+
   const { data: dadosExtratoLojaPeriodo = [], error: errorExtrato, isLoading: isLoadingExtrato, refetch: refetchListaExtrato } = useQuery(
     ['listaExtratoDaLojaPeriodo',],
     () => fetchListaExtrato(),
@@ -76,8 +77,17 @@ export const ActionPesquisaExtratoContaCorenteLoja = () => {
   };
 
   const handleClick = () => {
-    refetchListaExtrato()
-    setTabelaVisivel(true)
+    if (empresaSelecionada !== '') {
+      refetchListaExtrato()
+      setTabelaVisivel(true)
+    } else {
+      Swal.fire({
+        icon: 'info',
+        text: 'Selecione uma empresa!',
+        timer: 3000,
+      })
+    }
+
   }
 
   return (
@@ -107,7 +117,7 @@ export const ActionPesquisaExtratoContaCorenteLoja = () => {
 
           }))
         ]}
-        valueSelectEmpresa={console.log(empresaSelecionada)}
+        valueSelectEmpresa={empresaSelecionada}
         onChangeSelectEmpresa={handleSelectEmpresa}
 
         ButtonSearchComponent={ButtonType}
@@ -118,7 +128,9 @@ export const ActionPesquisaExtratoContaCorenteLoja = () => {
       />
 
       {tabelaVisivel && (
-        <ActionListaExtratoContaCorrenteLoja dadosExtratoLojaPeriodo={dadosExtratoLojaPeriodo} />
+        <ActionListaExtratoContaCorrenteLoja
+          dadosExtratoLojaPeriodo={dadosExtratoLojaPeriodo}
+        />
       )}
     </Fragment>
   )

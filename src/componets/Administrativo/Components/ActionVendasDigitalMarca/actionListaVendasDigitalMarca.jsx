@@ -68,19 +68,19 @@ export const ActionListaVendasDigitalMarca = ({ dadosVendasMarca }) => {
     {
       field: 'NOFANTASIA',
       header: 'Loja',
-      body: row => <th>{row.NOFANTASIA}</th>,
+      body: row => <th style={{ color: 'blue' }}>{row.NOFANTASIA}</th>,
       sortable: true,
     },
     {
       field: 'QTDTOTAL',
       header: 'QTD Produtos',
-      body: row => <th>{toFloat(row.QTDTOTAL)}</th>,
+      body: row => <th style={{ color: 'blue' }}>{toFloat(row.QTDTOTAL)}</th>,
       sortable: true,
     },
     {
       field: 'VRTOTALVENDA',
       header: 'Valor Vendido',
-      body: row => <th>{formatMoeda(row.VRTOTALVENDA)}</th>,
+      body: row => <th style={{ color: 'blue' }}>{formatMoeda(row.VRTOTALVENDA)}</th>,
       sortable: true,
     },
   ]

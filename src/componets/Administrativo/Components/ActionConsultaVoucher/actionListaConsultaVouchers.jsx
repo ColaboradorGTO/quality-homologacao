@@ -484,9 +484,9 @@ export const ActionListaConsultaVouchers = ({dadosVoucher, usuarioLogado, option
           Icon={GrFormView}
           iconColor={"#fff"}
           cor={"success"}
-          iconSize={25}
-          width="35px"
-          height="35px"
+          iconSize={20}
+          width="32px"
+          height="32px"
         />
         <ButtonTable
           titleButton={"Editar Situação"}
@@ -494,9 +494,9 @@ export const ActionListaConsultaVouchers = ({dadosVoucher, usuarioLogado, option
           Icon={CiEdit}
           iconColor={"#fff"}
           cor={"primary"}
-          iconSize={25}
-          width="35px"
-          height="35px"
+          iconSize={20}
+          width="32px"
+          height="32px"
         />
         <ButtonTable
           titleButton={"Imprimir"}
@@ -504,9 +504,9 @@ export const ActionListaConsultaVouchers = ({dadosVoucher, usuarioLogado, option
           Icon={MdOutlineLocalPrintshop}
           iconColor={"#fff"}
           cor={"secondary"}
-          iconSize={25}
-          width="35px"
-          height="35px"
+          iconSize={18}
+          width="32px"
+          height="32px"
         />
       </div>
       ),

@@ -31,7 +31,8 @@ export const ActionRelacaoProdutosModal = ({ dadosPagamentoModal, show, handleCl
       NPARCELAS: item.vendaPagamento[0].pag.NPARCELAS,
       NUOPERACAO: item.vendaPagamento[0].pag.NUOPERACAO,
       NSUAUTORIZADORA: item.vendaPagamento[0].pag.NSUAUTORIZADORA,
-      VALORRECEBIDO: item.vendaPagamento[0].pag.VALORRECEBIDO
+      VALORRECEBIDO: item.vendaPagamento[0].pag.VALORRECEBIDO,
+      NUAUTORIZACAO: item.vendaPagamento[0].pag.NUAUTORIZACAO
     }
   });
 
@@ -105,9 +106,9 @@ export const ActionRelacaoProdutosModal = ({ dadosPagamentoModal, show, handleCl
       sortable: true,
     },
     {
-      field: 'NSUAUTORIZADORA',
+      field: 'NUAUTORIZACAO',
       header: 'Autorização',
-      body: row => toFloat(row.NSUAUTORIZADORA),
+      body: row => toFloat(row.NUAUTORIZACAO),
       sortable: true,
     },
     {
