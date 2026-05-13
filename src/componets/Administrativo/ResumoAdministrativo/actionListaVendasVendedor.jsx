@@ -76,27 +76,22 @@ export const ActionListaVendasVendedor = ({ dadosVendasVendedor }) => {
     };
   });
 
+  const calcularTotal = (field) => {
+    return dadosVendedorVendas.reduce((total, item) => total + toFloat(item[field]), 0);
+  };
+
   const calcularTotalVendido = () => {
-    let total = 0;
-    for (let dados of dadosVendedorVendas) {
-      total += parseFloat(dados?.TOTALVENDIDOVENDEDOR);
-    }
+    const total = calcularTotal('TOTALVENDIDOVENDEDOR');
     return total;
   }
 
   const calcularTotalVouchers = () => {
-    let total = 0;
-    for (let dados of dadosVendedorVendas) {
-      total += parseFloat(dados.Vouchers);
-    }
+    const total = calcularTotal('Vouchers');
     return total;
   }
 
   const calcularTotalValorLiquido = () => {
-    let total = 0;
-    for (let dados of dadosVendedorVendas) {
-      total += parseFloat(dados.vrVendidoVendedor);
-    }
+    const total = calcularTotal('vrVendidoVendedor');
     return total;
   }
   const colunaVendidoVendedor = [

@@ -106,34 +106,34 @@ export const ActionListaVendasMarca = ({ dadosVendasMarca }) => {
     {
       field: 'IDEMPRESA',
       header: '#',
-      body: row => <th>{row.IDEMPRESA}</th>,
+      body: row => <th style={{ color: 'blue' }}>{row.IDEMPRESA}</th>,
       sortable: true,
     },
     {
       field: 'NOFANTASIA',
       header: 'Loja',
-      body: row => <th>{row.NOFANTASIA}</th>,
+      body: row => <th style={{ color: 'blue' }}>{row.NOFANTASIA}</th>,
       footer: 'Total',
       sortable: true,
     },
     {
       field: 'QTDVENDA',
       header: 'QTD Clientes',
-      body: row => <th>{toFloat(row.QTDVENDA)}</th>,
+      body: row => <th style={{ color: 'green' }}>{toFloat(row.QTDVENDA)}</th>,
       footer: calcularTotalQtdProduto(),
       sortable: true,
     },
     {
       field: 'vrDisponivelBrutoVoucher',
       header: 'Total Vendas',
-      body: row => <th>{formatMoeda(row.vrDisponivelBrutoVoucher)}</th>,
+      body: row => <th style={{ color: 'blue' }}>{formatMoeda(row.vrDisponivelBrutoVoucher)}</th>,
       footer: formatMoeda(calcularTotalVoucher()),
       sortable: true,
     },
     {
       field: 'valorTicketM',
       header: 'Ticket Médio',
-      body: row => <th>{formatMoeda(row.valorTicketM)}</th>,
+      body: row => <th style={{ color: 'blue' }}>{formatMoeda(row.valorTicketM)}</th>,
       footer: row => calcularTotalTicketMedio(),
       sortable: true,
     },
@@ -166,10 +166,9 @@ export const ActionListaVendasMarca = ({ dadosVendasMarca }) => {
             sortOrder={-1}
             selectionMode="single"
             selection={rowSelection}
-
-            // paginator={true}
-            // rows={10}
-            // rowsPerPageOptions={[5, 10, 20, 50]}
+            paginator={true}
+            rows={10}
+            rowsPerPageOptions={[5, 10, 20, 50]}
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
             filterDisplay="menu"

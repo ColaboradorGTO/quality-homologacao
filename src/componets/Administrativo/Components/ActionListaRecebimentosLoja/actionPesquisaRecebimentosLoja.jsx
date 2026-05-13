@@ -58,7 +58,7 @@ export const ActionPesquisaRecebimentosLoja = () => {
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
       animacaoCarregamento('Carregando dados...', true);
-                                            
+                                           
       const primeiraPagina = 1;
       const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
       const page = primeiraResposta.page || primeiraPagina;
@@ -169,7 +169,6 @@ export const ActionPesquisaRecebimentosLoja = () => {
     setTabelaRecebimentos(false)
   }
 
-
   return (
 
     <Fragment>
@@ -194,12 +193,11 @@ export const ActionPesquisaRecebimentosLoja = () => {
         onChangeSelectEmpresa={handleSelectEmpresa}
         valueSelectEmpresa={empresaSelecionada}
         optionsEmpresas={[
-          { value: '0', label: 'Selecionar Empresa' },
+          { value: '0', label: 'Todas' },
           ...optionsEmpresas.map((empresa) => {
             return {
               value: empresa.IDEMPRESA,
               label: empresa.NOFANTASIA,
-
             }
         })]}
         labelSelectEmpresa={"Empresa"}
@@ -207,7 +205,7 @@ export const ActionPesquisaRecebimentosLoja = () => {
         InputSelectMarcasComponent={InputSelectAction}
         labelSelectMarcas={"Marca"}
         optionsMarcas={[
-          { value: '0', label: 'Selecionar Marca' },
+          { value: '0', label: 'Todas' },
             ...optionsMarcas.map((marca) => {
             return {
               
@@ -242,8 +240,6 @@ export const ActionPesquisaRecebimentosLoja = () => {
         }))}
         valueSelectFuncionario={colaboradorSelecionado}
         onChangeSelectFuncionario={handleSelectFuncionario}
-
-       
 
         MultSelectSubGrupoComponent={MultSelectAction}
         labelMultSelectSubGrupo={"Parcelas"}

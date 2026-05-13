@@ -9,7 +9,7 @@ import { ButtonTypeModal } from "../../../Buttons/ButtonTypeModal";
 
 export const ActionDetalheVendaProdutosModal = ({ dadosProdutoModal, show, handleClose }) => {
   const dadosModalProduto = dadosProdutoModal.map((item) => {
- 
+
     return {
       NUCODBARRAS: item.NUCODBARRAS,
       DSNOME: item.DSNOME,
@@ -27,40 +27,40 @@ export const ActionDetalheVendaProdutosModal = ({ dadosProdutoModal, show, handl
     {
       field: 'NUCODBARRAS',
       header: 'Código Barras',
-      body: row => <th>{row.NUCODBARRAS}</th>,
+      body: row => <th style={{ color: 'blue' }}>{row.NUCODBARRAS}</th>,
       sortable: true,
 
     },
     {
       field: 'DSNOME',
       header: 'Descrição',
-      body: row => <th>{row.DSNOME}</th>,
+      body: row => <th style={{ color: 'blue' }}>{row.DSNOME}</th>,
       sortable: true,
 
     },
     {
       field: 'VUNCOM',
       header: 'Vr. Unit',
-      body: row => <th>{formatMoeda(row.VUNCOM)}</th>,
+      body: row => <th style={{ color: 'blue' }}>{formatMoeda(row.VUNCOM)}</th>,
       sortable: true,
 
     },
     {
       field: 'QTD',
       header: 'QTD',
-      body: row => <th>{row.QTD}</th>,
+      body: row => <th style={{ color: 'blue' }}>{row.QTD}</th>,
       sortable: true,
     },
     {
       field: 'VRTOTALLIQUIDO',
       header: 'Vr Recebido',
-      body: row => <th>{formatMoeda(row.VRTOTALLIQUIDO)}</th>,
+      body: row => <th style={{ color: 'blue' }}>{formatMoeda(row.VRTOTALLIQUIDO)}</th>,
       sortable: true,
     },
     {
       field: 'VENDEDOR_NOME',
       header: 'Vendedor',
-      body: row => <th>{row.VENDEDOR_NOME}</th>,
+      body: row => <th style={{ color: 'blue' }}>{row.VENDEDOR_NOME}</th>,
       sortable: true,
     },
 
@@ -73,7 +73,7 @@ export const ActionDetalheVendaProdutosModal = ({ dadosProdutoModal, show, handl
     {
       field: 'STTROCA',
       header: 'Troca',
-      body: row => <th style={{ color: row.STTROCA == 'False' ? 'red' : 'blue' }}>{row.STTROCA == 'False' ? 'NÃO' : 'SIM'}</th>,
+      body: row => <th style={{ color: 'blue' }}>{row.STTROCA == 'False' ? 'NÃO' : 'SIM'}</th>,
       sortable: true,
     }
   ]
@@ -100,6 +100,7 @@ export const ActionDetalheVendaProdutosModal = ({ dadosProdutoModal, show, handl
 
           <Modal.Body>
 
+            <h6>Lista de Produtos da Venda Nº {dadosProdutoModal[0]?.IDVENDA}</h6>
 
             <DataTable
               title="Vendas por Loja"

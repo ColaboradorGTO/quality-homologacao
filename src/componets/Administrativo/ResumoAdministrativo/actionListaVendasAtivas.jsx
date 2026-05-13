@@ -20,12 +20,12 @@ import * as XLSX from 'xlsx';
 import { ActionVendaXMLModal } from "./ActionVendasXML/actionVendaXMLModal";
 import { TbFileTypeXml } from "react-icons/tb";
 import { ActionCancelarVendaModal } from "./ActionCancelarVenda/actionCancelarVendaModal";
+import { toFloat } from "../../../utils/toFloat";
 
-
-export const ActionListaVendasAtivas = ({ 
-  dadosVendasAtivas, 
-  empresaSelecionada, 
-  usuarioLogado, 
+export const ActionListaVendasAtivas = ({
+  dadosVendasAtivas,
+  empresaSelecionada,
+  usuarioLogado,
   optionsModulos
 }) => {
   const [modalVendaVisivel, setModalVendaVisivel] = useState(false);
@@ -96,7 +96,6 @@ export const ActionListaVendasAtivas = ({
     XLSX.writeFile(workbook, 'vendas_ativas.xlsx');
   };
 
-
   const dadosAtivasVendas = dadosVendasAtivas.map((item, index) => {
     let contador = index + 1;
 
@@ -116,27 +115,22 @@ export const ActionListaVendasAtivas = ({
     };
   });
 
+  const calcularTotal = (field) => {
+    return dadosAtivasVendas.reduce((total, item) => total + toFloat(item[field]), 0);
+  };
+
   const calcularTotalValorBruto = () => {
-    let total = 0;
-    for (let dados of dadosAtivasVendas) {
-      total += parseFloat(dados.VRTOTALVENDA);
-    }
+    const total = calcularTotal('VRTOTALVENDA');
     return total;
   }
 
   const calcullarTotalDesconto = () => {
-    let total = 0;
-    for (let dados of dadosAtivasVendas) {
-      total += parseFloat(dados.VRTOTALDESCONTO);
-    }
+    const total = calcularTotal('VRTOTALDESCONTO');
     return total;
   }
 
   const calcullarTotalPago = () => {
-    let total = 0;
-    for (let dados of dadosAtivasVendas) {
-      total += parseFloat(dados.VRTOTALPAGO);
-    }
+    const total = calcularTotal('VRTOTALPAGO');
     return total;
   }
 
@@ -204,7 +198,7 @@ export const ActionListaVendasAtivas = ({
       field: 'STCONTINGENCIA',
       header: 'Nota',
       body: row => (
-        <th style={{ color: row.STCONTINGENCIA == 'Contigência' ? 'blue' : 'red' }}>
+        <th style={{ color: row.STCONTINGENCIA == 'Contigência' ? 'red' : 'blue' }}>
           {row.STCONTINGENCIA}
         </th>
       ),
@@ -213,60 +207,60 @@ export const ActionListaVendasAtivas = ({
     {
       header: 'Opções',
       body: (row) => {
-        if(row.STCONFERIDO == 1) {
+        if (row.STCONFERIDO == 1) {
           return (
 
-          <div className="p-1 "
-            style={{ justifyContent: "space-between", display: "flex" }}
-          >
-            <div className="p-1">
-              <ButtonTable
-                titleButton={"Detalhar Venda"}
-                onClickButton={() => handleClickVenda(row)}
-                Icon={GrView}
-                cor={"info"}
-                iconSize={20}
-                width="30px"
-                height="30px"
-              />
-            </div>
-            <div className="p-1">
-              <ButtonTable
-                titleButton={"Detalhar Produtos"}
-                onClickButton={() => handleClickProduto(row)}
-                Icon={FaProductHunt}
-                cor={"warning"}
-                iconSize={20}
-                width="30px"
-                height="30px"
-              />
-            </div>
-            <div className="p-1">
-              <ButtonTable
-                titleButton={"Detalhar Recebimentos"}
-                onClickButton={() => handleClickPagamento(row)}
-                Icon={MdOutlineAttachMoney}
-                cor={"success"}
-                iconSize={20}
-                width="30px"
-                height="30px"
-              />
-            </div>
-            <div className="p-1">
-              <ButtonTable
-                titleButton={`${row.XML_FORMATADO?.length > 0 ? 'Visualizar Xml da Venda' : 'Venda Sem XML'}`}
-                disabledBTN={row.XML_FORMATADO?.length === 0}
-                onClickButton={() => clickDetalharVendaXML(row)}
-                Icon={TbFileTypeXml}
-                iconSize={20}
-                iconColor={"#fff"}
-                cor={"info"}
-                width="30px"
-                height="30px"
-  
-              />
-            </div>
-            {/* <div className="p-1">
+            <div className="p-1 "
+              style={{ justifyContent: "space-between", display: "flex" }}
+            >
+              <div className="p-1">
+                <ButtonTable
+                  titleButton={"Detalhar Venda"}
+                  onClickButton={() => handleClickVenda(row)}
+                  Icon={GrView}
+                  cor={"info"}
+                  iconSize={20}
+                  width="30px"
+                  height="30px"
+                />
+              </div>
+              <div className="p-1">
+                <ButtonTable
+                  titleButton={"Detalhar Produtos"}
+                  onClickButton={() => handleClickProduto(row)}
+                  Icon={FaProductHunt}
+                  cor={"warning"}
+                  iconSize={20}
+                  width="30px"
+                  height="30px"
+                />
+              </div>
+              <div className="p-1">
+                <ButtonTable
+                  titleButton={"Detalhar Recebimentos"}
+                  onClickButton={() => handleClickPagamento(row)}
+                  Icon={MdOutlineAttachMoney}
+                  cor={"success"}
+                  iconSize={20}
+                  width="30px"
+                  height="30px"
+                />
+              </div>
+              <div className="p-1">
+                <ButtonTable
+                  titleButton={`${row.XML_FORMATADO?.length > 0 ? 'Visualizar Xml da Venda' : 'Venda Sem XML'}`}
+                  disabledBTN={row.XML_FORMATADO?.length === 0}
+                  onClickButton={() => clickDetalharVendaXML(row)}
+                  Icon={TbFileTypeXml}
+                  iconSize={20}
+                  iconColor={"#fff"}
+                  cor={"info"}
+                  width="30px"
+                  height="30px"
+
+                />
+              </div>
+              {/* <div className="p-1">
               <ButtonTable
                 titleButton={"Cancelar Venda"}
                 onClickButton={() => handleCancelarVenda(row)}
@@ -277,75 +271,75 @@ export const ActionListaVendasAtivas = ({
                 height="30px"
               />
             </div> */}
-          </div>
+            </div>
           )
         } else {
           return (
-             <div className="p-1 "
-            style={{ justifyContent: "space-between", display: "flex" }}
-          >
-            <div className="p-1">
-              <ButtonTable
-                titleButton={"Detalhar Venda"}
-                onClickButton={() => handleClickVenda(row)}
-                Icon={GrView}
-                cor={"info"}
-                iconSize={20}
-                width="30px"
-                height="30px"
-              />
+            <div className="p-1 "
+              style={{ justifyContent: "space-between", display: "flex" }}
+            >
+              <div className="p-1">
+                <ButtonTable
+                  titleButton={"Detalhar Venda"}
+                  onClickButton={() => handleClickVenda(row)}
+                  Icon={GrView}
+                  cor={"info"}
+                  iconSize={20}
+                  width="30px"
+                  height="30px"
+                />
+              </div>
+              <div className="p-1">
+                <ButtonTable
+                  titleButton={"Detalhar Produtos"}
+                  onClickButton={() => handleClickProduto(row)}
+                  Icon={FaProductHunt}
+                  cor={"warning"}
+                  iconSize={20}
+                  width="30px"
+                  height="30px"
+                />
+              </div>
+              <div className="p-1">
+                <ButtonTable
+                  titleButton={"Detalhar Recebimentos"}
+                  onClickButton={() => handleClickPagamento(row)}
+                  Icon={MdOutlineAttachMoney}
+                  cor={"success"}
+                  iconSize={20}
+                  width="30px"
+                  height="30px"
+                />
+              </div>
+              <div className="p-1">
+                <ButtonTable
+                  titleButton={`${row.XML_FORMATADO?.length > 0 ? 'Visualizar Xml da Venda' : 'Venda Sem XML'}`}
+                  disabledBTN={row.XML_FORMATADO?.length === 0}
+                  onClickButton={() => clickDetalharVendaXML(row)}
+                  Icon={TbFileTypeXml}
+                  iconSize={20}
+                  iconColor={"#fff"}
+                  cor={"info"}
+                  width="30px"
+                  height="30px"
+
+                />
+              </div>
+              <div className="p-1">
+                <ButtonTable
+                  titleButton={"Cancelar Venda"}
+                  onClickButton={() => handleCancelarVenda(row)}
+                  Icon={MdClose}
+                  cor={"danger"}
+                  iconSize={20}
+                  width="30px"
+                  height="30px"
+                />
+              </div>
             </div>
-            <div className="p-1">
-              <ButtonTable
-                titleButton={"Detalhar Produtos"}
-                onClickButton={() => handleClickProduto(row)}
-                Icon={FaProductHunt}
-                cor={"warning"}
-                iconSize={20}
-                width="30px"
-                height="30px"
-              />
-            </div>
-            <div className="p-1">
-              <ButtonTable
-                titleButton={"Detalhar Recebimentos"}
-                onClickButton={() => handleClickPagamento(row)}
-                Icon={MdOutlineAttachMoney}
-                cor={"success"}
-                iconSize={20}
-                width="30px"
-                height="30px"
-              />
-            </div>
-            <div className="p-1">
-              <ButtonTable
-                titleButton={`${row.XML_FORMATADO?.length > 0 ? 'Visualizar Xml da Venda' : 'Venda Sem XML'}`}
-                disabledBTN={row.XML_FORMATADO?.length === 0}
-                onClickButton={() => clickDetalharVendaXML(row)}
-                Icon={TbFileTypeXml}
-                iconSize={20}
-                iconColor={"#fff"}
-                cor={"info"}
-                width="30px"
-                height="30px"
-  
-              />
-            </div>
-            <div className="p-1">
-              <ButtonTable
-                titleButton={"Cancelar Venda"}
-                onClickButton={() => handleCancelarVenda(row)}
-                Icon={MdClose}
-                cor={"danger"}
-                iconSize={20}
-                width="30px"
-                height="30px"
-              />
-            </div>
-          </div>
           )
         }
-    }
+      }
     },
 
   ]
@@ -523,7 +517,7 @@ export const ActionListaVendasAtivas = ({
         dadosDetalheVendasXML={dadosDetalheVendasXML}
       />
 
-      <ActionCancelarVendaModal 
+      <ActionCancelarVendaModal
         show={modalCancelarVenda}
         handleClose={() => setModalCancelarVenda(false)}
         optionsModulos={optionsModulos}

@@ -3,7 +3,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { ButtonTable } from "../../../ButtonsTabela/ButtonTable";
 import { FaBalanceScale, FaBalanceScaleLeft } from "react-icons/fa";
-import { GrFormView } from "react-icons/gr";
+import { GrFormView, GrList } from "react-icons/gr";
 import { FaScaleUnbalanced } from "react-icons/fa6";
 import { FcCurrencyExchange } from "react-icons/fc";
 import HeaderTable from "../../../Tables/headerTable";
@@ -17,6 +17,8 @@ import { ActionPreviaBalancoModal } from "./ActionPreviaBalanco/actionPreviaBala
 import { ActionVisualizarImprimirPrestacaoContas } from "./ActionPrestacaoContasBalanco/actionVisualizarImprimirPrestacaoContas";
 import { toFloat } from "../../../../utils/toFloat";
 import Swal from "sweetalert2";
+import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
+import { useQuery } from "react-query";
 
 export const ActionListaBalancoPorLoja = ({ dadosBalanco, optionsModulos, usuarioLogado }) => {
   const [modalResumoBalanco, setModalResumoBalanco] = useState(false)
@@ -27,6 +29,7 @@ export const ActionListaBalancoPorLoja = ({ dadosBalanco, optionsModulos, usuari
   const [dadosListaContasBalanco, setDadosListaContasBalanco] = useState([])
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowSelection, setRowSelection] = useState(null);
+  const [paramsResumo, setParamsResumo] = useState(null);
   const dataTableRef = useRef();
 
   const onGlobalFilterChange = (e) => {
@@ -174,194 +177,269 @@ export const ActionListaBalancoPorLoja = ({ dadosBalanco, optionsModulos, usuari
         >
           <div className="p-1">
             <ButtonTable
-              titleButton={"Prévia Balanço Diferença"}
-              cor={"primary"}
-              Icon={FaBalanceScaleLeft}
-              iconSize={25}
-              width="35px"
-              height="35px"
-              onClickButton={() => handleClickPrevialanco(row)}
-            />
-          </div>
-          <div className="p-1">
-            <ButtonTable
               titleButton={"Detalhar Balanço"}
-              cor={"success"}
-              Icon={GrFormView}
-              iconSize={25}
-              width="35px"
-              height="35px"
+              cor={"primary"}
+              //Icon={GrFormView}
+              Icon={GrList}
+              iconSize={20}
+              width="32px"
+              height="32px"
               onClickButton={() => handleClickResumoBalanco(row)}
             />
           </div>
+
           <div className="p-1">
             <ButtonTable
               titleButton={"Prévia Balanço"}
-              cor={"warning"}
-              Icon={FaScaleUnbalanced}
-              iconSize={25}
-              width="35px"
-              height="35px"
+              cor={"success"}
+              Icon={GrFormView}
+              iconSize={20}
+              width="32px"
+              height="32px"
               onClickButton={() => handleClickPrevialanco(row)}
             />
           </div>
+
           <div className="p-1">
-            {/* {row.STCONSOLIDADO == 'True' && row.STCONCLUIDO == 'Aberto' && (
-              
-            )} */}
             <ButtonTable
-              titleButton={"Prestação de Contas"}
-              cor={"danger"}
-              Icon={FcCurrencyExchange}
-              iconSize={25}
-              width="35px"
-              height="35px"
-              onClickButton={() => handleClickContaBalanco(row)}
+              titleButton={"Prévia Balanço Diferença"}
+              cor={"warning"}
+              Icon={FaScaleUnbalanced}
+              iconSize={20}
+              width="32px"
+              height="32px"
+              onClickButton={() => handleClickPrevialanco(row)}
             />
           </div>
 
           <div className="p-1">
             <ButtonTable
               titleButton={"Prévia Balanço Geral"}
-              cor={"info"}
-              Icon={FaBalanceScale}
-              iconSize={25}
-              width="35px"
-              height="35px"
+              cor={"danger"}
+              Icon={GrList}
+              iconSize={20}
+              width="32px"
+              height="32px"
               onClickButton={() => handleClickPreviaGeral(row)}
             />
           </div>
+
+          <div className="p-1">
+     
+            <ButtonTable
+              titleButton={"Prestação de Contas"}
+              cor={"info"}
+              Icon={FcCurrencyExchange}
+              iconSize={20}
+              width="32px"
+              height="32px"
+              onClickButton={() => handleClickContaBalanco(row)}
+            />
+          </div>
+
+
         </div>
       ),
       sortable: true,
     },
   ]
 
-  const handleEditPreviaBalanco = async (IDRESUMOBALANCO, IDEMPRESA) => {
+  const fetchListaPreviaBalanco = async (IDRESUMOBALANCO, IDEMPRESA, diferenca, processa) => {
+    const urlBase = `/novo-previa-balanco?idResumo=${IDRESUMOBALANCO}&idEmpresa=${IDEMPRESA}&diferenca=${diferenca}&processa=${processa}`;
+    let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
+    urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
-      const response = await get(`/novo-previa-balanco?idResumo=${IDRESUMOBALANCO}&idEmpresa=${IDEMPRESA}&diferenca=1&processa=1`)
-      if (response.data && response.data.length > 0) {
-        setDadosPreviaBalancoModal(response.data)
-        setModalPreviaBalanco(true)
-        return response.data;
-      } else {
-  
-        Swal.fire({
-          icon: 'warning',
-          title: 'Atenção',
-          text: 'Nenhum dado encontrado para o balanço selecionado.',
-          customClass: {
-            container: 'custom-swal',
-          },
-          timer: 3000
-        })
-        return;
+      animacaoCarregamento('Carregando dados...', true);
+
+      const primeiraPagina = 1;
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const page = primeiraResposta.page || primeiraPagina;
+      const pageSize = primeiraResposta.pageSize || 1000;
+      const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
+      const totalPages = Math.ceil(totalRows / pageSize);
+
+      let allData = [...(primeiraResposta.data || [])];
+
+      if (totalPages > 1) {
+        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          allData.push(...(responsePage.data || []));
+        }
       }
+
+      return allData;
     } catch (error) {
-      console.log(error, "não foi possivel pegar os dados da tabela ")
+      console.error('Erro ao buscar dados da api:', error);
+      throw error;
+    } finally {
+      fecharAnimacaoCarregamento();
     }
-  }
+  };
+
+  const { data: dadosResumoBalanco = [], error: errorBalanco, isLoading: isLoadingBalanco, refetch: refetchListaResumoBalanco } = useQuery(
+    ['lista-previa-balanco', paramsResumo?.IDRESUMOBALANCO, paramsResumo?.NUMEROCOLETOR],
+    () => fetchListaPreviaBalanco(paramsResumo?.IDRESUMOBALANCO, paramsResumo?.NUMEROCOLETOR),
+    {
+      enabled: false,
+    }
+  );
+
+  const fetchListaColetor = async (IDRESUMOBALANCO, IDEMPRESA, diferenca, processa) => {
+    const urlBase = `/coletor-balanco?idEmpresa=${IDEMPRESA}&idResumo=${IDRESUMOBALANCO}&diferenca=${diferenca}&processa=${processa}`;
+    let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
+    urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+    try {
+      animacaoCarregamento('Carregando dados...', true);
+
+      const primeiraPagina = 1;
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const page = primeiraResposta.page || primeiraPagina;
+      const pageSize = primeiraResposta.pageSize || 1000;
+      const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
+      const totalPages = Math.ceil(totalRows / pageSize);
+
+      let allData = [...(primeiraResposta.data || [])];
+
+      if (totalPages > 1) {
+        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          allData.push(...(responsePage.data || []));
+        }
+      }
+
+      return allData;
+    } catch (error) {
+      console.error('Erro ao buscar dados da api:', error);
+      throw error;
+    } finally {
+      fecharAnimacaoCarregamento();
+    }
+  };
+
+  const { data: dadoscoletor = [], error: errorColetor, isLoading: isLoadingColetor, refetch: refetchListacoletor } = useQuery(
+    ['lista-coletor-balanco', paramsResumo?.IDRESUMOBALANCO, paramsResumo?.NUMEROCOLETOR],
+    () => fetchListaColetor(paramsResumo?.IDRESUMOBALANCO, paramsResumo?.NUMEROCOLETOR),
+    {
+      enabled: false,
+    }
+  );
 
   const handleClickPrevialanco = async (row) => {
     if (optionsModulos[0]?.ALTERAR == 'True') {
+      if (!row.IDRESUMOBALANCO || !row.IDEMPRESA) return;
+      const diferenca = 1;
+      const processa = 0;
 
-      if (row.IDRESUMOBALANCO && row.IDEMPRESA) {
-        handleEditPreviaBalanco(row.IDRESUMOBALANCO, row.IDEMPRESA)
-      }
-    } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Acesso Negado',
-        text: 'Você não tem permissão para acessar essa funcionalidade.',
-        customClass: {
-          container: 'custom-swal',
-        },
-        timer: 3000
-      });
-      return;
-    }
-  }
-
-  const handleEditPreviaGeral = async (IDRESUMOBALANCO, IDEMPRESA) => {
-    try {
-      const response = await get(`/novo-previa-balanco?idResumo=${IDRESUMOBALANCO}&idEmpresa=${IDEMPRESA}&diferenca=0&processa=0`)
-      if (response.data && response.data.length > 0) {
-        setDadosPreviaBalancoModal(response.data)
-        return response.data;
-      } else {
+      try {
         Swal.fire({
-          icon: 'warning',
-          title: 'Atenção',
-          text: 'Nenhum dado encontrado para o balanço selecionado.',
-          timer: 3000
-        })
-        return;
-      }
-    } catch (error) {
-      console.log(error, "não foi possivel pegar os dados da tabela ")
-    }
-  }
-
-  const handleClickPreviaGeral = async (row) => {
-    if (optionsModulos[0]?.ALTERAR == 'True') {
-
-      if (row.IDRESUMOBALANCO && row.IDEMPRESA) {
-        handleEditPreviaBalanco(row.IDRESUMOBALANCO, row.IDEMPRESA)
-      }
-    } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Acesso Negado',
-        text: 'Você não tem permissão para acessar essa funcionalidade.',
-        customClass: {
-          container: 'custom-swal',
-        },
-        timer: 3000
-      });
-    }
-  }
-
-  const handleEditResumoBalanco = async (IDRESUMOBALANCO, IDEMPRESA) => {
-    try {
-      const response = await get(`/coletor-balanco?idEmpresa=${IDEMPRESA}&idResumo=${IDRESUMOBALANCO}&diferenca=1&processa=0`)
-      if (response.data && response.data.length > 0) {
-        setDadosColetorBalanco(response.data)
-        setModalResumoBalanco(true)
-        return response.data;
-      } else {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Atenção',
-          text: 'Nenhum dado encontrado para o balanço selecionado.',
+          title: 'Carregando dados...',
+          html: 'Buscando produtos do balanço',
+          allowOutsideClick: false,
           customClass: {
-            container: 'custom-swal',
+            container: 'custom-swal'
           },
-          timer: 3000
-        })
-        return;
+          didOpen: () => Swal.showLoading()
+        });
+
+        const data = await fetchListaPreviaBalanco(row.IDRESUMOBALANCO, row.IDEMPRESA, diferenca, processa);
+
+        if (data?.length) {
+          setDadosPreviaBalancoModal(data)
+          setModalPreviaBalanco(true)
+
+        }
+
+      } catch (error) {
+        console.log(error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: 'Não foi possível carregar os dados',
+          customClass: { container: 'custom-swal' },
+        });
+      } finally {
+        Swal.close();
       }
-    } catch (error) {
-      console.log(error, "não foi possivel pegar os dados da tabela ")
     }
+  };
 
-
-  }
-
-  const handleClickResumoBalanco = async (row) => {
+    const handleClickPreviaGeral = async (row) => {
     if (optionsModulos[0]?.ALTERAR == 'True') {
-      if (row.IDRESUMOBALANCO && row.IDEMPRESA) {
-        handleEditResumoBalanco(row.IDRESUMOBALANCO, row.IDEMPRESA)
+      if (!row.IDRESUMOBALANCO || !row.IDEMPRESA) return;
+      const diferenca = 0;
+      const processa = 0;
+      try {
+        Swal.fire({
+          title: 'Carregando dados...',
+          html: 'Buscando produtos do balanço',
+          allowOutsideClick: false,
+          customClass: {
+            container: 'custom-swal'
+          },
+          didOpen: () => Swal.showLoading()
+        });
+
+        const data = await fetchListaPreviaBalanco(row.IDRESUMOBALANCO, row.IDEMPRESA, diferenca, processa);
+
+        if (data?.length) {
+          setDadosPreviaBalancoModal(data)
+          setModalPreviaBalanco(true)
+
+        }
+
+      } catch (error) {
+        console.log(error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: 'Não foi possível carregar os dados',
+          customClass: { container: 'custom-swal' },
+        });
+      } finally {
+        Swal.close();
       }
-    } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Acesso Negado',
-        html: `${usuarioLogado?.NOFUNCIONARIO}<br/>  Você não tem permissão para acessar essa funcionalidade.`,
-        timer: 5000
-      });
-      return; 
     }
-  }
+  };
+
+    const handleClickResumoBalanco = async (row) => {
+    if (optionsModulos[0]?.ALTERAR == 'True') {
+      if (!row.IDRESUMOBALANCO || !row.IDEMPRESA) return;
+      const diferenca = 1;
+      const processa = 0;
+      try {
+        Swal.fire({
+          title: 'Carregando dados...',
+          html: 'Buscando produtos do balanço',
+          allowOutsideClick: false,
+          customClass: {
+            container: 'custom-swal'
+          },
+          didOpen: () => Swal.showLoading()
+        });
+
+        const data = await fetchListaColetor(row.IDRESUMOBALANCO, row.IDEMPRESA, diferenca, processa);
+
+        if (data?.length) {
+           setDadosColetorBalanco(data)
+        setModalResumoBalanco(true)
+
+        }
+
+      } catch (error) {
+        console.log(error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: 'Não foi possível carregar os dados',
+          customClass: { container: 'custom-swal' },
+        });
+      } finally {
+        Swal.close();
+      }
+    }
+  };
 
   const handleEditContaBalanco = async (IDRESUMOBALANCO) => {
     try {
@@ -375,7 +453,6 @@ export const ActionListaBalancoPorLoja = ({ dadosBalanco, optionsModulos, usuari
       if (response.data && response.data.length > 0) {
         Swal.close();
         setDadosListaContasBalanco(response.data)
-
         setModalImprimirVisivel(true)
         return response.data;
       } else {
@@ -503,7 +580,7 @@ export const ActionListaBalancoPorLoja = ({ dadosBalanco, optionsModulos, usuari
         usuarioLogado={usuarioLogado}
         handleClickResumoBalanco={handleClickResumoBalanco}
       />
-      
+
     </Fragment>
   )
 }

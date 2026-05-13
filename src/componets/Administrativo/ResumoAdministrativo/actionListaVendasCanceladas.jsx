@@ -109,11 +109,13 @@ export const ActionListaVendasCanceladas = ({ dadosVendasCanceladas, empresaSele
     };
   });
 
+ const calcularTotal = (field) => {
+    return dadosVendasAtivas.reduce((total, item) => total + toFloat(item[field]), 0);
+  };
+
+
   const calcularValorTotaPago = () => {
-    let total = 0;
-    for (let dados of dadosVendasAtivas) {
-      total += parseFloat(dados.VRTOTALPAGO);
-    }
+  const total = calcularTotal('VRTOTALPAGO');
     return total;
   }
 
@@ -121,45 +123,45 @@ export const ActionListaVendasCanceladas = ({ dadosVendasCanceladas, empresaSele
     {
       field: 'contador',
       header: 'Nº',
-      body: row => <th>{row.contador}</th>,
+      body: row => <th style={{ color: 'red' }}>{row.contador}</th>,
       sortable: true,
       width: "5%"
     },
     {
       field: 'DSCAIXA',
       header: 'Caixa',
-      body: row => <th>{row.DSCAIXA}</th>,
+      body: row => <th style={{ color: 'red' }}>{row.DSCAIXA}</th>,
       sortable: true,
     },
     {
       field: 'IDVENDA',
       header: 'Nº Venda',
-      body: row => <th>{row.IDVENDA}</th>,
+      body: row => <th style={{ color: 'red' }}>{row.IDVENDA}</th>,
       sortable: true,
     },
     {
       field: 'NFE_INFNFE_IDE_NNF',
       header: 'NFCe',
-      body: row => <th>{row.NFE_INFNFE_IDE_NNF}</th>,
+      body: row => <th style={{ color: 'red' }}>{row.NFE_INFNFE_IDE_NNF}</th>,
       sortable: true,
     },
     {
       field: 'DTHORAFECHAMENTO',
       header: 'Abertura',
-      body: row => <th>{row.DTHORAFECHAMENTO}</th>,
+      body: row => <th style={{ color: 'red' }}>{row.DTHORAFECHAMENTO}</th>,
       sortable: true,
     },
     {
       field: 'NOFUNCIONARIO',
       header: 'Operador',
-      body: row => <th>{row.NOFUNCIONARIO}</th>,
+      body: row => <th style={{ color: 'red' }}>{row.NOFUNCIONARIO}</th>,
       footer: 'Total Vendas Cancelada',
       sortable: true,
     },
     {
       field: 'VRTOTALPAGO',
       header: 'Valor',
-      body: row => <th>{formatMoeda(row.VRTOTALPAGO)}</th>,
+      body: row => <th style={{ color: 'red' }}>{formatMoeda(row.VRTOTALPAGO)}</th>,
       footer: formatMoeda(calcularValorTotaPago()),
       sortable: true,
     },
@@ -176,13 +178,13 @@ export const ActionListaVendasCanceladas = ({ dadosVendasCanceladas, empresaSele
     {
       field: 'NOFUNCIOCANCEL',
       header: 'Cancelado Por',
-      body: row => <th>{row.NOFUNCIOCANCEL}</th>,
+      body: row => <th style={{ color: 'red' }}>{row.NOFUNCIOCANCEL}</th>,
       sortable: true,
     },
     {
       field: 'TXTMOTIVOCANCELAMENTO',
       header: 'Motivo',
-      body: row => <th>{row.TXTMOTIVOCANCELAMENTO}</th>,
+      body: row => <th style={{ color: 'red' }}>{row.TXTMOTIVOCANCELAMENTO}</th>,
       sortable: true,
     },
 

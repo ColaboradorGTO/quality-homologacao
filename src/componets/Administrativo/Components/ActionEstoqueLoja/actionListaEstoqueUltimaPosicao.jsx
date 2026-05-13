@@ -91,7 +91,7 @@ export const ActionListaEstoqueUltimaPosicao = ({ dadosEstoqueUltima }) => {
       DSPRODUTO: item.DSPRODUTO,
       NUCODBARRAS: item.NUCODBARRAS,
       UND: item.UND,
-      QTDFINAL: parseFloat(item.QTDFINAL),
+      QTDFINAL: item.QTDFINAL,
       PRECOCUSTO: item.PRECOCUSTO,
       PRECOVENDA: item.PRECOVENDA,
       DTMOVIMENTOFORMATADO: item.DTMOVIMENTOFORMATADO,
@@ -178,7 +178,7 @@ export const ActionListaEstoqueUltimaPosicao = ({ dadosEstoqueUltima }) => {
     {
       field: 'QTDFINAL',
       header: 'Estoque',
-      body: row => <th style={{ color: '#000', fontWeight: 600 }}>{row.QTDFINAL}</th>,
+      body: row => <th style={row.QTDFINAL < 0 ? { color: 'red', fontWeight: 600 } : { color: 'blue', fontWeight: 600 }}>{row.QTDFINAL}</th>,
       footer: calcularEstoque(),
       sortable: true
     },

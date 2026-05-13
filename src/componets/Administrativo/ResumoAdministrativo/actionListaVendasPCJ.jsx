@@ -8,6 +8,7 @@ import * as XLSX from 'xlsx';
 import { formatMoeda } from "../../../utils/formatMoeda";
 import { ColumnGroup } from "primereact/columngroup";
 import { Row } from "primereact/row";
+import { toFloat } from "../../../utils/toFloat";
 import { useRef } from "react";
 import HeaderTable from "../../Tables/headerTable";
 import { formatarPorcentagem } from "../../../utils/formatarPorcentagem";
@@ -86,12 +87,12 @@ export const ActionListaVendasPCJ = ({ dadosVendasPCJ }) => {
     const vrPCJ18 = toFloat(item.vendapcj?.[0]?.['venda-pcj']?.TOTALPCJ18);
     const vrPCJ78 = toFloat(item.vendapcj?.[0]?.['venda-pcj']?.TOTALPCJ78);
 
-    const totalPCJ = vrPCJ18 !== 0 ? (vrPCJ78 / vrPCJ18) * 100 : 0;
+    const totalPCJ =  (vrPCJ78 / vrPCJ18) * 100;
 
     return totalPCJ;
 
   }
-  
+
   const dadosExcel = dadosVendasPCJ.map((item) => {
     let pcjTotal = calcularTotalPCJTotal(item)
     return {
@@ -147,33 +148,74 @@ export const ActionListaVendasPCJ = ({ dadosVendasPCJ }) => {
     };
   });
 
-  const calcularTotalPCJ18 = () => {
-    let total = 0;
-    for (let dados of dadosMovLojaDia) {
-      total += parseFloat(dados.TOTALPCJ18);
+  const calcularTotal = (field) => {
+    return dadosMovLojaDia.reduce((total, item) => total + toFloat(item[field]), 0);
+  };
 
+  /*   const calcularTotalvrPCJ18 = () => {
+      const total = calcularTotal('TOTALPCJ18');
+      return total;
     }
-    return total;
-  }
+    const calcularTotalvrPCJ78 = () => {
+      const total = calcularTotal('TOTALPCJ78');
+      return total;
+    } */
+
+
+  /*   const calcularTotalPCJ = () => {
+      const vrPCJ18 = calcularTotalvrPCJ18('TOTALPCJ18');
+      const vrPCJ78 = calcularTotalvrPCJ78('TOTALPCJ78');
+      const totalPCJPorcentagem = (vrPCJ78 / vrPCJ18) * 100;
+  
+      return parseFloat(totalPCJPorcentagem.toFixed(2));
+    }
+  */
+    const calcularTotalPCJ18 = () => {
+      const total = calcularTotal('TOTALPCJ18');
+      return total;
+    } 
+
+  /*   const calcularTotalPCJ18 = () => {
+      let total = 0;
+      for (let dados of dadosMovLojaDia) {
+        total += parseFloat(dados.TOTALPCJ18);
+  
+      }
+      return total;
+    } */
 
   const calcularTotalPCJ78 = () => {
-    let total = 0;
-    for (let dados of dadosMovLojaDia) {
-      total += parseFloat(dados.TOTALPCJ78);
-
-    }
+    const total = calcularTotal('TOTALPCJ78');
     return total;
   }
 
-  const calcularValorTotalPCJTotal = () => {
-    let total = 0;
-    for (let dados of dadosMovLojaDia) {
-      total += parseFloat(dados.pcjTotal);
-
+  /*   const calcularTotalPCJ78 = () => {
+      let total = 0;
+      for (let dados of dadosMovLojaDia) {
+        total += parseFloat(dados.TOTALPCJ78);
+  
+      }
+      return total;
     }
-    return total;
+   */
+
+
+  const calcularTotalPCJ = () => {
+    const vrPCJ18 = calcularTotalPCJ18('TOTALPCJ18');
+    const vrPCJ78 = calcularTotalPCJ78('TOTALPCJ78');
+    const totalPCJPorcentagem = (vrPCJ78 / vrPCJ18) * 100;
+
+    return parseFloat(totalPCJPorcentagem.toFixed(2));
   }
 
+  /*     const calcularValorTotalPCJTotal = () => {
+      let total = 0;
+      for (let dados of dadosMovLojaDia) {
+        total += parseFloat(dados.pcjTotal);
+  
+      }
+      return total;
+    } */
   const colunaVendasPCJ = [
     {
       field: 'ID',
@@ -227,10 +269,10 @@ export const ActionListaVendasPCJ = ({ dadosVendasPCJ }) => {
 
       body: row => (
         <th style={{ color: row.pcjTotal === 0 ? 'red' : 'blue' }}>
-          {formatMoeda(row.pcjTotal)}
+          {formatMoeda(toFloat(row.pcjTotal))}
         </th>
       ),
-      footer: formatMoeda(calcularValorTotalPCJTotal()),
+      footer: calcularTotalPCJ(),
       sortable: true,
     },
 
@@ -242,7 +284,7 @@ export const ActionListaVendasPCJ = ({ dadosVendasPCJ }) => {
         <Column footer="Total dos Caixas " colSpan={5} footerStyle={{ textAlign: 'center', color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem', fontWeight: 'bold' }} />
         <Column footer={formatMoeda(calcularTotalPCJ18())} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem', fontWeight: 'bold' }} />
         <Column footer={formatMoeda(calcularTotalPCJ78())} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem', fontWeight: 'bold' }} />
-        <Column footer={formatMoeda(calcularValorTotalPCJTotal())} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem', fontWeight: 'bold' }} />
+        <Column footer={calcularTotalPCJ()} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem', fontWeight: 'bold' }} />
 
 
       </Row>

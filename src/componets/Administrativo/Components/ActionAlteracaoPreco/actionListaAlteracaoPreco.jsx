@@ -4,7 +4,7 @@ import { Column } from 'primereact/column';
 import { formatMoeda } from "../../../../utils/formatMoeda";
 import { toFloat } from "../../../../utils/toFloat";
 import { formatarPorcentagem } from "../../../../utils/formatarPorcentagem";
-import { dataFormatada } from "../../../../utils/dataFormatada";
+import { dataFormatada, dataHoraFormatada, } from "../../../../utils/dataFormatada";
 import HeaderTable from "../../../Tables/headerTable";
 import { useReactToPrint } from "react-to-print";
 import { jsPDF } from 'jspdf';
@@ -156,7 +156,7 @@ export const ActionListaAlteracaoPreco = ({ dadosAlteracaoPreco }) => {
     {
       field: 'DTHORAEXECUTADO',
       header: 'Data',
-      body: row => <th>{dataFormatada(row.DTHORAEXECUTADO)}</th>,
+      body: row => <th>{dataHoraFormatada(row.DTHORAEXECUTADO)}</th>,
       sortable: true,
     },
     {

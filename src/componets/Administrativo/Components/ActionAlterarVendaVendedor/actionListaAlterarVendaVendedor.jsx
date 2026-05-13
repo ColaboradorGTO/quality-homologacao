@@ -13,10 +13,11 @@ import { jsPDF } from 'jspdf';
 import * as XLSX from 'xlsx';
 import 'jspdf-autotable';
 import Swal from "sweetalert2";
+import { toFloat } from "../../../../utils/toFloat";
 
-export const ActionListaAlterarVendaVendedor = ({dadosVendasAtivas, empresaSelecionada, optionsModulos, usuarioLogado }) => {
-  const [dadosVendasDetalhada, setDadosVendasDetalhada] = useState([]); 
-  const [modalVisivel,  setModalVisivel] = useState(false);
+export const ActionListaAlterarVendaVendedor = ({ dadosVendasAtivas, empresaSelecionada, optionsModulos, usuarioLogado }) => {
+  const [dadosVendasDetalhada, setDadosVendasDetalhada] = useState([]);
+  const [modalVisivel, setModalVisivel] = useState(false);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
@@ -55,22 +56,22 @@ export const ActionListaAlterarVendaVendedor = ({dadosVendasAtivas, empresaSelec
     const workbook = XLSX.utils.book_new();
     const header = ['Nº', 'Caixa', 'Nº Venda', 'NFCe', 'Abertura', 'Operador', 'Valor'];
     worksheet['!cols'] = [
-      { wpx: 50, caption: 'Nº' }, 
-      { wpx: 100, caption: 'Caixa' }, 
-      { wpx: 100, caption: 'Nº Venda' }, 
-      { wpx: 100, caption: 'NFCe' }, 
-      { wpx: 100, caption: 'Abertura' }, 
-      { wpx: 100, caption: 'Operador' }, 
+      { wpx: 50, caption: 'Nº' },
+      { wpx: 100, caption: 'Caixa' },
+      { wpx: 100, caption: 'Nº Venda' },
+      { wpx: 100, caption: 'NFCe' },
+      { wpx: 100, caption: 'Abertura' },
+      { wpx: 100, caption: 'Operador' },
       { wpx: 100, caption: 'Valor' }
-    ]; 
+    ];
     XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Venda Vendedor');
     XLSX.writeFile(workbook, 'venda_vendedor.xlsx');
   };
-  
+
   const dadosExcel = dadosVendasAtivas.map((item, index) => {
     let contador = index + 1;
- 
+
     return {
       contador,
       IDCAIXAWEB: item.IDCAIXAWEB + ' - ' + item.DSCAIXA,
@@ -79,13 +80,13 @@ export const ActionListaAlterarVendaVendedor = ({dadosVendasAtivas, empresaSelec
       DTHORAFECHAMENTO: item.DTHORAFECHAMENTO,
       NOFUNCIONARIO: item.NOFUNCIONARIO,
       VRTOTALPAGO: item.VRTOTALPAGO,
-     
+
     }
   });
 
   const dados = dadosVendasAtivas.map((item, index) => {
     let contador = index + 1;
- 
+
     return {
       contador,
       IDCAIXAWEB: item.IDCAIXAWEB,
@@ -100,11 +101,12 @@ export const ActionListaAlterarVendaVendedor = ({dadosVendasAtivas, empresaSelec
     }
   });
 
+  const calcularTotal = (field) => {
+    return dados.reduce((total, item) => total + toFloat(item[field]), 0);
+  };
+
   const calcularTotalValorPago = () => {
-    let total = 0;
-    for(let dados of dadosVendasAtivas){
-      total += parseFloat(dados.VRTOTALPAGO);
-    }
+    const total = calcularTotal('VRTOTALPAGO');
     return total;
   }
 
@@ -112,44 +114,44 @@ export const ActionListaAlterarVendaVendedor = ({dadosVendasAtivas, empresaSelec
     {
       field: 'contador',
       header: 'Nº',
-      body: row => <th style={{color: 'blue'}}>{row.contador}</th>,
+      body: row => <th style={{ color: 'blue' }}>{row.contador}</th>,
       sortable: true,
     },
     {
       field: 'DSCAIXA',
       header: 'Caixa',
-      body: row => <th style={{color: 'blue'}}> {row.IDCAIXAWEB} - {row.DSCAIXA}</th>,
+      body: row => <th style={{ color: 'blue' }}> {row.IDCAIXAWEB} - {row.DSCAIXA}</th>,
       sortable: true,
     },
     {
       field: 'IDVENDA',
       header: 'Nº Venda',
-      body: row => <th style={{color: 'blue'}}>{row.IDVENDA}</th>,
+      body: row => <th style={{ color: 'blue' }}>{row.IDVENDA}</th>,
       sortable: true,
     },
     {
       field: 'NFE_INFNFE_IDE_NNF',
       header: 'NFCe',
-      body: row => <th style={{color: 'blue'}}>{row.NFE_INFNFE_IDE_NNF}</th>,
+      body: row => <th style={{ color: 'blue' }}>{row.NFE_INFNFE_IDE_NNF}</th>,
       sortable: true,
     },
     {
       field: 'DTHORAFECHAMENTO',
       header: 'Abertura',
-      body: row => <th style={{color: 'blue'}}>{row.DTHORAFECHAMENTO}</th>,
+      body: row => <th style={{ color: 'blue' }}>{row.DTHORAFECHAMENTO}</th>,
       sortable: true,
     },
     {
       field: 'NOFUNCIONARIO',
       header: 'Operador',
-      body: row => <th style={{color: 'blue'}}>{row.NOFUNCIONARIO}</th>,
+      body: row => <th style={{ color: 'blue' }}>{row.NOFUNCIONARIO}</th>,
       footer: 'Total Vendas Ativas',
       sortable: true,
     },
     {
       field: 'VRTOTALPAGO',
       header: 'Valor',
-      body: row => <th style={{color: 'blue'}}>{formatMoeda(row.VRTOTALPAGO)}</th>,
+      body: row => <th style={{ color: 'blue' }}>{formatMoeda(row.VRTOTALPAGO)}</th>,
       footer: formatMoeda(calcularTotalValorPago()),
       sortable: true,
     },
@@ -163,9 +165,9 @@ export const ActionListaAlterarVendaVendedor = ({dadosVendasAtivas, empresaSelec
           style={{ justifyContent: "space-between" }}
         >
           <div>
-            <ButtonTable  
+            <ButtonTable
               titleButton={"Detalhar Venda"}
-              onClickButton={() => handleClickEdit(row)} 
+              onClickButton={() => handleClickEdit(row)}
               cor={"primary"}
               Icon={CiEdit}
               iconSize={25}
@@ -201,7 +203,7 @@ export const ActionListaAlterarVendaVendedor = ({dadosVendasAtivas, empresaSelec
     }
   };
   const handleClickEdit = async (row) => {
-    if(optionsModulos[0]?.ALTERAR == 'True') {
+    if (optionsModulos[0]?.ALTERAR == 'True') {
       if (row && row.IDVENDA) {
         await handleEdit(empresaSelecionada, row.IDVENDA);
       }
@@ -274,7 +276,7 @@ export const ActionListaAlterarVendaVendedor = ({dadosVendasAtivas, empresaSelec
         </div>
       </div>
 
-      <ActionDetalheAlterarVendaModal 
+      <ActionDetalheAlterarVendaModal
         show={modalVisivel}
         handleClose={() => setModalVisivel(false)}
         dadosVendasDetalhada={dadosVendasDetalhada}
