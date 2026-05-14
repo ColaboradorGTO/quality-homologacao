@@ -27,119 +27,107 @@ export const ActionListaOperadorCaixa = ({
 
   const handlePrint = useReactToPrint({
     content: () => dataTableRef.current,
-    documentTitle: 'Lista Vendas Metas',
+    documentTitle: 'Lista Operador Caixa',
   });
 
-  const exportToPDF = () => {
-    const doc = new jsPDF();
-
-    const headerRows = [
-      [
-        { content: "CLASSIFICAÇÃO", styles: { halign: "center", fillColor: "#967BBD", textColor: "white", fontSize: 10 } },
-        { content: "SENIOR", styles: { halign: "center", fillColor: "#FFCA5B", textColor: "black", fontSize: 10 } },
-        { content: "PLENO", styles: { halign: "center", fillColor: "#FD52A3", textColor: "black", fontSize: 10 } },
-        { content: "JUNIOR", styles: { halign: "center", fillColor: "#39A1F4", textColor: "black", fontSize: 10 } },
-      ],
-      [
-        { content: "INDICADORES", styles: { fillColor: "#B19DCE", textColor: "black", fontSize: 9 } },
-        { content: "BÔNUS", styles: { fillColor: "#FFDB8E", textColor: "black", fontSize: 9 } },
-        { content: "BÔNUS", styles: { fillColor: "#FE85BE", textColor: "white", fontSize: 9 } },
-        { content: "BÔNUS", styles: { fillColor: "#6AB8F7", textColor: "white", fontSize: 9 } },
-      ],
-    ];
-
-    const bodyRows = dados.map((item) => [
-      item.NOINDICADOR,
-      item.VRBONUSSENIOR,
-      formatMoeda(item.VRBONUSPLENO),
-      formatMoeda(item.VRBONUSJUNIOR),
-    ]);
-
-    doc.autoTable({
-      head: headerRows,
-      body: bodyRows,
-      startY: 10,
-      theme: "plain",
-      styles: { fontSize: 8, cellPadding: 2 },
-      columnStyles: {
-        0: { halign: "center" },
-        1: { halign: "left" },
-        2: { halign: "right" },
-        3: { halign: "right" },
-      },
-    });
-
-    doc.save("marcas_vendas_metas.pdf");
-  };
-
-
-  const exportToExcel = async () => {
-    const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet("Metas Vendas");
-
-    // Cabeçalho agrupado igual ao DataTable
-    worksheet.getCell("A1").value = "CLASSIFICAÇÃO";
-    worksheet.getCell("A1").alignment = { horizontal: "center", vertical: "middle" };
-    worksheet.getCell("A1").fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF967BBD" } };
-    worksheet.getCell("A1").font = { color: { argb: "FFFFFF" }, bold: true };
-
-    worksheet.getCell("B1").value = "SENIOR";
-    worksheet.getCell("B1").alignment = { horizontal: "center", vertical: "middle" };
-    worksheet.getCell("B1").fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFFCA5B" } };
-    worksheet.getCell("B1").font = { color: { argb: "000000" }, bold: true };
-
-    worksheet.getCell("C1").value = "PLENO";
-    worksheet.getCell("C1").alignment = { horizontal: "center", vertical: "middle" };
-    worksheet.getCell("C1").fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFD52A3" } };
-    worksheet.getCell("C1").font = { color: { argb: "000000" }, bold: true };
-
-    worksheet.getCell("D1").value = "JUNIOR";
-    worksheet.getCell("D1").alignment = { horizontal: "center", vertical: "middle" };
-    worksheet.getCell("D1").fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF39A1F4" } };
-    worksheet.getCell("D1").font = { color: { argb: "000000" }, bold: true };
-
-    // Segunda linha de cabeçalho
-    worksheet.getRow(2).values = [
-      "INDICADORES", "BÔNUS", "BÔNUS", "BÔNUS"
-    ];
-    worksheet.getRow(2).eachCell((cell, colNumber) => {
-      cell.alignment = { horizontal: "center" };
-      cell.font = { bold: true };
-      if (colNumber === 1) {
-        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFB19DCE" } };
-        cell.font = { color: { argb: "000000" }, bold: true };
-      } else if (colNumber === 2) {
-        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFDB8E" } };
-        cell.font = { color: { argb: "000000" }, bold: true };
-      } else if (colNumber === 3) {
-        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFE85BE" } };
-        cell.font = { color: { argb: "FFFFFF" }, bold: true };
-      } else {
-        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF6AB8F7" } };
-        cell.font = { color: { argb: "FFFFFF" }, bold: true };
-      }
-    });
-
-    // Dados
-    dados.forEach((item) => {
-      worksheet.addRow([
+    const exportToPDF = () => {
+      const doc = new jsPDF();
+  
+      const headerRows = [
+        [
+          { content: "CLASSIFICAÇÃO", styles: { halign: "center", fillColor: "#967BBD", textColor: "white", fontSize: 10 } },
+          { content: "SENIOR/PLENO/JUNIOR", colSpan: 3, styles: { halign: "center", fillColor: "#FFCA5B", textColor: "black", fontSize: 10 } },
+        ],
+        [
+          { content: "INDICADORES", styles: { fillColor: "#B19DCE", textColor: "black", fontSize: 9 } },
+          { content: "BÔNUS", styles: { fillColor: "#FFDB8E", textColor: "black", fontSize: 9 } },
+          { content: "APURAÇÃO", styles: { fillColor: "#FE85BE", textColor: "white", fontSize: 9 } },
+          { content: "BÔNUS", styles: { fillColor: "#6AB8F7", textColor: "white", fontSize: 9 } },
+        ],
+      ];
+  
+      const bodyRows = dados.map((item) => [
         item.NOINDICADOR,
         item.VRBONUSSENIOR,
         formatMoeda(item.VRBONUSPLENO),
-        formatMoeda(item.VRBONUSJUNIOR)
+        formatMoeda(item.VRBONUSJUNIOR),
       ]);
-    });
-
-    // Ajuste de largura das colunas
-    worksheet.columns.forEach((col) => {
-      col.width = 18;
-    });
-
-
-    const buffer = await workbook.xlsx.writeBuffer();
-    saveAs(new Blob([buffer]), "marcas_vendas_metas.xlsx");
-  };
- 
+  
+      doc.autoTable({
+        head: headerRows,
+        body: bodyRows,
+        startY: 10,
+        theme: "plain",
+        styles: { fontSize: 8, cellPadding: 2 },
+        columnStyles: {
+          0: { halign: "center" },
+          1: { halign: "left" },
+          2: { halign: "right" },
+          3: { halign: "right" },
+        },
+      });
+  
+      doc.save("premiacao_operador_caixa.pdf");
+    };
+  
+  
+    const exportToExcel = async () => {
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet("Operador Caixa");
+  
+      // Cabeçalho agrupado igual ao DataTable
+      worksheet.getCell("A1").value = "CLASSIFICAÇÃO";
+      worksheet.getCell("A1").alignment = { horizontal: "center", vertical: "middle" };
+      worksheet.getCell("A1").fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF967BBD" } };
+      worksheet.getCell("A1").font = { color: { argb: "FFFFFF" }, bold: true };
+  
+      worksheet.mergeCells("B1:D1");
+      worksheet.getCell("B1").value = "SENIOR/PLENO/JUNIOR";
+      worksheet.getCell("B1").alignment = { horizontal: "center", vertical: "middle" };
+      worksheet.getCell("B1").fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFFCA5B" } };
+      worksheet.getCell("B1").font = { color: { argb: "000000" }, bold: true };
+  
+      // Segunda linha de cabeçalho
+      worksheet.getRow(2).values = [
+        "INDICADORES", "BÔNUS", "APURAÇÃO", "BÔNUS"
+      ];
+      worksheet.getRow(2).eachCell((cell, colNumber) => {
+        cell.alignment = { horizontal: "center" };
+        cell.font = { bold: true };
+        if (colNumber === 1) {
+          cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFB19DCE" } };
+          cell.font = { color: { argb: "000000" }, bold: true };
+        } else if (colNumber === 2) {
+          cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFDB8E" } };
+          cell.font = { color: { argb: "000000" }, bold: true };
+        } else if (colNumber === 3) {
+          cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFE85BE" } };
+          cell.font = { color: { argb: "FFFFFF" }, bold: true };
+        } else {
+          cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF6AB8F7" } };
+          cell.font = { color: { argb: "FFFFFF" }, bold: true };
+        }
+      });
+  
+      // Dados
+      dados.forEach((item) => {
+        worksheet.addRow([
+          item.NOINDICADOR,
+          item.VRBONUSSENIOR,
+          formatMoeda(item.VRBONUSPLENO),
+          formatMoeda(item.VRBONUSJUNIOR)
+        ]);
+      });
+  
+      // Ajuste de largura das colunas
+      worksheet.columns.forEach((col) => {
+        col.width = 18;
+      });
+  
+  
+      const buffer = await workbook.xlsx.writeBuffer();
+      saveAs(new Blob([buffer]), "premiacao_operador_caixa.xlsx");
+    };
   const dados = dadosLiderLoja?.data?.map((item, index) => {
     let contador = index + 1;
 

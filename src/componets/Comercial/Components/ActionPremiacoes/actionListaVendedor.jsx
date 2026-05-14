@@ -15,7 +15,7 @@ import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 
 export const ActionListaVendedor = ({ 
-  dadosLiderLoja,
+  dadosVendedor,
 }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowSelection, setRowSelection] = useState(null);
@@ -27,7 +27,7 @@ export const ActionListaVendedor = ({
 
   const handlePrint = useReactToPrint({
     content: () => dataTableRef.current,
-    documentTitle: 'Lista Vendas Metas',
+    documentTitle: 'Premiação Vendedor',
   });
 
   const exportToPDF = () => {
@@ -36,14 +36,12 @@ export const ActionListaVendedor = ({
     const headerRows = [
       [
         { content: "CLASSIFICAÇÃO", styles: { halign: "center", fillColor: "#967BBD", textColor: "white", fontSize: 10 } },
-        { content: "SENIOR", styles: { halign: "center", fillColor: "#FFCA5B", textColor: "black", fontSize: 10 } },
-        { content: "PLENO", styles: { halign: "center", fillColor: "#FD52A3", textColor: "black", fontSize: 10 } },
-        { content: "JUNIOR", styles: { halign: "center", fillColor: "#39A1F4", textColor: "black", fontSize: 10 } },
+        { content: "SENIOR/PLENO/JUNIOR", colSpan: 3, styles: { halign: "center", fillColor: "#FFCA5B", textColor: "black", fontSize: 10 } },
       ],
       [
         { content: "INDICADORES", styles: { fillColor: "#B19DCE", textColor: "black", fontSize: 9 } },
         { content: "BÔNUS", styles: { fillColor: "#FFDB8E", textColor: "black", fontSize: 9 } },
-        { content: "BÔNUS", styles: { fillColor: "#FE85BE", textColor: "white", fontSize: 9 } },
+        { content: "APURAÇÃO", styles: { fillColor: "#FE85BE", textColor: "white", fontSize: 9 } },
         { content: "BÔNUS", styles: { fillColor: "#6AB8F7", textColor: "white", fontSize: 9 } },
       ],
     ];
@@ -69,7 +67,7 @@ export const ActionListaVendedor = ({
       },
     });
 
-    doc.save("marcas_vendas_metas.pdf");
+    doc.save("premiacao_vendedor.pdf");
   };
 
 
@@ -83,24 +81,15 @@ export const ActionListaVendedor = ({
     worksheet.getCell("A1").fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF967BBD" } };
     worksheet.getCell("A1").font = { color: { argb: "FFFFFF" }, bold: true };
 
-    worksheet.getCell("B1").value = "SENIOR";
+    worksheet.mergeCells("B1:D1");
+    worksheet.getCell("B1").value = "SENIOR/PLENO/JUNIOR";
     worksheet.getCell("B1").alignment = { horizontal: "center", vertical: "middle" };
     worksheet.getCell("B1").fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFFCA5B" } };
     worksheet.getCell("B1").font = { color: { argb: "000000" }, bold: true };
 
-    worksheet.getCell("C1").value = "PLENO";
-    worksheet.getCell("C1").alignment = { horizontal: "center", vertical: "middle" };
-    worksheet.getCell("C1").fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFD52A3" } };
-    worksheet.getCell("C1").font = { color: { argb: "000000" }, bold: true };
-
-    worksheet.getCell("D1").value = "JUNIOR";
-    worksheet.getCell("D1").alignment = { horizontal: "center", vertical: "middle" };
-    worksheet.getCell("D1").fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF39A1F4" } };
-    worksheet.getCell("D1").font = { color: { argb: "000000" }, bold: true };
-
     // Segunda linha de cabeçalho
     worksheet.getRow(2).values = [
-      "INDICADORES", "BÔNUS", "BÔNUS", "BÔNUS"
+      "INDICADORES", "BÔNUS", "APURAÇÃO", "BÔNUS"
     ];
     worksheet.getRow(2).eachCell((cell, colNumber) => {
       cell.alignment = { horizontal: "center" };
@@ -137,10 +126,10 @@ export const ActionListaVendedor = ({
 
 
     const buffer = await workbook.xlsx.writeBuffer();
-    saveAs(new Blob([buffer]), "marcas_vendas_metas.xlsx");
+    saveAs(new Blob([buffer]), "premiacao_vendedor.xlsx");
   };
  
-  const dados = dadosLiderLoja?.data?.map((item, index) => {
+  const dados = dadosVendedor?.data?.map((item, index) => {
     let contador = index + 1;
 
     return {
@@ -199,7 +188,7 @@ export const ActionListaVendedor = ({
     <Fragment>
       <div className="panel" >
         <div className="panel-hdr">
-          {/* <h2>{`REGRAS PREMIAÇÕES: ${dadosLiderLoja?.dsSubGrupo} - ${dadosLiderLoja?.dataPesquisaInicio} a ${dadosLiderLoja?.dataPesquisaFim}`}</h2> */}
+          {/* <h2>{`REGRAS PREMIAÇÕES: ${dadosVendedor?.dsSubGrupo} - ${dadosVendedor?.dataPesquisaInicio} a ${dadosVendedor?.dataPesquisaFim}`}</h2> */}
           <h2>{`VENDEDOR`}</h2>
         </div>
         <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
