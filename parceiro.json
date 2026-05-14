@@ -324,6 +324,12 @@
     { "value": "CARTÃO PCJ 30%", "label": "CARTÃO PCJ 30%" },
     { "value": "CARTÃO/RECOMPRA", "label": "CARTÃO/RECOMPRA" },
     { "value": "CARTÃO/SEGURO", "label": "CARTÃO/SEGURO" }
-
+  ],
+  "optionsApuracao": [
+    { "value": "NENHUMA", "label": "NENHUMA" },
+    { "value": "INDIVIDUAL", "label": "INDIVIDUAL" },
+    { "value": "GERAL DA LOJA", "label": "GERAL DA LOJA" },
+    { "value": "GERAL DA CONFEÇÇÃO", "label": "GERAL DA CONFEÇÇÃO" },
+    { "value": "INDIVIDUAL / GERAL", "label": "INDIVIDUAL / GERAL" }
   ]
 }

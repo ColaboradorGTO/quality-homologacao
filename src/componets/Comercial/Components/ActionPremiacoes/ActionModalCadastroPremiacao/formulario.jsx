@@ -10,6 +10,7 @@ import { schema } from './schamaValidarFuncionario'
 import { GrFormView, GrFormViewHide } from "react-icons/gr"
 import { useState } from "react"
 import { useCadastrarPremiacoes } from "../hooks/useCadastrarPremiacoes"
+import { optionsFuncoesComercial, optionsIndicadores, optionsApuracao } from "../../../../../../parceiro.json"
 
 export const Formulario = ({ 
   handleClose,
@@ -148,7 +149,7 @@ export const Formulario = ({
 
               <Select
                 closeMenuOnSelect={false}
-                options={options?.map((item) => ({
+                options={optionsFuncoesComercial?.map((item) => ({
                   value: item.value,
                   label: item.label
                 }))}
@@ -169,7 +170,7 @@ export const Formulario = ({
 
               <Select
                 closeMenuOnSelect={false}
-                options={options?.map((item) => ({
+                options={optionsIndicadores?.map((item) => ({
                   value: item.value,
                   label: item.label
                 }))}
@@ -189,7 +190,7 @@ export const Formulario = ({
 
               <Select
                 closeMenuOnSelect={false}
-                options={options?.map((item) => ({
+                options={optionsApuracao?.map((item) => ({
                   value: item.value,
                   label: item.label
                 }))}
@@ -294,7 +295,7 @@ export const Formulario = ({
           corFechar="secondary"
 
           ButtonTypeConfirmar={ButtonTypeModal}
-          textButtonConfirmar={"Atualizar"}
+          textButtonConfirmar={"Cadastrar"}
           onClickButtonConfirmar={handleValidatedSubmit}
           corConfirmar="success"
 
