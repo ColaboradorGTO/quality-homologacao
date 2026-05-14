@@ -18,6 +18,7 @@ import { ActionImprimirVoucherModal } from './ActionImprimir/actionImprimirVouch
 import Swal from 'sweetalert2';
 import { useAuthFuncionarioUpdate } from './hooks/useAuthFuncionarioUpdate';
 import { useAuthFuncionarioPrint } from './hooks/useAuthFuncionarioPrint';
+import { ocultaParteDosDadosVoucher } from '../../../utils/ocultarParte';
 
 export const ActionListaVoucherEmitido = ({
   dadosVoucher,
@@ -135,8 +136,7 @@ export const ActionListaVoucherEmitido = ({
     {
       field: 'NUVOUCHER',
       header: 'Nº Voucher',
-      // body: row => <th style={{color: 'blue'}}>{ocultaParteDosDadosVoucher(row.NUVOUCHER)}</th>,
-      body: row => <th style={{ color: 'blue' }}>{row.NUVOUCHER}</th>,
+      body: row => <th style={{ color: 'blue' }}>{ocultaParteDosDadosVoucher(row.NUVOUCHER)}</th>,
       sortable: true,
     },
     {
