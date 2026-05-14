@@ -11,11 +11,13 @@ import { GrFormView, GrFormViewHide } from "react-icons/gr"
 import { useState } from "react"
 import { useCadastrarPremiacoes } from "../hooks/useCadastrarPremiacoes"
 import { optionsFuncoesComercial, optionsIndicadores, optionsApuracao } from "../../../../../../parceiro.json"
+import { formatarMoeda } from "../../../../../utils/formatMoeda"
 
 export const Formulario = ({ 
   handleClose,
   usuarioLogado, 
-  optionsModulos 
+  optionsModulos,
+  marcaSelecionada 
 }) => {
   const { handleSubmit, formState: { errors }, clearErrors, control, setError, setValue } = useForm({
     mode: "onChange"
@@ -43,7 +45,7 @@ export const Formulario = ({
     valorBonusTodos,
     setValorBonusTodos,
     onSubmit
-  } = useCadastrarPremiacoes({ usuarioLogado, optionsModulos });
+  } = useCadastrarPremiacoes({ usuarioLogado, optionsModulos, marcaSelecionada });
     
   const handleValidatedSubmit = async () => {
     try {
@@ -73,9 +75,8 @@ export const Formulario = ({
     }
   }
 
-  const options = [
-    { value: 'option1', label: 'Option 1' },
-  ]
+  const FUNCOES_COM_CLASSIFICACAO = ['GERENTE', 'LIDER DE LOJA', 'LIDER DE CAIXA'];
+  const isFuncaoComClassificacao = FUNCOES_COM_CLASSIFICACAO.includes(funcaoSelecionada?.value ?? '');
   
   return (
     <Fragment>
@@ -93,8 +94,8 @@ export const Formulario = ({
                     type="text"
                     errors={errors}
                     clearErrors={clearErrors}
-                    value={grupoEmpresarial}
-                    onChangeModal={e => setGrupoEmpresarial(e.target.value)}
+                    value={marcaSelecionada?.label || ''}
+                    // onChangeModal={e => setGrupoEmpresarial(e.target.value)}
                     readOnly={true}
                   />
                 )}
@@ -108,7 +109,7 @@ export const Formulario = ({
                   <FormField
                     name="dataInicioPremiacao"
                     label={"Data Início"}
-                    type="text"
+                    type="date"
                     errors={errors}
                     clearErrors={clearErrors}
                     value={dataInicio}
@@ -126,7 +127,7 @@ export const Formulario = ({
                   <FormField
                     name="dataFimPremiacao"
                     label={"Data Fim"}
-                    type="text"
+                    type="date"
                     errors={errors}
                     clearErrors={clearErrors}
                     value={dataFim}
@@ -224,8 +225,8 @@ export const Formulario = ({
                     errors={errors}
                     clearErrors={clearErrors}
                     value={valorBonusSenior}
-                    onChangeModal={e => setValorBonusSenior(e.target.value)}
-                    
+                    onChangeModal={e => setValorBonusSenior(formatarMoeda(e.target.value))}
+                    readOnly={!isFuncaoComClassificacao}
                   />
                 )}
               />
@@ -242,8 +243,8 @@ export const Formulario = ({
                     errors={errors}
                     clearErrors={clearErrors}
                     value={valorBonusPleno}
-                    onChangeModal={e => setValorBonusPleno(e.target.value)}
-                   
+                    onChangeModal={e => setValorBonusPleno(formatarMoeda(e.target.value))}
+                    readOnly={!isFuncaoComClassificacao}
                   />
                 )}
               />
@@ -260,8 +261,8 @@ export const Formulario = ({
                     errors={errors}
                     clearErrors={clearErrors}
                     value={valorBonusJunior}
-                    onChangeModal={e => setValorBonusJunior(e.target.value)}
-                  
+                    onChangeModal={e => setValorBonusJunior(formatarMoeda(e.target.value))}
+                    readOnly={!isFuncaoComClassificacao}
                   />
                 )}
               />
@@ -278,8 +279,8 @@ export const Formulario = ({
                     errors={errors}
                     clearErrors={clearErrors}
                     value={valorBonusTodos}
-                    onChangeModal={e => setValorBonusTodos(e.target.value)}
-                    readOnly={true}
+                    onChangeModal={e => setValorBonusTodos(formatarMoeda(e.target.value))}
+                    readOnly={isFuncaoComClassificacao}
                   />
                 )}
               />

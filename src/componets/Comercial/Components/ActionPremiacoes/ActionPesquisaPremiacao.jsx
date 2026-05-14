@@ -20,6 +20,7 @@ import { ActionListaSubGerente } from "./actionListaSubGerente";
 import { ActionCadastroModalPremiacao } from "./ActionModalCadastroPremiacao/actionModalCadastro";
 import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
+import Swal from "sweetalert2";
 
 export const ActionPesquisaPremiacoes = ({ usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
@@ -28,7 +29,7 @@ export const ActionPesquisaPremiacoes = ({ usuarioLogado }) => {
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
   const [dataPesquisaFim, setDataPesquisaFim] = useState('');
   const [marcas, setMarcas] = useState([]);
-  const [marcaSelecionada, setMarcaSelecionada] = useState(null);
+  const [marcaSelecionada, setMarcaSelecionada] = useState('');
   const [dadosGerente, setDadosGerente] = useState([]);
   const [dadosSubGerente, setDadosSubGerente] = useState([]);
   const [dadosLiderLoja, setDadosLiderLoja] = useState([]);
@@ -125,6 +126,25 @@ export const ActionPesquisaPremiacoes = ({ usuarioLogado }) => {
     }
   };
 
+  const handleCadastrar = () => {
+    if(marcaSelecionada == '') {
+      Swal.fire({
+        title: 'Marca Não Selecionada',
+        html: `Por favor, selecione uma marca para cadastrar a premiação!`,
+        icon: 'warning',
+        confirmButtonText: 'Ok',
+        timer: 6000,
+        customClass: {
+          container: 'custom-swal',
+        }
+      })
+      return;
+    } else {
+
+      setModalVisivel(true);
+    } 
+  }
+
   return (
 
     <Fragment>
@@ -150,16 +170,18 @@ export const ActionPesquisaPremiacoes = ({ usuarioLogado }) => {
 
         InputSelectEmpresaComponent={InputSelectAction}
         optionsEmpresas={[
-
-          { value: '', label: 'Selecione a Marca' },
           ...dadosMarcas?.map((empresa) => ({
             value: empresa.IDGRUPOEMPRESARIAL,
             label: empresa.DSGRUPOEMPRESARIAL,
           }))
         ]}
         labelSelectEmpresa={"Marca"}
-        valueSelectEmpresa={marcaSelecionada}
-        onChangeSelectEmpresa={(e) => setMarcaSelecionada(e.value)}
+        valueSelectEmpresa={marcaSelecionada} 
+        
+        onChangeSelectEmpresa={(e) => {
+          setMarcaSelecionada(e);
+          setMarcas(e.value)
+        }}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Listar Premiações Cadastradas"}
@@ -169,7 +191,7 @@ export const ActionPesquisaPremiacoes = ({ usuarioLogado }) => {
 
         ButtonTypeCadastro={ButtonType}
         linkNome={"Criar Premiações"}
-        onButtonClickCadastro={() => setModalVisivel(true)}
+        onButtonClickCadastro={handleCadastrar}
         corCadastro={"danger"}
         IconCadastro={IoIosAdd}
 
@@ -246,7 +268,11 @@ export const ActionPesquisaPremiacoes = ({ usuarioLogado }) => {
       <ActionCadastroModalPremiacao
         show={modalVisivel}
         handleClose={() => setModalVisivel(false)}
+        usuarioLogado={usuarioLogado}
+        optionsModulos={optionsModulos}
+        marcaSelecionada={marcaSelecionada}
       />
+   
     </Fragment>
   )
 }

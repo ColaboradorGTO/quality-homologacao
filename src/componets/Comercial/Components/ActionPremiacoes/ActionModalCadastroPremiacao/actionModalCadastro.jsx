@@ -9,7 +9,8 @@ export const ActionCadastroModalPremiacao = ({
   show, 
   handleClose, 
   usuarioLogado, 
-  optionsModulos 
+  optionsModulos,
+  marcaSelecionada 
 }) => {
   return (
     <Fragment>
@@ -34,6 +35,7 @@ export const ActionCadastroModalPremiacao = ({
           usuarioLogado={usuarioLogado}
           optionsModulos={optionsModulos}
           handleClose={handleClose}
+          marcaSelecionada={marcaSelecionada}
         />
         
         </Modal.Body>
