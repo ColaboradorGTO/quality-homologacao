@@ -360,6 +360,7 @@ export const ActionPesquisaVendasRelatorio = () => {
 
   const handleEmpresaChange = (selectedOptions) => {
     const values = selectedOptions.map((option) => option.value);
+
     setEmpresaSelecionada(values);
   }
 

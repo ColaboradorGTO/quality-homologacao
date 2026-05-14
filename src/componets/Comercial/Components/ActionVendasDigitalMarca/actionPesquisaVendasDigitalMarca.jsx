@@ -77,6 +77,13 @@ export const ActionPesquisaVendasDigitalMarca = () => {
     setTabelaVisivel(true)
   }
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
+
   return (
 
     <Fragment>
@@ -86,15 +93,18 @@ export const ActionPesquisaVendasDigitalMarca = () => {
         linkComponent={["Lista Vendas Digital"]}
         title="Vendas Digital por Marcas e Período"
         subTitle="Nome da Loja"
+
         InputFieldDTInicioComponent={InputField}
         labelInputFieldDTInicio={"Data Início"}
         valueInputFieldDTInicio={dataPesquisaInicio}
         onChangeInputFieldDTInicio={e => setDataPesquisaInicio(e.target.value)}
+        onKeyDownInputFieldDTInicio={handleKeyPress}
 
         InputFieldDTFimComponent={InputField}
         labelInputFieldDTFim={"Data Fim"}
         valueInputFieldDTFim={dataPesquisaFim}
         onChangeInputFieldDTFim={e => setDataPesquisaFim(e.target.value)}
+        onKeyDownInputFieldDTFim={handleKeyPress}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}

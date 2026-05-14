@@ -10,11 +10,19 @@ import { jsPDF } from 'jspdf';
 import * as XLSX from 'xlsx';
 import 'jspdf-autotable';
 import HeaderTable from "../../../Tables/headerTable";
+import { get } from "../../../../api/funcRequest";
 
-export const ActionListaMetas = ({ dadosVendasMarca }) => {
+export const ActionListaMetas = ({ 
+  dadosVendasMarca,
+  setTabelaVisivel,
+  setTabelaVendaResumidaVisivel,
+  setTabelaMetasVendasVisivel,
+  setDadosVendasResumida,
+  setDadosMetasDetalhadas
+}) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
-  const dataTableRef = useRef();
   const [rowSelection, setRowSelection] = useState(null);
+  const dataTableRef = useRef();
 
 
 
@@ -128,9 +136,9 @@ export const ActionListaMetas = ({ dadosVendasMarca }) => {
             <div className="p-1">
               <ButtonTable
                 titleButton={"Metas Resumida"}
-                onClickButton
-                Icon={FaBalanceScale}
-                iconSize={22}
+                onClickButton={() => handleClickVendasResumida(row)}
+                Icon={GrFormView}
+                iconSize={25}
                 iconColor={"#fff"}
                 cor={"success"}
                 width="30px"
@@ -142,9 +150,9 @@ export const ActionListaMetas = ({ dadosVendasMarca }) => {
             <div className="p-1">
               <ButtonTable
                 titleButton={"Metas Detalhada"}
-                onClickButton
+                onClickButton={() => handleClickVendasMetas(row)}
                 Icon={GrFormView}
-                iconSize={22}
+                iconSize={25}
                 iconColor={"#fff"}
                 cor={"info"}
                 width="30px"
@@ -157,7 +165,7 @@ export const ActionListaMetas = ({ dadosVendasMarca }) => {
                 titleButton={"Excluir Metas"}
                 onClickButton
                 Icon={AiOutlineDelete}
-                iconSize={22}
+                iconSize={25}
                 iconColor={"#fff"}
                 cor={"danger"}
                 width="30px"
@@ -174,11 +182,51 @@ export const ActionListaMetas = ({ dadosVendasMarca }) => {
     },
   ]
 
+  const handleVendasResumida = async (IDGRUPOEMPRESA, DTMETAINICIO, DTMETAFIM) => {
+    try {
+      const response = await get(`/meta-vendas-resumida?idMarca=${IDGRUPOEMPRESA}&dataPesquisaInicio=${DTMETAINICIO}&dataPesquisaFim=${DTMETAFIM}`)
+      if (response.data && response.data.length > 0) {
+        setDadosVendasResumida(response.data)
+        setTabelaVendaResumidaVisivel(true);
+        setTabelaVisivel(false);
+        setTabelaMetasVendasVisivel(false);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar metas resumidas: ', error);
+    }
+  };
+  
+  const handleClickVendasResumida = (row) => {
+    if (row && row.IDGRUPOEMPRESA) {
+      handleVendasResumida(row.IDGRUPOEMPRESA, row.DTMETAINICIO, row.DTMETAFIM);
+    }
+  };
+
+  const handleVendasMetas = async (IDGRUPOEMPRESA, DTMETAINICIO, DTMETAFIM) => {
+    try {
+      const response = await get(`/meta-vendas?idMarca=${IDGRUPOEMPRESA}&dataPesquisaInicio=${DTMETAINICIO}&dataPesquisaFim=${DTMETAFIM}`)
+      if (response.data && response.data.length > 0) {
+
+        setDadosMetasDetalhadas(response.data);
+        setTabelaMetasVendasVisivel(true);
+        setTabelaVisivel(false);
+        setTabelaVendaResumidaVisivel(false);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar metas detalhadas: ', error);
+    }
+  };
+  
+  const handleClickVendasMetas = (row) => {
+    if (row && row.IDGRUPOEMPRESA) {
+      handleVendasMetas(row.IDGRUPOEMPRESA, row.DTMETAINICIO, row.DTMETAFIM);
+    }
+  };
 
   return (
 
     <Fragment>
-      <div className="panel" style={{ marginTop: "4rem" }}>
+      <div className="panel" >
         <div className="panel-hdr">
           <h2>Metas Marcas Período</h2>
         </div>

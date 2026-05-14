@@ -85,6 +85,12 @@ export const ResumoDashBoardComercial = ({ }) => {
     refetchVendas();
   }
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
 
   return (
     <Fragment>
@@ -95,11 +101,13 @@ export const ResumoDashBoardComercial = ({ }) => {
         title="Dashboard Comercial"
         subTitle="Nome da Loja"
 
-        InputFieldDTConsultaComponent={InputField}
-        labelInputFieldDTConsulta={"Data Consulta"}
-        valueDTCosulta={dataPesquisa}
-        onChangeInputFieldDTConsulta={(e) => setDataPesquisa(e.target.value)}
+        InputFieldDTInicioComponent={InputField}
+        labelInputFieldDTInicio={"Data Consulta"}
+        valueInputFieldDTInicio={dataPesquisa}
+        onChangeInputFieldDTInicio={(e) => setDataPesquisa(e.target.value)}
+        onKeyDownInputFieldDTInicio={handleKeyPress}
       
+        
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}
         onButtonClickSearch={handleClick}

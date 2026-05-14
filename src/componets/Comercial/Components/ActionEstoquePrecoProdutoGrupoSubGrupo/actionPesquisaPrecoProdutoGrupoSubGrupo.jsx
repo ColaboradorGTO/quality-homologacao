@@ -48,12 +48,12 @@ export const ActionPesquisaPrecoProdutoGrupoSubGrupo = () => {
 
 
   const { data: dadosEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas } = useQuery(
-    '/listaEmpresaComercial',
+    ['/listaEmpresaComercial', marcaSelecionada],
     async () => {
       const response = await get(`/listaEmpresaComercial?idMarca=${marcaSelecionada}`);
       return response.data;
     },
-    { enabled: Boolean(marcaSelecionada), staleTime: 5 * 60 * 1000, }
+    { enabled: Boolean(marcaSelecionada) }
   );
 
 
@@ -68,25 +68,27 @@ export const ActionPesquisaPrecoProdutoGrupoSubGrupo = () => {
 
 
   const { data: dadosSubGrupos = [], error: errorSubGrupo, isLoading: isLoadingSubGrupo, refetch: refetchSubGrupo } = useQuery(
-    'subgrupo-produto',
+    ['subgrupo-produto', grupoSelecionado],
     async () => {
       const response = await get(`/subgrupo-produto?idGrupo=${grupoSelecionado}`);
+
       return response.data;
     },
-    { enabled: Boolean(grupoSelecionado), staleTime: 5 * 60 * 1000, }
+    { enabled: Boolean(grupoSelecionado)}
   );
 
 
+
   const { data: dadosFornecedor = [], error: errorFornecedor, isLoading: isLoadingFornecedor, refetch: refetchFornecedor } = useQuery(
-    'fornecedor-produto',
+    'lista-fornecedor-produto',
     async () => {
-      const response = await get(`/fornecedor-produto`);
+      const response = await get(`/lista-fornecedor-produto`);
       return response.data;
     },
     { enabled: true, staleTime: 5 * 60 * 1000, }
   );
 
-
+  console.log(dadosFornecedor, 'dadosFornecedor')
 
   const fetchEstoque = async () => {
     const urlBase = `/produtosPrecosEstoquesLojas?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idMarca=${marcaSelecionada}&idEmpresa=${empresaSelecionada}&descricaoProduto=${descricaoProduto}&ufPesquisa=${ufSelecionado}&idFornecedor=${fornecedorSelecionado}&idGrupo=${grupoSelecionado}&idGrade=${subGrupoSelecionado}&idMarcaProduto=${produtoPesquisado}&vlPrecoProduto=${precoProduto}`;
@@ -170,6 +172,7 @@ export const ActionPesquisaPrecoProdutoGrupoSubGrupo = () => {
     { value: 'GO', label: 'GO' },
   ]
 
+
   return (
 
     <Fragment>
@@ -226,8 +229,8 @@ export const ActionPesquisaPrecoProdutoGrupoSubGrupo = () => {
           }))
         ]}
         labelMultSelectGrupo={"Por Grupo"}
-        valueMultSelectGrupo={grupoSelecionado}
-        onChangeSelectGrupo={handleGrupoChange}
+        valueMultSelectGrupo={[grupoSelecionado]}
+        onChangeMultSelectGrupo={handleGrupoChange}
 
         MultSelectSubGrupoComponent={MultSelectAction}
         optionsMultSelectSubGrupo={[
@@ -266,7 +269,7 @@ export const ActionPesquisaPrecoProdutoGrupoSubGrupo = () => {
           { value: '', label: 'Selecione um Fornecedor' },
           ...dadosFornecedor.map((fornecedor) => ({
             value: fornecedor.ID_FORNECEDOR,
-            label: `${fornecedor.ID_FORNECEDOR} ${fornecedor.FORNECEDOR}`,
+            label: `${fornecedor.CNPJ_CPF} - ${fornecedor.FORNECEDOR}`,
           }))
         ]}
         labelMultSelectFornecedor={"Por Fornecedor"}

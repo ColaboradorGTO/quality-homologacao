@@ -341,8 +341,13 @@ export const ActionMain = ({
   onKeyDownInputFieldSearch,
   onKeyDownInputFieldDTInicioA,
   onKeyDownInputFieldDTFimA,
+  onKeyDownInputFieldDTInicioB,
+  onKeyDownInputFieldDTFimB,
+  onKeyDownInputFieldDTInicioC,
+  onKeyDownInputFieldDTFimC,
   onKeyDownInputFieldDTInicio,
   onKeyDownInputFieldDTFim,
+  onKeyDownInputFieldVendaCPFCNPJ,
 
   // Inputs Selects
   InputSelectEmpresaComponent,
@@ -752,7 +757,7 @@ export const ActionMain = ({
                         name="dtconsultainicio"
                         value={valueInputFieldDTInicioB}
                         onChange={onChangeInputFieldDTInicioB}
-
+                        onKeyDown={onKeyDownInputFieldDTInicioB}
                       />
                     )}
 
@@ -764,6 +769,7 @@ export const ActionMain = ({
                         name="dtconsultafim"
                         value={valueInputFieldDTFimB}
                         onChange={onChangeInputFieldDTFimB}
+                        onKeyDown={onKeyDownInputFieldDTFimB}
                       />
                     )}
 
@@ -775,6 +781,7 @@ export const ActionMain = ({
                         name="dtconsultainicio"
                         value={valueInputFieldDTInicioC}
                         onChange={onChangeInputFieldDTInicioC}
+                        onKeyDown={onKeyDownInputFieldDTInicioC}
                       />
                     )}
 
@@ -787,6 +794,7 @@ export const ActionMain = ({
                         name="dtconsultafim"
                         value={valueInputFieldDTFimC}
                         onChange={onChangeInputFieldDTFimC}
+                        onKeyDown={onKeyDownInputFieldDTFimC}
                       />
                     )}
                   </div>
@@ -1427,6 +1435,7 @@ export const ActionMain = ({
                         value={valueInputFieldVendaCPFCNPJ}
                         placeHolder={placeHolderInputFieldVendaCPFCNPJ}
                         readOnly={readOnlyVendaCPFCNPJ}
+                        onKeyDown={onKeyDownInputFieldVendaCPFCNPJ}
                       />
                     )}
                     {InputFieldTelefoneComponent && (

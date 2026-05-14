@@ -147,12 +147,16 @@ export const ActionPesquisaEstoqueProdutos = () => {
   }
 
   const handleClick = () => {
-
     refetchVendasEstoque();
     setTabelaVisivel(true)
-  
   }
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
 
   return (
 
@@ -168,31 +172,37 @@ export const ActionPesquisaEstoqueProdutos = () => {
         labelInputDTInicioA={"Data Início(A)"}
         onChangeInputFieldDTInicioA={(e) => setDataPesquisaInicio(e.target.value)}
         valueInputFieldDTInicioA={dataPesquisaInicio}
+        onKeyDownInputFieldDTInicioA={handleKeyPress}
 
         InputFieldDTFimAComponent={InputField}
         labelInputDTFimA={"Data Fim(A)"}
         onChangeInputFieldDTFimA={(e) => setDataPesquisaFim(e.target.value)}
         valueInputFieldDTFimA={dataPesquisaFim}
+        onKeyDownInputFieldDTFimA={handleKeyPress}
 
         InputFieldDTInicioBComponent={InputField}
         labelInputDTInicioB={"Data Início(B)"}
         valueInputFieldDTInicioB={dataPesquisaInicioB}
         onChangeInputFieldDTInicioB={(e) => setDataPesquisaInicioB(e.target.value)}
+        onKeyDownInputFieldDTInicioB={handleKeyPress}
 
         InputFieldDTFimBComponent={InputField}
         labelInputDTFimB={"Data Fim(B)"}
         onChangeInputFieldDTFimB={(e) => setDataPesquisaFimB(e.target.value)}
         valueInputFieldDTFimB={dataPesquisaFimB}
+        onKeyDownInputFieldDTFimB={handleKeyPress}
 
         InputFieldDTInicioCComponent={InputField}
         labelInputDTInicioC={"Data Início(C)"}
         onChangeInputFieldDTInicioC={(e) => setDataPesquisaInicioC(e.target.value)}
         valueInputFieldDTInicioC={dataPesquisaInicioC}
+        onKeyDownInputFieldDTInicioC={handleKeyPress}
 
         InputFieldDTFimCComponent={InputField}
         labelInputDTFimC={"Data Fim(C)"}
         onChangeInputFieldDTFimC={(e) => setDataPesquisaFimC(e.target.value)}
         valueInputFieldDTFimC={dataPesquisaFimC}
+        onKeyDownInputFieldDTFimC={handleKeyPress}
 
         MultSelectGrupoComponent={MultSelectAction}
         optionsMultSelectGrupo={[
@@ -235,6 +245,7 @@ export const ActionPesquisaEstoqueProdutos = () => {
         labelInputFieldCodBarra={"Cód. Barras / Nome Produto"}
         valueInputFieldCodBarra={descricaoProduto}
         onChangeInputFieldCodBarra={(e) => setDescricaoProduto(e.target.value)}
+        onKeyDownInputFieldCodBarra={handleKeyPress}
 
         MultSelectMarcaComponent={MultSelectAction}
         labelMultSelectMarca={"Marca"}

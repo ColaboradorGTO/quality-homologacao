@@ -108,27 +108,17 @@ export const ActionPesquisaVendasEstoque = () => {
     { enabled: false, staleTime: 60 * 60 * 1000 }
   );
 
-
-  const handleSelectMarcas = (e) => {
-    const selectedId = Number(e.value);
-    if (!isNaN(selectedId)) {
-      setMarcaSelecionada(selectedId);
-    }
-  }
-
-  const handleGrupoChange = (e) => {
-    const selectedGrupo = e.value;
-    if (!isNaN(selectedGrupo)) {
-      setGrupoSelecionado(selectedGrupo);
-    }
-
-  }
-
   const handleClick = () => {
     refetchListaEstoque()
     setTabelaVisivel(true)
   }
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
 
   return (
 
@@ -144,11 +134,13 @@ export const ActionPesquisaVendasEstoque = () => {
         labelInputFieldDTInicio={"Data Início"}
         valueInputFieldDTInicio={dataPesquisaInicio}
         onChangeInputFieldDTInicio={e => setDataPesquisaInicio(e.target.value)}
+        onKeyDownInputFieldDTInicio={handleKeyPress}
 
         InputFieldDTFimComponent={InputField}
         labelInputFieldDTFim={"Data Fim"}
         valueInputFieldDTFim={dataPesquisaFim}
         onChangeInputFieldDTFim={e => setDataPesquisaFim(e.target.value)}
+        onKeyDownInputFieldDTFim={handleKeyPress}
 
         InputSelectGrupoComponent={InputSelectAction}
         optionsGrupos={[
@@ -160,7 +152,7 @@ export const ActionPesquisaVendasEstoque = () => {
         ]}
         labelSelectGrupo={"Por Grupo"}
         valueSelectGrupo={grupoSelecionado}
-        onChangeSelectGrupo={handleGrupoChange}
+        onChangeSelectGrupo={(e) => setGrupoSelecionado(e.value)}
 
         InputSelectSubGrupoComponent={InputSelectAction}
         optionsSubGrupos={[
@@ -190,6 +182,7 @@ export const ActionPesquisaVendasEstoque = () => {
         labelInputFieldCodBarra={"Cód.Barras / Nome Produto"}
         valueInputFieldCodBarra={produtoPesquisado}
         onChangeInputFieldCodBarra={e => setProdutoPesquisado(e.target.value)}
+        onKeyDownInputFieldCodBarra={handleKeyPress}
 
         InputSelectMarcasComponent={InputSelectAction}
         labelSelectMarcas={"Marcas"}
@@ -202,7 +195,7 @@ export const ActionPesquisaVendasEstoque = () => {
           }))
         ]}
         valueSelectMarcas={marcaSelecionada}
-        onChangeSelectMarcas={handleSelectMarcas}
+        onChangeSelectMarcas={(e) => setMarcaSelecionada(e.value)}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}

@@ -4,6 +4,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { ButtonTable } from "../../../ButtonsTabela/ButtonTable";
 import { dataFormatada } from "../../../../utils/dataFormatada";
+import { useState } from "react";
 
 
 

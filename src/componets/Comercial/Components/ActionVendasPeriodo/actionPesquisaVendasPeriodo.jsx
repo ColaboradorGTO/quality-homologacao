@@ -42,9 +42,9 @@ export const ActionPesquisaVendasPeriodo = () => {
 
 
   const { data: dadosMarcas = [], error: errorMarcas, isLoading: isLoadingMarcas, refetch: refetchMarcas } = useQuery(
-    'listaGrupoEmpresas',
+    'marcasLista',
     async () => {
-      const response = await get(`/listaGrupoEmpresas`);
+      const response = await get(`/marcasLista`);
       return response.data;
     },
     {enabled: true, staleTime: 60 * 60 * 1000, }

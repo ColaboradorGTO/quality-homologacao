@@ -10,11 +10,9 @@ import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
 
 export const ActionPesquisaFuncionario = ({ usuarioLogado }) => {
-  const [tabelaVisivel, setTabelaVisivel] = useState(true);
   const [empresaSelecionadaNome, setEmpresaSelecionadaNome] = useState('');
   const [empresaSelecionada, setEmpresaSelecionada] = useState('');
   const [cpf, setCpf] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
   useEffect(() => {
@@ -94,11 +92,15 @@ export const ActionPesquisaFuncionario = ({ usuarioLogado }) => {
     setEmpresaSelecionada(e.value);
   }
 
-  const handleTabelaVisivel = () => {
-    setCurrentPage(prevPage => prevPage + 1);
-    setTabelaVisivel(true);
+  const handleClick = () => {
     refetchListaFuncionarios();
+  };
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
   };
 
   return (
@@ -114,6 +116,7 @@ export const ActionPesquisaFuncionario = ({ usuarioLogado }) => {
         labelInputFieldVendaCPFCNPJ={"Nome / CPF"}
         valueInputFieldVendaCPFCNPJ={cpf}
         onChangeInputFieldVendaCPFCNPJ={(e) => setCpf(e.target.value)}
+        onKeyDownInputFieldVendaCPFCNPJ={handleKeyPress}
 
         InputSelectEmpresaComponent={InputSelectAction}
         optionsEmpresas={[
@@ -129,20 +132,20 @@ export const ActionPesquisaFuncionario = ({ usuarioLogado }) => {
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}
-        onButtonClickSearch={handleTabelaVisivel}
+        onButtonClickSearch={handleClick}
         corSearch={"primary"}
         IconSearch={AiOutlineSearch}
       />
 
-      {tabelaVisivel &&
-        <ActionListaFuncionario 
-          dadosFuncionarios={dadosFuncionarios} 
-          dadosEmpresas={dadosEmpresas} 
-          refetchListaFuncionarios={refetchListaFuncionarios}
-          usuarioLogado={usuarioLogado}
-          optionsModulos={optionsModulos}  
-        />
-      }
+
+      <ActionListaFuncionario 
+        dadosFuncionarios={dadosFuncionarios} 
+        dadosEmpresas={dadosEmpresas} 
+        refetchListaFuncionarios={refetchListaFuncionarios}
+        usuarioLogado={usuarioLogado}
+        optionsModulos={optionsModulos}  
+      />
+     
     </Fragment>
   )
 }

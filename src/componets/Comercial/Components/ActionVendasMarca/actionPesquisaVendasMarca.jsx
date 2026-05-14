@@ -15,7 +15,7 @@ export const ActionPesquisaVendasMarca = () => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
   const [dataPesquisaFim, setDataPesquisaFim] = useState('');
-  const [marcaSelecionada, setMarcaSelecionada] = useState(null);
+  const [marcaSelecionada, setMarcaSelecionada] = useState('');
 
   useEffect(() => {
     const dataAtual = getDataAtual();
@@ -80,6 +80,13 @@ export const ActionPesquisaVendasMarca = () => {
     refetchListaVendasMarca();
   }
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
+
   return (
 
     <Fragment>
@@ -93,11 +100,13 @@ export const ActionPesquisaVendasMarca = () => {
         labelInputFieldDTInicio={"Data Início"}
         valueInputFieldDTInicio={dataPesquisaInicio}
         onChangeInputFieldDTInicio={e => setDataPesquisaInicio(e.target.value)}
+        onKeyDownInputFieldDTInicio={handleKeyPress}
 
         InputFieldDTFimComponent={InputField}
         labelInputFieldDTFim={"Data Fim"}
         valueInputFieldDTFim={dataPesquisaFim}
         onChangeInputFieldDTFim={e => setDataPesquisaFim(e.target.value)}
+        onKeyDownInputFieldDTFim={handleKeyPress}
 
         InputSelectEmpresaComponent={InputSelectAction}
         optionsEmpresas={[
@@ -126,4 +135,3 @@ export const ActionPesquisaVendasMarca = () => {
     </Fragment>
   )
 }
-

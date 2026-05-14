@@ -10,6 +10,7 @@ import { ActionListaRotatividade } from "./actionListaRotatividade";
 import { getDataAtual } from "../../../../utils/dataAtual";
 import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
+import { optionsUF } from "../../../../../parceiro.json";
 
 export const ActionPesquisaRotatividade = () => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
@@ -84,39 +85,33 @@ export const ActionPesquisaRotatividade = () => {
 
 
   const fetchListaRotatividade = async () => {
+    const urlBase = `/rotatividadeVendas?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idGrupoEmpresarial=${marcaSelecionada}&idEmpresa=${empresaSelecionada}&produtoPesquisado=${produtoPesquisado}&ufPesquisa=${ufSelecionado}&idFornecedor=${fornecedorSelecionado}&idGrupoGrade=${grupoSelecionado}&idGrade=${gradeSelecionado}`;
+    let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
+    urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
 
-      const urlApi = `/rotatividadeVendas?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idGrupoEmpresarial=${marcaSelecionada}&idEmpresa=${empresaSelecionada}&produtoPesquisado=${produtoPesquisado}&ufPesquisa=${ufSelecionado}&idFornecedor=${fornecedorSelecionado}&idGrupoGrade=${grupoSelecionado}&idGrade=${gradeSelecionado}`;
-      const response = await get(urlApi);
+      animacaoCarregamento('Carregando dados...', true);
 
-      if (response.data.length && response.data.length === pageSize) {
-        let allData = [...response.data];
-        animacaoCarregamento(`Carregando... Página ${currentPage} de ${response.data.length}`, true);
+      const primeiraPagina = 1;
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const page = primeiraResposta.page || primeiraPagina;
+      const pageSize = primeiraResposta.pageSize || 1000;
+      const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
+      const totalPages = Math.ceil(totalRows / pageSize);
 
-        async function fetchNextPage(currentPage) {
-          try {
-            currentPage++;
-            const responseNextPage = await get(`${urlApi}&page=${currentPage}`);
-            if (responseNextPage.length) {
-              allData.push(...responseNextPage.data);
-              return fetchNextPage(currentPage);
-            } else {
-              return allData;
-            }
-          } catch (error) {
-            console.error('Erro ao buscar próxima página:', error);
-            throw error;
-          }
+      let allData = [...(primeiraResposta.data || [])];
+
+      if (totalPages > 1) {
+        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          allData.push(...(responsePage.data || []));
         }
-
-        await fetchNextPage(currentPage);
-        return allData;
-      } else {
-
-        return response.data;
       }
+
+      return allData;
     } catch (error) {
-      console.error('Erro ao buscar dados:', error);
+      console.error('Erro ao buscar dados da api:', error);
       throw error;
     } finally {
       fecharAnimacaoCarregamento();
@@ -135,43 +130,18 @@ export const ActionPesquisaRotatividade = () => {
     setEmpresaSelecionada(values);
   };
 
-  const handleSelectMarcas = (e) => {
-    const selectedId = Number(e.value);
-
-    if (!isNaN(selectedId)) {
-      setMarcaSelecionada(selectedId);
-    }
-  }
-
-  const handleGrupoChange = (e) => {
-    const selectedGrupo = e.value;
-    if (!isNaN(selectedGrupo)) {
-      setGrupoSelecionado(selectedGrupo);
-    }
-  }
-
-  const handleFornecedorChange = (e) => {
-    const selectedFornecedor = e.value;
-    if (!isNaN(selectedFornecedor)) {
-      setFornecedorSelecionado(selectedFornecedor);
-    }
-  }
-
-  const handleSelectUF = (e) => {
-    const selectedUF = e.value;
-    setUFSelecionado(selectedUF);
-  }
-
   const handleClick = () => {
-    setCurrentPage(prevPage => prevPage + 1);
     setTabelaVisivel(true)
     refetchListaRotatividade()
   }
 
-  const optionsUF = [
-    { value: 'DF', label: 'DF' },
-    { value: 'GO', label: 'GO' },
-  ]
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
+
 
   return (
 
@@ -186,11 +156,13 @@ export const ActionPesquisaRotatividade = () => {
         labelInputFieldDTInicio={"Data Início"}
         valueInputFieldDTInicio={dataPesquisaInicio}
         onChangeInputFieldDTInicio={e => setDataPesquisaInicio(e.target.value)}
+        onKeyDownInputFieldDTInicio={handleKeyPress}
 
         InputFieldDTFimComponent={InputField}
         labelInputFieldDTFim={"Data Fim"}
         valueInputFieldDTFim={dataPesquisaFim}
         onChangeInputFieldDTFim={e => setDataPesquisaFim(e.target.value)}
+        onKeyDownInputFieldDTFim={handleKeyPress}
 
         InputSelectGrupoComponent={InputSelectAction}
         optionsGrupos={[
@@ -202,7 +174,7 @@ export const ActionPesquisaRotatividade = () => {
         ]}
         labelSelectGrupo={"Por Grupo"}
         valueSelectGrupo={grupoSelecionado}
-        onChangeSelectGrupo={handleGrupoChange}
+        onChangeSelectGrupo={(e) => setGrupoSelecionado(e.value)}
 
         InputSelectGradeComponent={InputSelectAction}
         optionsGrades={[
@@ -226,7 +198,7 @@ export const ActionPesquisaRotatividade = () => {
         ]}
         labelSelectFornecedor={"Por Fornecedor"}
         valueSelectFornecedor={fornecedorSelecionado}
-        onChangeSelectFornecedor={handleFornecedorChange}
+        onChangeSelectFornecedor={(e) => setFornecedorSelecionado(e.value)}
 
         InputFieldCodBarraComponent={InputField}
         labelInputFieldCodBarra={"Cód.Barras / Nome Produto"}
@@ -235,13 +207,13 @@ export const ActionPesquisaRotatividade = () => {
 
 
         InputSelectUFComponent={InputSelectAction}
-        optionsSelectUF={optionsUF.map((item) => ({
+        optionsSelectUF={optionsUF?.map((item) => ({
           value: item.value,
           label: item.label,
         }))}
         labelSelectUF={"UF"}
         valueSelectUF={ufSelecionado}
-        onChangeSelectUF={handleSelectUF}
+        onChangeSelectUF={(e) => setUFSelecionado(e.value)}
 
         MultSelectGrupoComponent={MultSelectAction}
         labelMultSelectGrupo={"Empresa"}
@@ -265,7 +237,7 @@ export const ActionPesquisaRotatividade = () => {
           }))
         ]}
         valueSelectMarcas={marcaSelecionada}
-        onChangeSelectMarcas={handleSelectMarcas}
+        onChangeSelectMarcas={(e) => setMarcaSelecionada(e.value)}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}

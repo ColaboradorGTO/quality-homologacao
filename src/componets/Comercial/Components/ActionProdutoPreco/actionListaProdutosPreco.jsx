@@ -85,7 +85,7 @@ export const ActionListaProductoPreco = ({ dadosProdutos }) => {
     {
       field: 'DSNOME',
       header: 'Descrição',
-      body: row => row.DSNOME,
+      body: row => <th>{row.DSNOME}</th>,
       sortable: true,
     },
     {
@@ -106,7 +106,7 @@ export const ActionListaProductoPreco = ({ dadosProdutos }) => {
 
     <Fragment>
 
-      <div className="panel" style={{ marginTop: "4rem" }}>
+      <div className="panel" >
         <div className="panel-hdr">
           <h2>Produtos Preços</h2>
         </div>

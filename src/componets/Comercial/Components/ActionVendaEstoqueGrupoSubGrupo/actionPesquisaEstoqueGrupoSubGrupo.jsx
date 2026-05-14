@@ -49,7 +49,6 @@ export const ActionPesquisaEstoqueVendaGrupoSubGrupo = () => {
   );
 
 
-
   const { data: dadosSubGrupos = [], error: errorSubGrupo, isLoading: isLoadingSubGrupo, refetch: refetchSubGrupo } = useQuery(
     'subgrupo-produto',
     async () => {
@@ -58,7 +57,6 @@ export const ActionPesquisaEstoqueVendaGrupoSubGrupo = () => {
     },
     { staleTime: 60 * 60 * 1000, }
   );
-
 
 
   const fetchGrupoSubGrupo = async () => {
@@ -126,6 +124,13 @@ export const ActionPesquisaEstoqueVendaGrupoSubGrupo = () => {
     setTabelaVisivel(true)
   }
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
+
   return (
 
     <Fragment>
@@ -140,11 +145,13 @@ export const ActionPesquisaEstoqueVendaGrupoSubGrupo = () => {
         labelInputFieldDTInicio={"Data Início"}
         valueInputFieldDTInicio={dataPesquisaInicio}
         onChangeInputFieldDTInicio={e => setDataPesquisaInicio(e.target.value)}
+        onKeyDownInputFieldDTInicio={handleKeyPress}
 
         InputFieldDTFimComponent={InputField}
         labelInputFieldDTFim={"Data Fim"}
         valueInputFieldDTFim={dataPesquisaFim}
         onChangeInputFieldDTFim={e => setDataPesquisaFim(e.target.value)}
+        onKeyDownInputFieldDTFim={handleKeyPress}
 
         InputSelectGrupoComponent={InputSelectAction}
         optionsGrupos={[
