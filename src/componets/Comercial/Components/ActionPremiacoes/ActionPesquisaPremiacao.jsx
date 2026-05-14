@@ -13,6 +13,7 @@ import { ActionListaLiderCaixa } from "./actionListaLiderCaixa";
 import { ActionListaOperadorCaixa } from "./actionListaOperadorCaixa";
 import { ActionListaVendedor } from "./actionListaVendedor";
 import { ActionListaAssistentes } from "./actionListaAssistentes";
+import { ActionListaMultiplicador } from "./actionListaMultiplicador";
 
 
 export const ActionPesquisaPremiacoes = () => {
@@ -143,6 +144,7 @@ export const ActionPesquisaPremiacoes = () => {
           setDadosOperadorCaixa={setDadosOperadorCaixa}
           setDadosVendedor={setDadosVendedor}
           setDadosAssistentes={setDadosAssistentes}  
+          setDadosMultiplicador={setDadosMultiplicador}
           setTabelaVisivel={setTabelaVisivel}
           setTabelasSecundariasVisiveis={setTabelasSecundariasVisiveis}
         />
@@ -153,38 +155,38 @@ export const ActionPesquisaPremiacoes = () => {
         <div>
           <div className="row">
             <div className="col-sm-6 col-md-6 col-lg-6">
-
               <ActionListaGerente dadosGerente={dadosGerente} />
-
             </div>
             <div className="col-sm-6 col-md-6 col-lg-6">
-
-
               <ActionListaLiderLoja dadosLiderLoja={dadosLiderLoja} />
             </div>
           </div>
           <div className="row">
             <div className="col-sm-6 col-md-6 col-lg-6">
-
               <ActionListaLiderCaixa dadosLiderCaixa={dadosLiderCaixa} />
-
             </div>
             <div className="col-sm-6 col-md-6 col-lg-6">
-
               <ActionListaOperadorCaixa dadosOperadorCaixa={dadosOperadorCaixa} />
-              
+            </div>
+          </div>
+          <div className="row">
+            <div className="col-sm-6 col-md-6 col-lg-6">
+              <ActionListaVendedor dadosVendedor={dadosVendedor} />
+            </div>
+            <div className="col-sm-6 col-md-6 col-lg-6">
+              <ActionListaAssistentes dadosAssistentes={dadosAssistentes} />
             </div>
           </div>
           <div className="row">
             <div className="col-sm-6 col-md-6 col-lg-6">
 
-              <ActionListaVendedor dadosVendedor={dadosVendedor} />
+              <ActionListaMultiplicador dadosMultiplicador={dadosMultiplicador} />
 
             </div>
             <div className="col-sm-6 col-md-6 col-lg-6">
 
               
-              <ActionListaAssistentes dadosAssistentes={dadosAssistentes} />
+            
             </div>
           </div>
         </div>

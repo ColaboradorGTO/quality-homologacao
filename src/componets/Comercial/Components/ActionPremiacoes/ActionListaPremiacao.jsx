@@ -17,6 +17,7 @@ export const ActionListaPremiacoes = ({
   setDadosOperadorCaixa,
   setDadosVendedor,
   setDadosAssistentes,
+  setDadosMultiplicador,
   setTabelaVisivel,
   setTabelasSecundariasVisiveis
 }) => {
@@ -235,6 +236,32 @@ export const ActionListaPremiacoes = ({
   const handleClickPremioAssistentes = (row) => {
     if (row && row.IDSUBGRUPOEMPRESARIAL) {
       handlePremioAssistentes(row.IDSUBGRUPOEMPRESARIAL, row.DTPREMIOINICIO, row.DTPREMIOFIM, row.DSSUBGRUPOEMPRESARIAL);
+    }
+  };
+
+  const handlePremioMultiplicador = async (IDSUBGRUPOEMPRESARIAL, DTPREMIOINICIO, DTPREMIOFIM, DSSUBGRUPOEMPRESARIAL) => {
+    try {
+      const response = await get(`/lista-premios-gerente?idSubGrupo=${IDSUBGRUPOEMPRESARIAL}&dataPesquisaInicio=${DTPREMIOINICIO}&dataPesquisaFim=${DTPREMIOFIM}&funcao=MULTIPLICADOR`)
+      if (response.data && response.data.length > 0) {
+
+        setDadosMultiplicador({
+          data: response.data,
+          idSubGrupo: IDSUBGRUPOEMPRESARIAL,
+          dataPesquisaInicio: DTPREMIOINICIO,
+          dataPesquisaFim: DTPREMIOFIM,
+          dsSubGrupo: DSSUBGRUPOEMPRESARIAL
+        });
+        setTabelasSecundariasVisiveis(true);
+        setTabelaVisivel(false);;
+      }
+    } catch (error) {
+      console.error('Erro ao buscar metas detalhadas: ', error);
+    }
+  };
+  
+  const handleClickPremioMultiplicador = (row) => {
+    if (row && row.IDSUBGRUPOEMPRESARIAL) {
+      handlePremioMultiplicador(row.IDSUBGRUPOEMPRESARIAL, row.DTPREMIOINICIO, row.DTPREMIOFIM, row.DSSUBGRUPOEMPRESARIAL);
     }
   };
 

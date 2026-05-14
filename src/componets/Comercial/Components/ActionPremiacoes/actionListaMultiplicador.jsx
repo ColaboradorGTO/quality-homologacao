@@ -14,8 +14,8 @@ import { formatMoeda } from "../../../../utils/formatMoeda";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 
-export const ActionListaAssistentes = ({ 
-  dadosAssistentes,
+export const ActionListaMultiplicador = ({ 
+  dadosMultiplicador,
 }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowSelection, setRowSelection] = useState(null);
@@ -27,34 +27,33 @@ export const ActionListaAssistentes = ({
 
   const handlePrint = useReactToPrint({
     content: () => dataTableRef.current,
-    documentTitle: 'Premiação Assistentes',
+    documentTitle: 'Premiação Multiplicador',
   });
+
+  const exportHeaderRows = [
+    [
+      { content: "CLASSIFICAÇÃO", styles: { halign: "center", fillColor: "#967BBD", textColor: "white", fontSize: 10 } },
+      { content: "SENIOR/PLENO/JUNIOR", colSpan: 3, styles: { halign: "center", fillColor: "#FFCA5B", textColor: "black", fontSize: 10 } },
+    ],
+    [
+      { content: "INDICADORES", styles: { fillColor: "#B19DCE", textColor: "black", fontSize: 9 } },
+      { content: "BÔNUS", styles: { fillColor: "#FE85BE", textColor: "black", fontSize: 9 } },
+      { content: "APURAÇÃO", styles: { fillColor: "#FFDB8E", textColor: "white", fontSize: 9 } },
+    ],
+  ];
+
+  const exportRows = dados?.map((item) => [
+    item.NOINDICADOR,
+    item.VRBONUSTODOS,
+    item.TPAPURACAO,
+  ]) ?? [];
 
   const exportToPDF = () => {
     const doc = new jsPDF();
 
-    const headerRows = [
-      [
-        { content: "CLASSIFICAÇÃO", styles: { halign: "center", fillColor: "#967BBD", textColor: "white", fontSize: 10 } },
-        { content: "SENIOR/PLENO/JUNIOR", colSpan: 3, styles: { halign: "center", fillColor: "#FFCA5B", textColor: "black", fontSize: 10 } },
-      ],
-      [
-        { content: "INDICADORES", styles: { fillColor: "#B19DCE", textColor: "black", fontSize: 9 } },
-        { content: "BÔNUS", styles: { fillColor: "#FFDB8E", textColor: "black", fontSize: 9 } },
-        { content: "APURAÇÃO", styles: { fillColor: "#FE85BE", textColor: "white", fontSize: 9 } },
-        
-      ],
-    ];
-
-    const bodyRows = dados.map((item) => [
-      item.NOINDICADOR,
-      item.VRBONUSTODOS,
-      item.TPAPURACAO,
-    ]);
-
     doc.autoTable({
-      head: headerRows,
-      body: bodyRows,
+      head: exportHeaderRows,
+      body: exportRows,
       startY: 10,
       theme: "plain",
       styles: { fontSize: 8, cellPadding: 2 },
@@ -66,13 +65,13 @@ export const ActionListaAssistentes = ({
       },
     });
 
-    doc.save("premiacao_assistentes.pdf");
+    doc.save("premiacao_multiplicador.pdf");
   };
 
 
   const exportToExcel = async () => {
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet("Assistentes");
+    const worksheet = workbook.addWorksheet("Multiplicador");
 
     // Cabeçalho agrupado igual ao DataTable
     worksheet.getCell("A1").value = "CLASSIFICAÇÃO";
@@ -88,7 +87,7 @@ export const ActionListaAssistentes = ({
 
     // Segunda linha de cabeçalho
     worksheet.getRow(2).values = [
-      "INDICADORES", "BÔNUS", "APURAÇÃO", "BÔNUS"
+      "INDICADORES", "BÔNUS", "APURAÇÃO"
     ];
     worksheet.getRow(2).eachCell((cell, colNumber) => {
       cell.alignment = { horizontal: "center" };
@@ -109,12 +108,8 @@ export const ActionListaAssistentes = ({
     });
 
     // Dados
-    dados.forEach((item) => {
-      worksheet.addRow([
-        item.NOINDICADOR,
-        item.VRBONUSTODOS,
-        item.TPAPURACAO,
-      ]);
+    exportRows.forEach((row) => {
+      worksheet.addRow(row);
     });
 
     // Ajuste de largura das colunas
@@ -124,16 +119,16 @@ export const ActionListaAssistentes = ({
 
 
     const buffer = await workbook.xlsx.writeBuffer();
-    saveAs(new Blob([buffer]), "premiacao_assistentes.xlsx");
+    saveAs(new Blob([buffer]), "premiacao_multiplicador.xlsx");
   };
  
-  const dados = dadosAssistentes?.data?.map((item, index) => {
+  const dados = dadosMultiplicador?.data?.map((item, index) => {
     let contador = index + 1;
 
     return {
       NOINDICADOR: item.NOINDICADOR,
-      VRBONUSTODOS: item.VRBONUSTODOS,
       TPAPURACAO: item.TPAPURACAO,
+      VRBONUSTODOS: item.VRBONUSTODOS,
     };
   });
 
@@ -186,7 +181,7 @@ export const ActionListaAssistentes = ({
       <div className="panel" >
         <div className="panel-hdr">
           {/* <h2>{`REGRAS PREMIAÇÕES: ${dadosAssistentes?.dsSubGrupo} - ${dadosAssistentes?.dataPesquisaInicio} a ${dadosAssistentes?.dataPesquisaFim}`}</h2> */}
-          <h2>{`ASSISTENTES`}</h2>
+          <h2>{`MULTIPLICADOR`}</h2>
         </div>
         <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
           <HeaderTable
