@@ -79,91 +79,62 @@ export const ActionListaVendasConvenio = ({ dadosVendasConvenio }) => {
     XLSX.writeFile(workbook, 'vendas_convenio_desconto_funcionario.xlsx');
   };
 
+  const calcularTotal = (field) => {
+    return dadosListaConvenio.reduce((total, item) => total + toFloat(item[field]), 0);
+  };
+  
   const cacularTotalValorBrutoNF = () => {
-    let total = 0;
-    for (let dados of dadosVendasConvenio) {
-      total += parseFloat(dados.VPROD)
-    }
+    const total = calcularTotal('VPROD');
     return total
   }
 
   const cacularTotalValorDescontoNF = () => {
-    let total = 0;
-    for (let dados of dadosVendasConvenio) {
-      total += parseFloat(dados.VDESC)
-    }
+    const total = calcularTotal('VDESC');
     return total
   }
 
   const cacularTotalValorLiquidoNF = () => {
-    let total = 0;
-    for (let dados of dadosVendasConvenio) {
-      total += parseFloat(dados.VNF)
-    }
+    const total = calcularTotal('VNF');
     return total
   }
 
   const cacularTotalValorBruto = () => {
-    let total = 0;
-    for (let dados of dadosVendasConvenio) {
-      total += parseFloat(dados.VRBRUTO)
-    }
+    const total = calcularTotal('VRBRUTO');
     return total
   }
 
   const cacularTotalValorDesconto = () => {
-    let total = 0;
-    for (let dados of dadosVendasConvenio) {
-      total += parseFloat(dados.VRDESCONTO)
-    }
+    const total = calcularTotal('VRDESCONTO');
     return total
   }
 
   const cacularTotalValorLiquido = () => {
-    let total = 0;
-    for (let dados of dadosVendasConvenio) {
-      total += parseFloat(dados.VRLIQUIDO)
-    }
+    const total = calcularTotal('VRLIQUIDO');
     return total
   }
 
   const cacularTotalValorRecebidoDinheiro = () => {
-    let total = 0;
-    for (let dados of dadosVendasConvenio) {
-      total += parseFloat(dados.VRRECDINHEIRO)
-    }
+    const total = calcularTotal('VRRECDINHEIRO');
     return total
   }
 
   const cacularTotalValorRecebidoCartao = () => {
-    let total = 0;
-    for (let dados of dadosVendasConvenio) {
-      total += parseFloat(dados.VRRECCARTAO)
-    }
+    const total = calcularTotal('VRRECCARTAO');
     return total
   }
 
   const cacularTotalValorRecebidoPOS = () => {
-    let total = 0;
-    for (let dados of dadosVendasConvenio) {
-      total += parseFloat(dados.VRRECPOS)
-    }
+    const total = calcularTotal('VRRECPOS');
     return total
   }
 
   const cacularTotalValorRecebidoVoucher = () => {
-    let total = 0;
-    for (let dados of dadosVendasConvenio) {
-      total += parseFloat(dados.VRRECVOUCHER)
-    }
+    const total = calcularTotal('VRRECVOUCHER');
     return total
   }
 
   const cacularTotalValorRecebidoConvenio = () => {
-    let total = 0;
-    for (let dados of dadosVendasConvenio) {
-      total += parseFloat(dados.VRRECCONVENIO)
-    }
+    const total = calcularTotal('VRRECCONVENIO');
     return total
   }
   const dadosListaConvenio = dadosVendasConvenio.map((item, index) => {
@@ -186,6 +157,7 @@ export const ActionListaVendasConvenio = ({ dadosVendasConvenio }) => {
       VRRECPOS: item.VRRECPOS,
       VRRECVOUCHER: item.VRRECVOUCHER,
       VRRECCONVENIO: item.VRRECCONVENIO,
+      NumeroVenda: item.NumeroVenda,
       
       VRRECCHEQUE: item.VRRECCHEQUE,
     }
@@ -202,6 +174,12 @@ export const ActionListaVendasConvenio = ({ dadosVendasConvenio }) => {
       field: 'NOFANTASIA',
       header: 'Loja',
       body: row => <p style={{fontWeight: '600',  width: '200px', margin: '0px' }}> {row.NOFANTASIA}</p>,
+      sortable: true,
+    },
+     {
+      field: 'NumeroVenda',
+      header: 'N° Venda',
+      body: row => <p style={{fontWeight: '600',  width: '100px', margin: '0px' }}> {row.NumeroVenda}</p>,
       sortable: true,
     },
     {

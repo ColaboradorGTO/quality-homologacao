@@ -70,6 +70,13 @@ export const ActionPesquisaVoucherResumido = () => {
     setTabelaVisivel(true)
   }
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
+
   return (
 
     <Fragment>
@@ -83,16 +90,19 @@ export const ActionPesquisaVoucherResumido = () => {
         labelInputFieldDTInicio={"Data Início"}
         valueInputFieldDTInicio={dataPesquisaInicio}
         onChangeInputFieldDTInicio={e => setDataPesquisaInicio(e.target.value)}
+        onKeyDownInputFieldDTInicio={handleKeyPress}
 
         InputFieldDTFimComponent={InputField}
         labelInputFieldDTFim={"Data Fim"}
         valueInputFieldDTFim={dataPesquisaFim}
         onChangeInputFieldDTFim={e => setDataPesquisaFim(e.target.value)}
+        onKeyDownInputFieldDTFim={handleKeyPress}
 
         InputFieldNumeroVoucherComponent={InputField}
         valueInputFieldNumeroVoucher={numeroVoucher}
         onChangeInputFieldNumeroVoucher={e => setNumeroVoucher(e.target.value)}
         labelInputFieldNumeroVoucher={"Voucher - Nº Venda ou CPF/CNPJ"}
+        onKeyDownInputFieldNumeroVoucher={handleKeyPress}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}

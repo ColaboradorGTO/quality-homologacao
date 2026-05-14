@@ -8,6 +8,7 @@ import * as XLSX from 'xlsx';
 import { formatMoeda } from "../../../utils/formatMoeda";
 import { ColumnGroup } from "primereact/columngroup";
 import { Row } from "primereact/row";
+import { toFloat } from "../../../utils/toFloat";
 import { useRef } from "react";
 import HeaderTable from "../../Tables/headerTable";
 import { formatarPorcentagem } from "../../../utils/formatarPorcentagem";
@@ -61,12 +62,12 @@ export const ActionListaVendasPCJ = ({ dadosVendasPCJ }) => {
     const toFloat = (value) => (isNaN(parseFloat(value)) || value === null || value === undefined) ? 0 : parseFloat(value);
 
     return (
-      toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDODINHEIRO) +
-      toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOCARTAO) +
-      toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOPOS) +
-      toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOCONVENIO) +
-      toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOPIX) +
-      toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOMOOVPAY)
+      toFloat(item.venda?.[0]['venda-movimento']?.TOTALVENDIDODINHEIRO) +
+      toFloat(item.venda?.[0]['venda-movimento']?.TOTALVENDIDOCARTAO) +
+      toFloat(item.venda?.[0]['venda-movimento']?.TOTALVENDIDOPOS) +
+      toFloat(item.venda?.[0]['venda-movimento']?.TOTALVENDIDOCONVENIO) +
+      toFloat(item.venda?.[0]['venda-movimento']?.TOTALVENDIDOPIX) +
+      toFloat(item.venda?.[0]['venda-movimento']?.TOTALVENDIDOMOOVPAY)
 
     );
   }
@@ -75,34 +76,34 @@ export const ActionListaVendasPCJ = ({ dadosVendasPCJ }) => {
     const toFloat = (value) => (isNaN(parseFloat(value)) || value === null || value === undefined) ? 0 : parseFloat(value);
 
     return (
-      toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDODINHEIRO) +
-      toFloat(item.fatura[0]['fatura-movimento'].TOTALRECEBIDOFATURA)
+      toFloat(item.venda?.[0]?.['venda-movimento']?.TOTALVENDIDODINHEIRO) +
+      toFloat(item.fatura?.[0]?.['fatura-movimento']?.TOTALRECEBIDOFATURA)
     )
   }
 
   const calcularTotalPCJTotal = (item) => {
     const toFloat = (value) => (isNaN(parseFloat(value)) || value === null || value === undefined) ? 0 : parseFloat(value)
 
-    const vrPCJ18 = toFloat(item.vendapcj[0]['venda-pcj'].TOTALPCJ18);
-    const vrPCJ78 = toFloat(item.vendapcj[0]['venda-pcj'].TOTALPCJ78);
+    const vrPCJ18 = toFloat(item.vendapcj?.[0]?.['venda-pcj']?.TOTALPCJ18);
+    const vrPCJ78 = toFloat(item.vendapcj?.[0]?.['venda-pcj']?.TOTALPCJ78);
 
-    const totalPCJ = vrPCJ18 !== 0 ? (vrPCJ78 / vrPCJ18) * 100 : 0;
+    const totalPCJ =  (vrPCJ78 / vrPCJ18) * 100;
 
     return totalPCJ;
 
   }
-  
+
   const dadosExcel = dadosVendasPCJ.map((item) => {
     let pcjTotal = calcularTotalPCJTotal(item)
     return {
 
-      ID: item.caixa.ID,
-      DSCAIXA: item.caixa.DSCAIXA,
-      DTABERTURA: item.caixa.DTABERTURA,
-      NOFUNCIONARIO: item.caixa.NOFUNCIONARIO,
-      NUCPF: item.caixa.NUCPF,
-      TOTALPCJ18: item.vendapcj[0]['venda-pcj'].TOTALPCJ18,
-      TOTALPCJ78: item.vendapcj[0]['venda-pcj'].TOTALPCJ78,
+      ID: item.caixa?.ID,
+      DSCAIXA: item.caixa?.DSCAIXA,
+      DTABERTURA: item.caixa?.DTABERTURA,
+      NOFUNCIONARIO: item.caixa?.NOFUNCIONARIO,
+      NUCPF: item.caixa?.NUCPF,
+      TOTALPCJ18: item.vendapcj?.[0]?.['venda-pcj']?.TOTALPCJ18,
+      TOTALPCJ78: item.vendapcj?.[0]?.['venda-pcj']?.TOTALPCJ78,
       pcjTotal: pcjTotal
     }
   });
@@ -114,31 +115,31 @@ export const ActionListaVendasPCJ = ({ dadosVendasPCJ }) => {
     let pcjTotal = calcularTotalPCJTotal(item)
     let contador = index + 1;
     return {
-      IDCAIXAWEB: item.caixa.IDCAIXAWEB,
-      ID: item.caixa.ID,
-      DSCAIXA: item.caixa.DSCAIXA,
-      DTABERTURA: item.caixa.DTABERTURA,
-      NOFUNCIONARIO: item.caixa.NOFUNCIONARIO,
-      NUCPF: item.caixa.NUCPF,
-      STFECHADO: item.caixa.STFECHADO,
-      VRRECDINHEIRO: item.caixa.VRRECDINHEIRO,
+      IDCAIXAWEB: item.caixa?.IDCAIXAWEB,
+      ID: item.caixa?.ID,
+      DSCAIXA: item.caixa?.DSCAIXA,
+      DTABERTURA: item.caixa?.DTABERTURA,
+      NOFUNCIONARIO: item.caixa?.NOFUNCIONARIO,
+      NUCPF: item.caixa?.NUCPF,
+      STFECHADO: item.caixa?.STFECHADO,
+      VRRECDINHEIRO: item.caixa?.VRRECDINHEIRO,
 
 
-      TOTALRECEBIDOFATURA: item.fatura[0]['fatura-movimento'].TOTALRECEBIDOFATURA,
-      TOTALRECEBIDOFATURAPIX: item.faturapix[0]['fatura-movimento-pix'].TOTALRECEBIDOFATURAPIX,
+      TOTALRECEBIDOFATURA: item.fatura?.[0]?.['fatura-movimento']?.TOTALRECEBIDOFATURA,
+      TOTALRECEBIDOFATURAPIX: item.faturapix?.[0]?.['fatura-movimento-pix']?.TOTALRECEBIDOFATURAPIX,
 
-      TOTALVENDIDODINHEIRO: parseFloat(item.venda[0]['venda-movimento'].TOTALVENDIDODINHEIRO),
-      TOTALVENDIDOCARTAO: parseFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOCARTAO),
-      TOTALVENDIDOPOS: parseFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOPOS),
-      TOTALVENDIDOPIX: parseFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOPIX),
-      TOTALVENDIDOMOOVPAY: parseFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOMOOVPAY),
-      TOTALVENDIDOVOUCHER: item.venda[0]['venda-movimento'].TOTALVENDIDOVOUCHER,
-      TOTALVENDIDOCONVENIO: parseFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOCONVENIO),
-      TOTALVENDIDO: item.venda[0]['venda-movimento'].TOTALVENDIDO,
-      TOTALNOTA: item.venda[0]['venda-movimento'].TOTALNOTA,
+      TOTALVENDIDODINHEIRO: parseFloat(item.venda?.[0]?.['venda-movimento']?.TOTALVENDIDODINHEIRO),
+      TOTALVENDIDOCARTAO: parseFloat(item.venda?.[0]?.['venda-movimento']?.TOTALVENDIDOCARTAO),
+      TOTALVENDIDOPOS: parseFloat(item.venda?.[0]?.['venda-movimento']?.TOTALVENDIDOPOS),
+      TOTALVENDIDOPIX: parseFloat(item.venda?.[0]?.['venda-movimento']?.TOTALVENDIDOPIX),
+      TOTALVENDIDOMOOVPAY: parseFloat(item.venda?.[0]?.['venda-movimento']?.TOTALVENDIDOMOOVPAY),
+      TOTALVENDIDOVOUCHER: item.venda?.[0]?.['venda-movimento']?.TOTALVENDIDOVOUCHER,
+      TOTALVENDIDOCONVENIO: parseFloat(item.venda?.[0]?.['venda-movimento']?.TOTALVENDIDOCONVENIO),
+      TOTALVENDIDO: item.venda?.[0]?.['venda-movimento']?.TOTALVENDIDO,
+      TOTALNOTA: item.venda?.[0]?.['venda-movimento']?.TOTALNOTA,
 
-      TOTALPCJ18: item.vendapcj[0]['venda-pcj'].TOTALPCJ18,
-      TOTALPCJ78: item.vendapcj[0]['venda-pcj'].TOTALPCJ78,
+      TOTALPCJ18: item.vendapcj?.[0]?.['venda-pcj']?.TOTALPCJ18,
+      TOTALPCJ78: item.vendapcj?.[0]?.['venda-pcj']?.TOTALPCJ78,
 
       totalVendido: totalVendido,
       vrDisponivel: vrDisponivel,
@@ -147,33 +148,74 @@ export const ActionListaVendasPCJ = ({ dadosVendasPCJ }) => {
     };
   });
 
-  const calcularTotalPCJ18 = () => {
-    let total = 0;
-    for (let dados of dadosMovLojaDia) {
-      total += parseFloat(dados.TOTALPCJ18);
+  const calcularTotal = (field) => {
+    return dadosMovLojaDia.reduce((total, item) => total + toFloat(item[field]), 0);
+  };
 
+  /*   const calcularTotalvrPCJ18 = () => {
+      const total = calcularTotal('TOTALPCJ18');
+      return total;
     }
-    return total;
-  }
+    const calcularTotalvrPCJ78 = () => {
+      const total = calcularTotal('TOTALPCJ78');
+      return total;
+    } */
+
+
+  /*   const calcularTotalPCJ = () => {
+      const vrPCJ18 = calcularTotalvrPCJ18('TOTALPCJ18');
+      const vrPCJ78 = calcularTotalvrPCJ78('TOTALPCJ78');
+      const totalPCJPorcentagem = (vrPCJ78 / vrPCJ18) * 100;
+  
+      return parseFloat(totalPCJPorcentagem.toFixed(2));
+    }
+  */
+    const calcularTotalPCJ18 = () => {
+      const total = calcularTotal('TOTALPCJ18');
+      return total;
+    } 
+
+  /*   const calcularTotalPCJ18 = () => {
+      let total = 0;
+      for (let dados of dadosMovLojaDia) {
+        total += parseFloat(dados.TOTALPCJ18);
+  
+      }
+      return total;
+    } */
 
   const calcularTotalPCJ78 = () => {
-    let total = 0;
-    for (let dados of dadosMovLojaDia) {
-      total += parseFloat(dados.TOTALPCJ78);
-
-    }
+    const total = calcularTotal('TOTALPCJ78');
     return total;
   }
 
-  const calcularValorTotalPCJTotal = () => {
-    let total = 0;
-    for (let dados of dadosMovLojaDia) {
-      total += parseFloat(dados.pcjTotal);
-
+  /*   const calcularTotalPCJ78 = () => {
+      let total = 0;
+      for (let dados of dadosMovLojaDia) {
+        total += parseFloat(dados.TOTALPCJ78);
+  
+      }
+      return total;
     }
-    return total;
+   */
+
+
+  const calcularTotalPCJ = () => {
+    const vrPCJ18 = calcularTotalPCJ18('TOTALPCJ18');
+    const vrPCJ78 = calcularTotalPCJ78('TOTALPCJ78');
+    const totalPCJPorcentagem = (vrPCJ78 / vrPCJ18) * 100;
+
+    return parseFloat(totalPCJPorcentagem.toFixed(2));
   }
 
+  /*     const calcularValorTotalPCJTotal = () => {
+      let total = 0;
+      for (let dados of dadosMovLojaDia) {
+        total += parseFloat(dados.pcjTotal);
+  
+      }
+      return total;
+    } */
   const colunaVendasPCJ = [
     {
       field: 'ID',
@@ -227,10 +269,10 @@ export const ActionListaVendasPCJ = ({ dadosVendasPCJ }) => {
 
       body: row => (
         <th style={{ color: row.pcjTotal === 0 ? 'red' : 'blue' }}>
-          {formatMoeda(row.pcjTotal)}
+          {formatMoeda(toFloat(row.pcjTotal))}
         </th>
       ),
-      footer: formatMoeda(calcularValorTotalPCJTotal()),
+      footer: calcularTotalPCJ(),
       sortable: true,
     },
 
@@ -242,7 +284,7 @@ export const ActionListaVendasPCJ = ({ dadosVendasPCJ }) => {
         <Column footer="Total dos Caixas " colSpan={5} footerStyle={{ textAlign: 'center', color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem', fontWeight: 'bold' }} />
         <Column footer={formatMoeda(calcularTotalPCJ18())} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem', fontWeight: 'bold' }} />
         <Column footer={formatMoeda(calcularTotalPCJ78())} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem', fontWeight: 'bold' }} />
-        <Column footer={formatMoeda(calcularValorTotalPCJTotal())} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem', fontWeight: 'bold' }} />
+        <Column footer={calcularTotalPCJ()} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem', fontWeight: 'bold' }} />
 
 
       </Row>

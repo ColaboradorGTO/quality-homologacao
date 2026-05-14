@@ -5,12 +5,12 @@ import axios from "axios";
 import { toFloat } from "../../../../../utils/toFloat";
 
 
-export const ActionListaConsolidacaoBalanco = ({ 
-    dadosBalancoConsolidado, 
-    optionsModulos, 
+export const ActionListaConsolidacaoBalanco = ({
+    dadosBalancoConsolidado,
+    optionsModulos,
     usuarioLogado,
-    handleClose, 
-    handleClickResumoBalanco 
+    handleClose,
+    handleClickResumoBalanco
 }) => {
     const [obsContagem, setObsContagem] = useState('');
     const [obsDivergenciaContagem, setObsDivergenciaContagem] = useState('');
@@ -22,14 +22,28 @@ export const ActionListaConsolidacaoBalanco = ({
     }, [usuarioLogado]);
 
     const getIPUsuario = async () => {
-        const response = await axios.get('http://ipwho.is/')
-        if (response.data) {
-            setIpUsuario(response.data.ip);
-        }
-        return response.data;
-    }
+        let usuarioIP = null;
 
-     const dados = dadosBalancoConsolidado.map((item, index) => {
+        try {
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+            usuarioIP = ipWhoisData?.ip;
+        } catch (error) {
+            console.error("Erro ao buscar IP via ipwho.is:", error);
+        }
+
+        if (!usuarioIP) {
+            try {
+                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+                usuarioIP = ipifyData?.ip;
+            } catch (error) {
+                console.error("Erro ao buscar IP via ipify.org:", error);
+            }
+        }
+        setIpUsuario(usuarioIP);
+        return usuarioIP;
+    };
+
+    const dados = dadosBalancoConsolidado.map((item, index) => {
 
         return {
             IDRESUMOBALANCO: item.IDRESUMOBALANCO,
@@ -166,12 +180,12 @@ export const ActionListaConsolidacaoBalanco = ({
                 <tr><td colspan="3"></td></tr>
                 <tr>
                     <td colspan="3" align="center">
-                        <button 
-                            type="button" 
-                            className="btn btn-success waves-effect waves-themed" 
-                            title="Confirmar a Consolidação do Balanço" 
+                        <button
+                            type="button"
+                            className="btn btn-success waves-effect waves-themed"
+                            title="Confirmar a Consolidação do Balanço"
                             onClick={handleSubmit}>
-                                Confirmar
+                            Confirmar
                         </button>
                     </td>
                 </tr>

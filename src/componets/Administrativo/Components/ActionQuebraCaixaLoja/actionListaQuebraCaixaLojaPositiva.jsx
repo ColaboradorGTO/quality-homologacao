@@ -125,7 +125,7 @@ export const ActionListaQuebraCaixaLojaPositiva = ({ dadosQuebraDeCaixaPositiva,
       sortable: true,
     },
     {
-      field: 'STATIVO',
+      field: 'opcoes',
       header: 'Opções',
       body: (row) => {
         if (row.STATIVO == 'True') {

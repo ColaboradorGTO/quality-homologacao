@@ -9,6 +9,7 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../Tables/headerTable";
+import { toFloat } from "../../../utils/toFloat";
 
 export const ActionListaVendasVoucherLancado = ({ dadosDetalheVoucher }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
@@ -111,7 +112,7 @@ export const ActionListaVendasVoucherLancado = ({ dadosDetalheVoucher }) => {
     {
       field: 'NUVOUCHER',
       header: 'Nº Voucher ',
-      body: row => <th style={{ color: 'blue' }}>{parseFloat(row.NUVOUCHER)}</th>,
+      body: row => <th style={{ color: 'blue' }}>{row.NUVOUCHER}</th>,
       sortable: true,
     },
     {
@@ -157,12 +158,11 @@ export const ActionListaVendasVoucherLancado = ({ dadosDetalheVoucher }) => {
     },
 
   ]
-
+  const calcularTotal = (field) => {
+    return dadosVoucherDetalhe.reduce((total, item) => total + toFloat(item[field]), 0);
+  };
   const calcularVrVoucher = () => {
-    let total = 0;
-    for (let dados of dadosVoucherDetalhe) {
-      total += parseFloat(dados.VRVOUCHER);
-    }
+    const total = calcularTotal('VRVOUCHER');
     return total;
   }
 

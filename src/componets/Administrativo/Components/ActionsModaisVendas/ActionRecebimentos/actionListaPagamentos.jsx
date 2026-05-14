@@ -68,7 +68,7 @@ export const ActionListaPagamentos = ({ dadosDetalheRecebimentos, dados }) => {
             DSTIPOPAGAMENTO: pagamento.pag.DSTIPOPAGAMENTO,
             NPARCELAS: pagamento.pag.NPARCELAS,
             NUOPERACAO: pagamento.pag.NUOPERACAO,
-            NSUAUTORIZADORA: pagamento.pag.NSUAUTORIZADORA,
+            NSUAUTORIZADORA: pagamento.pag.NUAUTORIZACAO,
             VALORRECEBIDO: pagamento.pag.VALORRECEBIDO
         }))
     );

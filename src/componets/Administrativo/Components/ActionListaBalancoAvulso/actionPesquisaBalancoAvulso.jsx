@@ -1,4 +1,4 @@
-import React, { Fragment,  useEffect, useState } from "react"
+import React, { Fragment, useEffect, useState } from "react"
 import { ActionMain } from "../../../Actions/actionMain";
 import { InputField } from "../../../Buttons/Input";
 import { InputSelectAction } from "../../../Inputs/InputSelectAction";
@@ -13,7 +13,7 @@ import Swal from "sweetalert2";
 import { useConfirmarBalancoAvulso } from "./hooks/useConfirmarBalancoAvulso";
 import { ActionModalProduto } from "./ActionModalProduto/actionModalProduto";
 
-export const ActionPesquisaBalancoAvulso = ({usuarioLogado }) => {
+export const ActionPesquisaBalancoAvulso = ({ usuarioLogado }) => {
   const [descricaoColetor, setDescricaoColetor] = useState('');
   const [descricaoProduto, setDescricaoProduto] = useState('');
   const [quantidade, setQuantidade] = useState('');
@@ -24,7 +24,7 @@ export const ActionPesquisaBalancoAvulso = ({usuarioLogado }) => {
   const [empresaSelecionadaNome, setEmpresaSelecionadaNome] = useState('')
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
- 
+
   useEffect(() => {
     const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
     if (menuSalvo) {
@@ -32,27 +32,27 @@ export const ActionPesquisaBalancoAvulso = ({usuarioLogado }) => {
       setMenuFilhoAtual(menuParsed);
     }
   }, []);
-  
+
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
     ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
       const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
-      
+
       return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
   );
 
   useEffect(() => {
-    
+
     const timer = setTimeout(() => {
       setDescricaoColetor('COLETOR WEB - ' + usuarioLogado.NOFUNCIONARIO)
     }, 2000);
-    
+
     return () => clearTimeout(timer);
-    
+
   }, [usuarioLogado])
-  
+
   const { data: dadosEmpresa = [], error: errorEmpresas, isLoading: isLoadingEmpresas } = useQuery(
     'empresas',
     async () => {
@@ -61,19 +61,19 @@ export const ActionPesquisaBalancoAvulso = ({usuarioLogado }) => {
     },
     { staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000, }
   );
-  
+
   const { data: dadosBalancoAvulso = [], error: errorBalanco, isLoading: isLoadingBalanco, refetch } = useQuery(
-    [ 'detalheBalancoAvulso', empresaSelecionada, usuarioLogado?.id],
+    ['detalheBalancoAvulso', empresaSelecionada, usuarioLogado?.id],
     async () => {
       const response = await get(`/detalheBalancoAvulso?idFilial=${empresaSelecionada}&coletor=${usuarioLogado.id}`);
       return response.data;
     },
     { enabled: Boolean(empresaSelecionada), staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000, }
   );
-  
-  const  { enviarConfirmacao, loading } = useConfirmarBalancoAvulso({ dadosBalancoAvulso, usuarioLogado, optionsModulos});
+
+  const { enviarConfirmacao, loading } = useConfirmarBalancoAvulso({ dadosBalancoAvulso, usuarioLogado, optionsModulos });
   const handleConfirmarBalanco = async () => {
-    if(optionsModulos[0]?.CRIAR == 'False') {
+    if (optionsModulos[0]?.CRIAR == 'False') {
       Swal.fire({
         icon: 'info',
         text: 'Você não tem permissão para confirmar o balanço avulso!',
@@ -90,7 +90,7 @@ export const ActionPesquisaBalancoAvulso = ({usuarioLogado }) => {
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
       animacaoCarregamento('Carregando dados...', true);
-                                                                            
+
       const primeiraPagina = 1;
       const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
       const page = primeiraResposta.page || primeiraPagina;
@@ -114,15 +114,15 @@ export const ActionPesquisaBalancoAvulso = ({usuarioLogado }) => {
       throw error;
     } finally {
       fecharAnimacaoCarregamento();
-    }  
+    }
   };
-  
+
   const { data: dadosColetorBalanco = [], refetch: refetchListaProdutosBalanco } = useQuery(
-    ['listaProdutos', ],
+    ['listaProdutos',],
     () => fetchListaProdutosBalanco(),
     { enabled: false }
   );
-  
+
 
   const handleSelectEmpresa = (e) => {
     const empresa = dadosEmpresa.find((empresa) => empresa.IDEMPRESA === e.value);
@@ -138,9 +138,9 @@ export const ActionPesquisaBalancoAvulso = ({usuarioLogado }) => {
     setModalVisivel(false)
   }
 
-  const handleClick = () => {   
-    if(!empresaSelecionada || descricaoProduto.length < 5) {
-     
+  const handleClick = () => {
+    if (!empresaSelecionada || descricaoProduto.length < 5) {
+
       Swal.fire({
         icon: 'info',
         text: 'Digite a descrição do produto ou o código de barras!',
@@ -154,7 +154,12 @@ export const ActionPesquisaBalancoAvulso = ({usuarioLogado }) => {
     }
   }
 
-   
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
 
   return (
 
@@ -190,11 +195,13 @@ export const ActionPesquisaBalancoAvulso = ({usuarioLogado }) => {
         labelInputFieldQuantidade={"Quantidade"}
         onChangeInputQuantidade={e => setQuantidade(e.target.value)}
         valueInputQuantidade={quantidade}
+        onKeyDownInputFieldQuantidade={handleKeyPress}
 
         InputFieldComponent={InputField}
         labelInputField={"Produto"}
         onChangeInputField={e => setDescricaoProduto(e.target.value)}
         valueInputField={descricaoProduto}
+        onKeyDownInputField={handleKeyPress}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}
@@ -208,26 +215,26 @@ export const ActionPesquisaBalancoAvulso = ({usuarioLogado }) => {
         corCadastro={"success"}
         IconCadastro={AiOutlineSave}
       />
- 
-      <ActionListaBalancoAvulso 
-        dadosBalancoAvulso={dadosBalancoAvulso} 
+
+      <ActionListaBalancoAvulso
+        dadosBalancoAvulso={dadosBalancoAvulso}
         usuarioLogado={usuarioLogado}
-        optionsModulos={optionsModulos}  
+        optionsModulos={optionsModulos}
         refetch={refetch}
       />
-       
+
       <ActionModalProduto
-        dadosColetorBalanco={dadosColetorBalanco} 
-        empresaSelecionada={empresaSelecionada} 
+        dadosColetorBalanco={dadosColetorBalanco}
+        empresaSelecionada={empresaSelecionada}
         quantidade={quantidade}
         usuarioLogado={usuarioLogado}
-        optionsModulos={optionsModulos}  
+        optionsModulos={optionsModulos}
         show={tabelaProduto}
         handleClose={() => setTabelaProduto(false)}
         refetch={refetch}
       />
-       
-      <ActionColetorBalancoModal 
+
+      <ActionColetorBalancoModal
         show={modalVisivel}
         handleClose={handleCloseModal}
         dadosColetorBalanco={dadosColetorBalanco}
@@ -236,7 +243,7 @@ export const ActionPesquisaBalancoAvulso = ({usuarioLogado }) => {
         usuarioLogado={usuarioLogado}
         optionsModulos={optionsModulos}
       />
-    
+
     </Fragment>
   )
 }

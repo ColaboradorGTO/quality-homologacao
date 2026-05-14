@@ -234,7 +234,9 @@ export const ActionListaPreviaBalanco = ({ dadosPreviaBalancoModal, optionsModul
                     selectionMode="single"
                     selection={rowSelection}
                     onSelectionChange={(e) => setRowSelection(e.value)}
-                    // rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
+                    rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
+                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
                     showGridlines
                     stripedRows
                     emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}

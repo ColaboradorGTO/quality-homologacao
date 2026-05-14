@@ -106,6 +106,13 @@ export const ActionPesquisaVendasVendedor = () => {
     refetchListaVendasVendedor()
   }
 
+    const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
+
   return (
 
     <Fragment>
@@ -120,11 +127,13 @@ export const ActionPesquisaVendasVendedor = () => {
         labelInputFieldDTInicio={"Data Início"}
         valueInputFieldDTInicio={dataPesquisaInicio}
         onChangeInputFieldDTInicio={e => setDataPesquisaInicio(e.target.value)}
+        onKeyDownInputFieldDTInicio={handleKeyPress}
 
         InputFieldDTFimComponent={InputField}
         labelInputFieldDTFim={"Data Fim"}
         valueInputFieldDTFim={dataPesquisaFim}
         onChangeInputFieldDTFim={e => setDataPesquisaFim(e.target.value)}
+        onKeyDownInputFieldDTFim={handleKeyPress}
 
         MultSelectEmpresaComponent={MultSelectAction}
         optionsMultSelectEmpresa={[
@@ -137,6 +146,7 @@ export const ActionPesquisaVendasVendedor = () => {
         labelMultSelectEmpresa={"Empresa"}
         valueMultSelectEmpresa={[empresaSelecionada]}
         onChangeMultSelectEmpresa={handleSelectEmpresa}
+        onKeyDownEmpresa={handleKeyPress}
 
         InputSelectMarcasComponent={InputSelectAction}
         labelSelectMarcas={"Marca"}
@@ -146,6 +156,7 @@ export const ActionPesquisaVendasVendedor = () => {
         }))}
         valueSelectMarca={marcaSelecionada}
         onChangeSelectMarcas={handleSelectMarca}
+        onKeyDownSelectMarcas={handleKeyPress}
 
         InputSelectUFComponent={InputSelectAction}
         labelSelectUF={"UF"}
@@ -155,6 +166,7 @@ export const ActionPesquisaVendasVendedor = () => {
         }))}
         onChangeSelectUF={e => setUfSelecionado(e.value)}
         valueSelectUF={ufSelecionado}
+        onKeyDownSelectUF={handleKeyPress}
 
         InputSelectComissoesComponent={InputSelectAction}
         labelSelectComissoes={"% Comissão"}
@@ -164,6 +176,7 @@ export const ActionPesquisaVendasVendedor = () => {
         }))}
         valueSelectComissoes={percComissaoSelecionada}
         onChangeSelectComissoes={handleSelectComissoes}
+        onKeyDownSelectComissoes={handleKeyPress}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}

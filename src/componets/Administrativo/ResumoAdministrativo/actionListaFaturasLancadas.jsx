@@ -80,23 +80,23 @@ export const ActionListaFaturasLancada = ({ dadosDetalheFaturaLancadas }) => {
     return {
       contador,
       DTPROCESSAMENTO: item.DTPROCESSAMENTO,
-      IDMOVIMENTOCAIXAWEB: parseFloat(item.IDMOVIMENTOCAIXAWEB),
-      DSCAIXA: item.DSCAIXA + ' - ' + item.IDCAIXAWEB,
+      IDMOVIMENTOCAIXAWEB: item.IDMOVIMENTOCAIXAWEB,
+      DSCAIXA: item.IDCAIXAWEB + ' - ' + item.DSCAIXA,
       NUCODAUTORIZACAO: toFloat(item.NUCODAUTORIZACAO),
       VRRECEBIDO: toFloat(item.VRRECEBIDO),
       NOFUNCIONARIO: item.NOFUNCIONARIO,
-      STCANCELADO: item.STCANCELADO == 'False' ? 'Ativo' : 'Cancelado',
+      STCANCELADO: item.STCANCELADO == 'False' ? 'ATIVO' : 'CANCELADO',
       TOTALVENDAPROD: toFloat(item.TOTALVENDAPROD),
       IDDETALHEFATURA: item.IDDETALHEFATURA,
       vrTotalFaturaLoja
     };
   });
+  const calcularTotal = (field) => {
+    return dadosFaturaDetalhe.reduce((total, item) => total + toFloat(item[field]), 0);
+  };
 
   const calcularTotalValorRecebido = () => {
-    let total = 0;
-    for (let resultado of dadosFaturaDetalhe) {
-      total += parseFloat(resultado.VRRECEBIDO);
-    }
+    const total = calcularTotal('VRRECEBIDO');
     return total;
   }
   const colunaFaturaLoja = [
@@ -122,7 +122,7 @@ export const ActionListaFaturasLancada = ({ dadosDetalheFaturaLancadas }) => {
     {
       field: 'DSCAIXA',
       header: 'Caixa',
-      body: row => <th style={{ color: 'blue' }}>{row.IDCAIXAWEB + row.DSCAIXA}</th>,
+      body: row => <th style={{ color: 'blue' }}>{row.DSCAIXA}</th>,
       sortable: true,
     },
     {
@@ -149,8 +149,8 @@ export const ActionListaFaturasLancada = ({ dadosDetalheFaturaLancadas }) => {
       field: 'STCANCELADO',
       header: 'Situação',
       body: row => (
-        <th style={{ color: row.STCANCELADO == 'False' ? 'blue' : 'red' }}>
-          {row.STCANCELADO == 'False' ? 'Ativo' : 'Cancelado'}
+        <th style={{ color: row.STCANCELADO == 'ATIVO' ? 'blue' : 'red' }}>
+          {row.STCANCELADO}
 
         </th>
       ),

@@ -37,8 +37,8 @@ export const ActionRelacaoRecebimentosModal = ({
 
           <Modal.Body>
   
-            <ActionListaPagamentos  dadosDetalheRecebimentos={dadosDetalheRecebimentos} />
             <ActionListaProdutos dadosDetalheRecebimentos={dadosDetalheRecebimentos} />
+            <ActionListaPagamentos  dadosDetalheRecebimentos={dadosDetalheRecebimentos} />
            
             <FormularioAlteracaoPagamento 
               dadosDetalheRecebimentos={dadosDetalheRecebimentos} 

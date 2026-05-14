@@ -71,7 +71,7 @@ export const ActionDetalheVendaModal = ({show, handleClose, dadosVendas}) => {
                       id="idnumnota" 
                       name="idnumnota" 
                       class="form-control input" 
-                      value="" 
+                      value={dadosVendas[0]?.NFE_INFNFE_IDE_NNF} 
                       readOnly 
                     />
                   </div>
@@ -112,7 +112,7 @@ export const ActionDetalheVendaModal = ({show, handleClose, dadosVendas}) => {
                         id="ChNota" 
                         name="ChNota" 
                         class="form-control" 
-                        value="" 
+                        value={dadosVendas[0]?.PROTNFE_INFPROT_CHNFE} 
                         readOnly 
                       />
                     </div>
@@ -209,6 +209,19 @@ export const ActionDetalheVendaModal = ({show, handleClose, dadosVendas}) => {
                         name="vrdesccupom" 
                         class="form-control input" 
                         value="0" 
+                        readOnly 
+                      />
+                    </div>
+
+                      <div class="col-sm-12 col-xl-12 mt-4">
+             
+                      <InputFieldModal 
+                        label="Motivo Cancelamento da Venda" 
+                        type="text" 
+                        id="motivocancelamento" 
+                        name="motivocancelamento" 
+                        class="form-control input" 
+                        value={dadosVendas[0]?.TXTMOTIVOCANCELAMENTO} 
                         readOnly 
                       />
                     </div>

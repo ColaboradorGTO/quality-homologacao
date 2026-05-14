@@ -54,17 +54,16 @@ export const ActionListaVendaOrigem = ({ dadosDetalheVoucher }) => {
         XLSX.writeFile(workbook, 'venda_origem.xlsx');
     };
 
-    const dados = dadosDetalheVoucher.map((item) => {
-
-        return {
-
-            NUCODBARRAS: item.detalhevoucher[0]?.det.NUCODBARRAS,
-            DSPRODUTO: item.detalhevoucher[0]?.det.DSPRODUTO,
-            QTD: item.detalhevoucher[0]?.det.QTD,
-            VRTOTALLIQUIDO: item.detalhevoucher[0]?.det.VRTOTALLIQUIDO,
-            // IDRESUMOVENDAWEB: item.voucher[0].IDRESUMOVENDAWEB,
-        }
-    })
+    const dados = dadosDetalheVoucher.flatMap((item) =>
+        item.detalhevoucher.map((detalhe) => ({
+            
+            NUCODBARRAS: detalhe.det.NUCODBARRAS,
+            DSPRODUTO: detalhe.det.DSPRODUTO,
+            QTD: detalhe.det.QTD,
+            VRTOTALLIQUIDO: detalhe.det.VRTOTALLIQUIDO,
+            //IDRESUMOVENDAWEB: item.voucher[0].IDRESUMOVENDAWEB
+        }))
+    );
 
     const colunasProdutosVendas = [
         {
@@ -96,61 +95,61 @@ export const ActionListaVendaOrigem = ({ dadosDetalheVoucher }) => {
 
     return (
         <Fragment>
-               <div className=" panel">
+            <div className=" panel">
                 <div className="panel-hdr">
 
-                  <h2 className="p-3">Produtos Venda de Origem: {dadosDetalheVoucher[0]?.voucher.IDRESUMOVENDAWEB}  </h2>
+                    <h2 className="p-3">Produtos Venda de Origem: {dadosDetalheVoucher[0]?.voucher.IDRESUMOVENDAWEB}  </h2>
                 </div>
                 <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
-                  <HeaderTable
-                    globalFilterValue={globalFilterValueOrigem}
-                    onGlobalFilterChange={onGlobalFilterChangeOrigem}
-                    handlePrint={handlePrintOrigem}
-                    exportToExcel={exportToExcelOrigem}
-                    exportToPDF={exportToPDFOrigem}
-                  />
+                    <HeaderTable
+                        globalFilterValue={globalFilterValueOrigem}
+                        onGlobalFilterChange={onGlobalFilterChangeOrigem}
+                        handlePrint={handlePrintOrigem}
+                        exportToExcel={exportToExcelOrigem}
+                        exportToPDF={exportToPDFOrigem}
+                    />
 
                 </div>
 
 
                 <div className="card" ref={dataTableRefOrigem}>
 
-                  <DataTable
-                    value={dados}
-                    globalFilter={globalFilterValueOrigem}
-                    sortOrder={-1}
-                    rows={10}
-                    size="small"
-                    selectionMode="single"
-                    selection={rowSelection}
-                    onSelectionChange={(e) => setRowSelection(e.value)}
-                    rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
-                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
-                    filterDisplay="menu"
-                    showGridlines
-                    stripedRows
-                    emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado </div>}
-                  >
-                    {colunasProdutosVendas.map(coluna => (
-                      <Column
-                        key={coluna.field}
-                        field={coluna.field}
-                        header={coluna.header}
-                        body={coluna.body}
-                        footer={coluna.footer}
-                        sortable={coluna.sortable}
-                        headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
-                        footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
-                        bodyStyle={{ fontSize: '0.8rem' }}
+                    <DataTable
+                        value={dados}
+                        globalFilter={globalFilterValueOrigem}
+                        sortOrder={-1}
+                        rows={10}
+                        size="small"
+                        selectionMode="single"
+                        selection={rowSelection}
+                        onSelectionChange={(e) => setRowSelection(e.value)}
+                        rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
+                        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+                        filterDisplay="menu"
+                        showGridlines
+                        stripedRows
+                        emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado </div>}
+                    >
+                        {colunasProdutosVendas.map(coluna => (
+                            <Column
+                                key={coluna.field}
+                                field={coluna.field}
+                                header={coluna.header}
+                                body={coluna.body}
+                                footer={coluna.footer}
+                                sortable={coluna.sortable}
+                                headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+                                footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
+                                bodyStyle={{ fontSize: '0.8rem' }}
 
-                      />
-                    ))}
+                            />
+                        ))}
 
-                  </DataTable>
+                    </DataTable>
                 </div>
 
-              </div>
+            </div>
         </Fragment>
     );
 }

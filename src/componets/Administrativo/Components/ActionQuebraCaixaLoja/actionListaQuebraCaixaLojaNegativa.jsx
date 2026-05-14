@@ -169,7 +169,7 @@ export const ActionListaQuebraCaixaLojaNegativa = ({ dadosQuebraDeCaixaNegativa,
       sortable: true,
     },
     {
-      field: 'STATIVO',
+      field: 'Opcoes',
       header: 'Opções',
       body: (row) => {
         if (row.STATIVO == 'True') {
