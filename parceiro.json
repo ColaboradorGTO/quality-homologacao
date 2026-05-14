@@ -303,5 +303,20 @@
     { "value": "Devolvido", "label": "Devolvido"},
     { "value": "Conferido", "label": "Conferido"},
     { "value": "Reenviado", "label": "Reenviado"}
+  ],
+  "optionsFuncoesComercial": [
+    { "value": "GERENTE", "label": "GERENTE" },
+    { "value": "LIDER DE LOJA", "label": "LIDER DE LOJA" },
+    { "value": "LIDER DE CAIXA", "label": "LIDER DE CAIXA" },
+    { "value": "LIDER SUBGERENTE", "label": "LIDER SUBGERENTE" },
+    { "value": "OPERADOR DE CAIXA", "label": "OPERADOR DE CAIXA" },
+    { "value": "ASSISTENTES", "label": "ASSISTENTES" },
+    { "value": "MULTIPLICADOR", "label": "MULTIPLICADOR" },
+    { "value": "PROVADOR", "label": "PROVADOR" },
+    { "value": "FISCAL", "label": "FISCAL" },
+    { "value": "VENDEDOR", "label": "VENDEDOR" }
+  ],
+  "optionsIndicadores": [
+    
   ]
 }
