@@ -317,6 +317,13 @@
     { "value": "VENDEDOR", "label": "VENDEDOR" }
   ],
   "optionsIndicadores": [
-    
+    { "value": "CONFECÇÃO", "label": "CONFECÇÃO" },
+    { "value": "CALÇADOS", "label": "CALÇADOS" },
+    { "value": "TICKET-MÉDIO", "label": "TICKET-MÉDIO" },
+    { "value": "CARTÃO/ATIVAÇÃO", "label": "CARTÃO/ATIVAÇÃO" },
+    { "value": "CARTÃO PCJ 30%", "label": "CARTÃO PCJ 30%" },
+    { "value": "CARTÃO/RECOMPRA", "label": "CARTÃO/RECOMPRA" },
+    { "value": "CARTÃO/SEGURO", "label": "CARTÃO/SEGURO" }
+
   ]
 }
