@@ -11,6 +11,7 @@ import { ActionListaGerente } from "./actionListaGerente";
 import { ActionListaLiderLoja } from "./actionListaLiderLoja";
 import { ActionListaLiderCaixa } from "./actionListaLiderCaixa";
 import { ActionListaOperadorCaixa } from "./actionListaOperadorCaixa";
+import { ActionListaVendedor } from "./actionListaVendedor";
 
 
 export const ActionPesquisaPremiacoes = () => {
@@ -170,6 +171,18 @@ export const ActionPesquisaPremiacoes = () => {
             <div className="col-sm-6 col-md-6 col-lg-6">
 
               <ActionListaOperadorCaixa dadosOperadorCaixa={dadosOperadorCaixa} />
+              
+            </div>
+          </div>
+          <div className="row">
+            <div className="col-sm-6 col-md-6 col-lg-6">
+
+              <ActionListaVendedor dadosVendedor={dadosVendedor} />
+
+            </div>
+            <div className="col-sm-6 col-md-6 col-lg-6">
+
+              
               
             </div>
           </div>
