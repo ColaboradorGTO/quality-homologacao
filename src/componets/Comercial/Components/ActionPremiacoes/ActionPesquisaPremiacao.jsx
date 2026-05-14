@@ -15,9 +15,13 @@ import { ActionListaVendedor } from "./actionListaVendedor";
 import { ActionListaAssistentes } from "./actionListaAssistentes";
 import { ActionListaMultiplicador } from "./actionListaMultiplicador";
 import { ActionListaFiscal } from "./actionListaFiscal";
+import { ActionListaProvador } from "./actionListaProvador";
+import { ActionListaSubGerente } from "./actionListaSubGerente";
+import { ActionCadastroModalPremiacao } from "./ActionModalCadastroPremiacao/actionModalCadastro";
+import { useQuery } from "react-query";
+import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
 
-
-export const ActionPesquisaPremiacoes = () => {
+export const ActionPesquisaPremiacoes = ({ usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [tabelasSecundariasVisiveis, setTabelasSecundariasVisiveis] = useState(false);
   const [clickContador, setClickContador] = useState(0);
@@ -25,8 +29,8 @@ export const ActionPesquisaPremiacoes = () => {
   const [dataPesquisaFim, setDataPesquisaFim] = useState('');
   const [marcas, setMarcas] = useState([]);
   const [marcaSelecionada, setMarcaSelecionada] = useState(null);
-  const [dadosListaPremiacoes, setDadosListaPremiacoes] = useState([]);
   const [dadosGerente, setDadosGerente] = useState([]);
+  const [dadosSubGerente, setDadosSubGerente] = useState([]);
   const [dadosLiderLoja, setDadosLiderLoja] = useState([]);
   const [dadosLiderCaixa, setDadosLiderCaixa] = useState([]);
   const [dadosVendedor, setDadosVendedor] = useState([]);
@@ -36,55 +40,90 @@ export const ActionPesquisaPremiacoes = () => {
   const [dadosProvador, setDadosProvador] = useState([]);
   const [dadosLiderSubGerente, setDadosLiderSubGerente] = useState([]);
   const [dadosOperadorCaixa, setDadosOperadorCaixa] = useState([]);
+  const [modalVisivel, setModalVisivel] = useState(false);
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
   useEffect(() => {
-    getGrupoEmpresas()
-  }, [])
+    const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
+    if (menuSalvo) {
+      const menuParsed = JSON.parse(menuSalvo);
+      setMenuFilhoAtual(menuParsed);
+    }
+  }, []);
+
+  const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
+    ['menus-usuario-excecao', menuFilhoAtual?.ID],
+    async () => {
+      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
+
+      return response.data;
+    },
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 5 * 60 * 1000, }
+  );
+
+  const { data: dadosMarcas = [], error: errorMarcas, isLoading: isLoadingMarcas, refetch: refetchMarcas } = useQuery(
+    ['marcasLista'],
+    async () => {
+      const response = await get(`/marcasLista`);
+
+      return response.data;
+    },
+    { enabled: true, staleTime: 5 * 60 * 1000, }
+  );
 
 
-  const getGrupoEmpresas = async () => {
+  const fetchListaPremiacoes = async () => {
+    const urlBase = `/listaPremiacoes`;
+    let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
+    urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
-      const response = await get(`/listaGrupoEmpresas`)
-      if (response.data) {
-        setMarcas(response.data)
+      animacaoCarregamento('Carregando dados...', true);
+
+      const primeiraPagina = 1;
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const page = primeiraResposta.page || primeiraPagina;
+      const pageSize = primeiraResposta.pageSize || 1000;
+      const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
+      const totalPages = Math.ceil(totalRows / pageSize);
+
+      let allData = [...(primeiraResposta.data || [])];
+
+      if (totalPages > 1) {
+        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          allData.push(...(responsePage.data || []));
+        }
       }
+
+      return allData;
     } catch (error) {
-      console.log(error, "não foi possivel pegar os dados da tabela ")
+      console.error('Erro ao buscar dados da api:', error);
+      throw error;
+    } finally {
+      fecharAnimacaoCarregamento();
     }
-  }
+  };
 
-  const getListaPremiacoes = async () => {
-    try {
-      const response = await get(`/listaPremiacoes?page=`)
-      if (response.data) {
-        setDadosListaPremiacoes(response.data)
-      }
-      return response.data
-    } catch (error) {
-      console.log(error, "não foi possivel pegar os dados da tabela ")
-    }
+  const { data: dadosListaPremiacoes = [], error: errorPremiacoes, isLoading: isLoadingPremiacoes, refetch: refetchListaPremiacoes } = useQuery(
+    ['premiacoes-loja',],
+    () => fetchListaPremiacoes(),
+    { enabled: true, staleTime: 60 * 60 * 1000 }
+  );
 
-
-  }
-
-
-  const handleSelectMarca = (e) => {
-    const selectId = e.target.value;
-
-    if (!isNaN(selectId)) {
-      setMarcaSelecionada(selectId)
-    }
-  }
 
   const handleClick = () => {
-    setClickContador(prevContador => prevContador + 1);
-
-    if (clickContador % 2 === 0) {
-      setTabelaVisivel(true)
-      getListaPremiacoes(marcaSelecionada)
-    }
-
+    refetchListaPremiacoes();
+    setTabelaVisivel(true);
+    setTabelasSecundariasVisiveis(false);
   }
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
 
   return (
 
@@ -100,27 +139,27 @@ export const ActionPesquisaPremiacoes = () => {
         labelInputFieldDTInicio={"Data Início"}
         valueInputFieldDTInicio={dataPesquisaInicio}
         onChangeInputFieldDTInicio={e => setDataPesquisaInicio(e.target.value)}
+        onKeyDownInputFieldDTInicio={handleKeyPress}
 
         InputFieldDTFimComponent={InputField}
         labelInputFieldDTFim={"Data Fim"}
         valueInputFieldDTFim={dataPesquisaFim}
         onChangeInputFieldDTFim={e => setDataPesquisaFim(e.target.value)}
+        onKeyDownInputFieldDTFim={handleKeyPress}
 
 
         InputSelectEmpresaComponent={InputSelectAction}
-        onChangeSelectEmpresa={handleSelectMarca}
-        valueSelectEmpresa={marcaSelecionada}
         optionsEmpresas={[
 
           { value: '', label: 'Selecione a Marca' },
-          ...marcas.map((empresa) => ({
+          ...dadosMarcas?.map((empresa) => ({
             value: empresa.IDGRUPOEMPRESARIAL,
-            label: empresa.GRUPOEMPRESARIAL,
+            label: empresa.DSGRUPOEMPRESARIAL,
           }))
         ]}
-
         labelSelectEmpresa={"Marca"}
-
+        valueSelectEmpresa={marcaSelecionada}
+        onChangeSelectEmpresa={(e) => setMarcaSelecionada(e.value)}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Listar Premiações Cadastradas"}
@@ -130,23 +169,25 @@ export const ActionPesquisaPremiacoes = () => {
 
         ButtonTypeCadastro={ButtonType}
         linkNome={"Criar Premiações"}
-        onButtonClickCadastro
+        onButtonClickCadastro={() => setModalVisivel(true)}
         corCadastro={"danger"}
         IconCadastro={IoIosAdd}
 
       />
 
       {tabelaVisivel && (
-        <ActionListaPremiacoes 
-          dadosListaPremiacoes={dadosListaPremiacoes} 
+        <ActionListaPremiacoes
+          dadosListaPremiacoes={dadosListaPremiacoes}
           setDadosGerente={setDadosGerente}
           setDadosLiderLoja={setDadosLiderLoja}
           setDadosLiderCaixa={setDadosLiderCaixa}
           setDadosOperadorCaixa={setDadosOperadorCaixa}
           setDadosVendedor={setDadosVendedor}
-          setDadosAssistentes={setDadosAssistentes}  
+          setDadosAssistentes={setDadosAssistentes}
           setDadosMultiplicador={setDadosMultiplicador}
+          setDadosProvador={setDadosProvador}
           setDadosFiscal={setDadosFiscal}
+          setDadosSubGerente={setDadosSubGerente}
           setTabelaVisivel={setTabelaVisivel}
           setTabelasSecundariasVisiveis={setTabelasSecundariasVisiveis}
         />
@@ -163,6 +204,7 @@ export const ActionPesquisaPremiacoes = () => {
               <ActionListaLiderLoja dadosLiderLoja={dadosLiderLoja} />
             </div>
           </div>
+
           <div className="row">
             <div className="col-sm-6 col-md-6 col-lg-6">
               <ActionListaLiderCaixa dadosLiderCaixa={dadosLiderCaixa} />
@@ -171,6 +213,7 @@ export const ActionPesquisaPremiacoes = () => {
               <ActionListaOperadorCaixa dadosOperadorCaixa={dadosOperadorCaixa} />
             </div>
           </div>
+
           <div className="row">
             <div className="col-sm-6 col-md-6 col-lg-6">
               <ActionListaVendedor dadosVendedor={dadosVendedor} />
@@ -179,18 +222,31 @@ export const ActionPesquisaPremiacoes = () => {
               <ActionListaAssistentes dadosAssistentes={dadosAssistentes} />
             </div>
           </div>
+
           <div className="row">
-            <div className="col-sm-6 col-md-6 col-lg-6">
+            <div className="col-sm-6 col-md-6 col-lg-6">{console.log(dadosMultiplicador, "dados multiplicador")}
               <ActionListaMultiplicador dadosMultiplicador={dadosMultiplicador} />
             </div>
             <div className="col-sm-6 col-md-6 col-lg-6">
-
               <ActionListaFiscal dadosFiscal={dadosFiscal} />
-            
+            </div>
+          </div>
+
+          <div className="row">
+            <div className="col-sm-6 col-md-6 col-lg-6">
+              <ActionListaProvador dadosProvador={dadosProvador} />
+            </div>
+            <div className="col-sm-6 col-md-6 col-lg-6">
+              <ActionListaSubGerente dadosSubGerente={dadosSubGerente} />
             </div>
           </div>
         </div>
       )}
+
+      <ActionCadastroModalPremiacao
+        show={modalVisivel}
+        handleClose={() => setModalVisivel(false)}
+      />
     </Fragment>
   )
 }

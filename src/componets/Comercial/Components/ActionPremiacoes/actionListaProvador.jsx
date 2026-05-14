@@ -14,8 +14,8 @@ import { formatMoeda } from "../../../../utils/formatMoeda";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 
-export const ActionListaMultiplicador = ({ 
-  dadosMultiplicador,
+export const ActionListaProvador = ({ 
+  dadosProvador,
 }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowSelection, setRowSelection] = useState(null);
@@ -27,7 +27,7 @@ export const ActionListaMultiplicador = ({
 
   const handlePrint = useReactToPrint({
     content: () => dataTableRef.current,
-    documentTitle: 'Premiação Multiplicador',
+    documentTitle: 'Premiação Provador',
   });
 
   
@@ -66,13 +66,13 @@ export const ActionListaMultiplicador = ({
       },
     });
 
-    doc.save("premiacao_multiplicador.pdf");
+    doc.save("premiacao_provador.pdf");
   };
 
 
   const exportToExcel = async () => {
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet("Multiplicador");
+    const worksheet = workbook.addWorksheet("Provador");
 
     // Cabeçalho agrupado igual ao DataTable
     worksheet.getCell("A1").value = "CLASSIFICAÇÃO";
@@ -124,10 +124,10 @@ export const ActionListaMultiplicador = ({
 
 
     const buffer = await workbook.xlsx.writeBuffer();
-    saveAs(new Blob([buffer]), "premiacao_multiplicador.xlsx");
+    saveAs(new Blob([buffer]), "premiacao_provador.xlsx");
   };
  
-  const dados = dadosMultiplicador?.data?.map((item, index) => {
+  const dados = dadosProvador?.data?.map((item, index) => {
     let contador = index + 1;
 
     return {
@@ -186,7 +186,7 @@ export const ActionListaMultiplicador = ({
       <div className="panel" >
         <div className="panel-hdr">
           {/* <h2>{`REGRAS PREMIAÇÕES: ${dadosAssistentes?.dsSubGrupo} - ${dadosAssistentes?.dataPesquisaInicio} a ${dadosAssistentes?.dataPesquisaFim}`}</h2> */}
-          <h2>{`MULTIPLICADOR`}</h2>
+          <h2>{`PROVADOR`}</h2>
         </div>
         <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
           <HeaderTable
@@ -201,7 +201,7 @@ export const ActionListaMultiplicador = ({
         <div className="card" ref={dataTableRef}>
 
           <DataTable
-            title="Lista de Premiações - Vendedor"
+            title="Lista de Premiações - Provador"
             value={dados}
             size="small"
             headerColumnGroup={headerGrupo}
@@ -222,10 +222,9 @@ export const ActionListaMultiplicador = ({
             
             >
               <Column field="NOINDICADOR" header="INDICADORES" body={row => <th>{row.NOINDICADOR}</th>} sortable={true} />
-              <Column field="VRBONUSSENIOR" header="BÔNUS" body={row => <th>{row.VRBONUSSENIOR}</th>} sortable={true} />
-              <Column field="VRBONUSPLENO" header="BÔNUS" body={row => <th>{formatMoeda(row.VRBONUSPLENO)}</th>} sortable={true} />
-              <Column field="VRBONUSJUNIOR" header="BÔNUS" body={row => <th>{formatMoeda(row.VRBONUSJUNIOR)}</th>} sortable={true} />
-              
+              <Column field="VRBONUSTODOS" header="BÔNUS" body={row => <th>{formatMoeda(row.VRBONUSTODOS)}</th>} sortable={true} />
+              <Column field="TPAPURACAO" header="APURAÇÃO" body={row => <th>{row.TPAPURACAO}</th>} sortable={true} />
+             
             </DataTable>
         </div>
       </div>

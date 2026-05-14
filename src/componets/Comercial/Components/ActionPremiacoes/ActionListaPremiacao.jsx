@@ -19,6 +19,8 @@ export const ActionListaPremiacoes = ({
   setDadosAssistentes,
   setDadosMultiplicador,
   setDadosFiscal,
+  setDadosProvador,
+  setDadosSubGerente,
   setTabelaVisivel,
   setTabelasSecundariasVisiveis
 }) => {
@@ -289,6 +291,58 @@ export const ActionListaPremiacoes = ({
   const handleClickPremioFiscal = (row) => {
     if (row && row.IDSUBGRUPOEMPRESARIAL) {
       handlePremioFiscal(row.IDSUBGRUPOEMPRESARIAL, row.DTPREMIOINICIO, row.DTPREMIOFIM, row.DSSUBGRUPOEMPRESARIAL);
+    }
+  };
+
+  const handlePremioProvador = async (IDSUBGRUPOEMPRESARIAL, DTPREMIOINICIO, DTPREMIOFIM, DSSUBGRUPOEMPRESARIAL) => {
+    try {
+      const response = await get(`/lista-premios-gerente?idSubGrupo=${IDSUBGRUPOEMPRESARIAL}&dataPesquisaInicio=${DTPREMIOINICIO}&dataPesquisaFim=${DTPREMIOFIM}&funcao=PROVADOR`)
+      if (response.data && response.data.length > 0) {
+
+        setDadosProvador({
+          data: response.data,
+          idSubGrupo: IDSUBGRUPOEMPRESARIAL,
+          dataPesquisaInicio: DTPREMIOINICIO,
+          dataPesquisaFim: DTPREMIOFIM,
+          dsSubGrupo: DSSUBGRUPOEMPRESARIAL
+        });
+        setTabelasSecundariasVisiveis(true);
+        setTabelaVisivel(false);;
+      }
+    } catch (error) {
+      console.error('Erro ao buscar metas detalhadas: ', error);
+    }
+  };
+  
+  const handleClickPremioProvador = (row) => {
+    if (row && row.IDSUBGRUPOEMPRESARIAL) {
+      handlePremioProvador(row.IDSUBGRUPOEMPRESARIAL, row.DTPREMIOINICIO, row.DTPREMIOFIM, row.DSSUBGRUPOEMPRESARIAL);
+    }
+  };
+
+  const handlePremioSubGerente = async (IDSUBGRUPOEMPRESARIAL, DTPREMIOINICIO, DTPREMIOFIM, DSSUBGRUPOEMPRESARIAL) => {
+    try {
+      const response = await get(`/lista-premios-gerente?idSubGrupo=${IDSUBGRUPOEMPRESARIAL}&dataPesquisaInicio=${DTPREMIOINICIO}&dataPesquisaFim=${DTPREMIOFIM}&funcao=LIDER SUBGERENTE`)
+      if (response.data && response.data.length > 0) {
+
+        setDadosSubGerente({
+          data: response.data,
+          idSubGrupo: IDSUBGRUPOEMPRESARIAL,
+          dataPesquisaInicio: DTPREMIOINICIO,
+          dataPesquisaFim: DTPREMIOFIM,
+          dsSubGrupo: DSSUBGRUPOEMPRESARIAL
+        });
+        setTabelasSecundariasVisiveis(true);
+        setTabelaVisivel(false);;
+      }
+    } catch (error) {
+      console.error('Erro ao buscar metas detalhadas: ', error);
+    }
+  };
+  
+  const handleClickPremioSubGerente = (row) => {
+    if (row && row.IDSUBGRUPOEMPRESARIAL) {
+      handlePremioSubGerente(row.IDSUBGRUPOEMPRESARIAL, row.DTPREMIOINICIO, row.DTPREMIOFIM, row.DSSUBGRUPOEMPRESARIAL);
     }
   };
 

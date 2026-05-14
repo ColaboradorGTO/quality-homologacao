@@ -15,7 +15,7 @@ import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 
 export const ActionListaFiscal = ({ 
-  dadosMultiplicador,
+  dadosFiscal,
 }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowSelection, setRowSelection] = useState(null);
@@ -27,33 +27,34 @@ export const ActionListaFiscal = ({
 
   const handlePrint = useReactToPrint({
     content: () => dataTableRef.current,
-    documentTitle: 'Premiação Multiplicador',
+    documentTitle: 'Premiação Fiscal',
   });
 
-  const exportHeaderRows = [
-    [
-      { content: "CLASSIFICAÇÃO", styles: { halign: "center", fillColor: "#967BBD", textColor: "white", fontSize: 10 } },
-      { content: "SENIOR/PLENO/JUNIOR", colSpan: 3, styles: { halign: "center", fillColor: "#FFCA5B", textColor: "black", fontSize: 10 } },
-    ],
-    [
-      { content: "INDICADORES", styles: { fillColor: "#B19DCE", textColor: "black", fontSize: 9 } },
-      { content: "BÔNUS", styles: { fillColor: "#FE85BE", textColor: "black", fontSize: 9 } },
-      { content: "APURAÇÃO", styles: { fillColor: "#FFDB8E", textColor: "white", fontSize: 9 } },
-    ],
-  ];
-
-  const exportRows = dados?.map((item) => [
-    item.NOINDICADOR,
-    item.VRBONUSTODOS,
-    item.TPAPURACAO,
-  ]) ?? [];
-
+  
   const exportToPDF = () => {
     const doc = new jsPDF();
 
+    const headerRows = [
+      [
+        { content: "CLASSIFICAÇÃO", styles: { halign: "center", fillColor: "#967BBD", textColor: "white", fontSize: 10 } },
+        { content: "SENIOR/PLENO/JUNIOR", colSpan: 3, styles: { halign: "center", fillColor: "#FFCA5B", textColor: "black", fontSize: 10 } },
+      ],
+      [
+        { content: "INDICADORES", styles: { fillColor: "#B19DCE", textColor: "black", fontSize: 9 } },
+        { content: "BÔNUS", styles: { fillColor: "#FE85BE", textColor: "black", fontSize: 9 } },
+        { content: "APURAÇÃO", styles: { fillColor: "#FFDB8E", textColor: "white", fontSize: 9 } },
+      ],
+    ];
+  
+    const bodyRows = dados?.map((item) => [
+      item.NOINDICADOR,
+      item.VRBONUSTODOS,
+      item.TPAPURACAO,
+    ]);
+
     doc.autoTable({
-      head: exportHeaderRows,
-      body: exportRows,
+      head: headerRows,
+      body: bodyRows,
       startY: 10,
       theme: "plain",
       styles: { fontSize: 8, cellPadding: 2 },
@@ -65,13 +66,13 @@ export const ActionListaFiscal = ({
       },
     });
 
-    doc.save("premiacao_multiplicador.pdf");
+    doc.save("premiacao_fiscal.pdf");
   };
 
 
   const exportToExcel = async () => {
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet("Multiplicador");
+    const worksheet = workbook.addWorksheet("Fiscal");
 
     // Cabeçalho agrupado igual ao DataTable
     worksheet.getCell("A1").value = "CLASSIFICAÇÃO";
@@ -108,8 +109,12 @@ export const ActionListaFiscal = ({
     });
 
     // Dados
-    exportRows.forEach((row) => {
-      worksheet.addRow(row);
+    dados.forEach((item) => {
+      worksheet.addRow([
+        item.NOINDICADOR,
+        item.VRBONUSTODOS,
+        item.TPAPURACAO,
+      ]);
     });
 
     // Ajuste de largura das colunas
@@ -119,10 +124,10 @@ export const ActionListaFiscal = ({
 
 
     const buffer = await workbook.xlsx.writeBuffer();
-    saveAs(new Blob([buffer]), "premiacao_multiplicador.xlsx");
+    saveAs(new Blob([buffer]), "premiacao_fiscal.xlsx");
   };
  
-  const dados = dadosMultiplicador?.data?.map((item, index) => {
+  const dados = dadosFiscal?.data?.map((item, index) => {
     let contador = index + 1;
 
     return {
@@ -181,7 +186,7 @@ export const ActionListaFiscal = ({
       <div className="panel" >
         <div className="panel-hdr">
           {/* <h2>{`REGRAS PREMIAÇÕES: ${dadosAssistentes?.dsSubGrupo} - ${dadosAssistentes?.dataPesquisaInicio} a ${dadosAssistentes?.dataPesquisaFim}`}</h2> */}
-          <h2>{`MULTIPLICADOR`}</h2>
+          <h2>{`FISCAL`}</h2>
         </div>
         <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
           <HeaderTable
@@ -196,7 +201,7 @@ export const ActionListaFiscal = ({
         <div className="card" ref={dataTableRef}>
 
           <DataTable
-            title="Lista de Premiações - Vendedor"
+            title="Lista de Premiações - Fiscal"
             value={dados}
             size="small"
             headerColumnGroup={headerGrupo}
@@ -217,10 +222,9 @@ export const ActionListaFiscal = ({
             
             >
               <Column field="NOINDICADOR" header="INDICADORES" body={row => <th>{row.NOINDICADOR}</th>} sortable={true} />
-              <Column field="VRBONUSSENIOR" header="BÔNUS" body={row => <th>{row.VRBONUSSENIOR}</th>} sortable={true} />
-              <Column field="VRBONUSPLENO" header="BÔNUS" body={row => <th>{formatMoeda(row.VRBONUSPLENO)}</th>} sortable={true} />
-              <Column field="VRBONUSJUNIOR" header="BÔNUS" body={row => <th>{formatMoeda(row.VRBONUSJUNIOR)}</th>} sortable={true} />
-              
+              <Column field="VRBONUSTODOS" header="BÔNUS" body={row => <th>{formatMoeda(row.VRBONUSTODOS)}</th>} sortable={true} />
+              <Column field="TPAPURACAO" header="APURAÇÃO" body={row => <th>{row.TPAPURACAO}</th>} sortable={true} />
+           
             </DataTable>
         </div>
       </div>
