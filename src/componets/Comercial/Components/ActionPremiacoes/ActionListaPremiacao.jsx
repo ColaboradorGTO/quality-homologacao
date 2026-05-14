@@ -212,6 +212,32 @@ export const ActionListaPremiacoes = ({
     }
   };
 
+  const handlePremioAssistentes = async (IDSUBGRUPOEMPRESARIAL, DTPREMIOINICIO, DTPREMIOFIM, DSSUBGRUPOEMPRESARIAL) => {
+    try {
+      const response = await get(`/lista-premios-gerente?idSubGrupo=${IDSUBGRUPOEMPRESARIAL}&dataPesquisaInicio=${DTPREMIOINICIO}&dataPesquisaFim=${DTPREMIOFIM}&funcao=ASSISTENTES`)
+      if (response.data && response.data.length > 0) {
+
+        setDadosAssistentes({
+          data: response.data,
+          idSubGrupo: IDSUBGRUPOEMPRESARIAL,
+          dataPesquisaInicio: DTPREMIOINICIO,
+          dataPesquisaFim: DTPREMIOFIM,
+          dsSubGrupo: DSSUBGRUPOEMPRESARIAL
+        });
+        setTabelasSecundariasVisiveis(true);
+        setTabelaVisivel(false);;
+      }
+    } catch (error) {
+      console.error('Erro ao buscar metas detalhadas: ', error);
+    }
+  };
+  
+  const handleClickPremioAssistentes = (row) => {
+    if (row && row.IDSUBGRUPOEMPRESARIAL) {
+      handlePremioAssistentes(row.IDSUBGRUPOEMPRESARIAL, row.DTPREMIOINICIO, row.DTPREMIOFIM, row.DSSUBGRUPOEMPRESARIAL);
+    }
+  };
+
   return (
 
     <Fragment>
