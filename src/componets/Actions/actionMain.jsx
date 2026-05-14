@@ -347,6 +347,15 @@ export const ActionMain = ({
   onKeyDownInputFieldDTFimC,
   onKeyDownInputFieldDTInicio,
   onKeyDownInputFieldDTFim,
+  onKeyDownSelectEmpresa,
+  onKeyDownInputFieldDTConsulta,
+  onKeyDownSelectMarcas,
+  onKeyDownEmpresa,
+  onKeyDownSelectUF,
+  onKeyDownSelectComissoes,
+  onKeyDownInputFieldQuantidade,
+  onKeyDownInputFieldNumeroVoucher,
+  onKeyDownInputFieldVendaCPFCNPJ,
 
   // Inputs Selects
   InputSelectEmpresaComponent,
