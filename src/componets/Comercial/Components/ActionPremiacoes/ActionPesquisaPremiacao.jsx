@@ -14,6 +14,7 @@ import { ActionListaOperadorCaixa } from "./actionListaOperadorCaixa";
 import { ActionListaVendedor } from "./actionListaVendedor";
 import { ActionListaAssistentes } from "./actionListaAssistentes";
 import { ActionListaMultiplicador } from "./actionListaMultiplicador";
+import { ActionListaFiscal } from "./actionListaFiscal";
 
 
 export const ActionPesquisaPremiacoes = () => {
@@ -145,6 +146,7 @@ export const ActionPesquisaPremiacoes = () => {
           setDadosVendedor={setDadosVendedor}
           setDadosAssistentes={setDadosAssistentes}  
           setDadosMultiplicador={setDadosMultiplicador}
+          setDadosFiscal={setDadosFiscal}
           setTabelaVisivel={setTabelaVisivel}
           setTabelasSecundariasVisiveis={setTabelasSecundariasVisiveis}
         />
@@ -179,13 +181,11 @@ export const ActionPesquisaPremiacoes = () => {
           </div>
           <div className="row">
             <div className="col-sm-6 col-md-6 col-lg-6">
-
               <ActionListaMultiplicador dadosMultiplicador={dadosMultiplicador} />
-
             </div>
             <div className="col-sm-6 col-md-6 col-lg-6">
 
-              
+              <ActionListaFiscal dadosFiscal={dadosFiscal} />
             
             </div>
           </div>

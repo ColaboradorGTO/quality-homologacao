@@ -18,6 +18,7 @@ export const ActionListaPremiacoes = ({
   setDadosVendedor,
   setDadosAssistentes,
   setDadosMultiplicador,
+  setDadosFiscal,
   setTabelaVisivel,
   setTabelasSecundariasVisiveis
 }) => {
@@ -262,6 +263,32 @@ export const ActionListaPremiacoes = ({
   const handleClickPremioMultiplicador = (row) => {
     if (row && row.IDSUBGRUPOEMPRESARIAL) {
       handlePremioMultiplicador(row.IDSUBGRUPOEMPRESARIAL, row.DTPREMIOINICIO, row.DTPREMIOFIM, row.DSSUBGRUPOEMPRESARIAL);
+    }
+  };
+
+  const handlePremioFiscal = async (IDSUBGRUPOEMPRESARIAL, DTPREMIOINICIO, DTPREMIOFIM, DSSUBGRUPOEMPRESARIAL) => {
+    try {
+      const response = await get(`/lista-premios-gerente?idSubGrupo=${IDSUBGRUPOEMPRESARIAL}&dataPesquisaInicio=${DTPREMIOINICIO}&dataPesquisaFim=${DTPREMIOFIM}&funcao=FISCAL`)
+      if (response.data && response.data.length > 0) {
+
+        setDadosFiscal({
+          data: response.data,
+          idSubGrupo: IDSUBGRUPOEMPRESARIAL,
+          dataPesquisaInicio: DTPREMIOINICIO,
+          dataPesquisaFim: DTPREMIOFIM,
+          dsSubGrupo: DSSUBGRUPOEMPRESARIAL
+        });
+        setTabelasSecundariasVisiveis(true);
+        setTabelaVisivel(false);;
+      }
+    } catch (error) {
+      console.error('Erro ao buscar metas detalhadas: ', error);
+    }
+  };
+  
+  const handleClickPremioFiscal = (row) => {
+    if (row && row.IDSUBGRUPOEMPRESARIAL) {
+      handlePremioFiscal(row.IDSUBGRUPOEMPRESARIAL, row.DTPREMIOINICIO, row.DTPREMIOFIM, row.DSSUBGRUPOEMPRESARIAL);
     }
   };
 
