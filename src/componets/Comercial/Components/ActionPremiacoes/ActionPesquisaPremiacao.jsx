@@ -7,16 +7,31 @@ import { InputSelectAction } from "../../../Inputs/InputSelectAction";
 import { ButtonType } from "../../../Buttons/ButtonType";
 import { get } from "../../../../api/funcRequest";
 import { ActionListaPremiacoes } from "./ActionListaPremiacao";
+import { ActionListaGerente } from "./actionListaGerente";
+import { ActionListaLiderLoja } from "./actionListaLiderLoja";
+import { ActionListaLiderCaixa } from "./actionListaLiderCaixa";
+import { ActionListaOperadorCaixa } from "./actionListaOperadorCaixa";
 
 
 export const ActionPesquisaPremiacoes = () => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
+  const [tabelasSecundariasVisiveis, setTabelasSecundariasVisiveis] = useState(false);
   const [clickContador, setClickContador] = useState(0);
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
   const [dataPesquisaFim, setDataPesquisaFim] = useState('');
   const [marcas, setMarcas] = useState([]);
   const [marcaSelecionada, setMarcaSelecionada] = useState(null);
   const [dadosListaPremiacoes, setDadosListaPremiacoes] = useState([]);
+  const [dadosGerente, setDadosGerente] = useState([]);
+  const [dadosLiderLoja, setDadosLiderLoja] = useState([]);
+  const [dadosLiderCaixa, setDadosLiderCaixa] = useState([]);
+  const [dadosVendedor, setDadosVendedor] = useState([]);
+  const [dadosAssistentes, setDadosAssistentes] = useState([]);
+  const [dadosMultiplicador, setDadosMultiplicador] = useState([]);
+  const [dadosFiscal, setDadosFiscal] = useState([]);
+  const [dadosProvador, setDadosProvador] = useState([]);
+  const [dadosLiderSubGerente, setDadosLiderSubGerente] = useState([]);
+  const [dadosOperadorCaixa, setDadosOperadorCaixa] = useState([]);
 
   useEffect(() => {
     getGrupoEmpresas()
@@ -118,8 +133,47 @@ export const ActionPesquisaPremiacoes = () => {
       />
 
       {tabelaVisivel && (
-        <ActionListaPremiacoes dadosListaPremiacoes={dadosListaPremiacoes} />
+        <ActionListaPremiacoes 
+          dadosListaPremiacoes={dadosListaPremiacoes} 
+          setDadosGerente={setDadosGerente}
+          setDadosLiderLoja={setDadosLiderLoja}
+          setDadosLiderCaixa={setDadosLiderCaixa}
+          setDadosOperadorCaixa={setDadosOperadorCaixa}
+          setDadosVendedor={setDadosVendedor}
+          setDadosAssistentes={setDadosAssistentes}  
+          setTabelaVisivel={setTabelaVisivel}
+          setTabelasSecundariasVisiveis={setTabelasSecundariasVisiveis}
+        />
 
+      )}
+
+      {tabelasSecundariasVisiveis && (
+        <div>
+          <div className="row">
+            <div className="col-sm-6 col-md-6 col-lg-6">
+
+              <ActionListaGerente dadosGerente={dadosGerente} />
+
+            </div>
+            <div className="col-sm-6 col-md-6 col-lg-6">
+
+
+              <ActionListaLiderLoja dadosLiderLoja={dadosLiderLoja} />
+            </div>
+          </div>
+          <div className="row">
+            <div className="col-sm-6 col-md-6 col-lg-6">
+
+              <ActionListaLiderCaixa dadosLiderCaixa={dadosLiderCaixa} />
+
+            </div>
+            <div className="col-sm-6 col-md-6 col-lg-6">
+
+              <ActionListaOperadorCaixa dadosOperadorCaixa={dadosOperadorCaixa} />
+              
+            </div>
+          </div>
+        </div>
       )}
     </Fragment>
   )

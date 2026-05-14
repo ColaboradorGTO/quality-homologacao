@@ -5,10 +5,21 @@ import { Column } from 'primereact/column';
 import { ButtonTable } from "../../../ButtonsTabela/ButtonTable";
 import { dataFormatada } from "../../../../utils/dataFormatada";
 import { useState } from "react";
+import { get } from "../../../../api/funcRequest";
 
 
 
-export const ActionListaPremiacoes = ({dadosListaPremiacoes}) => {
+export const ActionListaPremiacoes = ({
+  dadosListaPremiacoes,
+  setDadosGerente,
+  setDadosLiderLoja,
+  setDadosLiderCaixa,
+  setDadosOperadorCaixa,
+  setDadosVendedor,
+  setDadosAssistentes,
+  setTabelaVisivel,
+  setTabelasSecundariasVisiveis
+}) => {
   const [rowSelection, setRowSelection] = useState(null);
 
   const dados = dadosListaPremiacoes.map((item, index) => {
@@ -33,27 +44,27 @@ export const ActionListaPremiacoes = ({dadosListaPremiacoes}) => {
     {
       field: 'contador',
       header: '#',
-      body: row => row.contador,
+      body: row => <th>{row.contador}</th>,
       sortable: true,
     },
     {
       field: 'DSSUBGRUPOEMPRESARIAL',
       header: 'Grupo Empresarial',
-      body: row => row.DSSUBGRUPOEMPRESARIAL,
+      body: row => <th>{row.DSSUBGRUPOEMPRESARIAL}</th>,
       sortable: true,
 
     },
     {
       field: 'DTPREMIOINICIOFORMAT',
       header: 'Data Início',
-      body: row => dataFormatada(row.DTPREMIOINICIOFORMAT),
+      body: row => <th>{dataFormatada(row.DTPREMIOINICIOFORMAT)}</th>,
       sortable: true,
 
     },
     {
       field: 'DTPREMIOFIMFORMAT',
       header: 'DataFim',
-      body: row => dataFormatada(row.DTPREMIOFIMFORMAT),
+      body: row => <th>{dataFormatada(row.DTPREMIOFIMFORMAT)}</th>,
       sortable: true,
 
     },
@@ -62,10 +73,10 @@ export const ActionListaPremiacoes = ({dadosListaPremiacoes}) => {
       header: 'Situação',
       body: (
         (row) => (
-          <div style={{ color: row.STATIVO == 'True' ? 'blue' : 'red' }}>
+          <th style={{ color: row.STATIVO == 'True' ? 'blue' : 'red' }}>
             {row.STSALVO == 'True' ? 'ATIVO' : 'INATIVO'}
 
-          </div>
+          </th>
         )
       ),
       sortable: true,
@@ -80,12 +91,13 @@ export const ActionListaPremiacoes = ({dadosListaPremiacoes}) => {
             <div className="p-1">
               <ButtonTable
                 titleButton={"Detalhar Premiação"}
-                onClickButton
+                onClickButton={() => handleClickPremioGerente(row)}
                 Icon={GrFormView}
-                iconSize={18}
+                iconSize={30}
                 iconColor={"#fff"}
                 cor={"success"}
-
+                width="40px"
+                height="30px"
               />
 
             </div>
@@ -96,6 +108,109 @@ export const ActionListaPremiacoes = ({dadosListaPremiacoes}) => {
     },
   ]
 
+  const handlePremioGerente = async (IDSUBGRUPOEMPRESARIAL, DTPREMIOINICIO, DTPREMIOFIM, DSSUBGRUPOEMPRESARIAL) => {
+    try {
+      const response = await get(`/lista-premios-gerente?idSubGrupo=${IDSUBGRUPOEMPRESARIAL}&dataPesquisaInicio=${DTPREMIOINICIO}&dataPesquisaFim=${DTPREMIOFIM}&funcao=GERENTE`)
+      if (response.data && response.data.length > 0) {
+
+        setDadosGerente({
+          data: response.data,
+          idSubGrupo: IDSUBGRUPOEMPRESARIAL,
+          dataPesquisaInicio: DTPREMIOINICIO,
+          dataPesquisaFim: DTPREMIOFIM,
+          dsSubGrupo: DSSUBGRUPOEMPRESARIAL
+        });
+        setTabelasSecundariasVisiveis(true);
+        setTabelaVisivel(false);;
+      }
+    } catch (error) {
+      console.error('Erro ao buscar metas detalhadas: ', error);
+    }
+  };
+  
+  const handleClickPremioGerente = (row) => {
+    if (row && row.IDSUBGRUPOEMPRESARIAL) {
+      handlePremioGerente(row.IDSUBGRUPOEMPRESARIAL, row.DTPREMIOINICIO, row.DTPREMIOFIM, row.DSSUBGRUPOEMPRESARIAL);
+    }
+  };
+
+  const handlePremioLiderLoja = async (IDSUBGRUPOEMPRESARIAL, DTPREMIOINICIO, DTPREMIOFIM, DSSUBGRUPOEMPRESARIAL) => {
+    try {
+      const response = await get(`/lista-premios-gerente?idSubGrupo=${IDSUBGRUPOEMPRESARIAL}&dataPesquisaInicio=${DTPREMIOINICIO}&dataPesquisaFim=${DTPREMIOFIM}&funcao=LIDER DE LOJA`)
+      if (response.data && response.data.length > 0) {
+
+        setDadosLiderLoja({
+          data: response.data,
+          idSubGrupo: IDSUBGRUPOEMPRESARIAL,
+          dataPesquisaInicio: DTPREMIOINICIO,
+          dataPesquisaFim: DTPREMIOFIM,
+          dsSubGrupo: DSSUBGRUPOEMPRESARIAL
+        });
+        setTabelasSecundariasVisiveis(true);
+        setTabelaVisivel(false);;
+      }
+    } catch (error) {
+      console.error('Erro ao buscar metas detalhadas: ', error);
+    }
+  };
+  
+  const handleClickPremioLiderLoja = (row) => {
+    if (row && row.IDSUBGRUPOEMPRESARIAL) {
+      handlePremioLiderLoja(row.IDSUBGRUPOEMPRESARIAL, row.DTPREMIOINICIO, row.DTPREMIOFIM, row.DSSUBGRUPOEMPRESARIAL);
+    }
+  };
+  
+  const handlePremioLiderCaixa = async (IDSUBGRUPOEMPRESARIAL, DTPREMIOINICIO, DTPREMIOFIM, DSSUBGRUPOEMPRESARIAL) => {
+    try {
+      const response = await get(`/lista-premios-gerente?idSubGrupo=${IDSUBGRUPOEMPRESARIAL}&dataPesquisaInicio=${DTPREMIOINICIO}&dataPesquisaFim=${DTPREMIOFIM}&funcao=LIDER DE CAIXA`)
+      if (response.data && response.data.length > 0) {
+
+        setDadosLiderCaixa({
+          data: response.data,
+          idSubGrupo: IDSUBGRUPOEMPRESARIAL,
+          dataPesquisaInicio: DTPREMIOINICIO,
+          dataPesquisaFim: DTPREMIOFIM,
+          dsSubGrupo: DSSUBGRUPOEMPRESARIAL
+        });
+        setTabelasSecundariasVisiveis(true);
+        setTabelaVisivel(false);;
+      }
+    } catch (error) {
+      console.error('Erro ao buscar metas detalhadas: ', error);
+    }
+  };
+  
+  const handleClickPremioLiderCaixa = (row) => {
+    if (row && row.IDSUBGRUPOEMPRESARIAL) {
+      handlePremioLiderCaixa(row.IDSUBGRUPOEMPRESARIAL, row.DTPREMIOINICIO, row.DTPREMIOFIM, row.DSSUBGRUPOEMPRESARIAL);
+    }
+  };
+
+  const handlePremioOperadorCaixa = async (IDSUBGRUPOEMPRESARIAL, DTPREMIOINICIO, DTPREMIOFIM, DSSUBGRUPOEMPRESARIAL) => {
+    try {
+      const response = await get(`/lista-premios-gerente?idSubGrupo=${IDSUBGRUPOEMPRESARIAL}&dataPesquisaInicio=${DTPREMIOINICIO}&dataPesquisaFim=${DTPREMIOFIM}&funcao=OPERADOR DE CAIXA`)
+      if (response.data && response.data.length > 0) {
+
+        setDadosOperadorCaixa({
+          data: response.data,
+          idSubGrupo: IDSUBGRUPOEMPRESARIAL,
+          dataPesquisaInicio: DTPREMIOINICIO,
+          dataPesquisaFim: DTPREMIOFIM,
+          dsSubGrupo: DSSUBGRUPOEMPRESARIAL
+        });
+        setTabelasSecundariasVisiveis(true);
+        setTabelaVisivel(false);;
+      }
+    } catch (error) {
+      console.error('Erro ao buscar metas detalhadas: ', error);
+    }
+  };
+  
+  const handleClickPremioOperadorCaixa = (row) => {
+    if (row && row.IDSUBGRUPOEMPRESARIAL) {
+      handlePremioOperadorCaixa(row.IDSUBGRUPOEMPRESARIAL, row.DTPREMIOINICIO, row.DTPREMIOFIM, row.DSSUBGRUPOEMPRESARIAL);
+    }
+  };
 
   return (
 
@@ -109,10 +224,13 @@ export const ActionListaPremiacoes = ({dadosListaPremiacoes}) => {
           sortOrder={-1}
           paginator={true}
           rows={10}
-          selectionMode="single"
-          selection={rowSelection}
-          onSelectionChange={(e) => setRowSelection(e.value)}
-          rowsPerPageOptions={[5, 10, 20, 50]}
+              selectionMode="single"
+            selection={rowSelection}
+            onSelectionChange={(e) => setRowSelection(e.value)}
+            rowsPerPageOptions={[10, 20, 50, dados.length]}
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+            filterDisplay="menu"
           showGridlines
           stripedRows
           emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
@@ -127,9 +245,9 @@ export const ActionListaPremiacoes = ({dadosListaPremiacoes}) => {
               body={coluna.body}
               footer={coluna.footer}
               sortable={coluna.sortable}
-              headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+              headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '1rem' }}
               footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
-              bodyStyle={{ fontSize: '0.8rem' }}
+              bodyStyle={{ fontSize: '1rem' }}
 
             />
           ))}
@@ -139,4 +257,3 @@ export const ActionListaPremiacoes = ({dadosListaPremiacoes}) => {
     </Fragment>
   )
 }
-
