@@ -4,6 +4,7 @@ import axios from "axios";
 import { getDataAtual } from "../../../../../utils/dataAtual";
 import { post } from "../../../../../api/funcRequest";
 import { removerFormatacaoMoeda } from "../../../../../utils/formatMoeda";
+import { useQuery } from "react-query";
 
 export const useCadastrarPremiacoes = ({ handleClose, usuarioLogado, optionsModulos, marcaSelecionada }) => {
   const [grupoEmpresarial, setGrupoEmpresarial] = useState('');
@@ -45,6 +46,17 @@ export const useCadastrarPremiacoes = ({ handleClose, usuarioLogado, optionsModu
     setIpUsuario(usuarioIP);
     return usuarioIP;
   };
+
+ 
+  const { data: dadosPremiacaoCadastrada = [], error: errorPremiacaoCadastrada, isLoading: isLoadingPremiacaoCadastrada, refetch: refetchPremiacaoCadastrada } = useQuery(
+    ['lista-premiacao-cadastrada'],
+    async () => {
+      const response = await get(`/lista-premiacao-cadastrada?idSubGrupo=${marcaSelecionada?.value}&dataPesquisaInicio=${dataInicio}&dataPesquisaFim=${dataFim}`);
+
+      return response.data;
+    },
+    { enabled: true, staleTime: 5 * 60 * 1000, }
+  );
 
   const onSubmit = async (e) => {
 
@@ -102,7 +114,7 @@ export const useCadastrarPremiacoes = ({ handleClose, usuarioLogado, optionsModu
 
       await post('/log-web', createData)
 
-
+      refetchPremiacaoCadastrada();
       return response.data;
     } catch (error) {
       const textDados = JSON.stringify(postData)
