@@ -166,6 +166,13 @@ export const ActionPesquisaCreateVoucher = ({ usuarioLogado, ID }) => {
     refetchListaVouchers()
   }
 
+   const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
+
   const handleClickCadastro = () => {
     if (optionsModulos[0]?.CRIAR == 'True') {
       setActionPrincipal(false);
@@ -217,16 +224,19 @@ export const ActionPesquisaCreateVoucher = ({ usuarioLogado, ID }) => {
           valueInputFieldDTInicioA={dataPesquisaInicio}
           labelInputDTInicioA={"Data Início"}
           onChangeInputFieldDTInicioA={(e) => setDataPesquisaInicio(e.target.value)}
+          onKeyDownInputFieldDTInicioA={handleKeyPress}
 
           InputFieldDTFimAComponent={InputField}
           labelInputDTFimA={"Data Fim"}
           valueInputFieldDTFimA={dataPesquisaFim}
           onChangeInputFieldDTFimA={(e) => setDataPesquisaFim(e.target.value)}
+          onKeyDownInputFieldDTFimA={handleKeyPress}
 
           InputFieldNumeroVoucherComponent={InputField}
           valueInputFieldNumeroVoucher={numeroVoucherSelecionado}
           onChangeInputFieldNumeroVoucher={(e) => setNumeroVoucherSelecionado(e.target.value)}
           labelInputFieldNumeroVoucher={"Nº Voucher / Nº Venda CPF/CNPJ"}
+          onKeyDownInputFieldNumeroVoucher={handleKeyPress}
 
           ButtonSearchComponent={ButtonType}
           linkNomeSearch={"Pesquisar"}

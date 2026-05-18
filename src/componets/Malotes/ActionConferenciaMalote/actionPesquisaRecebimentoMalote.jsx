@@ -27,15 +27,15 @@ export const ActionPesquisaRecebimentoMalote = ({ usuarioLogado, ID }) => {
     }, [])
 
     const { data: optionsEmpresas = [] } = useFetchData('empresas', '/empresas');
-    
+
     const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
         ['menus-usuario-excecao', ID],
         async () => {
             const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${ID}`);
-            
+
             return response.data;
         },
-        { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
+        { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
     );
 
     const fetchListaMalotes = async () => {
@@ -71,15 +71,22 @@ export const ActionPesquisaRecebimentoMalote = ({ usuarioLogado, ID }) => {
         }
     };
 
-     const {  data: dadosMalotes = [], error: errorMalotes, isLoading: isLoadingMalotes, refetch: refetchLista  } = useQuery(
-    ['malotes-loja'],
-    () => fetchListaMalotes(),
-    { enabled: false, cacheTime: 60 * 60 * 1000, staleTime: 60 * 60 * 1000, }
-  );
+    const { data: dadosMalotes = [], error: errorMalotes, isLoading: isLoadingMalotes, refetch: refetchLista } = useQuery(
+        ['malotes-loja'],
+        () => fetchListaMalotes(),
+        { enabled: false, cacheTime: 60 * 60 * 1000, staleTime: 60 * 60 * 1000, }
+    );
     const handleClick = () => {
         setTabelaVisivel(true);
         refetchLista();
     }
+
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleClick();
+        }
+    };
 
     const optionsStatus = [
         { value: '', label: 'Selecione um Status' },
@@ -96,17 +103,19 @@ export const ActionPesquisaRecebimentoMalote = ({ usuarioLogado, ID }) => {
             <ActionMain
                 linkComponentAnterior={["Home"]}
                 linkComponent={["Recepção de Malotes"]}
-                title="Lista de Malotes por Período"
+                title="Lista de Malotes por Período s"
 
                 InputFieldDTInicioComponent={InputField}
                 labelInputFieldDTInicio={"Data Início"}
                 valueInputFieldDTInicio={dataPesquisaInicio}
                 onChangeInputFieldDTInicio={(e) => setDataPesquisaInicio(e.target.value)}
+                onKeyDownInputFieldDTInicio={handleKeyPress}
 
                 InputFieldDTFimComponent={InputField}
                 labelInputFieldDTFim={"Data Fim"}
                 valueInputFieldDTFim={dataPesquisaFim}
                 onChangeInputFieldDTFim={(e) => setDataPesquisaFim(e.target.value)}
+                onKeyDownInputFieldDTFim={handleKeyPress}
 
                 InputSelectGrupoComponent={InputSelectAction}
                 labelSelectGrupo={"Empresa"}
