@@ -51,10 +51,13 @@ export const formatarDataParaISO = (data) => {
   return `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
 };
 
-export const formatarDataParaBR =  (data) =>{
+export const formatarDataParaBR = (data) => {
   if (!data) return "";
 
-  const partes = data.split("-");
+  // Formato ISO 8601: 2026-05-15T03:00:00.000Z
+  const dateOnly = data.includes("T") ? data.split("T")[0] : data;
+
+  const partes = dateOnly.split("-");
   if (partes.length !== 3) return "";
 
   return partes[2] + "/" + partes[1] + "/" + partes[0];
