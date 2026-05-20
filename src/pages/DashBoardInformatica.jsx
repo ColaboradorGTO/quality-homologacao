@@ -135,7 +135,7 @@ export const DashBoardInformatica = () => {
     case "/informatica/ActionPesquisaNfce":
       component = <ActionPesquisaNfce usuarioLogado={usuarioLogado} ID={ID} />;
       break;
-    case "/informatica/ActionPesquisaCriarMenuFIlho":
+    case "/informatica/CriacaoMenuFilho":
       component = <ActionPesquisaCriarMenuFilho usuarioLogado={usuarioLogado} ID={ID} />;
       break;
     default:
