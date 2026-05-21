@@ -16,6 +16,7 @@ const ActionPesquisaProductoPreco = lazy(() => import("../componets/Contabilidad
 const ActionPesquisaAlvaraEmpresa = lazy(() => import("../componets/Contabilidade/Components/ActionAlvaraEmpresas/actionPesquisaAlvaraEmpresa").then(module => ({ default: module.ActionPesquisaAlvaraEmpresa })));
 const ActionPesquisaNcmExcecao = lazy(() => import("../componets/Contabilidade/Components/ActionNcmExcecao/actionPesquisaNcmExcecao").then(module => ({ default: module.ActionPesquisaNcmExcecao })));
 
+
 export const DashBoardContabilidade = () => {
   const [resumoVisivel, setResumoVisivel] = useState(true);
   const [usuarioLogado, setUsuarioLogado] = useState(null);
