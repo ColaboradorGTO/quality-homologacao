@@ -11,7 +11,7 @@ import { FaRegSave } from "react-icons/fa";
 import { useEditarPermissaoUsuario } from "../../../ActionPermissoes/hooks/useEditarPermissaoUsuario";
 import { Departamentos } from '../../../../../parceiro.json';
 import { useRef } from "react";
-import { InputListaMenus } from "../../../ActionPermissoes/inputListaMenus";
+import { InputListaMenus } from "./inputListaMenus";
 
 
 export const ActionPesquisaPermissao = ({ usuarioLogado }) => {
@@ -238,7 +238,7 @@ export const ActionPesquisaPermissao = ({ usuarioLogado }) => {
           <div className="col-sm-5 col-md-5 col-lg-5 col-xl-5">
             <div style={{ marginTop: '2rem', background: '' }} >
               <head style={{ display: 'block' }}>
-                <h3 style={{ color: '#fff' }}>Nível de Permissão do Módulo</h3>
+                <h3 style={{ color: '#000' }}>Nível de Permissão do Módulo</h3>
 
               </head>
 
@@ -249,7 +249,7 @@ export const ActionPesquisaPermissao = ({ usuarioLogado }) => {
                   onChange={(e) => setAdministrador(e.target.checked ? 'True' : 'False')}
                   className="form-check-input"
                 />
-                <label style={{ color: '#fff', fontSize: '1rem' }} className="form-check-label d-inline-block " htmlFor="">Administrador</label>
+                <label style={{ color: '#000', fontSize: '1rem' }} className="form-check-label d-inline-block " htmlFor="">Administrador</label>
               </div>
 
               <div className="form-group form-check">
@@ -259,7 +259,7 @@ export const ActionPesquisaPermissao = ({ usuarioLogado }) => {
                   onChange={(e) => setNivel1(e.target.checked ? 'True' : 'False')}
                   className="form-check-input"
                 />
-                <label style={{ color: '#fff', fontSize: '1rem' }} className="form-check-label d-inline-block " htmlFor="">Nível Permissão 1</label>
+                <label style={{ color: '#000', fontSize: '1rem' }} className="form-check-label d-inline-block " htmlFor="">Nível Permissão 1</label>
               </div>
 
               <div className="form-group form-check">
@@ -269,7 +269,7 @@ export const ActionPesquisaPermissao = ({ usuarioLogado }) => {
                   onChange={(e) => setNivel2(e.target.checked ? 'True' : 'False')}
                   className="form-check-input"
                 />
-                <label style={{ color: '#fff', fontSize: '1rem' }} className="form-check-label d-inline-block " htmlFor="">Nível Permissão 2</label>
+                <label style={{ color: '#000', fontSize: '1rem' }} className="form-check-label d-inline-block " htmlFor="">Nível Permissão 2</label>
               </div>
 
               <div className="form-group form-check">
@@ -279,7 +279,7 @@ export const ActionPesquisaPermissao = ({ usuarioLogado }) => {
                   onChange={(e) => setNivel3(e.target.checked ? 'True' : 'False')}
                   className="form-check-input"
                 />
-                <label style={{ color: '#fff', fontSize: '1rem' }} className="form-check-label d-inline-block " htmlFor="">Nível Permissão 3</label>
+                <label style={{ color: '#000', fontSize: '1rem' }} className="form-check-label d-inline-block " htmlFor="">Nível Permissão 3</label>
               </div>
 
               <div className="form-group form-check">
@@ -289,13 +289,13 @@ export const ActionPesquisaPermissao = ({ usuarioLogado }) => {
                   onChange={(e) => setNivel4(e.target.checked ? 'True' : 'False')}
                   className="form-check-input"
                 />
-                <label style={{ color: '#fff', fontSize: '1rem' }} className="form-check-label d-inline-block " htmlFor="">Nível Permissão 4</label>
+                <label style={{ color: '#000', fontSize: '1rem' }} className="form-check-label d-inline-block " htmlFor="">Nível Permissão 4</label>
               </div>
             </div>
 
             <div style={{ marginTop: '2rem' }} className="col-sm-6 col-md-6 col-lg-6 col-xl-6">
               <head style={{ display: 'block' }}>
-                <h2 style={{ color: '#fff' }}>Tipo de Permissão do Usuário</h2>
+                <h2 style={{ color: '#000' }}>Tipo de Permissão do Usuário</h2>
               </head>
 
               <div className="form-group form-check" style={{ justifyContent: 'center', marginTop: '2rem' }}>
@@ -305,7 +305,7 @@ export const ActionPesquisaPermissao = ({ usuarioLogado }) => {
                   onChange={(e) => setAlterar(e.target.checked ? 'True' : 'False')}
                   className="form-check-input"
                 />
-                <label style={{ color: '#fff', fontSize: '1rem' }} className="form-check-label d-inline-block " htmlFor="">Permissão Para Alterar</label>
+                <label style={{ color: '#000', fontSize: '1rem' }} className="form-check-label d-inline-block " htmlFor="">Permissão Para Alterar</label>
               </div>
 
               <div className="form-group form-check">
@@ -315,7 +315,7 @@ export const ActionPesquisaPermissao = ({ usuarioLogado }) => {
                   onChange={(e) => setCriar(e.target.checked ? 'True' : 'False')}
                   className="form-check-input"
                 />
-                <label style={{ color: '#fff', fontSize: '1rem' }} className="form-check-label d-inline-block" htmlFor="">
+                <label style={{ color: '#000', fontSize: '1rem' }} className="form-check-label d-inline-block" htmlFor="">
                   Permissão Para Criar
                 </label>
               </div>
@@ -329,7 +329,7 @@ export const ActionPesquisaPermissao = ({ usuarioLogado }) => {
               <head style={{ display: 'block', textAlign: 'center' }}>
 
                 <span style={{ color: '#000', fontSize: '28px', fontWeight: 600 }} className="text-center">{`MENU:`}</span>
-                <span style={{ color: '#fff', fontSize: '32px', textTransform: 'uppercase' }} className="text-center h6 fw-600">{` ${moduloSelecionadoObj?.NOME || ''}`}</span>
+                <span style={{ color: '#000', fontSize: '32px', textTransform: 'uppercase' }} className="text-center h6 fw-600">{` ${moduloSelecionadoObj?.NOME || ''}`}</span>
 
               </head>
               <InputListaMenus
@@ -346,7 +346,7 @@ export const ActionPesquisaPermissao = ({ usuarioLogado }) => {
                   onClickButtonType={handleSubmit}
                   cor="success"
                   Icon={FaRegSave}
-                  iconColo="#FFF"
+                  iconColo="#000"
                   iconSize={20}
                   tipo={"submit"}
                 />
@@ -356,7 +356,7 @@ export const ActionPesquisaPermissao = ({ usuarioLogado }) => {
                   onClickButtonType={() => setMenuFilhoSelecionado([])}
                   cor="danger"
                   Icon={AiOutlineClear}
-                  iconColo="#FFF"
+                  iconColo="#000"
                   iconSize={20}
                   tipo={"button"}
                 />
