@@ -76,7 +76,7 @@ export const useEditarPermissaoUsuario = () => {
   
   
   const handleSubmit = async (e) => {
-  e.preventDefault();
+  // e.preventDefault();
   
   // if(optionsModulos[0]?.ALTERAR == 'False') {
   //   Swal.fire({
