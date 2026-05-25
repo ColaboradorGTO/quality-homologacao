@@ -22,6 +22,7 @@ const ActionPesquisaDuplicarPermissao = lazy(() => import("../componets/Informat
 const ActionPesquisEmpresa = lazy(() => import("../componets/Informatica/Components/ActionPesquisaEmpresas/actionPesquisaEmpresa").then(module => ({ default: module.ActionPesquisEmpresa })));
 const ActionPesquisaNfce = lazy(() => import("../componets/Informatica/Components/ActionValidaVendasContigencia/actionPesquisaNfce").then(module => ({ default: module.ActionPesquisaNfce })));
 const ActionPesquisaCriarMenuFilho = lazy(() => import("../componets/Informatica/Components/ActionCriarMenuFilho/actionPesquisaCriarMenuFIlho").then(module => ({ default: module.ActionPesquisaCriarMenuFilho })));
+const ActionPesquisaPermissao = lazy(() => import("../componets/Informatica/Components/ActionCriarPermissao/actionPesquisaPermissao").then(module => ({ default: module.ActionPesquisaPermissao })));
 
 export const DashBoardInformatica = () => {
   const [actionVisivel, setActionVisivel] = useState(true);
@@ -137,6 +138,9 @@ export const DashBoardInformatica = () => {
       break;
     case "/informatica/CriacaoMenuFilho":
       component = <ActionPesquisaCriarMenuFilho usuarioLogado={usuarioLogado} ID={ID} />;
+      break;
+    case "/informatica/ActionPesquisaPermissao":
+      component = <ActionPesquisaPermissao usuarioLogado={usuarioLogado} ID={ID} />;
       break;
     default:
       component = null;
