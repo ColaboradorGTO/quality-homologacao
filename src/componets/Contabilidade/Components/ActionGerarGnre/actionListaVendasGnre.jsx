@@ -16,7 +16,7 @@ import { TbFileTypeXml } from "react-icons/tb";
 import Swal from "sweetalert2";
 
 export const ActionListaVendasGnre = ({
-  dadosVendasXML,
+  dadosVendasGnre,
   usuarioLogado,
   optionsModulos,
 }) => {
@@ -79,7 +79,7 @@ export const ActionListaVendasGnre = ({
   };
 
 
-  const dados = dadosVendasXML.map((item, index) => {
+  const dados = dadosVendasGnre.map((item, index) => {
     let contador = index + 1;
     return {
       contador,

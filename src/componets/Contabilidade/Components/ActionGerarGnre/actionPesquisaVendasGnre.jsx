@@ -4,7 +4,6 @@ import { ActionMain } from "../../../Actions/actionMain";
 import { InputField } from "../../../Buttons/Input";
 import { InputSelectAction } from "../../../Inputs/InputSelectAction";
 import { getDataAtual } from "../../../../utils/dataAtual";
-import { ActionListaVendasXML } from "./actionListaVendasXML";
 import { ButtonType } from "../../../Buttons/ButtonType";
 import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
@@ -12,6 +11,7 @@ import { AiOutlineDownload, AiOutlineSearch } from "react-icons/ai";
 import Swal from "sweetalert2";
 import { useFetchData } from "../../../../hooks/useFetchData";
 import JSZip from 'jszip';
+import { ActionListaVendasGnre } from "./actionListaVendasGnre";
 
 export const ActionPesquisaVendasGnre = ({ usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
