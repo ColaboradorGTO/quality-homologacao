@@ -98,13 +98,14 @@ export const FormularioEditar = ({
         localizacaoFuncionario: localizacaoSelcionada,
         categoriaContratacao: isChecked,
         salarioFuncionario: valorSalario,
-        valorDesconroFuncionario: valorDesconto,
+        descontoConvenioFuncionario: valorDesconto,
         execaoDescFuncionario: excecao,
         situacaoFuncionario: situacaoSelecionada,
         telefoneFuncionario: telefone,
-        departamentoFuncionario: departamentoSelecionado
+        departamentoFuncionario: departamentoSelecionado,
+        
       };
-      
+
       await schema.validate(dadosParaValidar, { abortEarly: false });
       onSubmit();
     } catch (validationError) {
@@ -131,7 +132,16 @@ export const FormularioEditar = ({
 
   const maxDataAdmissao = format(new Date(), "yyyy-MM-dd");
   const minDataAdmissao = format(subDays(new Date(), 45), "yyyy-MM-dd");
-  
+
+  const handlePorcentoDesconto = (value) => {
+    if (isNaN(value) || value == "" || typeof value !== "number") {
+      setValorDesconto(0);
+      return;
+    }
+    const val = Math.max(0, Math.min(Number(value), 99));
+    setValorDesconto(val);
+  }
+
   return (
     <Fragment>
       {formularioVisivel && (
@@ -327,7 +337,7 @@ export const FormularioEditar = ({
                   value={localizacaoSelcionada}
                   onChange={(e) => setLocalizacaoSelecionada(e)}
                 />
-                
+
                 {errors.localizacaoFuncionario && (
                   <AlertError
                     error={errors.localizacaoFuncionario?.value || errors.localizacaoFuncionario}
@@ -368,7 +378,27 @@ export const FormularioEditar = ({
 
             <div className="row form-group" >
               <div className="col-sm-3 col-md-4 col-xl-4 " >
-                <InputFieldModal
+
+                <Controller
+                  name="descontoConvenioFuncionario"
+                  control={control}
+                  render={({ field }) => (
+                    <FormField
+                      name="descontoConvenioFuncionario"
+                      label={"% Desc. Conv."}
+                      type="text"
+                      placeholder="0,00"
+                      errors={errors}
+                      clearErrors={clearErrors}
+                      value={valorDesconto}
+                      onChangeModal={e => handlePorcentoDesconto(Number(e.target.value))}
+
+                    />
+
+                  )}
+                />
+
+                {/*     <InputFieldModal
                   type="text"
                   className="form-control input"
                   placeholder={"0,00"}
@@ -377,7 +407,7 @@ export const FormularioEditar = ({
 
                   onChangeModal={(e) => setValorDesconto(e.target.value)}
 
-                />
+                /> */}
               </div>
               <div className="col-sm-3 col-md-4 col-lg-4 mb-2"  >
                 <label className="form-label" >Execeção de Desconto</label>
@@ -397,6 +427,8 @@ export const FormularioEditar = ({
 
               </div>
             </div>
+
+
 
             <div className="row form-group">
 
