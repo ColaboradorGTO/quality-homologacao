@@ -153,7 +153,7 @@ export const useEditarFuncionario = ({
     }
 
   };
-  console.log(situacaoSelecionada.value, 'SITUAÇÃO SELECIONADA')
+ // console.log(situacaoSelecionada.value, 'SITUAÇÃO SELECIONADA')
   const onSubmit = async (e) => {
     let maximoDesconto = 0;
     let dataBase = new Date('2024-08-01')

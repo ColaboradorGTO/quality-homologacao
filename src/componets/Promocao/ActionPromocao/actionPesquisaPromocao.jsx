@@ -132,9 +132,9 @@ export const ActionPesquisaPromocao = ({ }) => {
     mostrarProdutosSelecionadosDestino,
     modalDocumentacao,
     setModalDocumentacao,
-    modalPodutoSelecionadoDestinoCSV, 
+    modalPodutoSelecionadoDestinoCSV,
     setModalPodutoSelecionadoDestinoCSV,
-    modalPodutoSelecionadoOrigemCSV, 
+    modalPodutoSelecionadoOrigemCSV,
     setModalPodutoSelecionadoOrigemCSV,
     isCheckedGrupo,
     setIsCheckedGrupo,
@@ -165,7 +165,7 @@ export const ActionPesquisaPromocao = ({ }) => {
     onSubmit,
     downloadPlanilhaModelo,
     onSubmitEstrutura,
-    onSubmitEstruturaProduto 
+    onSubmitEstruturaProduto
 
   } = useCreatePromocaoAtiva({});
 
@@ -279,36 +279,36 @@ export const ActionPesquisaPromocao = ({ }) => {
 
   useEffect(() => {
     if (dadosSubGrupo.length) {
-    
+
       const gruposMap = new Map();
 
       dadosSubGrupo.forEach(subgrupo => {
         const grupoId = subgrupo.IDGRUPOESTRUTURA;
-        const grupoDescricao = subgrupo.DSGRUPOESTRUTURA; 
+        const grupoDescricao = subgrupo.DSGRUPOESTRUTURA;
 
-  
+
         if (!gruposMap.has(grupoId)) {
           gruposMap.set(grupoId, {
             key: `grupo_${grupoId}`,
-            label: grupoDescricao,   
-            children: [],           
+            label: grupoDescricao,
+            children: [],
           });
         }
 
         gruposMap.get(grupoId).children.push({
           key: `subgrupo_${subgrupo.IDSUBGRUPOESTRUTURA}`,
-          label: `${subgrupo.IDSUBGRUPOESTRUTURA} - ${subgrupo.DSSUBGRUPOESTRUTURA} `, 
-          data: subgrupo 
+          label: `${subgrupo.IDSUBGRUPOESTRUTURA} - ${subgrupo.DSSUBGRUPOESTRUTURA} `,
+          data: subgrupo
         });
       });
 
- 
+
       const formattedTreeData = Array.from(gruposMap.values());
       setTreeData(formattedTreeData);
 
     }
   }, [dadosSubGrupo]);
-  
+
   useEffect(() => {
     if (treeData.length && (grupoSelecionado.length || subGrupoDestino.length)) {
       const initialSelection = {};
@@ -402,7 +402,7 @@ export const ActionPesquisaPromocao = ({ }) => {
     setGrupoSelecionado(selectedGrupo);
     setSubGrupoOrigem(selectedSubGrupo);
     setSubGrupoProdutoOrigem(selectedSubGrupo);
-    
+
     // if (subGrupoOrigem.length > 0) {
     //   refetchProdutoSubGrupoOrigem();
     // }
@@ -435,7 +435,7 @@ export const ActionPesquisaPromocao = ({ }) => {
     //   refetchProdutoSubGrupoDestino();
     // }
   };
-  
+
 
   const fetchProdutoSubGrupoDestino = async () => {
     const urlBase = `/produto-subGrupo?idSubGrupo=${subGrupoDestino.join(',')}`;
@@ -469,7 +469,7 @@ export const ActionPesquisaPromocao = ({ }) => {
       fecharAnimacaoCarregamento();
     }
   };
-  
+
   const { data: dadosProdutoSubGrupoDestino = [], error: errorProdutoSubGrupoDestino, isLoading: isLoadingProdutoSubGrupoDestino, refetch: refetchProdutoSubGrupoDestino } = useQuery(
     ['produto-subGrupo', subGrupoDestino],
     async () => fetchProdutoSubGrupoDestino(),
@@ -626,8 +626,8 @@ export const ActionPesquisaPromocao = ({ }) => {
           setQtdInicio(valor);
         }}
         readOnlyQTDInicio={
-          mecanicaSelecionada == 1 && mecanicaSelecionadaEdicao !== "PROMOÇÃO POR EM UM PRODUTO // QUANTIDADE VALOR // VALOR FINAL" 
-            ? true 
+          mecanicaSelecionada == 1 && mecanicaSelecionadaEdicao !== "PROMOÇÃO POR EM UM PRODUTO // QUANTIDADE VALOR // VALOR FINAL"
+            ? true
             : false
         }
         // styleQTDInicio={styleQTDInicio}
@@ -775,25 +775,25 @@ export const ActionPesquisaPromocao = ({ }) => {
           { value: "all", label: "Selecionar Todas" },
           ...(dadosGrupo?.map((item) => ({
             value: item.IDSUBGRUPOESTRUTURA,
-            label:  `${item.IDSUBGRUPOESTRUTURA} - ${item.DSGRUPOESTRUTURA} - ${item.TPSECAO} `
+            label: `${item.IDSUBGRUPOESTRUTURA} - ${item.DSGRUPOESTRUTURA} - ${item.TPSECAO} `
           })) || [])
         ]}
 
         valueSelectSubGrupoOrigemAsync={
           Array.isArray(subGrupoOrigem) && Array.isArray(dadosGrupo)
             ? dadosGrupo
-                .filter(item => subGrupoOrigem.includes(String(item.IDSUBGRUPOESTRUTURA)))
-                .map(item => ({
-                  value: item.IDSUBGRUPOESTRUTURA,
-                  label: `${item.IDSUBGRUPOESTRUTURA} - ${item.DSGRUPOESTRUTURA} - ${item.TPSECAO} `
-                }))
+              .filter(item => subGrupoOrigem.includes(String(item.IDSUBGRUPOESTRUTURA)))
+              .map(item => ({
+                value: item.IDSUBGRUPOESTRUTURA,
+                label: `${item.IDSUBGRUPOESTRUTURA} - ${item.DSGRUPOESTRUTURA} - ${item.TPSECAO} `
+              }))
             : []
         }
         onChangeSelectSubGrupoOrigemAsync={(e) => {
           if (e.some((option) => option.value === "all")) {
             const allValues = dadosGrupo.map((grupo) => String(grupo.IDSUBGRUPOESTRUTURA));
             setSubGrupoOrigem(allValues);
-          } else {            
+          } else {
             handleChangeSubGrupoOrigem(e);
           }
         }}
@@ -810,25 +810,25 @@ export const ActionPesquisaPromocao = ({ }) => {
           { value: "all", label: "Selecionar Todas" },
           ...(dadosGrupo?.map((item) => ({
             value: item.IDSUBGRUPOESTRUTURA,
-            label:  `${item.IDSUBGRUPOESTRUTURA} - ${item.DSGRUPOESTRUTURA} - ${item.TPSECAO} `
+            label: `${item.IDSUBGRUPOESTRUTURA} - ${item.DSGRUPOESTRUTURA} - ${item.TPSECAO} `
           })) || [])
         ]}
 
         valueSelectSubGrupoDestinoAsync={
           Array.isArray(subGrupoDestino) && Array.isArray(dadosGrupo)
             ? dadosGrupo
-                .filter(item => subGrupoDestino.includes(String(item.IDSUBGRUPOESTRUTURA)))
-                .map(item => ({
-                  value: item.IDSUBGRUPOESTRUTURA,
-                  label: `${item.IDSUBGRUPOESTRUTURA} - ${item.DSGRUPOESTRUTURA} - ${item.TPSECAO} `
-                }))
+              .filter(item => subGrupoDestino.includes(String(item.IDSUBGRUPOESTRUTURA)))
+              .map(item => ({
+                value: item.IDSUBGRUPOESTRUTURA,
+                label: `${item.IDSUBGRUPOESTRUTURA} - ${item.DSGRUPOESTRUTURA} - ${item.TPSECAO} `
+              }))
             : []
         }
         onChangeSelectSubGrupoDestinoAsync={(e) => {
           if (e.some((option) => option.value === "all")) {
             const allValues = dadosGrupo.map((grupo) => String(grupo.IDSUBGRUPOESTRUTURA));
             setSubGrupoDestino(allValues);
-          } else {            
+          } else {
             handleChangeSubGrupoDestino(e);
           }
         }}
@@ -838,14 +838,14 @@ export const ActionPesquisaPromocao = ({ }) => {
         onChangeTreeSelectDestino={handleTreeSelectDestinoChange}
         optionsTreeSelectDestino={treeData}
         placeholderTreeSelectDestino={"Selecione"}
-    
+
         MenuTreeSelectOrigemComponentEstProd={MenuTreeSelect}
         valueTreeSelectOrigemEstProd={selectedNodesOrigem}
         onChangeTreeSelectOrigemEstProd={handleProdutoSubGrupoOrigemChange}
         optionsTreeSelectOrigemEstProd={treeData}
         placeholderTreeSelectOrigemEstProd="Selecione"
         labelSelectSubGrupoOrigemAsyncEstProd={"Sub Grupo Origem"}
-        
+
         ButtonTypeProdutoEstruturaOrigem={ButtonType}
         linkNomeProdutoEstruturaOrigem={"Visualizar Estrutura / Produto Origem"}
         onButtonClickProdutoEstruturaOrigem={mostrarModalEstruturaOrigem}
@@ -1057,9 +1057,9 @@ export const ActionPesquisaPromocao = ({ }) => {
         setProdutoSelecionadoEstProdutoOrigem={setProdutoSelecionadoEstProdutoOrigem}
         novoProdutoEstProdOrigem={novoProdutoEstProdOrigem}
         setNovoProdutoEstProdOrigem={setNovoProdutoEstProdOrigem}
-      />  
+      />
 
-      <ActionEstruturaProdutoDestinoModal 
+      <ActionEstruturaProdutoDestinoModal
         show={modalEstProdDestino}
         handleClose={() => setModalEstProdDestino(false)}
         dadosProdutoSubGrupoDestino={dadosProdutoSubGrupoDestino}

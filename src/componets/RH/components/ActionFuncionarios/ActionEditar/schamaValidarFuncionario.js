@@ -3,10 +3,10 @@ import * as yup from 'yup';
 export const schema = yup.object({
 
   empresaFuncionario: yup
-  .object()
-  .nullable()
-  .required('Empresa é obrigatória')
-  .typeError('Empresa é obrigatória'),
+    .object()
+    .nullable()
+    .required('Empresa é obrigatória')
+    .typeError('Empresa é obrigatória'),
 
   funcaoFuncionario: yup.object()
     .nullable()
@@ -17,10 +17,10 @@ export const schema = yup.object({
     .nullable()
     .required('Tipo Obrigatório')
     .typeError('Tipo Obrigatório'),
-     
+
 
   dataAdmissaoFuncionario: yup
-    .date()
+    .string()
     .required('Data de Admissão Obrigatória'),
 
   nome: yup
@@ -43,15 +43,15 @@ export const schema = yup.object({
   salarioFuncionario: yup
     .number()
     .transform((value) => {
-        if(typeof value === 'string') {
-            return value.replace(/\./g, '').replace(',', '.');
-        }
-        return value;
+      if (typeof value === 'string') {
+        return value.replace(/\./g, '').replace(',', '.');
+      }
+      return value;
     })
     .typeError('Salário deve ser um número')
     .required('Salário Obrigatório'),
 
-  valorDescontoFuncionario: yup
+  descontoConvenioFuncionario: yup
     .number()
     .typeError('Valor de desconto deve ser um número')
     .nullable(),
@@ -72,17 +72,27 @@ export const schema = yup.object({
 
   telefoneFuncionario: yup.string()
     .transform((value) => {
-        if (typeof value === 'string') {
-            return value.replace(/\D/g, ''); 
-        }
-        return value;
+      if (typeof value === 'string') {
+        return value.replace(/\D/g, '');
+      }
+      return value;
     })
     .required('Telefone Obrigatório')
     .matches(/^\d{10,11}$/, 'Telefone deve conter 10 ou 11 números'),
-  
-  
-  departamentoFuncionario: yup.object()
+
+
+  /*   departamentoFuncionario: yup.object()
+      .nullable()
+      .required('Departamento Obrigatório')
+      .typeError('Departamento Obrigatório'), */
+
+  departamentoFuncionario: yup
+    .object()
     .nullable()
     .required('Departamento Obrigatório')
-    .typeError('Departamento Obrigatório'),
+    .test(
+      'has-value',
+      'Departamento Obrigatório',
+      value => value?.value != null
+    )
 });
