@@ -3,14 +3,12 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { ButtonTable } from "../../../ButtonsTabela/ButtonTable";
 import { get } from "../../../../api/funcRequest";
-import { ActionDetalheVendaModal } from "./actionDetalheVendaModal";
 import { formatMoeda } from "../../../../utils/formatMoeda";
 import { useReactToPrint } from "react-to-print";
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../../Tables/headerTable";
-import { ActionVendaXMLModal } from "./actionVendaXMLModal";
 import { GrView } from "react-icons/gr";
 import { TbFileTypeXml } from "react-icons/tb";
 import Swal from "sweetalert2";
@@ -300,18 +298,7 @@ export const ActionListaVendasGnre = ({
           </DataTable>
         </div>
       </div>
-      <ActionDetalheVendaModal
-        show={modalVendas}
-        handleClose={() => setModalVendas(false)}
-        dadosDetalheVendas={dadosDetalheVendas}
-        dadosDetalhePagamento={dadosDetalhePagamento}
-      />
-
-      <ActionVendaXMLModal
-        show={detalheVendaXMLModal}
-        handleClose={() => setDetalheVendaXMLModal(false)}
-        dadosDetalheVendasXML={dadosDetalheVendasXML}
-      />
+ 
     </Fragment>
   )
 }
