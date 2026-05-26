@@ -331,5 +331,20 @@
     { "value": "GERAL DA LOJA", "label": "GERAL DA LOJA" },
     { "value": "GERAL DA CONFEÇÇÃO", "label": "GERAL DA CONFEÇÇÃO" },
     { "value": "INDIVIDUAL / GERAL", "label": "INDIVIDUAL / GERAL" }
+  ],
+  "optionsIcms": [
+    { "value": "0", "label": "Selecione um ICMS" },
+    { "value": "100030", "label": "100030 - ICMS Transporte" },
+    { "value": "100048", "label": "100048 - ICMS Substituição Tributária por Apuração" },
+    { "value": "100056", "label": "100056 - ICMS Importação" },
+    { "value": "100064", "label": "100064 - ICMS Autuação Fiscal" },
+    { "value": "100080", "label": "100080 - ICMS Recolhimentos Especiais" },
+    { "value": "100099", "label": "100099 - ICMS Substituição Tributária por Operação" },
+    { "value": "100102", "label": "100102 - ICMS Consumidor Final Não Contribuinte Outra UF por Operação" },
+    { "value": "100110", "label": "100110 - ICMS Consumidor Final Não Contribuinte Outra UF por Apuração" },
+    { "value": "100129", "label": "100129 - ICMS Fundo Estadual de Combate à Pobreza por Operação" },
+    { "value": "100137", "label": "100137 - ICMS Fundo Estadual de Combate à Pobreza por Apuração" },
+    { "value": "100153", "label": "100153 - ICMS Monofásico por Operação" },
+    { "value": "100161", "label": "100161 - ICMS Monofásico por Apuração" }
   ]
 }
