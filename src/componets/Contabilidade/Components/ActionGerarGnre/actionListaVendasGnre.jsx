@@ -12,6 +12,12 @@ import HeaderTable from "../../../Tables/headerTable";
 import { GrView } from "react-icons/gr";
 import { TbFileTypeXml } from "react-icons/tb";
 import Swal from "sweetalert2";
+import { Row } from "primereact/row";
+import { ColumnGroup } from "primereact/columngroup";
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
+import { FiSend } from "react-icons/fi";
+import { ActionVendasGnreModal } from "./actionVendasGnreModal";
 
 export const ActionListaVendasGnre = ({
   dadosVendasGnre,
@@ -22,7 +28,7 @@ export const ActionListaVendasGnre = ({
   const [rowSelection, setRowSelection] = useState(null);
   const [dadosDetalhePagamento, setDadosDetalhePagamento] = useState([]);
   const [detalheVendaXMLModal, setDetalheVendaXMLModal] = useState(false);
-  const [dadosDetalheVendasXML, setDadosDetalheVendasXML] = useState([]);
+  const [dadosDetalhesVendas, setDadosDetalhesVendas] = useState([]);
   const [modalVendas, setModalVendas] = useState(false);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const dataTableRef = useRef();
@@ -81,180 +87,169 @@ export const ActionListaVendasGnre = ({
     let contador = index + 1;
     return {
       contador,
-      NOFANTASIA: item.NOFANTASIA,
-      IDVENDA: item.IDVENDA,
-      SERIE: item.SERIE,
-      NF: item.NF,
-      IDCHAVENFE: item.IDCHAVENFE ? item.IDCHAVENFE : item.IDCHAVENFE.replace(/[a-zA-Z]/g, ''),
-      CHAVENFE: item.CHAVENFE ? item.CHAVENFE : item.IDCHAVENFE.replace(/[a-zA-Z]/g, ''),
-      STCONTINGENCIA: item.STCONTINGENCIA,
-      STCANCELADO: item.STCANCELADO == 'True' ? 'Cancelada' : item.STCONTINGENCIA == 'True' ? 'Contigência' : 'Autorizada',
-      TXTMOTIVOCANCELAMENTO: item.TXTMOTIVOCANCELAMENTO,
-      VRTOTALPAGO: item.VRTOTALPAGO,
-      PROTNFE_INFPROT_XMOTIVO: item.PROTNFE_INFPROT_XMOTIVO,
-      XML_FORMATADO: item.XML_FORMATADO || '',
+      DocEntry: item.DocEntry,
+      nNF: item.nNF,
+      TaxIdNum: item.TaxIdNum,
+      xNome: item.xNome,
+      State: item.State,
+      xLgr: item.xLgr,
+      xMun: item.xMun,
+      municipioEmitente: item.municipioEmitente,
+      CEP: item.CEP,
+      fone: item.fone,
+
+      UF: item.UF,
+      xNomeDestinatario: item.xNomeDestinatario,
+      CPFCNPJDest: item.CPFCNPJDest,
+      xMunDest: item.xMunDest,
+      municipioDestinatario: item.municipioDestinatario,
+      CodItem: item.CodItem,
+      Descricao: item.Descricao,
+      vProd: item.vProd,
+      vNF: item.vNF,
     }
 
   })
 
-  const colunasVendasContigencia = [
-    {
-      field: 'contador',
-      header: '#',
-      body: row => <th>{row.contador}</th>,
-      sortable: true,
-    },
-    {
-      field: 'NOFANTASIA',
-      header: 'Empresa',
-      body: row => <th style={{ width: '200px', margin: '0px' }}>{row.NOFANTASIA}</th>,
-      sortable: true,
-    },
-    {
-      field: 'IDVENDA',
-      header: 'Venda',
-      body: row => <th>{row.IDVENDA}</th>,
-      sortable: true,
-    },
-    {
-      field: 'SERIE',
-      header: 'Série',
-      body: row => <th>{row.SERIE}</th>,
-      sortable: true,
-    },
-    {
-      field: 'NF',
-      header: 'NFCE',
-      body: row => <th>{row.NF}</th>,
-      sortable: true,
-    },
-    {
-      field: 'CHAVENFE',
-      header: 'Chave NF',
-      body: row => <p style={{ width: '150px', margin: '0px', fontWeight: 600 }}>{row.CHAVENFE}</p>,
-      sortable: true,
-    },
-    {
-      field: 'STCANCELADO',
-      header: 'Situação',
-      body: row => <th>{row.STCANCELADO}</th>,
-      sortable: true,
-    },
-    {
-      field: 'VRTOTALPAGO',
-      header: 'Valor ',
-      body: row => <th>{formatMoeda(row.VRTOTALPAGO)}</th>,
-      sortable: true,
-    },
-    {
-      field: 'PROTNFE_INFPROT_XMOTIVO',
-      header: 'Motivo',
-      body: row => <th>{row.STCANCELADO == 'True' ? row.TXTMOTIVOCANCELAMENTO : row.PROTNFE_INFPROT_XMOTIVO || 'Sem Motivo'}</th>,
-      sortable: true,
-    },
-    {
-      header: 'Opções',
-      body: (row) => (
-        <div style={{ justifyContent: "space-between", display: "flex" }}>
+  const headerGrupo = (
+    <ColumnGroup  >
+      <Row>
+        <Column  
+          colSpan="6" 
+          headerStyle={{ fontSize: '1rem', textAlign: 'center', justifyContent: 'center', backgroundColor: "#7a59ad", color: 'white' }} 
+          headerClassName="grupo-meta-geral"
+          header="Dados do Emitente" 
+    
+        />
+        <Column  
+          colSpan="6" 
+          headerStyle={{ fontSize: '1rem', textAlign: 'center', justifyContent: 'center', backgroundColor: "#FFDB8E", color: 'black' }} 
+          headerClassName="grupo-meta-geral"
+          header="Dados do Destinatário" 
+            
+        />
 
-          <div className="p-1">
-            <ButtonTable
-              titleButton={"Detalhar Produtos da Venda"}
-              onClickButton={() => handleClickEdit(row)}
-              Icon={GrView}
-              iconSize={20}
-              iconColor={"#fff"}
-              cor={"success"}
-              width="30px"
-              height="30px"
-            />
+      </Row>
+     
 
-          </div>
+      <Row>
+        <Column 
+          field="contador" 
+          header="#" 
+          sortable={true} 
+          style={{color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}   
+        />
+        <Column 
+          field="DocEntry" 
+          header="DocEntry" 
+          sortable={true} 
+          style={{color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+        />
+        <Column 
+          field="xNome" 
+          header="Empresa Emitente" 
+          sortable={true} 
+          style={{color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}  
+        />
+        <Column 
+          field="State" 
+          header="Estado" 
+          sortable={true} 
+          style={{color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+        />
+        <Column 
+          field="xMun" 
+          header="Município " 
+          sortable={true} 
+          style={{color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}  
+        />
+        <Column 
+          field="municipioEmitente" 
+          header="Nº Município" 
+          sortable={true} 
+          style={{color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}  
+        />
 
-          <div className="p-1">
-            <ButtonTable
-              titleButton={`${row.XML_FORMATADO.length > 0 ? 'Visualizar Xml da Venda' : 'Venda Sem XML'}`}
-              disabledBTN={row.XML_FORMATADO.length === 0}
-              onClickButton={() => clickDetalharVendaXML(row)}
-              Icon={TbFileTypeXml}
-              iconSize={20}
-              iconColor={"#fff"}
-              cor={"info"}
-              width="30px"
-              height="30px"
+        <Column 
+          field="CPFCNPJDest" 
+          header="CPF/CNPJ" 
+          sortable={true} 
+          style={{color: 'black', backgroundColor: "#ffca5b", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+        />
+        <Column 
+          field="xNomeDestinatario" 
+          header="Destinatário" 
+          sortable={true} 
+          style={{color: 'black', backgroundColor: "#ffca5b", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+        />
+        <Column 
+          field="xMunDest" 
+          header="Município" 
+          sortable={true} 
+          style={{color: 'black', backgroundColor: "#ffca5b", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+        />
+        <Column 
+          field="municipioDestinatario" 
+          header="Nº Município" 
+          sortable={true} 
+          style={{color: 'black', backgroundColor: "#ffca5b", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+        />
+        <Column 
+          field="vNF" 
+          header="Valor NF" 
+          sortable={true} 
+          style={{color: 'black', backgroundColor: "#ffca5b", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+        />
 
-            />
-          </div>
-        </div>
-      ),
-    }
-  ]
+        <Column 
+          field="vNF" 
+          header="Ações" 
+          sortable={true} 
+          style={{color: 'black', backgroundColor: "#ffca5b", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+        />
+      </Row>
+    </ColumnGroup>
+  )
 
-  const handleEdit = async (IDVENDA) => {
-    try {
-      const response = await get(`/vendasPagamentoContigencia?idVenda=${IDVENDA}`);
-      const responseDetalhe = await get(`/vendasDetalheContigencia?idVenda=${IDVENDA}`);
-      if (response.data && responseDetalhe.data) {
-        setDadosDetalhePagamento(response.data)
-        setDadosDetalheVendas(responseDetalhe.data)
-        setModalVendas(true);
-      } else {
-        Swal.fire({
-          icon: 'info',
-          title: 'Sem Detalhes',
-          html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Não foi possível encontrar os detalhes para esta venda.`,
-          customClass: {
-          }
-        })
+    const handleEdit = async (DocEntry) => {
+      try {
+        const response = await get(`/vendas-gnre?doctEntry=${DocEntry}`);
+        if (response.data && response.data.length > 0) {
+
+          setDadosDetalhesVendas(response.data)
+          setModalVendas(true);
+        } else {
+          Swal.fire({
+            icon: 'info',
+            title: 'Sem Detalhes',
+            html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Não foi possível encontrar os detalhes para esta venda.`,
+            customClass: {
+            }
+          })
+        }
+  
+      } catch (error) {
+        console.error('Erro ao buscar detalhes da venda: ', error);
       }
-
-    } catch (error) {
-      console.error('Erro ao buscar detalhes da venda: ', error);
-    }
-  };
-
-
-  const handleClickEdit = (row) => {
-    if (row && row.IDVENDA) {
-      handleEdit(row.IDVENDA);
-    }
-  };
-
-  const clickDetalharVendaXML = (row) => {
-    if (row && row.IDVENDA) {
-      handleDetalharVendaXML(row.IDVENDA);
-    }
-  };
-
-  const handleDetalharVendaXML = async (IDVENDA) => {
-    try {
-      const response = await get(`/venda-xml?idVenda=${IDVENDA}`);
-      if (response.data && response.data.length > 0) {
-        setDadosDetalheVendasXML(response.data)
-        setDetalheVendaXMLModal(true);
-      } else {
-        Swal.fire({
-          icon: 'info',
-          title: 'Venda sem XML',
-          html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Não foi encontrado o XML para esta venda.`,
-        });
+    };
+  
+  
+    const handleClickEdit = (row) => {
+      if (row && row.DocEntry) {
+        handleEdit(row.DocEntry);
       }
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
+    };
+  
   return (
 
     <Fragment>
       <div className="panel" >
         <div className="panel-hdr mb-4">
 
-          <h2>Lista de Vendas Contigência</h2>
+          <h2>Vendas Para Gerar GNRE</h2>
         </div>
         <div style={{ marginBottom: "1rem" }}>
           <HeaderTable
-
             globalFilterValue={globalFilterValue}
             onGlobalFilterChange={onGlobalFilterChange}
             handlePrint={handlePrint}
@@ -264,15 +259,17 @@ export const ActionListaVendasGnre = ({
         </div>
         <div className="card" ref={dataTableRef}>
           <DataTable
-            title="Vendas Contigências"
+            title="Vendas Para Gerar GNRE"
             value={dados}
-            globalFilter={globalFilterValue}
             size="small"
+            headerColumnGroup={headerGrupo}
+            globalFilter={globalFilterValue}
             sortOrder={-1}
             paginator={true}
             rows={10}
-            selectionMode={'single'}
+            selectionMode={"single"}
             selection={rowSelection}
+            onSelectionChange={(e) => setRowSelection(e.value)}
             rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
@@ -281,24 +278,58 @@ export const ActionListaVendasGnre = ({
             stripedRows
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
           >
-            {colunasVendasContigencia.map(coluna => (
-              <Column
-                key={coluna.field}
-                field={coluna.field}
-                header={coluna.header}
-                body={coluna.body}
-                footer={coluna.footer}
-                sortable={coluna.sortable}
-                headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
-                footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
-                bodyStyle={{ fontSize: '0.8rem' }}
+            <Column field="contador" header="#" body={row => <th style={{ fontSize: '0.8rem' }}>{row.contador}</th>} sortable={true} />
+            <Column field="DocEntry" header="DocEntry" body={row => <th style={{ margin: '0px', fontSize: '0.8rem' }}>{row.DocEntry}</th>} sortable={true} />
+            <Column field="xNome" header="Empresa" body={row => <p style={{ width: '200px', margin: '0px', fontSize: '0.8rem', fontWeight: 600 }}>{row.xNome}</p>} sortable={true} />
+            <Column field="State" header="Estado" body={row => <th style={{ margin: '0px', fontSize: '0.8rem' }}>{row.State}</th>} sortable={true} />
+            <Column field="xMun" header="Município" body={row => <th style={{ margin: '0px', fontSize: '0.8rem' }}>{row.xMun}</th>} sortable={true} />
+            <Column field="municipioEmitente" header="Município Emitente" body={row => <th style={{ margin: '0px', fontSize: '0.8rem' }}>{row.municipioEmitente}</th>} sortable={true} />
+            {/* <Column field="CEP" header="CEP" body={row => <th style={{ margin: '0px' }}>{row.CEP}</th>} sortable={true} /> */}
+        
+            <Column field="CPFCNPJDest" header="CPF/CNPJ" body={row => <th style={{ margin: '0px', fontSize: '0.8rem' }}>{row.CPFCNPJDest}</th>} sortable={true} />
+            <Column field="xNomeDestinatario" header="Destinatário" body={row => <p style={{ width: '200px', margin: '0px', fontSize: '0.8rem', fontWeight: 600 }}>{row.xNomeDestinatario}</p>} sortable={true} />
+            <Column field="xMunDest" header="Município" body={row => <th style={{ margin: '0px', fontSize: '0.8rem' }}>{row.xMunDest}</th>} sortable={true} />
+            <Column field="municipioDestinatario" header="Nº Município" body={row => <th style={{ margin: '0px', fontSize: '0.8rem' }}>{row.municipioDestinatario}</th>} sortable={true} />
+            <Column field="vNF" header="Valor NF" body={row => <th style={{ margin: '0px', fontSize: '0.8rem' }}>{formatMoeda(row.vNF)}</th>} sortable={true} />
+            <Column header="Ações" body={(row) => (
+              <div style={{ justifyContent: "space-between", display: "flex" }}>
+                <div className="p-1">
+                  <ButtonTable
+                    titleButton={"Gerar GNRE"}
+                    onClickButton={() => handleClickEdit(row)}
+                    Icon={FiSend}
+                    iconSize={20}
+                    iconColor={"#fff"}
+                    cor={"success"}
+                    width="30px"
+                    height="30px"
+                  />
+                </div>
+                <div className="p-1">
+                  <ButtonTable
+                    titleButton={"Visualizar XML"}
+                    onClickButton={() => handleClickEdit(row)}
+                    Icon={GrView}
+                    iconSize={20}
+                    iconColor={"#fff"}
+                    cor={"primary"}
+                    width="30px"
+                    height="30px"
+                  />
+                </div>
 
-              />
-            ))}
+              </div>
+            )} 
+        
+          />  
           </DataTable>
         </div>
       </div>
- 
+      <ActionVendasGnreModal 
+        show={modalVendas}
+        handleClose={() => setModalVendas(false)}
+        dadosDetalheVendas={dadosDetalhesVendas}
+      />
     </Fragment>
   )
 }

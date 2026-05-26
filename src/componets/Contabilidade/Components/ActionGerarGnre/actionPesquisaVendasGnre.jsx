@@ -15,8 +15,7 @@ import { ActionListaVendasGnre } from "./actionListaVendasGnre";
 
 export const ActionPesquisaVendasGnre = ({ usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
-  const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
-  const [dataPesquisaFim, setDataPesquisaFim] = useState('');
+  const [nDocumento, setNDocumento] = useState('');
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
   useEffect(() => {
@@ -39,7 +38,7 @@ export const ActionPesquisaVendasGnre = ({ usuarioLogado }) => {
 
   const fetchListaVendasContigencia = async () => {
     try {
-      const urlBase = `/venda-xml?`;
+      const urlBase = `/vendas-gnre?`;
       let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
       urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
       animacaoCarregamento('Carregando dados...', true);
@@ -71,7 +70,7 @@ export const ActionPesquisaVendasGnre = ({ usuarioLogado }) => {
   };
 
   const { data: dadosVendasGnre = [], error: errorVendas, isLoading: isLoadingVendas, refetch: refetchVendasContigencia } = useQuery(
-    ['venda-xml', ],
+    ['vendas-gnre', ],
     () => fetchListaVendasContigencia(),
     { enabled: false, staleTime: 60 * 60 * 1000 }
   );
@@ -224,7 +223,7 @@ export const ActionPesquisaVendasGnre = ({ usuarioLogado }) => {
   }
 
   const handleClick = () => {
-    refetchVendasContigencia(marcaSelecionada)
+    refetchVendasContigencia()
     setTabelaVisivel(true);
   };
 
@@ -242,22 +241,15 @@ export const ActionPesquisaVendasGnre = ({ usuarioLogado }) => {
       <ActionMain
         linkComponentAnterior={["Home"]}
         linkComponent={["Lista de Vendas"]}
-        title=" Vendas Em Contingência"
+        title=" Vendas GNRE"
         subTitle="Nome da Loja"
 
-        InputFieldDTInicioComponent={InputField}
-        labelInputFieldDTInicio={"Data Início"}
-        valueInputFieldDTInicio={dataPesquisaInicio}
-        onChangeInputFieldDTInicio={e => setDataPesquisaInicio(e.target.value)}
-        onKeyDownInputFieldDTInicio={handleKeyPress}
-
-
-        InputFieldDTFimComponent={InputField}
-        labelInputFieldDTFim={"Data Fim"}
-        valueInputFieldDTFim={dataPesquisaFim}
-        onChangeInputFieldDTFim={e => setDataPesquisaFim(e.target.value)}
-        onKeyDownInputFieldDTFim={handleKeyPress}
-
+        InputFieldCodBarraComponent={InputField}
+        labelInputFieldCodBarra={"DocEntry"}
+        placeHolderInputFieldCodBarra="Digite o DocEntry"
+        valueInputFieldCodBarra={nDocumento}
+        onChangeInputFieldCodBarra={e => setNDocumento(e.target.value)}
+        onKeyDownInputFieldCodBarra={handleKeyPress}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Atualizar Dados"}
@@ -265,11 +257,11 @@ export const ActionPesquisaVendasGnre = ({ usuarioLogado }) => {
         IconSearch={AiOutlineSearch}
         corSearch={"primary"}
 
-        ButtonTypeCadastro={ButtonType}
-        linkNome={"Download XML"}
-        corCadastro={"success"}
-        IconCadastro={AiOutlineDownload}
-        onButtonClickCadastro={handleDownloadXmlEmLote}
+        // ButtonTypeCadastro={ButtonType}
+        // linkNome={"Download XML"}
+        // corCadastro={"success"}
+        // IconCadastro={AiOutlineDownload}
+        // onButtonClickCadastro={handleDownloadXmlEmLote}
       />
 
 

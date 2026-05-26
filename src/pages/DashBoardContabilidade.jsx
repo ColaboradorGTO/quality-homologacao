@@ -15,7 +15,7 @@ const ActionPesquisaVendasXML = lazy(() => import("../componets/Contabilidade/Co
 const ActionPesquisaProductoPreco = lazy(() => import("../componets/Contabilidade/Components/ActionProdutoPreco/actionPesquisaProdutosPreco").then(module => ({ default: module.ActionPesquisaProductoPreco })));
 const ActionPesquisaAlvaraEmpresa = lazy(() => import("../componets/Contabilidade/Components/ActionAlvaraEmpresas/actionPesquisaAlvaraEmpresa").then(module => ({ default: module.ActionPesquisaAlvaraEmpresa })));
 const ActionPesquisaNcmExcecao = lazy(() => import("../componets/Contabilidade/Components/ActionNcmExcecao/actionPesquisaNcmExcecao").then(module => ({ default: module.ActionPesquisaNcmExcecao })));
-
+const ActionPesquisaVendasGnre = lazy(() => import("../componets/Contabilidade/Components/ActionGerarGnre/actionPesquisaVendasGnre").then(module => ({ default: module.ActionPesquisaVendasGnre })));
 
 export const DashBoardContabilidade = () => {
   const [resumoVisivel, setResumoVisivel] = useState(true);
@@ -114,7 +114,7 @@ export const DashBoardContabilidade = () => {
       component = <ActionPesquisaNcmExcecao  usuarioLogado={usuarioLogado} ID={ID} />;
       break;
        case "/contabilidade/ActionPesquisaGnre":
-      component = <ActionPesquisaAlvaraEmpresa  usuarioLogado={usuarioLogado} ID={ID} />;
+      component = <ActionPesquisaVendasGnre usuarioLogado={usuarioLogado} ID={ID} />;
       break;
     default:
       break;
