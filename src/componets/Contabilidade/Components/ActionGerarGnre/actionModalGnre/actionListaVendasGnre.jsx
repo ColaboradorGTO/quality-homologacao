@@ -17,8 +17,8 @@ import { ColumnGroup } from "primereact/columngroup";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import { FiSend } from "react-icons/fi";
-import { ActionVendasGnreModal } from "./actionModalGnre/actionVendasGnreModal";
-import gnre from "../../../../../public/img/icons/marca-gnre.png"
+
+
 export const ActionListaVendasGnre = ({
   dadosVendasGnre,
   usuarioLogado,
@@ -211,35 +211,6 @@ export const ActionListaVendasGnre = ({
     </ColumnGroup>
   )
 
-    const handleEdit = async (DocEntry) => {
-      try {
-        const response = await get(`/vendas-gnre?docEntry=${DocEntry}`);
-        if (response.data && response.data.length > 0) {
-
-          setDadosDetalhesVendas(response.data)
-           console.log('dadosDetalhesVendas', dadosDetalhesVendas);
-          setModalVendas(true);
-        } else {
-          Swal.fire({
-            icon: 'info',
-            title: 'Sem Detalhes',
-            html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Não foi possível encontrar os detalhes para esta venda.`,
-            customClass: {
-            }
-          })
-        }
-  
-      } catch (error) {
-        console.error('Erro ao buscar detalhes da venda: ', error);
-      }
-    };
-  
-  
-    const handleClickEdit = (row) => {
-      if (row && row.DocEntry) {
-        handleEdit(row.DocEntry);
-      }
-    };
   
   return (
 
@@ -287,54 +258,17 @@ export const ActionListaVendasGnre = ({
             <Column field="municipioEmitente" header="Município Emitente" body={row => <th style={{ margin: '0px', fontSize: '0.8rem' }}>{row.municipioEmitente}</th>} sortable={true} />
             {/* <Column field="CEP" header="CEP" body={row => <th style={{ margin: '0px' }}>{row.CEP}</th>} sortable={true} /> */}
         
-            <Column field="CPFCNPJDest" header="CPF/CNPJ" body={row => <th style={{ margin: '0px', fontSize: '0.8rem' }}>{row.CPFCNPJDestinatario}</th>} sortable={true} />
+            <Column field="CPFCNPJDest" header="CPF/CNPJ" body={row => <th style={{ margin: '0px', fontSize: '0.8rem' }}>{row.CPFCNPJDest}</th>} sortable={true} />
             <Column field="xNomeDestinatario" header="Destinatário" body={row => <p style={{ width: '200px', margin: '0px', fontSize: '0.8rem', fontWeight: 600 }}>{row.xNomeDestinatario}</p>} sortable={true} />
             <Column field="xMunDest" header="Município" body={row => <th style={{ margin: '0px', fontSize: '0.8rem' }}>{row.xMunDest}</th>} sortable={true} />
             <Column field="municipioDestinatario" header="Nº Município" body={row => <th style={{ margin: '0px', fontSize: '0.8rem' }}>{row.municipioDestinatario}</th>} sortable={true} />
             <Column field="vNF" header="Valor NF" body={row => <th style={{ margin: '0px', fontSize: '0.8rem' }}>{formatMoeda(row.vNF)}</th>} sortable={true} />
-            <Column header="Ações" body={(row) => (
-              <div style={{ justifyContent: "space-between", display: "flex" }}>
-                <div className="p-1">
-                  <ButtonTable
-                    titleButton={"Gerar GNRE"}
-                    onClickButton={() => handleClickEdit(row)}
-                    Icon={FiSend}
-                    iconSize={20}
-                    iconColor={"#fff"}
-                    cor={"success"}
-                    width="30px"
-                    height="30px"
-                  />
-                </div>
-                <div className="p-1">
-                  <ButtonTable
-                    titleButton={"Visualizar XML"}
-                    onClickButton={() => handleClickEdit(row)}
-                    Icon={GrView}
-                    iconSize={20}
-                    iconColor={"#fff"}
-                    cor={"primary"}
-                    width="30px"
-                    height="30px"
-                  />
-                </div>
 
-              </div>
-            )} 
-        
-          />  
+
           </DataTable>
         </div>
       </div>
-      <ActionVendasGnreModal 
-        show={modalVendas}
-        handleClose={() => setModalVendas(false)}
-        dadosDetalhesVendas={dadosDetalhesVendas}
-        optionsModulos={optionsModulos}
-        usuarioLogado={usuarioLogado}
-      
-      />
+
     </Fragment>
   )
- 
 }
