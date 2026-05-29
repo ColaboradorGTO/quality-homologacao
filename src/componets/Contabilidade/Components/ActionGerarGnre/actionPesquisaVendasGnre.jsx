@@ -257,11 +257,6 @@ export const ActionPesquisaVendasGnre = ({ usuarioLogado }) => {
         IconSearch={AiOutlineSearch}
         corSearch={"primary"}
 
-        // ButtonTypeCadastro={ButtonType}
-        // linkNome={"Download XML"}
-        // corCadastro={"success"}
-        // IconCadastro={AiOutlineDownload}
-        // onButtonClickCadastro={handleDownloadXmlEmLote}
       />
 
 
