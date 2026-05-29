@@ -7,6 +7,7 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../../Tables/headerTable";
+import { dataFormatada } from "../../../../../../api/src/utils/dataFormatada";
 
 export const ActionListaTransacoesLojas = ({ dadosTransacoesEmpresas, dataPesquisa }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
@@ -85,7 +86,7 @@ export const ActionListaTransacoesLojas = ({ dadosTransacoesEmpresas, dataPesqui
     {
       field: 'dataPesquisa',
       header: 'Data',
-      body: row => <th style={{ color: 'blue' }}>{row.dataPesquisa}</th>,
+      body: row => <th style={{ color: 'blue' }}>{dataFormatada(row.dataPesquisa)}</th>,
       sortable: true,
       dataKey: 'dataPesquisa',
     },
