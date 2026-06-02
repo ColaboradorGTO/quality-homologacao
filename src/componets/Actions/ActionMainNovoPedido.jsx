@@ -675,7 +675,6 @@ export const ActionMainNovoPedido = ({
                         Icon={IconClonar}
                         iconColor="#000"
                         iconSize={16}
-                        // style={styleClonar}
                         visibilityBTN={styleClonar}
                       />
                     )}

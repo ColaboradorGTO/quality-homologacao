@@ -2,22 +2,31 @@ import { Fragment, useMemo } from "react"
 import { toFloat } from "../../../../../utils/toFloat";
 import { formatMoeda } from "../../../../../utils/formatMoeda";
 import "./styles.css";
+import { maskValorEmInteiro } from "../../../../../utils/mascaraValor";
 
 export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
 
   const processarGradeCompleta = (detalhegrade) => {
     if (!detalhegrade || !Array.isArray(detalhegrade)) return '';
-    
-    const tablegrade = detalhegrade.map(({ DSTAMANHO, INDICETAMANHO }) => 
-      `<div style="display: inline-block; text-align: center; margin: 0 2px; font-size: 8px; width: 4.5%; font-family: 'Verdana, sans-serif';">
-        ${DSTAMANHO}<br/><b>${INDICETAMANHO}</b>
-      </div>`
+
+    const tablegrade = detalhegrade.map(({ DSTAMANHO, INDICETAMANHO }) =>
+      `
+      <table width="100%" class="rowGradeTable">
+        <tbody >
+          <tr style="display: table-row; margin: 0; padding: 1px; font-family: 'Verdana';">
+            <td align="center" style="font-size: 08px;" width="4.5%">
+              ${DSTAMANHO}<br/><b>${INDICETAMANHO}</b>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    `
     ).join('');
-    
+
     return tablegrade;
   };
 
- 
+
   const { dadosAgrupados, totalGeral } = useMemo(() => {
     const grupos = {};
     let totalVrGeral = 0;
@@ -27,26 +36,26 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
     dadosDetalhePedido.forEach((item) => {
       const detpedido = item.detpedido;
       const detalhegrade = item.detalhegrade;
-      
-     
+
+
       const grupoChave = `${detpedido?.DSGRUPOESTRUTURA} / ${detpedido?.DSSUBGRUPOESTRUTURA}`;
-      
-   
-      const TpModPedido = detpedido?.DSCATEGORIAPEDIDO; 
+
+
+      const TpModPedido = detpedido?.DSCATEGORIAPEDIDO;
       const txtCxTec = TpModPedido === 'CALCADOS' ? 'Caixas' : 'Tecido';
-      const DadosCxTecido = TpModPedido === 'CALCADOS' ? 
-        Math.round(detpedido?.NUCAIXA || 0) : 
+      const DadosCxTecido = TpModPedido === 'CALCADOS' ?
+        Math.round(detpedido?.NUCAIXA || 0) :
         detpedido?.DSTIPOTECIDO;
 
       contadorGeral++;
       const vrTotal = toFloat(detpedido?.VRTOTALDETALHEPEDIDO);
       const qtdTotal = toFloat(detpedido?.QTDTOTAL);
 
-      
+
       totalVrGeral += vrTotal;
       totalQtdGeral += qtdTotal;
 
-     
+
       if (!grupos[grupoChave]) {
         grupos[grupoChave] = {
           nome: grupoChave,
@@ -56,7 +65,7 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
         };
       }
 
-    
+
       const itemProcessado = {
         contador: contadorGeral,
         QTDTOTAL: qtdTotal,
@@ -148,8 +157,8 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
               <Fragment key={grupoIndex}>
                 {/* Header do Grupo */}
                 <tr className="group">
-                  <td colSpan="14" style={{padding: "5px" }}>
-                    <label style={{textAlign: "left", color: "blue", fontSize: "12px", lineHeight: "18px", fontWeight: 500, fontFamily: 'Verdana' }}>
+                  <td colSpan="14" style={{ padding: "5px" }}>
+                    <label style={{ textAlign: "left", color: "blue", fontSize: "12px", lineHeight: "18px", fontWeight: 500, fontFamily: 'Verdana' }}>
                       <strong>{grupo.nome}</strong>
                     </label>
                   </td>
@@ -157,9 +166,9 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
 
                 {/* Itens do Grupo */}
                 {grupo.itens.map((item, itemIndex) => (
-                  <tr 
-                    key={itemIndex} 
-                    role="row" 
+                  <tr
+                    key={itemIndex}
+                    role="row"
                     className={itemIndex % 2 === 0 ? "even" : "odd"}
                   >
                     <td className="tdCount">{item.contador}</td>
@@ -174,88 +183,114 @@ export const ActionListaDetalheSempreco = ({ dadosDetalhePedido }) => {
                     <td className="td">{item.STREDESOCIAL}</td>
                     <td className="td">{item.OBSPRODUTO}</td>
                     <td className="td">
-                      <div dangerouslySetInnerHTML={{ __html: item.gradeCompleta }} />
+                      <div style={{ display: "flex" }} dangerouslySetInnerHTML={{ __html: item.gradeCompleta }} />
                     </td>
                     <td className="td">{formatMoeda(item.VRUNITLIQDETALHEPEDIDO)}</td>
                     <td className="td">{formatMoeda(item.VRTOTALDETALHEPEDIDO)}</td>
                   </tr>
                 ))}
+                <tr className="group">
+                  <td colSpan="15" style={{ textAlign: "right", padding: "5px" }}>
+                    <label >
+                      <strong style={{ textAlign: "right", color: "blue", fontSize: "12px", lineHeight: "18px", fontWeight: 500 }}>{formatMoeda(grupo.subtotalVr)}</strong>
+                    </label>
+                  </td>
+                </tr>
               </Fragment>
             ))}
           </tbody>
 
           {/* Total Geral */}
-          <div style={{width: "100%", display: "flex", justifyContent: "flex-end", marginTop: "15px"}}>
+          <div style={{ width: "100%", display: "flex", justifyContent: "flex-end", marginTop: "15px" }}>
 
           </div>
-            <tbody style={{border: "solid 1px #000", fontFamily: 'Verdana'}}>
-              <tr >
-                <td 
-                  className="pr-2" 
-                  align="center" 
-                  style={{
-                    fontWeight: 700, 
-                    color: "#666", 
-                    border: "solid 1px #000", 
-                    textAlign: "left", 
-                    fontSize: "14px",
-                    lineHeight: "15px",
-                    fontFamily: 'Verdana'
-                  }}
-                  colSpan={1}
-                >
-                  Qtd Total 
-                </td>
-                <td 
-                  align="center" 
-                  style={{
-                    fontWeight: 700, 
-                    color: "#666", 
-                    border: "solid 1px #000", 
-                    textAlign: "center", 
-                    fontSize: "12px",
-                    lineHeight: "15px",
-                    fontFamily: 'Verdana'
-                  }}
-                  colSpan={2}
-                >
-                  <b>{Math.round(totalGeral.totalQtdGeral)}</b>
-                </td>
-                <td 
-                  className="pr-2 " 
-                  align="center"
-                  style={{
-                    fontWeight: 700, 
-                    color: "#666", 
-                    border: "solid 1px #000", 
-                    textAlign: "end", 
-                    fontSize: "12px",
-                    lineHeight: "15px",
-                    fontFamily: 'Verdana',
-                    
-                  }}
-                  colSpan={10}
-                >
-                  <p><b>Valor Total </b></p>
-                </td>
-                <td 
-                  align="center" 
-                  style={{
-                    fontWeight: 700, 
-                    color: "#666", 
-                    border: "solid 1px #000", 
-                    textAlign: "end", 
-                    fontSize: "14px",
-                    lineHeight: "15px",
-                    fontFamily: 'Verdana'
-                  }}
-                  colSpan={1}
-                >
-                  {formatMoeda(totalGeral.totalVrGeral)}
-                </td>
+          <tbody style={{ border: "solid 1px #000", fontFamily: 'Verdana' }}>
+            <tr >
+              <td
+                className="pr-2"
+                align="center"
+                style={{
+                  fontWeight: 700,
+                  color: "#666",
+                  border: "solid 1px #000",
+                  textAlign: "left",
+                  fontSize: "14px",
+                  lineHeight: "15px",
+                  fontFamily: 'Verdana'
+                }}
+                colSpan={1}
+              >
+                Qtd Total
+              </td>
+              <td
+                align="center"
+                style={{
+                  fontWeight: 700,
+                  color: "#666",
+                  border: "solid 1px #000",
+                  textAlign: "center",
+                  fontSize: "12px",
+                  lineHeight: "15px",
+                  fontFamily: 'Verdana'
+                }}
+                colSpan={2}
+              >
+                <b>{maskValorEmInteiro(totalGeral.totalQtdGeral)}</b>
+              </td>
+              <td
+                className="pr-2 "
+                align="center"
+                style={{
+                  fontWeight: 700,
+                  color: "#666",
+                  border: "solid 1px #000",
+                  textAlign: "end",
+                  fontSize: "12px",
+                  lineHeight: "15px",
+                  fontFamily: 'Verdana',
+
+                }}
+                colSpan={10}
+              >
+                <p><b>Valor Total </b></p>
+              </td>
+              <td
+                align="center"
+                style={{
+                  fontWeight: 700,
+                  color: "#666",
+                  border: "solid 1px #000",
+                  textAlign: "end",
+                  fontSize: "14px",
+                  lineHeight: "15px",
+                  fontFamily: 'Verdana'
+                }}
+                colSpan={1}
+              >
+                {formatMoeda(totalGeral.totalVrGeral)}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div style={{ width: "100% !important" }}>
+          <table className="semborda">
+            <tbody>
+              <tr>
+                <th style={{ textAlign: "left", fontSize: "14px" }}>QTD Produtos : </th>
+                <th style={{ textAlign: "right", fontSize: "14px" }}>
+                  <b>{maskValorEmInteiro(totalGeral.totalQtdGeral)}</b>
+                </th>
+              </tr>
+              <tr>
+                <th style={{ textAlign: "left", fontSize: "14px" }}>Valor Total Compra : </th>
+                <th style={{ textAlign: "right", fontSize: "14px", paddingLeft: "10px" }}>
+                  <b>{formatMoeda(totalGeral.totalVrGeral)}</b>
+                </th>
               </tr>
             </tbody>
-        </table>
+          </table>
+        </div>
       </div>
     </Fragment>
   )

@@ -31,8 +31,8 @@ export const ActionListaDetalhe = ({ dadosDetalhePedido }) => {
     const grupos = {};
     let totalVrGeral = 0;
     let totalQtdGeral = 0;
-    let totalVrVendaPedidosImprimir = 0; // ✅ 2. Variável que faltava
-    let totalVrLucroPedidoImprimir = 0;  // ✅ 3. Variável que faltava
+    let totalVrVendaPedidosImprimir = 0; 
+    let totalVrLucroPedidoImprimir = 0;  
     let totalPercLucroImprimir = 0;   
     let contadorGeral = 0;
 

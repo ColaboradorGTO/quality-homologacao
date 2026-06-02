@@ -134,127 +134,181 @@ export const ActionPesquisaNovoPedido = ({
     refetchListaCadastroProdutoPedidos,
     refetchListaProdutoPedidos,
     handleFecharPedido,
-    handleClonarCabecalhoPedido
+    handleClonarCabecalhoPedido,
+    titleSubheader,
+    setTituloSubheader,
+    camposHabilitados,
+    setCamposHabilitados,
+    checkboxIntermediario,
+    setCheckboxIntermediario
   } = useIncluirProutoPedido({ usuarioLogado, optionsModulos });
 
-  // useEffect(() => {
-  //   console.log('🔍 dadosVisualizarPedido:', dadosVisualizarPedido); // DEBUG
-    
-  //   // VALIDAÇÃO MAIS ROBUSTA
-  //   if (!dadosVisualizarPedido || !Array.isArray(dadosVisualizarPedido) || dadosVisualizarPedido.length === 0) {
-  //     console.log('❌ Dados não disponíveis ou inválidos');
-  //     return;
-  //   }
+  const [botoesVisiveis, setBotoesVisiveis] = useState({
+    incluir: true,
+    fechar: true,
+    salvar: false,
+    clonar: false,
+    clonarCabecalho: true,
+    novoPedido: true
+  });
 
-  //   const dados = dadosVisualizarPedido[0];
-  //   console.log('📋 Dados do pedido:', dados); // DEBUG
-
-  //   // ========== VARIÁVEIS COM VALIDAÇÃO ==========
-  //   const IdAndamentoPedido = parseInt(dados?.IDANDAMENTO || '0', 10);
-  //   const StCancelaPedido = String(dados?.STCANCELADO || 'False').trim();
-  //   const IDPEDIDORESUMO = String(dados?.IDPEDIDO || '');
-  //   const stMigradoSap = String(dados?.STMIGRADOSAP || 'False') === 'True';
-  //   const stPedidoPorIntermediario = String(dados?.STPEDIDOPRIMARIO || 'False') === 'True';
-  //   const idPedidoPrimario = parseInt(dados?.IDPEDIDOPRIMARIO || '0', 10);
-
-  //   console.log('🎯 Variáveis processadas:', {
-  //     IdAndamentoPedido,
-  //     StCancelaPedido,
-  //     IDPEDIDORESUMO,
-  //     stMigradoSap,
-  //     stPedidoPorIntermediario,
-  //     idPedidoPrimario
-  //   }); // DEBUG
-
-  //   // ========== LÓGICA PRINCIPAL ==========
-  //   let novosBotoesVisiveis = {
-  //     incluir: false,
-  //     fechar: false,
-  //     salvar: false,
-  //     clonar: false,
-  //     clonarCabecalho: false,
-  //     novoPedido: true // SEMPRE VISÍVEL
-  //   };
-    
-  //   let camposDevemEstarHabilitados = false;
-  //   let novoTitulo = '';
-
-  //   // ========== CONDIÇÃO 1: Pedido cancelado OU em andamento (2-14) ==========
-  //   if (StCancelaPedido === 'True' || (IdAndamentoPedido >= 2 && IdAndamentoPedido < 15)) {
-  //     console.log('🚫 Condição 1: Pedido cancelado ou em andamento');
+  useEffect(() => {
+      // console.log('🔍 dadosVisualizarPedido:', dadosVisualizarPedido); // DEBUG
       
-  //     // Botão clonar só aparece em condições específicas
-  //     const clonarVisivel = !(StCancelaPedido === 'True' && IdAndamentoPedido !== 2 && IdAndamentoPedido !== 5);
+      // VALIDAÇÃO MAIS ROBUSTA
+      if (!dadosVisualizarPedido || !Array.isArray(dadosVisualizarPedido) || dadosVisualizarPedido.length === 0) {
+        console.log('❌ Dados não disponíveis ou inválidos');
+        return;
+      }
+  
+      const dados = dadosVisualizarPedido[0];
+      // console.log('📋 Dados do pedido:', dados); // DEBUG
+  
+      // ========== VARIÁVEIS COM VALIDAÇÃO ==========
+      const IdAndamentoPedido = parseInt(dados?.IDANDAMENTO || '0', 10);
+      const StCancelaPedido = String(dados?.STCANCELADO || 'False').trim();
+      const IDPEDIDORESUMO = String(dados?.IDPEDIDO || '');
+      const dsSetorAndamentoPedido = String(dados?.DSSETOR || '');
+      const stCancelado = StCancelaPedido === 'True';
+      const stMigradoSap = String(dados?.STMIGRADOSAP || 'False') === 'True';
+      const stPedidoPorIntermediario = String(dados?.STPEDIDOPRIMARIO || 'False') === 'True';
+      const idPedidoPrimario = parseInt(dados?.IDPEDIDOPRIMARIO || '0', 10);
+      const isPedidoSecundario = idPedidoPrimario > 0;
+  
+      // console.log('🎯 Variáveis processadas:', {
+      //   IdAndamentoPedido,
+      //   StCancelaPedido,
+      //   IDPEDIDORESUMO,
+      //   stMigradoSap,
+      //   stPedidoPorIntermediario,
+      //   idPedidoPrimario
+      // }); // DEBUG
+  
+      // ========== LÓGICA PRINCIPAL ==========
+      const clonarVisivelPadrao = !(stCancelado && IdAndamentoPedido !== 2 && IdAndamentoPedido !== 5);
+  
+      let novosBotoesVisiveis = {
+        incluir: false,
+        fechar: false,
+        salvar: false,
+        clonar: clonarVisivelPadrao,
+        clonarCabecalho: true,
+        novoPedido: true // SEMPRE VISÍVEL
+      };
       
-  //     novosBotoesVisiveis = {
-  //       ...novosBotoesVisiveis,
-  //       clonar: clonarVisivel
-  //     };
+      let camposDevemEstarHabilitados = false;
+      let novoTitulo = '';
+  
+      // ========== CONDIÇÃO 1: Pedido cancelado OU em andamento (2-14) ==========
+      if (StCancelaPedido === 'True' || (IdAndamentoPedido >= 2 && IdAndamentoPedido < 15)) {
+        novosBotoesVisiveis = {
+          ...novosBotoesVisiveis,
+        };
+        
+        camposDevemEstarHabilitados = false;
+        
+        if (IdAndamentoPedido >= 2 && IdAndamentoPedido < 15) {
+          novoTitulo = `Visualizar Pedido Nº: ${IDPEDIDORESUMO}`;
+        }
+      } 
+      // ========== CONDIÇÃO 2: Inclusão (1) OU Alteração (15) ==========
+      else if (IdAndamentoPedido === 1 || IdAndamentoPedido === 15) {
+        novosBotoesVisiveis = {
+          ...novosBotoesVisiveis,
+          incluir: true,
+          fechar: true,
+          salvar: true,
+          clonarCabecalho: true
+        };
+        
+        camposDevemEstarHabilitados = true;
+        
+        const tipoOperacao = IdAndamentoPedido === 1 ? 'Inclusão' : 'Alteração';
+        novoTitulo = `${tipoOperacao} - Pedido Nº: ${IDPEDIDORESUMO}`;
+      }
+  
+      // ========== CONDIÇÃO 3: Se migrado para SAP ==========
+      if (stMigradoSap) {
+        camposDevemEstarHabilitados = false;
+      }
       
-  //     camposDevemEstarHabilitados = false;
+      // ========== CONDIÇÃO 4: Pedido secundário ==========
+      if (idPedidoPrimario > 0) {
+        novosBotoesVisiveis = {
+          incluir: false,
+          fechar: false,
+          salvar: false,
+          clonar: false,
+          clonarCabecalho: false,
+          novoPedido: true 
+        };
+        camposDevemEstarHabilitados = false;
+      }
+  
+      // console.log('🎯 Estados finais:', {
+      //   novosBotoesVisiveis,
+      //   camposDevemEstarHabilitados,
+      //   novoTitulo
+      // }); // DEBUG
+  
+      // ========== APLICAR ESTADOS ==========
+      let statusTitleSubHeader = stCancelado
+        ? (
+          <span className="text-danger fw-900 pl-1">
+            CANCELADO <i className="fal fa-times ml-1"></i>
+          </span>
+        )
+        : (
+          <>
+            <span className="text-warning fw-900 pl-1">
+              Bloqueado <CiLock />
+            </span>
+            {` -> Está no Setor: ${dsSetorAndamentoPedido}`}
+          </>
+        );
+  
+      if (!stCancelado && (IdAndamentoPedido === 1 || IdAndamentoPedido === 15)) {
+        statusTitleSubHeader = IdAndamentoPedido === 1
+          ? (
+            <span className="text-primary fw-700 pl-1">
+              Inclusão Liberada <FaCheck />
+            </span>
+          )
+          : (
+            <span className="text-info fw-700 pl-1">
+              Alteração Liberada <FaCheck />
+            </span>
+          );
+      }
+  
+      let prefixoTituloPedido = 'Pedido ';
+  
+      if (isPedidoSecundario) {
+        prefixoTituloPedido += 'Secundário ';
+      } else if (stPedidoPorIntermediario) {
+        prefixoTituloPedido += 'Primário ';
+      }
+  
+      novoTitulo = (
+        <>
+          {`${prefixoTituloPedido}Nº: ${IDPEDIDORESUMO}`}
+          {' - '}
+          {statusTitleSubHeader}
+        </>
+      );
+  
+      setBotoesVisiveis(novosBotoesVisiveis);
+      setCamposHabilitados(camposDevemEstarHabilitados);
+      setTituloSubheader(novoTitulo);
       
-  //     if (IdAndamentoPedido >= 2 && IdAndamentoPedido < 15) {
-  //       novoTitulo = `Pedido Nº: ${IDPEDIDORESUMO}`;
-  //     }
-  //   } 
-  //   // ========== CONDIÇÃO 2: Inclusão (1) OU Alteração (15) ==========
-  //   else if (IdAndamentoPedido === 1 || IdAndamentoPedido === 15) {
-  //     console.log('✅ Condição 2: Inclusão ou Alteração');
+      setCheckboxIntermediario({
+        disabled: idPedidoPrimario > 0 || stPedidoPorIntermediario || stMigradoSap,
+        checked: idPedidoPrimario > 0 || stPedidoPorIntermediario
+      });
       
-  //     novosBotoesVisiveis = {
-  //       ...novosBotoesVisiveis,
-  //       incluir: true,
-  //       fechar: true,
-  //       salvar: true,
-  //       clonar: true,
-  //       clonarCabecalho: true
-  //     };
+      setIdPedidoPrimario(idPedidoPrimario);
       
-  //     camposDevemEstarHabilitados = true;
-      
-  //     const tipoOperacao = IdAndamentoPedido === 1 ? 'Inclusão' : 'Alteração';
-  //     novoTitulo = `${tipoOperacao} - Pedido Nº: ${IDPEDIDORESUMO}`;
-  //   }
-
-  //   // ========== CONDIÇÃO 3: Se migrado para SAP ==========
-  //   if (stMigradoSap) {
-  //     console.log('🔒 SAP: Desabilitando campos');
-  //     camposDevemEstarHabilitados = false;
-  //   }
-    
-  //   // ========== CONDIÇÃO 4: Pedido secundário ==========
-  //   if (idPedidoPrimario > 0) {
-  //     console.log('🔗 Pedido secundário: Ocultando botões');
-  //     novosBotoesVisiveis = {
-  //       incluir: false,
-  //       fechar: false,
-  //       salvar: false,
-  //       clonar: false,
-  //       clonarCabecalho: false,
-  //       novoPedido: true // SEMPRE VISÍVEL
-  //     };
-  //     camposDevemEstarHabilitados = false;
-  //   }
-
-  //   console.log('🎯 Estados finais:', {
-  //     novosBotoesVisiveis,
-  //     camposDevemEstarHabilitados,
-  //     novoTitulo
-  //   }); // DEBUG
-
-  //   // ========== APLICAR ESTADOS ==========
-  //   setBotoesVisiveis(novosBotoesVisiveis);
-  //   setCamposHabilitados(camposDevemEstarHabilitados);
-  //   setTituloSubheader(novoTitulo);
-    
-  //   setCheckboxIntermediario({
-  //     disabled: idPedidoPrimario > 0 || stPedidoPorIntermediario || stMigradoSap,
-  //     checked: idPedidoPrimario > 0 || stPedidoPorIntermediario
-  //   });
-    
-  //   setIdPedidoPrimario(idPedidoPrimario);
-    
-  // }, [dadosVisualizarPedido]); 
+    }, [dadosVisualizarPedido]);  
 
 
   const calcularTotal = (field) => {
@@ -639,30 +693,35 @@ export const ActionPesquisaNovoPedido = ({
         onButtonClickSearch={clonarCabecalho}
         corSearch={"primary"}
         IconSearch={MdMenu}
+        styleSearch={botoesVisiveis.incluir}
 
         ButtonTypeCancelar={ButtonType}
         linkCancelar={"Fechar Pedido"}
         onButtonClickCancelar={handleFecharPedido}
         corCancelar={"danger"}
         IconCancelar={MdOutlineVisibility}
+        styleCancelar={botoesVisiveis.fechar}
 
         ButtonTypeCadastro={ButtonType}
         linkNome={"Novo Pedido"}
         onButtonClickCadastro={() => handleNovoPedido()}
         corCadastro={"success"}
         IconCadastro={MdOutlineCheck}
+        styleCadastro={botoesVisiveis.novoPedido}
 
         ButtonTypePedido={ButtonType}
         linkPedido={"Clonar Cabeçalho Pedido"}
         onButtonClickPedido={() =>  handleClonarCabecalhoPedido()}
         corPedido={"warning"}
         IconPedido={MdOutlinePictureAsPdf}
+        stylePedido={botoesVisiveis.clonarCabecalho}
 
         ButtonTypeTXT={ButtonType}
         linkTXT={"Salvar Cabeçalho Pedido"}
         onButtonClickTXT={() => handleSalvarPedido()}
         corTXT={"info"}
         IconTXT={AiOutlineSave}
+        styleTXT={botoesVisiveis.salvar}
       />
 
         {/* {console.log(pendenciasFornecedor, 'len')} */}

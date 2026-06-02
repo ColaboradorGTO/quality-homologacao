@@ -1,7 +1,7 @@
 import { Fragment } from "react"
 import { Modal } from "react-bootstrap"
 import { HeaderModal } from "../../../../../Modais/HeaderModal/HeaderModal";
-import { FormularioIncluirProdutoPedido } from "./formularioIncluir";
+// import { FormularioIncluirProdutoPedido } from "./formularioIncluir";
 
 export const ActionIncluirProdutoPedidoModal = ({
   show, 
@@ -33,7 +33,7 @@ export const ActionIncluirProdutoPedidoModal = ({
 
         <Modal.Body>
 
-          <FormularioIncluirProdutoPedido 
+          {/* <FormularioIncluirProdutoPedido 
             handleClose={handleClose}
             usuarioLogado={usuarioLogado}
             optionsModulos={optionsModulos}
@@ -41,7 +41,7 @@ export const ActionIncluirProdutoPedidoModal = ({
             dadosDetalhePedido={dadosDetalhePedido}
             dadosPedidosDetalhe={dadosPedidosDetalhe}
             dadosVisualizarPedido={dadosVisualizarPedido}
-         />
+         /> */}
           
         </Modal.Body>
       </Modal>

@@ -62,6 +62,22 @@ export const useIncluirProutoPedido = ({
     const [btnClonarCabecalho, setBtnClonarCabecalho] = useState(false);
     const [btnNovoPedido, setBtnNovoPedido] = useState(true); 
 
+    const [camposHabilitados, setCamposHabilitados] = useState(false);
+    const [tituloSubheader, setTituloSubheader] = useState('');
+    const [totalBruto, setTotalBruto] = useState(0);
+    const [totalItens, setTotalItens] = useState(0);
+    const [qtdProdutos, setQtdProdutos] = useState(0);
+    const [valorLiquido, setValorLiquido] = useState(0);
+    const [setorAndamento, setSetorAndamento] = useState('');
+    const [detalheProdutoPedido, setDetalheProdutoPedido] = useState([]);
+    const [dadosDetalheProdutoPedido, setDadosDetalheProdutoPedido] = useState([]);
+    const [checkboxIntermediario, setCheckboxIntermediario] = useState({
+        disabled: false,
+        checked: false
+    });
+    const [dadosProdutosPedido, setDadosProdutosPedido] = useState([]);
+
+
     useEffect(() => {
         const data = getDataAtual();
         setDataPesquisaInicio(data);
@@ -712,7 +728,7 @@ export const useIncluirProutoPedido = ({
             }
         });
 
-        
+    
         const data = {
             IDRESUMOPEDIDO: idResumoAtual,
             IDGRUPOEMPRESARIAL: parseFloat(marcaSelecionada?.value),
@@ -824,95 +840,62 @@ export const useIncluirProutoPedido = ({
 
     const handleClonarCabecalhoPedido = async () => {
         try {
-            // ========== 1. CONFIRMAÇÃO DO USUÁRIO ==========
             const confirmacao = await Swal.fire({
                 icon: 'question',
                 title: 'Deseja realmente clonar o cabeçalho e iniciar outro pedido?',
                 text: 'Esta ação não poderá ser revertida!',
                 showCancelButton: true,
                 showConfirmButton: true,
-                confirmButtonText: 'Sim, Clonar',
+                confirmButtonText: 'Sim',
                 cancelButtonText: 'Cancelar',
             });
 
             if (!confirmacao.isConfirmed) {
-            return;
+                return;
             }
 
-            // ========== 2. OBTENÇÃO DA DATA ATUAL ==========
             const hoje = new Date();
             const dataAtualFormatada = hoje.toISOString().slice(0, 10); // YYYY-MM-DD
             
-            // ========== 3. ATUALIZAÇÃO DO TÍTULO E INTERFACE ==========
+            setDataPedido(dataAtualFormatada);
             setTituloSubheader('Novo Pedido');
-            
-            // Configuração dos botões para modo "Novo Pedido"
-            setBtnIncluir(true);       // Habilitar "Incluir Produtos"
-            setBtnFechar(false);       // Desabilitar "Fechar Pedido"
+
+            setBtnFechar(false);       
+            setBtnClonar(false);   
+            setBtnNovoPedido(false);  
+            setBtnIncluir(true);     
             setBtnSalvar(true);
-            setBtnClonar(false);      // Desabilitar "Clonar Produto"
-            setBtnClonarCabecalho(false); // Desabilitar "Clonar Cabeçalho"
-            setBtnNovoPedido(false);  // Desabilitar "Novo Pedido"
+            setBtnClonarCabecalho(false); 
 
-            // ========== 4. RESET DE IDs E VALORES ==========
-            setIdResumoPedido(0);               // Novo pedido = ID 0
-            setIdPedidoPrimario(0);             // Limpar pedido primário
-            setTotalLiq(0);                     // Valor líquido = 0
-            setDesconto1('0.00');               // Desconto 1 = 0
-            setDesconto2('0.00');               // Desconto 2 = 0
-            setDesconto3('0.00');               // Desconto 3 = 0
-            setComissao('0.00');                // Comissão = 0
+            
+            setIdResumoPedido('');               
+            setIdPedidoPrimario('');        
 
-            // ========== 5. ATUALIZAÇÃO DAS DATAS ==========
-            setDataPesquisaInicio(dataAtualFormatada); // Data do pedido = hoje
-            setDataPesquisaFim('');                     // Limpar data de entrega
+            setTotalLiq(0);      
+            setTotalBruto(0);
+            setTotalItens(0);
+            setQtdProdutos(0);
+            setValorLiquido(0);
 
-            // ========== 6. RESET DO STATUS DO PEDIDO ==========
-            // Aqui você define os valores equivalentes ao andamento 1 (COMPRAS)
-            // Se você tem variáveis de estado para isso:
-            // setIdAndamento(1);
-            // setSetorAndamento('COMPRAS');
-            // setStRascunho('True'); // Novo pedido começa como rascunho
+            setIdAndamento(1)
+            setSetorAndamento('COMPRAS');
 
-            // ========== 7. CONFIGURAÇÃO DO CHECKBOX INTERMEDIÁRIO ==========
-            setCheckboxIntermediario({
-                disabled: true,     // Desabilitado para novo pedido
-                checked: false      // Desmarcado
+            setDadosDetalheProdutoPedido([]);
+            setDadosProdutosPedido([]);
+            // setDadosDetalhePedido([]);
+    
+            setCamposHabilitados(true)
+                
+            setChecked(false);
+            setDisabledChecked(true);
+            setDadosDetalheProdutoPedido([]); 
+            setCheckboxIntermediario?.({
+                checked: false,
+                disabled: true,
+                readOnly: true
             });
-            setChecked(false);    // Estado do checkbox
 
-            // ========== 8. HABILITAÇÃO DOS CAMPOS ==========
-            setCamposHabilitados(true); // Habilitar todos os campos para edição
 
-            // ========== 9. LIMPAR LISTA DE PRODUTOS ==========
-            // Se você tem estado para lista de produtos do pedido:
-            setDadosDetalheProdutoPedido([]); // Lista vazia
-            // ou chamar refetch da lista:
-            // refetchListaDetalhePedidos?.();
-
-            // ========== 10. PRESERVAR DADOS DO CABEÇALHO ==========
-            // Os dados abaixo são MANTIDOS (clonados) do pedido anterior:
-            // - fornecedorSelecionado ✅ (mantém)
-            // - marcaSelecionada ✅ (mantém)
-            // - compradorSelecionado ✅ (mantém)
-            // - condicoesPagamentosSelecionado ✅ (mantém)
-            // - transportadoraSelecionada ✅ (mantém)
-            // - fiscalSelecionado ✅ (mantém)
-            // - freteSelecionado ✅ (mantém)
-            // - tipoPedidoSelecionado ✅ (mantém)
-            // - enviarSelecionado ✅ (mantém)
-            // - vendedor ✅ (mantém)
-            // - emailVendedor ✅ (mantém)
-            // - obsFornecedor ✅ (mantém)
-            // - obsInterna ✅ (mantém)
-
-            // ========== 11. VALIDAÇÃO DE FORNECEDOR (se necessário) ==========
-            // Equivalente a verificaDadosDoFornecedorSelecionado(false)
-            if (fornecedorSelecionado?.value) {
-                await verificaDadosDoFornecedorSelecionado?.(false);
-            }
-
-            // ========== 12. FEEDBACK DE SUCESSO ==========
             Swal.fire({
                 position: 'center',
                 icon: 'success',
@@ -921,16 +904,10 @@ export const useIncluirProutoPedido = ({
                 showConfirmButton: false,
                 timer: 3000
             });
-
-            // ========== 13. CALLBACK OPCIONAL PARA PARENT COMPONENT ==========
-            // Se o componente pai precisar saber que um novo pedido foi iniciado:
-            onNovoPedidoIniciado?.({
-                tipo: 'clone_cabecalho',
-                dataCriacao: dataAtualFormatada,
-                fornecedor: fornecedorSelecionado,
-                marca: marcaSelecionada
-            });
-
+            
+            
+            await verificaDadosDoFornecedorSelecionado?.(false);
+            
         } catch (error) {
             console.error('Erro ao clonar cabeçalho:', error);
             
@@ -1565,7 +1542,13 @@ export const useIncluirProutoPedido = ({
         dadosUltimosPedidos,
         dadosCabecalhoClonado,
         handleFecharPedido,
-        handleClonarCabecalhoPedido
+        handleClonarCabecalhoPedido,
+        tituloSubheader,
+        setTituloSubheader,
+        camposHabilitados,
+        setCamposHabilitados,
+        checkboxIntermediario,
+        setCheckboxIntermediario
     }
 }
 

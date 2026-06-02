@@ -48,7 +48,7 @@ export const ButtonTypeCompras = ({
           id={id}
           className={`${btnClasses} ${className}`}
           type={typeButton}
-          onClick={() => onClickButtonType()}
+          onClick={onClickButtonType}
           style={defaultStyle}
           disabled={disabledBTN}
           visible={visibilityBTN}

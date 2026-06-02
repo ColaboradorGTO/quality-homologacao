@@ -72,10 +72,15 @@ export const useIncluirProduto = ({
     );
 
     const { data: dadosCategoriaPedidos  = [], error: errorCategoriaPedidos, isLoading: isLoadingCategoriaPedidos, refetch: refetchCategoriaPedidos } = useQuery(
-        'categoria-pedido',
-        async () => { const response = await get(`/categoria-pedido?idCategoriaPedido=${tipoPedidoSelecionado?.value}`); return response.data},
+        'categoriasProdutos',
+        async () => { const response = await get(`/categoriasProdutos?idCategoriaPedido=${tipoPedidoSelecionado?.value}`); return response.data},
         { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
     );
+    // const { data: dadosCategoriaPedidos  = [], error: errorCategoriaPedidos, isLoading: isLoadingCategoriaPedidos, refetch: refetchCategoriaPedidos } = useQuery(
+    //     'categoria-pedido',
+    //     async () => { const response = await get(`/categoria-pedido?idCategoriaPedido=${tipoPedidoSelecionado?.value}`); return response.data},
+    //     { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+    // );
     
     const { data: dadosCategoriasProdutos  = [], error: errorCategoriasProdutos, isLoading: isLoadingCategoriasProdutos, refetch: refetchCategoriasProdutos } = useQuery(
         'categoriasProdutos',
@@ -110,6 +115,12 @@ export const useIncluirProduto = ({
             return response.data
         },
         { enabled: true, staleTime: 60 * 60 * 1000 }
+    );
+
+    const { data: dadosVinculoEstiloGrupo = [], error: errorVinculoEstiloGrupo, isLoading: isLoadingVinculoEstiloGrupo, refetch: refetchVinculoEstiloGrupo } = useQuery(
+        'vinculo-estilo-grupo',
+        async () => { const response = await get(`/vinculo-estilo-grupo?idVinculoEstilo=${estruturaSelecionada?.value}`); return response.data },
+        { enabled: Boolean(estruturaSelecionada?.value) }
     );
 
     const { data: dadosProdutosPedidos  = [], error: errorProdutosPedidos, isLoading: isLoadingProdutosPedidos, refetch: refetchProdutosPedidos } = useQuery(
@@ -328,6 +339,7 @@ export const useIncluirProduto = ({
         dadosLocalExposicao,
         dadosGrade,
         dadosProdutosPedidos,
+        dadosVinculoEstiloGrupo,
         optionsTipoCadastro,
         optionsReposicao,
         atualiza_valor_QtdUnit,

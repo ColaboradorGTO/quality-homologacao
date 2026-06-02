@@ -8,11 +8,13 @@ import { ActionMainNovoPedido } from "../../../../Actions/ActionMainNovoPedido";
 import { InputSelectActionPedido } from "../../../../Inputs/InputSelectActionPedido";
 import { InputFieldPedido } from "../../../../Buttons/InputActionPedido";
 import { InputFieldCheckBox } from "../../.././../Inputs/InputChekBox";
-import { useIncluirProutoPedido } from "../../ActionNovoPedido/hooks/useIncluirProdutoPedido";
+import { useIncluirProutoPedido } from "./IncluirProdutoPedido/hooks/useIncluirProduto";
 import { optionsTipoFrete, optionsTipoPedido, optionsEnviar, optionsFiscal } from "../../../../../../parceiro.json"
 import { ActionListaPedidos } from "./actionListaPedidos";
 import { ButtonTypeCompras } from "../../../../Buttons/Button";
-import { ActionIncluirProdutoPedidoModal } from "./IncluirProdutoPedido/actionIncluirProdutoPedidoModal";
+// import { ActionIncluirProdutoPedidoModal } from "./IncluirProdutoPedido/actionIncluirProdutoPedidoModal";
+import { CiLock } from "react-icons/ci";
+import { FaCheck } from "react-icons/fa";
 
 export const ActionVisualizarPedido = ({
   usuarioLogado,
@@ -27,6 +29,10 @@ export const ActionVisualizarPedido = ({
 }) => {
 
   const {
+       tabelaVisivel,
+    setTabelaVisivel,
+    tabelaCadastroProduto,
+    setTabelaCadastroProduto,
     marcaSelecionada,
     setMarcaSelecionada,
     fornecedorSelecionado,
@@ -63,6 +69,16 @@ export const ActionVisualizarPedido = ({
     setTransportadoraSelecionada,
     freteSelecionado,
     setFreteSelecionado,
+    modalPedidoNota,
+    setModalPedidoNota,
+    modalPedidoNotaSemPreco,
+    setModalPedidoNotaSemPreco,
+    arquivoGerado,
+    setArquivoGerado,
+    currentPage,
+    setCurrentPage,
+    pageSize,
+    setPageSize,
     dataPesquisaFim,
     setDataPesquisaFim,
     dataPesquisaInicio,
@@ -71,7 +87,7 @@ export const ActionVisualizarPedido = ({
     setIdResumoPedido,
     checked,
     setChecked,
-    disabledChecked,
+    disabledChecked, 
     setDisabledChecked,
     modalIncluirProdutoPedido,
     setModalIncluirProdutoPedido,
@@ -88,6 +104,9 @@ export const ActionVisualizarPedido = ({
     setBtnClonarCabecalho,
     btnClonarCabecalho,
     setBtnNovoPedido,
+    onIncluirProdutoPedido,
+    verificaDadosDoFornecedorSelecionado,
+    pendenciasFornecedor,
     dadosFornecedores,
     dadosComprador,
     dadosMarcas,
@@ -96,14 +115,15 @@ export const ActionVisualizarPedido = ({
     dadosDetalhe, 
     dadosDetalhesPedidos,
     dadosProdutosPedidos,
-    verificaDadosDoFornecedorSelecionado,
-    pendenciasFornecedor,
-    onIncluirProdutoPedido,
+    dadosUltimosPedidos,
     clonarCabecalho,
     handleIncluir,
-    dadosUltimosPedidos,
-    dadosCabecalhoClonado,
-    handleFecharPedido
+    handleSalvarPedido,
+    refetchListaDetalhePedidos,
+    refetchListaCadastroProdutoPedidos,
+    refetchListaProdutoPedidos,
+    handleFecharPedido,
+    handleClonarCabecalhoPedido
   } = useIncluirProutoPedido({ usuarioLogado, optionsModulos, dadosVisualizarPedido, dadosDetalhePedido });
 
   const [dadosDetalheProdutoPedido, setDadosDetalheProdutoPedido] = useState([]);
@@ -112,7 +132,7 @@ export const ActionVisualizarPedido = ({
     fechar: false,
     salvar: false,
     clonar: false,
-    clonarCabecalho: false,
+    clonarCabecalho: true,
     novoPedido: true
   });
 
@@ -139,9 +159,12 @@ export const ActionVisualizarPedido = ({
     const IdAndamentoPedido = parseInt(dados?.IDANDAMENTO || '0', 10);
     const StCancelaPedido = String(dados?.STCANCELADO || 'False').trim();
     const IDPEDIDORESUMO = String(dados?.IDPEDIDO || '');
+    const dsSetorAndamentoPedido = String(dados?.DSSETOR || '');
+    const stCancelado = StCancelaPedido === 'True';
     const stMigradoSap = String(dados?.STMIGRADOSAP || 'False') === 'True';
     const stPedidoPorIntermediario = String(dados?.STPEDIDOPRIMARIO || 'False') === 'True';
     const idPedidoPrimario = parseInt(dados?.IDPEDIDOPRIMARIO || '0', 10);
+    const isPedidoSecundario = idPedidoPrimario > 0;
 
     // console.log('🎯 Variáveis processadas:', {
     //   IdAndamentoPedido,
@@ -153,12 +176,14 @@ export const ActionVisualizarPedido = ({
     // }); // DEBUG
 
     // ========== LÓGICA PRINCIPAL ==========
+    const clonarVisivelPadrao = !(stCancelado && IdAndamentoPedido !== 2 && IdAndamentoPedido !== 5);
+
     let novosBotoesVisiveis = {
       incluir: false,
       fechar: false,
       salvar: false,
-      clonar: false,
-      clonarCabecalho: false,
+      clonar: clonarVisivelPadrao,
+      clonarCabecalho: true,
       novoPedido: true // SEMPRE VISÍVEL
     };
     
@@ -167,14 +192,8 @@ export const ActionVisualizarPedido = ({
 
     // ========== CONDIÇÃO 1: Pedido cancelado OU em andamento (2-14) ==========
     if (StCancelaPedido === 'True' || (IdAndamentoPedido >= 2 && IdAndamentoPedido < 15)) {
-      // console.log('🚫 Condição 1: Pedido cancelado ou em andamento');
-      
-      // Botão clonar só aparece em condições específicas
-      const clonarVisivel = !(StCancelaPedido === 'True' && IdAndamentoPedido !== 2 && IdAndamentoPedido !== 5);
-      
       novosBotoesVisiveis = {
         ...novosBotoesVisiveis,
-        clonar: clonarVisivel
       };
       
       camposDevemEstarHabilitados = false;
@@ -185,14 +204,11 @@ export const ActionVisualizarPedido = ({
     } 
     // ========== CONDIÇÃO 2: Inclusão (1) OU Alteração (15) ==========
     else if (IdAndamentoPedido === 1 || IdAndamentoPedido === 15) {
-      // console.log('✅ Condição 2: Inclusão ou Alteração');
-      
       novosBotoesVisiveis = {
         ...novosBotoesVisiveis,
         incluir: true,
         fechar: true,
         salvar: true,
-        clonar: true,
         clonarCabecalho: true
       };
       
@@ -204,20 +220,18 @@ export const ActionVisualizarPedido = ({
 
     // ========== CONDIÇÃO 3: Se migrado para SAP ==========
     if (stMigradoSap) {
-      // console.log('🔒 SAP: Desabilitando campos');
       camposDevemEstarHabilitados = false;
     }
     
     // ========== CONDIÇÃO 4: Pedido secundário ==========
     if (idPedidoPrimario > 0) {
-      // console.log('🔗 Pedido secundário: Ocultando botões');
       novosBotoesVisiveis = {
         incluir: false,
         fechar: false,
         salvar: false,
         clonar: false,
         clonarCabecalho: false,
-        novoPedido: true // SEMPRE VISÍVEL
+        novoPedido: true 
       };
       camposDevemEstarHabilitados = false;
     }
@@ -229,6 +243,51 @@ export const ActionVisualizarPedido = ({
     // }); // DEBUG
 
     // ========== APLICAR ESTADOS ==========
+    let statusTitleSubHeader = stCancelado
+      ? (
+        <span className="text-danger fw-900 pl-1">
+          CANCELADO <i className="fal fa-times ml-1"></i>
+        </span>
+      )
+      : (
+        <>
+          <span className="text-warning fw-900 pl-1">
+            Bloqueado <CiLock />
+          </span>
+          {` -> Está no Setor: ${dsSetorAndamentoPedido}`}
+        </>
+      );
+
+    if (!stCancelado && (IdAndamentoPedido === 1 || IdAndamentoPedido === 15)) {
+      statusTitleSubHeader = IdAndamentoPedido === 1
+        ? (
+          <span className="text-primary fw-700 pl-1">
+            Inclusão Liberada <FaCheck />
+          </span>
+        )
+        : (
+          <span className="text-info fw-700 pl-1">
+            Alteração Liberada <FaCheck />
+          </span>
+        );
+    }
+
+    let prefixoTituloPedido = 'Pedido ';
+
+    if (isPedidoSecundario) {
+      prefixoTituloPedido += 'Secundário ';
+    } else if (stPedidoPorIntermediario) {
+      prefixoTituloPedido += 'Primário ';
+    }
+
+    novoTitulo = (
+      <>
+        {`${prefixoTituloPedido}Nº: ${IDPEDIDORESUMO}`}
+        {' - '}
+        {statusTitleSubHeader}
+      </>
+    );
+
     setBotoesVisiveis(novosBotoesVisiveis);
     setCamposHabilitados(camposDevemEstarHabilitados);
     setTituloSubheader(novoTitulo);
@@ -240,7 +299,7 @@ export const ActionVisualizarPedido = ({
     
     setIdPedidoPrimario(idPedidoPrimario);
     
-  }, [dadosVisualizarPedido]); 
+  }, [dadosVisualizarPedido]);  
 
   // const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
   //   'menus-usuario-excecao',
@@ -259,7 +318,7 @@ export const ActionVisualizarPedido = ({
       setDataPesquisaInicio(dadosVisualizarPedido[0]?.DTPEDIDOFORMATADA)
       setDataPesquisaFim(dadosVisualizarPedido[0]?.DTPREVENTREGAFORMATADA)
       setCompradorSelecionado({
-        value: dadosVisualizarPedido[0]?.IDCOMPRADOR , 
+        value: dadosVisualizarPedido[0]?.IDCOMPRADOR, 
         label: dadosVisualizarPedido[0]?.NOMECOMPRADOR
       })
     
@@ -355,29 +414,34 @@ export const ActionVisualizarPedido = ({
         ]}
         valueSelectFornecedor={fornecedorSelecionado}
         onChangeSelectFornecedor={(e) => setFornecedorSelecionado(e)}
+        readOnlyFornecedor={true}
 
         InputFieldDTInicioComponent={InputFieldPedido}
         labelInputDTInicio={"Data Pedido"}
         valueInputFieldDTInicio={dataPesquisaInicio}
         onChangeInputFieldDTInicio={(e) => setDataPesquisaInicio(e.target.value)}
+        readOnlyDTInicio={true}
        
 
         InputFieldDTFimComponent={InputFieldPedido}
         labelInputDTFim={"Data Entrega"}
         valueInputFieldDTFim={dataPesquisaFim}
         onChangeInputFieldDTFim={(e) => setDataPesquisaFim(e.target.value)}
+        readOnlyDTFim={true}
         
         InputSelectFiscalComponent={InputSelectActionPedido}
         labelSelectFiscal={"Tipo Fiscal"}
         optionsFiscal={optionsFiscal}
         valueSelectFiscal={fiscalSelecionado}
         onChangeSelectFiscal={(e) => setFiscalSelecionado(e.value)}
+        readOnlyFiscal={true}
 
         InputSelectEnviarComponent={InputSelectActionPedido}
         labelSelectEnviar={"Enviar"}
         optionsSelectEnviar={optionsEnviar}
         valueSelectEnviar={enviarSelecionado}
         onChangeSelectEnviar={(e) => setEnviarSelecionado(e.value)}
+        readOnlyEnviar={true}
 
         InputSelectCompradorComponent={InputSelectActionPedido}
         labelSelectComprador={"Comprador"}
@@ -389,7 +453,7 @@ export const ActionVisualizarPedido = ({
         })}
         valueSelectComprador={compradorSelecionado}
         onChangeSelectComprador  ={(e) => setCompradorSelecionado(e.value)}
-       
+        readOnlyComprador={true}
 
         InputSelectMarcasComponent={InputSelectActionPedido}
         labelSelectMarcas={"Marca"}
@@ -401,6 +465,7 @@ export const ActionVisualizarPedido = ({
         })}
         valueSelectMarca={marcaSelecionada}
         onChangeSelectMarcas={(e) => setMarcaSelecionada(e)}
+        readOnlyMarcas={true}
         
         InputSelectCondicoesPagamentos={InputSelectActionPedido}
         labelSelectCondicoesPagamentos={"Condições de Pagamento"}
@@ -412,51 +477,56 @@ export const ActionVisualizarPedido = ({
         })}
         valueSelectCondicoesPagamentos={condicoesPagamentosSelecionado}
         onChangeSelectCondicoesPagamentos={(e) => setCondicoesPagamentosSelecionado(e.value)}
+        readOnlyCondicoesPagamentos={true}
         
         InputFieldObsFornecedor={InputFieldPedido}
         labelInputFieldObsFornecedor={"Observação do Fornecedor - Max. 450 caracteres"}
         valueInputFieldObsFornecedor={obsFornecedor}
         onChangeInputFieldObsFornecedor={(e) => setObsFornecedor(e.target.value)}
-      
+        readOnlyObsFornecedor={true}
 
         InputFieldObsInterna={InputFieldPedido}
         labelInputFieldObsInterna={"Observação Interna - Max. 450 caracteres"}
         valueInputFieldObsInterna={obsInterna}
         onChangeInputFieldObsInternas={(e) => setObsInterna(e.target.value)}
+        readOnlyObsInterna={true}
        
         InputSelectTipoPedido={InputSelectActionPedido}
         labelSelectTipoPedido={"Tipo de Pedido"}
         optionsTipoPedido={optionsTipoPedido}
         valueSelectTipoPedido={tipoPedidoSelecionado}
         onChangeSelectTipoPedido={(e) => setTipoPedidoSelecionado(e.value)}
+        readOnlyTipoPedido={true}
 
         InputFieldVendedor={InputFieldPedido}
         labelInputFieldVendedor={"Vendedor"}
         valueInputFieldVendedor={vendedor}
         onChangeInputFieldVendedor={(e) => setVendedor(e.target.value)}
+        readOnlyVendedor={true}
 
         InputFieldEmailVendedor={InputFieldPedido}
         labelInputFieldEmailVendedor={"Email do Vendedor"}
         valueInputFieldEmailVendedor={emailVendedor}
         onChangeInputFieldEmailVendedor={(e) => setEmailVendedor(e.target.value)}
+        readOnlyEmailVendedor={true}
 
         InputFieldDescontoComponent1={InputFieldPedido}
         labelInputFieldDesconto1={"Desconto I(%)"}
         valueInputFieldDesconto1={desconto1}
         onChangeInputFieldDesconto1={(e) => setDesconto1(e.target.value)}
-        // readOnlyDesconto1={true}
+        readOnlyDesconto1={true}
 
         InputFieldDescontoComponent2={InputFieldPedido}
         labelInputFieldDesconto2={"Desconto II(%)"}
         valueInputFieldDesconto2={desconto2}
         onChangeInputFieldDesconto2={(e) => setDesconto2(e.target.value)}
-        // readOnlyDesconto2={true}
+        readOnlyDesconto2={true}
 
         InputFieldDescontoComponent3={InputFieldPedido}
         labelInputFieldDesconto3={"Desconto III(%)"}
         valueInputFieldDesconto3={desconto3}
         onChangeInputFieldDesconto3={(e) => setDesconto3(e.target.value)}
-        // readOnlyDesconto3={true}
+        readOnlyDesconto3={true}
 
         InputFieldTotalLiq={InputFieldPedido}
         labelInputFieldTotalLiq={"Total Liquido"}
@@ -468,7 +538,7 @@ export const ActionVisualizarPedido = ({
         labelInputFieldComissao={"Comissão (%)"}
         valueInputFieldComissao={comissao}
         onChangeInputFieldComissao={(e) => setComissao(e.target.value)}
-        // readOnlyComissao={true}
+        readOnlyComissao={true}
 
         InputTransportadora={InputFieldPedido}
         labelTransportadora={"Transportadora"}
@@ -504,42 +574,44 @@ export const ActionVisualizarPedido = ({
         onButtonClickSearch={handleIncluir}
         corSearch={"primary"}
         IconSearch={MdMenu}
-        styleSearch={botoesVisiveis.incluir == true}
+        styleSearch={botoesVisiveis.incluir}
       
         ButtonTypeCadastro={ButtonTypeCompras}
         linkNome={"Salvar Cabeçalho Pedido"}
-        onButtonClickCadastro
+        onButtonClickCadastro={() => handleSalvarPedido()}
+        // onButtonClickCadastro={() => {clonarCabecalho()}
         corCadastro={"info"}
         IconCadastro={MdOutlineCheck}
-        styleCadastro={botoesVisiveis.salvar == true}
+        styleCadastro={botoesVisiveis.salvar}
         
         ButtonTypeCancelar={ButtonTypeCompras}
         linkCancelar={"Fechar Pedido"}
         onButtonClickCancelar={handleFecharPedido}
         corCancelar={"danger"}
         IconCancelar={MdOutlineVisibility}
-        styleCancelar={botoesVisiveis.fechar == true}
+        styleCancelar={botoesVisiveis.fechar}
 
         ButtonTypePedido={ButtonTypeCompras}
         linkPedido={"Novo Pedido"}
-        onButtonClickPedido
+        onButtonClickPedido={() => handleNovoPedido()}
         corPedido={"success"}
         IconPedido={MdOutlinePictureAsPdf}
-        stylePedido={botoesVisiveis.novoPedido == true}
+        stylePedido={botoesVisiveis.novoPedido}
         
         ButtonTypeTXT={ButtonTypeCompras}
         linkTXT={"Clonar Cabeçalho Pedido"}
-        onButtonClickTXT
+        onButtonClickTXT={() =>  handleClonarCabecalhoPedido()}
         corTXT={"warning"}
         IconTXT={MdOutlineCopyAll}
-        styleTXT={botoesVisiveis.clonarCabecalho == true}
+        styleTXT={botoesVisiveis.clonarCabecalho}
 
         ButtonTypeClonar={ButtonTypeCompras}
         linkClonar={"Clonar Pedido"}
         onButtonClickClonar
+        // onButtonClickClonar={() => handleSalvarPedido()}
         corClonar={"secondary"}
         IconClonar={MdContentCopy}
-        styleClonar={botoesVisiveis.clonar == true}
+        styleClonar={botoesVisiveis.clonar}
 
         ButtonTypeRetornar={ButtonType}
         linkRetornar={"Voltar"}
@@ -556,7 +628,7 @@ export const ActionVisualizarPedido = ({
           optionsModulos={optionsModulos}
       />
     
-      <ActionIncluirProdutoPedidoModal
+      {/* <ActionIncluirProdutoPedidoModal
           show={modalIncluirProdutoPedido}
           handleClose={() => setModalIncluirProdutoPedido(false)}
           usuarioLogado={usuarioLogado}
@@ -567,7 +639,7 @@ export const ActionVisualizarPedido = ({
           marcaSelecionada={marcaSelecionada}
           idResumoPedido={idResumoPedido}
           dadosUltimosPedidos={dadosUltimosPedidos}
-        />
+        /> */}
     </Fragment>
   )
 }

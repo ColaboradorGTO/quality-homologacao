@@ -92,6 +92,7 @@ export const FormularioIncluirProdutoPedido = ({
         dadosLocalExposicao,
         dadosGrade,
         dadosProdutosPedidos,
+        dadosVinculoEstiloGrupo,
         optionsTipoCadastro,
         optionsReposicao,
         atualiza_valor_QtdUnit,
@@ -113,7 +114,6 @@ export const FormularioIncluirProdutoPedido = ({
     const handleValidatedSubmit = async () => {
         try {
             const dadosParaValidar = {
-                nomeMarcaPedido: nomeMarca,
                 referenciaProdutoPedido: referenciaProduto,
                 descricaoProdutoPedido: descricaoProduto,
                 vrHojeCusto: vrCusto,
@@ -169,16 +169,16 @@ export const FormularioIncluirProdutoPedido = ({
 
         data.forEach((item) => {
             if (!grupos[item.DS_GRUPO]) {
-            grupos[item.DS_GRUPO] = {
-                label: item.DS_GRUPO,
-                options: []
-            };
+                grupos[item.DS_GRUPO] = {
+                    label: item.DS_GRUPO,
+                    options: []
+                };
             }
 
             grupos[item.DS_GRUPO].options.push({
-            value: item.ID_ESTRUTURA,
-            label: item.ESTRUTURA,
-            original: item
+                value: item.ID_ESTRUTURA,
+                label: item.ESTRUTURA,
+                original: item
             });
         });
 
@@ -190,16 +190,16 @@ export const FormularioIncluirProdutoPedido = ({
 
         data.forEach((item) => {
             if (!grupos[item.DS_GRUPOCOR]) {
-            grupos[item.DS_GRUPOCOR] = {
-                label: item.DS_GRUPOCOR,
-                options: []
-            };
+                grupos[item.DS_GRUPOCOR] = {
+                    label: item.DS_GRUPOCOR,
+                    options: []
+                };
             }
 
             grupos[item.DS_GRUPOCOR].options.push({
-            value: item.ID_COR,
-            label: item.DS_COR,
-            original: item
+                value: item.ID_COR,
+                label: item.DS_COR,
+                original: item
             });
         });
 
@@ -234,39 +234,7 @@ export const FormularioIncluirProdutoPedido = ({
                         </div>
                     </div>
                 </div>
-                <div className="form-group">
-                    <div className="row">
-                        <div className="col-sm-6 col-xl-3">
-                            <label className="form-label" htmlFor="strep">Reposição</label>
-                            <Select
-                                id={"stReposicao"}
-                                options={optionsReposicao.map((item) => {
-                                    return {
-                                        value: item.value,
-                                        label: item.label
-                                    }
-                                })}
-                                value={reposicaoSelecionado}
-                                onChange={(e) => setReposicaoSelecionado(e)}
-                            />
-                        </div>
-                        <div className="col-sm-6 col-xl-3">
-                            <label className="form-label" htmlFor="strep">Tipo de Cadastro</label>
-                            <Select
-                                id={"stReposicao"}
-                                options={optionsTipoCadastro.map((item) => {
-                                    return {
-                                        value: item.value,
-                                        label: item.label
-                                    }
-                                })}
-                                value={tipoCadastroSelecionado}
-                                onChange={(e) => setTipoCadastroSelecionado(e)}
-                            />
-                        </div>
-                    </div>
-                </div>
-                <div className="form-group">
+                   <div className="form-group">
                     <div className="row">
                         <div className="col-sm-6 col-xl-6">
                             <Controller
@@ -304,10 +272,57 @@ export const FormularioIncluirProdutoPedido = ({
                         </div>
                     </div>
                 </div>
+
+                {/*<div className="form-group">
+                    <div className="row">
+                        <div className="col-sm-6 col-xl-3">
+                            <label className="form-label" htmlFor="strep">Reposição</label>
+                            <Select
+                                id={"stReposicao"}
+                                options={optionsReposicao.map((item) => {
+                                    return {
+                                        value: item.value,
+                                        label: item.label
+                                    }
+                                })}
+                                value={reposicaoSelecionado}
+                                onChange={(e) => setReposicaoSelecionado(e)}
+                            />
+                        </div>
+                          <div className="col-sm-6 col-xl-3">
+                            <label className="form-label" htmlFor="strep">Tipo de Cadastro</label>
+                            <Select
+                                id={"stReposicao"}
+                                options={optionsTipoCadastro.map((item) => {
+                                    return {
+                                        value: item.value,
+                                        label: item.label
+                                    }
+                                })}
+                                value={tipoCadastroSelecionado}
+                                onChange={(e) => setTipoCadastroSelecionado(e)}
+                            />
+                        </div> 
+                    </div>
+                </div>*/}
+             
                 <hr />
                 <div className="form-group">
                     <div className="row">
-
+                          <div className="col-sm-6 col-xl-2">
+                            <label className="form-label" htmlFor="strep">Reposição</label>
+                            <Select
+                                id={"stReposicao"}
+                                options={optionsReposicao.map((item) => {
+                                    return {
+                                        value: item.value,
+                                        label: item.label
+                                    }
+                                })}
+                                value={reposicaoSelecionado}
+                                onChange={(e) => setReposicaoSelecionado(e)}
+                            />
+                        </div>
                         <div className="col-sm-6 col-xl-6">
                             <Controller
                                 name="descricaoProdutoPedido"
@@ -478,7 +493,8 @@ export const FormularioIncluirProdutoPedido = ({
                             />
                         </div>
                         <div className="col-sm-4 col-xl-4">
-                            <label className="form-label" htmlFor="tptecido">Tipo de Tecido</label>
+                            {/* verificar o retorno da api no select */}
+                            <label className="form-label" htmlFor="tptecido">Tipo de Material</label>
                             <Select
                                 id={"tpTecidoProduto"}
                                 value={tipoTecidoSelecionado}
@@ -524,7 +540,22 @@ export const FormularioIncluirProdutoPedido = ({
                      
                         </div>
                         <div className="col-sm-4 col-xl-4">
-                            <Controller 
+                            {/* fazer um select aqui */}
+                            <label className="form-label" htmlFor="tpcat">Estilos</label>
+                            <SelectList
+                                id={"categoriaProduto"}
+                                value={estiloSelecionado}
+                                options={dadosVinculoEstiloGrupo?.map((item) => {
+                                    return {
+                                        value: item.IDESTILO,
+                                        label: item.DSESTILO
+                                    }
+                                })}
+                                onChange={(e) => setEstiloSelecionado(e)}
+                                
+                            />
+                     
+                            {/* <Controller 
                                 name="estiloProduto"
                                 control={control}
                                 render={({ field }) => (
@@ -538,7 +569,7 @@ export const FormularioIncluirProdutoPedido = ({
                                         clearErrors={clearErrors}
                                     />
                                 )}
-                            />
+                            /> */}
                         </div>
                     </div>
                 </div>
@@ -724,7 +755,7 @@ export const FormularioIncluirProdutoPedido = ({
                                         value={vrSugerido}
                                         onChange={(e) => {
                                             setVrSugerido(e.target.value);
-                                            setVrSugerigoFixo(e.target.value); // Define como valor fixo quando editado manualmente
+                                            setVrSugerigoFixo(e.target.value); 
                                         }}
                                         errors={errors}
                                         clearErrors={clearErrors}
