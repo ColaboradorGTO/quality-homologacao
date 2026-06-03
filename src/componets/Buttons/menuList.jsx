@@ -27,6 +27,8 @@ export const SelectList = ({
   isDisabled = false,
   menuHeaderTitle,
   menuHeaderStyle,
+  styles,
+  getOptionDisabled,
   ...rest
 }) => {
   return (
@@ -42,6 +44,8 @@ export const SelectList = ({
       components={{ MenuList }}
       menuHeaderTitle={menuHeaderTitle}
       menuHeaderStyle={menuHeaderStyle}
+      styles={styles}
+      getOptionDisabled={getOptionDisabled}
       {...rest}
     />
   );

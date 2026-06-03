@@ -772,7 +772,7 @@ export const FormularioIncluirProdutoPedido = ({
                         <div className="col-sm-12 col-xl-12">
                             <label className="form-label" htmlFor="vrtotalunit">QTD/TAMANHOS</label>
 
-                            {/* Exibição de erros */}
+                            
                             {errosValidacao.length > 0 && (
                                 <div className="alert alert-danger mt-2">
                                     {errosValidacao.map((erro, index) => (
@@ -790,16 +790,10 @@ export const FormularioIncluirProdutoPedido = ({
                                     const stDisabled = stDiversos;
                                     const valorAtual = quantidadePorTamanho[idTamanho] || 0;
                                     const qtdDistribuida = distribuicao[idTamanho];
-                                    // console.log(idTamanho, 'idTamanho');
-                                    // console.log(stDiversos, 'stDiversos');
-                                    // console.log(titleGrade, 'titleGrade');
-                                    // console.log(stDisabled, 'stDisabled');
-                                    // console.log(valorAtual, 'valorAtual');
-                                   
 
                                     return (
                                         <div key={item.IDTAMANHO} className="d-flex flex-column align-items-center">
-                                            {/* Label do tamanho */}
+                                         
                                             <label
                                                 className="form-label text-center mb-1"
                                                 htmlFor={idTamanho}
@@ -808,7 +802,7 @@ export const FormularioIncluirProdutoPedido = ({
                                                 {item.DSTAMANHO}
                                             </label>
 
-                                            {/* Input da quantidade/índice */}
+                                            
                                             <input
                                                 type="text"
                                                 id={idTamanho}
@@ -828,7 +822,7 @@ export const FormularioIncluirProdutoPedido = ({
                                                 onBlur={() => validarGradeamento()} // Valida ao perder foco
                                             />
 
-                                            {/* Exibe quantidade calculada */}
+                                        
                                             {qtdDistribuida !== undefined && valorAtual > 0 && (
                                                 <small
                                                     className="text-muted mt-1"
@@ -842,7 +836,7 @@ export const FormularioIncluirProdutoPedido = ({
                                 })}
                             </div>
 
-                            {/* Botão para validar manualmente */}
+                    
                             <div className="mt-3">
                                 <button
                                     type="button"
@@ -852,7 +846,7 @@ export const FormularioIncluirProdutoPedido = ({
                                     Validar Gradeamento
                                 </button>
 
-                                {/* Mostra total de índices */}
+                 
                                 {Object.values(quantidadePorTamanho).some(v => v > 0) && (
                                     <span className="ms-3 text-info">
                                         Total de Índices: {Object.values(quantidadePorTamanho).reduce((acc, val) => acc + Number(val || 0), 0)}

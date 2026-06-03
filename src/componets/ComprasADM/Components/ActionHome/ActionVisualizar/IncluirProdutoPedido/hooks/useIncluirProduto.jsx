@@ -287,20 +287,10 @@ export const useIncluirProduto = ({
             setStPedidoPorIntermediario(dadosDetalhePedido[0]?.STPEDIDOPORINTEMEDIARIO)
             setObsFornecedor(dadosDetalhePedido[0]?.OBSPEDIDO)
             setRascunho(dadosDetalhePedido[0]?.STRASCUNHO)
-            // setProdutoDadosGrade(dadosDetalhePedido[0]?.DETALHEGRADE.map((item) => ({
-            //     IDTAMANHO: item.IDTAMANHO,
-            //     DSTAMANHO: item.DSTAMANHO,
-            // })))
-            // console.log(dadosDetalhePedido[0]?.DETALHEGRADE.map((item) => ({
-            //     IDTAMANHO: item.IDTAMANHO,
-            //     DSTAMANHO: item.DSTAMANHO,
-            //     INDICETAMANHO: item.INDICETAMANHO
-            // })), 'dadosDetalhePedido[0]?.DETALHEGRADE - Campos selecionados')
+          
         }
     }, [dadosDetalhePedido]);
-    // console.log(dadosDetalheGradePedido, 'dadosDetalheGradePedido')
-
-    // Inicializa os valores quando dadosGrade muda
+    
     useEffect(() => {
         if (dadosGrade?.length) {
             const valoresIniciais = {};
