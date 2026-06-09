@@ -1,5 +1,6 @@
 import { Fragment, useEffect } from "react"
 import Select from 'react-select';
+import Swal from "sweetalert2";
 import { useIncluirProduto } from "./hooks/useIncluirProduto";
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal";
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal";
@@ -7,6 +8,10 @@ import { useForm, Controller } from "react-hook-form";
 import { schema } from "./schema/useProdutoSchema";
 import FormField from "../../../../Formularios/FormField";
 import { SelectList } from "../../../../Buttons/menuList";
+import { CiLock } from "react-icons/ci";
+import { FaLock } from "react-icons/fa";
+import { MdLockOutline } from "react-icons/md";
+import { formatarMoeda, formatMoeda } from "../../../../../utils/formatMoeda";
 
 
 export const FormularioIncluirProdutoPedido = ({
@@ -86,6 +91,7 @@ export const FormularioIncluirProdutoPedido = ({
         dadosUnidadeMedida,
         dadosTipoTecidos,
         dadosCategoriaPedidos,
+        dadosCategoriaPedidoGrade,
         dadosCategoriasProdutos,
         dadosSubGrupoProduto,
         dadosFabricantePedido,
@@ -114,6 +120,8 @@ export const FormularioIncluirProdutoPedido = ({
         setStReposicao,
         isDiversos,
         getInputStateGrade,
+        validarCamposProduto,
+        preencherDadosProdutoSelecionado,
         onSubmit,
     } = useIncluirProduto({
         usuarioLogado,
@@ -151,6 +159,9 @@ export const FormularioIncluirProdutoPedido = ({
 
             await schema.validate(dadosParaValidar, { abortEarly: false });
 
+            const gradeValida = validarGradeamento();
+            if (!gradeValida) return;
+
             onSubmit();
 
         } catch (validationError) {
@@ -173,6 +184,53 @@ export const FormularioIncluirProdutoPedido = ({
         }
     }
 
+    const handleProdutoSelecionado = async (selectedOption) => {
+        setProdutoSelecionado(selectedOption);
+
+        if (!selectedOption) return;
+
+        const produto = dadosProdutosPedidos.find(p => String(p.IDPRODUTO) === String(selectedOption.value));
+        if (!produto) return;
+
+        const { stValido, msgCamposVazios } = validarCamposProduto(produto);
+
+        if (!stValido) {
+            const resultado = await Swal.fire({
+                title: 'Produto com campos vazios',
+                html: `Este produto possui campos vazios/divergentes:<br><b>${msgCamposVazios}</b><br><br>Deseja preencher os dados mesmo assim?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sim, preencher',
+                cancelButtonText: 'Cancelar',
+                customClass: {
+                    container: 'custom-swal',   
+                },
+            });
+            if (!resultado.isConfirmed) {
+                setProdutoSelecionado(null);
+                return;
+            }
+        } else {
+            const resultado = await Swal.fire({
+                title: 'Preencher dados do produto?',
+                text: 'Deseja preencher os dados do produto selecionado na pesquisa? Esta ação é recomendada para produtos de reposição.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Sim',
+                cancelButtonText: 'Não',
+                customClass: {
+                    container: 'custom-swal',   
+                },
+            });
+            if (!resultado.isConfirmed) {
+                setProdutoSelecionado(null);
+                return;
+            }
+        }
+
+        await preencherDadosProdutoSelecionado(produto);
+    };
+
     const menuHeaderStyle = {
         padding: "8px 12px",
         background: "#7a59ad",
@@ -194,10 +252,11 @@ export const FormularioIncluirProdutoPedido = ({
             grupos[item.DS_GRUPO].options.push({
                 value: item.ID_ESTRUTURA,
                 label: item.ESTRUTURA,
+                id: item.ID_GRUPO,
                 original: item
             });
         });
-
+      
         return Object.values(grupos);
     };
 
@@ -281,51 +340,19 @@ export const FormularioIncluirProdutoPedido = ({
             }
         });
 
-        // igual ao jQuery: ativas primeiro, bloqueadas no final
         return [...optionsAtivas, ...optionsBloqueadas];
     }; 
 
-    /*
-    const formatSelectMaterial = (data = []) => {
-        const grupos = new Map();
+    const formatSelectProduto = (data = []) => {
+        return data.map((item) => ({
+            value: item.IDPRODUTO,
+            label: `${item.NUCODBARRAS} - ${item.DSNOME}`,
+            original: item
+        }));
 
-        data.forEach((item) => {
-            const {
-                IDTPTECIDO,
-                DSTIPOTECIDO,
-                DSSIGLA,
-                STBLOQUEADOPARACADASTROPRODUTONOVO
-            } = item;
-
-            const nomeMaterial = (DSTIPOTECIDO || "").trim();
-            const nomeMaterialUpper = nomeMaterial.toUpperCase();
-
-            const bloqueadaPorNome = nomeMaterialUpper === "NENHUM" || nomeMaterialUpper === "NENHUMA";
-            const bloqueadaPorFlag = String(STBLOQUEADOPARACADASTROPRODUTONOVO) === "True";
-            const isDisabled = bloqueadaPorNome || bloqueadaPorFlag;
-
-            const sigla = (DSSIGLA || "").trim();
-            const labelMaterial = sigla ? `${nomeMaterial} - ${sigla}` : nomeMaterial;
-
-            const groupKey = String(IDTPTECIDO ?? "SEM_GRUPO");
-            if (!grupos.has(groupKey)) {
-                grupos.set(groupKey, {
-                    label: String(DSTIPOTECIDO || "SEM GRUPO").toUpperCase(),
-                    options: []
-                });
-            }
-
-            grupos.get(groupKey).options.push({
-                value: IDTPTECIDO,
-                label: labelMaterial,
-                isDisabled,
-                original: item
-            });
-        });
-
-        return Array.from(grupos.values());
-    };
-    */
+        
+    }
+    
     return (
         <Fragment>
             <form onSubmit={handleSubmit(handleValidatedSubmit)}>
@@ -378,15 +405,25 @@ export const FormularioIncluirProdutoPedido = ({
                         <div className="col-sm-6 col-xl-6">
                             <label className="form-label" htmlFor="tpunid">Produtos Cadastrados / Cod Barras - Nome</label>
                             <Select
-                                id={"listprodpesqped"}
+                                id={"listaProdutosPedidos"}
                                 value={produtoSelecionado}
                                 options={dadosProdutosPedidos.map((item) => {
+                                    const { stValido, msgCamposVazios } = validarCamposProduto(item);
                                     return {
                                         value: item.IDPRODUTO,
-                                        label: `${item.NUCODBARRAS} - ${item.DSNOME}`
-                                    }
+                                        label: `${item.NUCODBARRAS} - ${item.DSNOME}`,
+                                        isDisabled: !stValido,
+                                        title: !stValido ? `Produto com campos vazios: ${msgCamposVazios}` : item.DSNOME,
+                                        original: item,
+                                    };
                                 })}
-                                onChange={(e) => setProdutoSelecionado(e)}
+                                onChange={handleProdutoSelecionado}
+                                formatOptionLabel={(option) => (
+                                    <span title={option.title} style={option.isDisabled ? { color: '#000', fontWeight: '500' } : {}}>
+                                        {option.isDisabled && <MdLockOutline  size={25} color="#f63c97" />}
+                                        {option.label}
+                                    </span>
+                                )}
                             />
 
                         </div>
@@ -440,10 +477,11 @@ export const FormularioIncluirProdutoPedido = ({
                                         label={"VR Custo"}
                                         name="vrHojeCusto"
                                         type="text"
-                                        value={vrCusto}
-                                        onChange={(e) => setVrCusto(e.target.value)}
+                                        value={formatMoeda(vrCusto)}
+                                        onChange={(e) => setVrCusto(formatarMoeda(e.target.value))}
                                         errors={errors}
                                         clearErrors={clearErrors}
+                                        readOnly
                                     />
                                 )}
                             />
@@ -457,10 +495,11 @@ export const FormularioIncluirProdutoPedido = ({
                                         label={"VR Venda"}
                                         name="vrVendaHoje"
                                         type="text"
-                                        value={vrVenda}
-                                        onChange={(e) => setVrVenda(e.target.value)}
+                                        value={formatMoeda(vrVenda)}
+                                        onChange={(e) => setVrVenda(formatarMoeda(e.target.value))}
                                         errors={errors}
                                         clearErrors={clearErrors}
+                                        readOnly
                                     />
                                 )}
                             />
@@ -480,8 +519,9 @@ export const FormularioIncluirProdutoPedido = ({
                                         type="text"
                                         value={quantidade}
                                         onChange={(e) => {
-                                            setQuantidade(e.target.value);
-                                            atualiza_valor_QtdUnit();
+                                            const val = e.target.value;
+                                            setQuantidade(val);
+                                            atualiza_valor_QtdUnit({ quantidade: val });
                                         }}
                                         errors={errors}
                                         clearErrors={clearErrors}
@@ -559,17 +599,6 @@ export const FormularioIncluirProdutoPedido = ({
                         </div>
                         <div className="col-sm-4 col-xl-4">
                             <label className="form-label" htmlFor="tpcor">Cor</label>
-                            {/* <Select
-                                id={"corProduto"}
-                                value={corSelecionada}
-                                options={dadosCores.map((item) => {
-                                    return {
-                                        value: item.ID_COR,
-                                        label: item.DS_COR
-                                    }
-                                })}
-                                onChange={(e) => setCorSelecionada(e)}
-                            /> */}
                             <SelectList
                                 id={"corProduto"}
                                 value={corSelecionada}
@@ -626,10 +655,10 @@ export const FormularioIncluirProdutoPedido = ({
                             <Select
                                 id={"categoriaGradeProduto"}
                                 value={categoriaGradeSelecionada}
-                                options={optionsReposicao.map((item) => {
+                                options={dadosCategoriaPedidoGrade.map((item) => {
                                     return {
-                                        value: item.value,
-                                        label: item.label
+                                        value: item.IDCATEGORIAPEDIDO,
+                                        label: `${item.TIPOPEDIDO} - ${item.DSCATEGORIAPEDIDO}`
                                     }
                                 })}
                                 onChange={(e) => setCategoriaGradeSelecionada(e)}
@@ -645,12 +674,17 @@ export const FormularioIncluirProdutoPedido = ({
                                 menuHeaderTitle={"Selecione"}
                                 menuHeaderStyle={menuHeaderStyle}
                                 onChange={(e) => setEstruturaSelecionada(e)}
-
+                                styles={{
+                                    option: (base) => ({
+                                        ...base,
+                                        fontSize: "14px"
+                                    })
+                                }}
                             />
 
                         </div>
                         <div className="col-sm-4 col-xl-4">
-                            {/* fazer um select aqui */}
+                          
                             <label className="form-label" htmlFor="tpcat">Estilos</label>
                             <SelectList
                                 id={"categoriaProduto"}
@@ -658,28 +692,13 @@ export const FormularioIncluirProdutoPedido = ({
                                 options={dadosVinculoEstiloGrupo?.map((item) => {
                                     return {
                                         value: item.IDESTILO,
-                                        label: item.DSESTILO
+                                        label: `${item.IDESTILO} - ${item.DSESTILO}`
                                     }
                                 })}
                                 onChange={(e) => setEstiloSelecionado(e)}
 
                             />
 
-                            {/* <Controller 
-                                name="estiloProduto"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormField
-                                        label={"Estilos"}
-                                        name="estiloProduto"
-                                        type="text"
-                                        value={estiloSelecionado}
-                                        onChange={(e) => setEstiloSelecionado(e.target.value)}
-                                        errors={errors}
-                                        clearErrors={clearErrors}
-                                    />
-                                )}
-                            /> */}
                         </div>
                     </div>
                 </div>
@@ -759,9 +778,9 @@ export const FormularioIncluirProdutoPedido = ({
                                         type="text"
                                         value={vrBruto}
                                         onChange={(e) => {
-                                            setVrBruto(e.target.value);
-                                            // Chama o cálculo após um pequeno delay para evitar conflitos
-                                            setTimeout(() => atualiza_valor_QtdUnit(), 100);
+                                            const val = e.target.value;
+                                            setVrBruto(val);
+                                            atualiza_valor_QtdUnit({ vrBruto: val });
                                         }}
                                         errors={errors}
                                         clearErrors={clearErrors}
@@ -780,9 +799,9 @@ export const FormularioIncluirProdutoPedido = ({
                                         type="text"
                                         value={percDescontoI}
                                         onChange={(e) => {
-                                            setPercDescontoI(e.target.value);
-                                            // Chama o cálculo após um pequeno delay para evitar conflitos
-                                            setTimeout(() => atualiza_valor_QtdUnit(), 100);
+                                            const val = formatarMoeda(e.target.value);
+                                            setPercDescontoI(val);
+                                            atualiza_valor_QtdUnit({ percDescontoI: val });
                                         }}
                                         errors={errors}
                                         clearErrors={clearErrors}
@@ -802,9 +821,9 @@ export const FormularioIncluirProdutoPedido = ({
                                         type="text"
                                         value={percDescontoII}
                                         onChange={(e) => {
-                                            setPercDescontoII(e.target.value);
-                                            // Chama o cálculo após um pequeno delay para evitar conflitos
-                                            setTimeout(() => atualiza_valor_QtdUnit(), 100);
+                                            const val = formatarMoeda(e.target.value);
+                                            setPercDescontoII(val);
+                                            atualiza_valor_QtdUnit({ percDescontoII: val });
                                         }}
                                         errors={errors}
                                         clearErrors={clearErrors}
@@ -823,9 +842,9 @@ export const FormularioIncluirProdutoPedido = ({
                                         type="text"
                                         value={percDescontoIII}
                                         onChange={(e) => {
-                                            setPercDescontoIII(e.target.value);
-                                            // Chama o cálculo após um pequeno delay para evitar conflitos
-                                            setTimeout(() => atualiza_valor_QtdUnit(), 100);
+                                            const val = formatarMoeda(e.target.value);
+                                            setPercDescontoIII(val);
+                                            atualiza_valor_QtdUnit({ percDescontoIII: val });
                                         }}
                                         errors={errors}
                                         clearErrors={clearErrors}
@@ -844,7 +863,7 @@ export const FormularioIncluirProdutoPedido = ({
                                         name="vrUnitLiquidoProduto"
                                         type="text"
                                         value={vrLiquido}
-                                        onChange={(e) => setVrLiquido(e.target.value)}
+                                        onChange={(e) => setVrLiquido(formatarMoeda(e.target.value))}
 
                                         errors={errors}
                                         clearErrors={clearErrors}
@@ -864,7 +883,7 @@ export const FormularioIncluirProdutoPedido = ({
                                         type="text"
                                         value={vrSugerido}
                                         onChange={(e) => {
-                                            setVrSugerido(e.target.value);
+                                            setVrSugerido(formatarMoeda(e.target.value));
                                             setVrSugerigoFixo(e.target.value);
                                         }}
                                         errors={errors}

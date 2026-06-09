@@ -21,7 +21,7 @@ export const ActionIncluirProdutoPedidoModal = ({
         show={show}
         onHide={handleClose}
         class="modal-content"
-        size="lg"
+        size="xl"
         centered
       >
 

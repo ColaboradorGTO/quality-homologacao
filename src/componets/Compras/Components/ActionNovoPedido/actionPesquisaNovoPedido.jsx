@@ -308,7 +308,7 @@ export const ActionPesquisaNovoPedido = ({
       
       setIdPedidoPrimario(idPedidoPrimario);
       
-    }, [dadosVisualizarPedido]);  
+  }, [dadosVisualizarPedido]);  
 
 
   const calcularTotal = (field) => {
@@ -349,7 +349,7 @@ export const ActionPesquisaNovoPedido = ({
   }
 
   const handleNovoPedido = () => {
-    console.log('novo pedido')
+     window.location.replace('/DashBoardCompras');
   }
 
   const handleClickPedidoTXT = async () => {    
@@ -471,7 +471,7 @@ export const ActionPesquisaNovoPedido = ({
 
   
  const handleVerificar = async () => {
-    const existe = await verificaDadosDoFornecedorSelecionado ();
+    const existe = await verificaDadosDoFornecedorSelecionado();
     if (existe) {
       console.log('Fornecedor válido!');
     } else {
@@ -690,7 +690,7 @@ export const ActionPesquisaNovoPedido = ({
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Incluir Itens"}
-        onButtonClickSearch={clonarCabecalho}
+        onButtonClickSearch={handleIncluir}
         corSearch={"primary"}
         IconSearch={MdMenu}
         styleSearch={botoesVisiveis.incluir}
@@ -767,7 +767,7 @@ export const ActionPesquisaNovoPedido = ({
         dadosUltimosPedidos={dadosUltimosPedidos}
       />
       
-
+      {console.log(dadosUltimosPedidos, 'dadosUltimosPedidos')}
     </Fragment>
   )
 }
