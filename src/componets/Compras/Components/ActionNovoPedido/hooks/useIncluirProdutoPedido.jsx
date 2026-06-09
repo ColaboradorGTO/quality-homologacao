@@ -897,17 +897,17 @@ export const useIncluirProutoPedido = ({
             });
 
 
-            Swal.fire({
+            await Swal.fire({
                 position: 'center',
                 icon: 'success',
                 title: 'Novo pedido iniciado!',
                 text: 'Cabeçalho clonado com sucesso. Você pode agora incluir produtos.',
-                showConfirmButton: false,
+                showConfirmButton: true,
+                confirmButtonText: 'OK',
                 timer: 3000
             });
-            
-            
-            await verificaDadosDoFornecedorSelecionado?.(false);
+
+            verificaDadosDoFornecedorSelecionado?.(false);
             
         } catch (error) {
             console.error('Erro ao clonar cabeçalho:', error);

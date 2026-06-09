@@ -349,7 +349,57 @@ export const ActionPesquisaNovoPedido = ({
   }
 
   const handleNovoPedido = () => {
-     window.location.replace('/DashBoardCompras');
+    setTabelaVisivel(false);
+    setTabelaCadastroProduto(false);
+    setModalPedidoNota(false);
+    setModalPedidoNotaSemPreco(false);
+    setModalIncluirProdutoPedido(false);
+    setArquivoGerado(false);
+
+    setMarcaSelecionada(null);
+    setFornecedorSelecionado(null);
+    setCompradorSelecionado('');
+    setFiscalSelecionado('');
+    setEnviarSelecionado('');
+    setCondicoesPagamentosSelecionado('');
+    setTransportadoraSelecionada('');
+    setFreteSelecionado('');
+    setTipoPedidoSelecionado('');
+
+    setObsFornecedor('');
+    setObsInterna('');
+    setVendedor('');
+    setEmailVendedor('');
+    setDesconto1(0);
+    setDesconto2(0);
+    setDesconto3(0);
+    setComissao(0);
+    setTotalLiq(0);
+
+    setIdResumoPedido(0);
+    setIdPedidoPrimario(0);
+    setCurrentPage(1);
+
+    setChecked(false);
+    setDisabledChecked(false);
+    setCheckboxIntermediario({
+      disabled: false,
+      checked: false,
+    });
+
+    setBotoesVisiveis({
+      incluir: true,
+      fechar: true,
+      salvar: false,
+      clonar: false,
+      clonarCabecalho: true,
+      novoPedido: true,
+    });
+
+    setCamposHabilitados(true);
+    setTituloSubheader('Novo Pedido');
+
+    window.location.replace('/DashBoardCompras#');
   }
 
   const handleClickPedidoTXT = async () => {    
@@ -491,30 +541,29 @@ export const ActionPesquisaNovoPedido = ({
 
     <Fragment>
      
-      <ResultadoResumo
-        cardVendas={true}
-        valorVendas={calcularTotalDetalhe()}
-        nomeVendas="Valor Bruto Pedido"
-        IconVendas={MdOutlinePayment}
-        iconSize={100}
-        iconColor={"#fff"}
-
-        cardTicketMedio={true}
-        valorTicketMedio={calcularTotalDetalhe()}
-        nomeTicketMedio="Valor Líquido Pedido"
-        IconTicketMedio={MdOutlinePayment}
-
-        cardCliente={true}
-        numeroCliente={calcularTotalQuantidade()}
-        nomeCliente="QTD Produtos"
-        IconNumeroCliente={MdOutlinePayment}
-      />
 
       <ActionMainNovoPedido
         lBinkComponentAnterior={["Home"]}
         linkComponent={["Novo Pedido"]}
         title="Novo Pedido"
         subTitle="Nome da Loja"
+        
+        cardVendas={true}
+        valorVendas={calcularTotalDetalhe()}
+        nomeVendas="Valor Bruto Pedido"
+        IconVendas={MdOutlinePayment}
+        iconSize={100}
+        iconColor={"#fff"}
+  
+        cardTicketMedio={true}
+        valorTicketMedio={calcularTotalDetalhe()}
+        nomeTicketMedio="Valor Líquido Pedido"
+        IconTicketMedio={MdOutlinePayment}
+  
+        cardCliente={true}
+        numeroCliente={calcularTotalQuantidade()}
+        nomeCliente="QTD Produtos"
+        IconNumeroCliente={MdOutlinePayment}
 
         InputCheckBoxPedido={InputFieldCheckBox}
         labelCheckBoxPedido={"Pedido Por Intermediário"}
@@ -724,11 +773,7 @@ export const ActionPesquisaNovoPedido = ({
         styleTXT={botoesVisiveis.salvar}
       />
 
-        {/* {console.log(pendenciasFornecedor, 'len')} */}
-
-      <div id="resultadoListaPdido"
-        style={{ backgroundColor: "#fff", padding: "15px" }}
-      >
+      <div id="resultadoListaPdido" style={{ backgroundColor: "#fff", padding: "15px" }}>
 
         <ActionListaNovoPedidos 
           dadosVisualizarPedido={dadosVisualizarPedido} 
@@ -767,7 +812,7 @@ export const ActionPesquisaNovoPedido = ({
         dadosUltimosPedidos={dadosUltimosPedidos}
       />
       
-      {console.log(dadosUltimosPedidos, 'dadosUltimosPedidos')}
+      
     </Fragment>
   )
 }
