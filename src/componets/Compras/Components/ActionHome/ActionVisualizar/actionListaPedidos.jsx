@@ -280,9 +280,7 @@ export const ActionListaPedidos = ({
 
         const idDetalhePedidoPrimario = Number(row.IDDETALHEPEDIDOPRIMARIO || 0);
 
-        const idResumoPedidoPrimario = Number(
-          dadosVisualizarPedido[0]?.IDRESUMOPEDIDOPRIMARIO || 0
-        );
+        const idResumoPedidoPrimario = Number(dadosVisualizarPedido[0]?.IDPEDIDOPRIMARIO || 0);
 
         let btnOpcoes = null;
 

@@ -116,6 +116,7 @@ export const ActionListaPedidos = ({
     return {
       IDPEDIDO: item.IDPEDIDO,
       DTPEDIDOFORMATADABR: item.DTPEDIDOFORMATADABR,
+      DTPREVENTREFAFORMATADABR: item.DTPREVENTREFAFORMATADABR,
       VRTOTALLIQUIDO: toFloat(item.VRTOTALLIQUIDO),
       STCANCELADO: item.STCANCELADO,
       NOMECOMPRADOR: item.NOMECOMPRADOR,
@@ -146,6 +147,12 @@ export const ActionListaPedidos = ({
       field: 'DTPEDIDOFORMATADABR',
       header: 'Data',
       body: row => <th>{row.DTPEDIDOFORMATADABR}</th>,
+      sortable: true,
+    },
+    {
+      field: 'DTPREVENTREFAFORMATADABR',
+      header: 'Dt Entrega',
+      body: row => <th>{row.DTPREVENTREFAFORMATADABR}</th>,
       sortable: true,
     },
     {
@@ -192,7 +199,7 @@ export const ActionListaPedidos = ({
       body: row => {
         return (
           <div>
-            <th style={{ color: row.DSSETOR == 'COMPRAS' ? 'blue' : row.DSSETOR == 'CADASTRO' ? 'green' : row.DSSETOR == 'COMPRAS ADM' ? 'gray' : '' }} >{row.DSSETOR}</th>
+            <th style={{ color: row.DSSETOR == 'COMPRAS' ? 'blue' : row.DSSETOR == 'CADASTRO' ? 'green' : row.DSSETOR == 'COMPRASADM' ? 'gray' : '' }} >{row.DSSETOR == 'COMPRASADM' ? 'COMPRAS ADM' : row.DSSETOR}</th>
           </div>
         )
       },
@@ -215,21 +222,21 @@ export const ActionListaPedidos = ({
           cor = DSANDAMENTO === 'PEDIDO CANCELADO' ? 'red' : 'green';
         }
 
+        const isPedidoSecundario = IDPEDIDOPRIMARIO > 0;
+        const isPedidoPrimario = IDPEDIDOSECUNDARIO > 0 && STPEDIDOPRIMARIO === 'True';
+
         return (
           <div style={{ fontSize: '14px', fontWeight: 600 }}>
-            {/* Status principal */}
             <span style={{ color: cor }}>
               {DSANDAMENTO}
-              {/* Rascunho só aparece se PEDIDO INICIADO e STRASCUNHO = True */}
-              {DSANDAMENTO === 'PEDIDO INICIADO' && STRASCUNHO === 'True' && (
+              {STRASCUNHO === 'True' && (
                 <span style={{ color: 'red' }}> / SALVO COMO RASCUNHO</span>
               )}
             </span>
 
-            {/* Info de pedido primário/secundário */}
-            {(STPEDIDOPRIMARIO === 'True' || IDPEDIDOPRIMARIO > 0) && (
+            {(isPedidoPrimario || isPedidoSecundario) && (
               <span style={{ color: 'red', marginLeft: '4px' }}>
-                {IDPEDIDOPRIMARIO > 0
+                {isPedidoSecundario
                   ? `-> PEDIDO PRIMARIO -> ${IDPEDIDOPRIMARIO}`
                   : `-> PEDIDO SECUNDARIO -> ${IDPEDIDOSECUNDARIO}`
                 }
@@ -243,324 +250,107 @@ export const ActionListaPedidos = ({
       field: 'opcoes',
       header: 'Opções',
       body: (row) => {
-        if (row.DSSETOR === 'COMPRAS') {
-          if (row.DSANDAMENTO === 'PEDIDO INICIADO') {
-            return (
-              <div className="p-1" style={{ justifyContent: "space-between", width: "150px", display: "flex" }}>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={CiEdit}
-                    cor={"info"}
-                    iconColor={"white"}
-                    onClickButton={() => handleClickEditarPedido(row)}
-                    titleButton={"Editar Pedido"}
-                    iconSize={25}
-                    width="30px"
-                    height="30px"
-                  />
-                </div>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={AiOutlineDelete}
-                    cor={"danger"}
-                    iconColor={"white"}
-                    onClickButton={() => handleClickCancelar(row)}
-                    titleButton={"Cancelar Pedido"}
-                    iconSize={25}
-                    width="30px"
-                    height="30px"
-                  />
-                </div>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={MdOutlineLocalPrintshop}
-                    cor={"warning"}
-                    iconColor={"white"}
-                    onClickButton={() => handleClickImprimir(row)}
-                    titleButton={"Imprimir Pedido Com Preço de Venda"}
-                    iconSize={25}
-                    width="30px"
-                    height="30px"
-                  />
-                </div>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={MdOutlineLocalPrintshop}
-                    cor={"dark"}
-                    iconColor={"white"}
-                    onClickButton={() => handleClickImprimirSempreco(row)}
-                    titleButton={"Imprimir Pedido Sem Preço de Venda"}
-                    iconSize={25}
-                    width="30px"
-                    height="30px"
-                  />
-                </div>
-              </div>
-            );
-          }
+        const { DSSETOR, DSANDAMENTO, IDPEDIDOPRIMARIO } = row;
+        const isPedidoSecundario = IDPEDIDOPRIMARIO > 0;
 
-          // PEDIDO PARA SER AJUSTADO
-          else if (row.DSANDAMENTO === 'PEDIDO PARA SER AJUSTADO') {
-            return (
-              <div className="p-1" style={{ justifyContent: "space-between", width: "150px", display: "flex" }}>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={CiEdit}
-                    cor={"info"}
-                    iconColor={"white"}
-                    onClickButton={() => handleClickEditarPedido(row)}
-                    titleButton={"Editar Pedido"}
-                    iconSize={25}
-                    width="30px"
-                    height="30px"
-                  />
-                </div>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={MdOutlineLocalPrintshop}
-                    cor={"warning"}
-                    iconColor={"white"}
-                    onClickButton={() => handleClickImprimir(row)}
-                    titleButton={"Imprimir Pedido Com Preço de Venda"}
-                    iconSize={25}
-                    width="30px"
-                    height="30px"
-                  />
-                </div>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={MdOutlineLocalPrintshop}
-                    cor={"dark"}
-                    iconColor={"white"}
-                    onClickButton={() => handleClickImprimirSempreco(row)}
-                    titleButton={"Imprimir Pedido Sem Preço de Venda"}
-                    iconSize={25}
-                    width="30px"
-                    height="30px"
-                  />
-                </div>
-              </div>
-            );
-          }
+        const btnVisualizar = (
+          <ButtonTable
+            Icon={GrView}
+            cor={"success"}
+            iconColor={"white"}
+            onClickButton={() => handleClickVisualizarPedido(row)}
+            titleButton={"Visualizar o Pedido"}
+            iconSize={25}
+            width="30px"
+            height="30px"
+          />
+        );
+        const btnEditar = (
+          <ButtonTable
+            Icon={CiEdit}
+            cor={"info"}
+            iconColor={"white"}
+            onClickButton={() => handleClickEditarPedido(row)}
+            titleButton={"Editar Pedido"}
+            iconSize={25}
+            width="30px"
+            height="30px"
+          />
+        );
+        const btnCancelar = (
+          <ButtonTable
+            Icon={AiOutlineDelete}
+            cor={"danger"}
+            iconColor={"white"}
+            onClickButton={() => handleClickCancelar(row)}
+            titleButton={"Cancelar Pedido"}
+            iconSize={25}
+            width="30px"
+            height="30px"
+          />
+        );
+        const btnAtivar = (
+          <ButtonTable
+            Icon={FaCheck}
+            cor={"danger"}
+            iconColor={"white"}
+            onClickButton={() => handleClickAtivar(row)}
+            titleButton={"Ativar Pedido"}
+            iconSize={25}
+            width="30px"
+            height="30px"
+          />
+        );
+        const btnImprimirCom = (
+          <ButtonTable
+            Icon={MdOutlineLocalPrintshop}
+            cor={"warning"}
+            iconColor={"white"}
+            onClickButton={() => handleClickImprimir(row)}
+            titleButton={"Imprimir Pedido Com Preço de Venda"}
+            iconSize={25}
+            width="30px"
+            height="30px"
+          />
+        );
+        const btnImprimirSem = (
+          <ButtonTable
+            Icon={MdOutlineLocalPrintshop}
+            cor={"dark"}
+            iconColor={"white"}
+            onClickButton={() => handleClickImprimirSempreco(row)}
+            titleButton={"Imprimir Pedido Sem Preço de Venda"}
+            iconSize={25}
+            width="30px"
+            height="30px"
+          />
+        );
 
-          // PEDIDO FINALIZADO
-          else if (row.DSANDAMENTO === 'PEDIDO FINALIZADO') {
-            return (
-              <div className="p-1" style={{ justifyContent: "space-between", width: "150px", display: "flex" }}>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={GrView}
-                    cor={"success"}
-                    iconColor={"white"}
-                    onClickButton={() => handleClickVisualizarPedido(row)}
-                    titleButton={"Visualizar o Pedido"}
-                    iconSize={25}
-                    width="30px"
-                    height="30px"
-                  />
-                </div>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={AiOutlineDelete}
-                    cor={"danger"}
-                    iconColor={"white"}
-                    onClickButton={() => handleClickCancelar(row)}
-                    titleButton={"Cancelar Pedido"}
-                    iconSize={25}
-                    width="30px"
-                    height="30px"
-                  />
-                </div>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={MdOutlineLocalPrintshop}
-                    cor={"warning"}
-                    iconColor={"white"}
-                    onClickButton={() => handleClickImprimir(row)}
-                    titleButton={"Imprimir Pedido Com Preço de Venda"}
-                    iconSize={25}
-                    width="30px"
-                    height="30px"
-                  />
-                </div>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={MdOutlineLocalPrintshop}
-                    cor={"dark"}
-                    iconColor={"white"}
-                    onClickButton={() => handleClickImprimirSempreco(row)}
-                    titleButton={"Imprimir Pedido Sem Preço de Venda"}
-                    iconSize={25}
-                    width="30px"
-                    height="30px"
-                  />
-                </div>
-              </div>
-            );
-          }
+        let buttons = [];
 
-          // PEDIDO CANCELADO
-          else if (row.DSANDAMENTO === 'PEDIDO CANCELADO') {
-            return (
-              <div className="p-1" style={{ justifyContent: "space-between", width: "150px", display: "flex" }}>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={GrView}
-                    cor={"success"}
-                    iconColor={"white"}
-                    onClickButton={() => handleClickVisualizarPedido(row)}
-                    titleButton={"Visualizar o Pedido"}
-                    iconSize={25}
-                    width="30px"
-                    height="30px"
-                  />
-                </div>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={FaCheck}
-                    cor={"danger"}
-                    iconColor={"white"}
-                    onClickButton={() => handleClickAtivar(row)}
-                    titleButton={"Ativar Pedido"}
-                    iconSize={25}
-                    width="30px"
-                    height="30px"
-                  />
-                </div>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={MdOutlineLocalPrintshop}
-                    cor={"warning"}
-                    iconColor={"white"}
-                    onClickButton={() => handleClickImprimir(row)}
-                    titleButton={"Imprimir Pedido Com Preço de Venda"}
-                    iconSize={25}
-                    width="30px"
-                    height="30px"
-                  />
-                </div>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={MdOutlineLocalPrintshop}
-                    cor={"dark"}
-                    iconColor={"white"}
-                    onClickButton={() => handleClickImprimirSempreco(row)}
-                    titleButton={"Imprimir Pedido Sem Preço de Venda"}
-                    iconSize={25}
-                    width="30px"
-                    height="30px"
-                  />
-                </div>
-              </div>
-            );
+        if (DSSETOR === 'COMPRAS') {
+          if (DSANDAMENTO === 'PEDIDO INICIADO') {
+            buttons = [btnEditar, btnCancelar, btnImprimirCom, btnImprimirSem];
+          } else if (DSANDAMENTO === 'PEDIDO PARA SER AJUSTADO') {
+            buttons = [btnEditar, btnImprimirCom, btnImprimirSem];
+          } else if (DSANDAMENTO === 'PEDIDO FINALIZADO') {
+            buttons = [btnVisualizar, btnCancelar, btnImprimirCom, btnImprimirSem];
+          } else if (DSANDAMENTO === 'PEDIDO CANCELADO') {
+            buttons = [btnVisualizar, btnAtivar, btnImprimirCom, btnImprimirSem];
           }
+        } else {
+          buttons = [btnVisualizar, btnImprimirCom, btnImprimirSem];
         }
 
-        // 2️⃣ SETOR CADASTRO ou COMPRASADM
-        else if (row.DSSETOR === 'CADASTRO' || row.DSSETOR === 'COMPRASADM') {
-
-          // 🔥 VERIFICAÇÃO CRÍTICA: Pedidos primários/secundários sobrescrevem botões
-          if (row.STPEDIDOPRIMARIO === 'True' || row.IDPEDIDOPRIMARIO > 0) {
-            return (
-              <div className="p-1" style={{ justifyContent: "space-between", width: "150px", display: "flex" }}>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={GrView}
-                    cor={"success"}
-                    iconColor={"white"}
-                    onClickButton={() => handleClickVisualizarPedido(row)}
-                    titleButton={"Visualizar o Pedido"}
-                    iconSize={25}
-                    width="30px"
-                    height="30px"
-                  />
-                </div>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={MdOutlineLocalPrintshop}
-                    cor={"warning"}
-                    iconColor={"white"}
-                    onClickButton={() => handleClickImprimir(row)}
-                    titleButton={"Imprimir Pedido Com Preço de Venda"}
-                    iconSize={25}
-                    width="30px"
-                    height="30px"
-                  />
-                </div>
-                <div className="p-1">
-                  <ButtonTable
-                    Icon={MdOutlineLocalPrintshop}
-                    cor={"dark"}
-                    iconColor={"white"}
-                    onClickButton={() => handleClickImprimirSempreco(row)}
-                    titleButton={"Imprimir Pedido Sem Preço de Venda"}
-                    iconSize={25}
-                    width="30px"
-                    height="30px"
-                  />
-                </div>
-              </div>
-            );
-          }
-
-          // Padrão para CADASTRO/COMPRASADM (sempre só visualizar + imprimir)
-          return (
-            <div className="p-1" style={{ justifyContent: "space-between", width: "150px", display: "flex" }}>
-              <div className="p-1">
-                <ButtonTable
-                  Icon={GrView}
-                  cor={"success"}
-                  iconColor={"white"}
-                  onClickButton={() => handleClickVisualizarPedido(row)}
-                  titleButton={"Visualizar o Pedido"}
-                  iconSize={25}
-                  width="30px"
-                  height="30px"
-                />
-              </div>
-              <div className="p-1">
-                <ButtonTable
-                  Icon={MdOutlineLocalPrintshop}
-                  cor={"warning"}
-                  iconColor={"white"}
-                  onClickButton={() => handleClickImprimir(row)}
-                  titleButton={"Imprimir Pedido Com Preço de Venda"}
-                  iconSize={25}
-                  width="30px"
-                  height="30px"
-                />
-              </div>
-              <div className="p-1">
-                <ButtonTable
-                  Icon={MdOutlineLocalPrintshop}
-                  cor={"dark"}
-                  iconColor={"white"}
-                  onClickButton={() => handleClickImprimirSempreco(row)}
-                  titleButton={"Imprimir Pedido Sem Preço de Venda"}
-                  iconSize={25}
-                  width="30px"
-                  height="30px"
-                />
-              </div>
-            </div>
-          );
+        if (isPedidoSecundario) {
+          buttons = [btnVisualizar, btnImprimirCom, btnImprimirSem];
         }
 
-        // 3️⃣ FALLBACK: Caso não se enquadre nas condições acima
         return (
           <div className="p-1" style={{ justifyContent: "space-between", width: "150px", display: "flex" }}>
-            <div className="p-1">
-              <ButtonTable
-                Icon={GrView}
-                cor={"success"}
-                iconColor={"white"}
-                onClickButton={() => handleClickVisualizarPedido(row)}
-                titleButton={"Visualizar o Pedido"}
-                iconSize={25}
-                width="30px"
-                height="30px"
-              />
-            </div>
+            {buttons.map((btn, i) => (
+              <div key={i} className="p-1">{btn}</div>
+            ))}
           </div>
         );
       },
@@ -621,7 +411,7 @@ export const ActionListaPedidos = ({
     const stOutlet = confirmacao.value === true;
 
     if (!stImprimir) {
-      return; // Sai se usuário não quer imprimir
+      return; 
     }
 
     try {
@@ -630,7 +420,7 @@ export const ActionListaPedidos = ({
       if (response.data && responseDetlhe.data) {
         setDadosPedido({
           ...response.data,
-          STOUTLET: stOutlet ? 'True' : 'False' // Adiciona a propriedade STOUTLET com base na escolha do usuário
+          STOUTLET: stOutlet ? 'True' : 'False' 
         })
         setDadosDetalhePedido(responseDetlhe.data)
         setModalPedidoNota(true)
@@ -670,7 +460,7 @@ export const ActionListaPedidos = ({
     const stOutlet = confirmacao.value === true;
 
     if (!stImprimir) {
-      return; // Sai se usuário não quer imprimir
+      return; 
     }
 
     try {
