@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { get } from "../../../../../../../api/funcRequest";
 import { useQuery } from "react-query";
 import axios from "axios";
 import { toFloat } from "../../../../../../../utils/toFloat";
-import { set } from "date-fns";
-
+import { optionsReposicao, optionsTipoCadastro } from "../../../../../../../../parceiro.json"
 
 
 export const useIncluirProduto = ({ 
@@ -18,7 +17,8 @@ export const useIncluirProduto = ({
     const [nomeMarca, setNomeMarca] = useState('')
     const [referenciaProduto, setReferenciaProduto] = useState('')
     const [produtoSelecionado, setProdutoSelecionado] = useState('')
-    const [stReposicaoSelecionado, setStReposicaoSelecionado] = useState('')
+    const [reposicaoSelecionado, setReposicaoSelecionado] = useState('')
+    const [tipoCadastroSelecionado, setTipoCadastroSelecionado] = useState('')
     const [descricaoProduto, setDescricaoProduto] = useState('')
     const [vrCusto, setVrCusto] = useState('')
     const [vrVenda, setVrVenda] = useState('')
@@ -55,6 +55,14 @@ export const useIncluirProduto = ({
     const [stReposicao, setStReposicao] = useState('False');
     const [stRascunho, setRascunho] = useState('False');
     const [tipoCadastro, setTipoCadastro] = useState('');
+    const [tamanhoUnicoId, setTamanhoUnicoId] = useState(null);
+    const [stTransformado, setStTransformado] = useState('False');
+    const [tamanhosAtivosEdicao, setTamanhosAtivosEdicao] = useState(new Set());
+    const [dadosPedidoAtual, setDadosPedidoAtual] = useState([])
+    const [gradeDetalhes, setGradeDetalhes] = useState({});
+
+    const pendingTamanhoIdRef = useRef(null);
+
 
     const { data: dadosVinculoEstiloGrupo = [], error: errorVinculoEstiloGrupo, isLoading: isLoadingVinculoEstiloGrupo, refetch: refetchVinculoEstiloGrupo } = useQuery(
         'vinculo-estilo-grupo',
@@ -83,15 +91,21 @@ export const useIncluirProduto = ({
     );
 
     const { data: dadosTipoTecidos  = [], error: errorTipoTecidos, isLoading: isLoadingTipoTecidos, refetch: refetchTipoTecidos } = useQuery(
-        'tipo-tecido',
-        async () => { const response = await get(`/tipo-tecido`);  return response.data },  
+        'tipoTecidos',
+        async () => { const response = await get(`/tipoTecidos`);  return response.data },  
         { enabled: true }
     );
 
     const { data: dadosCategoriaPedidos  = [], error: errorCategoriaPedidos, isLoading: isLoadingCategoriaPedidos, refetch: refetchCategoriaPedidos } = useQuery(
-        'categoria-pedido',
-        async () => { const response = await get(`/categoria-pedido?idCategoriaPedido=${dadosDetalhePedido[0]?.IDCATEGORIAPEDIDO}`); return response.data},
+        'categoriasProdutos',
+        async () => { const response = await get(`/categoriasProdutos?idCategoriaPedido=${dadosDetalhePedido[0]?.IDCATEGORIAPEDIDO}`); return response.data},
         { enabled: true }
+    );
+
+    const { data: dadosCategoriaPedidoGrade  = [], error: errorCategoriaPedidoGrade, isLoading: isLoadingCategoriaPedidoGrade, refetch: refetchCategoriaPedidoGrade } = useQuery(
+        'categoria-pedido',
+        async () => { const response = await get(`/categoria-pedido?idCategoriaPedido=${tipoPedidoSelecionado?.value}`); return response.data},
+        { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
     );
     
     const { data: dadosCategoriasProdutos  = [], error: errorCategoriasProdutos, isLoading: isLoadingCategoriasProdutos, refetch: refetchCategoriasProdutos } = useQuery(
@@ -147,98 +161,70 @@ export const useIncluirProduto = ({
         let usuarioIP = null;
 
         try {
-            const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
-            usuarioIP = ipWhoisData?.ip;
+        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+        usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-            console.error("Erro ao buscar IP via ipwho.is:", error);
+        console.error("Erro ao buscar IP via ifconfig.me:", error);
         }
 
         if (!usuarioIP) {
-            try {
-                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-                usuarioIP = ipifyData?.ip;
-            } catch (error) {
-                console.error("Erro ao buscar IP via ipify.org:", error);
-            }
+        try {
+            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+            usuarioIP = ipifyData?.ip;
+        } catch (error) {
+            console.error("Erro ao buscar IP via ipify.org:", error);
+        }
         }
         setIpUsuario(usuarioIP);
         return usuarioIP;
     };
 
-    const optionsCadastro = [
-        { value: 'False', label: 'NORMAL'},
-        { value: 'True', label: 'POR REFERÊNCIA' },
-    ]
-    
-    const optionsReposicao = [
-        { value: 'True', label: 'SIM' },
-        { value: 'False', label: 'NÃO' }
-    ]
 
-    // Função utilitária para formatar números
     const formatarNumero = (valor, decimais = 2) => {
         if (valor === '' || valor === null || valor === undefined) return '';
         const numero = parseFloat(valor);
         if (isNaN(numero)) return '';
-        return numero.toLocaleString('pt-BR', { 
-            style: 'decimal', 
+        return numero.toLocaleString('pt-BR', {
+            style: 'decimal',
             minimumFractionDigits: decimais,
             maximumFractionDigits: decimais
         });
     };
 
-    // Função utilitária para converter string brasileira em número
     const converterParaNumero = (valor) => {
         if (!valor || valor === '') return 0;
-        // Remove pontos de milhares e substitui vírgula por ponto
+      
         const valorLimpo = valor.toString().replace(/\./g, '').replace(',', '.');
         const numero = parseFloat(valorLimpo);
         return isNaN(numero) ? 0 : numero;
     };
 
-    const atualiza_valor_QtdUnit = () => {
-        // Garantir que todos os campos tenham valores padrão
-        const descI = converterParaNumero(percDescontoI) || 0;
-        const descII = converterParaNumero(percDescontoII) || 0;
-        const descIII = converterParaNumero(percDescontoIII) || 0;
-        const vrUnitBruto = converterParaNumero(vrBruto) || 0;
-        const qtdProdPedido = converterParaNumero(quantidade) || 0;
-        const vrSug = converterParaNumero(vrSugerido) || 0;
-        const vrSugFixo = converterParaNumero(vrSugerigoFixo) || 0;
+    const atualiza_valor_QtdUnit = (overrides = {}) => {
+        const vrUnitBruto = converterParaNumero(overrides.vrBruto ?? vrBruto) || 0;
+        const qtdProdPedido = converterParaNumero(overrides.quantidade ?? quantidade) || 0;
+        const vrSugFixo = converterParaNumero(overrides.vrSugerigoFixo ?? vrSugerigoFixo) || 0;
 
-        // Calcular descontos em cascata
-        let valorComDesconto = vrUnitBruto;
+        const descI = overrides.percDescontoI ?? percDescontoI;
+        const descII = overrides.percDescontoII ?? percDescontoII;
+        const descIII = overrides.percDescontoIII ?? percDescontoIII;
 
-        // Primeiro desconto
-        if (descI > 0) {
-            valorComDesconto = valorComDesconto - (valorComDesconto * (descI / 100));
-        }
+        const desc01 = isNaN(converterParaNumero(descI)) ? 0 : converterParaNumero(descI);
+        const desc02 = isNaN(converterParaNumero(descII)) ? 0 : converterParaNumero(descII);
+        const desc03 = isNaN(converterParaNumero(descIII)) ? 0 : converterParaNumero(descIII);
 
-        // Segundo desconto
-        if (descII > 0) {
-            valorComDesconto = valorComDesconto - (valorComDesconto * (descII / 100));
-        }
+        const desconto1 = vrUnitBruto - (vrUnitBruto * (desc01 / 100));
+        const desconto2 = desconto1 - (desconto1 * (desc02 / 100));
+        const desconto3 = desconto2 - (desconto2 * (desc03 / 100));
 
-        // Terceiro desconto
-        if (descIII > 0) {
-            valorComDesconto = valorComDesconto - (valorComDesconto * (descIII / 100));
-        }
+        setVrLiquido(formatarNumero(desconto3));
 
-        // Atualizar valor líquido (só formatar se não estiver vazio)
-        setVrLiquido(valorComDesconto.toFixed(2).replace('.', ','));
+        const total = desconto3 * qtdProdPedido;
+        setVrTotal(formatarNumero(total));
 
-        // Calcular valor total (quantidade * valor líquido)
-        const valorTotal = valorComDesconto * qtdProdPedido;
-        setVrTotal(valorTotal.toFixed(2).replace('.', ','));
-
-        // Calcular valor de venda sugerido
-        if (vrSugFixo === 0) {
-            // Se não tem valor fixo, calcular 2.5x o valor líquido
-            const vrVendaSugerida = valorComDesconto * 2.5;
-            setVrSugerido(vrVendaSugerida.toFixed(2).replace('.', ','));
+        if (parseFloat(vrSugFixo) === 0) {
+            setVrSugerido(formatarNumero(desconto3 * 2.5));
         } else {
-            // Se tem valor fixo, usar o valor fixo
-            setVrSugerido(vrSugFixo.toFixed(2).replace('.', ','));
+            setVrSugerido(formatarNumero(vrSugFixo));
         }
     };
 
@@ -253,7 +239,7 @@ export const useIncluirProduto = ({
                 dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL == 3 ? 'YO - YORUS' : 
                 'FC - FREE CENTER'
             )
-            setStReposicaoSelecionado({
+            setReposicaoSelecionado({
                 value: dadosDetalhePedido[0]?.STREPOSICAO, 
                 label:  dadosDetalhePedido[0]?.STREPOSICAO == 'True' ? 'SIM' : 'NÃO'
             })
@@ -272,7 +258,6 @@ export const useIncluirProduto = ({
             setUnidadeSelecionada({value: dadosDetalhePedido[0]?.IDUNIDADEMEDIDA, label: dadosDetalhePedido[0]?.DSSIGLA})
             setCorSelecionada({value: dadosDetalhePedido[0]?.IDCOR, label: dadosDetalhePedido[0]?.DSCOR})
             setTipoTecidoSelecionado({value: dadosDetalhePedido[0]?.IDTIPOTECIDO, label: dadosDetalhePedido[0]?.DSTIPOTECIDO})
-            // IDCATEGORIAPEDIDO
             setCategoriaGradeSelecionada({
                 value: dadosDetalhePedido[0]?.IDCATEGORIAGRADE, 
                 label: `${dadosDetalhePedido[0]?.TPCATEGORIAPRODPEDIDO} - ${dadosDetalhePedido[0]?.DSCATEGORIAPEDIDO}`
@@ -294,159 +279,259 @@ export const useIncluirProduto = ({
             setStPedidoPorIntermediario(dadosDetalhePedido[0]?.STPEDIDOPORINTEMEDIARIO)
             setObsFornecedor(dadosDetalhePedido[0]?.OBSPEDIDO)
             setRascunho(dadosDetalhePedido[0]?.STRASCUNHO)
-            // setProdutoDadosGrade(dadosDetalhePedido[0]?.DETALHEGRADE.map((item) => ({
-                //     IDTAMANHO: item.IDTAMANHO,
-                //     DSTAMANHO: item.DSTAMANHO,
-                // })))
-            // console.log(dadosDetalhePedido[0]?.DETALHEGRADE.map((item) => ({
-                //     IDTAMANHO: item.IDTAMANHO,
-                //     DSTAMANHO: item.DSTAMANHO,
-                //     INDICETAMANHO: item.INDICETAMANHO
-            // })), 'dadosDetalhePedido[0]?.DETALHEGRADE - Campos selecionados')
+
         }
         }, [dadosDetalhePedido]);
 
 
-    // Inicializa os valores quando dadosGrade muda
-    useEffect(() => {
-        if (dadosGrade?.length) {
-            const valoresIniciais = {};
-            dadosGrade.forEach(item => {
-                const stDiversos = item.DSTAMANHO?.toUpperCase() === 'DIVERSOS' || 
-                                item.DSTAMANHO?.toUpperCase() === 'U-DIVERSOS';
-                valoresIniciais[item.IDTAMANHO] = stDiversos ? 1 : 0;
-            });
-            setQuantidadePorTamanho(valoresIniciais);
-        }
-    }, [dadosGrade]);
-
-      // Função para formatar valor (equivalente ao formataValorGrade do jQuery)
-    const formataValorGrade = (valor, condicao = 'False') => {
-        const vrInput = Number(valor?.toString().replace(/[^0-9]/g, '') || (condicao === 'True' ? 1 : 0));
-        return vrInput;
-    };
-
-    // Função de validação da grade (equivalente ao validarGradeamentoProduto do jQuery)
-    const validarGradeamento = () => {
-        const qtdprodpedido = Number(quantidade);
-        let totalindice = 0;
-        const erros = [];
-        
-        // Filtra inputs com valores > 0
-        const inputsComValor = Object.entries(quantidadePorTamanho).filter(([id, valor]) => Number(valor || 0) > 0);
-        
-        if (inputsComValor.length) {
-        // Valida reposição com múltiplos tamanhos
-        if (stReposicaoSelecionado !== 'False' && inputsComValor.length > 1) {
-            erros.push("Este produto é de reposição e por isso não pode ser gradeado com mais de um tamanho.");
-        } else {
-            // Calcula total de índices
-            for (let [id, valor] of inputsComValor) {
-            totalindice += parseFloat(valor);
-            }
-            
-            // Verifica se divisões resultam em números inteiros
-            let acumuladorInputsError = '';
-            for (let [id, valor] of inputsComValor) {
-            const item = dadosGrade.find(g => g.IDTAMANHO.toString() === id);
-            const labelInput = item?.DSTAMANHO || '';
-            const qtdgradetotal = (qtdprodpedido / totalindice) * parseFloat(valor);
-            
-            if (!Number.isInteger(qtdgradetotal)) {
-                acumuladorInputsError += `( Tamanho: ${labelInput} , Quantidade: ${qtdgradetotal.toFixed(2)} ), `;
-            }
-            }
-            
-            if (acumuladorInputsError) {
-            erros.push(`O Gradeamento não dá valor de quantidade exato para os TAMANHOS: ${acumuladorInputsError}`);
-            }
-        }
-        } else {
-        erros.push('O Gradeamento de Tamanhos Não Pode Ser Zerado.');
-        }
-        
-        setErrosValidacao(erros);
-        return erros.length === 0;
-    };
-
-    // Função para montar payload da grade (equivalente ao montarPayloadGradeProduto do jQuery)
-    const montarPayloadGrade = () => {
-        const qtdprodpedido = Number(quantidade);
-        const grade = [];
-        let totalindice = 0;
-        
-        // Filtra inputs com valores > 0
-        const inputsComValor = Object.entries(quantidadePorTamanho).filter(([id, valor]) => Number(valor || 0) > 0);
-        
-        // Calcula total de índices
-        for (let [id, valor] of inputsComValor) {
-            totalindice += parseFloat(valor);
-        }
-        
-        // Monta o payload
-        for (let [id, valor] of inputsComValor) {
-            const qtdgradetotal = (qtdprodpedido / totalindice) * parseFloat(valor);
-        
-            grade.push({
-                "idgrade": parseInt(id),
-                "vlrgrade": parseInt(valor),
-                "qtdgrade": parseFloat(qtdgradetotal)
-            });
-        }
-        
-        return grade;
-    };
-
-     // Handler para mudança de valor nos inputs
-    const handleChangeQuantidade = (idTamanho, valor) => {
+      const handleChangeQuantidade = (idTamanho, valor) => {
         const valorFormatado = formataValorGrade(valor);
-        
+
         setQuantidadePorTamanho(prevState => ({
-        ...prevState,
-        [idTamanho]: valorFormatado
+            ...prevState,
+            [idTamanho]: valorFormatado
         }));
-        
-        // Limpa erros quando usuário digita
+
         if (errosValidacao.length > 0) {
-        setErrosValidacao([]);
+            setErrosValidacao([]);
         }
     };
 
-     // Calcula a distribuição de quantidades para exibição
     const calcularDistribuicao = () => {
         const qtdprodpedido = Number(quantidade);
         const inputsComValor = Object.entries(quantidadePorTamanho).filter(([id, valor]) => Number(valor || 0) > 0);
-        
+
         if (inputsComValor.length === 0 || qtdprodpedido === 0) return {};
-        
+
         let totalindice = 0;
         for (let [id, valor] of inputsComValor) {
             totalindice += parseFloat(valor);
         }
-        
+
         const distribuicao = {};
         for (let [id, valor] of inputsComValor) {
             const qtdgradetotal = (qtdprodpedido / totalindice) * parseFloat(valor);
             distribuicao[id] = qtdgradetotal;
         }
-         console.log(distribuicao, 'distribuicao');
+        
         return distribuicao;
     };
 
     useEffect(() => {
-        // Simula carregamento dos dados da grade
-        setProdutoDadosGrade([
-        { IDTAMANHO: 1, DSTAMANHO: 'P' },
-        { IDTAMANHO: 2, DSTAMANHO: 'M' },
-        { IDTAMANHO: 3, DSTAMANHO: 'G' },
-        { IDTAMANHO: 4, DSTAMANHO: 'GG' },
-        { IDTAMANHO: 5, DSTAMANHO: 'EG' },
-        { IDTAMANHO: 6, DSTAMANHO: 'DIVERSOS' }
-        ]);
-    }, []);
+    if (dadosGrade?.length) {
+        setQuantidadePorTamanho(prev => {
+            // se já há valores (vieram de preencherGradeEdicao), não reseta
+            const jaTemValores = Object.values(prev).some(v => Number(v) > 0);
+            if (jaTemValores) return prev;
+
+            const valoresIniciais = {};
+            dadosGrade.forEach(item => {
+                const stDiversos = item.DSTAMANHO?.toUpperCase() === 'DIVERSOS' ||
+                    item.DSTAMANHO?.toUpperCase() === 'U-DIVERSOS';
+                valoresIniciais[item.IDTAMANHO] = stDiversos ? 1 : 0;
+            });
+            return valoresIniciais;
+        });
+    }
+}, [dadosGrade]);
+
+
+   
+    const preencherGradeEdicao = (gradeamentoItem) => {
+        const detalhes = {};
+        const quantidades = {};
+
+        gradeamentoItem.forEach(({ IDTAMANHO, IDDETALHEPEDIDOGRADE, INDICETAMANHO, STATIVO }) => {
+            detalhes[String(IDTAMANHO)] = Number(IDDETALHEPEDIDOGRADE) || null;
+            // espelha exatamente o que o jQuery faz: só preenche os STATIVO == 'True'
+            if (STATIVO === 'True') {
+                quantidades[String(IDTAMANHO)] = Number(INDICETAMANHO) || 0;
+            }
+        });
+
+        setGradeDetalhes(detalhes);
+        setQuantidadePorTamanho(quantidades);
+    };
+
+    useEffect(() => {
+        if (dadosPedidoGrade?.length) {
+            preencherGradeEdicao(dadosPedidoGrade);
+        }
+    }, [dadosPedidoGrade]);
+
+    const formataValorGrade = (valor, condicao = 'False') => {
+        let vrInput = Number(String(valor ?? '').replace(/[^0-9]/g, '')) || 0;
+
+        if (condicao === 'True') {
+            vrInput = Number(vrInput) || 1;
+        }
+        return vrInput;
+    };
+
+    const validarGradeamento = () => {
+        const qtdprodpedido = Number(quantidade || 0);
+        let totalindice = 0;
+        const erros = [];
+        let acumuladorInputsError = '';
+
+        const inputsComValor = Object.entries(quantidadePorTamanho)
+            .filter(([, valor]) => Number(valor || 0) > 0);
+
+        if (inputsComValor.length) {
+            if (stReposicao !== 'False' && inputsComValor.length > 1) {
+                erros.push('Este produto é de reposição e por isso não pode ser gradeado com mais de um tamanho.');
+            } else {
+                for (const [, valor] of inputsComValor) {
+                    totalindice += Number(valor);
+                }
+
+                if (totalindice <= 0) {
+                    erros.push('O Gradeamento de Tamanhos Não Pode Estar Zerado.');
+                } else {
+                    for (const [id, valor] of inputsComValor) {
+                        const item = dadosGrade.find(g => String(g.IDTAMANHO) === String(id));
+                        const labelInput = item?.DSTAMANHO || '';
+                        const qtdgradetotal = (qtdprodpedido / totalindice) * Number(valor);
+
+                        if (!Number.isInteger(qtdgradetotal)) {
+                            acumuladorInputsError += `( Tamanho: ${labelInput} , Quantidade: ${qtdgradetotal.toFixed(2)} ), `;
+                        }
+                    }
+
+                    if (acumuladorInputsError) {
+                        erros.push(`Os valores digitados no Gradeamento de Tamanhos não geram quantidades exatas para cada TAMANHO: ${acumuladorInputsError}`);
+                    }
+                }
+            }
+        } else {
+            erros.push('O Gradeamento de Tamanhos Não Pode Estar Zerado.');
+        }
+
+        setErrosValidacao(erros);
+        return erros.length === 0;
+    };
+    
+    const montarPayloadGrade = () => {
+        const qtdprodpedido = Number(quantidade || 0);
+        const grade = [];
+
+        const inputsComValor = Object.entries(quantidadePorTamanho)
+            .filter(([, valor]) => Number(valor || 0) > 0);
+
+        const totalindice = inputsComValor.reduce((acc, [, valor]) => acc + Number(valor), 0);
+        if (!inputsComValor.length || totalindice <= 0 || qtdprodpedido <= 0) return [];
+
+        for (const [id, valor] of inputsComValor) {
+            const qtdgradetotal = (qtdprodpedido / totalindice) * Number(valor);
+
+            grade.push({
+                IDDETALHEPEDIDOGRADE: gradeDetalhes[id] ?? null, 
+                IDTAMANHO: parseInt(id, 10),
+                INDICETAMANHO: parseInt(valor, 10),
+                QTD: Number(qtdgradetotal)
+            });
+        }
+
+        return grade;
+    };
+
+    const isDiversos = (nome = '') => {
+        const t = String(nome).toUpperCase();
+        return t === 'DIVERSOS' || t === 'U-DIVERSOS';
+    };
+
+    const getInputStateGrade = ({ item, valorAtual }) => {
+        const id = String(item.IDTAMANHO);
+        const diversos = isDiversos(item.DSTAMANHO);
+
+
+        if (diversos) {
+            return { disabled: true, readOnly: true };
+        }
+
+   
+        if (tamanhoUnicoId) {
+            const isSelecionado = String(tamanhoUnicoId) === id;
+            return { disabled: !isSelecionado, readOnly: !isSelecionado };
+        }
+
+    
+        if (stReposicao === 'True') {
+            const ativo = tamanhosAtivosEdicao?.has(id);
+            return { disabled: !ativo, readOnly: !ativo };
+        }
+
+    
+        if (stTransformado === 'True') {
+            const temValor = Number(valorAtual || 0) > 0;
+            return { disabled: !temValor, readOnly: !temValor };
+        }
+
+   
+        return { disabled: false, readOnly: false };
+    };
 
     const onSubmit = async () => {
+        if (stReposicao === 'False') {
+            const responseProdutoExistente = await get(`/produtos-pedido?referenciaProduto=${descricaoProduto}`);
+            if (responseProdutoExistente.data.length > 0) {
+                Swal.fire({
+                    title: 'Edite e tente novamente!',
+                    text: 'Já existe um produto cadastrado com a mesma descrição digitada!',
+                    icon: 'warning',
+                    customClass: {
+                        container: 'custom-swal',   
+                    },
+                });
+                return;
+            }
 
+            const corOriginal = dadosCores.find(c => String(c.ID_COR) === String(corSelecionada?.value));
+            const corBloqueada = String(corOriginal?.STBLOQUEADOPARACADASTROPRODUTONOVO) === 'True'
+                || ['NENHUM', 'NENHUMA'].includes((corOriginal?.DS_COR || '').trim().toUpperCase());
+            if (corBloqueada) {
+                Swal.fire({
+                    title: 'Atenção!',
+                    text: 'A Cor selecionada está bloqueada para cadastro em novos produtos!',
+                    icon: 'warning',
+                    customClass: {
+                        container: 'custom-swal',   
+                    },
+                });
+                return;
+            }
+
+            const materialOriginal = dadosTipoTecidos.find(t => String(t.IDTPTECIDO) === String(tipoTecidoSelecionado?.value));
+            const materialBloqueado = String(materialOriginal?.STBLOQUEADOPARACADASTROPRODUTONOVO) === 'True'
+                || ['NENHUM', 'NENHUMA'].includes((materialOriginal?.DSTIPOTECIDO || '').trim().toUpperCase());
+            if (materialBloqueado) {
+                Swal.fire({
+                    title: 'Atenção!',
+                    text: 'O Tipo de Material está bloqueado para cadastro em novos produtos!',
+                    icon: 'warning',
+                    customClass: {
+                        container: 'custom-swal',   
+                    },
+                });
+                return;
+            }
+        }
+
+        const validarDuplicidadePedido = await get(`/lista-detalhe-pedidos?idPedido=${idResumoPedido}&dsProduto=${descricaoProduto}&refProduto=${referenciaProduto}`);
+        if (validarDuplicidadePedido.data.length > 0) {
+            Swal.fire({
+                title: 'Este Produto já existe no pedido!',
+                text: 'Caso queira incrementar quantidade, volte e edite o item referente!',
+                icon: 'warning',
+                customClass: {
+                    container: 'custom-swal',   
+                },
+            });
+            return;
+        }
+
+        const grade = montarPayloadGrade();
+        
         try {
             const data = {
                 IDRESUMOPEDIDO: parseInt(idResumoPedido),
@@ -491,15 +576,17 @@ export const useIncluirProduto = ({
         }
     }
 
-    return {
-        nomeMarca, 
+      return {
+        nomeMarca,
         setNomeMarca,
         referenciaProduto,
         setReferenciaProduto,
         produtoSelecionado,
         setProdutoSelecionado,
-        stReposicaoSelecionado,
-        setStReposicaoSelecionado,
+        reposicaoSelecionado,
+        setReposicaoSelecionado,
+        tipoCadastroSelecionado,
+        setTipoCadastroSelecionado,
         descricaoProduto,
         setDescricaoProduto,
         vrCusto,
@@ -550,20 +637,19 @@ export const useIncluirProduto = ({
         setVrTotal,
         observacao,
         setObservacao,
-        dadosCategorias,
         dadosCores,
         dadosUnidadeMedida,
         dadosTipoTecidos,
         dadosCategoriaPedidos,
+        dadosCategoriaPedidoGrade,
         dadosCategoriasProdutos,
         dadosSubGrupoProduto,
         dadosFabricantePedido,
         dadosLocalExposicao,
         dadosGrade,
-        dadosPedidoGrade,
         dadosProdutosPedidos,
         dadosVinculoEstiloGrupo,
-        optionsCadastro,
+        optionsTipoCadastro,
         optionsReposicao,
         atualiza_valor_QtdUnit,
         vrSugerigoFixo,
@@ -582,6 +668,16 @@ export const useIncluirProduto = ({
         setProdutoDadosGrade,
         stReposicao,
         setStReposicao,
+        isDiversos,
+        getInputStateGrade,
+        tamanhosAtivosEdicao,
+        setTamanhosAtivosEdicao,
+        tamanhoUnicoId,
+        setTamanhoUnicoId,
+        stTransformado,
+        setStTransformado,
+        gradeDetalhes,
+        preencherGradeEdicao,
         onSubmit,
     }
 

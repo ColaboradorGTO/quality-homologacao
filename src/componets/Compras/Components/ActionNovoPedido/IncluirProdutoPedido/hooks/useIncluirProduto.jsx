@@ -186,7 +186,6 @@ export const useIncluirProduto = ({
         });
     };
 
-   
     const converterParaNumero = (valor) => {
         if (!valor || valor === '') return 0;
       
@@ -344,7 +343,6 @@ export const useIncluirProduto = ({
         return vrInput;
     };
 
-
     const validarGradeamento = () => {
         const qtdprodpedido = Number(quantidade || 0);
         let totalindice = 0;
@@ -387,7 +385,6 @@ export const useIncluirProduto = ({
         setErrosValidacao(erros);
         return erros.length === 0;
     };
-
     
     const montarPayloadGrade = () => {
         const qtdprodpedido = Number(quantidade || 0);

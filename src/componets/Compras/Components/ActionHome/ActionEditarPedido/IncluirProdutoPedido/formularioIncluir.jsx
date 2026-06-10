@@ -6,9 +6,9 @@ import { ButtonTypeModal } from "../../../../../Buttons/ButtonTypeModal";
 import { useForm, Controller } from "react-hook-form";
 import { schema } from "./schema/useProdutoSchema";
 import FormField from "../../../../../Formularios/FormField";
-import { formatMoeda } from "../../../../../../utils/formatMoeda";
+import { formatarMoeda, formatMoeda } from "../../../../../../utils/formatMoeda";
 import { SelectList } from "../../../../../Buttons/menuList";
-
+ 
 
 export const FormularioIncluirProdutoPedido = ({
     usuarioLogado,
@@ -23,14 +23,16 @@ export const FormularioIncluirProdutoPedido = ({
         mode: "onChange"
     });
     const {
-        nomeMarca,
+         nomeMarca,
         setNomeMarca,
         referenciaProduto,
         setReferenciaProduto,
         produtoSelecionado,
         setProdutoSelecionado,
-        stReposicaoSelecionado,
-        setStReposicaoSelecionado,
+        reposicaoSelecionado,
+        setReposicaoSelecionado,
+        tipoCadastroSelecionado,
+        setTipoCadastroSelecionado,
         descricaoProduto,
         setDescricaoProduto,
         vrCusto,
@@ -81,20 +83,19 @@ export const FormularioIncluirProdutoPedido = ({
         setVrTotal,
         observacao,
         setObservacao,
-        dadosCategorias,
         dadosCores,
         dadosUnidadeMedida,
         dadosTipoTecidos,
         dadosCategoriaPedidos,
+        dadosCategoriaPedidoGrade,
         dadosCategoriasProdutos,
         dadosSubGrupoProduto,
         dadosFabricantePedido,
         dadosLocalExposicao,
         dadosGrade,
-        dadosPedidoGrade,
         dadosProdutosPedidos,
         dadosVinculoEstiloGrupo,
-        optionsCadastro,
+        optionsTipoCadastro,
         optionsReposicao,
         atualiza_valor_QtdUnit,
         vrSugerigoFixo,
@@ -111,6 +112,10 @@ export const FormularioIncluirProdutoPedido = ({
         setQuantidadePorTamanho,
         produtoDadosGrade,
         setProdutoDadosGrade,
+        stReposicao,
+        setStReposicao,
+        isDiversos,
+        getInputStateGrade,
         onSubmit,
     } = useIncluirProduto({ usuarioLogado, optionsModulos, dadosDetalhePedido, dadosDetalheGradePedido, dadosPedidosDetalhe, dadosVisualizarPedido });
 
@@ -170,7 +175,7 @@ export const FormularioIncluirProdutoPedido = ({
         fontSize: "14px",
     };
 
-    const formatSelectGroup = (data) => {
+     const formatSelectGroup = (data) => {
         const grupos = {};
 
         data.forEach((item) => {
@@ -184,38 +189,99 @@ export const FormularioIncluirProdutoPedido = ({
             grupos[item.DS_GRUPO].options.push({
                 value: item.ID_ESTRUTURA,
                 label: item.ESTRUTURA,
+                id: item.ID_GRUPO,
                 original: item
             });
         });
-
+      
         return Object.values(grupos);
     };
 
-    const formatSelectCor = (data) => {
-        const grupos = {};
+    const formatSelectCor = (data = []) => {
+        const grupos = new Map();
 
         data.forEach((item) => {
-            if (!grupos[item.DS_GRUPOCOR]) {
-                grupos[item.DS_GRUPOCOR] = {
-                    label: item.DS_GRUPOCOR,
-                    options: []
-                };
+            const {
+            ID_COR,
+            DS_COR,
+            ID_GRUPOCOR,
+            DS_GRUPOCOR,
+            DSSIGLA,
+            STBLOQUEADOPARACADASTROPRODUTONOVO
+            } = item;
+
+            const nomeCor = (DS_COR || "").trim();
+            const nomeCorUpper = nomeCor.toUpperCase();
+
+            const bloqueadaPorNome = nomeCorUpper === "NENHUM" || nomeCorUpper === "NENHUMA";
+            const bloqueadaPorFlag = String(STBLOQUEADOPARACADASTROPRODUTONOVO) === "True";
+            const isDisabled = bloqueadaPorNome || bloqueadaPorFlag;
+
+            const sigla = (DSSIGLA || "").trim();
+            const labelCor = sigla ? `${nomeCor} - ${sigla}` : nomeCor;
+
+            const groupKey = String(ID_GRUPOCOR ?? "SEM_GRUPO");
+            if (!grupos.has(groupKey)) {
+            grupos.set(groupKey, {
+                label: String(DS_GRUPOCOR || "SEM GRUPO").toUpperCase(),
+                options: []
+            });
             }
 
-            grupos[item.DS_GRUPOCOR].options.push({
-                value: item.ID_COR,
-                label: item.DS_COR,
-                original: item
+            grupos.get(groupKey).options.push({
+            value: ID_COR,
+            label: labelCor,
+            isDisabled,
+            original: item
             });
         });
 
-        return Object.values(grupos);
+        return Array.from(grupos.values());
     };
 
+    const formatSelectMaterial = (data = []) => {
+        const opcoesBloqueadas = ["NENHUM", "NENHUMA"];
+        const optionsAtivas = [];
+        const optionsBloqueadas = [];
 
-    // console.log(dadosDetalheGradePedido, 'dadosDetalheGradePedido')
-    // console.log(dadosPedidosDetalhe, 'dadosPedidosDetalhe')
-    // console.log(dadosVisualizarPedido, 'dadosVisualizarPedido')
+        data.forEach((item) => {
+            const {
+            IDTPTECIDO,
+            DSTIPOTECIDO,
+            DSSIGLA,
+            STBLOQUEADOPARACADASTROPRODUTONOVO
+            } = item;
+
+            const nomeMaterial = (DSTIPOTECIDO || "").trim();
+            const nomeMaterialUpper = nomeMaterial.toUpperCase();
+
+            const bloqueadaPorNome = opcoesBloqueadas.includes(nomeMaterialUpper);
+            const bloqueadaPorFlag = String(STBLOQUEADOPARACADASTROPRODUTONOVO) === "True";
+            const isDisabled = bloqueadaPorNome || bloqueadaPorFlag;
+
+            const sigla = (DSSIGLA || "").trim();
+            const labelMaterial = sigla ? `${nomeMaterial} - ${sigla}` : nomeMaterial;
+
+            const option = {
+                value: IDTPTECIDO,
+                label: labelMaterial,
+                isDisabled,
+                color: isDisabled ? "#f63c97" : undefined,
+                original: item
+            };
+
+            if (isDisabled) {
+            optionsBloqueadas.push(option);
+            } else {
+            optionsAtivas.push(option);
+            }
+        });
+
+        return [...optionsAtivas, ...optionsBloqueadas];
+    }; 
+
+    
+
     return (
         <Fragment>
             <form onSubmit={handleSubmit(handleValidatedSubmit)}>
@@ -245,77 +311,21 @@ export const FormularioIncluirProdutoPedido = ({
                         </div>
                     </div>
                 </div>
-                {/* <div className="form-group">
-                    <div className="row">
-                  
-                        <div className="col-sm-6 col-xl-3">
-                            <label className="form-label" htmlFor="strep">Tipo de Cadastro</label>
-                            <Select
-                                id={"stReposicao"}
-                                value={stReposicaoSelecionado}
-                                options={optionsCadastro.map((item) => {
-                                    return {
-                                        value: item.value,
-                                        label: item.label
-                                    }
-                                })}
-                                onChange={(e) => setStReposicaoSelecionado(e)}
-                                isDisabled={true}
-                            />
-                        </div>
-                    </div>
-                </div> */}
-                <div className="form-group">
-                    <div className="row">
-                        <div className="col-sm-6 col-xl-6">
-                            <Controller
-                                name="referenciaProdutoPedido"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormField
-                                        label={"Pesquisar Referencia/Produto"}
-                                        name="referenciaProdutoPedido"
-                                        type="text"
-                                        value={referenciaProduto}
-                                        onChange={(e) => setReferenciaProduto(e.target.value)}
-                                        errors={errors}
-                                        clearErrors={clearErrors}
-                                    />
 
-                                )}
-                            />
-                        </div>
-                        <div className="col-sm-6 col-xl-6">
-                            <label className="form-label" htmlFor="tpunid">Produtos Cadastrados / Cod Barras - Nome</label>
-                            <Select
-                                id={"listprodpesqped"}
-                                value={produtoSelecionado}
-                                options={dadosProdutosPedidos.map((item) => {
-                                    return {
-                                        value: item.IDPRODUTO,
-                                        label: `${item.NUCODBARRAS} - ${item.DSNOME}`
-                                    }
-                                })}
-                                onChange={(e) => setProdutoSelecionado(e)}
-                            />
-                        </div>
-                    </div>
-                </div>
-                <hr />
                 <div className="form-group">
                     <div className="row">
-                        <div className="col-sm-6 col-xl-2">
+                        <div className="col-sm-6 col-xl-6">
                             <label className="form-label" htmlFor="strep">Reposição</label>
                             <Select
                                 id={"stReposicao"}
-                                value={stReposicaoSelecionado}
                                 options={optionsReposicao.map((item) => {
                                     return {
                                         value: item.value,
                                         label: item.label
                                     }
                                 })}
-                                onChange={(e) => setStReposicaoSelecionado(e)}
+                                value={reposicaoSelecionado}
+                                onChange={(e) => setReposicaoSelecionado(e)}
                                 isDisabled={true}
                             />
                         </div>
@@ -332,14 +342,19 @@ export const FormularioIncluirProdutoPedido = ({
                                         onChange={(e) => setDescricaoProduto(e.target.value)}
                                         errors={errors}
                                         clearErrors={clearErrors}
-                                        readOnly={true}
+                                        
                                     />
 
                                 )}
                             />
-
                         </div>
-                        <div className="col-sm-3 col-xl-2">
+                    </div>
+                </div>
+                <hr />
+                <div className="form-group">
+                    <div className="row">
+
+                        <div className="col-sm-3 col-xl-3">
                             <Controller
                                 name="vrHojeCusto"
                                 control={control}
@@ -357,7 +372,7 @@ export const FormularioIncluirProdutoPedido = ({
                                 )}
                             />
                         </div>
-                        <div className="col-sm-3 col-xl-2">
+                        <div className="col-sm-3 col-xl-3">
                             <Controller
                                 name="vrVendaHoje"
                                 control={control}
@@ -431,7 +446,7 @@ export const FormularioIncluirProdutoPedido = ({
                                         onChange={(e) => setReferencia(e.target.value)}
                                         errors={errors}
                                         clearErrors={clearErrors}
-                                        readOnly={true}
+                                        
                                     />
                                 )}
                             />
@@ -467,7 +482,7 @@ export const FormularioIncluirProdutoPedido = ({
                                     }
                                 })}
                                 onChange={(e) => setUnidadeSelecionada(e)}
-                                isDisabled={true}
+                                
                             />
                         </div>
                         <div className="col-sm-4 col-xl-4">
@@ -479,22 +494,42 @@ export const FormularioIncluirProdutoPedido = ({
                                 menuHeaderTitle={"Selecione"}
                                 menuHeaderStyle={menuHeaderStyle}
                                 onChange={(e) => setCorSelecionada(e)}
-                                isDisabled={true}
+                                getOptionDisabled={(option) => !!option.isDisabled}
+                                styles={{
+                                    option: (base, state) => ({
+                                    ...base,
+                                    color: state.data?.isDisabled ? "#f63c97" : base.color,
+                                    cursor: state.data?.isDisabled ? "not-allowed" : "pointer"
+                                    }),
+                                    singleValue: (base, state) => ({
+                                    ...base,
+                                    color: state.data?.isDisabled ? "#f63c97" : base.color
+                                    })
+                                }}
                             />
                         </div>
                         <div className="col-sm-4 col-xl-4">
                             <label className="form-label" htmlFor="tptecido">Tipo de Material</label>
-                            <Select
-                                id={"tpTecidoProduto"}
+                            <SelectList
+                                id={"tipoTecidoProduto"}
                                 value={tipoTecidoSelecionado}
-                                options={dadosTipoTecidos.map((item) => {
-                                    return {
-                                        value: item.IDTPTECIDO,
-                                        label: item.DSTIPOTECIDO
-                                    }
-                                })}
+                                options={formatSelectMaterial(dadosTipoTecidos)}
+                                menuHeaderTitle={"Selecione"}
+                                menuHeaderStyle={menuHeaderStyle}
                                 onChange={(e) => setTipoTecidoSelecionado(e)}
-                                isDisabled={true}
+                                getOptionDisabled={(option) => !!option.isDisabled}
+                                styles={{
+                                    option: (base, state) => ({
+                                    ...base,
+                                    color: state.data?.isDisabled ? "#f63c97" : base.color,
+                                    cursor: state.data?.isDisabled ? "not-allowed" : "pointer",
+                                    fontSize: "13px"
+                                    }),
+                                    singleValue: (base, state) => ({
+                                    ...base,
+                                    color: state.data?.isDisabled ? "#f63c97" : base.color
+                                    })
+                                }}
                             />
                         </div>
                     </div>
@@ -513,7 +548,7 @@ export const FormularioIncluirProdutoPedido = ({
                                     }
                                 })}
                                 onChange={(e) => setCategoriaGradeSelecionada(e)}
-                                isDisabled={true}
+                               
                             />
 
                         </div>
@@ -521,13 +556,18 @@ export const FormularioIncluirProdutoPedido = ({
                             <label className="form-label" htmlFor="estruturaProduto">Estrutura</label>
 
                             <SelectList
-                                id={"categoriaProduto"}
+                                id={"estruturaProduto"}
                                 value={estruturaSelecionada}
                                 options={formatSelectGroup(dadosSubGrupoProduto)}
                                 menuHeaderTitle={"Selecione"}
                                 menuHeaderStyle={menuHeaderStyle}
                                 onChange={(e) => setEstruturaSelecionada(e)}
-                                isDisabled={true}
+                                styles={{
+                                    option: (base) => ({
+                                        ...base,
+                                        fontSize: "14px"
+                                    })
+                                }}
                             />
                         </div>
                         <div className="col-sm-4 col-xl-4">
@@ -542,7 +582,7 @@ export const FormularioIncluirProdutoPedido = ({
                                     }
                                 })}
                                 onChange={(e) => setEstiloSelecionado(e)}
-                                isDisabled={true}
+                      
                             />
 
                         </div>
@@ -555,14 +595,14 @@ export const FormularioIncluirProdutoPedido = ({
                             <Select
                                 id={"CategoriaProduto"}
                                 value={categoriaSelecionada}
-                                options={dadosCategorias.map((item) => {
+                                options={dadosCategoriaPedidos.map((item) => {
                                     return {
                                         value: item.IDCATEGORIAS,
                                         label: `${item.IDCATEGORIAS} - ${item.DSCATEGORIAS} - ${item.TPCATEGORIAS}`
                                     }
                                 })}
                                 onChange={(e) => setCategoriaSelecionada(e)}
-                                isDisabled={true}
+                            
                             />
                         </div>
                         <div className="col-sm-3 col-xl-3">
@@ -578,14 +618,14 @@ export const FormularioIncluirProdutoPedido = ({
                                     }
                                 })}
                                 onChange={(e) => setLocalExposicaoSelecionado(e)}
-                                isDisabled={true}
+                               
                             />
                         </div>
                         <div className="col-sm-3 col-xl-3">
                             <label className="form-label" htmlFor="ecommercest">E-commerce</label>
 
                             <Select
-                                id={"localExposicao"}
+                                id={"ecommerceProduto"}
                                 value={ecommerceSelecionado}
                                 options={optionsReposicao.map((item) => {
                                     return {
@@ -600,7 +640,7 @@ export const FormularioIncluirProdutoPedido = ({
                             <label className="form-label" htmlFor="redesocialst">Rede Social</label>
 
                             <Select
-                                id={"localExposicao"}
+                                id={"redeSocialProduto"}
                                 value={redeSocialSelecionada}
                                 options={optionsReposicao.map((item) => {
                                     return {
@@ -626,9 +666,9 @@ export const FormularioIncluirProdutoPedido = ({
                                         type="text"
                                         value={formatMoeda(vrBruto)}
                                         onChange={(e) => {
-                                            setVrBruto(e.target.value);
-                                            // Chama o cálculo após um pequeno delay para evitar conflitos
-                                            setTimeout(() => atualiza_valor_QtdUnit(), 100);
+                                            const val = e.target.value;
+                                            setVrBruto(val);
+                                            atualiza_valor_QtdUnit({ vrBruto: val });
                                         }}
                                         errors={errors}
                                         clearErrors={clearErrors}
@@ -647,9 +687,9 @@ export const FormularioIncluirProdutoPedido = ({
                                         type="text"
                                         value={percDescontoI}
                                         onChange={(e) => {
-                                            setPercDescontoI(e.target.value);
-                                            // Chama o cálculo após um pequeno delay para evitar conflitos
-                                            setTimeout(() => atualiza_valor_QtdUnit(), 100);
+                                            const val = e.target.value;
+                                            setPercDescontoI(val);
+                                            atualiza_valor_QtdUnit({ percDescontoI: val });
                                         }}
                                         errors={errors}
                                         clearErrors={clearErrors}
@@ -669,9 +709,9 @@ export const FormularioIncluirProdutoPedido = ({
                                         type="text"
                                         value={percDescontoII}
                                         onChange={(e) => {
-                                            setPercDescontoII(e.target.value);
-                                            // Chama o cálculo após um pequeno delay para evitar conflitos
-                                            setTimeout(() => atualiza_valor_QtdUnit(), 100);
+                                            const val = e.target.value;
+                                            setPercDescontoII(val);
+                                            atualiza_valor_QtdUnit({ percDescontoII: val });
                                         }}
                                         errors={errors}
                                         clearErrors={clearErrors}
@@ -690,9 +730,9 @@ export const FormularioIncluirProdutoPedido = ({
                                         type="text"
                                         value={percDescontoIII}
                                         onChange={(e) => {
-                                            setPercDescontoIII(e.target.value);
-                                            // Chama o cálculo após um pequeno delay para evitar conflitos
-                                            setTimeout(() => atualiza_valor_QtdUnit(), 100);
+                                            const val = e.target.value;
+                                            setPercDescontoIII(val);
+                                            atualiza_valor_QtdUnit({ percDescontoIII: val });
                                         }}
                                         errors={errors}
                                         clearErrors={clearErrors}
@@ -711,7 +751,7 @@ export const FormularioIncluirProdutoPedido = ({
                                         name="vrUnitLiquidoProduto"
                                         type="text"
                                         value={formatMoeda(vrLiquido)}
-                                        onChange={(e) => setVrLiquido(e.target.value)}
+                                        onChange={(e) => setVrLiquido(formatarMoeda(e.target.value))} 
 
                                         errors={errors}
                                         clearErrors={clearErrors}
@@ -731,8 +771,8 @@ export const FormularioIncluirProdutoPedido = ({
                                         type="text"
                                         value={formatMoeda(vrSugerido)}
                                         onChange={(e) => {
-                                            setVrSugerido(e.target.value);
-                                            setVrSugerigoFixo(e.target.value); // Define como valor fixo quando editado manualmente
+                                            setVrSugerido(formatarMoeda(e.target.value));
+                                            setVrSugerigoFixo(e.target.value); 
                                         }}
                                         errors={errors}
                                         clearErrors={clearErrors}
@@ -754,7 +794,7 @@ export const FormularioIncluirProdutoPedido = ({
                                         name="vrTotalProduto"
                                         type="text"
                                         value={formatMoeda(vrTotal)}
-                                        onChange={(e) => setVrTotal(e.target.value)}
+                                        onChange={(e) => setVrTotal(formatarMoeda(e.target.value))}
                                         readOnly
                                         errors={errors}
                                         clearErrors={clearErrors}
@@ -781,12 +821,13 @@ export const FormularioIncluirProdutoPedido = ({
                         </div>
                     </div>
                 </div>
-                <div className="form-group">
+                
+                 <div className="form-group">
                     <div className="row" id="resultadoqtdtamanhos">
                         <div className="col-sm-12 col-xl-12">
                             <label className="form-label" htmlFor="vrtotalunit">QTD/TAMANHOS</label>
 
-                            {/* Exibição de erros */}
+
                             {errosValidacao.length > 0 && (
                                 <div className="alert alert-danger mt-2">
                                     {errosValidacao.map((erro, index) => (
@@ -795,43 +836,18 @@ export const FormularioIncluirProdutoPedido = ({
                                 </div>
                             )}
 
-                            <div className="d-flex flex-wrap gap-2 mt-2" style={{ maxWidth: "100%" }}>
+                            <div className="d-flex flex-wrap gap-2 mt-2" style={{ maxWidth: '100%' }}>
                                 {dadosGrade?.map((item) => {
-                                    const idTamanho = item.IDTAMANHO.toString();
+                                    const idTamanho = String(item.IDTAMANHO);
+                                    const valorAtual = Number(quantidadePorTamanho[idTamanho] || 0);
+                                    const titleGrade = isDiversos(item.DSTAMANHO)
+                                        ? 'A Grade Diversos Possui Gradeamento Unico!'
+                                        : '';
 
-                                    // Lógica para DIVERSOS (original)
-                                    const stDiversos = item.DSTAMANHO?.toUpperCase() === 'DIVERSOS' ||
-                                        item.DSTAMANHO?.toUpperCase() === 'U-DIVERSOS';
+                                    const { disabled, readOnly } = getInputStateGrade({ item, valorAtual });
 
-                                    const valorAtual = quantidadePorTamanho[idTamanho] || 0;
-
-                                    // NOVA LÓGICA: Implementar a mesma regra do jQuery
-                                    const stTransformado = dadosDetalhePedido[0]?.STTRANSFORMADO; // ← VOCÊ PRECISA DESSA VARIÁVEL
-                                    // console.log(dadosDetalhePedido[0]?.STTRANSFORMADO, 'STTRANSFORMADO')
-                                    // console.log(dadosDetalheGradePedido[0]?.STTRANSFORMADO, 'dadosDetalheGradePedido')
-                                    let stDisabled = false;
-
-                                    if (stTransformado === 'True') {
-                                        // Se transformado, desabilita campos com quantidade zero
-                                        stDisabled = !valorAtual || valorAtual == 0;
-                                    }
-
-                                    // Se é DIVERSOS, sempre desabilita (exceto se valor = 1)
-                                    if (stDiversos) {
-                                        stDisabled = true;
-                                    }
-
-                                    const titleGrade = stDiversos ? 'A Grade Diversos Possuí Gradeamento Único!' : '';
-                                    const qtdDistribuida = distribuicao[idTamanho];
-                                    console.log({
-                                        idTamanho,
-                                        valorAtual,
-                                        stTransformado,
-                                        stDiversos,
-                                        stDisabled
-                                    });
                                     return (
-                                        <div key={item.IDTAMANHO} className="d-flex flex-column align-items-center p-1">
+                                        <div key={item.IDTAMANHO} className="d-flex flex-column align-items-center">
                                             <label
                                                 className="form-label text-center mb-1"
                                                 htmlFor={idTamanho}
@@ -844,46 +860,31 @@ export const FormularioIncluirProdutoPedido = ({
                                                 type="text"
                                                 id={idTamanho}
                                                 name={idTamanho}
-                                                value={stDiversos && valorAtual === 0 ? 1 : valorAtual} // ← DIVERSOS sempre valor 1
+                                                value={valorAtual}
                                                 title={titleGrade}
                                                 className="form-control class_grade text-center"
-                                                style={{
-                                                    width: "60px",
-                                                    minWidth: "50px",
-                                                    maxWidth: "80px",
-                                                    flex: "0 0 auto",
-                                                    fontSize: '0.9rem'
-                                                }}
-                                                disabled={stDisabled}  // ← USAR A LÓGICA COMPLETA
-                                                readOnly={stDisabled}
+                                                style={{ width: '60px', minWidth: '50px', maxWidth: '80px', flex: '0 0 auto', fontSize: '0.9rem' }}
+                                                disabled={disabled}
+                                                readOnly={readOnly}
                                                 onChange={(e) => handleChangeQuantidade(idTamanho, e.target.value)}
-                                                onBlur={() => validarGradeamento()}
+                                                onBlur={validarGradeamento}
                                             />
-
-                                            {qtdDistribuida !== undefined && valorAtual > 0 && (
-                                                <small
-                                                    className="text-muted mt-1"
-                                                    style={{ fontSize: '0.7rem', textAlign: 'center' }}
-                                                >
-                                                    Qtd: {Number.isInteger(qtdDistribuida) ? qtdDistribuida : qtdDistribuida.toFixed(2)}
-                                                </small>
-                                            )}
                                         </div>
                                     );
                                 })}
                             </div>
 
-                            {/* Botão para validar manualmente */}
+
                             <div className="mt-3">
-                                <button
+                                {/* <button
                                     type="button"
                                     className="btn btn-sm btn-outline-primary"
                                     onClick={validarGradeamento}
                                 >
                                     Validar Gradeamento
-                                </button>
+                                </button> */}
 
-                                {/* Mostra total de índices */}
+
                                 {Object.values(quantidadePorTamanho).some(v => v > 0) && (
                                     <span className="ms-3 text-info">
                                         Total de Índices: {Object.values(quantidadePorTamanho).reduce((acc, val) => acc + Number(val || 0), 0)}
@@ -908,9 +909,9 @@ export const FormularioIncluirProdutoPedido = ({
 
                     ButtonTypeCadastrar={ButtonTypeModal}
                     onClickButtonCadastrar
-                    textButtonCadastrar={"Salvar"}
+                    textButtonCadastrar={"Editar"}
                     corCadastrar={"success"}
-                    loadingTextCadastrar={"Cadastrando..."}
+                    loadingTextCadastrar={"Editando..."}
                     autoLoadingCadastrar={true}
                 />
             </form>

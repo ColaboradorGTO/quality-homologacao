@@ -12,7 +12,7 @@ import { CiLock } from "react-icons/ci";
 import { FaLock } from "react-icons/fa";
 import { MdLockOutline } from "react-icons/md";
 import { formatarMoeda, formatMoeda } from "../../../../../utils/formatMoeda";
-
+ 
 
 export const FormularioIncluirProdutoPedido = ({
     usuarioLogado,
@@ -799,7 +799,7 @@ export const FormularioIncluirProdutoPedido = ({
                                         type="text"
                                         value={percDescontoI}
                                         onChange={(e) => {
-                                            const val = formatarMoeda(e.target.value);
+                                            const val = e.target.value;
                                             setPercDescontoI(val);
                                             atualiza_valor_QtdUnit({ percDescontoI: val });
                                         }}
@@ -821,7 +821,7 @@ export const FormularioIncluirProdutoPedido = ({
                                         type="text"
                                         value={percDescontoII}
                                         onChange={(e) => {
-                                            const val = formatarMoeda(e.target.value);
+                                            const val = e.target.value;
                                             setPercDescontoII(val);
                                             atualiza_valor_QtdUnit({ percDescontoII: val });
                                         }}
@@ -842,7 +842,7 @@ export const FormularioIncluirProdutoPedido = ({
                                         type="text"
                                         value={percDescontoIII}
                                         onChange={(e) => {
-                                            const val = formatarMoeda(e.target.value);
+                                            const val = e.target.value;
                                             setPercDescontoIII(val);
                                             atualiza_valor_QtdUnit({ percDescontoIII: val });
                                         }}

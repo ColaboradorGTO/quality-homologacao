@@ -14,7 +14,10 @@ export const ActionIncluirProdutoPedidoModal = ({
   dadosVisualizarPedido,
   dadosUltimosPedidos
 }) => {
-  
+  const stReposicao = dadosVisualizarPedido?.[0]?.STREPOSICAO;
+  const tipoCategoriaPedido = dadosVisualizarPedido?.[0]?.TIPOCATEGORIAPEDIDO || dadosVisualizarPedido?.[0]?.TIPOPEDIDO || "tipoPedido";
+  const idResumoPedido = dadosVisualizarPedido?.[0]?.IDPEDIDO;
+
   return (
 
     <Fragment>
@@ -25,26 +28,16 @@ export const ActionIncluirProdutoPedidoModal = ({
         size="lg"
         centered
       >
-        
-        <HeaderModal
-          title={`Pedido de Produtos de REPOSIÇÃO para VESTUARIO Nº ${dadosVisualizarPedido[0]?.IDPEDIDO}`}
-          subTitle={"Edição de Itens do Pedido"}
-          handleClose={handleClose}
-        />
+  
+        <header className="p-3"> 
+          <h3 className="modal-title"> Pedido de Produtos{" "} {stReposicao === "True" ? ( 
+              <> de <label className="text-danger">REPOSIÇÃO</label> </> ) :
+              ( <label className="text-info">NOVOS</label> )}
+              {" "} para {tipoCategoriaPedido} Nº <b>{idResumoPedido}</b> 
+              <small className="m-0 text-muted"> Edição de Itens do Pedido </small> 
+          </h3> 
+        </header>
 
-
-        {/* <header
-          className="p-1"
-        >
-            <h5 
-              className="modal-title" 
-              
-            >
-              Pedido {dadosVisualizarPedido[0]?.STREPOSICAO == 'True' ? `de <label class="text-danger">REPOSIÇÃO</label>` : dadosVisualizarPedido[0]?.STREPOSICAO == 'False' ? `de Produtos <label class="text-info">NOVOS</label>` : ''} 
-              para tipoPedido Nº <b> {dadosVisualizarPedido[0]?.IDPEDIDO}</b>
-            <small class="m-0 text-muted"> Inclusão de Itens do Pedido </small>
-            </h5>
-        </header> */}
         <Modal.Body>  
 
           <FormularioIncluirProdutoPedido 

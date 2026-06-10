@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useState } from "react"
 import { ButtonType } from "../../../../Buttons/ButtonType";
-import { MdContentCopy, MdMenu, MdOutlineCheck, MdOutlineCopyAll, MdOutlineKeyboardReturn, MdOutlinePayment, MdOutlinePictureAsPdf, MdOutlineVisibility } from "react-icons/md";
+import { MdContentCopy, MdMenu, MdOutlineCheck, MdOutlineCopyAll, MdOutlineEdit, MdOutlineKeyboardReturn, MdOutlinePayment, MdOutlinePictureAsPdf, MdOutlineVisibility } from "react-icons/md";
 import { ResultadoResumo } from "../../../../ResultadoResumo/ResultadoResumo";
 import { formatMoeda } from "../../../../../utils/formatMoeda";
 import { toFloat } from "../../../../../utils/toFloat";
@@ -14,8 +14,9 @@ import { ActionListaPedidos } from "./actionListaPedidos";
 import { ButtonTypeCompras } from "../../../../Buttons/Button";
 import { ActionIncluirProdutoPedidoModal } from "./IncluirProdutoPedido/actionIncluirProdutoPedidoModal";
 import { ActionPesquisaNovoPedido } from "../../ActionNovoPedido/actionPesquisaNovoPedido";
-import { FaCheck } from "react-icons/fa";
+import { FaCheck, FaRegSave } from "react-icons/fa";
 import { CiLock } from "react-icons/ci";
+import { FaListCheck } from "react-icons/fa6";
 
 export const ActionEditarPedido = ({
   usuarioLogado,
@@ -526,21 +527,21 @@ export const ActionEditarPedido = ({
         linkNome={"Salvar Cabeçalho Pedido"}
         onButtonClickCadastro
         corCadastro={"info"}
-        IconCadastro={MdOutlineCheck}
+        IconCadastro={FaRegSave}
         styleCadastro={botoesVisiveis.salvar}
         
         ButtonTypeCancelar={ButtonTypeCompras}
         linkCancelar={"Fechar Pedido"}
         onButtonClickCancelar={handleFecharPedido}
         corCancelar={"danger"}
-        IconCancelar={MdOutlineVisibility}
+        IconCancelar={FaListCheck}
         styleCancelar={botoesVisiveis.fechar}
 
         ButtonTypePedido={ButtonTypeCompras}
         linkPedido={"Novo Pedido"}
         onButtonClickPedido={handleNovoPedido}
         corPedido={"success"}
-        IconPedido={MdOutlinePictureAsPdf}
+        IconPedido={MdOutlineEdit}
         stylePedido={botoesVisiveis.novoPedido}
         
         ButtonTypeTXT={ButtonTypeCompras}
@@ -557,11 +558,11 @@ export const ActionEditarPedido = ({
         IconClonar={MdContentCopy}
         styleClonar={botoesVisiveis.clonar}
 
-        ButtonTypeRetornar={ButtonType}
-        linkRetornar={"Voltar"}
-        onButtonClickRetornar={handleReturn}
-        corRetornar={"danger"}
-        IconRetornar={MdOutlineKeyboardReturn}
+        // ButtonTypeRetornar={ButtonType}
+        // linkRetornar={"Voltar"}
+        // onButtonClickRetornar={handleReturn}
+        // corRetornar={"danger"}
+        // IconRetornar={MdOutlineKeyboardReturn}
         // styleRetornar
       />
       <ActionListaPedidos 

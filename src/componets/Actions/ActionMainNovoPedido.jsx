@@ -294,28 +294,6 @@ export const ActionMainNovoPedido = ({
         </div>
 
         <div className="col-sm-6 col-lg-4 col-xl-4 col-xxl-3 " >
-          {cardCliente && (
-            <div className="p-3 bg-warning-400 rounded overflow-hidden position-relative text-white mb-g">
-              <div className="quantidadeClienteVenda">
-                <h3 className="display-4 d-block l-h-n m-0 fw-500">
-                  {numeroCliente}
-                  <small className="m-0 l-h-n"> {nomeCliente}</small>
-                </h3>
-              </div>
-              {/* <BsGem className="fal  position-absolute pos-right pos-bottom opacity-15 mb-n1 mr-n1" size={100} style={{ fontSize: "8rem" }} /> */}
-              { IconNumeroCliente && 
-                <IconNumeroCliente 
-                  className="position-absolute pos-right pos-bottom opacity-15 mb-n1 mr-n1"
-                  size={iconSize}  
-                  color={iconColor} 
-                />
-              }
-            </div>
-
-          )}
-        </div>
-
-        <div className="col-sm-6 col-lg-4 col-xl-4 col-xxl-3 " >
           {cardTicketMedio && (
             <div className="p-3 bg-success-200 rounded overflow-hidden position-relative text-white mb-g">
               <div className="ticketMedioVenda">
@@ -327,6 +305,28 @@ export const ActionMainNovoPedido = ({
               {/* <FaRegLightbulb className="fal fa-lightbulb position-absolute pos-right pos-bottom opacity-15 mb-n1 mr-n1" size={100} style={{ fontSize: "6rem" }} /> */}
               { IconTicketMedio && 
                 <IconTicketMedio 
+                  className="position-absolute pos-right pos-bottom opacity-15 mb-n1 mr-n1"
+                  size={iconSize}  
+                  color={iconColor} 
+                />
+              }
+            </div>
+
+          )}
+        </div>
+
+        <div className="col-sm-6 col-lg-4 col-xl-4 col-xxl-3 " >
+          {cardCliente && (
+            <div className="p-3 bg-warning-400 rounded overflow-hidden position-relative text-white mb-g">
+              <div className="quantidadeClienteVenda">
+                <h3 className="display-4 d-block l-h-n m-0 fw-500">
+                  {numeroCliente}
+                  <small className="m-0 l-h-n"> {nomeCliente}</small>
+                </h3>
+              </div>
+              {/* <BsGem className="fal  position-absolute pos-right pos-bottom opacity-15 mb-n1 mr-n1" size={100} style={{ fontSize: "8rem" }} /> */}
+              { IconNumeroCliente && 
+                <IconNumeroCliente 
                   className="position-absolute pos-right pos-bottom opacity-15 mb-n1 mr-n1"
                   size={iconSize}  
                   color={iconColor} 

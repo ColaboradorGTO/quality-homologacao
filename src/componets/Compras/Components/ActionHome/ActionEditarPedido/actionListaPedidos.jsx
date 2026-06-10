@@ -17,7 +17,7 @@ import { get } from '../../../../../api/funcRequest';
 import { useProdutoPedido } from './hook/useProdutoPedido';
 import Swal from 'sweetalert2';
 
-
+ 
 export const ActionListaPedidos = ({
   dadosDetalhePedido,
   dadosVisualizarPedido,
@@ -121,11 +121,16 @@ export const ActionListaPedidos = ({
       VRVENDADETALHEPEDIDO: toFloat(item.VRVENDADETALHEPEDIDO),
       STTRANSFORMADO: item.STTRANSFORMADO,
       DSSUBGRUPOESTRUTURA: item.DSSUBGRUPOESTRUTURA,
+      DSTIPOTECIDO: item.DSTIPOTECIDO,
       DSCOR: item.DSCOR,
+      OBSPRODUTO: item.OBSPRODUTO,
       IDANDAMENTO: item.IDANDAMENTO,
       VRTOTALDETALHEPEDIDO: toFloat(item.VRTOTALDETALHEPEDIDO),
       IDPEDIDO: item.IDPEDIDO,
       IDDETALHEPEDIDOPRIMARIO: toFloat(item.IDDETALHEPEDIDOPRIMARIO) || 0,
+      DETALHEPEDIDOGRADE: item.DETALHEPEDIDOGRADE,
+      DSTAMANHO: item.DSTAMANHO,
+      INDICETAMANHO: item.INDICETAMANHO,
       setorAndamento
     }
   });
@@ -175,9 +180,51 @@ export const ActionListaPedidos = ({
       sortable: true,
     },
     {
+      field: 'DSTIPOTECIDO',
+      header: 'Mat. Fab.',
+      body: row => <th>{row.DSTIPOTECIDO}</th>,
+      sortable: true,
+    },
+    {
       field: 'DSCOR',
       header: 'Cor',
       body: row => <th>{row.DSCOR}</th>,
+      sortable: true,
+    },
+    {
+      field: 'OBSPRODUTO',
+      header: 'Obs',
+      body: row => <th>{row.OBSPRODUTO}</th>,
+      sortable: true,
+    },
+    {
+      field: 'INDICETAMANHO',
+      header: 'Grade',
+      body: row => {
+        const listaGradeamento = Array.isArray(row.DETALHEPEDIDOGRADE) ? row.DETALHEPEDIDOGRADE : [];
+
+        if (listaGradeamento.length === 0) {
+          return (
+            <div style={{ flex: 1, textAlign: 'center', border: '1px solid #000', padding: '2px' }}>
+              <b>{row.DSTAMANHO?.trim?.() || ''}</b>
+              <br />
+              <b>{row.INDICETAMANHO || ''}</b>
+            </div>
+          )
+        }
+
+        return (
+          <div style={{ width: '100%', display: 'flex', alignItems: 'stretch', fontSize: '10px', overflow: 'hidden' }}>
+            {listaGradeamento.map((item, index) => (
+              <div key={`${item?.DSTAMANHO || 'tam'}-${item?.INDICETAMANHO || index}-${index}`} style={{ flex: 1, textAlign: 'center', border: '1px solid #000', padding: '2px' }}>
+                <b>{item?.DSTAMANHO?.trim?.() || ''}</b>
+                <br />
+                <b>{item?.INDICETAMANHO || ''}</b>
+              </div>
+            ))}
+          </div>
+        )
+      },
       sortable: true,
     },
     {
