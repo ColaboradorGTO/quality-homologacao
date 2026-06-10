@@ -21,6 +21,8 @@ import { useIncluirProutoPedido } from "./hooks/useIncluirProdutoPedido";
 import { optionsTipoFrete, optionsTipoPedido, optionsEnviar, optionsFiscal } from "../../../../../parceiro.json"
 import { Alert } from "../../../Inputs/alert";
 import { AiOutlineSave } from "react-icons/ai";
+import { CiLock } from "react-icons/ci";
+import { FaCheck } from "react-icons/fa";
 
 export const ActionPesquisaNovoPedido = ({
   usuarioLogado,
@@ -707,13 +709,13 @@ export const ActionPesquisaNovoPedido = ({
         labelTransportadora={"Transportadora"}
         valueTransportadora={transportadoraSelecionada}
         onChangeTransportadora={(e) => setTransportadoraSelecionada(e.value)}
-        readOnlyTransportadora={true}
+        // readOnlyTransportadora={true}
 
         InputFreteComponent={InputFieldPedido}
         labelFrete={"Tipo Frete"}
         valueFrete={freteSelecionado}
         onChangeFrete={(e) => setFreteSelecionado(e.value)}
-        readOnlyFrete={true}
+        // readOnlyFrete={true}
        
         InputSelectTransportadora={InputSelectActionPedido}
         labelSelectTransportadora={"Transportadora"}

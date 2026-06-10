@@ -1,19 +1,15 @@
-import { Fragment, useState } from "react"
+import { Fragment } from "react"
 
-export const InputFieldCheckBox = ({ 
-  label, 
-  readOnly, 
-  id, 
-  nome, 
+export const InputFieldCheckBox = ({
+  label,
+  readOnly,
+  id,
+  nome,
   placeholder,
-  disabledChecked
+  disabledChecked,
+  checkedCheckBoxPedido,
+  onChangeCheckBoxPedido
 }) => {
-  const [isChecked, setIsChecked] = useState(false);
-
-  const handleCheckboxChange = () => {
-    setIsChecked(!isChecked);
-  };
-
   return (
 
     <Fragment>
@@ -21,19 +17,17 @@ export const InputFieldCheckBox = ({
         <input
           style={{
             width: "15px",
-            height: "15px", 
+            height: "15px",
             marginRight: "10px",
-           
-
           }}
           id={id}
           type="checkbox"
           name={nome}
           readOnly={readOnly}
           disabled={disabledChecked}
-          checked={isChecked}
+          checked={checkedCheckBoxPedido ?? false}
           placeHolder={placeholder}
-          onChange={handleCheckboxChange}
+          onChange={onChangeCheckBoxPedido ?? (() => {})}
         />
         <label className="custom-label" htmlFor={id}>
           {label}
