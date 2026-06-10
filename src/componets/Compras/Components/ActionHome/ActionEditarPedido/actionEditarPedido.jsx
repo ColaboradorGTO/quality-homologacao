@@ -305,37 +305,33 @@ export const ActionEditarPedido = ({
     setActionEditarPedido(false)
   }
   
-  /* 
-    Voltar aqui para exibição dos botões, por que não está funcionando.
-  */
+
 
   return (
 
     <Fragment>
-      <ResultadoResumo
+      <ActionMainNovoPedido
+        lBinkComponentAnterior={["Home"]}
+        linkComponent={["Novo Pedido"]}
+        //title={`Pedido Nº: ${dadosVisualizarPedido[0]?.IDPEDIDO}`}
+        subTitle={tituloSubheader}
+        
         cardVendas={true}
         valorVendas={formatMoeda(toFloat(dadosVisualizarPedido[0]?.VRTOTALBRUTO))}
         nomeVendas="Valor Bruto Pedido"
         IconVendas={MdOutlinePayment}
         iconSize={100}
         iconColor={"#fff"}
-
+  
         cardTicketMedio={true}
         valorTicketMedio={formatMoeda(totalLiq)}
         nomeTicketMedio="Valor Líquido Pedido"
         IconTicketMedio={MdOutlinePayment}
-
+  
         cardCliente={true}
         numeroCliente={toFloat(dadosVisualizarPedido[0]?.QTDTOTPRODUTOS)}
         nomeCliente="QTD Produtos"
         IconNumeroCliente={MdOutlinePayment}
-      />
-
-      <ActionMainNovoPedido
-        lBinkComponentAnterior={["Home"]}
-        linkComponent={["Novo Pedido"]}
-        //title={`Pedido Nº: ${dadosVisualizarPedido[0]?.IDPEDIDO}`}
-        subTitle={tituloSubheader}
 
         InputCheckBoxPedido={InputFieldCheckBox}
         labelCheckBoxPedido={"Pedido Por Intermediário"}
