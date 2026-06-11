@@ -111,8 +111,6 @@ export const useAtivarCancelar = ({ usuarioLogado, handleClick, status }) => {
 
             return responsePost.data;
         }
-            
-        
     }
 
 

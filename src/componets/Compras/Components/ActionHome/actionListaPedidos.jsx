@@ -243,8 +243,6 @@ export const ActionListaPedidos = ({
       header: 'Status',
       body: (row) => {
         const { DSANDAMENTO, DSSETOR, STRASCUNHO, STPEDIDOPRIMARIO, IDPEDIDOPRIMARIO, IDPEDIDOSECUNDARIO } = row;
-
-        // Cor do status principal
         let cor = 'blue';
         if (DSSETOR === 'COMPRAS') {
           if (DSANDAMENTO === 'PEDIDO FINALIZADO') cor = 'tomato';
@@ -526,7 +524,6 @@ export const ActionListaPedidos = ({
   const handleClickImprimirSempreco = async (row) => {
     if (row.IDPEDIDO) {
       handleImprimirSemPreco(row.IDPEDIDO)
-
     }
   }
 
@@ -564,7 +561,7 @@ export const ActionListaPedidos = ({
   const handleVisualizarPedido = async (IDPEDIDO) => {
     try {
       const response = await get(`/lista-pedidos?idPedido=${IDPEDIDO}`)
-      const responseDetlhe = await get(`/lista-detalhe-pedidos?idPedido=${IDPEDIDO}`)
+      const responseDetlhe = await get(`/lista-detalhe-pedidos?idPedido=${IDPEDIDO}&somenteGradeAtiva=True`)
       if (response.data && responseDetlhe.data) {
         setDadosVisualizarPedido(response.data)
         setDadosDetalhePedido(responseDetlhe.data)
