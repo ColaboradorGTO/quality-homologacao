@@ -35,14 +35,14 @@ export const useAtivarCancelar = ({ usuarioLogado, handleClick, status }) => {
         setIpUsuario(usuarioIP);
         return usuarioIP;
     };
-
     const handleAtivarCancelarPedido = async (IDRESUMOPEDIDO, STATIVO) => {
+        console.log(STATIVO, 'status')
         
-        let txtAcao = status === 'True' ? 'Cancelar' : 'Ativar';
-        let textoCancelaPedido = status === 'True' ? 'CANCELADO PELO COMPRADOR' : 'ATIVADO PELO COMPRADOR';
-        let idAndamento = status === 'True' ? 3 : 1;
-        let msgRetorno = status === 'True' ? 'Cancelado' : 'Ativado';
-        let textoFuncao = status === 'True' ? 'COMPRAS/CANCELAR PEDIDO' : 'COMPRAS/ATIVAR PEDIDO';
+        let txtAcao = STATIVO === 'True' ? 'Cancelar' : 'Ativar';
+        let textoCancelaPedido = STATIVO === 'True' ? 'CANCELADO PELO COMPRADOR' : 'ATIVADO PELO COMPRADOR';
+        let idAndamento = STATIVO === 'True' ? 3 : 1;
+        let msgRetorno = STATIVO === 'True' ? 'Cancelado' : 'Ativado';
+        let textoFuncao = STATIVO === 'True' ? 'COMPRAS/CANCELAR PEDIDO' : 'COMPRAS/ATIVAR PEDIDO';
 
         const putData = {
             IDRESUMOPEDIDO: parseInt(IDRESUMOPEDIDO),
@@ -50,7 +50,7 @@ export const useAtivarCancelar = ({ usuarioLogado, handleClick, status }) => {
             IDRESPCANCELAMENTO: parseInt(usuarioLogado.id),
             DSMOTIVOCANCELAMENTO: textoCancelaPedido,
             DTCANCELAMENTO: data,
-            STCANCELADO: status 
+            STCANCELADO: STATIVO 
         }
 
         try {
