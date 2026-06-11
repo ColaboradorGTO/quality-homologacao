@@ -19,7 +19,8 @@ export const FormularioIncluirProdutoPedido = ({
     dadosDetalheGradePedido,
     dadosPedidosDetalhe,
     dadosVisualizarPedido,
-    checkboxIntermediario
+    checkboxIntermediario,
+    handleClickEditarPedido
 }) => {
     const { register, handleSubmit, formState: { errors }, clearErrors, setError, control } = useForm({
         mode: "onChange"
@@ -127,7 +128,8 @@ export const FormularioIncluirProdutoPedido = ({
         dadosDetalheGradePedido, 
         dadosPedidosDetalhe, 
         dadosVisualizarPedido, 
-        checkboxIntermediario 
+        checkboxIntermediario,
+        handleClickEditarPedido 
     });
     
     const distribuicao = calcularDistribuicao();
@@ -919,7 +921,7 @@ export const FormularioIncluirProdutoPedido = ({
                     corFechar={"secondary"}
 
                     ButtonTypeCadastrar={ButtonTypeModal}
-                    onClickButtonCadastrar={handleValidatedSubmit}
+                    // onClickButtonCadastrar={handleValidatedSubmit}
                     textButtonCadastrar={"Editar"}
                     corCadastrar={"success"}
                     loadingTextCadastrar={"Editando..."}

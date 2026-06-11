@@ -568,6 +568,7 @@ export const ActionEditarPedido = ({
       />
       <ActionListaPedidos 
           dadosDetalhePedido={dadosDetalhePedido}
+          setDadosDetalhePedido={setDadosDetalhePedido}
           dadosVisualizarPedido={dadosVisualizarPedido}
           setModalIncluirProdutoPedido={setModalIncluirProdutoPedido}
           usuarioLogado={usuarioLogado}

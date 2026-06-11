@@ -14,7 +14,8 @@ export const ActionIncluirProdutoPedidoModal = ({
   dadosPedidosDetalhe,
   dadosVisualizarPedido,
   dadosUltimosPedidos,
-  checkboxIntermediario
+  checkboxIntermediario,
+  handleClickEditarPedido
 }) => {
   const stReposicao = dadosVisualizarPedido?.[0]?.STREPOSICAO;
   const tipoCategoriaPedido = dadosVisualizarPedido?.[0]?.TIPOCATEGORIAPEDIDO || dadosVisualizarPedido?.[0]?.TIPOPEDIDO || "tipoPedido";
@@ -52,6 +53,7 @@ export const ActionIncluirProdutoPedidoModal = ({
             dadosPedidosDetalhe={dadosPedidosDetalhe}
             dadosVisualizarPedido={dadosVisualizarPedido}
             checkboxIntermediario={checkboxIntermediario}
+            handleClickEditarPedido={handleClickEditarPedido}
          />
           
         </Modal.Body>

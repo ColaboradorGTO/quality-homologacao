@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { get, post } from "../../../../../../../api/funcRequest";
+import { get, post, put } from "../../../../../../../api/funcRequest";
 import { useQuery } from "react-query";
 import axios from "axios";
 import { toFloat } from "../../../../../../../utils/toFloat";
@@ -15,7 +15,8 @@ export const useIncluirProduto = ({
     setDadosDetalhePedido,
     dadosDetalheGradePedido,
     dadosVisualizarPedido,
-    checkboxIntermediario
+    checkboxIntermediario,
+    handleClickEditarPedido
 }) => {
     const [ipUsuario, setIpUsuario] = useState('');
     const [nomeMarca, setNomeMarca] = useState('')
@@ -287,6 +288,7 @@ export const useIncluirProduto = ({
             setRascunho(dadosDetalhePedido[0]?.STRASCUNHO)
             setCodBarras(dadosDetalhePedido[0]?.NUCODBARRAS)
             setIdProduto(dadosDetalhePedido[0]?.IDPRODUTO)
+            setIdResumoPedido(dadosDetalhePedido[0]?.IDPEDIDO)
         }
         }, [dadosDetalhePedido]);
 
@@ -477,10 +479,10 @@ export const useIncluirProduto = ({
    
         return { disabled: false, readOnly: false };
     };
-    console.log(checkboxIntermediario, 'checkboxIntermediario hook')
-
+    // console.log(checkboxIntermediario ? 'True' : 'False', 'checkboxIntermediario hook')
+    // console.log(stReposicao, 'stReposicao hook')
     const onSubmit = async () => {
-        if (stReposicao === 'False') {
+        if (stReposicao == 'False') {
             const responseProdutoExistente = await get(`/produtos-pedido?referenciaProduto=${descricaoProduto}`);
             if (responseProdutoExistente.data.length > 0) {
                 Swal.fire({
@@ -572,12 +574,12 @@ export const useIncluirProduto = ({
             IDPRODUTO: idProduto ? idProduto : '',
             IDRESPATUALIZACAO: parseInt(usuarioLogado?.id),
             GRADE: grade,
-            STPEDIDOPORINTEMEDIARIO: stPedidoPorIntermediario
+            STPEDIDOPORINTEMEDIARIO: checkboxIntermediario ? 'True' : 'False',
         }
         try {
+         
             const response = await put(`/detalhe-pedido/:id`, data);
-            console.log('Payload enviado para API:', data);
-            console.log('Resposta da API:', response);
+      
             const responsePut = await put(`/lista-pedidos/:id?IDRESUMOPEDIDO=${idResumoPedido}`);
             const textDados = JSON.stringify(data);
             const ipUsuario = await getIPUsuario();
@@ -606,28 +608,28 @@ export const useIncluirProduto = ({
             setDadosDetalhePedido(responseUltimoPedido.data);
             return response.data;
         } catch (error) {
-            console.log('Erro ao enviar payload para API:', data);
+            
             const textDados = JSON.stringify(data);
-            // const ipUsuario = await getIPUsuario();
-            // const textoFuncao = `COMPRAS / ERRO AO ALTERAR PRODUTO NO PEDIDO `;
-            // const postData = {
-            //     IDFUNCIONARIO: String(usuarioLogado.id),
-            //     PATHFUNCAO: textoFuncao,
-            //     DADOS: textDados,
-            //     IP: ipUsuario || 'Indisponível'
-            // };
+            const ipUsuario = await getIPUsuario();
+            const textoFuncao = `COMPRAS / ERRO AO ALTERAR PRODUTO NO PEDIDO `;
+            const postData = {
+                IDFUNCIONARIO: String(usuarioLogado.id),
+                PATHFUNCAO: textoFuncao,
+                DADOS: textDados,
+                IP: ipUsuario || 'Indisponível'
+            };
 
-            // const responsePost = await post('/log-web', postData);
-            // Swal.fire({
-            //     icon: 'error',
-            //     title: 'Erro',
-            //     text: 'Erro ao alterar produto no pedido.',
-            //     customClass: {
-            //         container: 'custom-swal',   
-            //     },
-            // });
+            const responsePost = await post('/log-web', postData);
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro',
+                text: 'Erro ao alterar produto no pedido.',
+                customClass: {
+                    container: 'custom-swal',   
+                },
+            });
 
-            // return responsePost.data;
+            return responsePost.data;
         }
     }
 

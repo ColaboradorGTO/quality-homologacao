@@ -20,6 +20,7 @@ import Swal from 'sweetalert2';
  
 export const ActionListaPedidos = ({
   dadosDetalhePedido,
+  setDadosDetalhePedido,
   dadosVisualizarPedido,
   setModalIncluirProdutoPedido,
   usuarioLogado,
@@ -402,6 +403,12 @@ export const ActionListaPedidos = ({
       if (response.data && responseDetalheGrade.data) {
         setDadosDetalheGradePedido(response.data)
         setDadosPedidosDetalhe(responseDetalheGrade.data)
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: 'Não foi possível obter os detalhes do pedido para edição.',
+        })
       }
     } catch (error) {
       console.log(error, "não foi possivel pegar os dados da tabela ")
@@ -412,7 +419,6 @@ export const ActionListaPedidos = ({
     if (row.IDDETPEDIDO) {
       handleEditarPedido(row.IDDETPEDIDO)
       setModalEditar(true)
-      // setModalIncluirProdutoPedido(true)
     }
   }
 
@@ -481,9 +487,11 @@ export const ActionListaPedidos = ({
         dadosDetalheGradePedido={dadosDetalheGradePedido}
         dadosPedidosDetalhe={dadosPedidosDetalhe}
         dadosDetalhePedido={dadosDetalhePedido}
+        setDadosDetalhePedido={setDadosDetalhePedido}
         dadosVisualizarPedido={dadosVisualizarPedido}
         dadosUltimosPedidos={dadosUltimosPedidos}
         checkboxIntermediario={checkboxIntermediario}
+        handleClickEditarPedido={handleClickEditarPedido}
       />
     </Fragment>
   )
