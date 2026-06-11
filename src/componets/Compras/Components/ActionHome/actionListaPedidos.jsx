@@ -82,20 +82,36 @@ export const ActionListaPedidos = ({
   };
 
   const exportToExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(dados);
+    const worksheet = XLSX.utils.json_to_sheet(dadosListaPedidos.map(item => ({
+      Nº: item.contador,
+      Data: item.DTPEDIDOFORMATADABR,
+      'Dt Entrega': item.DTPREVENTREFAFORMATADABR,
+      'Nº Pedido': item.IDPEDIDO,
+      Marca: item.NOFANTASIA,
+      Comprador: item.NOMECOMPRADOR,
+      Fornecedor: item.NOFORNECEDOR,
+      Fabricante: item.FABRICANTE,
+      'Vr Pedido': formatMoeda(item.VRTOTALLIQUIDO),
+      Setor: item.DSSETOR,
+      Status: item.DSANDAMENTO,
+      'SAP': item.STMIGRADOSAP == null ? 'NÃO MIGRADO SAP' : 'MIGRADO SAP'
+    
+    })));
     const workbook = XLSX.utils.book_new();
-    const header = ['Nº', 'Data', 'Nº Pedido', 'Marca', 'Comprador', 'Fornecedor', 'Fabricante', 'Vr Pedido', 'Setor', 'Status'];
+    const header = ['Nº', 'Data', 'Dt Entrega', 'Nº Pedido', 'Marca', 'Comprador', 'Fornecedor', 'Fabricante', 'Vr Pedido', 'Setor', 'Status', 'SAP'];
     worksheet['!cols'] = [
       { wpx: 70, caption: 'Nº' },
       { wpx: 70, caption: 'Data' },
+      { wpx: 70, caption: 'Dt Entrega' },
       { wpx: 70, caption: 'Nº Pedido' },
-      { wpx: 70, caption: 'Marca' },
-      { wpx: 70, caption: 'Comprador' },
-      { wpx: 70, caption: 'Fornecedor' },
-      { wpx: 70, caption: 'Fabricante' },
+      { wpx: 200, caption: 'Marca' },
+      { wpx: 200, caption: 'Comprador' },
+      { wpx: 250, caption: 'Fornecedor' },
+      { wpx: 100, caption: 'Fabricante' },
       { wpx: 70, caption: 'Vr Pedido' },
-      { wpx: 70, caption: 'Setor' },
-      { wpx: 70, caption: 'Status' },
+      { wpx: 100, caption: 'Setor' },
+      { wpx: 100, caption: 'Status' },
+      { wpx: 100, caption: 'SAP' },
     ];
     XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Pedidos Periodo');

@@ -72,7 +72,7 @@ export const ActionListaPedidos = ({
   };
 
   const exportToExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(dados);
+    const worksheet = XLSX.utils.json_to_sheet(dadosListaPedidos);
     const workbook = XLSX.utils.book_new();
     const header = ['Nº', 'Categoria', 'Qtd', 'Unid', 'Ref', 'Descrição', 'Estrutura', 'Cor', 'Desc I', 'Desc II', 'Desc III', 'Vr Unit', 'Vr Venda', 'Total'];
     worksheet['!cols'] = [
