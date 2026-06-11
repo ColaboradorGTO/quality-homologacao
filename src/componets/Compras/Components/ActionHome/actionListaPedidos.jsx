@@ -61,10 +61,11 @@ export const ActionListaPedidos = ({
   const exportToPDF = () => {
     const doc = new jsPDF();
     doc.autoTable({
-      head: [['Nº', 'Data', 'Nº Pedido', 'Marca', 'Comprador', 'Fornecedor', 'Fabricante', 'Vr Pedido', 'Setor', 'Status']],
-      body: dados.map(item => [
+      head: [['Nº', 'Data', 'Dt Entrega', 'Nº Pedido', 'Marca', 'Comprador', 'Fornecedor', 'Fabricante', 'Vr Pedido', 'Setor', 'Status']],
+      body: dadosListaPedidos.map(item => [
         item.contador,
         item.DTPEDIDOFORMATADABR,
+        item.DTPREVENTREFAFORMATADABR,
         item.IDPEDIDO,
         item.NOFANTASIA,
         item.NOMECOMPRADOR,
@@ -72,8 +73,7 @@ export const ActionListaPedidos = ({
         item.FABRICANTE,
         formatMoeda(item.VRTOTALLIQUIDO),
         item.DSSETOR == 'CADASTRO' ? 'CADASTRO' : item.DSSETOR == 'COMPRAS' ? 'COMPRAS' : item.DSSETOR == 'COMPRAS ADM' ? 'COMPRAS ADM' : '',
-        item.DSANDAMENTO == 'PRODUTOS/INCLUSÃO INICIADA' ? 'PRODUTOS/INCLUSÃO INICIADA' : item.DSANDAMENTO == 'PRODUTOS/INCLUSÃO FINALIZADA' ? 'PRODUTOS/INCLUSÃO FINALIZADA' : item.DSANDAMENTO == 'PEDIDO EM ANÁLISE' ? 'PEDIDO EM ANÁLISE' : item.DSANDAMENTO == 'PEDIDO CANCELADO' ? 'PEDIDO CANCELADO' : item.DSANDAMENTO == 'PEDIDO INICIADO' ? 'PEDIDO INICIADO' : '',
-        item.STMIGRADOSAP == null ? 'NÃO MIGRADO SAP' : 'MIGRADO SAP'
+        item.DSANDAMENTO + (item.STRASCUNHO === 'True' ? ' / SALVO COMO RASCUNHO' : '') + (Number(item.IDPEDIDOPRIMARIO) > 0 ? ` -> PEDIDO PRIMARIO -> ${item.IDPEDIDOPRIMARIO}` : (Number(item.IDPEDIDOSECUNDARIO) > 0 && item.STPEDIDOPRIMARIO === 'True' ? ` -> PEDIDO SECUNDARIO -> ${item.IDPEDIDOSECUNDARIO}` : ''))
       ]),
       horizontalPageBreak: true,
       horizontalPageBreakBehaviour: 'immediately'
@@ -93,9 +93,7 @@ export const ActionListaPedidos = ({
       Fabricante: item.FABRICANTE,
       'Vr Pedido': formatMoeda(item.VRTOTALLIQUIDO),
       Setor: item.DSSETOR,
-      Status: item.DSANDAMENTO,
-      'SAP': item.STMIGRADOSAP == null ? 'NÃO MIGRADO SAP' : 'MIGRADO SAP'
-    
+      Status: formatStatusTexto(item)
     })));
     const workbook = XLSX.utils.book_new();
     const header = ['Nº', 'Data', 'Dt Entrega', 'Nº Pedido', 'Marca', 'Comprador', 'Fornecedor', 'Fabricante', 'Vr Pedido', 'Setor', 'Status', 'SAP'];
@@ -110,8 +108,7 @@ export const ActionListaPedidos = ({
       { wpx: 100, caption: 'Fabricante' },
       { wpx: 70, caption: 'Vr Pedido' },
       { wpx: 100, caption: 'Setor' },
-      { wpx: 100, caption: 'Status' },
-      { wpx: 100, caption: 'SAP' },
+      { wpx: 500, caption: 'Status' }
     ];
     XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Pedidos Periodo');
@@ -125,6 +122,26 @@ export const ActionListaPedidos = ({
     }
     return total;
   }
+
+  const formatStatusTexto = (item) => {
+    const { DSANDAMENTO, STRASCUNHO, STPEDIDOPRIMARIO, IDPEDIDOPRIMARIO, IDPEDIDOSECUNDARIO } = item;
+    const isPedidoSecundario = Number(IDPEDIDOPRIMARIO) > 0;
+    const isPedidoPrimario = Number(IDPEDIDOSECUNDARIO) > 0 && STPEDIDOPRIMARIO === 'True';
+
+    let status = DSANDAMENTO || '';
+
+    if (STRASCUNHO === 'True') {
+      status += ' / SALVO COMO RASCUNHO';
+    }
+
+    if (isPedidoSecundario) {
+      status += ` -> PEDIDO PRIMARIO -> ${IDPEDIDOPRIMARIO}`;
+    } else if (isPedidoPrimario) {
+      status += ` -> PEDIDO SECUNDARIO -> ${IDPEDIDOSECUNDARIO}`;
+    }
+
+    return status;
+  };
 
   const dadosListaPedidos = dadosPedidos.map((item, index) => {
     let contador = index + 1;
@@ -223,7 +240,7 @@ export const ActionListaPedidos = ({
     },
     {
       field: 'DSANDAMENTO',
-      header: 'Situação',
+      header: 'Status',
       body: (row) => {
         const { DSANDAMENTO, DSSETOR, STRASCUNHO, STPEDIDOPRIMARIO, IDPEDIDOPRIMARIO, IDPEDIDOSECUNDARIO } = row;
 
