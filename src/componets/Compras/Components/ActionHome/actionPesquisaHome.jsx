@@ -354,6 +354,7 @@ export const ActionPesquisaHome = ({ usuarioLogado }) => {
           optionsModulos={optionsModulos}
           dadosVisualizarPedido={dadosVisualizarPedido}
           dadosDetalhePedido={dadosDetalhePedido}
+          setDadosDetalhePedido={setDadosDetalhePedido}
           actionEditarPedido={actionEditarPedido}
           setActionEditarPedido={setActionEditarPedido}
           setActionVisualizarPedido={setActionVisualizarPedido}

@@ -1,17 +1,21 @@
 import { useEffect, useRef, useState } from "react";
-import { get } from "../../../../../../../api/funcRequest";
+import { get, post } from "../../../../../../../api/funcRequest";
 import { useQuery } from "react-query";
 import axios from "axios";
 import { toFloat } from "../../../../../../../utils/toFloat";
 import { optionsReposicao, optionsTipoCadastro } from "../../../../../../../../parceiro.json"
+import { removerFormatacaoMoeda } from "../../../../../../../utils/formatMoeda";
+import Swal from "sweetalert2";
 
 
 export const useIncluirProduto = ({ 
     usuarioLogado, 
     optionsModulos,
     dadosDetalhePedido,
+    setDadosDetalhePedido,
     dadosDetalheGradePedido,
     dadosVisualizarPedido,
+    checkboxIntermediario
 }) => {
     const [ipUsuario, setIpUsuario] = useState('');
     const [nomeMarca, setNomeMarca] = useState('')
@@ -60,6 +64,8 @@ export const useIncluirProduto = ({
     const [tamanhosAtivosEdicao, setTamanhosAtivosEdicao] = useState(new Set());
     const [dadosPedidoAtual, setDadosPedidoAtual] = useState([])
     const [gradeDetalhes, setGradeDetalhes] = useState({});
+    const [codBarras, setCodBarras] = useState('');
+    const [idProduto, setIdProduto] = useState(null);
 
     const pendingTamanhoIdRef = useRef(null);
 
@@ -104,7 +110,7 @@ export const useIncluirProduto = ({
 
     const { data: dadosCategoriaPedidoGrade  = [], error: errorCategoriaPedidoGrade, isLoading: isLoadingCategoriaPedidoGrade, refetch: refetchCategoriaPedidoGrade } = useQuery(
         'categoria-pedido',
-        async () => { const response = await get(`/categoria-pedido?idCategoriaPedido=${tipoPedidoSelecionado?.value}`); return response.data},
+        async () => { const response = await get(`/categoria-pedido?idCategoriaPedido=${dadosDetalhePedido[0]?.IDTIPOPEDIDO}`); return response.data},
         { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
     );
     
@@ -279,7 +285,8 @@ export const useIncluirProduto = ({
             setStPedidoPorIntermediario(dadosDetalhePedido[0]?.STPEDIDOPORINTEMEDIARIO)
             setObsFornecedor(dadosDetalhePedido[0]?.OBSPEDIDO)
             setRascunho(dadosDetalhePedido[0]?.STRASCUNHO)
-
+            setCodBarras(dadosDetalhePedido[0]?.NUCODBARRAS)
+            setIdProduto(dadosDetalhePedido[0]?.IDPRODUTO)
         }
         }, [dadosDetalhePedido]);
 
@@ -318,22 +325,22 @@ export const useIncluirProduto = ({
     };
 
     useEffect(() => {
-    if (dadosGrade?.length) {
-        setQuantidadePorTamanho(prev => {
-            // se já há valores (vieram de preencherGradeEdicao), não reseta
-            const jaTemValores = Object.values(prev).some(v => Number(v) > 0);
-            if (jaTemValores) return prev;
+        if (dadosGrade?.length) {
+            setQuantidadePorTamanho(prev => {
+                // se já há valores (vieram de preencherGradeEdicao), não reseta
+                const jaTemValores = Object.values(prev).some(v => Number(v) > 0);
+                if (jaTemValores) return prev;
 
-            const valoresIniciais = {};
-            dadosGrade.forEach(item => {
-                const stDiversos = item.DSTAMANHO?.toUpperCase() === 'DIVERSOS' ||
-                    item.DSTAMANHO?.toUpperCase() === 'U-DIVERSOS';
-                valoresIniciais[item.IDTAMANHO] = stDiversos ? 1 : 0;
+                const valoresIniciais = {};
+                dadosGrade.forEach(item => {
+                    const stDiversos = item.DSTAMANHO?.toUpperCase() === 'DIVERSOS' ||
+                        item.DSTAMANHO?.toUpperCase() === 'U-DIVERSOS';
+                    valoresIniciais[item.IDTAMANHO] = stDiversos ? 1 : 0;
+                });
+                return valoresIniciais;
             });
-            return valoresIniciais;
-        });
-    }
-}, [dadosGrade]);
+        }
+    }, [dadosGrade]);
 
 
    
@@ -470,6 +477,7 @@ export const useIncluirProduto = ({
    
         return { disabled: false, readOnly: false };
     };
+    console.log(checkboxIntermediario, 'checkboxIntermediario hook')
 
     const onSubmit = async () => {
         if (stReposicao === 'False') {
@@ -531,48 +539,95 @@ export const useIncluirProduto = ({
         }
 
         const grade = montarPayloadGrade();
-        
+
+        const data = {
+            idDetPedido: parseInt(dadosDetalhePedido[0]?.IDDETPEDIDO),
+            IDCOR: parseInt(corSelecionada?.value),
+            IDSUBGRUPOESTRUTURA: parseInt(estruturaSelecionada?.value),
+            IDCATEGORIAPEDIDO: parseInt(categoriaSelecionada?.value),
+            IDTIPOTECIDO: parseInt(tipoTecidoSelecionado?.value),
+            IDESTILO: parseInt(estiloSelecionado?.value),
+            IDFABRICANTE: parseInt(fabricanteSelecionado?.value),
+            IDLOCALEXPOSICAO: parseInt(localExposicaoSelecionado?.value),
+            NUREF: referenciaProduto,
+            DSPRODUTO: descricaoProduto,
+            QTDTOTAL: parseInt(quantidade),
+            NUCAIXA: parseInt(quantidadeCaixa),
+            UND: parseInt(unidadeSelecionada?.value),
+            VRUNITBRUTO: parseFloat(vrBruto),
+            DESC01: parseFloat(percDescontoI),
+            DESC02: parseFloat(percDescontoII),
+            DESC03: parseFloat(percDescontoIII),
+            VRUNITLIQUIDO: parseFloat(vrLiquido),
+            VRVENDA: parseFloat(vrVenda),
+            VRTOTAL: parseFloat(vrTotal),
+            STECOMMERCE: ecommerceSelecionado?.value,
+            STREDESOCIAL: redeSocialSelecionada?.value,
+            VRCUSTOPRODATUAL: removerFormatacaoMoeda(vrCusto),
+            VRVENDAPRODATUAL: removerFormatacaoMoeda(vrVenda),
+            OBSPRODUTO: observacao,
+            IDCATEGORIAS: parseInt(categoriaSelecionada?.value),
+            STREPOSICAO: reposicaoSelecionado?.value,
+            NUCODBARRAS: codBarras ? codBarras : '',
+            IDPRODUTO: idProduto ? idProduto : '',
+            IDRESPATUALIZACAO: parseInt(usuarioLogado?.id),
+            GRADE: grade,
+            STPEDIDOPORINTEMEDIARIO: stPedidoPorIntermediario
+        }
         try {
-            const data = {
-                IDRESUMOPEDIDO: parseInt(idResumoPedido),
-                IDCOR: parseInt(corSelecionada?.value),
-                IDSUBGRUPOESTRUTURA: parseInt(estruturaSelecionada?.value),
-                IDCATEGORIAPEDIDO: parseInt(categoriaSelecionada?.value),
-                IDTIPOTECIDO: parseInt(tipoTecidoSelecionado?.value),
-                IDESTILO: parseInt(estiloSelecionado?.value),
-                IDFABRICANTE: parseInt(fabricanteSelecionado?.value),
-                IDLOCALEXPOSICAO: parseInt(localExposicaoSelecionado?.value),
-                NUREF: referenciaProduto,
-                DSPRODUTO: descricaoProduto,
-                QTDTOTAL: parseInt(quantidade),
-                NUCAIXA: parseInt(quantidadeCaixa),
-                UND: parseInt(unidadeSelecionada?.value),
-                VRUNITBRUTO: parseFloat(vrBruto),
-                DESC01: parseFloat(percDescontoI),
-                DESC02: parseFloat(percDescontoII),
-                DESC03: parseFloat(percDescontoIII),
-                VRUNITLIQUIDO: parseFloat(vrLiquido),
-                VRVENDA: parseFloat(vrVenda),
-                VRTOTAL: parseFloat(vrTotal),
-                STRECEBIDO: 'False',
-                STECOMMERCE: ecommerceSelecionado?.value,
-                STREDESOCIAL: redeSocialSelecionada?.value,
-                STCANCELADO: 'False',
-                GRADE:'',
-                VRCUSTOPRODATUAL: parseFloat(vrCusto),
-                VRVENDAPRODATUAL: parseFloat(vrVenda),
-                OBSPRODUTO: observacao,
-                STTRANSFORMADO: 'False',
-                IDCATEGORIAS: parseInt(categoriaSelecionada?.value),
-                STREPOSICAO: stReposicaoSelecionado?.value,
-                NUCODBARRAS: referencia,
-                IDPRODUTO: produtoSelecionado?.IDPRODUTO,
-                IDRESPCADASTRO: parseInt(usuarioLogado?.id),
-                STPEDIDOPORINTEMEDIARIO: stPedidoPorIntermediario,
-                IDCATEGORIAGRADE: parseInt(categoriaGradeSelecionada?.value),
-            }
+            const response = await put(`/detalhe-pedido/:id`, data);
+            console.log('Payload enviado para API:', data);
+            console.log('Resposta da API:', response);
+            const responsePut = await put(`/lista-pedidos/:id?IDRESUMOPEDIDO=${idResumoPedido}`);
+            const textDados = JSON.stringify(data);
+            const ipUsuario = await getIPUsuario();
+            const textoFuncao = `COMPRAS/ALTERAR PRODUTO PEDIDO`;
+            const postData = {
+                IDFUNCIONARIO: String(usuarioLogado.id),
+                PATHFUNCAO: textoFuncao,
+                DADOS: textDados,
+                IP: ipUsuario || 'Indisponível'
+            };
+
+            await post('/log-web', postData);
+
+            Swal.fire({
+                icon: 'success',
+                title: `Item Incluido no Pedido: ${idResumoPedido} com Sucesso!`,
+                showConfirmButton: false,
+                timer: 3000,
+                customClass: {
+                    container: 'custom-swal',   
+                },
+            });
+
+            const responseUltimoPedido = await get(`/lista-detalhe-pedidos?idPedido=${idResumoPedido}&somenteGradeAtiva=True`);
+            setDadosPedidoAtual(responseUltimoPedido.data);
+            setDadosDetalhePedido(responseUltimoPedido.data);
+            return response.data;
         } catch (error) {
-            console.error('Erro ao incluir produto no pedido:', error);s
+            console.log('Erro ao enviar payload para API:', data);
+            const textDados = JSON.stringify(data);
+            // const ipUsuario = await getIPUsuario();
+            // const textoFuncao = `COMPRAS / ERRO AO ALTERAR PRODUTO NO PEDIDO `;
+            // const postData = {
+            //     IDFUNCIONARIO: String(usuarioLogado.id),
+            //     PATHFUNCAO: textoFuncao,
+            //     DADOS: textDados,
+            //     IP: ipUsuario || 'Indisponível'
+            // };
+
+            // const responsePost = await post('/log-web', postData);
+            // Swal.fire({
+            //     icon: 'error',
+            //     title: 'Erro',
+            //     text: 'Erro ao alterar produto no pedido.',
+            //     customClass: {
+            //         container: 'custom-swal',   
+            //     },
+            // });
+
+            // return responsePost.data;
         }
     }
 

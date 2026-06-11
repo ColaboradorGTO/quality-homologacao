@@ -24,7 +24,8 @@ export const ActionListaPedidos = ({
   setModalIncluirProdutoPedido,
   usuarioLogado,
   optionsModulos,
-  dadosUltimosPedidos
+  dadosUltimosPedidos,
+  checkboxIntermediario
 }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowSelection, setRowSelection] = useState(null);
@@ -482,6 +483,7 @@ export const ActionListaPedidos = ({
         dadosDetalhePedido={dadosDetalhePedido}
         dadosVisualizarPedido={dadosVisualizarPedido}
         dadosUltimosPedidos={dadosUltimosPedidos}
+        checkboxIntermediario={checkboxIntermediario}
       />
     </Fragment>
   )

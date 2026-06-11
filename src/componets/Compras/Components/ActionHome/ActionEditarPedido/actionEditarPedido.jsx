@@ -23,6 +23,7 @@ export const ActionEditarPedido = ({
   optionsModulos,
   dadosVisualizarPedido,
   dadosDetalhePedido,
+  setDadosDetalhePedido,
   actionVisualizarPedido,
   actionEditarPedido,
   setActionEditarPedido,
@@ -325,7 +326,7 @@ export const ActionEditarPedido = ({
     setActionEditarPedido(false)
   }
   
-
+  // console.log(checkboxIntermediario.checked, 'checkboxIntermediario')
 
   return (
 
@@ -572,6 +573,7 @@ export const ActionEditarPedido = ({
           usuarioLogado={usuarioLogado}
           optionsModulos={optionsModulos}
           dadosUltimosPedidos={dadosUltimosPedidos}
+          checkboxIntermediario={checkboxIntermediario}
       />
     
       <ActionIncluirProdutoPedidoModal
@@ -580,11 +582,13 @@ export const ActionEditarPedido = ({
           usuarioLogado={usuarioLogado}
           optionsModulos={optionsModulos}
           dadosDetalhePedido={dadosDetalhePedido}
+          setDadosDetalhePedido={setDadosDetalhePedido}
           dadosVisualizarPedido={dadosVisualizarPedido}
           tipoPedidoSelecionado={tipoPedidoSelecionado}
           marcaSelecionada={marcaSelecionada}
           idResumoPedido={idResumoPedido}
           dadosUltimosPedidos={dadosUltimosPedidos}
+          checkboxIntermediario={checkboxIntermediario}
         />
 
       {actionPesquisarNovoPedido && (

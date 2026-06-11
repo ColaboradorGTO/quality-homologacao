@@ -15,15 +15,17 @@ export const FormularioIncluirProdutoPedido = ({
     optionsModulos,
     handleClose,
     dadosDetalhePedido,
+    setDadosDetalhePedido,
     dadosDetalheGradePedido,
     dadosPedidosDetalhe,
-    dadosVisualizarPedido
+    dadosVisualizarPedido,
+    checkboxIntermediario
 }) => {
     const { register, handleSubmit, formState: { errors }, clearErrors, setError, control } = useForm({
         mode: "onChange"
     });
     const {
-         nomeMarca,
+        nomeMarca,
         setNomeMarca,
         referenciaProduto,
         setReferenciaProduto,
@@ -117,8 +119,17 @@ export const FormularioIncluirProdutoPedido = ({
         isDiversos,
         getInputStateGrade,
         onSubmit,
-    } = useIncluirProduto({ usuarioLogado, optionsModulos, dadosDetalhePedido, dadosDetalheGradePedido, dadosPedidosDetalhe, dadosVisualizarPedido });
-
+    } = useIncluirProduto({ 
+        usuarioLogado, 
+        optionsModulos, 
+        dadosDetalhePedido, 
+        setDadosDetalhePedido, 
+        dadosDetalheGradePedido, 
+        dadosPedidosDetalhe, 
+        dadosVisualizarPedido, 
+        checkboxIntermediario 
+    });
+    
     const distribuicao = calcularDistribuicao();
 
     const handleValidatedSubmit = async () => {
@@ -175,7 +186,7 @@ export const FormularioIncluirProdutoPedido = ({
         fontSize: "14px",
     };
 
-     const formatSelectGroup = (data) => {
+    const formatSelectGroup = (data) => {
         const grupos = {};
 
         data.forEach((item) => {
@@ -908,7 +919,7 @@ export const FormularioIncluirProdutoPedido = ({
                     corFechar={"secondary"}
 
                     ButtonTypeCadastrar={ButtonTypeModal}
-                    onClickButtonCadastrar
+                    onClickButtonCadastrar={handleValidatedSubmit}
                     textButtonCadastrar={"Editar"}
                     corCadastrar={"success"}
                     loadingTextCadastrar={"Editando..."}

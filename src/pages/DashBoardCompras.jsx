@@ -193,7 +193,7 @@ export const DashBoardCompras = () => {
                             <Suspense fallback={<div>Loading...</div>}>
                               {homeVisivel && !componentToShow && (
 
-                                <ActionPesquisaHome />
+                                <ActionPesquisaHome usuarioLogado={usuarioLogado}/>
                               )}
                               {componentToShow && component}
                             </Suspense>
