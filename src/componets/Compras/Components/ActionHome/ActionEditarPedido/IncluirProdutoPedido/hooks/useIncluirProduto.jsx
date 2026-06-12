@@ -578,7 +578,7 @@ export const useIncluirProduto = ({
         }
         try {
          
-            const response = await put(`/detalhe-pedido/:id`, data);
+            const response = await put(`/detalhe-pedido/:id`, data); 
       
             const responsePut = await put(`/lista-pedidos/:id?IDRESUMOPEDIDO=${idResumoPedido}`);
             const textDados = JSON.stringify(data);
