@@ -142,7 +142,8 @@ export const ActionImprimirEtiquetaModal = ({
         icon: 'error',
         title: 'Erro na Impressão ZPL',
         text: error.message || 'Erro desconhecido ao processar etiquetas',
-        confirmButtonText: 'OK'
+        confirmButtonText: 'OK',
+        customClass: { container: 'custom-swal' },
       });
     }
   }

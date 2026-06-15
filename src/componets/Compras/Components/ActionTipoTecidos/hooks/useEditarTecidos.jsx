@@ -54,9 +54,11 @@ export const useEditarTecido = ({ dadosDetalheTipoTecido, usuarioLogado, options
     }
 
     const postData = {
-      IDTPTECIDO: dadosDetalheTipoTecido[0]?.IDTPTECIDO,
+      IDTPTECIDO: parseInt(dadosDetalheTipoTecido[0]?.IDTPTECIDO, 10),
       DSTIPOTECIDO: descricao,
+      DSSIGLA: '',
       STATIVO: statusSelecionado.value,
+      IDFUNCIONARIO: parseInt(usuarioLogado.id),
     }
     try {
 
@@ -73,7 +75,7 @@ export const useEditarTecido = ({ dadosDetalheTipoTecido, usuarioLogado, options
         }
       });
       const textDados = JSON.stringify(postData);
-      let textoFuncao = 'COMPRAS/CADASTRO DE TIPOS DE TECIDOS';
+      let textoFuncao = 'COMPRAS/EDICAO DE MATERIAL DE FABRICACAO';
 
       const ip = await getIPUsuario();
 
@@ -90,7 +92,7 @@ export const useEditarTecido = ({ dadosDetalheTipoTecido, usuarioLogado, options
       return response.data;
     } catch (error) {
       const textDados = JSON.stringify(postData);
-      let textoFuncao = 'COMPRAS/ERRO AO CADASTRAR TIPOS DE TECIDOS';
+      let textoFuncao = 'COMPRAS/ERRO AO EDITAR MATERIAL DE FABRICACAO';
 
       const ip = await getIPUsuario();
 
