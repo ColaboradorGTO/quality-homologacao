@@ -73,7 +73,7 @@ export const ActionImprimirEtiquetaModal = ({
           let priceLength = precoVenda.length;
           let ajustePositionPrice = priceLength > 7 ? (priceLength - 7) * 15 : 0;
           let ajusteFontSizePrice = priceLength <= 11 ? 0 : 5;
-          let offsetDireita = 55; 
+          let offsetDireita = 20;
           let positionDefault = offsetDireita + (contador * 280);
           let positionPrice = offsetDireita + 135 + (contador * 280) - ajustePositionPrice;
           let positionTamanho = offsetDireita + 10 + (contador * 280);
