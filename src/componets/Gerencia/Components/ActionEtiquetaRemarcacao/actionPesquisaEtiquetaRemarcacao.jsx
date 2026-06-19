@@ -40,7 +40,7 @@ export const ActionPesquisaEtiquetaRemarcacao = ({ }) => {
       setDadosEtiquetas([]);
       setModalAcumulador(true);
     } else if (preco > 0 || dadosEtiquetas.length > 0) {
-      //setModalDetalhar(true);
+
       setDadosEtiquetas(dadosEtiquetas)
 
       const { value: formValues, isDismissed } = await Swal.fire({
@@ -64,7 +64,7 @@ export const ActionPesquisaEtiquetaRemarcacao = ({ }) => {
       });
 
       if (isDismissed) {
-        // setModalAcumulador(false);
+   
         setQuantidadeEtiquetas(0);
       } else if (formValues) {
         const qtdEtiqueta = parseInt(formValues, 10);
@@ -205,7 +205,7 @@ export const ActionPesquisaEtiquetaRemarcacao = ({ }) => {
         InputFieldQuantidadeComponent={dadosAcumuladorEtiquetas.length > 0 ? InputField : null}
         labelInputFieldQuantidade={"QTD CÓPIAS"}
         valueInputQuantidade={copias}
-        onChangeInputQuantidade={(e) => setCopias(Number(e.target.value) || 1)}
+        onChangeInputQuantidade={(e) => setCopias(e.target.value)}
         placeHolderInputFieldQuantidade={"Digite a quantidade"}
 
         ButtonTypeCadastro={ButtonType}
@@ -244,6 +244,7 @@ export const ActionPesquisaEtiquetaRemarcacao = ({ }) => {
         quantidadeEtiquetas={quantidadeEtiquetas}
         copias={copiasImprimir}
       />
+
       <ActionImprimirAcumuladorEtiquetaModal
         show={modalAcumulador}
         handleClose={fecharModalAcumulador}

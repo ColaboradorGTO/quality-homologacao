@@ -12,7 +12,8 @@ export const useIncluirProutoPedido = ({
     optionsModulos, 
     usuarioLogado,
     dadosVisualizarPedido, 
-    dadosDetalhePedido 
+    dadosDetalhePedido,
+    dadosFornecedor 
 }) => {
     const [dataPesquisaInicio, setDataPesquisaInicio] = useState('')
     const [dataPesquisaFim, setDataPesquisaFim] = useState('')
@@ -183,9 +184,10 @@ export const useIncluirProutoPedido = ({
 
     useEffect(() => {
         if(dadosVisualizarPedido && dadosVisualizarPedido.length > 0) {
-            // console.log((dadosVisualizarPedido[0]), 'dadosVisualizarPedido[0')
+            console.log((dadosVisualizarPedido[0]), 'dadosVisualizarPedido[0')
             
-         
+            setIdAndamento(dadosVisualizarPedido[0]?.IDANDAMENTO || '');
+            setMarcaSelecionada(dadosVisualizarPedido[0]?.IDGRUPOEMPRESARIAL || '');
             setIdResumoPedido(dadosVisualizarPedido[0]?.IDPEDIDO || '');
             setCompradorSelecionado({value: dadosVisualizarPedido[0]?.IDCOMPRADOR, label: dadosVisualizarPedido[0]?.NOMECOMPRADOR });
        
@@ -322,10 +324,11 @@ export const useIncluirProutoPedido = ({
 
     }
 
+    // console.log(dadosFornecedor, 'dadosFornecedor')
     const retornoDadosDoFonecedoNoPedido = async (dadosFornecedor) => {
         try {
             const dados = dadosFornecedor?.data?.[0] || dadosFornecedor?.[0];
-            
+            console.log(dados, 'dados')
             const NUCNPJ = dados?.CNPJFORN;
           
             if (!dados) return;
@@ -980,11 +983,11 @@ export const useIncluirProutoPedido = ({
                 allowOutsideClick: false,
                 didOpen: () => { Swal.showLoading(); }
             });
-
+            // Voltar daqui e verificar o payload
             const data = {
-                IDRESUMOPEDIDO: idResumoPedidoAtual,
-                IDGRUPOEMPRESARIAL: parseFloat(marcaSelecionada?.value),
-                IDSUBGRUPOEMPRESARIAL: parseFloat(marcaSelecionada?.value),
+                IDRESUMOPEDIDO: Number(idResumoPedidoAtual) || dadosVisualizarPedido[0]?.IDPEDIDO,
+                IDGRUPOEMPRESARIAL: parseFloat(marcaSelecionada?.value) || dadosVisualizarPedido[0]?.IDGRUPOEMPRESARIAL,
+                IDSUBGRUPOEMPRESARIAL: parseFloat(marcaSelecionada?.value) || dadosVisualizarPedido[0]?.IDSUBGRUPOEMPRESARIAL,
                 IDCOMPRADOR: parseFloat(compradorSelecionado?.value),
                 IDCONDICAOPAGAMENTO: parseFloat(condicoesPagamentosSelecionado?.value),
                 IDFORNECEDOR: fornecedorSelecionado?.value,
@@ -999,8 +1002,8 @@ export const useIncluirProutoPedido = ({
                 DESCPERC01: parseFloat(desconto1 || 0),
                 DESCPERC02: parseFloat(desconto2 || 0),
                 DESCPERC03: parseFloat(desconto3 || 0),
-                PERCCOMISSAO: comissao,
-                VRTOTALLIQUIDO: totalLiq,
+                PERCCOMISSAO: parseFloat(comissao || 0),
+                VRTOTALLIQUIDO: parseFloat(totalLiq || 0),
                 OBSPEDIDO: obsInterna,
                 OBSPEDIDO2: obsFornecedor,
                 DTFECHAMENTOPEDIDO: dataAtual,
