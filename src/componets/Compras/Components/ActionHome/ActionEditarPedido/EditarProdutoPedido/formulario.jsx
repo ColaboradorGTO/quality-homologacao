@@ -4,15 +4,13 @@ import { useIncluirProduto } from "./hooks/useIncluirProduto";
 import { FooterModal } from "../../../../../Modais/FooterModal/footerModal";
 import { ButtonTypeModal } from "../../../../../Buttons/ButtonTypeModal";
 import { useForm, Controller } from "react-hook-form";
-import { schema } from "./schema/useProdutoSchema";
+import { schema } from "./schema/useEditarProdutoSchema";
 import FormField from "../../../../../Formularios/FormField";
 import { formatarMoeda, formatMoeda } from "../../../../../../utils/formatMoeda";
 import { SelectList } from "../../../../../Buttons/menuList";
-import { MdLockOutline } from "react-icons/md";
-import Swal from "sweetalert2";
+ 
 
-
-export const FormularioIncluirProdutoPedido = ({
+export const FormularioEditarProdutoPedido = ({
     usuarioLogado,
     optionsModulos,
     handleClose,
@@ -28,7 +26,7 @@ export const FormularioIncluirProdutoPedido = ({
         mode: "onChange"
     });
     const {
-         nomeMarca,
+        nomeMarca,
         setNomeMarca,
         referenciaProduto,
         setReferenciaProduto,
@@ -121,21 +119,19 @@ export const FormularioIncluirProdutoPedido = ({
         setStReposicao,
         isDiversos,
         getInputStateGrade,
-        validarCamposProduto,
-        preencherDadosProdutoSelecionado,
         onSubmit,
-    } = useIncluirProduto({
-        usuarioLogado,
-        optionsModulos,
-        dadosDetalhePedido,
-        setDadosDetalhePedido,
-        dadosDetalheGradePedido,
-        dadosPedidosDetalhe,
-        dadosVisualizarPedido,
+    } = useIncluirProduto({ 
+        usuarioLogado, 
+        optionsModulos, 
+        dadosDetalhePedido, 
+        setDadosDetalhePedido, 
+        dadosDetalheGradePedido, 
+        dadosPedidosDetalhe, 
+        dadosVisualizarPedido, 
         checkboxIntermediario,
-        handleClickEditarPedido
+        handleClickEditarPedido 
     });
-
+    
     const distribuicao = calcularDistribuicao();
 
     const handleValidatedSubmit = async () => {
@@ -163,9 +159,6 @@ export const FormularioIncluirProdutoPedido = ({
 
             await schema.validate(dadosParaValidar, { abortEarly: false });
 
-            const gradeValida = validarGradeamento();
-            if (!gradeValida) return;
-
             onSubmit();
 
         } catch (validationError) {
@@ -188,58 +181,11 @@ export const FormularioIncluirProdutoPedido = ({
         }
     }
 
-    const handleProdutoSelecionado = async (selectedOption) => {
-        setProdutoSelecionado(selectedOption);
-
-        if (!selectedOption) return;
-
-        const produto = dadosProdutosPedidos.find(p => String(p.IDPRODUTO) === String(selectedOption.value));
-        if (!produto) return;
-
-        const { stValido, msgCamposVazios } = validarCamposProduto(produto);
-
-        if (!stValido) {
-            const resultado = await Swal.fire({
-                title: 'Produto com campos vazios',
-                html: `Este produto possui campos vazios/divergentes:<br><b>${msgCamposVazios}</b><br><br>Deseja preencher os dados mesmo assim?`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Sim, preencher',
-                cancelButtonText: 'Cancelar',
-                customClass: {
-                    container: 'custom-swal',
-                },
-            });
-            if (!resultado.isConfirmed) {
-                setProdutoSelecionado(null);
-                return;
-            }
-        } else {
-            const resultado = await Swal.fire({
-                title: 'Preencher dados do produto?',
-                text: 'Deseja preencher os dados do produto selecionado na pesquisa? Esta ação é recomendada para produtos de reposição.',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Sim',
-                cancelButtonText: 'Não',
-                customClass: {
-                    container: 'custom-swal',
-                },
-            });
-            if (!resultado.isConfirmed) {
-                setProdutoSelecionado(null);
-                return;
-            }
-        }
-
-        await preencherDadosProdutoSelecionado(produto);
-    };
-
     const menuHeaderStyle = {
         padding: "8px 12px",
         background: "#7a59ad",
         color: "#ffffff",
-        fontSize: "16px",
+        fontSize: "14px",
     };
 
     const formatSelectGroup = (data) => {
@@ -260,7 +206,7 @@ export const FormularioIncluirProdutoPedido = ({
                 original: item
             });
         });
-
+      
         return Object.values(grupos);
     };
 
@@ -269,12 +215,12 @@ export const FormularioIncluirProdutoPedido = ({
 
         data.forEach((item) => {
             const {
-                ID_COR,
-                DS_COR,
-                ID_GRUPOCOR,
-                DS_GRUPOCOR,
-                DSSIGLA,
-                STBLOQUEADOPARACADASTROPRODUTONOVO
+            ID_COR,
+            DS_COR,
+            ID_GRUPOCOR,
+            DS_GRUPOCOR,
+            DSSIGLA,
+            STBLOQUEADOPARACADASTROPRODUTONOVO
             } = item;
 
             const nomeCor = (DS_COR || "").trim();
@@ -289,17 +235,17 @@ export const FormularioIncluirProdutoPedido = ({
 
             const groupKey = String(ID_GRUPOCOR ?? "SEM_GRUPO");
             if (!grupos.has(groupKey)) {
-                grupos.set(groupKey, {
-                    label: String(DS_GRUPOCOR || "SEM GRUPO").toUpperCase(),
-                    options: []
-                });
+            grupos.set(groupKey, {
+                label: String(DS_GRUPOCOR || "SEM GRUPO").toUpperCase(),
+                options: []
+            });
             }
 
             grupos.get(groupKey).options.push({
-                value: ID_COR,
-                label: labelCor,
-                isDisabled,
-                original: item
+            value: ID_COR,
+            label: labelCor,
+            isDisabled,
+            original: item
             });
         });
 
@@ -313,10 +259,10 @@ export const FormularioIncluirProdutoPedido = ({
 
         data.forEach((item) => {
             const {
-                IDTPTECIDO,
-                DSTIPOTECIDO,
-                DSSIGLA,
-                STBLOQUEADOPARACADASTROPRODUTONOVO
+            IDTPTECIDO,
+            DSTIPOTECIDO,
+            DSSIGLA,
+            STBLOQUEADOPARACADASTROPRODUTONOVO
             } = item;
 
             const nomeMaterial = (DSTIPOTECIDO || "").trim();
@@ -338,26 +284,16 @@ export const FormularioIncluirProdutoPedido = ({
             };
 
             if (isDisabled) {
-                optionsBloqueadas.push(option);
+            optionsBloqueadas.push(option);
             } else {
-                optionsAtivas.push(option);
+            optionsAtivas.push(option);
             }
         });
 
         return [...optionsAtivas, ...optionsBloqueadas];
-    };
+    }; 
 
-    const formatSelectProduto = (data = []) => {
-        return data.map((item) => ({
-            value: item.IDPRODUTO,
-            label: `${item.NUCODBARRAS} - ${item.DSNOME}`,
-            original: item
-        }));
-
-
-    }
-
-
+    
 
     return (
         <Fragment>
@@ -389,7 +325,7 @@ export const FormularioIncluirProdutoPedido = ({
                     </div>
                 </div>
 
-                <div className="form-group">
+                {/* <div className="form-group">
                     <div className="row">
                         <div className="col-sm-6 col-xl-6">
                             <Controller
@@ -404,7 +340,7 @@ export const FormularioIncluirProdutoPedido = ({
                                         onChange={(e) => setReferenciaProduto(e.target.value)}
                                         errors={errors}
                                         clearErrors={clearErrors}
-
+                                        
                                     />
 
                                 )}
@@ -412,30 +348,20 @@ export const FormularioIncluirProdutoPedido = ({
                         </div>
                         <div className="col-sm-6 col-xl-6">
                             <label className="form-label" htmlFor="tpunid">Produtos Cadastrados / Cod Barras - Nome</label>
-                              <Select
-                                id={"listaProdutosPedidos"}
+                            <Select
+                                id={"listprodpesqped"}
                                 value={produtoSelecionado}
                                 options={dadosProdutosPedidos.map((item) => {
-                                    const { stValido, msgCamposVazios } = validarCamposProduto(item);
                                     return {
                                         value: item.IDPRODUTO,
-                                        label: `${item.NUCODBARRAS} - ${item.DSNOME}`,
-                                        isDisabled: !stValido,
-                                        title: !stValido ? `Produto com campos vazios: ${msgCamposVazios}` : item.DSNOME,
-                                        original: item,
-                                    };
+                                        label: `${item.NUCODBARRAS} - ${item.DSNOME}`
+                                    }
                                 })}
-                                onChange={handleProdutoSelecionado}
-                                formatOptionLabel={(option) => (
-                                    <span title={option.title} style={option.isDisabled ? { color: '#000', fontWeight: '500' } : {}}>
-                                        {option.isDisabled && <MdLockOutline  size={25} color="#f63c97" />}
-                                        {option.label}
-                                    </span>
-                                )}
+                                onChange={(e) => setProdutoSelecionado(e)}
                             />
                         </div>
                     </div>
-                </div>
+                </div> */}
 
                 <div className="form-group">
                     <div className="row">
@@ -467,7 +393,7 @@ export const FormularioIncluirProdutoPedido = ({
                                         onChange={(e) => setDescricaoProduto(e.target.value)}
                                         errors={errors}
                                         clearErrors={clearErrors}
-
+                                        
                                     />
 
                                 )}
@@ -571,7 +497,7 @@ export const FormularioIncluirProdutoPedido = ({
                                         onChange={(e) => setReferencia(e.target.value)}
                                         errors={errors}
                                         clearErrors={clearErrors}
-
+                                        
                                     />
                                 )}
                             />
@@ -607,7 +533,7 @@ export const FormularioIncluirProdutoPedido = ({
                                     }
                                 })}
                                 onChange={(e) => setUnidadeSelecionada(e)}
-
+                                
                             />
                         </div>
                         <div className="col-sm-4 col-xl-4">
@@ -622,13 +548,13 @@ export const FormularioIncluirProdutoPedido = ({
                                 getOptionDisabled={(option) => !!option.isDisabled}
                                 styles={{
                                     option: (base, state) => ({
-                                        ...base,
-                                        color: state.data?.isDisabled ? "#f63c97" : base.color,
-                                        cursor: state.data?.isDisabled ? "not-allowed" : "pointer"
+                                    ...base,
+                                    color: state.data?.isDisabled ? "#f63c97" : base.color,
+                                    cursor: state.data?.isDisabled ? "not-allowed" : "pointer"
                                     }),
                                     singleValue: (base, state) => ({
-                                        ...base,
-                                        color: state.data?.isDisabled ? "#f63c97" : base.color
+                                    ...base,
+                                    color: state.data?.isDisabled ? "#f63c97" : base.color
                                     })
                                 }}
                             />
@@ -645,14 +571,14 @@ export const FormularioIncluirProdutoPedido = ({
                                 getOptionDisabled={(option) => !!option.isDisabled}
                                 styles={{
                                     option: (base, state) => ({
-                                        ...base,
-                                        color: state.data?.isDisabled ? "#f63c97" : base.color,
-                                        cursor: state.data?.isDisabled ? "not-allowed" : "pointer",
-                                        fontSize: "13px"
+                                    ...base,
+                                    color: state.data?.isDisabled ? "#f63c97" : base.color,
+                                    cursor: state.data?.isDisabled ? "not-allowed" : "pointer",
+                                    fontSize: "13px"
                                     }),
                                     singleValue: (base, state) => ({
-                                        ...base,
-                                        color: state.data?.isDisabled ? "#f63c97" : base.color
+                                    ...base,
+                                    color: state.data?.isDisabled ? "#f63c97" : base.color
                                     })
                                 }}
                             />
@@ -666,14 +592,14 @@ export const FormularioIncluirProdutoPedido = ({
                             <Select
                                 id={"categoriaProduto"}
                                 value={categoriaGradeSelecionada}
-                                options={dadosCategoriaPedidoGrade?.map((item) => {
+                                options={dadosGrade?.map((item) => {
                                     return {
                                         value: item.IDCATEGORIAPEDIDO,
                                         label: `${item.TIPOPEDIDO} - ${item.DSCATEGORIAPEDIDO}`
                                     }
                                 })}
                                 onChange={(e) => setCategoriaGradeSelecionada(e)}
-
+                               
                             />
 
                         </div>
@@ -707,7 +633,7 @@ export const FormularioIncluirProdutoPedido = ({
                                     }
                                 })}
                                 onChange={(e) => setEstiloSelecionado(e)}
-
+                      
                             />
 
                         </div>
@@ -727,7 +653,7 @@ export const FormularioIncluirProdutoPedido = ({
                                     }
                                 })}
                                 onChange={(e) => setCategoriaSelecionada(e)}
-
+                            
                             />
                         </div>
                         <div className="col-sm-3 col-xl-3">
@@ -743,7 +669,7 @@ export const FormularioIncluirProdutoPedido = ({
                                     }
                                 })}
                                 onChange={(e) => setLocalExposicaoSelecionado(e)}
-
+                               
                             />
                         </div>
                         <div className="col-sm-3 col-xl-3">
@@ -789,7 +715,7 @@ export const FormularioIncluirProdutoPedido = ({
                                         label={"VR Bruto"}
                                         name="vrBrutoProduto"
                                         type="text"
-                                        value={vrBruto}
+                                        value={formatMoeda(vrBruto)}
                                         onChange={(e) => {
                                             const val = e.target.value;
                                             setVrBruto(val);
@@ -875,8 +801,8 @@ export const FormularioIncluirProdutoPedido = ({
                                         label={"VR Líquido"}
                                         name="vrUnitLiquidoProduto"
                                         type="text"
-                                        value={vrLiquido}
-                                        onChange={(e) => setVrLiquido(formatarMoeda(e.target.value))}
+                                        value={formatMoeda(vrLiquido)}
+                                        onChange={(e) => setVrLiquido(formatarMoeda(e.target.value))} 
 
                                         errors={errors}
                                         clearErrors={clearErrors}
@@ -894,10 +820,10 @@ export const FormularioIncluirProdutoPedido = ({
                                         label={"VR Sugerido"}
                                         name="vrUnitSugeridoProduto"
                                         type="text"
-                                        value={vrSugerido}
+                                        value={formatMoeda(vrSugerido)}
                                         onChange={(e) => {
                                             setVrSugerido(formatarMoeda(e.target.value));
-                                            setVrSugerigoFixo(e.target.value);
+                                            setVrSugerigoFixo(e.target.value); 
                                         }}
                                         errors={errors}
                                         clearErrors={clearErrors}
@@ -918,8 +844,8 @@ export const FormularioIncluirProdutoPedido = ({
                                         label={"VR Total"}
                                         name="vrTotalProduto"
                                         type="text"
-                                        value={vrTotal}
-                                        onChange={(e) => setVrTotal(e.target.value)}
+                                        value={formatMoeda(vrTotal)}
+                                        onChange={(e) => setVrTotal(formatarMoeda(e.target.value))}
                                         readOnly
                                         errors={errors}
                                         clearErrors={clearErrors}
@@ -946,8 +872,8 @@ export const FormularioIncluirProdutoPedido = ({
                         </div>
                     </div>
                 </div>
-
-                <div className="form-group">
+                
+                 <div className="form-group">
                     <div className="row" id="resultadoqtdtamanhos">
                         <div className="col-sm-12 col-xl-12">
                             <label className="form-label" htmlFor="vrtotalunit">QTD/TAMANHOS</label>

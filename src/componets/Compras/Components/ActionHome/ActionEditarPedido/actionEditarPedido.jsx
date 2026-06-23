@@ -8,11 +8,12 @@ import { ActionMainNovoPedido } from "../../../../Actions/ActionMainNovoPedido";
 import { InputSelectActionPedido } from "../../../../Inputs/InputSelectActionPedido";
 import { InputFieldPedido } from "../../../../Buttons/InputActionPedido";
 import { InputFieldCheckBox } from "../../.././../Inputs/InputChekBox";
-import { useIncluirProutoPedido } from "../../ActionNovoPedido/hooks/useIncluirProdutoPedido";
+import { useIncluirProutoPedido } from "./IncluirProdutoPedido/hooks/useIncluirProdutoPedido";
 import { optionsTipoFrete, optionsTipoPedido, optionsEnviar, optionsFiscal } from "../../../../../../parceiro.json"
 import { ActionListaPedidos } from "./actionListaPedidos";
 import { ButtonTypeCompras } from "../../../../Buttons/Button";
 import { ActionIncluirProdutoPedidoModal } from "./IncluirProdutoPedido/actionIncluirProdutoPedidoModal";
+// import { ActionIncluirProdutoPedidoModal } from "../../ActionNovoPedido/IncluirProdutoPedido/actionIncluirProdutoPedidoModal";
 import { ActionPesquisaNovoPedido } from "../../ActionNovoPedido/actionPesquisaNovoPedido";
 import { FaCheck, FaRegSave } from "react-icons/fa";
 import { CiLock } from "react-icons/ci";
@@ -129,6 +130,7 @@ export const ActionEditarPedido = ({
     checked: false
   });
 
+  
   useEffect(() => {
       if (!dadosVisualizarPedido || !Array.isArray(dadosVisualizarPedido) || dadosVisualizarPedido.length === 0) {
         console.log('❌ Dados não disponíveis ou inválidos');
@@ -281,7 +283,11 @@ export const ActionEditarPedido = ({
         label: dadosVisualizarPedido[0]?.NOMECOMPRADOR
       })
     
-      setMarcaSelecionada({value: dadosVisualizarPedido[0]?.NOFANTASIA, label: dadosVisualizarPedido[0]?.NOFANTASIA})
+      // setMarcaSelecionada({value: dadosVisualizarPedido[0]?.NOFANTASIA, label: dadosVisualizarPedido[0]?.NOFANTASIA})
+      setMarcaSelecionada({
+                value: dadosVisualizarPedido[0]?.NOFANTASIA == 'TO - TESOURA DE OURO' ? 1 : dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL == 'MG - MAGAZINE' ? 2 : dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL == 'YO - YORUS' ? 3 : dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL == 'FC - FREE CENTER' ? 4 : null, 
+                label: dadosVisualizarPedido[0]?.NOFANTASIA
+            })
       setFornecedorSelecionado({
         value: dadosVisualizarPedido[0]?.IDFORNECEDOR, 
         label: `${dadosVisualizarPedido[0]?.NOFANTASIAFORNECEDOR} / / ${dadosVisualizarPedido[0]?.CNPJFORN} / / ${dadosVisualizarPedido[0]?.NOFORNECEDOR}`
@@ -578,19 +584,19 @@ export const ActionEditarPedido = ({
       />
     
       <ActionIncluirProdutoPedidoModal
-          show={modalIncluirProdutoPedido}
-          handleClose={() => setModalIncluirProdutoPedido(false)}
-          usuarioLogado={usuarioLogado}
-          optionsModulos={optionsModulos}
-          dadosDetalhePedido={dadosDetalhePedido}
-          setDadosDetalhePedido={setDadosDetalhePedido}
-          dadosVisualizarPedido={dadosVisualizarPedido}
-          tipoPedidoSelecionado={tipoPedidoSelecionado}
-          marcaSelecionada={marcaSelecionada}
-          idResumoPedido={idResumoPedido}
-          dadosUltimosPedidos={dadosUltimosPedidos}
-          checkboxIntermediario={checkboxIntermediario}
-        />
+        show={modalIncluirProdutoPedido}
+        handleClose={() => setModalIncluirProdutoPedido(false)}
+        usuarioLogado={usuarioLogado}
+        optionsModulos={optionsModulos}
+        dadosDetalhePedido={dadosDetalhePedido}
+        setDadosDetalhePedido={setDadosDetalhePedido}
+        dadosVisualizarPedido={dadosVisualizarPedido}
+        tipoPedidoSelecionado={tipoPedidoSelecionado}
+        marcaSelecionada={marcaSelecionada}
+        idResumoPedido={idResumoPedido}
+        dadosUltimosPedidos={dadosUltimosPedidos}
+        checkboxIntermediario={checkboxIntermediario}
+      />
 
       {actionPesquisarNovoPedido && (
       

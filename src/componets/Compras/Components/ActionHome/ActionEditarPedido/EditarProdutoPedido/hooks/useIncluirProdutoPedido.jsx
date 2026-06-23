@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import axios from "axios"
 import Swal from "sweetalert2";
-import { get, post, put } from "../../../../../api/funcRequest";
-import { getDataAtual } from "../../../../../utils/dataAtual";
+import { get, post, put } from "../../../../../../../api/funcRequest";
+import { getDataAtual } from "../../../../../../../utils/dataAtual";
 import { useQuery } from "react-query";
-import { toFloat } from "../../../../../utils/toFloat";
-import { use } from "react";
+import { toFloat } from "../../../../../../../utils/toFloat";
+
 
 
 export const useIncluirProutoPedido = ({ 
@@ -927,8 +927,8 @@ export const useIncluirProutoPedido = ({
     
     const handleIncluir = async () => {
         try {
-            let idResumoPedidoAtual = idResumoPedido
-            let idCompradorPedidoAtual = Number(compradorSelecionado?.value || 0);
+            let idResumoPedidoAtual = idResumoPedido || dadosVisualizarPedido[0]?.IDPEDIDO;
+            let idCompradorPedidoAtual = Number(compradorSelecionado?.value || 0) || dadosVisualizarPedido[0]?.IDCOMPRADOR;
             let stPedidoPorIntermediario = checked ? 'True' : 'False';
             let idResumoPedidoPrimario = Number(idPedidoPrimario || 0);
             let stPedidoPri = stPedidoPrimario || 'False';

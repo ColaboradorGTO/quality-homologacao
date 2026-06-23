@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import axios from "axios"
 import Swal from "sweetalert2";
-import { get, post, put } from "../../../../../api/funcRequest";
-import { getDataAtual } from "../../../../../utils/dataAtual";
+import { get, post, put } from "../../../../../../../api/funcRequest";
+import { getDataAtual } from "../../../../../../../utils/dataAtual";
 import { useQuery } from "react-query";
-import { toFloat } from "../../../../../utils/toFloat";
-import { use } from "react";
+import { toFloat } from "../../../../../../../utils/toFloat";
+
 
 
 export const useIncluirProutoPedido = ({ 
@@ -15,6 +15,28 @@ export const useIncluirProutoPedido = ({
     dadosDetalhePedido,
     dadosFornecedor 
 }) => {
+    const formatarDataParaInput = (valorData) => {
+        if (!valorData) return '';
+
+        const somenteData = String(valorData).split(' ')[0];
+
+        // Já está no formato YYYY-MM-DD
+        if (/^\d{4}-\d{2}-\d{2}$/.test(somenteData)) {
+            return somenteData;
+        }
+
+        // Formatos comuns vindos do backend: DD-MM-YYYY ou DD/MM/YYYY
+        const partes = somenteData.split(/[-/]/);
+        if (partes.length === 3) {
+            const [dia, mes, ano] = partes;
+            if (ano?.length === 4) {
+                return `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+            }
+        }
+
+        return somenteData;
+    }
+
     const [dataPesquisaInicio, setDataPesquisaInicio] = useState('')
     const [dataPesquisaFim, setDataPesquisaFim] = useState('')
     const [tabelaVisivel, setTabelaVisivel] = useState(true);
@@ -85,6 +107,7 @@ export const useIncluirProutoPedido = ({
         setDataPesquisaInicio(data);
         setDataPesquisaFim(data);
         setDataAtual(data);
+        console.log(data, 'data')
     }, [])
 
     const getIPUsuario = async () => {
@@ -184,13 +207,20 @@ export const useIncluirProutoPedido = ({
 
     useEffect(() => {
         if(dadosVisualizarPedido.length && dadosDetalhePedido.length > 0) {
-            console.log((dadosDetalhePedido), 'dadosDetalhePedido')
-            
+            console.log(dadosVisualizarPedido, 'dadosVisualizarPedido')
+            console.log(dadosDetalhePedido, 'dadosDetalhePedido')
+            // setNomeMarca(dadosDetalhePedido[0]?.NOFANTASIA);
             setIdAndamento(dadosVisualizarPedido[0]?.IDANDAMENTO || '');
-            setMarcaSelecionada(dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL || '');
+            // setMarcaSelecionada(dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL || '');
+            // setMarcaSelecionada({
+            //     value: dadosVisualizarPedido[0]?.NOFANTASIA == 'TO - TESOURA DE OURO' ? 1 : dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL == 'MG - MAGAZINE' ? 2 : dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL == 'YO - YORUS' ? 3 : dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL == 'FC - FREE CENTER' ? 4 : null, 
+            //     label: dadosVisualizarPedido[0]?.NOFANTASIA
+            // })
             setIdResumoPedido(dadosVisualizarPedido[0]?.IDPEDIDO || '');
             setCompradorSelecionado({value: dadosVisualizarPedido[0]?.IDCOMPRADOR, label: dadosVisualizarPedido[0]?.NOMECOMPRADOR });
-       
+            setDataPrevisaoEntrega(formatarDataParaInput(dadosVisualizarPedido[0]?.DTPREVENTREGA));
+            setDataPedido(formatarDataParaInput(dadosVisualizarPedido[0]?.DTPEDIDO));
+ 
         }
     },[dadosVisualizarPedido, dadosDetalhePedido])
     
@@ -547,13 +577,13 @@ export const useIncluirProutoPedido = ({
             const isUpdate = idResumoPedido.length > 0 && idResumoPedido;
             const data = {
                 ...(isUpdate && { IDRESUMOPEDIDO: idResumoPedido }),
-                IDGRUPOEMPRESARIAL: '',
-                IDSUBGRUPOEMPRESARIAL: '',
+                IDGRUPOEMPRESARIAL: dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL || '', 
+                IDSUBGRUPOEMPRESARIAL: dadosDetalhePedido[0]?.IDSUBGRUPOEMPRESARIAL || '',
                 IDCOMPRADOR: compradorSelecionado?.value,
                 IDCONDICAOPAGAMENTO: condicoesPagamentosSelecionado?.value,
                 IDFORNECEDOR: fornecedorSelecionado?.value,
                 IDTRANSPORTADORA: transportadoraSelecionada?.value,
-                IDANDAMENTO: '',
+                IDANDAMENTO: dadosVisualizarPedido[0]?.IDANDAMENTO || '',
                 MODPEDIDO: tipoPedidoSelecionado?.value,
                 NOVENDEDOR: vendedor,
                 EEMAILVENDEDOR: emailVendedor,
@@ -924,11 +954,13 @@ export const useIncluirProutoPedido = ({
             });
         }
     };
-    
+    console.log(dadosVisualizarPedido[0], 'dadosVisualizarPedido[0]') 
+    console.log(dadosDetalhePedido, 'dadosDetalhePedido[0]')
+    console.log(marcaSelecionada?.value, 'marcaSelecionada')
     const handleIncluir = async () => {
         try {
-            let idResumoPedidoAtual = idResumoPedido
-            let idCompradorPedidoAtual = Number(compradorSelecionado?.value || 0);
+            let idResumoPedidoAtual = idResumoPedido || dadosVisualizarPedido[0]?.IDPEDIDO;
+            let idCompradorPedidoAtual = Number(compradorSelecionado?.value || 0) || dadosVisualizarPedido[0]?.IDCOMPRADOR;
             let stPedidoPorIntermediario = checked ? 'True' : 'False';
             let idResumoPedidoPrimario = Number(idPedidoPrimario || 0);
             let stPedidoPri = stPedidoPrimario || 'False';
@@ -984,15 +1016,16 @@ export const useIncluirProutoPedido = ({
                 didOpen: () => { Swal.showLoading(); }
             });
             // Voltar daqui e verificar o payload
+            console.log(dadosVisualizarPedido[0], 'dadosVisualizarPedido[0]') 
             const data = {
                 IDRESUMOPEDIDO: Number(idResumoPedidoAtual) || dadosVisualizarPedido[0]?.IDPEDIDO,
-                IDGRUPOEMPRESARIAL: parseFloat(marcaSelecionada?.value) ? dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL : dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL,
-                IDSUBGRUPOEMPRESARIAL: parseFloat(marcaSelecionada?.value) ? dadosDetalhePedido[0]?.IDSUBGRUPOEMPRESARIAL : dadosDetalhePedido[0]?.IDSUBGRUPOEMPRESARIAL,
+                IDGRUPOEMPRESARIAL: parseFloat(marcaSelecionada?.value) ? parseFloat(marcaSelecionada?.value) : dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL,
+                IDSUBGRUPOEMPRESARIAL: parseFloat(marcaSelecionada?.value) ? parseFloat(marcaSelecionada?.value) : dadosDetalhePedido[0]?.IDSUBGRUPOEMPRESARIAL,
                 IDCOMPRADOR: parseFloat(compradorSelecionado?.value),
                 IDCONDICAOPAGAMENTO: parseFloat(condicoesPagamentosSelecionado?.value),
                 IDFORNECEDOR: fornecedorSelecionado?.value,
                 IDTRANSPORTADORA: parseFloat(transportadoraSelecionada?.value),
-                IDANDAMENTO: parseFloat(idAndamento),
+                IDANDAMENTO: parseFloat(idAndamento) || 1,
                 MODPEDIDO: tipoPedidoSelecionado?.value,
                 NOVENDEDOR: vendedor,
                 EEMAILVENDEDOR: emailVendedor,

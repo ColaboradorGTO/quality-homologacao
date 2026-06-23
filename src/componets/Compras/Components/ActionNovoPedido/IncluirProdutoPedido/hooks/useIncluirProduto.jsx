@@ -799,39 +799,3 @@ export const useIncluirProduto = ({
     }
 
 }
-
-// {
-    
-//    "idDetPedido":105645,
-//    "IDCOR":1911,
-//    "IDSUBGRUPOESTRUTURA":137,
-//    "IDCATEGORIAPEDIDO":2,
-//    "IDTIPOTECIDO":398,
-//    "IDESTILO":63,
-//    "IDFABRICANTE":3233,
-//    "IDLOCALEXPOSICAO":1,
-//    "NUREF":"",
-//    "DSPRODUTO":"Camisa 001 Viscolinho Estampada Sortido  tst hml",
-//    "QTDTOTAL":20,
-//    "NUCAIXA":0,
-//    "UND":9,
-//    "VRUNITBRUTO":10,
-//    "DESC01":0,
-//    "DESC02":0,
-//    "DESC03":0,
-//    "VRUNITLIQUIDO":10,
-//    "VRVENDA":45.99,
-//    "VRTOTAL":200,
-//    "STECOMMERCE":"False",
-//    "STREDESOCIAL":"False",
-//    "VRCUSTOPRODATUAL":17,
-//    "VRVENDAPRODATUAL":45.99,
-//    "OBSPRODUTO":"teste hml Myl",
-//    "IDCATEGORIAS":2,
-//    "STREPOSICAO":"False",
-//    "NUCODBARRAS":"",
-//    "IDPRODUTO":"",
-//    "IDRESPATUALIZACAO":30514,
-//    "GRADE":[{"IDDETALHEPEDIDOGRADE":548841,"IDTAMANHO":77,"INDICETAMANHO":10,"QTD":10},{"IDDETALHEPEDIDOGRADE":548842,"IDTAMANHO":79,"INDICETAMANHO":10,"QTD":10}]}
-   
-// }
