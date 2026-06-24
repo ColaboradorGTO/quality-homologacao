@@ -53,7 +53,7 @@ export const useProdutoPedido = ({ usuarioLogado, handleClick, status }) => {
         }
 
         try {
-            Swal.fire({
+           const confirmacao = await Swal.fire({
                 title: `Deseja Realmente ${txtAcao} o Pedido?`,
                 text: 'Você não poderá reverter a ação!',
                 icon: 'warning',
@@ -62,12 +62,15 @@ export const useProdutoPedido = ({ usuarioLogado, handleClick, status }) => {
                 cancelButtonText: 'Cancelar',
                 confirmButtonText: 'OK',
                 customClass: {
-                    confirmButton: 'btn btn-primary',
-                    cancelButton: 'btn btn-danger',
-                    actions: 'swal-button-spacing'
+                    confirmButton: 'btn btn-primary ms-2',
+                    cancelButton: 'btn btn-danger me-2'
                 },
                 buttonsStyling: false,
             })
+
+            if (!confirmacao.isConfirmed) {
+                return;
+            }
 
             const response = await put('/atualizacao-status-produto-pedido/:id', putData)
             const textDados = JSON.stringify(putData)

@@ -1033,9 +1033,9 @@ export const FormularioIncluirProdutoPedido = ({
                     ButtonTypeCadastrar={ButtonTypeModal}
                     onClickButtonCadastrar={handleSubmit(handleValidatedSubmit)}
                     tipoBtnCadastrar={"submit"}
-                    textButtonCadastrar={"Editar"}
+                    textButtonCadastrar={"Inlcuir"}
                     corCadastrar={"success"}
-                    loadingTextCadastrar={"Editando..."}
+                    loadingTextCadastrar={"Incluindo..."}
                     autoLoadingCadastrar={true}
                 />
             </form>

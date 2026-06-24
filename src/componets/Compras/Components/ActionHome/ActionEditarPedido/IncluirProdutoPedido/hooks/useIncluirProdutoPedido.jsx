@@ -206,7 +206,7 @@ export const useIncluirProutoPedido = ({
     );
 
     useEffect(() => {
-        if(dadosVisualizarPedido.length && dadosDetalhePedido.length > 0) {
+        if(dadosVisualizarPedido?.length > 0 || dadosDetalhePedido?.length > 0) {
             console.log(dadosVisualizarPedido, 'dadosVisualizarPedido')
             console.log(dadosDetalhePedido, 'dadosDetalhePedido')
             // setNomeMarca(dadosDetalhePedido[0]?.NOFANTASIA);
@@ -954,9 +954,7 @@ export const useIncluirProutoPedido = ({
             });
         }
     };
-    console.log(dadosVisualizarPedido[0], 'dadosVisualizarPedido[0]') 
-    console.log(dadosDetalhePedido, 'dadosDetalhePedido[0]')
-    console.log(marcaSelecionada?.value, 'marcaSelecionada')
+
     const handleIncluir = async () => {
         try {
             let idResumoPedidoAtual = idResumoPedido || dadosVisualizarPedido[0]?.IDPEDIDO;

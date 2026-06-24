@@ -579,17 +579,17 @@ export const useIncluirProduto = ({
         }
 
         const grade = montarPayloadGrade();
-
+ /* AQUI */
         const data = {
             IDRESUMOPEDIDO: parseInt(idResumoPedido),
             IDCOR: parseInt(corSelecionada?.value),
             IDSUBGRUPOESTRUTURA: parseInt(estruturaSelecionada?.value),
-            IDCATEGORIAPEDIDO: parseInt(categoriaSelecionada?.value),
+            IDCATEGORIAPEDIDO: parseInt(categoriaGradeSelecionada?.value),
             IDTIPOTECIDO: parseInt(tipoTecidoSelecionado?.value),
             IDESTILO: parseInt(estiloSelecionado?.value),
             IDFABRICANTE: parseInt(fabricanteSelecionado?.value),
             IDLOCALEXPOSICAO: parseInt(localExposicaoSelecionado?.value),
-            NUREF: referenciaProduto,
+            NUREF: referencia,
             DSPRODUTO: descricaoProduto,
             QTDTOTAL: parseInt(quantidade),
             NUCAIXA: parseInt(quantidadeCaixa),
@@ -624,7 +624,7 @@ export const useIncluirProduto = ({
             const responsePut = await put(`/lista-pedidos/:id?IDRESUMOPEDIDO=${idResumoPedido}`);
             const textDados = JSON.stringify(data);
             const ipUsuario = await getIPUsuario();
-            const textoFuncao = `COMPRAS/ALTERAR PRODUTO PEDIDO`;
+            const textoFuncao = `COMPRAS/INCLUSAO ITEM PEDIDO`;
             const postData = {
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
@@ -652,7 +652,7 @@ export const useIncluirProduto = ({
             
             const textDados = JSON.stringify(data);
             const ipUsuario = await getIPUsuario();
-            const textoFuncao = `COMPRAS / ERRO AO ALTERAR PRODUTO NO PEDIDO `;
+            const textoFuncao = `COMPRAS / ERRO AO INCLUIR ITEM PEDIDO `;
             const postData = {
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,

@@ -183,7 +183,7 @@ export const useIncluirProutoPedido = ({
     );
 
     useEffect(() => {
-        if(dadosVisualizarPedido.length && dadosDetalhePedido.length > 0) {
+        if(dadosVisualizarPedido?.length > 0 || dadosDetalhePedido?.length > 0) {
             console.log((dadosDetalhePedido), 'dadosDetalhePedido')
             
             setIdAndamento(dadosVisualizarPedido[0]?.IDANDAMENTO || '');

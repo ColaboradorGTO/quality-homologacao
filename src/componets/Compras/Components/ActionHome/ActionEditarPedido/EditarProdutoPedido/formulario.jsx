@@ -159,7 +159,7 @@ export const FormularioEditarProdutoPedido = ({
 
             await schema.validate(dadosParaValidar, { abortEarly: false });
 
-            onSubmit();
+            await onSubmit();
 
         } catch (validationError) {
             clearErrors();

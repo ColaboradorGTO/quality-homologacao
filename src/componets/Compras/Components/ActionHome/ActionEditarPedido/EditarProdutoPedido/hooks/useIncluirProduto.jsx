@@ -479,8 +479,7 @@ export const useIncluirProduto = ({
    
         return { disabled: false, readOnly: false };
     };
-    // console.log(checkboxIntermediario ? 'True' : 'False', 'checkboxIntermediario hook')
-    // console.log(stReposicao, 'stReposicao hook')
+   
     const onSubmit = async () => {
         if (stReposicao == 'False') {
             const responseProdutoExistente = await get(`/produtos-pedido?referenciaProduto=${descricaoProduto}`);
