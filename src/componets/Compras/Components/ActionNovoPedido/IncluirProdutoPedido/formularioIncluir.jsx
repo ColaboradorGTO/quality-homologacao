@@ -162,7 +162,7 @@ export const FormularioIncluirProdutoPedido = ({
             const gradeValida = validarGradeamento();
             if (!gradeValida) return;
 
-            onSubmit();
+            await onSubmit();
 
         } catch (validationError) {
             clearErrors();

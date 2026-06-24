@@ -166,7 +166,7 @@ export const FormularioIncluirProdutoPedido = ({
             const gradeValida = validarGradeamento();
             if (!gradeValida) return;
 
-            onSubmit();
+           await onSubmit();
 
         } catch (validationError) {
             clearErrors();
@@ -353,8 +353,6 @@ export const FormularioIncluirProdutoPedido = ({
             label: `${item.NUCODBARRAS} - ${item.DSNOME}`,
             original: item
         }));
-
-
     }
 
 
@@ -1033,7 +1031,8 @@ export const FormularioIncluirProdutoPedido = ({
                     corFechar={"secondary"}
 
                     ButtonTypeCadastrar={ButtonTypeModal}
-                    // onClickButtonCadastrar={handleValidatedSubmit}
+                    onClickButtonCadastrar={handleSubmit(handleValidatedSubmit)}
+                    tipoBtnCadastrar={"submit"}
                     textButtonCadastrar={"Editar"}
                     corCadastrar={"success"}
                     loadingTextCadastrar={"Editando..."}

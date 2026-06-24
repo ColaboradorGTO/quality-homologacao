@@ -216,7 +216,7 @@ export const useIncluirProutoPedido = ({
             //     value: dadosVisualizarPedido[0]?.NOFANTASIA == 'TO - TESOURA DE OURO' ? 1 : dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL == 'MG - MAGAZINE' ? 2 : dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL == 'YO - YORUS' ? 3 : dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL == 'FC - FREE CENTER' ? 4 : null, 
             //     label: dadosVisualizarPedido[0]?.NOFANTASIA
             // })
-            setIdResumoPedido(dadosVisualizarPedido[0]?.IDPEDIDO || '');
+            setIdResumoPedido(dadosVisualizarPedido[0]?.IDPEDIDO);
             setCompradorSelecionado({value: dadosVisualizarPedido[0]?.IDCOMPRADOR, label: dadosVisualizarPedido[0]?.NOMECOMPRADOR });
             setDataPrevisaoEntrega(formatarDataParaInput(dadosVisualizarPedido[0]?.DTPREVENTREGA));
             setDataPedido(formatarDataParaInput(dadosVisualizarPedido[0]?.DTPEDIDO));
@@ -1270,7 +1270,7 @@ export const useIncluirProutoPedido = ({
 
     const handleFecharPedido = async () => {
         try {
-            let idResumoAtual = Number(idResumoPedido || 0);
+            let idResumoAtual = Number(idResumoPedido) || Number(dadosVisualizarPedido[0]?.IDPEDIDO) || 0;
             let stRascunhoValue = stRascunho || 'False';
 
             Swal.fire({
@@ -1284,7 +1284,7 @@ export const useIncluirProutoPedido = ({
 
             let itensValidos = false;
             try {
-                const responseExistente = await get(`/lista-detalhes-pedido?idpedido=${idResumoAtual}`);
+                const responseExistente = await get(`/lista-detalhe-pedidos?idpedido=${idResumoAtual}`);
 
                 if (!responseExistente?.data || responseExistente.data.length === 0) {
                     Swal.close();
@@ -1345,13 +1345,13 @@ export const useIncluirProutoPedido = ({
                 didOpen: () => { Swal.showLoading(); }
             });
 
+            // voltar daquie conferir o payload de como esta chegando no banco
             const data = {
-                IDRESUMOPEDIDO: idResumoAtual,
                 IDGRUPOEMPRESARIAL: parseFloat(marcaSelecionada?.value),
                 IDSUBGRUPOEMPRESARIAL: parseFloat(marcaSelecionada?.value),
                 IDCOMPRADOR: parseFloat(compradorSelecionado?.value),
                 IDCONDICAOPAGAMENTO: parseFloat(condicoesPagamentosSelecionado?.value),
-                IDFORNECEDOR: parseFloat(fornecedorSelecionado?.value),
+                IDFORNECEDOR: String(fornecedorSelecionado?.value),
                 IDTRANSPORTADORA: parseFloat(transportadoraSelecionada?.value),
                 IDANDAMENTO: 6,
                 MODPEDIDO: tipoPedidoSelecionado?.value,
@@ -1360,11 +1360,11 @@ export const useIncluirProutoPedido = ({
                 DTPEDIDO: dataPedido,
                 DTPREVENTREGA: dataPrevisaoEntrega,
                 TPFRETE: freteSelecionado?.value,
-                DESCPERC01: parseFloat(desconto1),
-                DESCPERC02: parseFloat(desconto2),
-                DESCPERC03: parseFloat(desconto3),
-                PERCCOMISSAO: parseFloat(comissao),
-                VRTOTALLIQUIDO: parseFloat(totalLiq),
+                DESCPERC01: toFloat(desconto1),
+                DESCPERC02: toFloat(desconto2),
+                DESCPERC03: toFloat(desconto3),
+                PERCCOMISSAO: toFloat(comissao),
+                VRTOTALLIQUIDO: toFloat(totalLiq),
                 OBSPEDIDO: obsFornecedor,
                 OBSPEDIDO2: obsInterna,
                 DTFECHAMENTOPEDIDO: dataAtual,
@@ -1375,6 +1375,7 @@ export const useIncluirProutoPedido = ({
                 STCANCELADO: 'False',
                 TPFISCAL: fiscalSelecionado?.value,
                 STRASCUNHO: stRascunhoValue,
+                IDRESUMOPEDIDO: idResumoAtual
             };
 
             const response = await put('/finalizar-pedido/:id', data);

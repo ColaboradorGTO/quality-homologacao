@@ -70,6 +70,18 @@ export const useIncluirProduto = ({
 
     const pendingTamanhoIdRef = useRef(null);
 
+    useEffect(() => {
+        if(dadosDetalhePedido && dadosDetalhePedido) {
+            
+            setNomeMarca(dadosVisualizarPedido[0]?.NOFANTASIA);
+            setReposicaoSelecionado({
+                value: dadosDetalhePedido[0]?.STREPOSICAO, 
+                label:  dadosDetalhePedido[0]?.STREPOSICAO == 'True' ? 'SIM' : 'NÃO'
+            })
+            setIdResumoPedido(dadosDetalhePedido[0]?.IDPEDIDO ? dadosDetalhePedido[0]?.IDPEDIDO : dadosVisualizarPedido[0]?.IDPEDIDO)
+            setCategoriaGradeSelecionada(dadosDetalhePedido[0]?.TIPOPEDIDO ? dadosVisualizarPedido[0]?.MODPEDIDO : '')
+        }
+    }, [dadosDetalhePedido]); 
 
     const { data: dadosVinculoEstiloGrupo = [], error: errorVinculoEstiloGrupo, isLoading: isLoadingVinculoEstiloGrupo, refetch: refetchVinculoEstiloGrupo } = useQuery(
         'vinculo-estilo-grupo',
@@ -109,10 +121,16 @@ export const useIncluirProduto = ({
         { enabled: true }
     );
 
+    const idCategoriaPedidoParam = dadosDetalhePedido?.[0]?.TIPOPEDIDO || dadosVisualizarPedido?.[0]?.MODPEDIDO || ''; 
+  
     const { data: dadosCategoriaPedidoGrade  = [], error: errorCategoriaPedidoGrade, isLoading: isLoadingCategoriaPedidoGrade, refetch: refetchCategoriaPedidoGrade } = useQuery(
-        'categoria-pedido',
-        async () => { const response = await get(`/categoria-pedido?idCategoriaPedido=${dadosDetalhePedido[0]?.TIPOPEDIDO || ''}`); return response.data},
-        { enabled: Boolean(dadosDetalhePedido[0]?.TIPOPEDIDO),  }
+        ['categoria-pedido', idCategoriaPedidoParam],
+        async () => {
+           
+            const response = await get(`/categoria-pedido?idCategoriaPedido=${idCategoriaPedidoParam}`);
+            return response.data
+        },
+        { enabled: Boolean(idCategoriaPedidoParam) }
     );
     
     const { data: dadosCategoriasProdutos  = [], error: errorCategoriasProdutos, isLoading: isLoadingCategoriasProdutos, refetch: refetchCategoriasProdutos } = useQuery(
@@ -132,11 +150,13 @@ export const useIncluirProduto = ({
         async () => { const response = await get(`/vincularFabricanteFornecedor?idFornecedorPedido=${dadosDetalhePedido[0]?.IDFORNECEDOR || ''}`);  return response.data},
         { enabled: true }
     );
+
     const { data: dadosLocalExposicao  = [], error: errorLocalExposicao, isLoading: isLoadingLocalExposicao, refetch: refetchLocalExposicao } = useQuery(
         'localExposicao',
         async () => { const response = await get(`/localExposicao`);  return response.data},
         { enabled: true }
     );
+
     const { data: dadosGrade  = [], error: errorGrade, isLoading: isLoadingGrade, refetch: refetchGrade } = useQuery(
         'vinculo-tamanho-categoria',
         async () => { 
@@ -152,7 +172,6 @@ export const useIncluirProduto = ({
         'lista-detalhe-pedidos-grade',
         async () => { 
             const response = await get(`/lista-detalhe-pedidos-grade?idDetalhePedido=${dadosDetalhePedido[0]?.IDDETPEDIDO || ''}`);  
-            // setProdutoDadosGrade(response.data)
             return response.data
         },
         { enabled: true }
@@ -234,19 +253,6 @@ export const useIncluirProduto = ({
             setVrSugerido(formatarNumero(vrSugFixo));
         }
     };
-
-    
-    useEffect(() => {
-        if(dadosDetalhePedido && dadosDetalhePedido) {
-            
-            setNomeMarca(dadosVisualizarPedido[0]?.NOFANTASIA);
-            setReposicaoSelecionado({
-                value: dadosDetalhePedido[0]?.STREPOSICAO, 
-                label:  dadosDetalhePedido[0]?.STREPOSICAO == 'True' ? 'SIM' : 'NÃO'
-            })
-            setIdResumoPedido(dadosDetalhePedido[0]?.IDPEDIDO)
-        }
-    }, [dadosDetalhePedido]); 
 
     const handleChangeQuantidade = (idTamanho, valor) => {
         const valorFormatado = formataValorGrade(valor);
@@ -512,7 +518,7 @@ export const useIncluirProduto = ({
         setRedeSocialSelecionada(rs ? { value: rs.value, label: rs.label } : null);
     };
 
-    /* este hook precisa está igual a do hook do novoPedido */
+ 
     const onSubmit = async () => {
         if (stReposicao == 'False') {
             const responseProdutoExistente = await get(`/produtos-pedido?referenciaProduto=${descricaoProduto}`);
@@ -575,7 +581,7 @@ export const useIncluirProduto = ({
         const grade = montarPayloadGrade();
 
         const data = {
-            idDetPedido: parseInt(dadosDetalhePedido[0]?.IDDETPEDIDO),
+            IDRESUMOPEDIDO: parseInt(idResumoPedido),
             IDCOR: parseInt(corSelecionada?.value),
             IDSUBGRUPOESTRUTURA: parseInt(estruturaSelecionada?.value),
             IDCATEGORIAPEDIDO: parseInt(categoriaSelecionada?.value),
@@ -595,22 +601,25 @@ export const useIncluirProduto = ({
             VRUNITLIQUIDO: parseFloat(vrLiquido),
             VRVENDA: parseFloat(vrVenda),
             VRTOTAL: parseFloat(vrTotal),
+            STRECEBIDO: 'False',
             STECOMMERCE: ecommerceSelecionado?.value,
             STREDESOCIAL: redeSocialSelecionada?.value,
+            STCANCELADO: 'False',
             VRCUSTOPRODATUAL: removerFormatacaoMoeda(vrCusto),
             VRVENDAPRODATUAL: removerFormatacaoMoeda(vrVenda),
             OBSPRODUTO: observacao,
+            STTRANSFORMADO: stTransformado,
             IDCATEGORIAS: parseInt(categoriaSelecionada?.value),
             STREPOSICAO: reposicaoSelecionado?.value,
             NUCODBARRAS: codBarras ? codBarras : '',
             IDPRODUTO: idProduto ? idProduto : '',
-            IDRESPATUALIZACAO: parseInt(usuarioLogado?.id),
+            IDRESPCADASTRO: parseInt(usuarioLogado?.id),
             GRADE: grade,
             STPEDIDOPORINTEMEDIARIO: checkboxIntermediario ? 'True' : 'False',
         }
         try {
          
-            const response = await put(`/detalhe-pedido/:id`, data); 
+            const response = await post(`/detalhe-pedido`, data); 
       
             const responsePut = await put(`/lista-pedidos/:id?IDRESUMOPEDIDO=${idResumoPedido}`);
             const textDados = JSON.stringify(data);
