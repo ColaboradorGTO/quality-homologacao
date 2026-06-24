@@ -77,7 +77,7 @@ export const useCreateAjusteExtrato = ({ handleClose, optionsModulos, usuarioLog
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: `FINANCEIRO/AJUSTE EXTRATO CRIADO`,
                 DADOS: dados,
-                IP: ipUsuario || 'IP não disponível'
+                IP: ipUsuario || 'Indisponível'
             }
     
             await post('/log-web', postLogData)
@@ -92,7 +92,7 @@ export const useCreateAjusteExtrato = ({ handleClose, optionsModulos, usuarioLog
                     container: 'custom-swal',
                 }
             })
-            handleClose()
+            // handleClose()
             return response.data
         } catch (error) {
             const dados = JSON.stringify(postData)
@@ -101,11 +101,11 @@ export const useCreateAjusteExtrato = ({ handleClose, optionsModulos, usuarioLog
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: `FINANCEIRO/ERRO AO CRIAR AJUSTE EXTRATO`,
                 DADOS: dados,
-                IP: ipUsuario || 'IP não disponível'
+                IP: ipUsuario || 'Indisponível'
             }
     
             const responsePost = await post('/log-web', postLogData)
-            handleClose()
+            // handleClose()
 
              Swal.fire({
                 position: 'center',

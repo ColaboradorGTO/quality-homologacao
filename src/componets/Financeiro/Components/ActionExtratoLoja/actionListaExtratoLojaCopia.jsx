@@ -17,15 +17,23 @@ import { ModalEditarDepositoDaLoja } from "./ActionEditarDeposito/modalEditarDep
 import { get } from "../../../../api/funcRequest";
 import { useUpdateStatusDeposito } from "./hooks/useUpdateStatusDeposito";
 import Swal from "sweetalert2";
+import { FaLockOpen } from "react-icons/fa6";
+import { ButtonType } from "../../../Buttons/ButtonType";
+import { MdAdd } from "react-icons/md";
+import { ModalCadastroDeDepositoDaLoja } from "./ActionCadastroDeposito/modalCadastroDeDepositoDaLoja";
+import { ModalAjusteExtratoModal } from "./ActionCadastroAjuste/actionCadastroAjusteExtratoModal";
 
 export const ActionListaExtratoContaCorrenteLoja = ({
   dadosExtratoLojaPeriodo,
   usuarioLogado,
   optionsModulos,
-  handleClick
+  handleClick,
+  empresaSelecionada,
 }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [modalEditar, setModalEditar] = useState(false);
+  const [modalCadastro, setModalCadastro] = useState(false)
+  const [modalAjuste, setModalAjuste] = useState(false)
   const [dadosDeposito, setDadosDeposito] = useState([]);
   const dataTableRef = useRef();
 
@@ -528,6 +536,41 @@ export const ActionListaExtratoContaCorrenteLoja = ({
                   <tr>
                     <th>Informativo</th>
                   </tr>
+
+                  <div style={{ display: 'flex', marginBottom: '20px' }}>
+
+                    <ButtonType
+                      type="button"
+                      className="btn btn-success"
+                      title="Extrato Loja"
+                      onClickButtonType={() => setModalCadastro(true)}
+                      textButton="Cadastrar Depósitos"
+                      Icon={MdAdd}
+                      iconSize={18}
+                      style={{ marginRight: '10px' }}
+                    />
+                    <ButtonType
+                      type="button"
+                      className="btn btn-danger"
+                      title="Extrato Loja"
+                      onClickButtonType={() => setModalAjuste(true)}
+                      textButton="Ajustar Extrato"
+                      Icon={CiEdit}
+                      iconSize={18}
+                    />
+
+
+                    <ButtonType
+                      type="button"
+                      className="btn btn-success "
+                      title="Extrato Loja"
+                      onClick={() => { }}
+                      textButton="Bloquear Data Depósito"
+                      Icon={FaLockOpen}
+                      iconSize={18}
+                    />
+
+                  </div>
                   <tr>
                     <td colspan="9"><b >Extrato a partir do dia 11 de dezembro de 2020</b ></td>
                   </tr>
@@ -577,6 +620,22 @@ export const ActionListaExtratoContaCorrenteLoja = ({
         usuarioLogado={usuarioLogado}
         dadosDeposito={dadosDeposito}
       />
+
+      <ModalCadastroDeDepositoDaLoja
+          show={modalCadastro}
+          handleClose={() => setModalCadastro(false)}
+          optionsModulos={optionsModulos}
+          usuarioLogado={usuarioLogado}
+          empresaSelecionada={empresaSelecionada}
+        />
+  
+        <ModalAjusteExtratoModal
+          show={modalAjuste}
+          handleClose={() => setModalAjuste(false)}
+          optionsModulos={optionsModulos}
+          usuarioLogado={usuarioLogado}
+          empresaSelecionada={empresaSelecionada}
+        />
     </Fragment>
 
   );

@@ -29,19 +29,19 @@ export const useCreateDeposito = ({ handleClose, optionsModulos, usuarioLogado, 
         let usuarioIP = null;
 
         try {
-        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
-        usuarioIP = ipWhoisData?.ip;
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+            usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-        console.error("Erro ao buscar IP via ipwho.is:", error);
+            console.error("Erro ao buscar IP via ipwho.is:", error);
         }
 
         if (!usuarioIP) {
-        try {
-            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-            usuarioIP = ipifyData?.ip;
-        } catch (error) {
-            console.error("Erro ao buscar IP via ipify.org:", error);
-        }
+            try {
+                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+                usuarioIP = ipifyData?.ip;
+            } catch (error) {
+                console.error("Erro ao buscar IP via ipify.org:", error);
+            }
         }
         setIpUsuario(usuarioIP);
         return usuarioIP;
@@ -74,7 +74,7 @@ export const useCreateDeposito = ({ handleClose, optionsModulos, usuarioLogado, 
         const postData = {
             IDEMPRESA: parseInt(empresaSelecionada),
             IDUSR: parseInt(usuarioLogado.id),
-            IDCONTABANCO: parseInt(contaSelecionada),
+            IDCONTABANCO: parseInt(contaSelecionada?.value),
             DTDEPOSITO: data + ' ' + hora,
             DTMOVIMENTOCAIXA: dataMovimento + ' ' + horaMovimento,
             DSHISTORIO: historico,
@@ -86,7 +86,7 @@ export const useCreateDeposito = ({ handleClose, optionsModulos, usuarioLogado, 
             DSMOTIVOCANCELAMENTO: '',
             IDUSRCACELAMENTO: '',
         }
-
+      
         try {
         
             const response = await post('/cadastrar-deposito-loja', postData)
@@ -98,7 +98,7 @@ export const useCreateDeposito = ({ handleClose, optionsModulos, usuarioLogado, 
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario || 'IP não disponível'
+                IP: ipUsuario || 'Indisponível'
             }
     
             await post('/log-web', postLogData)
@@ -120,12 +120,12 @@ export const useCreateDeposito = ({ handleClose, optionsModulos, usuarioLogado, 
             const ipUsuario = await getIPUsuario();
             const postLogData = {
                 IDFUNCIONARIO: String(usuarioLogado.id),
-                PATHFUNCAO: `FINANCEIRO/ERRO AO CRIAR AJUSTE EXTRATO`,
+                PATHFUNCAO: `FINANCEIRO/ERRO AO CRIAR DEPOSITO PELO EXTRATO DE CONTAS`,
                 DADOS: textDados,
-                IP: ipUsuario || 'IP não disponível'
+                IP: ipUsuario || 'Indisponível'
             }
     
-            await post('/log-web', postLogData)
+            const response = await post('/log-web', postLogData)
             handleClose()
 
              Swal.fire({
@@ -140,7 +140,7 @@ export const useCreateDeposito = ({ handleClose, optionsModulos, usuarioLogado, 
                 timer: 4000 
             });
 
-            return responsePost.data
+            return response.data
             
         }
 
