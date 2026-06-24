@@ -36,7 +36,7 @@ export const ActionPesquisaDescontoVendas = () => {
   const { data: optionsEmpresas = [],} = useFetchEmpresas(marcaSelecionada);
 
   const fetchDescontoVendas = async () => {
-    const urlBase = `/desconto-vendas?idEmpresa=${empresaSelecionada}&idMarca=${marcaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
+    const urlBase = `/desconto-vendas?idEmpresa=${empresaSelecionada}&idMarca=${marcaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&motivoDesconto=${descontoSelecionado}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {

@@ -170,7 +170,7 @@ export const ActionPesquisaVendasPixDTW = ({ usuarioLogado }) => {
   }
 
   const { data: dadosVendasPixCompensacao = [], error: errorVendasPixCompensacao, isLoading: isLoadingVendasPixCompenscao, refetch: refetchVendasPixCompensacao } = useQuery(
-    ['venda-pix-periodo'],
+    ['venda-pix-compensacao'],
     () => fetchListaVendasPixCompensacao(),
     { enabled: false, staleTime: 60 * 60 * 1000 }
   );

@@ -13,6 +13,7 @@ import { toFloat } from "../../../../utils/toFloat";
 import { useConfirmarConsolidacaoFatura } from "./hooks/useConfirmarConsolidacaoFatura";
 import Swal from "sweetalert2";
 import { Checkbox } from "primereact/checkbox";
+import { dataFormatada } from "../../../../../../api/src/utils/dataFormatada";
 
 export const ActionListaFaturasConsolidadas = ({
   dadosDetalheFatura,
@@ -217,7 +218,7 @@ export const ActionListaFaturasConsolidadas = ({
     {
       field: 'DTPROCESSAMENTO',
       header: 'Data Recebimento',
-      body: row => <th style={{}}>  {row.DTPROCESSAMENTO}  </th>,
+      body: row => <th style={{}}>  {dataFormatada(row.DTPROCESSAMENTO)}  </th>,
       footer: 'Total Lançamentos',
       sortable: true,
     },

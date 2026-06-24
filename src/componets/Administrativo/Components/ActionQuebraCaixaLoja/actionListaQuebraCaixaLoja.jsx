@@ -15,6 +15,7 @@ import Swal from "sweetalert2";
 import { mascaraValor } from "../../../../utils/mascaraValor";
 import { toFloat } from "../../../../utils/toFloat";
 import { useCancelarQuebraCaixa } from "./hooks/useCancelar";
+import { mascaraCPF } from "../../../../utils/formatCPF";
 
 
 export const ActionListaQuebraCaixaLoja = ({ dadosQuebraDeCaixa, handleClick, quebraSelecionada, optionsModulos, usuarioLogado }) => {
@@ -138,7 +139,7 @@ export const ActionListaQuebraCaixaLoja = ({ dadosQuebraDeCaixa, handleClick, qu
     {
       field: 'CPFOPERADOR',
       header: 'CPF',
-      body: row => <th style={{ }}>{row.CPFOPERADOR}</th>,
+      body: row => <th style={{ }}>{mascaraCPF(row.CPFOPERADOR)}</th>,
       sortable: true,
     },
     {

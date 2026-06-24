@@ -267,7 +267,7 @@ export const ActionListaDespesaLoja = ({
     {
       field: 'DTDESPESA',
       header: 'Data Mov',
-      body: row => <th style={{ color: 'blue' }}> {dataFormatada(row.DTDESPESA)} </th>,
+      body: row => <th style={{ color: 'blue' }}> {row.DTDESPESA} </th>,
       sortable: true,
     },
     {
