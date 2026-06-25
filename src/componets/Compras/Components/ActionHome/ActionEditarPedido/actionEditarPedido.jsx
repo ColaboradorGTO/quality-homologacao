@@ -84,6 +84,24 @@ export const ActionEditarPedido = ({
     setModalIncluirProdutoPedido,
     setIdPedidoPrimario,
     idPedidoPrimario,
+    setTotalBruto,
+    totalBruto,
+    setQtdProdutos,
+    qtdProdutos,
+    setTituloSubheader,
+    tituloSubheader,
+    setDadosDetalheProdutoPedido,
+    dadosDetalheProdutoPedido, 
+    setCamposHabilitados,
+    camposHabilitados, 
+    setActionPesquisarNovoPedido,
+    actionPesquisarNovoPedido, 
+    setCheckboxIntermediario,
+    checkboxIntermediario, 
+    setBotoesVisiveis,
+    botoesVisiveis, 
+    setDadosProdutosPedido,
+    dadosProdutosPedido, 
     setBtnIncluir,
     btnIncluir,
     setBtnSalvar,
@@ -107,28 +125,30 @@ export const ActionEditarPedido = ({
     pendenciasFornecedor,
     onIncluirProdutoPedido,
     clonarCabecalho,
+    handleClonarCabecalhoPedido,
+    handleSalvarPedido,
     handleIncluir,
     dadosUltimosPedidos,
     dadosCabecalhoClonado,
     handleFecharPedido
   } = useIncluirProutoPedido({ usuarioLogado, optionsModulos, dadosVisualizarPedido, dadosDetalhePedido });
 
-  const [dadosDetalheProdutoPedido, setDadosDetalheProdutoPedido] = useState([]);
-  const [botoesVisiveis, setBotoesVisiveis] = useState({
-    incluir: false,
-    fechar: false,
-    salvar: false,
-    clonar: false,
-    clonarCabecalho: false,
-    novoPedido: true
-  });
-  const [actionPesquisarNovoPedido, setActionPesquisarNovoPedido] = useState(false);
-  const [camposHabilitados, setCamposHabilitados] = useState(false);
-  const [tituloSubheader, setTituloSubheader] = useState('');
-  const [checkboxIntermediario, setCheckboxIntermediario] = useState({
-    disabled: false,
-    checked: false
-  });
+  // const [dadosDetalheProdutoPedido, setDadosDetalheProdutoPedido] = useState([]);
+  // const [botoesVisiveis, setBotoesVisiveis] = useState({
+  //   incluir: false,
+  //   fechar: false,
+  //   salvar: false,
+  //   clonar: false,
+  //   clonarCabecalho: false,
+  //   novoPedido: true
+  // });
+  // const [actionPesquisarNovoPedido, setActionPesquisarNovoPedido] = useState(false);
+  // const [camposHabilitados, setCamposHabilitados] = useState(false);
+  // const [tituloSubheader, setTituloSubheader] = useState('');
+  // const [checkboxIntermediario, setCheckboxIntermediario] = useState({
+  //   disabled: false,
+  //   checked: false
+  // });
 
   
   useEffect(() => {
@@ -317,7 +337,7 @@ export const ActionEditarPedido = ({
       setDesconto2(toFloat(dadosVisualizarPedido[0]?.DESCPERC02).toFixed(2))
       setDesconto3(toFloat(dadosVisualizarPedido[0]?.DESCPERC03).toFixed(2))
       setTotalLiq(toFloat(dadosVisualizarPedido[0]?.VRTOTALLIQUIDO))
-      setIdResumoPedido(dadosVisualizarPedido[0]?.IDPEDIDIO)
+      setIdResumoPedido(dadosVisualizarPedido[0]?.IDPEDIDO)
     }
   }, [dadosVisualizarPedido])
 
@@ -332,8 +352,6 @@ export const ActionEditarPedido = ({
     setActionEditarPedido(false)
   }
   
-  // console.log(checkboxIntermediario.checked, 'checkboxIntermediario')
-
   return (
 
     <Fragment>
@@ -343,7 +361,7 @@ export const ActionEditarPedido = ({
         subTitle={tituloSubheader}
         
         cardVendas={true}
-        valorVendas={formatMoeda(toFloat(dadosVisualizarPedido[0]?.VRTOTALBRUTO))}
+        valorVendas={formatMoeda(totalBruto)}
         nomeVendas="Valor Bruto Pedido"
         IconVendas={MdOutlinePayment}
         iconSize={100}
@@ -355,7 +373,7 @@ export const ActionEditarPedido = ({
         IconTicketMedio={MdOutlinePayment}
   
         cardCliente={true}
-        numeroCliente={toFloat(dadosVisualizarPedido[0]?.QTDTOTPRODUTOS)}
+        numeroCliente={qtdProdutos}
         nomeCliente="QTD Produtos"
         IconNumeroCliente={MdOutlinePayment}
 
@@ -532,7 +550,7 @@ export const ActionEditarPedido = ({
       
         ButtonTypeCadastro={ButtonTypeCompras}
         linkNome={"Salvar Cabeçalho Pedido"}
-        onButtonClickCadastro
+        onButtonClickCadastro={handleSalvarPedido}
         corCadastro={"info"}
         IconCadastro={FaRegSave}
         styleCadastro={botoesVisiveis.salvar}
@@ -553,7 +571,7 @@ export const ActionEditarPedido = ({
         
         ButtonTypeTXT={ButtonTypeCompras}
         linkTXT={"Clonar Cabeçalho Pedido"}
-        onButtonClickTXT
+        onButtonClickTXT={handleClonarCabecalhoPedido}
         corTXT={"warning"}
         IconTXT={MdOutlineCopyAll}
         styleTXT={botoesVisiveis.clonarCabecalho}
@@ -581,6 +599,8 @@ export const ActionEditarPedido = ({
           optionsModulos={optionsModulos}
           dadosUltimosPedidos={dadosUltimosPedidos}
           checkboxIntermediario={checkboxIntermediario}
+          idResumoPedido={idResumoPedido}
+          setIdResumoPedido={setIdResumoPedido}
       />
     
       <ActionIncluirProdutoPedidoModal

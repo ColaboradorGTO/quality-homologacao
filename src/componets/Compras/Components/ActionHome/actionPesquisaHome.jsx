@@ -13,7 +13,7 @@ import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../ut
 import { useQuery } from "react-query";
 import { ActionEditarPedido } from "./ActionEditarPedido/actionEditarPedido";
 import { ActionVisualizarPedido } from "./ActionVisualizar/actionVisualizarPedido";
-
+ 
 
 export const ActionPesquisaHome = ({ usuarioLogado }) => {
   const [actionHome, setActionHome] = useState(true)

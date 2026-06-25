@@ -26,7 +26,9 @@ export const ActionListaPedidos = ({
   usuarioLogado,
   optionsModulos,
   dadosUltimosPedidos,
-  checkboxIntermediario
+  checkboxIntermediario,
+  idResumoPedido,
+  setIdResumoPedido
 }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowSelection, setRowSelection] = useState(null);
@@ -426,9 +428,10 @@ export const ActionListaPedidos = ({
   return (
     <Fragment>
       <div className="panel">
-        <div className="panel-hdr">
+        <div className="panel-hdr"> 
 
-         <h2>LISTA DOS ITENS DO PEDIDO Nº: {dadosVisualizarPedido[0]?.IDPEDIDO}</h2>
+         {/* <h2>LISTA DOS ITENS DO PEDIDO Nº: {dadosVisualizarPedido[0]?.IDPEDIDO}</h2> */}
+         <h2>LISTA DOS ITENS DO PEDIDO Nº: {idResumoPedido}</h2>
         </div>
         <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
           <HeaderTable

@@ -86,8 +86,6 @@ export const useIncluirProutoPedido = ({
     const [btnClonarCabecalho, setBtnClonarCabecalho] = useState(false);
     const [btnNovoPedido, setBtnNovoPedido] = useState(true); 
 
-    const [camposHabilitados, setCamposHabilitados] = useState(false);
-    const [tituloSubheader, setTituloSubheader] = useState('');
     const [totalBruto, setTotalBruto] = useState(0);
     const [totalItens, setTotalItens] = useState(0);
     const [qtdProdutos, setQtdProdutos] = useState(0);
@@ -95,10 +93,22 @@ export const useIncluirProutoPedido = ({
     const [setorAndamento, setSetorAndamento] = useState('');
     const [detalheProdutoPedido, setDetalheProdutoPedido] = useState([]);
     const [dadosDetalheProdutoPedido, setDadosDetalheProdutoPedido] = useState([]);
+    const [camposHabilitados, setCamposHabilitados] = useState(false);
+    const [actionPesquisarNovoPedido, setActionPesquisarNovoPedido] = useState(false);
+    const [tituloSubheader, setTituloSubheader] = useState('');
     const [checkboxIntermediario, setCheckboxIntermediario] = useState({
         disabled: false,
         checked: false
     });
+    const [botoesVisiveis, setBotoesVisiveis] = useState({
+        incluir: false,
+        fechar: false,
+        salvar: false,
+        clonar: false,
+        clonarCabecalho: false,
+        novoPedido: true
+    });
+
     const [dadosProdutosPedido, setDadosProdutosPedido] = useState([]);
 
 
@@ -107,7 +117,7 @@ export const useIncluirProutoPedido = ({
         setDataPesquisaInicio(data);
         setDataPesquisaFim(data);
         setDataAtual(data);
-        console.log(data, 'data')
+        
     }, [])
 
     const getIPUsuario = async () => {
@@ -207,8 +217,8 @@ export const useIncluirProutoPedido = ({
 
     useEffect(() => {
         if(dadosVisualizarPedido?.length > 0 || dadosDetalhePedido?.length > 0) {
-            console.log(dadosVisualizarPedido, 'dadosVisualizarPedido')
-            console.log(dadosDetalhePedido, 'dadosDetalhePedido')
+           
+  
             // setNomeMarca(dadosDetalhePedido[0]?.NOFANTASIA);
             setIdAndamento(dadosVisualizarPedido[0]?.IDANDAMENTO || '');
             // setMarcaSelecionada(dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL || '');
@@ -220,7 +230,9 @@ export const useIncluirProutoPedido = ({
             setCompradorSelecionado({value: dadosVisualizarPedido[0]?.IDCOMPRADOR, label: dadosVisualizarPedido[0]?.NOMECOMPRADOR });
             setDataPrevisaoEntrega(formatarDataParaInput(dadosVisualizarPedido[0]?.DTPREVENTREGA));
             setDataPedido(formatarDataParaInput(dadosVisualizarPedido[0]?.DTPEDIDO));
- 
+            setTotalBruto(toFloat(dadosVisualizarPedido[0]?.VRTOTALBRUTO))
+            setQtdProdutos(toFloat(dadosVisualizarPedido[0]?.QTDTOTPRODUTOS))
+
         }
     },[dadosVisualizarPedido, dadosDetalhePedido])
     
@@ -893,13 +905,14 @@ export const useIncluirProutoPedido = ({
             
             setDataPedido(dataAtualFormatada);
             setTituloSubheader('Novo Pedido');
-
-            setBtnFechar(false);       
-            setBtnClonar(false);   
-            setBtnNovoPedido(false);  
-            setBtnIncluir(true);     
-            setBtnSalvar(true);
-            setBtnClonarCabecalho(false); 
+            setBotoesVisiveis({
+                incluir: true,
+                fechar: false,
+                salvar: true,
+                clonar: false,
+                clonarCabecalho: true,
+                novoPedido: false
+            });
 
             
             setIdResumoPedido('');               
@@ -922,7 +935,6 @@ export const useIncluirProutoPedido = ({
                 
             setChecked(false);
             setDisabledChecked(true);
-            setDadosDetalheProdutoPedido([]); 
             setCheckboxIntermediario?.({
                 checked: false,
                 disabled: true,
@@ -1265,7 +1277,7 @@ export const useIncluirProutoPedido = ({
             });
         }
     }
-
+      
     const handleFecharPedido = async () => {
         try {
             let idResumoAtual = Number(idResumoPedido) || Number(dadosVisualizarPedido[0]?.IDPEDIDO) || 0;
@@ -1489,6 +1501,25 @@ export const useIncluirProutoPedido = ({
         setModalIncluirProdutoPedido,
         setIdPedidoPrimario,
         idPedidoPrimario,
+        setTotalBruto,
+        totalBruto,
+        setQtdProdutos,
+        qtdProdutos,
+        tituloSubheader,
+        setTituloSubheader,
+        setDadosDetalheProdutoPedido,
+        dadosDetalheProdutoPedido, 
+        setCamposHabilitados,
+        camposHabilitados, 
+        setActionPesquisarNovoPedido,
+        actionPesquisarNovoPedido, 
+        setCheckboxIntermediario,
+        checkboxIntermediario, 
+        setBotoesVisiveis,
+        botoesVisiveis, 
+        setDadosProdutosPedido,
+        dadosProdutosPedido, 
+
         setBtnIncluir,
         btnIncluir,
         setBtnSalvar,
@@ -1522,8 +1553,6 @@ export const useIncluirProutoPedido = ({
         dadosCabecalhoClonado,
         handleFecharPedido,
         handleClonarCabecalhoPedido,
-        tituloSubheader,
-        setTituloSubheader,
         camposHabilitados,
         setCamposHabilitados,
         checkboxIntermediario,
