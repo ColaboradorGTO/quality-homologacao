@@ -57,7 +57,7 @@ export const useUpdateStatusDeposito = ({ handleClick, optionsModulos, usuarioLo
                             IDFUNCIONARIO: String(usuarioLogado.id),
                             PATHFUNCAO: textoFuncao,
                             DADOS: textdados,
-                            IP: ipUsuario || 'IP não disponível'
+                            IP: ipUsuario || 'Indisponível'
                         };
 
                         await post("/log-web", dadosLog);
@@ -83,7 +83,7 @@ export const useUpdateStatusDeposito = ({ handleClick, optionsModulos, usuarioLo
                             IDFUNCIONARIO: String(usuarioLogado.id),
                             PATHFUNCAO: textoFuncao,
                             DADOS: textdados,
-                            IP: ipUsuario || 'IP não disponível'
+                            IP: ipUsuario || 'Indisponível'
                         };
                         await post("/log-web", dadosLog);
                         Swal.fire({

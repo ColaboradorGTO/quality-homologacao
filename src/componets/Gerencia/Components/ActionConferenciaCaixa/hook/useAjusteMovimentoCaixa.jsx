@@ -3,7 +3,7 @@ import { post, put } from "../../../../../api/funcRequest";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { removerFormatacaoMoeda } from "../../../../../utils/formatMoeda";
-import { parse } from "node:path";
+
 
 export const useAjusteMovimentoCaixa = ({
     handleClose,

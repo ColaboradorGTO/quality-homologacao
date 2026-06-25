@@ -135,22 +135,30 @@ export const ActionPesquisaPrecoProdutoGrupoSubGrupo = () => {
   };
 
   const handleEmpresaChange = (selectedOptions) => {
-    const values = selectedOptions.map((option) => option.value);
+    const values = (selectedOptions || [])
+    .map((option) => option.value)
+    .filter((value) => value !== '' && value !== null && value !== undefined);
     setEmpresaSelecionada(values);
   }
 
   const handleGrupoChange = (selectedOptions) => {
-    const values = selectedOptions.map((option) => option.value);
+    const values = (selectedOptions || [])
+    .map((option) => option.value)
+    .filter((value) => value !== '' && value !== null && value !== undefined);
     setGrupoSelecionado(values);
   }
 
   const handleSubGrupoChange = (selectedOptions) => {
-    const values = selectedOptions.map((option) => option.value);
+    const values = (selectedOptions || [])
+    .map((option) => option.value)
+    .filter((value) => value !== '' && value !== null && value !== undefined);
     setSubGrupoSelecionado(values);
   }
 
   const handleFornecedorChange = (selectedOptions) => {
-    const values = selectedOptions.map((option) => option.value);
+    const values = (selectedOptions || [])
+    .map((option) => option.value)
+    .filter((value) => value !== '' && value !== null && value !== undefined);
     setFornecedorSelecionado(values);
   }
 

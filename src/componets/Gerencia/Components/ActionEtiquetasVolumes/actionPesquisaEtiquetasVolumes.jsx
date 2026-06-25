@@ -66,8 +66,6 @@ export const ActionPesquisaEtiquetasVolumes = ({ usuarioLogado }) => {
     }
   }, [tipoSelecionado, setSolicitanteSelecionado, setEmpresaDestinoSelecionada])
   
-  console.log(categoria, 'categoria')
-  console.log(descricao, 'descricao')
 
   return (
 

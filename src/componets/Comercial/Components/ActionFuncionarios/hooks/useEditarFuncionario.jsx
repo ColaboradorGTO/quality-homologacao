@@ -20,16 +20,14 @@ export const useEditarFuncionario = ({ dadosAtualizarFuncionarios, dadosEmpresas
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [mostrarRepitaSenha, setMostrarRepitaSenha] = useState(false);
 
-
-
   const getIPUsuario = async () => {
     let usuarioIP = null;
 
     try {
-      const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+      const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
       usuarioIP = ipWhoisData?.ip;
     } catch (error) {
-      console.error("Erro ao buscar IP via ipwho.is:", error);
+      console.error("Erro ao buscar IP via ifconfig.me:", error);
     }
 
     if (!usuarioIP) {
@@ -43,7 +41,6 @@ export const useEditarFuncionario = ({ dadosAtualizarFuncionarios, dadosEmpresas
     setIpUsuario(usuarioIP);
     return usuarioIP;
   };
-
 
   useEffect(() => {
     if (dadosAtualizarFuncionarios) {
@@ -124,7 +121,7 @@ export const useEditarFuncionario = ({ dadosAtualizarFuncionarios, dadosEmpresas
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || 'Indisponível'
       }
 
       await post('/log-web', createData)
@@ -140,7 +137,7 @@ export const useEditarFuncionario = ({ dadosAtualizarFuncionarios, dadosEmpresas
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || 'Indisponível'
       }
 
       const response = await post('/log-web', createData)

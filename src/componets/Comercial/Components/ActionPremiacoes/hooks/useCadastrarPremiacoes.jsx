@@ -29,10 +29,10 @@ export const useCadastrarPremiacoes = ({ handleClose, usuarioLogado, optionsModu
     let usuarioIP = null;
 
     try {
-      const { data: ipWhoisData } = await axios.get("http://ipwho.is/");
+      const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
       usuarioIP = ipWhoisData?.ip;
     } catch (error) {
-      console.error("Erro ao buscar IP via ipwho.is:", error);
+      console.error("Erro ao buscar IP via ifconfig.me:", error);
     }
 
     if (!usuarioIP) {
@@ -47,7 +47,6 @@ export const useCadastrarPremiacoes = ({ handleClose, usuarioLogado, optionsModu
     return usuarioIP;
   };
 
- 
   const { data: dadosPremiacaoCadastrada = [], error: errorPremiacaoCadastrada, isLoading: isLoadingPremiacaoCadastrada, refetch: refetchPremiacaoCadastrada } = useQuery(
     ['lista-premiacao-cadastrada'],
     async () => {

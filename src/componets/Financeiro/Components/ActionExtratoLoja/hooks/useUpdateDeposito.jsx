@@ -210,7 +210,7 @@ export const useUpdateDeposito = ({ handleClose, optionsModulos, usuarioLogado, 
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario || 'IP não disponívels'
+                IP: ipUsuario || 'Indisponível'
             }
 
             await post('/log-web', postLogData)
@@ -234,7 +234,7 @@ export const useUpdateDeposito = ({ handleClose, optionsModulos, usuarioLogado, 
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: `FINANCEIRO/ERRO AO ATUALIZAR DEPOSITO`,
                 DADOS: textDados,
-                IP: ipUsuario || 'IP não disponível'
+                IP: ipUsuario || 'Indisponível'
             }
 
             const responsePost = await post('/log-web', postLogData)

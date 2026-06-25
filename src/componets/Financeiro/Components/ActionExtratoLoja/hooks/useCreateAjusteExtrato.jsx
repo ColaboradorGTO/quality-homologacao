@@ -92,7 +92,7 @@ export const useCreateAjusteExtrato = ({ handleClose, optionsModulos, usuarioLog
                     container: 'custom-swal',
                 }
             })
-            // handleClose()
+            handleClose()
             return response.data
         } catch (error) {
             const dados = JSON.stringify(postData)
@@ -105,7 +105,7 @@ export const useCreateAjusteExtrato = ({ handleClose, optionsModulos, usuarioLog
             }
     
             const responsePost = await post('/log-web', postLogData)
-            // handleClose()
+            handleClose()
 
              Swal.fire({
                 position: 'center',

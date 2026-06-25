@@ -61,7 +61,7 @@ export const FormularioEditarFuncionario = ({
         empresaFuncionario: empresaSelecionada,
       }
       await schema.validate(dadosParaValidar, { abortEarly: false });
-      onSubmit();
+      await onSubmit();
     } catch (validationError) {
       console.error('❌ Erro de validação:', validationError);
 
@@ -295,6 +295,8 @@ export const FormularioEditarFuncionario = ({
           textButtonConfirmar={"Atualizar"}
           onClickButtonConfirmar={handleValidatedSubmit}
           corConfirmar="success"
+          loadingTextConfirmar="Atualizando..."
+          autoLoadingConfirmar={true}
 
         />
       </form>

@@ -11,6 +11,7 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../../Tables/headerTable";
+import Swal from "sweetalert2";
 
 export const ActionListaVendasLoja = ({ dadosVendasPagamentos, dataPesquisa }) => {
   const [dadosDetalheFechamento, setDadosDetalheFechamento] = useState([]);
@@ -270,9 +271,18 @@ export const ActionListaVendasLoja = ({ dadosVendasPagamentos, dataPesquisa }) =
     try {
       const response = await get(`/detalheFechamento?idEmpresa=${IDEMPRESA}&dataPesquisa=${dataPesquisa}`);
 
-      if (response.data) {
+      if (response.data && response.data.length > 0) {
         setDadosDetalheFechamento(response.data);
         setModalVisivel(true);
+      } else {
+        Swal.fire({
+          title: 'Atenção!',
+          text: 'Nenhum detalhe encontrado para a venda selecionada.',
+          icon: 'warning',
+          customClass: {
+            container: 'custom-swal',
+          },
+        });
       }
     } catch (error) {
       console.error('Erro ao buscar detalhes da venda: ', error);

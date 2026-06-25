@@ -11,6 +11,7 @@ import { jsPDF } from 'jspdf';
 import * as XLSX from 'xlsx';
 import 'jspdf-autotable';
 import HeaderTable from "../../../Tables/headerTable";
+import Swal from "sweetalert2";
 
 export const ActionListaFuncionario = ({
   dadosFuncionarios, 
@@ -82,7 +83,7 @@ export const ActionListaFuncionario = ({
       PERC: item.PERC,
       STATIVO: item.STATIVO == 'True' ? 'Ativo' : 'Inativo',
       DTDEMISSAO: item.DTDEMISSAO,
-      IDFUNCIONARIO: item.IDFUNCIONARIO,
+      ID: item.ID,
     };
   });
 
@@ -147,7 +148,7 @@ export const ActionListaFuncionario = ({
     },
 
     {
-      field: 'IDFUNCIONARIO',
+      field: 'ID',
       header: 'Opções',
       body: (
         (row) => {
@@ -181,12 +182,18 @@ export const ActionListaFuncionario = ({
 
   ]
 
-  const handleEdit = async (IDFUNCIONARIO) => {
+  const handleEdit = async (ID) => {
     try {
-      const response = await get(`/atualizarFuncionario?idFuncionario=${IDFUNCIONARIO}`)
+      const response = await get(`/atualizarFuncionario?idFuncionario=${ID}`)
       if (response.data && response.data.length > 0) {
         setDadosAtualizarFuncionarios(response.data)
         setModalAlterarFuncionarioVisivel(true);
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: 'Não foi possível buscar detalhes do funcionário.'
+        })
       }
     } catch (error) {
       console.error('Erro ao buscar detalhes do funcionário: ', error);
@@ -194,8 +201,8 @@ export const ActionListaFuncionario = ({
   };
 
   const handleClickEdit = (row) => {
-    if (row && row.IDFUNCIONARIO) {
-      handleEdit(row.IDFUNCIONARIO);
+    if (row && row.ID) {
+      handleEdit(row.ID);
     }
   };
 

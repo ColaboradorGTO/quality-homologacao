@@ -9,17 +9,17 @@ import * as XLSX from 'xlsx';
 import { useReactToPrint } from "react-to-print";
 import HeaderTable from "../../../Tables/headerTable";
 
-export const ActionListaVendasPorVendedor  = ({dadosVendasVendedor}) => {
+export const ActionListaVendasPorVendedor = ({ dadosVendasVendedor }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(10);
   const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
 
-  
+
   const onPageChange = (event) => {
-      setFirst(event.first);
-      setRows(event.rows);
+    setFirst(event.first);
+    setRows(event.rows);
   };
 
   const onGlobalFilterChange = (e) => {
@@ -34,7 +34,7 @@ export const ActionListaVendasPorVendedor  = ({dadosVendasVendedor}) => {
   const exportToPDF = () => {
     const doc = new jsPDF();
     doc.autoTable({
-      head: [['Nº', 'Empresa', 'Matrícula', 'Funcionário', 'QTD Vendas', 'QTD Produtos', 'Valor Total Vendas', 'Valor Total Venda Liq', 'Valor Total Custo' ]],
+      head: [['Nº', 'Empresa', 'Matrícula', 'Funcionário', 'QTD Vendas', 'QTD Produtos', 'Valor Total Vendas', 'Valor Total Venda Liq', 'Valor Total Custo']],
       body: dadosListaVendedorVendas.map(item => [
         item.contador,
         item.NOFANTASIA,
@@ -56,7 +56,7 @@ export const ActionListaVendasPorVendedor  = ({dadosVendasVendedor}) => {
   const exportToExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(dadosListaVendedorVendas);
     const workbook = XLSX.utils.book_new();
-    const header = ['Nº', 'Empresa', 'Matrícula', 'Funcionário', 'QTD Vendas', 'QTD Produtos', 'Valor Total Vendas', 'Valor Total Venda Liq', 'Valor Total Custo' ]
+    const header = ['Nº', 'Empresa', 'Matrícula', 'Funcionário', 'QTD Vendas', 'QTD Produtos', 'Valor Total Vendas', 'Valor Total Venda Liq', 'Valor Total Custo']
     worksheet['!cols'] = [
       { wpx: 100, caption: 'Nº' },
       { wpx: 200, caption: 'Empresa' },
@@ -75,7 +75,7 @@ export const ActionListaVendasPorVendedor  = ({dadosVendasVendedor}) => {
 
 
   const calcularValorTotalVendaLiquida = (item) => {
-    
+
     return toFloat(item.VRTOTALVENDA) - toFloat(item.VRRECVOUCHER)
   }
 
@@ -83,7 +83,7 @@ export const ActionListaVendasPorVendedor  = ({dadosVendasVendedor}) => {
   const dadosListaVendedorVendas = dadosVendasVendedor.map((item, index) => {
     let contador = index + 1;
     const valorTotalVendaLiquida = calcularValorTotalVendaLiquida(item);
-    
+
     return {
       contador,
       NOFANTASIA: item.NOFANTASIA,
@@ -97,10 +97,10 @@ export const ActionListaVendasPorVendedor  = ({dadosVendasVendedor}) => {
       PRECO_COMPRA: item.PRECO_COMPRA,
     }
   });
-  
+
   const filtrarDados = (dados, filtro) => {
     if (!filtro) return dados;
-    
+
     return dados.filter(item => {
       return Object.values(item).some(value => {
         if (value === null || value === undefined) return false;
@@ -134,7 +134,7 @@ export const ActionListaVendasPorVendedor  = ({dadosVendasVendedor}) => {
   const calcularTotalVendaLiquidaVendasVendedorPorPagina = () => {
     const totalPagina = calcularTotalPagina('valorTotalVendaLiquida');
     const totalGeral = calcularTotalGeral('valorTotalVendaLiquida');
-    
+
     if (globalFilterValue) {
       return `${formatMoeda(totalPagina)} (${formatMoeda(totalGeral)} total)`;
     }
@@ -188,7 +188,7 @@ export const ActionListaVendasPorVendedor  = ({dadosVendasVendedor}) => {
     {
       field: 'NOFANTASIA',
       header: 'Empresa',
-      body: row => <p style={{margin: '0px', width: '200px', fontWeight: 600}}>{row.NOFANTASIA}</p>,
+      body: row => <p style={{ margin: '0px', width: '200px', fontWeight: 600 }}>{row.NOFANTASIA}</p>,
       sortable: true
     },
     {
@@ -200,7 +200,7 @@ export const ActionListaVendasPorVendedor  = ({dadosVendasVendedor}) => {
     {
       field: 'VENDEDOR_NOME',
       header: 'Funcionário',
-      body: row => <p style={{margin: '0px', width: '200px', fontWeight: 600}}>{row.VENDEDOR_NOME}</p>,
+      body: row => <p style={{ margin: '0px', width: '200px', fontWeight: 600 }}>{row.VENDEDOR_NOME}</p>,
       sortable: true
     },
     {
@@ -208,8 +208,8 @@ export const ActionListaVendasPorVendedor  = ({dadosVendasVendedor}) => {
       header: 'Quantidade Vendas',
       body: row => <th>{row.QTD_VENDAS}</th>,
       footer: () => {
-        return(
-          <div>          
+        return (
+          <div>
             <th style={{ fontWeight: 600, }}>{calcularTotalQuantidadeVendasPorPagina()}</th>
           </div>
         )
@@ -221,8 +221,8 @@ export const ActionListaVendasPorVendedor  = ({dadosVendasVendedor}) => {
       header: 'Quantidade Produtos',
       body: row => <th>{row.QTD_PRODUTOS}</th>,
       footer: () => {
-        return(
-          <div>          
+        return (
+          <div>
             <th style={{ fontWeight: 600, }}>{calcularTotalQuantidadeProdutosPorPagina()}</th>
           </div>
         )
@@ -234,8 +234,8 @@ export const ActionListaVendasPorVendedor  = ({dadosVendasVendedor}) => {
       header: 'Venda Bruta',
       body: row => <th>{formatMoeda(row.VRTOTALVENDA)}</th>,
       footer: () => {
-        return(
-          <div>          
+        return (
+          <div>
             <th style={{ fontWeight: 600, }}>{calcularTotalVendaBrutaVendasVendedorPorPagina()}</th>
           </div>
         )
@@ -247,8 +247,8 @@ export const ActionListaVendasPorVendedor  = ({dadosVendasVendedor}) => {
       header: 'Valor Total Vouchers',
       body: row => <th>{formatMoeda(row.VRRECVOUCHER)}</th>,
       footer: () => {
-        return(
-          <div>          
+        return (
+          <div>
             <th style={{ fontWeight: 600, }}>{calcularTotalValorVoucherPorPagina()}</th>
           </div>
         )
@@ -260,8 +260,8 @@ export const ActionListaVendasPorVendedor  = ({dadosVendasVendedor}) => {
       header: 'Total Venda Líquida',
       body: row => <th>{formatMoeda(row.valorTotalVendaLiquida)}</th>,
       footer: () => {
-        return(
-          <div>          
+        return (
+          <div>
             <th style={{ fontWeight: 600, }}>{calcularTotalVendaLiquidaVendasVendedorPorPagina()}</th>
           </div>
         )
@@ -273,8 +273,8 @@ export const ActionListaVendasPorVendedor  = ({dadosVendasVendedor}) => {
       header: 'Total Custo',
       body: row => <th>{formatMoeda(row.PRECO_COMPRA)}</th>,
       footer: () => {
-        return(
-          <div>          
+        return (
+          <div>
             <th style={{ fontWeight: 600, }}>{calcularTotalValorCustoPorPagina()}</th>
           </div>
         )
@@ -282,7 +282,7 @@ export const ActionListaVendasPorVendedor  = ({dadosVendasVendedor}) => {
       sortable: true
     }
   ]
- 
+
 
   return (
 
@@ -335,7 +335,7 @@ export const ActionListaVendasPorVendedor  = ({dadosVendasVendedor}) => {
                 footer={coluna.footer}
                 sortable={coluna.sortable}
                 headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
-                footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem'}}
+                footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
                 bodyStyle={{ fontSize: '0.8rem' }}
 
               />

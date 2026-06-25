@@ -72,17 +72,6 @@ export const ActionPesquisaPremiacoes = ({ usuarioLogado }) => {
     { enabled: true, staleTime: 5 * 60 * 1000, }
   );
 
-  // const { data: dadosListaPremiacoes = [], error: errorPremiacoes, isLoading: isLoadingPremiacoes, refetch: refetchListaPremiacoes } = useQuery(
-  //   ['listaPremiacoes'],
-  //   async () => {
-  //     const response = await get(`/listaPremiacoes`);
-
-  //     return response.data;
-  //   },
-  //   { enabled: true, staleTime: 5 * 60 * 1000, }
-  // );
-
-
   const fetchListaPremiacoes = async () => {
     const urlBase = `/listaPremiacoes`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
@@ -255,7 +244,7 @@ export const ActionPesquisaPremiacoes = ({ usuarioLogado }) => {
           </div>
 
           <div className="row">
-            <div className="col-sm-6 col-md-6 col-lg-6">{console.log(dadosMultiplicador, "dados multiplicador")}
+            <div className="col-sm-6 col-md-6 col-lg-6">
               <ActionListaMultiplicador dadosMultiplicador={dadosMultiplicador} />
             </div>
             <div className="col-sm-6 col-md-6 col-lg-6">
