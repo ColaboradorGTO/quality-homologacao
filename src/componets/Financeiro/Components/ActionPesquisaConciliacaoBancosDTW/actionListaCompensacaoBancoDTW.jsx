@@ -15,14 +15,14 @@ import { toFloat } from "../../../../utils/toFloat";
 import { useEditarDeposito } from "./hooks/useEditarDeposito";
 
 
-export const ActionListaCompensacaoBancoDTW = ({ dadosConciliarBanco, contaSelecionada, optionsModulos, usuarioLogado, handleClickCompensacao }) => {
+export const ActionListaCompensacaoBancoDTW = ({ dadosConciliarBanco, contaSelecionada, optionsModulos, usuarioLogado, refetchConciliarBanco, refetchBancoConsolidado }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
 
   const {
     handleCancelar
-  } = useEditarDeposito({ optionsModulos, usuarioLogado, handleClickCompensacao })
+  } = useEditarDeposito({ optionsModulos, usuarioLogado, refetchConciliarBanco, refetchBancoConsolidado })
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -38,14 +38,14 @@ export const ActionListaCompensacaoBancoDTW = ({ dadosConciliarBanco, contaSelec
     doc.autoTable({
       head: [['Loja', 'Conta Crédito', 'Conta Transitória', 'Data Depósito', 'Data Movimento', 'Banco', 'Valor', 'Doc.', 'Status', 'Situação']],
       body: dadosListaConciliarBanco.map(item => [
-        item.NOFANTASIA, 
+        item.NOFANTASIA,
         item.CONTACREDITOSAP,
         item.contaTransitoriaSap,
-        item.DTDEPOSITO, 
-        item.DTMOVIMENTOCAIXA, 
-        item.DSBANCO, 
-        formatMoeda(item.VRDEPOSITO),  
-        parseFloat(item.NUDOCDEPOSITO).toFixed(2), 
+        item.DTDEPOSITO,
+        item.DTMOVIMENTOCAIXA,
+        item.DSBANCO,
+        formatMoeda(item.VRDEPOSITO),
+        parseFloat(item.NUDOCDEPOSITO).toFixed(2),
         item.STCANCELADO === 'False' ? 'Dep. Ativo' : 'Dep. Cancelado',
         item.STCONFERIDO === 'True' ? 'Conciliado' : 'Não Conciliado'
       ]),
@@ -60,16 +60,16 @@ export const ActionListaCompensacaoBancoDTW = ({ dadosConciliarBanco, contaSelec
     const workbook = XLSX.utils.book_new();
     const header = ['Loja', 'Conta Transitória', 'Conta Débito', 'Data Compensação', 'Banco', 'Valor', 'Doc.', 'Status', 'Situação'];
     worksheet['!cols'] = [
-      { wpx: 200, caption: 'Loja' }, 
-      { wpx: 100, caption: 'Conta Transitória' }, 
-      { wpx: 100, caption: 'Conta Débito' }, 
-      { wpx: 150, caption: 'Data Compensação' }, 
-      { wpx: 150, caption: 'Banco' }, 
-      { wpx: 100, caption: 'Valor' }, 
-      { wpx: 150, caption: 'Doc' }, 
-      { wpx: 100, caption: 'Status' }, 
+      { wpx: 200, caption: 'Loja' },
+      { wpx: 100, caption: 'Conta Transitória' },
+      { wpx: 100, caption: 'Conta Débito' },
+      { wpx: 150, caption: 'Data Compensação' },
+      { wpx: 150, caption: 'Banco' },
+      { wpx: 100, caption: 'Valor' },
+      { wpx: 150, caption: 'Doc' },
+      { wpx: 100, caption: 'Status' },
       { wpx: 100, caption: 'Situação' }
-    ]; 
+    ];
     XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Conciliação de Compensação');
     XLSX.writeFile(workbook, 'conciliacao_compensacao_banco.xlsx');
@@ -88,7 +88,7 @@ export const ActionListaCompensacaoBancoDTW = ({ dadosConciliarBanco, contaSelec
 
   const dadosExcel = dadosConciliarBanco.map((item) => {
     let contaTransitoriaSap = '';
-   
+
 
     if (contaSelecionada === 43 || contaSelecionada === 218 || contaSelecionada === 58 || contaSelecionada === 10006 || contaSelecionada === 10018 || contaSelecionada === 10008) {
       contaTransitoriaSap = '1.01.01.01.0003';
@@ -98,8 +98,8 @@ export const ActionListaCompensacaoBancoDTW = ({ dadosConciliarBanco, contaSelec
       contaTransitoriaSap = '4.01.01.09.0004';
     } else if (contaSelecionada === 10) {
       contaTransitoriaSap = '1.01.01.01.0002';
-    } 
-    
+    }
+
     return {
       NOFANTASIA: item.NOFANTASIA,
       contaTransitoriaSap,
@@ -111,13 +111,13 @@ export const ActionListaCompensacaoBancoDTW = ({ dadosConciliarBanco, contaSelec
       STCANCELADO: item.STCANCELADO === 'False' ? 'Dep. Ativo' : 'Dep. Cancelado',
       STCONFERIDO: item.STCONFERIDO === 'True' ? 'Conciliado' : 'Não Conciliado'
 
-  
+
     }
   })
 
   const dadosListaConciliarBanco = dadosConciliarBanco.map((item) => {
     let contaTransitoriaSap = '';
-   
+
     if (contaSelecionada === 43 || contaSelecionada === 218 || contaSelecionada === 58 || contaSelecionada === 10006 || contaSelecionada === 10018 || contaSelecionada === 10008) {
       contaTransitoriaSap = '1.01.01.01.0003';
     } else if (contaSelecionada === 3) {
@@ -126,7 +126,7 @@ export const ActionListaCompensacaoBancoDTW = ({ dadosConciliarBanco, contaSelec
       contaTransitoriaSap = '4.01.01.09.0004';
     } else if (contaSelecionada === 10) {
       contaTransitoriaSap = '1.01.01.01.0002';
-    } 
+    }
 
     return {
       NOFANTASIA: item.NOFANTASIA,
@@ -145,7 +145,7 @@ export const ActionListaCompensacaoBancoDTW = ({ dadosConciliarBanco, contaSelec
     }
   })
 
- 
+
   const colunasConciliarBanco = [
     {
       field: 'NOFANTASIA',
@@ -251,10 +251,10 @@ export const ActionListaCompensacaoBancoDTW = ({ dadosConciliarBanco, contaSelec
           container: 'custom-swal',
         },
         showConfirmButton: false,
-        timer: 4000 
+        timer: 4000
       });
       return
-    } 
+    }
     if (row && row.IDDEPOSITOLOJA) {
       handleCancelar(row.IDDEPOSITOLOJA);
     }
@@ -266,7 +266,7 @@ export const ActionListaCompensacaoBancoDTW = ({ dadosConciliarBanco, contaSelec
 
     <Fragment>
 
-     
+
       <div className="panel" >
         <div className="panel-hdr">
           <h2>
@@ -295,6 +295,7 @@ export const ActionListaCompensacaoBancoDTW = ({ dadosConciliarBanco, contaSelec
             sortOrder={-1}
             paginator={true}
             rows={10}
+            cellMemo={false}
             rowsPerPageOptions={[10, 20, 50, 100, dadosListaConciliarBanco.length]}
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"

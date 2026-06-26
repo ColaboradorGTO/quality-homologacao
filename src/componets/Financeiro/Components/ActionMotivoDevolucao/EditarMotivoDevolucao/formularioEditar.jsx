@@ -6,7 +6,7 @@ import { FooterModal } from "../../../../Modais/FooterModal/footerModal";
 import { useEditarMotivoDevolucao } from "../hooks/useEditarMotivoDevolucao";
 import { useForm } from "react-hook-form";
 
-export const FomularioEditar = ({dadosDetalheMotivoDevolucao, optionsModulos, usuarioLogado, handleClose}) => {
+export const FomularioEditar = ({dadosDetalheMotivoDevolucao, optionsModulos, usuarioLogado, handleClose, handleClick}) => {
     const { register, handleSubmit, formState: { errors } } = useForm();
     const {
         statusSelecionado,
@@ -21,7 +21,7 @@ export const FomularioEditar = ({dadosDetalheMotivoDevolucao, optionsModulos, us
         setMotivo,
         onSubmit,
         optionsStatus
-    } = useEditarMotivoDevolucao({dadosDetalheMotivoDevolucao, optionsModulos, usuarioLogado})
+    } = useEditarMotivoDevolucao({dadosDetalheMotivoDevolucao, optionsModulos, usuarioLogado, handleClick})
 
     return (
         <Fragment>

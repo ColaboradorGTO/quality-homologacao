@@ -166,7 +166,7 @@ export const ActionListaEmpresas = ({dadosEmpresas, optionsModulos, usuarioLogad
       }
     } else {
       Swal.fire({
-        position: 'top-end',
+        position: 'center',
         icon: 'error',
         title: `Você não tem permissão para alterar!`,
         customClass: {
@@ -208,6 +208,7 @@ export const ActionListaEmpresas = ({dadosEmpresas, optionsModulos, usuarioLogad
           onSelectionChange={(e) => setRowSelection(e.value)}
           sortOrder={-1}
           paginator
+          cellMemo={false}
           rows={10}
           rowsPerPageOptions={[10, 20, 30, 50, 100, dados.length]}
           paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
