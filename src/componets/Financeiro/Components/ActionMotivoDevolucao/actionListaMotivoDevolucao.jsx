@@ -12,7 +12,7 @@ import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import Swal from "sweetalert2";
 
-export const ActionListaMotivoDevolucao = ({ dadosMotivoDevolucao, optionsModulos, usuarioLogado }) => {
+export const ActionListaMotivoDevolucao = ({ dadosMotivoDevolucao, optionsModulos, usuarioLogado, handleClick }) => {
   const [dadosDetalheMotivoDevolucao, setDadosDetalheMotivoDevolucao] = useState([])
   const [modalVisivel, setModalVisivel] = useState(false)
   const [globalFilterValue, setGlobalFilterValue] = useState('');
@@ -228,6 +228,7 @@ export const ActionListaMotivoDevolucao = ({ dadosMotivoDevolucao, optionsModulo
             sortOrder={-1}
             paginator
             rows={10}
+            cellMemo={false}
             rowsPerPageOptions={[10, 20, 30, 50, 100, dadosListaMotivoDevolucao.length]}
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"

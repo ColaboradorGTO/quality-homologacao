@@ -3,7 +3,7 @@ import { useState } from "react";
 import Swal from "sweetalert2";
 import { post, put } from "../../../../../api/funcRequest";
 
-export const useEditarDeposito = ({ optionsModulos, usuarioLogado, handleClick, handleClickCompensacao }) => {
+export const useEditarDeposito = ({ optionsModulos, usuarioLogado, refetchConciliarBanco, refetchBancoConsolidado }) => {
     const [ipUsuario, setIpUsuario] = useState('');
 
     const getIPUsuario = async () => {
@@ -74,7 +74,7 @@ export const useEditarDeposito = ({ optionsModulos, usuarioLogado, handleClick, 
                     IDFUNCIONARIO: String(usuarioLogado.id),
                     PATHFUNCAO:  textoFuncao,
                     DADOS: textDados,
-                    IP: ipUsuario || 'IP não disponível',
+                    IP: ipUsuario || 'INDISPONIVEL',
                 }
         
                 await post('/log-web', postData)
@@ -84,8 +84,8 @@ export const useEditarDeposito = ({ optionsModulos, usuarioLogado, handleClick, 
                     text: 'Conciliação do Depósito cancelado com Sucesso', 
                     icon: 'success'
                 })
-                handleClick()
-                handleClickCompensacao()
+                refetchConciliarBanco()
+                refetchBancoConsolidado()
           
                 return response.data;
             } catch (error) {
@@ -99,7 +99,7 @@ export const useEditarDeposito = ({ optionsModulos, usuarioLogado, handleClick, 
                     IDFUNCIONARIO: String(usuarioLogado.id),
                     PATHFUNCAO:  textoFuncao,
                     DADOS: textDados,
-                    IP: ipUsuario || 'IP não disponível',
+                    IP: ipUsuario || 'INDISPONIVEL',
                 }
         
                 const responsePost = await post('/log-web', postData)
@@ -115,8 +115,7 @@ export const useEditarDeposito = ({ optionsModulos, usuarioLogado, handleClick, 
                     showConfirmButton: false,
                     timer: 4000 
                 });
-                handleClick()
-                handleClickCompensacao()
+               
                 return responsePost.data;
             }
             }

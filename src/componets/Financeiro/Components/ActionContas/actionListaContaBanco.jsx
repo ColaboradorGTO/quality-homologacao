@@ -188,7 +188,7 @@ export const ActionListaContaBanco = ({
 
 
   const handleClickEditar = (row) => {
-    if (optionsModulos[0]?.ALTERAR == 'False') {
+    if (optionsModulos[0]?.ALTERAR == 'True') {
       if (row && row.IDCONTABANCO) {
         handleEditar(row.IDCONTABANCO);
       }
@@ -239,6 +239,7 @@ export const ActionListaContaBanco = ({
             sortOrder={-1}
             paginator={true}
             rows={10}
+            cellMemo={false}
             rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
             showGridlines
             stripedRows

@@ -27,8 +27,8 @@ export const ActionPesquisaMotivoDevolucao = ({ usuarioLogado }) => {
     setDataPesquisaInicio(dataInicial);
     setDataPesquisaFim(dataFinal);
   }, [])
-  
-  
+
+
   useEffect(() => {
     const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
     if (menuSalvo) {
@@ -53,7 +53,7 @@ export const ActionPesquisaMotivoDevolucao = ({ usuarioLogado }) => {
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
       animacaoCarregamento('Carregando dados...', true);
-        
+
       const primeiraPagina = 1;
       const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
       const page = primeiraResposta.page || primeiraPagina;
@@ -72,7 +72,7 @@ export const ActionPesquisaMotivoDevolucao = ({ usuarioLogado }) => {
       }
 
       return allData;
-  
+
     } catch (error) {
       console.error('Error fetching data:', error);
       throw error;
@@ -88,7 +88,7 @@ export const ActionPesquisaMotivoDevolucao = ({ usuarioLogado }) => {
   );
 
   const handleClickCadastro = () => {
-    if(optionsModulos[0]?.CRIAR == 'True') {
+    if (optionsModulos[0]?.CRIAR == 'True') {
       setModalCriarVisivel(true)
     } else {
       Swal.fire({
@@ -163,10 +163,12 @@ export const ActionPesquisaMotivoDevolucao = ({ usuarioLogado }) => {
       />
 
       {tabelaVisivel && (
-        <ActionListaMotivoDevolucao 
+        <ActionListaMotivoDevolucao
           dadosMotivoDevolucao={dadosMotivoDevolucao}
           optionsModulos={optionsModulos}
           usuarioLogado={usuarioLogado}
+          handleClick={handleClick}
+
         />
       )}
 

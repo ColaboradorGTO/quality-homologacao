@@ -436,6 +436,7 @@ export const ActionListaConsolidacaoFaturas = ({
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
             filterDisplay="menu"
             sortOrder={-1}
+            cellMemo={false}
             paginator={true}
             rows={10}
             rowsPerPageOptions={[10, 20, 50, 100, 200, 300, 500, dados.length]}

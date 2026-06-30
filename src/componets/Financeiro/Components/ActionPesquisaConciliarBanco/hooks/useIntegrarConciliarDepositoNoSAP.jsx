@@ -11,26 +11,26 @@ export const useIntegrarConciliarDepositoNoSAP = ({ optionsModulos, usuarioLogad
         let usuarioIP = null;
 
         try {
-        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
-        usuarioIP = ipWhoisData?.ip;
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+            usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-        console.error("Erro ao buscar IP via ifconfig.me:", error);
+            console.error("Erro ao buscar IP via ifconfig.me:", error);
         }
 
         if (!usuarioIP) {
-        try {
-            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-            usuarioIP = ipifyData?.ip;
-        } catch (error) {
-            console.error("Erro ao buscar IP via ipify.org:", error);
-        }
+            try {
+                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+                usuarioIP = ipifyData?.ip;
+            } catch (error) {
+                console.error("Erro ao buscar IP via ipify.org:", error);
+            }
         }
         setIpUsuario(usuarioIP);
         return usuarioIP;
     };
 
     const handleConciliar = async (IDDEPOSITOLOJA) => {
-        if(optionsModulos[0]?.ALTERAR == 'False') {
+        if (optionsModulos[0]?.ALTERAR == 'False') {
             Swal.fire({
                 position: 'center',
                 icon: 'error',
@@ -40,7 +40,7 @@ export const useIntegrarConciliarDepositoNoSAP = ({ optionsModulos, usuarioLogad
                     container: 'custom-swal',
                 },
                 showConfirmButton: false,
-                timer: 4000 
+                timer: 4000
             });
             return
         }
@@ -54,81 +54,90 @@ export const useIntegrarConciliarDepositoNoSAP = ({ optionsModulos, usuarioLogad
             cancelButtonText: 'Cancelar',
             confirmButtonText: 'OK',
             customClass: {
-                confirmButton: 'btn btn-success mx-2', 
-                cancelButton: 'btn btn-danger mx-2', 
+                confirmButton: 'btn btn-success mx-2',
+                cancelButton: 'btn btn-danger mx-2',
                 loader: 'custom-loader'
             },
             buttonsStyling: false
         }).then(async (result) => {
             if (result.isConfirmed) {
-            try {
-                const putData = { 
-                    IDDEPOSITOLOJA: IDDEPOSITOLOJA,
-                }
-                animationLodadingStart('Integrando Depósito no SAP', 1000, false);
-                const response = await post('/deposito-integracao', putData)                
-                const textDados = JSON.stringify(putData)
-                let textoFuncao = 'FINANCEIRO/INTEGRACAO CONCILIAÇÃO DO DEPOSITO'
-                const ipUsuario = await getIPUsuario()
-                const postData = {  
-                    IDFUNCIONARIO: String(usuarioLogado.id),
-                    PATHFUNCAO:  textoFuncao,
-                    DADOS: textDados,
-                    IP: ipUsuario || 'IP não disponível',
-                }
-        
-                
-                await post('/log-web', postData)
-            
                 Swal.fire({
-                    title: 'Integrado', 
-                    text: 'Conciliação do Depósito Integrada no SAP com Sucesso!', 
-                    icon: 'success',
-                    customClass: {
-                        container: 'custom-swal',
-                    },
+                    icon: 'info',
+                    title: 'Integrando...',
+                    html: 'Por favor, aguarde enquanto a conciliação do depósito integrada no SAP.',
+                    allowOutsideClick: false,
                     showConfirmButton: false,
-                    timer: 4000
+                    willOpen: () => {
+                        Swal.showLoading()
+                    }
                 })
-                handleClick()
-          
-                return response.data;
-            } catch (error) {
-                const putData = { 
-                    IDDEPOSITOLOJA: IDDEPOSITOLOJA,
-                }
-                const textDados = JSON.stringify(putData)
-                const ipUsuario = await getIPUsuario()
-                const textoFuncao = 'FINANCEIRO/ERRO AO CANCELAR CONCILIAÇÃO DO DEPOSITO';
-            
-                const postData = {  
-                    IDFUNCIONARIO: String(usuarioLogado.id),
-                    PATHFUNCAO:  textoFuncao,
-                    DADOS: textDados,
-                    IP: ipUsuario || 'IP não disponível',
-                }
-        
-                const responsePost = await post('/log-web', postData)
+                try {
+                    const putData = {
+                        IDDEPOSITOLOJA: IDDEPOSITOLOJA,
+                    }
 
-          
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Erro!',
-                    text: 'Erro ao cancelar ao conciliar o depósito no SAP!',
-                    customClass: {
-                        container: 'custom-swal',
-                    },
-                    showConfirmButton: false,
-                    timer: 4000 
-                });
-                handleClick()
-                return responsePost.data;
-            }
+                    const response = await post('/deposito-integracao', putData)
+                    const textDados = JSON.stringify(putData)
+                    let textoFuncao = 'FINANCEIRO/INTEGRACAO CONCILIAÇÃO DO DEPOSITO'
+                    const ipUsuario = await getIPUsuario()
+                    const postData = {
+                        IDFUNCIONARIO: String(usuarioLogado.id),
+                        PATHFUNCAO: textoFuncao,
+                        DADOS: textDados,
+                        IP: ipUsuario || 'INDISPONIVEL',
+                    }
+
+
+                    await post('/log-web', postData)
+
+                    Swal.fire({
+                        title: 'Integrado',
+                        text: 'Conciliação do Depósito Integrada no SAP com Sucesso!',
+                        icon: 'success',
+                        customClass: {
+                            container: 'custom-swal',
+                        },
+                        showConfirmButton: false,
+                        timer: 4000
+                    })
+                    handleClick()
+
+                    return response.data;
+                } catch (error) {
+                    const putData = {
+                        IDDEPOSITOLOJA: IDDEPOSITOLOJA,
+                    }
+                    const textDados = JSON.stringify(putData)
+                    const ipUsuario = await getIPUsuario()
+                    const textoFuncao = 'FINANCEIRO/ERRO AO CANCELAR CONCILIAÇÃO DO DEPOSITO';
+
+                    const postData = {
+                        IDFUNCIONARIO: String(usuarioLogado.id),
+                        PATHFUNCAO: textoFuncao,
+                        DADOS: textDados,
+                        IP: ipUsuario || 'INDISPONIVEL',
+                    }
+
+                    const responsePost = await post('/log-web', postData)
+
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro!',
+                        text: 'Erro ao cancelar ao conciliar o depósito no SAP!',
+                        customClass: {
+                            container: 'custom-swal',
+                        },
+                        showConfirmButton: false,
+                        timer: 4000
+                    });
+                    return responsePost.data;
+                }
             }
         })
-    
+
     }
-      
+
     return {
         handleConciliar,
         ipUsuario,

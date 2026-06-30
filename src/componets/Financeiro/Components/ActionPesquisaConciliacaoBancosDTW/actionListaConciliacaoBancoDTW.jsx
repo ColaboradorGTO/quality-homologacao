@@ -15,14 +15,14 @@ import { toFloat } from "../../../../utils/toFloat";
 import { useEditarDeposito } from "./hooks/useEditarDeposito";
 
 
-export const ActionListaConciliacaoBancoDTW = ({ dadosConciliarBanco, contaSelecionada, optionsModulos, usuarioLogado, handleClick }) => {
+export const ActionListaConciliacaoBancoDTW = ({ dadosConciliarBanco, contaSelecionada, optionsModulos, usuarioLogado, refetchConciliarBanco, refetchBancoConsolidado }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
 
   const {
     handleCancelar
-  } = useEditarDeposito({ optionsModulos, usuarioLogado, handleClick })
+  } = useEditarDeposito({ optionsModulos, usuarioLogado, refetchConciliarBanco, refetchBancoConsolidado })
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
