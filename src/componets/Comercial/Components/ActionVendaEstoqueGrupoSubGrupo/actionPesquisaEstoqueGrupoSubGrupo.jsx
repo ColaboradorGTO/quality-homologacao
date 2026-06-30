@@ -115,7 +115,9 @@ export const ActionPesquisaEstoqueVendaGrupoSubGrupo = () => {
   }
 
   const handleSubGrupoChange = (selectedOptions) => {
-    const values = selectedOptions.map((option) => option.value);
+    const values = (selectedOptions || [])
+    .map((option) => option.value)
+    .filter((value) => value !== '' && value !== null && value !== undefined);
     setSubGrupoSelecionado(values);
   }
 
@@ -173,7 +175,7 @@ export const ActionPesquisaEstoqueVendaGrupoSubGrupo = () => {
         }))
         }
         labelMultSelectSubGrupo={"SubGrupo"}
-        valueMultSelectSubGrupoo={subGrupoSelecionado}
+        valueMultSelectSubGrupoo={[subGrupoSelecionado]}
         onChangeMultSelectSubGrupo={handleSubGrupoChange}
 
         InputSelectMarcasComponent={InputSelectAction}

@@ -166,12 +166,12 @@ Como a etiqueta usa `^FWR`, o sentido visual de "subir/descer" pode parecer inve
   ^LL980
   ^LS0
   ^CI28
-  ^FO560,-20
-  ^GB150,1200,250^FS
-  ^FO600, REMANEJAMENTO 
-  ^FB1100,1,0,C,0
+  ^FO560,0
+  ^GB0,1000,5^FS
+  ^FO550, REMANEJAMENTO 
+
   ^FR
-  ^CF0,100
+  ^CF0,750
   ^FD titulo ^FS
   ^CF0,60
   ^FO430,20^FB480,2,1,L,0^FDOR: ^FS
@@ -189,6 +189,8 @@ Como a etiqueta usa `^FWR`, o sentido visual de "subir/descer" pode parecer inve
   Visualizar etiqueta 
   https://zplprinter.azurewebsites.net/
   https://labelary.com/viewer.html
+
+
  -->
 
 

@@ -3,26 +3,26 @@ import { post } from "../../../../../api/funcRequest";
 import axios from 'axios'
 import Swal from "sweetalert2";
 
-export const useIntegrarAdiantamento = ({optionsModulos, usuarioLogado, handleClick, setSelectedItems}) => {
+export const useIntegrarAdiantamento = ({ optionsModulos, usuarioLogado, handleClick, setSelectedItems }) => {
     const [ipUsuario, setIpUsuario] = useState('');
 
     const getIPUsuario = async () => {
         let usuarioIP = null;
 
         try {
-        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
-        usuarioIP = ipWhoisData?.ip;
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+            usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-        console.error("Erro ao buscar IP via ipwho.is:", error);
+            console.error("Erro ao buscar IP via ipwho.is:", error);
         }
 
         if (!usuarioIP) {
-        try {
-            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-            usuarioIP = ipifyData?.ip;
-        } catch (error) {
-            console.error("Erro ao buscar IP via ipify.org:", error);
-        }
+            try {
+                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+                usuarioIP = ipifyData?.ip;
+            } catch (error) {
+                console.error("Erro ao buscar IP via ipify.org:", error);
+            }
         }
         setIpUsuario(usuarioIP);
         return usuarioIP;
@@ -67,10 +67,15 @@ export const useIntegrarAdiantamento = ({optionsModulos, usuarioLogado, handleCl
                     position: 'center',
                     icon: 'info',
                     title: 'Integrando Adiantamentos',
-                    html: 'Aguarde... <br><small><strong id="progressoIntegracao">0</strong> de <strong id="totalIntegracao">' + rowData.length + '</strong></small>',
+                    html: 'Aguarde...',
+
+                    //html: 'Aguarde... <br><small><strong id="progressoIntegracao">0</strong> de <strong id="totalIntegracao">' + rowData.length + '</strong></small>',
                     showConfirmButton: false,
                     allowOutsideClick: false,
                     allowEscapeKey: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    },
                     customClass: {
                         container: 'custom-swal',
                     }
@@ -82,7 +87,7 @@ export const useIntegrarAdiantamento = ({optionsModulos, usuarioLogado, handleCl
                 }
 
                 try {
-        
+
                     const response = await post('/adiantamentos-salariais-integracao', putData)
                     const textDados = JSON.stringify(putData)
                     const ipUsuario = await getIPUsuario();
@@ -90,7 +95,7 @@ export const useIntegrarAdiantamento = ({optionsModulos, usuarioLogado, handleCl
                         IDFUNCIONARIO: String(usuarioLogado.id),
                         PATHFUNCAO: `FINANCEIRO/INTEGRAR ADIANTAMENTO SALARIAL`,
                         DADOS: textDados,
-                        IP: ipUsuario || 'IP não disponível'
+                        IP: ipUsuario || 'INDISPONIVEL'
                     }
 
                     await post('/log-web', postData)
@@ -104,7 +109,7 @@ export const useIntegrarAdiantamento = ({optionsModulos, usuarioLogado, handleCl
                             container: 'custom-swal',
                         },
                     })
-        
+
                     handleClick();
                     setSelectedItems([]);
                     return response.data;
@@ -115,7 +120,7 @@ export const useIntegrarAdiantamento = ({optionsModulos, usuarioLogado, handleCl
                         IDFUNCIONARIO: String(usuarioLogado.id),
                         PATHFUNCAO: `FINANCEIRO/ERRO AO INTEGRAR ADIANTAMENTO SALARIAL`,
                         DADOS: textDados,
-                        IP: ipUsuario || 'IP não disponível'
+                        IP: ipUsuario || 'INDISPONIVEL'
                     }
 
                     const responsePost = await post('/log-web', postData)

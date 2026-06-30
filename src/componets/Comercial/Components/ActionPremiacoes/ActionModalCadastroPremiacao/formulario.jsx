@@ -53,7 +53,7 @@ export const Formulario = ({
         empresaFuncionario: empresaSelecionada,
       }
       await schema.validate(dadosParaValidar, { abortEarly: false });
-      onSubmit();
+      await onSubmit();
     } catch (validationError) {
       console.error('❌ Erro de validação:', validationError);
 

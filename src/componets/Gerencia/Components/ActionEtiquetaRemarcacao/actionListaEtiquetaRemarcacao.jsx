@@ -14,6 +14,7 @@ export const ActionListaEtiquetaRemarcacao = ({ dadosAcumuladorEtiquetas, setDad
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [quantidades, setQuantidades] = useState({});
   const [copias, setCopias] = useState(1);
+  const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
 
   const onGlobalFilterChange = (e) => {
@@ -141,12 +142,19 @@ export const ActionListaEtiquetaRemarcacao = ({ dadosAcumuladorEtiquetas, setDad
         </div>
         <div className="card" ref={dataTableRef}>
           <DataTable
+            title="Lista de Etiquetas"
             value={dados}
             globalFilterValue={globalFilterValue}
             size="small"
-            paginator
+            selectionMode="single"
+            selection={rowSelection}
+            onSelectionChange={(e) => setRowSelection(e.value)}
+            paginator={true}
             rows={10}
             rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+            filterDisplay="menu"
             showGridlines
             stripedRows
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
@@ -156,15 +164,13 @@ export const ActionListaEtiquetaRemarcacao = ({ dadosAcumuladorEtiquetas, setDad
                 key={coluna.field}
                 field={coluna.field}
                 header={coluna.header}
+
                 body={coluna.body}
+                footer={coluna.footer}
                 sortable={coluna.sortable}
-                headerStyle={{
-                  color: "white",
-                  backgroundColor: "#7a59ad",
-                  border: "1px solid #e9e9e9",
-                  fontSize: "1rem",
-                }}
-                bodyStyle={{ fontSize: "1.5rem" }}
+                headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+                footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
+                bodyStyle={{ fontSize: '1rem' }}
               />
             ))}
           </DataTable>

@@ -323,9 +323,9 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
   ]
 
 
-  const handleEdit = async (IDFUNCIONARIO) => {
+  const handleEdit = async (ID) => {
     try {
-      const response = await get(`/funcionarios-loja?byId=${IDFUNCIONARIO}`)
+      const response = await get(`/funcionarios-loja?byId=${ID}`)
       if (response.data && response.data.length > 0) {
         setDadosAtualizarFuncionarios(response.data)
         setModalAlterarFuncionarioVisivel(true);
@@ -349,8 +349,8 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
 
   const handleClickEdit = (row) => {
     if (optionsModulos[0]?.ALTERAR == 'True') {
-      if (row && row.IDFUNCIONARIO) {
-        handleEdit(row.IDFUNCIONARIO);
+      if (row && row.ID) {
+        handleEdit(row.ID);
       }
     } else {
       Swal.fire({
@@ -365,9 +365,9 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
     }
   };
 
-  const handleDesconto = async (IDFUNCIONARIO) => {
+  const handleDesconto = async (ID) => {
     try {
-      const response = await get(`/funcionarios-loja?byId=${IDFUNCIONARIO}`)
+      const response = await get(`/funcionarios-loja?byId=${ID}`)
       if (response.data && response.data.length > 0) {
         setDadosDescontoFuncionarios(response.data)
         setModalDescontoVisivel(true);
@@ -390,8 +390,8 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
 
   const handleClickDesconto = (row) => {
     if (optionsModulos[0]?.ALTERAR == 'True') {
-      if (row && row.IDFUNCIONARIO) {
-        handleDesconto(row.IDFUNCIONARIO);
+      if (row && row.ID) {
+        handleDesconto(row.ID);
       }
     } else {
       Swal.fire({

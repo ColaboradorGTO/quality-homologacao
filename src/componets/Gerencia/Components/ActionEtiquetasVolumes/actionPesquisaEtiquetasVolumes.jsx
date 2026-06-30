@@ -39,7 +39,7 @@ export const ActionPesquisaEtiquetasVolumes = ({ usuarioLogado }) => {
       descricao,
       categoria,
       empresaOrigem: usuarioLogado?.NOFANTASIA,
-      empresaDestinoSelecionada: empresaDestinoSelecionada,
+      empresaDestinoSelecionada: '0101 - TO - CD (Depósito)',
       solicitanteSelecionado,
       quantidade: quantidade
     }];
@@ -65,7 +65,7 @@ export const ActionPesquisaEtiquetasVolumes = ({ usuarioLogado }) => {
       setEmpresaDestinoSelecionada('');
     }
   }, [tipoSelecionado, setSolicitanteSelecionado, setEmpresaDestinoSelecionada])
-
+  
 
   return (
 
@@ -131,14 +131,14 @@ export const ActionPesquisaEtiquetasVolumes = ({ usuarioLogado }) => {
 
         InputFieldNumeroNFComponent={InputField}
         labelInputFieldNumeroNF={"Descrição"}
-        valueInputFieldNumeroNF={descricao.toUpperCase()}
-        onChangeInputFieldNumeroNF={(e) => setDescricao(e.target.value)}
+        valueInputFieldNumeroNF={descricao}
+        onChangeInputFieldNumeroNF={(e) => setDescricao(e.target.value.toUpperCase())}
         placeHolderInputFieldNumeroNF={"Descrição"}
 
         InputFieldDescricaoComponent={InputField}
         labelInputFieldDescricao={"Categoria"}
-        valueInputFieldDescricao={categoria.toUpperCase()}
-        onChangeInputFieldDescricao={(e) => setCategoria(e.target.value)}
+        valueInputFieldDescricao={categoria}
+        onChangeInputFieldDescricao={(e) => setCategoria(e.target.value.toUpperCase())}
         placeHolderInputFieldDescricao={"Categoria"}
 
         InputFieldQuantidadeComponent={InputField}
@@ -155,14 +155,13 @@ export const ActionPesquisaEtiquetasVolumes = ({ usuarioLogado }) => {
         IconSearch={MdOutlineLocalPrintshop}
 
       />
-
       <ActionImprimirEtiquetaModal
         show={modalImprimir}
         handleClose={() => setModalImprimir(false)}
         dadosAcumuladorEtiquetas={dadosAcumuladorEtiquetas}
         tipoSelecionado={tipoSelecionado}
         usuarioLogado={usuarioLogado}
-      />
+        />
 
     </Fragment>
   )

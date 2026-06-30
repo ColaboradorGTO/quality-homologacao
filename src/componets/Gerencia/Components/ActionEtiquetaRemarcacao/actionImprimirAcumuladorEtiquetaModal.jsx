@@ -7,6 +7,7 @@ import { ButtonTypeModal } from "../../../Buttons/ButtonTypeModal";
 import { FooterModal } from "../../../Modais/FooterModal/footerModal";
 import { useReactToPrint } from "react-to-print";
 
+import { enviarZPLParaImpressora, gerarZPLEtiquetas } from "../../../../utils/labelPrinterService";
 
 const chunkArray = (array, size) => {
   const expandedArray = array.flatMap(item => 
@@ -20,28 +21,64 @@ const chunkArray = (array, size) => {
   return chunks;
 };
 
-
-export const ActionImprimirAcumuladorEtiquetaModal = ({ show, handleClose,  dadosAcumuladorEtiquetas, copias, setDadosEtiquetas, dadosAcumuladorImpressao }) => {
+export const ActionImprimirAcumuladorEtiquetaModal = ({ show, handleClose,  dadosAcumuladorEtiquetas, copias, setDadosEtiquetas, quantidadeEtiquetas }) => {
   const dataTableRef = useRef();
 
-  const handlePrint = useReactToPrint({
-    content: () => dataTableRef.current,
-    documentTitle: "Lista de Etiquetas",
+ 
+  const handlePrint = async () => {
+    try {
+      
+      let comandosZPL = '';
+      
+      etiquetasPorPagina.forEach((paginaEtiquetas) => {
+        const posicoes = [
+          { x: 32, y: 25 },
+          { x: 216, y: 25 },
+          { x: 400, y: 25 },
+          { x: 584, y: 25 }
+        ];
 
-  });
+        comandosZPL += `^XA^PR2^MD15^FWN^PW800^LL80^CI28`;
+
+        paginaEtiquetas.forEach((etiqueta, indiceEtiqueta) => {
+          const posicao = posicoes[indiceEtiqueta];
+          if (posicao) {
+            const valorFormatado = formatMoeda(etiqueta.valor);
+            comandosZPL += `^FO${posicao.x},${posicao.y}^A0,40,30^FB184,1,1,C,0^FD${valorFormatado}^FS`;
+          }
+        });
+
+        comandosZPL += `^PQ1^XZ\n`;
+      });
+
+      await enviarZPLParaImpressora(comandosZPL.trim());
+
+    } catch (error) {
+      console.error('❌ Erro na impressão WebSocket:', error);
+    }
+  };
+
 
   const etiquetas =  dadosAcumuladorEtiquetas.map((item) => ({
     idEtiqueta: item.idEtiqueta,
     quantidade: item.quantidade,
     valor: item.valor,
-
-   
   }));
 
   const quantidadeTotalEtiquetas = etiquetas.reduce((total, etiqueta) => total + etiqueta.quantidade, 0);
+
   const etiquetasPorPagina = chunkArray(etiquetas, 4);
-  const totalPaginas = etiquetasPorPagina.length * copias;
-    
+  const totalPaginas = etiquetasPorPagina.length;
+  console.log(totalPaginas, 'totalPaginas')
+  console.log(quantidadeTotalEtiquetas, 'quantidadeTotalEtiquetas')
+
+
+  const paginasCompias = etiquetasPorPagina.map((pagina, indexPagina) => ({
+    pagina,
+    numeroPagina: indexPagina + 1,
+    copia: 1,
+    indexOriginal: indexPagina
+  }));
   
   return (
     <Fragment>
@@ -63,15 +100,15 @@ export const ActionImprimirAcumuladorEtiquetaModal = ({ show, handleClose,  dado
             <p>Qtd Etiquetas: <b>{quantidadeTotalEtiquetas + ' ' + 'unidades'} </b></p>
           </header>
           <div style={{ width: '100%' }} ref={dataTableRef}>
-            {etiquetasPorPagina.map((pagina, pageIndex) => (
+            {paginasCompias.map((item, pageIndex) => (
               <div
                 className="etiqueta-remarcacao-page"
                 key={pageIndex}
               >
-                {pagina.map((etiqueta, etiquetaIndex) => (
+                {item.pagina.map((etiqueta, etiquetaIndex) => (
                   <div
                     className="etiqueta-remarcacao-card border-dark rounded "
-                    key={etiquetaIndex}
+                     key={`etiqueta-${etiquetaIndex}-${item.copia}`}
                     style={{ borderRadius: '4px', maxWidth: '100%' }}
                   >
                     <div
@@ -99,6 +136,7 @@ export const ActionImprimirAcumuladorEtiquetaModal = ({ show, handleClose,  dado
           textButtonCadastrar={"Imprimir"}
           onClickButtonCadastrar={handlePrint}
           corCadastrar={"primary"}
+          
           ButtonTypeFechar={ButtonTypeModal}
           textButtonFechar={"Fechar"}
           onClickButtonFechar={handleClose}

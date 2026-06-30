@@ -75,8 +75,15 @@ export const useMigrarTodasDespesasSAP = ({optionsModulos, usuarioLogado, select
         
             
                 try {
-        
-                    const response = await post('/integrar-despesa', putData)
+                    for (const item of selectedItems) {
+
+                        const putData = {
+                            IDDESPESASLOJA: Number(item.IDDESPESASLOJA),
+                            IDFUNCIONARIO: Number(usuarioLogado.id),
+                        };
+
+                        await post('/integrar-despesa', putData);
+                    }
                 
                     const textDados = JSON.stringify(putData)
                     const ipUsuario = await getIPUsuario();
@@ -100,7 +107,6 @@ export const useMigrarTodasDespesasSAP = ({optionsModulos, usuarioLogado, select
                     })
         
                     handleClick();
-                    return response.data;
                 } catch (error) {
                     const textDados = JSON.stringify(putData)
                     const ipUsuario = await getIPUsuario();

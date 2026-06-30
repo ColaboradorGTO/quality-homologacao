@@ -256,8 +256,8 @@ export const ActionPesquisaConciliacaoBancosDTW = ({ usuarioLogado }) => {
           contaSelecionada={contaSelecionada}
           optionsModulos={optionsModulos}
           usuarioLogado={usuarioLogado}
-          handleClick={handleClick}
-        />
+          refetchConciliarBanco={refetchConciliarBanco}
+          refetchBancoConsolidado={refetchBancoConsolidado} />
       )}
       {tabelaVisivelCompensacao && (
         <ActionListaCompensacaoBancoDTW
@@ -265,8 +265,8 @@ export const ActionPesquisaConciliacaoBancosDTW = ({ usuarioLogado }) => {
           contaSelecionada={contaSelecionada}
           optionsModulos={optionsModulos}
           usuarioLogado={usuarioLogado}
-          handleClickCompensacao={handleClickCompensacao}
-        />
+          refetchConciliarBanco={refetchConciliarBanco}
+          refetchBancoConsolidado={refetchBancoConsolidado} />
       )}
 
       {tabelaVisivelConsolidado && (

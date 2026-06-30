@@ -39,7 +39,7 @@ const ActionRelatorioBI = lazy(() => import("../componets/Gerencia/Components/Ac
 const ActionPesquisaEtiquetasVolumes = lazy(() => import("../componets/Gerencia/Components/ActionEtiquetasVolumes/actionPesquisaEtiquetasVolumes").then(module => ({ default: module.ActionPesquisaEtiquetasVolumes })));
 const ActionPesquisaVendaVoucher = lazy(() => import("../componets/Gerencia/Components/ActionVendaVoucher/actionPesquisaVendaVoucher").then(module => ({ default: module.ActionPesquisaVendaVoucher })));
 const ActionPesquisaVendasDigitais = lazy(() => import("../componets/Gerencia/Components/ActionVendasDigitais/actionPesquisaVendasDigitais").then(module => ({ default: module.ActionPesquisaVendasDigitais })));
-
+ 
 export const DashBoardGerencia = () => {
   const storedModule = localStorage.getItem('moduloselecionado');
   const selectedModule = JSON.parse(storedModule);

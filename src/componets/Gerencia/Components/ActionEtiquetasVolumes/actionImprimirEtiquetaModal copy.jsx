@@ -23,14 +23,14 @@ const chunkArray = (array, size) => {
 export const ActionImprimirEtiquetaModal = ({ show, handleClose, dadosAcumuladorEtiquetas }) => {
   const dataTableRef = useRef();
 
-
   const handlePrintZPL = async () => {
     try {
       let etiquetasZPL = '';
       const zplResetConfiguracao = `
+        ~SD07
         ^XA
         ^MD0
-        ~SD07
+        ^FWN
         ^JUS
         ^XZ
       `;
@@ -47,7 +47,8 @@ export const ActionImprimirEtiquetaModal = ({ show, handleClose, dadosAcumulador
           solicitanteSelecionado,
           quantidade
         } = dadosAcumuladorEtiquetas[itemIndex]
-
+        console.log(descricao, 'descricao')
+        console.log(categoria, 'categoria')
         const qtd = Number(quantidade) || 1;
 
         for (let i = 0; i < qtd; i++) {
@@ -63,10 +64,11 @@ export const ActionImprimirEtiquetaModal = ({ show, handleClose, dadosAcumulador
           ^CI28
           
           ^FO560,0
-          ^GB150,1000,150^FS
+          ^GB145,980,150^FS
 
-          ^FO550,${titulo == 'REMANEJAMENTO' ? '120' : '250'}
+          ^FO555,${titulo == 'REMANEJAMENTO' ? '120' : '250'}
           ^FR
+          
           ^CF0,100
           ^FD${titulo}^FS
 
@@ -86,7 +88,7 @@ export const ActionImprimirEtiquetaModal = ({ show, handleClose, dadosAcumulador
           ^FO80,20^FB980,2,1,L,0^FDDESTINATÁRIO: ${empresaDestino}^FS
 
           ^CF0,40
-          ^FO40,550^FDQTD: ${i + 1}/${qtd}^FS
+          ^FO40,750^FDQTD: ${i + 1}/${qtd}^FS
 
           ^XZ
         `;
@@ -243,3 +245,8 @@ export const ActionImprimirEtiquetaModal = ({ show, handleClose, dadosAcumulador
     </Fragment>
   );
 };
+
+/* 
+tamanho da etiqueta
+12 cm largura 7.8 cm de altura
+*/

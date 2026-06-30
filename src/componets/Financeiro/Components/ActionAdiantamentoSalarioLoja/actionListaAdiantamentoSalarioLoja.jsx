@@ -44,7 +44,7 @@ export const ActionListaAdiantamentoSalarioLoja = ({
 
   const {
     confirmar
-  } = useIntegrarAdiantamento({optionsModulos, usuarioLogado, handleClick, setSelectedItems}) 
+  } = useIntegrarAdiantamento({ optionsModulos, usuarioLogado, handleClick, setSelectedItems })
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -110,11 +110,11 @@ export const ActionListaAdiantamentoSalarioLoja = ({
   }) : [];
 
   const arraySituacao = [
-    {color: '#2196F3', txt: 'Pronto para Integrar SAP'},
-    {color: '#886ab5', txt: 'Em Fila'},
-    {color: 'success', txt: 'Integrado'},
-    {color: '#fd3995', txt: 'Erro ao Tentar Integrar'},
-    {color: '#fd3995', txt: 'Cancelado'}
+    { color: '#2196F3', txt: 'Pronto para Integrar SAP' },
+    { color: '#886ab5', txt: 'Em Fila' },
+    { color: 'success', txt: 'Integrado' },
+    { color: '#fd3995', txt: 'Erro ao Tentar Integrar' },
+    { color: '#fd3995', txt: 'Cancelado' }
   ]
 
   const arrayMsgStatusIntegracao = [
@@ -134,7 +134,7 @@ export const ActionListaAdiantamentoSalarioLoja = ({
     const stAguardandoEmFila = item?.STATUS_BLOQUEIO_ATUALIZACAO === 'True';
     const indexSituacao = !stAdiantamento ? 4 : logErrorIntegracao.length ? 3 : stMigrado ? 2 : stAguardandoEmFila ? 1 : 0;
     const colorSitucao = arraySituacao[indexSituacao].color;
-    
+
     const msgTitleIntegracao = (logErrorIntegracao.length) ? 'MOTIVO:' : arraySituacao[indexSituacao].txt
     const msgTextIntegracao = logErrorIntegracao || arrayMsgStatusIntegracao[indexSituacao];
     const txtSituacao = arraySituacao[indexSituacao].txt;
@@ -244,7 +244,7 @@ export const ActionListaAdiantamentoSalarioLoja = ({
     }
   };
 
-  
+
   const colunasAdiantamentos = [
     {
       field: 'contador',
@@ -327,7 +327,7 @@ export const ActionListaAdiantamentoSalarioLoja = ({
       header: 'Situação',
       body: row => (
         <th style={{ color: row.colorSitucao, fontWeight: 'bold' }}>
-      
+
           {row.txtSituacao}
         </th>
       ),
@@ -516,6 +516,7 @@ export const ActionListaAdiantamentoSalarioLoja = ({
             sortOrder={-1}
             paginator={true}
             rows={10}
+            cellMemo={false}
             selectionMode="single"
             selection={rowSelection}
             onSelectionChange={(e) => setRowSelection(e.value)}

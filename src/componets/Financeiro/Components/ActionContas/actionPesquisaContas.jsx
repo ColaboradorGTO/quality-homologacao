@@ -97,7 +97,7 @@ export const ActionPesquisaContas = ({ usuarioLogado }) => {
   const { data: dadosContaBanco = [], error: erroContaBanco, isLoading: isLoadingContaBanco, refetch: refetchContaBanco } = useQuery(
     'conta-banco',
     () => fetchContaBanco(),
-    { enabled: false, staleTime: 60 * 60 * 1000 }
+    { enabled: false }
   );
 
 

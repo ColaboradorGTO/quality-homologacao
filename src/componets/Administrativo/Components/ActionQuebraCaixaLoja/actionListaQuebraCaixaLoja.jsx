@@ -3,7 +3,7 @@ import { ButtonTable } from "../../../ButtonsTabela/ButtonTable";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { MdOutlineLocalPrintshop } from "react-icons/md";
-import { get} from "../../../../api/funcRequest";
+import { get } from "../../../../api/funcRequest";
 import { ModalImprimirQuebra } from "../../Components/ModalImprimirQuebra";
 import { FaCheck, FaRegTrashAlt } from "react-icons/fa";
 import HeaderTable from "../../../Tables/headerTable";
@@ -27,7 +27,7 @@ export const ActionListaQuebraCaixaLoja = ({ dadosQuebraDeCaixa, handleClick, qu
   const handleCloseModal = () => setModalVisivel(false);
   const {
     handleCancelar
-  } = useCancelarQuebraCaixa({usuarioLogado, optionsModulos, handleClick})
+  } = useCancelarQuebraCaixa({ usuarioLogado, optionsModulos, handleClick })
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
   };
@@ -63,7 +63,7 @@ export const ActionListaQuebraCaixaLoja = ({ dadosQuebraDeCaixa, handleClick, qu
     const workbook = XLSX.utils.book_new();
     const header = ['ID', 'DT Lançamento', 'Nº Mov', 'Matrícula', 'Colaborador', 'Vr. Quebra Sistema', 'Vr. Quebra Lançado', 'Historíco', 'Situação'];
     worksheet['!cols'] = [
-      { wpx: 50, caption: 'ID' }, 
+      { wpx: 50, caption: 'ID' },
       { wpx: 100, caption: 'DT Lançamento' },
       { wpx: 150, caption: 'Nº Mov' },
       { wpx: 100, caption: 'Matrícula' },
@@ -72,8 +72,8 @@ export const ActionListaQuebraCaixaLoja = ({ dadosQuebraDeCaixa, handleClick, qu
       { wpx: 100, caption: 'Vr. Quebra Lançado' },
       { wpx: 150, caption: 'Historíco' },
       { wpx: 100, caption: 'Situação' }
-      
-    ]; 
+
+    ];
     XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Lista Quebra de Caixas');
     XLSX.writeFile(workbook, 'quebra_caixa_loja.xlsx');
@@ -93,7 +93,7 @@ export const ActionListaQuebraCaixaLoja = ({ dadosQuebraDeCaixa, handleClick, qu
       VRQUEBRASISTEMA: toFloat(item.VRQUEBRASISTEMA),
       VRQUEBRAEFETIVADO: toFloat(item.VRQUEBRAEFETIVADO),
       TXTHISTORICO: item.TXTHISTORICO,
-      STATIVO: item.STATIVO 
+      STATIVO: item.STATIVO
 
     }
   });
@@ -102,44 +102,44 @@ export const ActionListaQuebraCaixaLoja = ({ dadosQuebraDeCaixa, handleClick, qu
     {
       field: 'contador',
       header: 'Nº',
-      body: row => <th style={{ }}>{row.contador}</th>,
+      body: row => <th style={{}}>{row.contador}</th>,
       sortable: true,
     },
     {
       field: 'NOFANTASIA',
       header: 'Empresa',
-      body: row => <p style={{width: '200px', fontWeight: 600, margin: '0px' }}>{row.NOFANTASIA}</p>,
+      body: row => <p style={{ width: '200px', fontWeight: 600, margin: '0px' }}>{row.NOFANTASIA}</p>,
       sortable: true,
     },
     {
       field: 'DTLANCAMENTO',
       header: 'DT Lançamento',
-      body: row => <th style={{ }}>{row.DTLANCAMENTO}</th>,
+      body: row => <th style={{}}>{row.DTLANCAMENTO}</th>,
       sortable: true,
     },
     {
       field: 'IDMOVIMENTOCAIXA',
       header: 'Nº Movimento',
-      body: row => <th style={{ }}>{row.IDMOVIMENTOCAIXA}</th>,
+      body: row => <th style={{}}>{row.IDMOVIMENTOCAIXA}</th>,
       sortable: true,
 
     },
     {
       field: 'IDFUNCIONARIO',
       header: 'Nº Matrícula',
-      body: row => <th style={{ }}>{row.IDFUNCIONARIO}</th>,
+      body: row => <th style={{}}>{row.IDFUNCIONARIO}</th>,
       sortable: true,
     },
     {
       field: 'NOMEOPERADOR',
       header: 'Colaborador',
-      body: row => <th style={{ }}>{row.NOMEOPERADOR}</th>,
+      body: row => <th style={{}}>{row.NOMEOPERADOR}</th>,
       sortable: true,
     },
     {
       field: 'CPFOPERADOR',
       header: 'CPF',
-      body: row => <th style={{ }}>{mascaraCPF(row.CPFOPERADOR)}</th>,
+      body: row => <th style={{}}>{row.CPFOPERADOR}</th>,
       sortable: true,
     },
     {
@@ -170,7 +170,7 @@ export const ActionListaQuebraCaixaLoja = ({ dadosQuebraDeCaixa, handleClick, qu
     {
       field: 'TXTHISTORICO',
       header: 'Histórico',
-      body: row => <th style={{ }}>{row.TXTHISTORICO}</th>,
+      body: row => <th style={{}}>{row.TXTHISTORICO}</th>,
       sortable: true,
     },
     {
@@ -258,7 +258,7 @@ export const ActionListaQuebraCaixaLoja = ({ dadosQuebraDeCaixa, handleClick, qu
   };
 
   const handleClickImprimir = (row) => {
-    if(optionsModulos[0]?.ALTERAR == 'True') {
+    if (optionsModulos[0]?.ALTERAR == 'True') {
       if (row && row.IDQUEBRACAIXA) {
         handleImprimir(row.IDQUEBRACAIXA);
       }
@@ -280,8 +280,8 @@ export const ActionListaQuebraCaixaLoja = ({ dadosQuebraDeCaixa, handleClick, qu
       handleCancelar(IDQUEBRACAIXA, status);
     }
   };
-  
-  
+
+
   return (
 
     <Fragment>
@@ -299,7 +299,7 @@ export const ActionListaQuebraCaixaLoja = ({ dadosQuebraDeCaixa, handleClick, qu
           />
         </div>
         <div className="card" ref={dataTableRef}>
-    
+
           <DataTable
             title="Quebra de Caixa das Lojas"
             value={dados}
@@ -309,6 +309,7 @@ export const ActionListaQuebraCaixaLoja = ({ dadosQuebraDeCaixa, handleClick, qu
             selection={rowSelection}
             onSelectionChange={(e) => setRowSelection(e.value)}
             sortOrder={-1}
+            cellMemo={false}
             paginator={true}
             rows={10}
             rowsPerPageOptions={[5, 10, 20, 50, 100, dados.length]}

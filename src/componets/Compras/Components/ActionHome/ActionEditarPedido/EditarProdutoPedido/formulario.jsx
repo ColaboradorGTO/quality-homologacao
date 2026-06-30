@@ -1,27 +1,26 @@
-import { Fragment, useEffect } from "react"
+import { Fragment } from "react"
 import Select from 'react-select';
-import Swal from "sweetalert2";
 import { useIncluirProduto } from "./hooks/useIncluirProduto";
-import { FooterModal } from "../../../../Modais/FooterModal/footerModal";
-import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal";
+import { FooterModal } from "../../../../../Modais/FooterModal/footerModal";
+import { ButtonTypeModal } from "../../../../../Buttons/ButtonTypeModal";
 import { useForm, Controller } from "react-hook-form";
-import { schema } from "./schema/useProdutoSchema";
-import FormField from "../../../../Formularios/FormField";
-import { SelectList } from "../../../../Buttons/menuList";
-import { CiLock } from "react-icons/ci";
-import { FaLock } from "react-icons/fa";
-import { MdLockOutline } from "react-icons/md";
-import { formatarMoeda, formatMoeda } from "../../../../../utils/formatMoeda";
+import { schema } from "./schema/useEditarProdutoSchema";
+import FormField from "../../../../../Formularios/FormField";
+import { formatarMoeda, formatMoeda } from "../../../../../../utils/formatMoeda";
+import { SelectList } from "../../../../../Buttons/menuList";
  
 
-export const FormularioIncluirProdutoPedido = ({
+export const FormularioEditarProdutoPedido = ({
     usuarioLogado,
     optionsModulos,
     handleClose,
-    tipoPedidoSelecionado,
-    marcaSelecionada,
-    idResumoPedido,
-    dadosUltimosPedidos
+    dadosDetalhePedido,
+    setDadosDetalhePedido,
+    dadosDetalheGradePedido,
+    dadosPedidosDetalhe,
+    dadosVisualizarPedido,
+    checkboxIntermediario,
+    handleClickEditarPedido
 }) => {
     const { register, handleSubmit, formState: { errors }, clearErrors, setError, control } = useForm({
         mode: "onChange"
@@ -120,24 +119,25 @@ export const FormularioIncluirProdutoPedido = ({
         setStReposicao,
         isDiversos,
         getInputStateGrade,
-        validarCamposProduto,
-        preencherDadosProdutoSelecionado,
         onSubmit,
-    } = useIncluirProduto({
-        usuarioLogado,
-        optionsModulos,
-        handleClose,
-        tipoPedidoSelecionado,
-        marcaSelecionada,
-        dadosUltimosPedidos
+    } = useIncluirProduto({ 
+        usuarioLogado, 
+        optionsModulos, 
+        dadosDetalhePedido, 
+        setDadosDetalhePedido, 
+        dadosDetalheGradePedido, 
+        dadosPedidosDetalhe, 
+        dadosVisualizarPedido, 
+        checkboxIntermediario,
+        handleClickEditarPedido 
     });
-
-
+    
     const distribuicao = calcularDistribuicao();
 
     const handleValidatedSubmit = async () => {
         try {
             const dadosParaValidar = {
+                nomeMarcaPedido: nomeMarca,
                 referenciaProdutoPedido: referenciaProduto,
                 descricaoProdutoPedido: descricaoProduto,
                 vrHojeCusto: vrCusto,
@@ -158,9 +158,6 @@ export const FormularioIncluirProdutoPedido = ({
             }
 
             await schema.validate(dadosParaValidar, { abortEarly: false });
-
-            const gradeValida = validarGradeamento();
-            if (!gradeValida) return;
 
             await onSubmit();
 
@@ -184,58 +181,11 @@ export const FormularioIncluirProdutoPedido = ({
         }
     }
 
-    const handleProdutoSelecionado = async (selectedOption) => {
-        setProdutoSelecionado(selectedOption);
-
-        if (!selectedOption) return;
-
-        const produto = dadosProdutosPedidos.find(p => String(p.IDPRODUTO) === String(selectedOption.value));
-        if (!produto) return;
-
-        const { stValido, msgCamposVazios } = validarCamposProduto(produto);
-
-        if (!stValido) {
-            const resultado = await Swal.fire({
-                title: 'Produto com campos vazios',
-                html: `Este produto possui campos vazios/divergentes:<br><b>${msgCamposVazios}</b><br><br>Deseja preencher os dados mesmo assim?`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Sim, preencher',
-                cancelButtonText: 'Cancelar',
-                customClass: {
-                    container: 'custom-swal',   
-                },
-            });
-            if (!resultado.isConfirmed) {
-                setProdutoSelecionado(null);
-                return;
-            }
-        } else {
-            const resultado = await Swal.fire({
-                title: 'Preencher dados do produto?',
-                text: 'Deseja preencher os dados do produto selecionado na pesquisa? Esta ação é recomendada para produtos de reposição.',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Sim',
-                cancelButtonText: 'Não',
-                customClass: {
-                    container: 'custom-swal',   
-                },
-            });
-            if (!resultado.isConfirmed) {
-                setProdutoSelecionado(null);
-                return;
-            }
-        }
-
-        await preencherDadosProdutoSelecionado(produto);
-    };
-
     const menuHeaderStyle = {
         padding: "8px 12px",
         background: "#7a59ad",
         color: "#ffffff",
-        fontSize: "16px",
+        fontSize: "14px",
     };
 
     const formatSelectGroup = (data) => {
@@ -326,11 +276,11 @@ export const FormularioIncluirProdutoPedido = ({
             const labelMaterial = sigla ? `${nomeMaterial} - ${sigla}` : nomeMaterial;
 
             const option = {
-            value: IDTPTECIDO,
-            label: labelMaterial,
-            isDisabled,
-            color: isDisabled ? "#f63c97" : undefined,
-            original: item
+                value: IDTPTECIDO,
+                label: labelMaterial,
+                isDisabled,
+                color: isDisabled ? "#f63c97" : undefined,
+                original: item
             };
 
             if (isDisabled) {
@@ -343,16 +293,8 @@ export const FormularioIncluirProdutoPedido = ({
         return [...optionsAtivas, ...optionsBloqueadas];
     }; 
 
-    const formatSelectProduto = (data = []) => {
-        return data.map((item) => ({
-            value: item.IDPRODUTO,
-            label: `${item.NUCODBARRAS} - ${item.DSNOME}`,
-            original: item
-        }));
-
-        
-    }
     
+
     return (
         <Fragment>
             <form onSubmit={handleSubmit(handleValidatedSubmit)}>
@@ -368,7 +310,7 @@ export const FormularioIncluirProdutoPedido = ({
                                         label={"Pedido para a Marca"}
                                         name="nomeMarcaPedido"
                                         type="text"
-                                        value={marcaSelecionada?.label}
+                                        value={nomeMarca}
                                         onChange={(e) => setNomeMarca(e.target.value)}
                                         errors={errors}
                                         clearErrors={clearErrors}
@@ -378,25 +320,27 @@ export const FormularioIncluirProdutoPedido = ({
                                 )}
                             />
 
+
                         </div>
                     </div>
                 </div>
-                <div className="form-group">
+
+                {/* <div className="form-group">
                     <div className="row">
                         <div className="col-sm-6 col-xl-6">
                             <Controller
-                                name="referenciaProdutoPedido"
+                                name="pesquisaProdutoPedido"
                                 control={control}
                                 render={({ field }) => (
                                     <FormField
                                         label={"Pesquisar Referencia/Produto"}
-                                        name="referenciaProdutoPedido"
+                                        name="pesquisaProdutoPedido"
                                         type="text"
-                                        placeholder={"Digite a Descrição..."}
                                         value={referenciaProduto}
                                         onChange={(e) => setReferenciaProduto(e.target.value)}
                                         errors={errors}
                                         clearErrors={clearErrors}
+                                        
                                     />
 
                                 )}
@@ -405,36 +349,23 @@ export const FormularioIncluirProdutoPedido = ({
                         <div className="col-sm-6 col-xl-6">
                             <label className="form-label" htmlFor="tpunid">Produtos Cadastrados / Cod Barras - Nome</label>
                             <Select
-                                id={"listaProdutosPedidos"}
+                                id={"listprodpesqped"}
                                 value={produtoSelecionado}
                                 options={dadosProdutosPedidos.map((item) => {
-                                    const { stValido, msgCamposVazios } = validarCamposProduto(item);
                                     return {
                                         value: item.IDPRODUTO,
-                                        label: `${item.NUCODBARRAS} - ${item.DSNOME}`,
-                                        isDisabled: !stValido,
-                                        title: !stValido ? `Produto com campos vazios: ${msgCamposVazios}` : item.DSNOME,
-                                        original: item,
-                                    };
+                                        label: `${item.NUCODBARRAS} - ${item.DSNOME}`
+                                    }
                                 })}
-                                onChange={handleProdutoSelecionado}
-                                formatOptionLabel={(option) => (
-                                    <span title={option.title} style={option.isDisabled ? { color: '#000', fontWeight: '500' } : {}}>
-                                        {option.isDisabled && <MdLockOutline  size={25} color="#f63c97" />}
-                                        {option.label}
-                                    </span>
-                                )}
+                                onChange={(e) => setProdutoSelecionado(e)}
                             />
-
                         </div>
                     </div>
-                </div>
+                </div> */}
 
-
-                <hr />
                 <div className="form-group">
                     <div className="row">
-                        <div className="col-sm-6 col-xl-2">
+                        <div className="col-sm-6 col-xl-6">
                             <label className="form-label" htmlFor="strep">Reposição</label>
                             <Select
                                 id={"stReposicao"}
@@ -446,6 +377,7 @@ export const FormularioIncluirProdutoPedido = ({
                                 })}
                                 value={reposicaoSelecionado}
                                 onChange={(e) => setReposicaoSelecionado(e)}
+                                isDisabled={true}
                             />
                         </div>
                         <div className="col-sm-6 col-xl-6">
@@ -456,19 +388,24 @@ export const FormularioIncluirProdutoPedido = ({
                                     <FormField
                                         label={"Descrição Produto"}
                                         name="descricaoProdutoPedido"
-                                        placeholder={"Digite a Descrição..."}
                                         type="text"
                                         value={descricaoProduto}
                                         onChange={(e) => setDescricaoProduto(e.target.value)}
                                         errors={errors}
                                         clearErrors={clearErrors}
+                                        
                                     />
 
                                 )}
                             />
-
                         </div>
-                        <div className="col-sm-3 col-xl-2">
+                    </div>
+                </div>
+                <hr />
+                <div className="form-group">
+                    <div className="row">
+
+                        <div className="col-sm-3 col-xl-3">
                             <Controller
                                 name="vrHojeCusto"
                                 control={control}
@@ -478,15 +415,15 @@ export const FormularioIncluirProdutoPedido = ({
                                         name="vrHojeCusto"
                                         type="text"
                                         value={formatMoeda(vrCusto)}
-                                        onChange={(e) => setVrCusto(formatarMoeda(e.target.value))}
+                                        onChange={(e) => setVrCusto(e.target.value)}
                                         errors={errors}
                                         clearErrors={clearErrors}
-                                        readOnly
+                                        readOnly={true}
                                     />
                                 )}
                             />
                         </div>
-                        <div className="col-sm-3 col-xl-2">
+                        <div className="col-sm-3 col-xl-3">
                             <Controller
                                 name="vrVendaHoje"
                                 control={control}
@@ -496,10 +433,10 @@ export const FormularioIncluirProdutoPedido = ({
                                         name="vrVendaHoje"
                                         type="text"
                                         value={formatMoeda(vrVenda)}
-                                        onChange={(e) => setVrVenda(formatarMoeda(e.target.value))}
+                                        onChange={(e) => setVrVenda(e.target.value)}
                                         errors={errors}
                                         clearErrors={clearErrors}
-                                        readOnly
+                                        readOnly={true}
                                     />
                                 )}
                             />
@@ -519,10 +456,10 @@ export const FormularioIncluirProdutoPedido = ({
                                         type="text"
                                         value={quantidade}
                                         onChange={(e) => {
-                                            const val = e.target.value;
-                                            setQuantidade(val);
-                                            atualiza_valor_QtdUnit({ quantidade: val });
+                                            setQuantidade(e.target.value);
+                                            atualiza_valor_QtdUnit();
                                         }}
+
                                         errors={errors}
                                         clearErrors={clearErrors}
                                     />
@@ -560,6 +497,7 @@ export const FormularioIncluirProdutoPedido = ({
                                         onChange={(e) => setReferencia(e.target.value)}
                                         errors={errors}
                                         clearErrors={clearErrors}
+                                        
                                     />
                                 )}
                             />
@@ -595,6 +533,7 @@ export const FormularioIncluirProdutoPedido = ({
                                     }
                                 })}
                                 onChange={(e) => setUnidadeSelecionada(e)}
+                                
                             />
                         </div>
                         <div className="col-sm-4 col-xl-4">
@@ -621,7 +560,6 @@ export const FormularioIncluirProdutoPedido = ({
                             />
                         </div>
                         <div className="col-sm-4 col-xl-4">
-     
                             <label className="form-label" htmlFor="tptecido">Tipo de Material</label>
                             <SelectList
                                 id={"tipoTecidoProduto"}
@@ -644,29 +582,30 @@ export const FormularioIncluirProdutoPedido = ({
                                     })
                                 }}
                             />
-
                         </div>
                     </div>
                 </div>
                 <div className="form-group">
                     <div className="row">
                         <div className="col-sm-4 col-xl-4">
-                            <label className="form-label" htmlFor="categoriaGradeProduto">Categoria Grade</label>
+                            <label className="form-label" htmlFor="tpcat">Categoria Grade</label>
                             <Select
-                                id={"categoriaGradeProduto"}
+                                id={"categoriaProduto"}
                                 value={categoriaGradeSelecionada}
-                                options={dadosCategoriaPedidoGrade.map((item) => {
+                                options={dadosGrade?.map((item) => {
                                     return {
                                         value: item.IDCATEGORIAPEDIDO,
                                         label: `${item.TIPOPEDIDO} - ${item.DSCATEGORIAPEDIDO}`
                                     }
                                 })}
                                 onChange={(e) => setCategoriaGradeSelecionada(e)}
+                               
                             />
+
                         </div>
                         <div className="col-sm-4 col-xl-4">
-
                             <label className="form-label" htmlFor="estruturaProduto">Estrutura</label>
+
                             <SelectList
                                 id={"estruturaProduto"}
                                 value={estruturaSelecionada}
@@ -681,22 +620,20 @@ export const FormularioIncluirProdutoPedido = ({
                                     })
                                 }}
                             />
-
                         </div>
                         <div className="col-sm-4 col-xl-4">
-                          
-                            <label className="form-label" htmlFor="tpcat">Estilos</label>
-                            <SelectList
-                                id={"categoriaProduto"}
+                            <label className="form-label" htmlFor="estiloProduto">Estilo</label>
+                            <Select
+                                id={"estiloProduto"}
                                 value={estiloSelecionado}
-                                options={dadosVinculoEstiloGrupo?.map((item) => {
+                                options={dadosVinculoEstiloGrupo.map((item) => {
                                     return {
                                         value: item.IDESTILO,
                                         label: `${item.IDESTILO} - ${item.DSESTILO}`
                                     }
                                 })}
                                 onChange={(e) => setEstiloSelecionado(e)}
-
+                      
                             />
 
                         </div>
@@ -716,6 +653,7 @@ export const FormularioIncluirProdutoPedido = ({
                                     }
                                 })}
                                 onChange={(e) => setCategoriaSelecionada(e)}
+                            
                             />
                         </div>
                         <div className="col-sm-3 col-xl-3">
@@ -731,13 +669,14 @@ export const FormularioIncluirProdutoPedido = ({
                                     }
                                 })}
                                 onChange={(e) => setLocalExposicaoSelecionado(e)}
+                               
                             />
                         </div>
                         <div className="col-sm-3 col-xl-3">
                             <label className="form-label" htmlFor="ecommercest">E-commerce</label>
 
                             <Select
-                                id={"localExposicao"}
+                                id={"ecommerceProduto"}
                                 value={ecommerceSelecionado}
                                 options={optionsReposicao.map((item) => {
                                     return {
@@ -752,7 +691,7 @@ export const FormularioIncluirProdutoPedido = ({
                             <label className="form-label" htmlFor="redesocialst">Rede Social</label>
 
                             <Select
-                                id={"localExposicao"}
+                                id={"redeSocialProduto"}
                                 value={redeSocialSelecionada}
                                 options={optionsReposicao.map((item) => {
                                     return {
@@ -776,7 +715,7 @@ export const FormularioIncluirProdutoPedido = ({
                                         label={"VR Bruto"}
                                         name="vrBrutoProduto"
                                         type="text"
-                                        value={vrBruto}
+                                        value={formatMoeda(vrBruto)}
                                         onChange={(e) => {
                                             const val = e.target.value;
                                             setVrBruto(val);
@@ -862,8 +801,8 @@ export const FormularioIncluirProdutoPedido = ({
                                         label={"VR Líquido"}
                                         name="vrUnitLiquidoProduto"
                                         type="text"
-                                        value={vrLiquido}
-                                        onChange={(e) => setVrLiquido(formatarMoeda(e.target.value))}
+                                        value={formatMoeda(vrLiquido)}
+                                        onChange={(e) => setVrLiquido(formatarMoeda(e.target.value))} 
 
                                         errors={errors}
                                         clearErrors={clearErrors}
@@ -881,10 +820,10 @@ export const FormularioIncluirProdutoPedido = ({
                                         label={"VR Sugerido"}
                                         name="vrUnitSugeridoProduto"
                                         type="text"
-                                        value={vrSugerido}
+                                        value={formatMoeda(vrSugerido)}
                                         onChange={(e) => {
                                             setVrSugerido(formatarMoeda(e.target.value));
-                                            setVrSugerigoFixo(e.target.value);
+                                            setVrSugerigoFixo(e.target.value); 
                                         }}
                                         errors={errors}
                                         clearErrors={clearErrors}
@@ -905,8 +844,8 @@ export const FormularioIncluirProdutoPedido = ({
                                         label={"VR Total"}
                                         name="vrTotalProduto"
                                         type="text"
-                                        value={vrTotal}
-                                        onChange={(e) => setVrTotal(e.target.value)}
+                                        value={formatMoeda(vrTotal)}
+                                        onChange={(e) => setVrTotal(formatarMoeda(e.target.value))}
                                         readOnly
                                         errors={errors}
                                         clearErrors={clearErrors}
@@ -933,7 +872,8 @@ export const FormularioIncluirProdutoPedido = ({
                         </div>
                     </div>
                 </div>
-                <div className="form-group">
+                
+                 <div className="form-group">
                     <div className="row" id="resultadoqtdtamanhos">
                         <div className="col-sm-12 col-xl-12">
                             <label className="form-label" htmlFor="vrtotalunit">QTD/TAMANHOS</label>
@@ -987,13 +927,13 @@ export const FormularioIncluirProdutoPedido = ({
 
 
                             <div className="mt-3">
-                                <button
+                                {/* <button
                                     type="button"
                                     className="btn btn-sm btn-outline-primary"
                                     onClick={validarGradeamento}
                                 >
                                     Validar Gradeamento
-                                </button>
+                                </button> */}
 
 
                                 {Object.values(quantidadePorTamanho).some(v => v > 0) && (
@@ -1019,13 +959,15 @@ export const FormularioIncluirProdutoPedido = ({
                     corFechar={"secondary"}
 
                     ButtonTypeCadastrar={ButtonTypeModal}
-                    onClickButtonCadastrar
-                    textButtonCadastrar={"Salvar"}
+                    // onClickButtonCadastrar={handleValidatedSubmit}
+                    textButtonCadastrar={"Editar"}
                     corCadastrar={"success"}
-                    loadingTextCadastrar={"Cadastrando..."}
+                    loadingTextCadastrar={"Editando..."}
                     autoLoadingCadastrar={true}
                 />
             </form>
         </Fragment>
     )
 }
+
+

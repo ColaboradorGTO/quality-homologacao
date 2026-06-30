@@ -78,7 +78,7 @@ export const useUpdateStatusConferido = ({handleClick, optionsModulos, usuarioLo
                             IDFUNCIONARIO: String(usuarioLogado.id),
                             PATHFUNCAO: textoFuncao,
                             DADOS: textdados,
-                            IP: ipUsuario || 'IP não disponível'
+                            IP: ipUsuario || 'Indisponível'
                         };
     
                         await post("/log-web", dadosLog);
@@ -104,7 +104,7 @@ export const useUpdateStatusConferido = ({handleClick, optionsModulos, usuarioLo
                             "IDFUNCIONARIO": String(usuarioLogado.id),
                             "PATHFUNCAO": textoFuncao,
                             "DADOS": textdados,
-                            "IP": ipUsuario || 'IP não disponível'
+                            "IP": ipUsuario || 'Indisponível'
                         });
     
                         Swal.fire('Erro!', 'Erro ao Confirmar Status.', 'error');

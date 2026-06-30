@@ -1,9 +1,9 @@
 import { Fragment } from "react"
 import Modal from 'react-bootstrap/Modal';
 import { HeaderModal } from "../../../../Modais/HeaderModal/HeaderModal";
-import { FomularioEditar,  } from "./formularioEditar";
+import { FomularioEditar, } from "./formularioEditar";
 
-export const ActionEditarMotivoDevolucaoModal = ({ show, handleClose, dadosDetalheMotivoDevolucao, optionsModulos, usuarioLogado }) => {
+export const ActionEditarMotivoDevolucaoModal = ({ show, handleClose, dadosDetalheMotivoDevolucao, optionsModulos, usuarioLogado, handleClick }) => {
 
   return (
     <Fragment>
@@ -24,15 +24,16 @@ export const ActionEditarMotivoDevolucaoModal = ({ show, handleClose, dadosDetal
         />
 
         <Modal.Body>
-          <FomularioEditar 
+          <FomularioEditar
             dadosDetalheMotivoDevolucao={dadosDetalheMotivoDevolucao}
             optionsModulos={optionsModulos}
             usuarioLogado={usuarioLogado}
-            handleClose={handleClose} 
-            
+            handleClose={handleClose}
+            handleClick={handleClick}
+
           />
         </Modal.Body>
-       
+
       </Modal>
     </Fragment>
   )

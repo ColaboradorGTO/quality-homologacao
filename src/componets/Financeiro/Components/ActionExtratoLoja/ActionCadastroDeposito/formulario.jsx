@@ -45,6 +45,7 @@ export const FormularioCadastroDeposito = ({ handleClose, optionsModulos, usuari
         const valor = e.target.value.replace(/,/g, '.');
         setVrDeposito(valor);
     };
+
     return (
         <Fragment>
             <form onSubmit={handleSubmit(submit)}>
@@ -58,7 +59,7 @@ export const FormularioCadastroDeposito = ({ handleClose, optionsModulos, usuari
                             <InputFieldModal
                                 label={"Empresa"}
                                 type="text"
-                                value={usuarioLogado?.NOFANTASIA ?? empresa}
+                                value={usuarioLogado?.NOFANTASIA ?? empresaSelecionada?.NOFANTASIA ?? ''}
                                 onChangeModal={(e) => setEmpresa(e.target.value)}
                                 readOnly={true}
                             />
@@ -93,7 +94,6 @@ export const FormularioCadastroDeposito = ({ handleClose, optionsModulos, usuari
 
                             <label htmlFor="">Conta *</label>
                             <Select
-                                defaultValue={contaSelecionada}
                                 options={[
                                     { value: '', label: 'Selecione...' },
                                     ...dadosContaBanco.map((item) => {
@@ -101,8 +101,9 @@ export const FormularioCadastroDeposito = ({ handleClose, optionsModulos, usuari
                                             value: item.IDCONTABANCO,
                                             label: `${item.DSCONTABANCO} `
                                         }
-                                    })]}
-                                onChange={(e => setContaSelecionada(e.value))}
+                                })]}
+                                value={contaSelecionada}
+                                onChange={(e => setContaSelecionada(e))}
                             />
                         </div>
                     </div>

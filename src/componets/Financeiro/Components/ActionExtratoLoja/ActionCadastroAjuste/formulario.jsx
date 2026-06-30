@@ -20,6 +20,7 @@ export const Formulario = ({ show, handleClose, optionsModulos, usuarioLogado, e
         setHoraMovimento,
         submit,
     } = useCreateAjusteExtrato({ show, handleClose, optionsModulos, usuarioLogado, empresaSelecionada })
+    
     return (
         <Fragment>
             <form onSubmit={handleSubmit(submit)}>

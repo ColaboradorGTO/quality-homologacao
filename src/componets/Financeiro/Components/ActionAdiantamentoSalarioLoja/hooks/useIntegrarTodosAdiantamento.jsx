@@ -77,6 +77,9 @@ export const useIntegrarTodosAdiantamento = ({
                     showConfirmButton: false,
                     allowOutsideClick: false,
                     allowEscapeKey: false,
+                      didOpen: () => {
+                        Swal.showLoading();
+                    },
                     customClass: {
                         container: 'custom-swal',
                     }
@@ -99,7 +102,7 @@ export const useIntegrarTodosAdiantamento = ({
                             IDFUNCIONARIO: String(usuarioLogado.id),
                             PATHFUNCAO: `FINANCEIRO/INTEGRAR TODOS ADIANTAMENTOS SALARIOS SELECIONADOS`,
                             DADOS: textDados,
-                            IP: ipUsuario || 'IP não disponível'
+                            IP: ipUsuario || 'INDISPONIVEL'
                         }
 
                         await post('/log-web', postData)
@@ -125,7 +128,7 @@ export const useIntegrarTodosAdiantamento = ({
                         IDFUNCIONARIO: String(usuarioLogado.id),
                         PATHFUNCAO: `FINANCEIRO/ERRO AO INTEGRAR TODAS CONSOLIDACOES FATURAS SELECIONADAS`,
                         DADOS: '',
-                        IP: ipUsuario || 'IP não disponível'
+                        IP: ipUsuario || 'INDISPONIVEL'
                     }
 
                     const responsePost = await post('/log-web', postData)

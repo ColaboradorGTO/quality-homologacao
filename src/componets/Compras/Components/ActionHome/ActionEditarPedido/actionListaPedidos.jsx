@@ -12,10 +12,10 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { toFloat } from '../../../../../utils/toFloat';
-import { ActionIncluirProdutoPedidoModal } from './IncluirProdutoPedido/actionIncluirProdutoPedidoModal';
 import { get } from '../../../../../api/funcRequest';
 import { useProdutoPedido } from './hook/useProdutoPedido';
 import Swal from 'sweetalert2';
+import { ActionEditarProdutoPedidoModal } from './EditarProdutoPedido/actionEditarProdutoPedidoModal';
 
  
 export const ActionListaPedidos = ({
@@ -479,7 +479,7 @@ export const ActionListaPedidos = ({
         </div>
       </div>
 
-      <ActionIncluirProdutoPedidoModal
+      <ActionEditarProdutoPedidoModal
         show={modalEditar}
         handleClose={() => setModalEditar(false)}
         usuarioLogado={usuarioLogado}

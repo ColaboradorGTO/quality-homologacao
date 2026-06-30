@@ -11,10 +11,11 @@ import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../ut
 import { useFetchData } from "../../../../hooks/useFetchData"
 import Swal from "sweetalert2"
 import { ActionListaExtratoContaCorrenteLoja } from "./actionListaExtratoLojaCopia"
+import { IoMdAdd } from "react-icons/io"
 
 export const ActionPesquisaExtratoLoja = ({ usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
-  const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
+  const [dataPesquisaInicio, setDataPesquisaInicio] = useState(''); 
   const [dataPesquisaFim, setDataPesquisaFim] = useState('');
   const [empresaSelecionada, setEmpresaSelecionada] = useState('');
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
@@ -141,6 +142,12 @@ export const ActionPesquisaExtratoLoja = ({ usuarioLogado }) => {
         onButtonClickSearch={handleClick}
         corSearch={"primary"}
         IconSearch={AiOutlineSearch}
+
+        ButtonTypeCadastro={ButtonType}
+        linkNome={"Cadastrar Depósitos"}
+        onButtonClickCadastro
+        corCadastro={"success"}
+        IconCadastro={IoMdAdd}
       />
 
       {tabelaVisivel && (

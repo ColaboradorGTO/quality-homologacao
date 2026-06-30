@@ -3,7 +3,7 @@ import { post } from "../../../../../api/funcRequest";
 import axios from 'axios'
 import Swal from "sweetalert2";
 
-export const useConfirmarConsolidacaoFatura = ({optionsModulos, usuarioLogado, handleClick}) => {
+export const useConfirmarConsolidacaoFatura = ({optionsModulos, usuarioLogado, handleClickConciliar}) => {
     const [ipUsuario, setIpUsuario] = useState('');
 
     const getIPUsuario = async () => {
@@ -69,7 +69,7 @@ export const useConfirmarConsolidacaoFatura = ({optionsModulos, usuarioLogado, h
                     IDEMPRESA: Number(rowData.IDEMPRESA),
                     DTPROCESSAMENTO: rowData.DTPROCESSAMENTO,
                     QTDTOTALFATURAS: Number(rowData.QTDFATURAS),
-                    VRTOTALRECEBIDO: Number(rowData.VRTOTALRECEBIDO),
+                    VRTOTALRECEBIDO: Number(rowData.VRTOTAL),
                     IDFUNCIONARIO: Number(usuarioLogado.id),
                 }
 
@@ -98,7 +98,7 @@ export const useConfirmarConsolidacaoFatura = ({optionsModulos, usuarioLogado, h
                         },
                     })
         
-                    handleClick();
+                    handleClickConciliar();
                     return response.data;
                 } catch (error) {
                     const textDados = JSON.stringify(putData)
