@@ -15,6 +15,7 @@ import Swal from "sweetalert2";
 import { mascaraValor } from "../../../../utils/mascaraValor";
 import { toFloat } from "../../../../utils/toFloat";
 import { useCancelarQuebraCaixa } from "./hooks/useCancelar";
+import { mascaraCPF } from "../../../../utils/formatCPF";
 
 
 export const ActionListaQuebraCaixaLoja = ({ dadosQuebraDeCaixa, handleClick, quebraSelecionada, optionsModulos, usuarioLogado }) => {

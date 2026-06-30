@@ -3,7 +3,7 @@ import { ActionMain } from "../../../Actions/actionMain"
 import { InputField } from "../../../Buttons/Input"
 import { ButtonType } from "../../../Buttons/ButtonType"
 import { get } from "../../../../api/funcRequest"
-import {  AiOutlineSearch } from "react-icons/ai"
+import { AiOutlineSearch } from "react-icons/ai"
 import { ActionListaConsolidadoBanco } from "./actionListaConsolidadoBanco"
 import { ActionListaConciliarPorBanco } from "./actionListaConciliarBanco"
 import { InputSelectAction } from "../../../Inputs/InputSelectAction"
@@ -12,7 +12,7 @@ import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../ut
 import { useEffect } from "react"
 
 
-export const ActionPesquisaConciliarBanco = ({usuarioLogado }) => {
+export const ActionPesquisaConciliarBanco = ({ usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [tabelaVisivelConsolidado, setTabelaVisivelConsolidado] = useState(false);
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('')
@@ -58,7 +58,7 @@ export const ActionPesquisaConciliarBanco = ({usuarioLogado }) => {
 
     try {
       animacaoCarregamento('Carregando dados...', true);
-        
+
       const primeiraPagina = 1;
       const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
       const page = primeiraResposta.page || primeiraPagina;
@@ -96,7 +96,7 @@ export const ActionPesquisaConciliarBanco = ({usuarioLogado }) => {
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
-        
+
       const primeiraPagina = 1;
       const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
       const page = primeiraResposta.page || primeiraPagina;
@@ -115,36 +115,65 @@ export const ActionPesquisaConciliarBanco = ({usuarioLogado }) => {
       }
 
       return allData;
-  
+
     } catch (error) {
       console.error('Error fetching data:', error);
       throw error;
     } finally {
       fecharAnimacaoCarregamento();
     }
-    
+
   };
 
   const { data: dadosConciliarBancoConsolidado = [], error: errorBancoConsolidado, isLoading: isLoadingBancoConsolidado, refetch: refetchBancoConsolidado } = useQuery(
-    ['deposito-loja-consolidado', ],
+    ['deposito-loja-consolidado',],
     () => fetchConciliarBancoConsolidado(),
     { enabled: false, staleTime: 60 * 60 * 1000 }
   )
 
-  
+
   const onChangeSelectConta = (e) => {
     setContaSelecionada(e.value)
   }
 
   const handleClick = () => {
-
+    if (!dataPesquisaInicio &&
+      !dataPesquisaFim &&
+      !dataPesquisaInicioB &&
+      !dataPesquisaFimB &&
+      !dataPesquisaInicioC &&
+      !dataPesquisaFimC) {
+      Swal.fire({
+        title: 'Atenção!',
+        text: `Informe ao menos uma das Datas para a pesquisa `,
+        icon: 'warning',
+        customClass: {
+          container: 'custom-swal',
+        },
+      })
+      return
+    }
     setTabelaVisivel(true)
     setTabelaVisivelConsolidado(false)
     refetchConciliarBanco()
   }
 
   const handleClickConsolidado = () => {
-
+    if (!dataPesquisaFim &&
+      !dataPesquisaInicioB &&
+      !dataPesquisaFimB &&
+      !dataPesquisaInicioC &&
+      !dataPesquisaFimC) {
+      Swal.fire({
+        title: 'Atenção!',
+        text: `Informe ao menos uma das Datas para a pesquisa `,
+        icon: 'warning',
+        customClass: {
+          container: 'custom-swal',
+        },
+      })
+      return
+    }
     setTabelaVisivelConsolidado(true)
     setTabelaVisivel(false)
     refetchBancoConsolidado()
@@ -158,7 +187,7 @@ export const ActionPesquisaConciliarBanco = ({usuarioLogado }) => {
         linkComponentAnterior={["Home"]}
         linkComponent={["Conciliação por Bancos"]}
         title="Conciliação por Bancos"
-  
+
         InputFieldDTInicioAComponent={InputField}
         labelInputDTInicioA={"Data Depósito Início"}
         onChangeInputFieldDTInicioA={(e) => setDataPesquisaInicio(e.target.value)}
@@ -188,7 +217,7 @@ export const ActionPesquisaConciliarBanco = ({usuarioLogado }) => {
         labelInputDTFimC={"Data Movimento Fim"}
         onChangeInputFieldDTFimC={(e) => setDataPesquisaFimC(e.target.value)}
         valueInputFieldDTFimC={dataPesquisaFimC}
-        
+
 
         InputSelectEmpresaComponent={InputSelectAction}
         labelSelectEmpresa={"Conta Banco"}
@@ -196,9 +225,9 @@ export const ActionPesquisaConciliarBanco = ({usuarioLogado }) => {
           { value: '', label: 'Selecione uma conta' },
           ...(Array.isArray(dadosContaBanco)
             ? dadosContaBanco.map((item) => ({
-                value: item.IDCONTABANCO,
-                label: `${item.IDCONTABANCO} - ${item.DSCONTABANCO}`
-              }))
+              value: item.IDCONTABANCO,
+              label: `${item.IDCONTABANCO} - ${item.DSCONTABANCO}`
+            }))
             : [])
         ]}
         valueSelectEmpresa={contaSelecionada}
@@ -220,16 +249,16 @@ export const ActionPesquisaConciliarBanco = ({usuarioLogado }) => {
       />
 
       {tabelaVisivel && (
-        <ActionListaConciliarPorBanco 
-          dadosConciliarBanco={dadosConciliarBanco} 
+        <ActionListaConciliarPorBanco
+          dadosConciliarBanco={dadosConciliarBanco}
           usuarioLogado={usuarioLogado}
-          optionsModulos={optionsModulos}  
+          optionsModulos={optionsModulos}
           handleClick={handleClick}
         />
 
       )}
       {tabelaVisivelConsolidado && (
-        <ActionListaConsolidadoBanco  
+        <ActionListaConsolidadoBanco
           dadosConciliarBancoConsolidado={dadosConciliarBancoConsolidado}
         />
 

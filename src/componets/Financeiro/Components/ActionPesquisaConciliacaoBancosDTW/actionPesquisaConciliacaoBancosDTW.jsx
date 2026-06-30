@@ -158,6 +158,18 @@ export const ActionPesquisaConciliacaoBancosDTW = ({ usuarioLogado }) => {
   }
 
   const handleClickConsolidado = () => {
+    if (!contaSelecionada && !dataPesquisaInicioB && !dataPesquisaFimB && !dataPesquisaInicioC && !dataPesquisaFimC) {
+      Swal.fire({
+        title: 'Atenção!',
+        text: `Informe ao menos uma das Datas para a pesquisa e conta para a pesquisa `,
+        icon: 'warning',
+        customClass: {
+          container: 'custom-swal',
+        },
+
+      })
+      return;
+    }
     setTabelaVisivelConsolidado(true)
     setTabelaVisivel(false)
     setTabelaVisivelCompensacao(false)
