@@ -13,7 +13,6 @@ import { optionsTipoFrete, optionsTipoPedido, optionsEnviar, optionsFiscal } fro
 import { ActionListaPedidos } from "./actionListaPedidos";
 import { ButtonTypeCompras } from "../../../../Buttons/Button";
 import { ActionIncluirProdutoPedidoModal } from "./IncluirProdutoPedido/actionIncluirProdutoPedidoModal";
-// import { ActionIncluirProdutoPedidoModal } from "../../ActionNovoPedido/IncluirProdutoPedido/actionIncluirProdutoPedidoModal";
 import { ActionPesquisaNovoPedido } from "../../ActionNovoPedido/actionPesquisaNovoPedido";
 import { FaCheck, FaRegSave } from "react-icons/fa";
 import { CiLock } from "react-icons/ci";
@@ -23,6 +22,7 @@ export const ActionEditarPedido = ({
   usuarioLogado,
   optionsModulos,
   dadosVisualizarPedido,
+  setDadosVisualizarPedido,
   dadosDetalhePedido,
   setDadosDetalhePedido,
   actionVisualizarPedido,
@@ -132,7 +132,7 @@ export const ActionEditarPedido = ({
     dadosCabecalhoClonado,
     handleFecharPedido
   } = useIncluirProutoPedido({ usuarioLogado, optionsModulos, dadosVisualizarPedido, dadosDetalhePedido });
-
+ 
   // const [dadosDetalheProdutoPedido, setDadosDetalheProdutoPedido] = useState([]);
   // const [botoesVisiveis, setBotoesVisiveis] = useState({
   //   incluir: false,
@@ -167,7 +167,13 @@ export const ActionEditarPedido = ({
       const stPedidoPorIntermediario = String(dados?.STPEDIDOPRIMARIO || 'False') === 'True';
       const idPedidoPrimario = parseInt(dados?.IDPEDIDOPRIMARIO || '0', 10);
       const isPedidoSecundario = idPedidoPrimario > 0;
-      const clonarVisivelPadrao = !(stCancelado && IdAndamentoPedido !== 2 && IdAndamentoPedido !== 5);
+      // Regra alinhada ao legado (retornoVisualizarPedido):
+      // em COMPRAS e nao cancelado, o botao clonar fica oculto.
+      const clonarVisivelPadrao = stMigradoSap
+        ? false
+        : stCancelado
+          ? (IdAndamentoPedido === 2 || IdAndamentoPedido === 5)
+          : dsSetorAndamentoPedido !== 'COMPRAS';
   
       let novosBotoesVisiveis = {
         incluir: false,
@@ -336,10 +342,20 @@ export const ActionEditarPedido = ({
       setDesconto1(toFloat(dadosVisualizarPedido[0]?.DESCPERC01).toFixed(2))
       setDesconto2(toFloat(dadosVisualizarPedido[0]?.DESCPERC02).toFixed(2))
       setDesconto3(toFloat(dadosVisualizarPedido[0]?.DESCPERC03).toFixed(2))
-      setTotalLiq(toFloat(dadosVisualizarPedido[0]?.VRTOTALLIQUIDO))
       setIdResumoPedido(dadosVisualizarPedido[0]?.IDPEDIDO)
+
+      const totalLiquidoCalculado = (dadosDetalhePedido || []).reduce(
+        (acc, item) => acc + toFloat(item?.VRTOTALDETALHEPEDIDO),
+        0
+      );
+
+      const totalLiquidoFinal = totalLiquidoCalculado > 0
+        ? totalLiquidoCalculado
+        : toFloat(dadosVisualizarPedido[0]?.VRTOTALLIQUIDO);
+
+      setTotalLiq(totalLiquidoFinal)
     }
-  }, [dadosVisualizarPedido])
+  }, [dadosVisualizarPedido, dadosDetalhePedido])
 
   const handleNovoPedido = () => {
     // setActionVisualizandoNovoPedido(false);
@@ -594,6 +610,7 @@ export const ActionEditarPedido = ({
           dadosDetalhePedido={dadosDetalhePedido}
           setDadosDetalhePedido={setDadosDetalhePedido}
           dadosVisualizarPedido={dadosVisualizarPedido}
+          setDadosVisualizarPedido={setDadosVisualizarPedido}
           setModalIncluirProdutoPedido={setModalIncluirProdutoPedido}
           usuarioLogado={usuarioLogado}
           optionsModulos={optionsModulos}

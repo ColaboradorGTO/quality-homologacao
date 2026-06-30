@@ -17,6 +17,7 @@ const FormField = ({
     value,
     onChange,
     onFocus,
+    onBlur,
     style,
     mask,
     children,
@@ -82,6 +83,7 @@ const FormField = ({
                 value={mask ? mask(value) : value}
                 onChangeModal={onChange}
                 onFocus={onFocus}
+                onBlur={onBlur}
                 {...props}
                 styleInputFieldModal={style}
             // {...register(name, {

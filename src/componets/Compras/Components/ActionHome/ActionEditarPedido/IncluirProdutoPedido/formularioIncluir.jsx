@@ -102,6 +102,7 @@ export const FormularioIncluirProdutoPedido = ({
         dadosVinculoEstiloGrupo,
         optionsTipoCadastro,
         optionsReposicao,
+        handleBlurPesquisaProduto,
         atualiza_valor_QtdUnit,
         vrSugerigoFixo,
         setVrSugerigoFixo,
@@ -400,6 +401,7 @@ export const FormularioIncluirProdutoPedido = ({
                                         type="text"
                                         value={referenciaProduto}
                                         onChange={(e) => setReferenciaProduto(e.target.value)}
+                                        onBlur={handleBlurPesquisaProduto}
                                         errors={errors}
                                         clearErrors={clearErrors}
 

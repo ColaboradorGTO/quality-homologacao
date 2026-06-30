@@ -940,7 +940,7 @@ export const useIncluirProutoPedido = ({
                 didOpen: () => { Swal.showLoading(); }
             });
 
-            const camposValidos = await validarCamposCabecalhoPedido();
+            const camposValidos = await validarCamposCabecalhoPedido(); 
 
             if (!camposValidos) {
                 Swal.close();

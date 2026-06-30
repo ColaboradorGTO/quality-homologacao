@@ -11,6 +11,7 @@ export const InputFieldModal = ({
   placeholder, 
   onChangeModal, 
   onFocus,
+  onBlur,
   styleInputFieldModal,
   min,
   max
@@ -39,6 +40,7 @@ export const InputFieldModal = ({
           placeHolder={placeholder}
           onChange={onChangeModal}
           onFocus={onFocus}
+          onBlur={onBlur}
           style={styleInputFieldModal}
           min={min}
           max={max}

@@ -116,6 +116,8 @@ export const useIncluirProutoPedido = ({
         const data = getDataAtual();
         setDataPesquisaInicio(data);
         setDataPesquisaFim(data);
+        setDataPedido(data);
+        setDataPrevisaoEntrega(data);
         setDataAtual(data);
         
     }, [])
@@ -216,26 +218,64 @@ export const useIncluirProutoPedido = ({
     );
 
     useEffect(() => {
-        if(dadosVisualizarPedido?.length > 0 || dadosDetalhePedido?.length > 0) {
-           
-  
-            // setNomeMarca(dadosDetalhePedido[0]?.NOFANTASIA);
-            setIdAndamento(dadosVisualizarPedido[0]?.IDANDAMENTO || '');
-            // setMarcaSelecionada(dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL || '');
-            // setMarcaSelecionada({
-            //     value: dadosVisualizarPedido[0]?.NOFANTASIA == 'TO - TESOURA DE OURO' ? 1 : dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL == 'MG - MAGAZINE' ? 2 : dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL == 'YO - YORUS' ? 3 : dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL == 'FC - FREE CENTER' ? 4 : null, 
-            //     label: dadosVisualizarPedido[0]?.NOFANTASIA
-            // })
-            setIdResumoPedido(dadosVisualizarPedido[0]?.IDPEDIDO);
-            setCompradorSelecionado({value: dadosVisualizarPedido[0]?.IDCOMPRADOR, label: dadosVisualizarPedido[0]?.NOMECOMPRADOR });
-            setDataPrevisaoEntrega(formatarDataParaInput(dadosVisualizarPedido[0]?.DTPREVENTREGA));
-            setDataPedido(formatarDataParaInput(dadosVisualizarPedido[0]?.DTPEDIDO));
-            setTotalBruto(toFloat(dadosVisualizarPedido[0]?.VRTOTALBRUTO))
-            setQtdProdutos(toFloat(dadosVisualizarPedido[0]?.QTDTOTPRODUTOS))
+        if(dadosVisualizarPedido?.length && dadosDetalhePedido?.length > 0) {
+        setDataPesquisaInicio(dadosVisualizarPedido[0]?.DTPEDIDOFORMATADA)
+        setDataPesquisaFim(dadosVisualizarPedido[0]?.DTPREVENTREGAFORMATADA)
+        setCompradorSelecionado({
+            value: dadosVisualizarPedido[0]?.IDCOMPRADOR , 
+            label: dadosVisualizarPedido[0]?.NOMECOMPRADOR
+        })
+        
+        setMarcaSelecionada({
+            value: dadosVisualizarPedido[0]?.NOFANTASIA == 'TO - TESOURA DE OURO' ? 1 : dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL == 'MG - MAGAZINE' ? 2 : dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL == 'YO - YORUS' ? 3 : dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL == 'FC - FREE CENTER' ? 4 : null, 
+            label: dadosVisualizarPedido[0]?.NOFANTASIA
+        })
+        setFornecedorSelecionado({
+            value: dadosVisualizarPedido[0]?.IDFORNECEDOR, 
+            label: `${dadosVisualizarPedido[0]?.NOFANTASIAFORNECEDOR} / / ${dadosVisualizarPedido[0]?.CNPJFORN} / / ${dadosVisualizarPedido[0]?.NOFORNECEDOR}`
+        })
+        
+        setObsInterna(dadosVisualizarPedido[0]?.OBSPEDIDO)
+        setObsFornecedor(dadosVisualizarPedido[0]?.OBSPEDIDO2)
+        setVendedor(dadosVisualizarPedido[0]?.NOREPRESETANTE || dadosVisualizarPedido[0]?.NOVENDEDOR)
+        setTipoPedidoSelecionado(dadosVisualizarPedido[0]?.MODPEDIDO)
+        setEmailVendedor(dadosVisualizarPedido[0]?.EEMAIL || dadosVisualizarPedido[0]?.EEMAILVENDEDOR || dadosVisualizarPedido[0]?.EMAILFORN || '') 
+        setCondicoesPagamentosSelecionado({value: dadosVisualizarPedido[0]?.IDCONDICAOPAGAMENTO, label: dadosVisualizarPedido[0]?.DSCONDICAOPAG})
+        setEnviarSelecionado({
+            value: dadosVisualizarPedido[0]?.TPARQUIVO, 
+            label: dadosVisualizarPedido[0]?.TPARQUIVO == 'NE' ? 'NÃO ENVIAR' : dadosVisualizarPedido[0]?.TPARQUIVO == 'ET' ? 'ETIQUETA' : 'ARQUIVO'
+        })
+        setTipoPedidoSelecionado({value: dadosVisualizarPedido[0]?.TPPEDIDOPADRAO || dadosVisualizarPedido[0]?.MODPEDIDO, label: dadosVisualizarPedido[0]?.MODPEDIDO})
+        setTransportadoraSelecionada({value: dadosVisualizarPedido[0]?.IDTRANSPORTADORA, label: dadosVisualizarPedido[0]?.NOMETRANSPORTADORA})
+        setFiscalSelecionado({
+            value: dadosVisualizarPedido[0]?.TPFISCAL,
+            label: dadosVisualizarPedido[0]?.TPFISCAL == 'S' ? 'Simples Nacional' : dadosVisualizarPedido[0]?.TPFISCAL == 'N' ? 'Lucro Presumido' : 'Lucro Real'
+        })
+        setFreteSelecionado({
+            value: dadosVisualizarPedido[0]?.TPFRETE,
+            label: dadosVisualizarPedido[0]?.TPFRETE == 'PAGO' ? 'PAGO - CIF' : 'A PAGAR - FOB'
+        })
+        setDesconto1(toFloat(dadosVisualizarPedido[0]?.DESCPERC01).toFixed(2))
+        setDesconto2(toFloat(dadosVisualizarPedido[0]?.DESCPERC02).toFixed(2))
+        setDesconto3(toFloat(dadosVisualizarPedido[0]?.DESCPERC03).toFixed(2))
+        const totalLiquidoCalculado = (dadosDetalhePedido || []).reduce( (acc, item) => acc + toFloat(item?.VRTOTALDETALHEPEDIDO),0);
 
+        const totalLiquidoFinal = totalLiquidoCalculado > 0
+            ? totalLiquidoCalculado
+            : toFloat(dadosVisualizarPedido[0]?.VRTOTALLIQUIDO);
+
+        setTotalLiq(totalLiquidoFinal)
+
+        setIdResumoPedido(dadosVisualizarPedido[0]?.IDPEDIDO)
+        setIdAndamento(dadosVisualizarPedido[0]?.IDANDAMENTO || '');
+        setDataPrevisaoEntrega(formatarDataParaInput(dadosVisualizarPedido[0]?.DTPREVENTREGA));
+        setDataPedido(formatarDataParaInput(dadosVisualizarPedido[0]?.DTPEDIDO));
+        setTotalBruto(toFloat(dadosVisualizarPedido[0]?.VRTOTALBRUTO))
+        setQtdProdutos(toFloat(dadosVisualizarPedido[0]?.QTDTOTPRODUTOS))
+        
         }
-    },[dadosVisualizarPedido, dadosDetalhePedido])
-    
+    }, [dadosVisualizarPedido, dadosDetalhePedido])
+        
 
     const verificaDadosDoFornecedorSelecionado = async (stCarregarDados = true) => {
         try {
@@ -366,15 +406,13 @@ export const useIncluirProutoPedido = ({
 
     }
 
-    // console.log(dadosFornecedor, 'dadosFornecedor')
+    
     const retornoDadosDoFonecedoNoPedido = async (dadosFornecedor) => {
         try {
             const dados = dadosFornecedor?.data?.[0] || dadosFornecedor?.[0];
-            console.log(dados, 'dados')
             const NUCNPJ = dados?.CNPJFORN;
           
             if (!dados) return;
-            // Preencher os estados com os dados recebidos
             
             setIdResumoPedido(dados?.IDPEDIDO || '');
             setIdAndamento(dados?.IDANDAMENTO || '');
@@ -385,8 +423,8 @@ export const useIncluirProutoPedido = ({
     
     
             // setMarcaSelecionada(dados?.NOFANTASIA || '');
-            setObsFornecedor(dados?.OBSPEDIDO || '');
-            setObsInterna(dados?.OBSPEDIDO2 || '');
+            setObsFornecedor(dados?.OBSPEDIDO2 || '');
+            setObsInterna(dados?.OBSPEDIDO || '');
             setVendedor(dados?.NOREPRESETANTE || dados?.NOVENDEDOR || '');
             setTipoPedidoSelecionado(dados?.MODPEDIDO || '');
             setEmailVendedor(dados?.EEMAIL || dados?.EEMAILVENDEDOR || dados?.EMAILFORN || '');
@@ -398,7 +436,7 @@ export const useIncluirProutoPedido = ({
                 label: dados.DSCONDICAOPAG
             } );
             
-            // Configurar envio
+       
             if (dados?.TPARQUIVO) {
                 setEnviarSelecionado({
                     value: dados.TPARQUIVO, 
@@ -462,17 +500,11 @@ export const useIncluirProutoPedido = ({
         
         let indice = 0;
         let msgFormatada = '';
-        
-        // Setando como rascunho (equivalente ao $('#stRascunho').val('True'))
         setStRascunho('True');
-
-        // Formatando as mensagens como no jQuery
         for (let msg of pendencias) {
             msgFormatada += `${msg}, `;
             indice++;
         }
-
-        // Condição para exibir SweetAlert baseada no andamento
         const andamentoNum = Number(idAndamento);
         const deveExibirSwal = andamentoNum == 1 || andamentoNum == 15 || !idAndamento;
 
@@ -490,7 +522,7 @@ export const useIncluirProutoPedido = ({
 
         }
 
-        return pendencias; // Retorna as pendências para serem usadas no componente
+        return pendencias;
     };
 
 
@@ -901,7 +933,7 @@ export const useIncluirProutoPedido = ({
             }
 
             const hoje = new Date();
-            const dataAtualFormatada = hoje.toISOString().slice(0, 10); // YYYY-MM-DD
+            const dataAtualFormatada = hoje.toISOString().slice(0, 10); 
             
             setDataPedido(dataAtualFormatada);
             setTituloSubheader('Novo Pedido');
@@ -1026,7 +1058,7 @@ export const useIncluirProutoPedido = ({
                 didOpen: () => { Swal.showLoading(); }
             });
             // Voltar daqui e verificar o payload
-            console.log(dadosVisualizarPedido[0], 'dadosVisualizarPedido[0]') 
+           
             const data = {
                 IDRESUMOPEDIDO: Number(idResumoPedidoAtual) || dadosVisualizarPedido[0]?.IDPEDIDO,
                 IDGRUPOEMPRESARIAL: parseFloat(marcaSelecionada?.value) ? parseFloat(marcaSelecionada?.value) : dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL,
@@ -1111,41 +1143,28 @@ export const useIncluirProutoPedido = ({
             });
         }
     }
-
+   
     const handleSalvarPedido = async () => {
         let idResumoAtual = Number(idResumoPedido || 0);
-        let idResumoPedidoPrimario = Number(1 || 0); // Ajuste conforme sua lógica
+        let idResumoPedidoPrimario = Number(dadosVisualizarPedido[0]?.IDPEDIDOPRIMARIO || idPedidoPrimario || 0);
         let stPedidoPorIntermediario = checked;
-    
-        if(!marcaSelecionada || marcaSelecionada == '') {
-          Swal.fire({
-            icon: "warning",
-            title: `Selecione uma Marca para Incluir os Produtos`,
-            showConfirmButton: false,
-            timer: 5000
-          })
-          return;
-        }
 
-        if (!compradorSelecionado || compradorSelecionado === '') {
-            Swal.fire({
-                icon: "warning",
-                title: `Selecione um Comprador para Salvar o Pedido`,
-                showConfirmButton: false,
-                timer: 6000
-            });
+        const camposValidos = await validarCamposCabecalhoPedido();
+
+        if (!camposValidos) {
+            Swal.close();
             return;
         }
 
         let msgPergunta = 'Deseja realmente salvar?';
         let txtObs = '';
-        
+
         if (idResumoPedidoPrimario == 0 && stPedidoPorIntermediario) {
             msgPergunta = 'Deseja realmente salvar e efetuar este pedido pelo Atacadista RN?';
             txtObs = 'Esta ação não poderá ser desfeita!';
         }
-    
-        const confirmacao = Swal.fire({
+
+        const confirmacao = await Swal.fire({
             icon: 'warning',
             title: msgPergunta,
             text: txtObs,
@@ -1153,13 +1172,12 @@ export const useIncluirProutoPedido = ({
             showConfirmButton: true,
             confirmButtonText: 'Salvar',
             cancelButtonText: 'Cancelar',
-    
-        })
-    
+        });
+
         if (!confirmacao.isConfirmed) {
             return;
         }
-    
+
         Swal.fire({
             title: 'Carregando dados, aguarde...',
             allowOutsideClick: false,
@@ -1168,14 +1186,13 @@ export const useIncluirProutoPedido = ({
             }
         });
 
-        
         const data = {
             IDRESUMOPEDIDO: idResumoAtual,
             IDGRUPOEMPRESARIAL: parseFloat(marcaSelecionada?.value),
             IDSUBGRUPOEMPRESARIAL: parseFloat(marcaSelecionada?.value),
             IDCOMPRADOR: parseFloat(compradorSelecionado?.value),
             IDCONDICAOPAGAMENTO: parseFloat(condicoesPagamentosSelecionado?.value),
-            IDFORNECEDOR: parseFloat(fornecedorSelecionado?.value),
+            IDFORNECEDOR: String(fornecedorSelecionado?.value),
             IDTRANSPORTADORA: parseFloat(transportadoraSelecionada?.value),
             IDANDAMENTO: parseFloat(idAndamento),
             MODPEDIDO: tipoPedidoSelecionado?.value,
@@ -1184,11 +1201,11 @@ export const useIncluirProutoPedido = ({
             DTPEDIDO: dataPedido,
             DTPREVENTREGA: dataPrevisaoEntrega,
             TPFRETE: freteSelecionado?.value,
-            DESCPERC01: parseFloat(desconto1),
-            DESCPERC02: parseFloat(desconto2),
-            DESCPERC03: parseFloat(desconto3),
-            PERCCOMISSAO: parseFloat(comissao),
-            VRTOTALLIQUIDO: parseFloat(totalLiq),
+            DESCPERC01: parseFloat(desconto1 || 0),
+            DESCPERC02: parseFloat(desconto2 || 0),
+            DESCPERC03: parseFloat(desconto3 || 0),
+            PERCCOMISSAO: parseFloat(comissao || 0),
+            VRTOTALLIQUIDO: parseFloat(totalLiq || 0),
             OBSPEDIDO: obsInterna,
             OBSPEDIDO2: obsFornecedor,
             DTFECHAMENTOPEDIDO: dataAtual,
@@ -1200,70 +1217,60 @@ export const useIncluirProutoPedido = ({
             TPFISCAL: fiscalSelecionado?.value,
             STRASCUNHO: stRascunho || 'False',
             STPEDIDOPORINTEMEDIARIO: checked ? 'True' : 'False'
-        }
+        };
 
         try {
             let response;
             let idResumoPedidoAtual;
-            if(idResumoAtual == 0)  {
-                response =  await post('/lista-pedidos', data);
-                
-                if(response.data && response.data.length > 0) {
+
+            if (idResumoAtual == 0) {
+                response = await post('/pedido', data);
+
+                if (response?.data && response.data.length > 0) {
                     idResumoPedidoAtual = response.data[0].IDRESUMOPEDIDO;
                 }
-
             } else {
-                response =  await put('/lista-pedidos', data);
+                response = await put('/atualizar-pedido/:id', data);
                 idResumoPedidoAtual = idResumoAtual;
             }
 
-            const textDados = JSON.stringify(data);
-            let textFuncao =  'COMPRAS / SALVAR CABEÇALHO DO PEDIDO';
             const ipUsuario = await getIPUsuario();
-
-            const createtLog = {
+            await post('/log-web', {
                 IDFUNCIONARIO: String(usuarioLogado.id),
-                PATHFUNCAO: textFuncao,
-                DADOS: textDados,
+                PATHFUNCAO: 'COMPRAS / SALVAR CABEÇALHO DO PEDIDO',
+                DADOS: JSON.stringify(data),
                 IP: ipUsuario || 'Indisponível'
-            }
+            });
 
-            await post('/log-web', createtLog)
             Swal.close();
 
-
-            Swal.fire({
+            await Swal.fire({
                 position: 'center',
                 icon: 'success',
-                title: 'Cadastrado!',
-                text: 'Pedido cadastrado com sucesso.',
+                title: 'Salvo!',
+                text: 'Cabeçalho do Pedido Salvo com Sucesso.',
                 showConfirmButton: false,
                 timer: 5000,
-                customClass: {
-                    container: 'custom-swal',
-                }
-            })
+                customClass: { container: 'custom-swal' }
+            });
 
             if (idResumoPedidoAtual) {
                 const dadosPedidos = await get(`/lista-pedidos?idPedido=${idResumoPedidoAtual}`);
                 setDadosCabecalhoClonado(dadosPedidos?.data);
-                
-                // Atualiza o ID do pedido atual
                 setIdResumoPedido(idResumoPedidoAtual);
+                await refetchListaProdutoPedidos();
             }
 
-            return response.data;
+            return response?.data;
         } catch (error) {
-            const textDados = JSON.stringify(data)
-            let textFuncao = 'COMPRAS / ERRO AO SALVAR CABEÇALHO DO PEDIDO';
+            Swal.close();
             const ipUsuario = await getIPUsuario();
-            const createtLog = {
+            await post('/log-web', {
                 IDFUNCIONARIO: String(usuarioLogado.id),
-                PATHFUNCAO: textFuncao,
-                DADOS: textDados,
+                PATHFUNCAO: 'COMPRAS / ERRO AO SALVAR CABEÇALHO DO PEDIDO',
+                DADOS: JSON.stringify(''),
                 IP: ipUsuario || 'Indisponível'
-            }
-            await post('/log-web', createtLog)
+            });
 
             Swal.fire({
                 position: 'center',
@@ -1271,9 +1278,7 @@ export const useIncluirProutoPedido = ({
                 title: 'Erro ao tentar Salvar o cabeçalho do pedido, recarregue e tente novamente!',
                 showConfirmButton: false,
                 timer: 3000,
-                customClass: {
-                    container: 'custom-swal',
-                }
+                customClass: { container: 'custom-swal' }
             });
         }
     }
@@ -1294,13 +1299,13 @@ export const useIncluirProutoPedido = ({
 
             let itensValidos = false;
             try {
-                const responseExistente = await get(`/lista-detalhe-pedidos?idpedido=${idResumoAtual}`);
+                const responseExistente = await get(`/lista-detalhe-pedidos?idPedido=${idResumoAtual}`);
 
                 if (!responseExistente?.data || responseExistente.data.length === 0) {
                     Swal.close();
                     Swal.fire({
                         icon: "warning",
-                        title: 'Sem Itens Cadastrados',
+                        title: `Não existem itens cadastrados neste Pedido: ${idResumoAtual}. Inclua os itens e tente novamente!`,
                         text: `Não existem itens cadastrados neste Pedido: ${idResumoAtual}. Inclua os itens e tente novamente!`,
                         showConfirmButton: true,
                     });
@@ -1343,8 +1348,8 @@ export const useIncluirProutoPedido = ({
                 text: 'Você não poderá reverter esta ação!',
                 showCancelButton: true,
                 showConfirmButton: true,
-                confirmButtonText: 'Salvar',
-                cancelButtonText: 'Cancelar',
+                confirmButtonText: 'Sim',
+                cancelButtonText: 'Não',
             });
 
             if (!confirmacao.isConfirmed) return;
@@ -1375,8 +1380,8 @@ export const useIncluirProutoPedido = ({
                 DESCPERC03: toFloat(desconto3),
                 PERCCOMISSAO: toFloat(comissao),
                 VRTOTALLIQUIDO: toFloat(totalLiq),
-                OBSPEDIDO: obsFornecedor,
-                OBSPEDIDO2: obsInterna,
+                OBSPEDIDO: obsInterna,
+                OBSPEDIDO2: obsFornecedor,
                 DTFECHAMENTOPEDIDO: dataAtual,
                 DTCADASTRO: dataAtual,
                 TPARQUIVO: enviarSelecionado?.value,

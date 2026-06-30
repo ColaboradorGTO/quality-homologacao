@@ -40,6 +40,7 @@ export const ActionImprimirEtiquetaModal = ({
         ^LL320
         ^CI28
       `;
+      
       let endPageLabel = '^XZ';
       let dataLabelsZPLToPrint = startPageLabel;
       let contador = 0;

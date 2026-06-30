@@ -22,6 +22,7 @@ export const ActionListaPedidos = ({
   dadosDetalhePedido,
   setDadosDetalhePedido,
   dadosVisualizarPedido,
+  setDadosVisualizarPedido,
   setModalIncluirProdutoPedido,
   usuarioLogado,
   optionsModulos,
@@ -36,7 +37,7 @@ export const ActionListaPedidos = ({
   const [dadosPedidosDetalhe, setDadosPedidosDetalhe] = useState([]);
   const [dadosDetalheGradePedido, setDadosDetalheGradePedido] = useState([]);
   const dataTableRef = useRef();
-  const { handleAtivarCancelarProdutoPedido } = useProdutoPedido({ usuarioLogado, status })
+  const { handleAtivarCancelarProdutoPedido } = useProdutoPedido({ usuarioLogado, status, setDadosDetalhePedido, setDadosVisualizarPedido });
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);

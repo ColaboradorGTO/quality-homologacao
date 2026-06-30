@@ -1,18 +1,12 @@
 import Swal from "sweetalert2";
-import { post, put } from "../../../../../../api/funcRequest";
+import { get, post, put } from "../../../../../../api/funcRequest";
 import { useState } from "react";
 import axios from "axios";
-import { useEffect } from "react";
-import { getDataAtual } from "../../../../../../utils/dataAtual";
 
-export const useProdutoPedido = ({ usuarioLogado, handleClick, status }) => {
+
+
+export const useProdutoPedido = ({ usuarioLogado, handleClick, setDadosDetalhePedido, setDadosVisualizarPedido }) => {
     const [ipUsuario, setIpUsuario] = useState('');
-    const [data, setData] = useState('');
-
-    useEffect(() => {
-        const dataAtual = getDataAtual()
-        setData(dataAtual);
-    }, [])
 
     const getIPUsuario = async () => {
         let usuarioIP = null;
@@ -36,7 +30,7 @@ export const useProdutoPedido = ({ usuarioLogado, handleClick, status }) => {
         return usuarioIP;
     };
 
-    const handleAtivarCancelarProdutoPedido = async (row, STATIVO) => {
+    const handleAtivarCancelarProdutoPedido = async (row, status) => {
         
         let txtAcao = status === 'True' ? 'Cancelar' : 'Ativar';
         let textoCancelaPedido = status === 'True' ? 'PRODUTO CANCELADO PELO COMPRADOR' : 'COMPRAS/CANCELAR PRODUTO DO PEDIDO';
@@ -45,13 +39,13 @@ export const useProdutoPedido = ({ usuarioLogado, handleClick, status }) => {
         let textoFuncao = status === 'True' ? 'COMPRAS/CANCELAR PEDIDO' : 'COMPRAS/ATIVAR PEDIDO';
 
         const putData = {
-            IDDETALHEPEDIDO: row?.IDDETALHEPEDIDO,
+            IDDETALHEPEDIDO: row?.IDDETPEDIDO,
             STCANCELADO: status, 
             IDRESPCANCELAMENTO: String(usuarioLogado.id),
             TXTOBSCANCELAMENTO: textoCancelaPedido,
-            IDRESUMOPEDIDO: parseInt(row?.IDRESUMOPEDIDO),
+            IDRESUMOPEDIDO: parseInt(row?.IDPEDIDO),
         }
-
+ 
         try {
            const confirmacao = await Swal.fire({
                 title: `Deseja Realmente ${txtAcao} o Pedido?`,
@@ -86,12 +80,31 @@ export const useProdutoPedido = ({ usuarioLogado, handleClick, status }) => {
             await post('/log-web', postData)
             
             
+                try {
+                  const responsePedidos = await get(`/lista-pedidos?idPedido=${row?.IDPEDIDO}`)
+                  const responseDetlhe = await get(`/lista-detalhe-pedidos?idPedido=${row?.IDPEDIDO}`)
+                  if (responsePedidos.data && responseDetlhe.data) {
+                    setDadosVisualizarPedido(responsePedidos.data)
+                    setDadosDetalhePedido(responseDetlhe.data)
+                  } else {
+                    Swal.fire({
+                      icon: 'error',
+                      title: 'Erro',
+                      text: 'Não foi possível obter os dados do pedido.',
+                    })
+                    return;
+                  }
+                } catch (error) {
+                  console.log(error, "não foi possivel pegar os dados da tabela ")
+                }
+              
+
             Swal.fire({
                 icon: 'success',
                 title: 'Sucesso',
                 text: `Pedido ${msgRetorno} com Sucesso!`,
             });
-            handleClick()
+       
             return response.data;
         } catch (error) {
             const textDados = JSON.stringify(putData)
