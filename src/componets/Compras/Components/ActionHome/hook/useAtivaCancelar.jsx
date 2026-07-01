@@ -35,9 +35,7 @@ export const useAtivarCancelar = ({ usuarioLogado, handleClick, status }) => {
         setIpUsuario(usuarioIP);
         return usuarioIP;
     };
-    const handleAtivarCancelarPedido = async (IDRESUMOPEDIDO, STATIVO) => {
-        console.log(STATIVO, 'status')
-        
+    const handleAtivarCancelarPedido = async (IDRESUMOPEDIDO, STATIVO) => {   
         let txtAcao = STATIVO === 'True' ? 'Cancelar' : 'Ativar';
         let textoCancelaPedido = STATIVO === 'True' ? 'CANCELADO PELO COMPRADOR' : 'ATIVADO PELO COMPRADOR';
         let idAndamento = STATIVO === 'True' ? 3 : 1;
@@ -54,7 +52,7 @@ export const useAtivarCancelar = ({ usuarioLogado, handleClick, status }) => {
         }
 
         try {
-            Swal.fire({
+            const confirmacao = await Swal.fire({
                 title: `Deseja Realmente ${txtAcao} o Pedido?`,
                 text: 'Você não poderá reverter a ação!',
                 icon: 'warning',
@@ -69,6 +67,10 @@ export const useAtivarCancelar = ({ usuarioLogado, handleClick, status }) => {
                 },
                 buttonsStyling: false,
             })
+
+            if (!confirmacao.isConfirmed) {
+                return;
+            }
 
             const response = await put('/atualizacao-status-pedido/:id', putData)
             const textDados = JSON.stringify(putData)

@@ -1,5 +1,4 @@
 import { Fragment, useEffect, useState, useRef } from "react"
-
 import { ButtonType } from "../../../Buttons/ButtonType";
 import { useQuery } from "react-query";
 import { MdMenu, MdOutlineCheck, MdOutlinePayment, MdOutlinePictureAsPdf, MdOutlineVisibility } from "react-icons/md";
@@ -545,7 +544,7 @@ export const ActionPesquisaNovoPedido = ({
      
 
       <ActionMainNovoPedido
-        lBinkComponentAnterior={["Home"]}
+        linkComponentAnterior={["Home"]}
         linkComponent={["Novo Pedido"]}
         title="Novo Pedido"
         subTitle="Nome da Loja"
@@ -606,13 +605,13 @@ export const ActionPesquisaNovoPedido = ({
         labelSelectFiscal={"Tipo Fiscal"}
         optionsFiscal={optionsFiscal}
         valueSelectFiscal={fiscalSelecionado}
-        onChangeSelectFiscal={(e) => setFiscalSelecionado(e.value)}
+        onChangeSelectFiscal={(e) => setFiscalSelecionado(e)}
 
         InputSelectEnviarComponent={InputSelectActionPedido}
         labelSelectEnviar={"Enviar"}
         optionsSelectEnviar={optionsEnviar}
         valueSelectEnviar={enviarSelecionado}
-        onChangeSelectEnviar={(e) => setEnviarSelecionado(e.value)}
+        onChangeSelectEnviar={(e) => setEnviarSelecionado(e)}
 
         InputSelectCompradorComponent={InputSelectActionPedido}
         labelSelectComprador={"Comprador"}
@@ -623,7 +622,7 @@ export const ActionPesquisaNovoPedido = ({
           }
         })}
         valueSelectComprador={compradorSelecionado}
-        onChangeSelectComprador  ={(e) => setCompradorSelecionado(e.value)}
+        onChangeSelectComprador={(e) => setCompradorSelecionado(e)}
        
 
         InputSelectMarcasComponent={InputSelectActionPedido}
@@ -646,7 +645,7 @@ export const ActionPesquisaNovoPedido = ({
           } 
         })}
         valueSelectCondicoesPagamentos={condicoesPagamentosSelecionado}
-        onChangeSelectCondicoesPagamentos={(e) => setCondicoesPagamentosSelecionado(e.value)}
+        onChangeSelectCondicoesPagamentos={(e) => setCondicoesPagamentosSelecionado(e)}
         
         InputFieldObsFornecedor={InputFieldPedido}
         labelInputFieldObsFornecedor={"Observação do Fornecedor - Max. 450 caracteres"}
@@ -657,13 +656,13 @@ export const ActionPesquisaNovoPedido = ({
         InputFieldObsInterna={InputFieldPedido}
         labelInputFieldObsInterna={"Observação Interna - Max. 450 caracteres"}
         valueInputFieldObsInterna={obsInterna}
-        onChangeInputFieldObsInternas={(e) => setObsInterna(e.target.value)}
+        onChangeInputFieldObsInterna={(e) => setObsInterna(e.target.value)}
        
         InputSelectTipoPedido={InputSelectActionPedido}
         labelSelectTipoPedido={"Tipo de Pedido"}
         optionsTipoPedido={optionsTipoPedido}
         valueSelectTipoPedido={tipoPedidoSelecionado}
-        onChangeSelectTipoPedido={(e) => setTipoPedidoSelecionado(e.value)}
+        onChangeSelectTipoPedido={(e) => setTipoPedidoSelecionado(e)}
 
         InputFieldVendedor={InputFieldPedido}
         labelInputFieldVendedor={"Vendedor"}
@@ -726,13 +725,13 @@ export const ActionPesquisaNovoPedido = ({
           }
         })}
         valueSelectTransportadora={transportadoraSelecionada}
-        onChangeSelectTransportadora={(e) => setTransportadoraSelecionada(e.value)}
+        onChangeSelectTransportadora={(e) => setTransportadoraSelecionada(e)}
 
         InputSelectFreteComponent={InputSelectActionPedido}
         labelSelectFrete={"Tipo Frete"}
         optionsFrete={optionsTipoFrete}
         valueSelectFrete={freteSelecionado}
-        onChangeSelectFrete={(e) => setFreteSelecionado(e.value)}
+        onChangeSelectFrete={(e) => setFreteSelecionado(e)}
 
         Alerta={Alert}
         messageAlerta={pendenciasFornecedor}

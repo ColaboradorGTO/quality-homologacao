@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useState } from "react"
 import { ButtonType } from "../../../../Buttons/ButtonType";
-import { MdContentCopy, MdMenu, MdOutlineCheck, MdOutlineCopyAll, MdOutlineEdit, MdOutlineKeyboardReturn, MdOutlinePayment, MdOutlinePictureAsPdf, MdOutlineVisibility } from "react-icons/md";
+import { MdContentCopy, MdMenu, MdMonetizationOn, MdOutlineCheck, MdOutlineCopyAll, MdOutlineEdit, MdOutlineKeyboardReturn, MdOutlinePayment, MdOutlinePictureAsPdf, MdOutlineVisibility } from "react-icons/md";
 import { ResultadoResumo } from "../../../../ResultadoResumo/ResultadoResumo";
 import { formatMoeda } from "../../../../../utils/formatMoeda";
 import { toFloat } from "../../../../../utils/toFloat";
@@ -127,6 +127,7 @@ export const ActionEditarPedido = ({
     clonarCabecalho,
     handleClonarCabecalhoPedido,
     handleSalvarPedido,
+    handleClonarPedido,
     handleIncluir,
     dadosUltimosPedidos,
     dadosCabecalhoClonado,
@@ -379,14 +380,14 @@ export const ActionEditarPedido = ({
         cardVendas={true}
         valorVendas={formatMoeda(totalBruto)}
         nomeVendas="Valor Bruto Pedido"
-        IconVendas={MdOutlinePayment}
+        IconVendas={MdMonetizationOn}
         iconSize={100}
         iconColor={"#fff"}
   
         cardTicketMedio={true}
         valorTicketMedio={formatMoeda(totalLiq)}
         nomeTicketMedio="Valor Líquido Pedido"
-        IconTicketMedio={MdOutlinePayment}
+        IconTicketMedio={MdMonetizationOn}
   
         cardCliente={true}
         numeroCliente={qtdProdutos}
@@ -594,7 +595,7 @@ export const ActionEditarPedido = ({
 
         ButtonTypeClonar={ButtonTypeCompras}
         linkClonar={"Clonar Pedido"}
-        onButtonClickClonar
+        onButtonClickClonar={handleClonarPedido}
         corClonar={"secondary"}
         IconClonar={MdContentCopy}
         styleClonar={botoesVisiveis.clonar}

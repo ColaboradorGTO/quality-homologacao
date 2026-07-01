@@ -183,16 +183,62 @@ export const useIncluirProutoPedido = ({
     );
 
     useEffect(() => {
-        if(dadosVisualizarPedido?.length > 0 || dadosDetalhePedido?.length > 0) {
-            console.log((dadosDetalhePedido), 'dadosDetalhePedido')
+            if(dadosVisualizarPedido?.length && dadosDetalhePedido?.length > 0) {
+            setDataPesquisaInicio(dadosVisualizarPedido[0]?.DTPEDIDOFORMATADA)
+            setDataPesquisaFim(dadosVisualizarPedido[0]?.DTPREVENTREGAFORMATADA)
+            setCompradorSelecionado({
+                value: dadosVisualizarPedido[0]?.IDCOMPRADOR , 
+                label: dadosVisualizarPedido[0]?.NOMECOMPRADOR
+            })
             
+            setMarcaSelecionada({
+                value: dadosVisualizarPedido[0]?.NOFANTASIA == 'TO - TESOURA DE OURO' ? 1 : dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL == 'MG - MAGAZINE' ? 2 : dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL == 'YO - YORUS' ? 3 : dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL == 'FC - FREE CENTER' ? 4 : null, 
+                label: dadosVisualizarPedido[0]?.NOFANTASIA
+            })
+            setFornecedorSelecionado({
+                value: dadosVisualizarPedido[0]?.IDFORNECEDOR, 
+                label: `${dadosVisualizarPedido[0]?.NOFANTASIAFORNECEDOR} / / ${dadosVisualizarPedido[0]?.CNPJFORN} / / ${dadosVisualizarPedido[0]?.NOFORNECEDOR}`
+            })
+            
+            setObsInterna(dadosVisualizarPedido[0]?.OBSPEDIDO)
+            setObsFornecedor(dadosVisualizarPedido[0]?.OBSPEDIDO2)
+            setVendedor(dadosVisualizarPedido[0]?.NOREPRESETANTE || dadosVisualizarPedido[0]?.NOVENDEDOR)
+            setTipoPedidoSelecionado(dadosVisualizarPedido[0]?.MODPEDIDO)
+            setEmailVendedor(dadosVisualizarPedido[0]?.EEMAIL || dadosVisualizarPedido[0]?.EEMAILVENDEDOR || dadosVisualizarPedido[0]?.EMAILFORN || '') 
+            setCondicoesPagamentosSelecionado({value: dadosVisualizarPedido[0]?.IDCONDICAOPAGAMENTO, label: dadosVisualizarPedido[0]?.DSCONDICAOPAG})
+            setEnviarSelecionado({
+                value: dadosVisualizarPedido[0]?.TPARQUIVO, 
+                label: dadosVisualizarPedido[0]?.TPARQUIVO == 'NE' ? 'NÃO ENVIAR' : dadosVisualizarPedido[0]?.TPARQUIVO == 'ET' ? 'ETIQUETA' : 'ARQUIVO'
+            })
+            setTipoPedidoSelecionado({value: dadosVisualizarPedido[0]?.TPPEDIDOPADRAO || dadosVisualizarPedido[0]?.MODPEDIDO, label: dadosVisualizarPedido[0]?.MODPEDIDO})
+            setTransportadoraSelecionada({value: dadosVisualizarPedido[0]?.IDTRANSPORTADORA, label: dadosVisualizarPedido[0]?.NOMETRANSPORTADORA})
+            setFiscalSelecionado({
+                value: dadosVisualizarPedido[0]?.TPFISCAL,
+                label: dadosVisualizarPedido[0]?.TPFISCAL == 'S' ? 'Simples Nacional' : dadosVisualizarPedido[0]?.TPFISCAL == 'N' ? 'Lucro Presumido' : 'Lucro Real'
+            })
+            setFreteSelecionado({
+                value: dadosVisualizarPedido[0]?.TPFRETE,
+                label: dadosVisualizarPedido[0]?.TPFRETE == 'PAGO' ? 'PAGO - CIF' : 'A PAGAR - FOB'
+            })
+            setDesconto1(toFloat(dadosVisualizarPedido[0]?.DESCPERC01).toFixed(2))
+            setDesconto2(toFloat(dadosVisualizarPedido[0]?.DESCPERC02).toFixed(2))
+            setDesconto3(toFloat(dadosVisualizarPedido[0]?.DESCPERC03).toFixed(2))
+            const totalLiquidoCalculado = (dadosDetalhePedido || []).reduce( (acc, item) => acc + toFloat(item?.VRTOTALDETALHEPEDIDO),0);
+    
+            setTotalLiq(totalLiquidoCalculado)
+    
+            setIdResumoPedido(dadosVisualizarPedido[0]?.IDPEDIDO)
             setIdAndamento(dadosVisualizarPedido[0]?.IDANDAMENTO || '');
-            setMarcaSelecionada(dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL || '');
-            setIdResumoPedido(dadosVisualizarPedido[0]?.IDPEDIDO || '');
-            setCompradorSelecionado({value: dadosVisualizarPedido[0]?.IDCOMPRADOR, label: dadosVisualizarPedido[0]?.NOMECOMPRADOR });
-       
-        }
-    },[dadosVisualizarPedido, dadosDetalhePedido])
+            setDataPrevisaoEntrega(formatarDataParaInput(dadosVisualizarPedido[0]?.DTPREVENTREGA));
+            setDataPedido(formatarDataParaInput(dadosVisualizarPedido[0]?.DTPEDIDO));
+            // setQtdProdutos(toFloat(dadosVisualizarPedido[0]?.QTDTOTPRODUTOS))
+            const totalQtdProdutosCalculado = (dadosDetalhePedido || []).reduce( (acc, item) => acc + toFloat(item?.QTDTOTAL),0);
+            setQtdProdutos(totalQtdProdutosCalculado);
+            
+            const totalDetPedidosCalculado = (dadosDetalhePedido || []).reduce( (acc, item) => acc + toFloat(item?.VRTOTALDETALHEPEDIDO),0);
+            setTotalBruto(totalDetPedidosCalculado)
+            }
+        }, [dadosVisualizarPedido, dadosDetalhePedido])
     
 
     const verificaDadosDoFornecedorSelecionado = async (stCarregarDados = true) => {
@@ -328,7 +374,7 @@ export const useIncluirProutoPedido = ({
     const retornoDadosDoFonecedoNoPedido = async (dadosFornecedor) => {
         try {
             const dados = dadosFornecedor?.data?.[0] || dadosFornecedor?.[0];
-            console.log(dados, 'dados')
+          
             const NUCNPJ = dados?.CNPJFORN;
           
             if (!dados) return;
@@ -557,8 +603,8 @@ export const useIncluirProutoPedido = ({
                 MODPEDIDO: tipoPedidoSelecionado?.value,
                 NOVENDEDOR: vendedor,
                 EEMAILVENDEDOR: emailVendedor,
-                DTPEDIDO: dataPedido,
-                DTPREVENTREGA: dataPrevisaoEntrega,
+                DTPEDIDO: dataPesquisaInicio,
+                DTPREVENTREGA: dataPesquisaFim,
                 TPFRETE: freteSelecionado?.value,
                 DESCPERC01: desconto1,
                 DESCPERC02: desconto2,
@@ -656,11 +702,12 @@ export const useIncluirProutoPedido = ({
 
         // Se houver erros, mostrar alerta
         if (errors.length) {
+            Swal.close(); // Fechar qualquer alerta anterior
             await Swal.fire({
-            icon: 'warning',
-            title: 'Campos obrigatórios',
-            html: errors.map(erro => `• ${erro}`).join('<br>'),
-            confirmButtonText: 'OK'
+                icon: 'warning',
+                title: 'Campos obrigatórios',
+                html: errors.map(erro => `• ${erro}`).join('<br>'),
+                confirmButtonText: 'OK'
             });
             
             return false;
@@ -927,18 +974,19 @@ export const useIncluirProutoPedido = ({
     
     const handleIncluir = async () => {
         try {
-            let idResumoPedidoAtual = idResumoPedido
+            let idResumoPedidoAtual = idResumoPedido || 0;
             let idCompradorPedidoAtual = Number(compradorSelecionado?.value || 0);
             let stPedidoPorIntermediario = checked ? 'True' : 'False';
             let idResumoPedidoPrimario = Number(idPedidoPrimario || 0);
             let stPedidoPri = stPedidoPrimario || 'False';
-         
 
-            Swal.fire({
-                title: 'Validando dados, aguarde...',
-                allowOutsideClick: false,
-                didOpen: () => { Swal.showLoading(); }
-            });
+            // Swal.fire({
+            //     title: 'Validando dados, aguarde...',
+            //     allowOutsideClick: false,
+            //     didOpen: () => {
+            //         Swal.showLoading();
+            //     }
+            // });
 
             const camposValidos = await validarCamposCabecalhoPedido();
 
@@ -981,31 +1029,33 @@ export const useIncluirProutoPedido = ({
             Swal.fire({
                 title: 'Carregando dados, aguarde...',
                 allowOutsideClick: false,
-                didOpen: () => { Swal.showLoading(); }
+                 didOpen: () => {
+                    Swal.showLoading();
+                }
             });
-            // Voltar daqui e verificar o payload
+
             const data = {
-                IDRESUMOPEDIDO: Number(idResumoPedidoAtual) || dadosVisualizarPedido[0]?.IDPEDIDO,
-                IDGRUPOEMPRESARIAL: parseFloat(marcaSelecionada?.value) ? dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL : dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL,
-                IDSUBGRUPOEMPRESARIAL: parseFloat(marcaSelecionada?.value) ? dadosDetalhePedido[0]?.IDSUBGRUPOEMPRESARIAL : dadosDetalhePedido[0]?.IDSUBGRUPOEMPRESARIAL,
+                IDRESUMOPEDIDO: Number(idResumoPedidoAtual) ? dadosVisualizarPedido[0]?.IDPEDIDO : 0,
+                IDGRUPOEMPRESARIAL: parseFloat(marcaSelecionada?.value),
+                IDSUBGRUPOEMPRESARIAL: parseFloat(marcaSelecionada?.value),
                 IDCOMPRADOR: parseFloat(compradorSelecionado?.value),
                 IDCONDICAOPAGAMENTO: parseFloat(condicoesPagamentosSelecionado?.value),
                 IDFORNECEDOR: fornecedorSelecionado?.value,
                 IDTRANSPORTADORA: parseFloat(transportadoraSelecionada?.value),
-                IDANDAMENTO: parseFloat(idAndamento),
+                IDANDAMENTO: parseFloat(idAndamento) || 1,
                 MODPEDIDO: tipoPedidoSelecionado?.value,
                 NOVENDEDOR: vendedor,
                 EEMAILVENDEDOR: emailVendedor,
-                DTPEDIDO: dataPedido,
-                DTPREVENTREGA: dataPrevisaoEntrega,
+                DTPEDIDO: dataPesquisaInicio,
+                DTPREVENTREGA: dataPesquisaFim,
                 TPFRETE: freteSelecionado?.value,
-                DESCPERC01: parseFloat(desconto1 || 0),
-                DESCPERC02: parseFloat(desconto2 || 0),
-                DESCPERC03: parseFloat(desconto3 || 0),
-                PERCCOMISSAO: parseFloat(comissao || 0),
-                VRTOTALLIQUIDO: parseFloat(totalLiq || 0),
-                OBSPEDIDO: obsInterna,
-                OBSPEDIDO2: obsFornecedor,
+                DESCPERC01: parseFloat(desconto1) || 0,
+                DESCPERC02: parseFloat(desconto2) || 0,
+                DESCPERC03: parseFloat(desconto3) || 0,
+                PERCCOMISSAO: parseFloat(comissao) || 0,
+                VRTOTALLIQUIDO: parseFloat(totalLiq) || 0,
+                OBSPEDIDO: obsFornecedor,
+                OBSPEDIDO2: obsInterna,
                 DTFECHAMENTOPEDIDO: dataAtual,
                 DTCADASTRO: dataAtual,
                 TPARQUIVO: enviarSelecionado?.value,
@@ -1016,10 +1066,12 @@ export const useIncluirProutoPedido = ({
                 STRASCUNHO: stRascunho || 'False',
                 STPEDIDOPORINTEMEDIARIO: stPedidoPorIntermediario
             };
-
+            
             let response;
+            
 
             if (idResumoPedidoAtual == 0) {
+
                 response = await post('/pedido', data);
 
                 if (response && response.length > 0) {
@@ -1040,23 +1092,28 @@ export const useIncluirProutoPedido = ({
             Swal.close();
 
             const ipUsuario = await getIPUsuario();
-            await post('/log-web', {
+            let textFuncao = 'COMPRAS / INCLUIR PRODUTO NO PEDIDO';
+            const createtLog = {
                 IDFUNCIONARIO: String(usuarioLogado.id),
-                PATHFUNCAO: 'COMPRAS / INCLUIR PRODUTO NO PEDIDO',
+                PATHFUNCAO: textFuncao,
                 DADOS: JSON.stringify(data),
                 IP: ipUsuario || 'Indisponível'
-            });
+            }
+            await post('/log-web', createtLog);
+        
 
             return response?.data;
         } catch (error) {
             Swal.close();
             const ipUsuario = await getIPUsuario();
-            await post('/log-web', {
+            let textFuncao = 'COMPRAS / ERRO AO INCLUIR PRODUTO NO PEDIDO';
+            const createtLog = {
                 IDFUNCIONARIO: String(usuarioLogado.id),
-                PATHFUNCAO: 'COMPRAS / ERRO AO INCLUIR PRODUTO NO PEDIDO',
-                DADOS: JSON.stringify(''),
+                PATHFUNCAO: textFuncao,
+                DADOS: '',
                 IP: ipUsuario || 'Indisponível'
-            });
+            }
+            await post('/log-web', createtLog);
 
             Swal.fire({
                 position: 'center',
@@ -1240,14 +1297,16 @@ export const useIncluirProutoPedido = ({
             let idResumoAtual = Number(idResumoPedido || 0);
             let stRascunhoValue = stRascunho || 'False';
 
-            Swal.fire({
-                title: 'Validando Dados do Pedido, aguarde...',
-                allowOutsideClick: false,
-                didOpen: () => { Swal.showLoading(); }
-            });
-
+            
             const camposValidos = await validarCamposCabecalhoPedido();
             if (!camposValidos) return;
+            await Swal.fire({
+                title: 'Validando Dados do Pedido, aguarde...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
 
             let itensValidos = false;
             try {
@@ -1255,7 +1314,7 @@ export const useIncluirProutoPedido = ({
 
                 if (!responseExistente?.data || responseExistente.data.length === 0) {
                     Swal.close();
-                    Swal.fire({
+                   await  Swal.fire({
                         icon: "warning",
                         title: 'Sem Itens Cadastrados',
                         text: `Não existem itens cadastrados neste Pedido: ${idResumoAtual}. Inclua os itens e tente novamente!`,
@@ -1267,7 +1326,7 @@ export const useIncluirProutoPedido = ({
             } catch (error) {
                 console.error('Erro ao validar itens do pedido:', error);
                 Swal.close();
-                Swal.fire({
+               await Swal.fire({
                     icon: "error",
                     title: 'Erro de Validação',
                     text: 'Erro ao tentar validar os Itens do pedido, recarregue e tente novamente!',
@@ -1284,7 +1343,7 @@ export const useIncluirProutoPedido = ({
                     : 'Não é possivel finalizar este pedido! Solucione as pendências e tente novamente!';
 
                 Swal.close();
-                Swal.fire({
+                await Swal.fire({
                     icon: "warning",
                     title: 'Pedido não pode ser Fechado',
                     text: text,
@@ -1306,7 +1365,7 @@ export const useIncluirProutoPedido = ({
 
             if (!confirmacao.isConfirmed) return;
 
-            Swal.fire({
+            await Swal.fire({
                 title: 'Atualizando dados, aguarde...',
                 allowOutsideClick: false,
                 didOpen: () => { Swal.showLoading(); }
@@ -1327,11 +1386,11 @@ export const useIncluirProutoPedido = ({
                 DTPEDIDO: dataPedido,
                 DTPREVENTREGA: dataPrevisaoEntrega,
                 TPFRETE: freteSelecionado?.value,
-                DESCPERC01: parseFloat(desconto1),
-                DESCPERC02: parseFloat(desconto2),
-                DESCPERC03: parseFloat(desconto3),
-                PERCCOMISSAO: parseFloat(comissao),
-                VRTOTALLIQUIDO: parseFloat(totalLiq),
+                DESCPERC01: toFloat(desconto1),
+                DESCPERC02: toFloat(desconto2),
+                DESCPERC03: toFloat(desconto3),
+                PERCCOMISSAO: toFloat(comissao),
+                VRTOTALLIQUIDO: toFloat(totalLiq),
                 OBSPEDIDO: obsFornecedor,
                 OBSPEDIDO2: obsInterna,
                 DTFECHAMENTOPEDIDO: dataAtual,

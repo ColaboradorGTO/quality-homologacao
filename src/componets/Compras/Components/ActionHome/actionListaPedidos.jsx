@@ -391,7 +391,7 @@ export const ActionListaPedidos = ({
   const handleClickAtivar = (row) => {
     if (optionsModulos[0]?.ALTERAR == 'True') {
       if (row && row.IDPEDIDO) {
-        handleAtivarCancelarPedido(row.IDPEDIDO, 'True');
+        handleAtivarCancelarPedido(row.IDPEDIDO, 'False');
       }
     } else {
       Swal.fire({
@@ -411,7 +411,7 @@ export const ActionListaPedidos = ({
   const handleClickCancelar = (row) => {
     if (optionsModulos[0]?.ALTERAR == 'True') {
       if (row && row.IDPEDIDO) {
-        handleAtivarCancelarPedido(row.IDPEDIDO, 'False');
+        handleAtivarCancelarPedido(row.IDPEDIDO, 'True');
       }
     } else {
       Swal.fire({

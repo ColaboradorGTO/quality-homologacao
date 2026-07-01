@@ -122,6 +122,7 @@ export const FormularioIncluirProdutoPedido = ({
         getInputStateGrade,
         validarCamposProduto,
         preencherDadosProdutoSelecionado,
+        handleBlurPesquisaProduto,
         onSubmit,
     } = useIncluirProduto({
         usuarioLogado,
@@ -395,10 +396,11 @@ export const FormularioIncluirProdutoPedido = ({
                                         placeholder={"Digite a Descrição..."}
                                         value={referenciaProduto}
                                         onChange={(e) => setReferenciaProduto(e.target.value)}
+                                        onBlur={handleBlurPesquisaProduto}
                                         errors={errors}
                                         clearErrors={clearErrors}
                                     />
-
+ 
                                 )}
                             />
                         </div>

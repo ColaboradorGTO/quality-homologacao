@@ -3,8 +3,6 @@ import { get, post, put } from "../../../../../../api/funcRequest";
 import { useState } from "react";
 import axios from "axios";
 
-
-
 export const useProdutoPedido = ({ usuarioLogado, handleClick, setDadosDetalhePedido, setDadosVisualizarPedido }) => {
     const [ipUsuario, setIpUsuario] = useState('');
 

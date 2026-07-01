@@ -260,19 +260,18 @@ export const useIncluirProutoPedido = ({
         setDesconto3(toFloat(dadosVisualizarPedido[0]?.DESCPERC03).toFixed(2))
         const totalLiquidoCalculado = (dadosDetalhePedido || []).reduce( (acc, item) => acc + toFloat(item?.VRTOTALDETALHEPEDIDO),0);
 
-        const totalLiquidoFinal = totalLiquidoCalculado > 0
-            ? totalLiquidoCalculado
-            : toFloat(dadosVisualizarPedido[0]?.VRTOTALLIQUIDO);
-
-        setTotalLiq(totalLiquidoFinal)
+        setTotalLiq(totalLiquidoCalculado)
 
         setIdResumoPedido(dadosVisualizarPedido[0]?.IDPEDIDO)
         setIdAndamento(dadosVisualizarPedido[0]?.IDANDAMENTO || '');
         setDataPrevisaoEntrega(formatarDataParaInput(dadosVisualizarPedido[0]?.DTPREVENTREGA));
         setDataPedido(formatarDataParaInput(dadosVisualizarPedido[0]?.DTPEDIDO));
-        setTotalBruto(toFloat(dadosVisualizarPedido[0]?.VRTOTALBRUTO))
-        setQtdProdutos(toFloat(dadosVisualizarPedido[0]?.QTDTOTPRODUTOS))
+        // setQtdProdutos(toFloat(dadosVisualizarPedido[0]?.QTDTOTPRODUTOS))
+        const totalQtdProdutosCalculado = (dadosDetalhePedido || []).reduce( (acc, item) => acc + toFloat(item?.QTDTOTAL),0);
+        setQtdProdutos(totalQtdProdutosCalculado);
         
+        const totalDetPedidosCalculado = (dadosDetalhePedido || []).reduce( (acc, item) => acc + toFloat(item?.VRTOTALDETALHEPEDIDO),0);
+        setTotalBruto(totalDetPedidosCalculado)
         }
     }, [dadosVisualizarPedido, dadosDetalhePedido])
         
@@ -742,6 +741,8 @@ export const useIncluirProutoPedido = ({
 
         return true;
     };
+
+ 
 
     const clonarCabecalho = async () => {
         let idResumoAtual = idResumoPedido || 0;
@@ -1282,6 +1283,91 @@ export const useIncluirProutoPedido = ({
             });
         }
     }
+
+    const handleClonarPedido = async () => {
+        let idResumoAtual = Number(idResumoPedido);
+        const camposValidos = await validarCamposCabecalhoPedido();
+
+        if (!camposValidos) {
+            Swal.close();
+            return;
+        }
+
+        const confirmacao = await Swal.fire({
+            icon: 'warning',
+            title: 'Deseja Realmente Clonar Este Pedido?',
+            text: 'Você não poderá reverter esta ação!',
+            showCancelButton: true,
+            showConfirmButton: true,
+            confirmButtonText: 'Sim',
+            cancelButtonText: 'Não',
+        });
+
+        if (!confirmacao.isConfirmed) {
+            return;
+        }
+
+        Swal.fire({
+            title: 'Carregando dados, aguarde...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        const data = {
+            IDRESUMOPEDIDOCLONAR: idResumoAtual,
+            IDRESPCADASTRO: parseInt(usuarioLogado.id),
+        };
+
+        try {
+     
+          
+            const response = await post('/clonar-pedido', data);
+
+        
+            const ipUsuario = await getIPUsuario();
+            await post('/log-web', {
+                IDFUNCIONARIO: String(usuarioLogado.id),
+                PATHFUNCAO: 'COMPRAS /CLONAR PEDIDO',
+                DADOS: JSON.stringify(data),
+                IP: ipUsuario || 'Indisponível'
+            });
+
+            Swal.close();
+
+            await Swal.fire({
+                position: 'center',
+                icon: 'success',
+                title: 'Clonado!',
+                text: 'Pedido Clonado com Sucesso.',
+                showConfirmButton: false,
+                timer: 5000,
+                customClass: { container: 'custom-swal' }
+            });
+
+            window.location.replace('/DashBoardCompras');
+            return response?.data;
+        } catch (error) {
+            Swal.close();
+            const ipUsuario = await getIPUsuario();
+            await post('/log-web', {
+                IDFUNCIONARIO: String(usuarioLogado.id),
+                PATHFUNCAO: 'COMPRAS / ERRO AO CLONAR PEDIDO',
+                DADOS: JSON.stringify(data),
+                IP: ipUsuario || 'Indisponível'
+            });
+
+            Swal.fire({
+                position: 'center',
+                icon: 'error',
+                title: 'Erro ao tentar clonar o pedido, recarregue e tente novamente!',
+                showConfirmButton: false,
+                timer: 3000,
+                customClass: { container: 'custom-swal' }
+            });
+        }
+    }
       
     const handleFecharPedido = async () => {
         try {
@@ -1551,6 +1637,7 @@ export const useIncluirProutoPedido = ({
         clonarCabecalho,
         handleIncluir,
         handleSalvarPedido,
+        handleClonarPedido,
         refetchListaDetalhePedidos,
         refetchListaCadastroProdutoPedidos,
         refetchListaProdutoPedidos,
