@@ -13,7 +13,7 @@ import { toFloat } from "../../../../utils/toFloat";
 import { useConfirmarConsolidacaoFatura } from "./hooks/useConfirmarConsolidacaoFatura";
 import Swal from "sweetalert2";
 import { Checkbox } from "primereact/checkbox";
-import { dataFormatada } from "../../../../../../api/src/utils/dataFormatada";
+import { dataFormatada } from "../../../../utils/dataFormatada";
 
 export const ActionListaFaturasConsolidadas = ({
   dadosDetalheFatura,
