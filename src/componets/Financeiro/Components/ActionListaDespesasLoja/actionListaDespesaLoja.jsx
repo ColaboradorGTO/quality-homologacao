@@ -30,7 +30,7 @@ export const ActionListaDespesaLoja = ({
   setBtnVisivel
 }) => {
   const { handleAtivar, handleCancelar } = useEditarDespesa(usuarioLogado, optionsModulos, handleClick);
-  const { handleMigrarDespesa } = useMigrarDespesaSAP({optionsModulos, usuarioLogado, selectedItems, handleClick});
+  const { handleMigrarDespesa } = useMigrarDespesaSAP({ optionsModulos, usuarioLogado, selectedItems, handleClick });
   const [modalDespesasVisivel, setModalDespesasVisivel] = useState(false);
   const [dadosDespesasLojaDetalhe, setDadosDespesasLojaDetalhe] = useState([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
@@ -267,7 +267,7 @@ export const ActionListaDespesaLoja = ({
     {
       field: 'DTDESPESA',
       header: 'Data Mov',
-      body: row => <th style={{ color: 'blue' }}> {dataFormatada(row.DTDESPESA)} </th>,
+      body: row => <th style={{ color: 'blue' }}> {row.DTDESPESA} </th>,
       sortable: true,
     },
     {
@@ -572,7 +572,7 @@ export const ActionListaDespesaLoja = ({
               {selectAllChecked ? "Desmarcar Todos" : "Marcar Todos"}
             </span>
           </div>
-      </div>
+        </div>
 
         <div className="card" ref={dataTableRef}>
 
@@ -581,6 +581,8 @@ export const ActionListaDespesaLoja = ({
             value={dados}
             globalFilter={globalFilterValue}
             size="small"
+            dataKey="IDDESPESASLOJA"
+            cellMemo={false}
             selectionMode="single"
             selection={rowSelection}
             onSelectionChange={(e) => setRowSelection(e.value)}

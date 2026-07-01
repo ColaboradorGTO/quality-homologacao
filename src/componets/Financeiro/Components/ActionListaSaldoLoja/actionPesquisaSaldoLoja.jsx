@@ -9,6 +9,7 @@ import { get } from "../../../../api/funcRequest";
 import { AiOutlineSearch } from "react-icons/ai";
 import { useQuery } from 'react-query';
 import { useFetchData } from "../../../../hooks/useFetchData";
+import Swal from "sweetalert2";
 
 export const ActionPesquisaSaldoLoja = () => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
@@ -72,6 +73,17 @@ export const ActionPesquisaSaldoLoja = () => {
   };
 
   const handleClick = () => {
+     if (marcaSelecionada === '') {
+      Swal.fire({
+        title: 'Atenção!',
+        text: `Selecione uma marca!`,
+        icon: 'warning',
+        customClass: {
+          container: 'custom-swal',
+        },
+      })
+      return;
+    }
     setClickContador(prevContador => prevContador + 1);
     if (clickContador % 2 === 0) {
       setTabelaVisivel(true);

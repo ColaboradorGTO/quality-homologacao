@@ -228,6 +228,7 @@ export const ActionPesquisaFaturasLoja = ({ usuarioLogado, ID }) => {
           InputSelectEmpresaComponent={InputSelectAction}
           labelSelectEmpresa={"Empresa"}
           optionsEmpresas={[
+            {value: '', label: 'Selecione uma empresa'},
             ...optionsEmpresas.map((empresa) => ({
               value: empresa.IDEMPRESA,
               label: empresa.NOFANTASIA,

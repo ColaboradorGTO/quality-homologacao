@@ -626,6 +626,7 @@ export const ActionListaConciliarPorBanco = ({
             onSelectionChange={(e) => setRowSelection(e.value)}
             sortOrder={-1}
             paginator={true}
+            cellMemo={false}
             rows={rows}
             first={first}
             onPage={(e) => {

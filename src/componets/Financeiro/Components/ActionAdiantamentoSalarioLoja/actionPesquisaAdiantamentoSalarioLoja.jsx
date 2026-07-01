@@ -201,6 +201,7 @@ export const ActionPesquisaAdiantamentoSalarioLoja = ({usuarioLogado, ID }) => {
         onChangeSelectEmpresa={handleChangeEmpresa}
         valueSelectEmpresa={empresaSelecionada}
         optionsEmpresas={[
+          { value: '', label: 'Selecione uma empresa' },
           ...optionsEmpresas.map((empresa) => ({
             value: empresa.IDEMPRESA,
             label: empresa.NOFANTASIA,

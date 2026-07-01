@@ -3,7 +3,7 @@ import { ActionMain } from "../../../Actions/actionMain"
 import { InputField } from "../../../Buttons/Input"
 import { ButtonType } from "../../../Buttons/ButtonType"
 import { get } from "../../../../api/funcRequest"
-import {  AiOutlineSearch } from "react-icons/ai"
+import { AiOutlineSearch } from "react-icons/ai"
 import { InputSelectAction } from "../../../Inputs/InputSelectAction"
 import { useQuery } from 'react-query';
 import Swal from "sweetalert2"
@@ -45,8 +45,8 @@ export const ActionPesquisaConciliacaoBancosDTW = ({ usuarioLogado }) => {
   );
 
   const { data: dadosContaBanco = [], error: errorContaBanco, isLoading: isLoadingContaBanco, } = useFetchData('contaBanco', '/contaBanco');
-  
-  
+
+
 
   useEffect(() => {
     if (errorContaBanco) {
@@ -63,9 +63,9 @@ export const ActionPesquisaConciliacaoBancosDTW = ({ usuarioLogado }) => {
     const urlBase = `/deposito-loja?idConta=${contaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&dataCompInicio=${dataPesquisaInicioB}&dataCompFim=${dataPesquisaFimB}&dataMovInicio=${dataPesquisaInicioC}&dataMovFim=${dataPesquisaFimC}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
-    try {             
+    try {
       animacaoCarregamento('Carregando dados...', true);
-        
+
       const primeiraPagina = 1;
       const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
       const page = primeiraResposta.page || primeiraPagina;
@@ -93,18 +93,18 @@ export const ActionPesquisaConciliacaoBancosDTW = ({ usuarioLogado }) => {
   };
 
   const { data: dadosConciliarBanco = [], error: errorConciliarBanco, isLoading: isLoadingConciliarBanco, refetch: refetchConciliarBanco } = useQuery(
-    ['deposito-loja',  ],
+    ['deposito-loja',],
     () => fetchConciliarBanco(),
     { enabled: false, staleTime: 5 * 60 * 1000 }
   )
 
-  const fetchConciliarBancoConsolidado = async ( ) => {
+  const fetchConciliarBancoConsolidado = async () => {
     const urlBase = `/deposito-loja-consolidado?idConta=${contaSelecionada}&dataCompInicio=${dataPesquisaInicioB}&dataCompFim=${dataPesquisaFimB}&dataMovInicio=${dataPesquisaInicioC}&dataMovFim=${dataPesquisaFimC}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
       animacaoCarregamento('Carregando dados...', true);
-        
+
       const primeiraPagina = 1;
       const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
       const page = primeiraResposta.page || primeiraPagina;
@@ -129,11 +129,11 @@ export const ActionPesquisaConciliacaoBancosDTW = ({ usuarioLogado }) => {
     } finally {
       fecharAnimacaoCarregamento();
     }
-    
+
   };
 
   const { data: dadosConciliarBancoConsolidado = [], error: errorBancoConsolidado, isLoading: isLoadingBancoConsolidado, refetch: refetchBancoConsolidado } = useQuery(
-    ['deposito-loja-consolidado',  ],
+    ['deposito-loja-consolidado',],
     () => fetchConciliarBancoConsolidado(),
     { enabled: false, staleTime: 5 * 60 * 1000 }
   )
@@ -158,6 +158,18 @@ export const ActionPesquisaConciliacaoBancosDTW = ({ usuarioLogado }) => {
   }
 
   const handleClickConsolidado = () => {
+    if (!contaSelecionada && !dataPesquisaInicioB && !dataPesquisaFimB && !dataPesquisaInicioC && !dataPesquisaFimC) {
+      Swal.fire({
+        title: 'Atenção!',
+        text: `Informe ao menos uma das Datas para a pesquisa e conta para a pesquisa `,
+        icon: 'warning',
+        customClass: {
+          container: 'custom-swal',
+        },
+
+      })
+      return;
+    }
     setTabelaVisivelConsolidado(true)
     setTabelaVisivel(false)
     setTabelaVisivelCompensacao(false)
@@ -173,7 +185,7 @@ export const ActionPesquisaConciliacaoBancosDTW = ({ usuarioLogado }) => {
         linkComponentAnterior={["Home"]}
         linkComponent={["Conciliação por Bancos DTW"]}
         title="Conciliação por Bancos DTW"
-  
+
         InputFieldDTInicioAComponent={InputField}
         labelInputDTInicioA={"Data Depósito Início"}
         onChangeInputFieldDTInicioA={(e) => setDataPesquisaInicio(e.target.value)}
@@ -203,7 +215,7 @@ export const ActionPesquisaConciliacaoBancosDTW = ({ usuarioLogado }) => {
         labelInputDTFimC={"Data Movimento Fim"}
         onChangeInputFieldDTFimC={(e) => setDataPesquisaFimC(e.target.value)}
         valueInputFieldDTFimC={dataPesquisaFimC}
-        
+
 
         InputSelectEmpresaComponent={InputSelectAction}
         labelSelectEmpresa={"Conta Banco"}
@@ -239,26 +251,26 @@ export const ActionPesquisaConciliacaoBancosDTW = ({ usuarioLogado }) => {
       />
 
       {tabelaVisivel && (
-        <ActionListaConciliacaoBancoDTW 
-          dadosConciliarBanco={dadosConciliarBanco} 
-          contaSelecionada={contaSelecionada} 
-          optionsModulos={optionsModulos}  
+        <ActionListaConciliacaoBancoDTW
+          dadosConciliarBanco={dadosConciliarBanco}
+          contaSelecionada={contaSelecionada}
+          optionsModulos={optionsModulos}
           usuarioLogado={usuarioLogado}
-          handleClick={handleClick}
-        />
+          refetchConciliarBanco={refetchConciliarBanco}
+          refetchBancoConsolidado={refetchBancoConsolidado} />
       )}
       {tabelaVisivelCompensacao && (
-        <ActionListaCompensacaoBancoDTW 
-          dadosConciliarBanco={dadosConciliarBanco} 
-          contaSelecionada={contaSelecionada} 
-          optionsModulos={optionsModulos}  
+        <ActionListaCompensacaoBancoDTW
+          dadosConciliarBanco={dadosConciliarBanco}
+          contaSelecionada={contaSelecionada}
+          optionsModulos={optionsModulos}
           usuarioLogado={usuarioLogado}
-          handleClickCompensacao={handleClickCompensacao}
-        />
+          refetchConciliarBanco={refetchConciliarBanco}
+          refetchBancoConsolidado={refetchBancoConsolidado} />
       )}
-   
+
       {tabelaVisivelConsolidado && (
-        <ActionListaConsolidadoBancoDTW   dadosConciliarBancoConsolidado={dadosConciliarBancoConsolidado}/>
+        <ActionListaConsolidadoBancoDTW dadosConciliarBancoConsolidado={dadosConciliarBancoConsolidado} />
 
       )}
     </Fragment>
