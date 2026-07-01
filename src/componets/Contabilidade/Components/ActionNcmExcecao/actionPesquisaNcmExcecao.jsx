@@ -170,7 +170,7 @@ export const ActionPesquisaNcmExcecao = ({ usuarioLogado }) => {
                 ButtonTypeImportar={ButtonType}
                 linkImportar={"Importar"}
                 onButtonClickImportar={handleImportar}
-                corCadastro={"info"}
+                
             />
             {tabelaVisivel && (
                 <ActionListaNcmExcecao
