@@ -10,8 +10,14 @@ export const ActionIncluirProdutoPedidoModal = ({
   optionsModulos,
   tipoPedidoSelecionado,
   marcaSelecionada,
+  fornecedorSelecionado,
   idResumoPedido,
-  dadosUltimosPedidos
+  dadosUltimosPedidos,
+  dadosDetalhePedido,
+  refetchListaProdutoPedidos,
+  setDadosDetalhe,
+  checkboxIntermediario,
+  checked
 }) => {
 
   return (
@@ -39,8 +45,14 @@ export const ActionIncluirProdutoPedidoModal = ({
             optionsModulos={optionsModulos}
             tipoPedidoSelecionado={tipoPedidoSelecionado}
             marcaSelecionada={marcaSelecionada}
+            fornecedorSelecionado={fornecedorSelecionado}
             idResumoPedido={idResumoPedido}
             dadosUltimosPedidos={dadosUltimosPedidos}
+            dadosDetalhePedido={dadosDetalhePedido}
+            refetchListaProdutoPedidos={refetchListaProdutoPedidos}
+            setDadosDetalhe={setDadosDetalhe}
+            checkboxIntermediario={checkboxIntermediario}
+            checked={checked}
          />
           
         </Modal.Body>
