@@ -9,6 +9,7 @@ import * as XLSX from 'xlsx';
 import HeaderTable from "../../../Tables/headerTable";
 import { Row } from "primereact/row";
 import { ColumnGroup } from "primereact/columngroup";
+import { toFloat } from "../../../../utils/toFloat";
 
 export const ActionListaVendasConvenio = ({ dadosVendasConvenio }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
@@ -137,6 +138,7 @@ export const ActionListaVendasConvenio = ({ dadosVendasConvenio }) => {
     const total = calcularTotal('VRRECCONVENIO');
     return total
   }
+
   const dadosListaConvenio = dadosVendasConvenio.map((item, index) => {
     let contador = index + 1;
 
@@ -191,7 +193,7 @@ export const ActionListaVendasConvenio = ({ dadosVendasConvenio }) => {
     {
       field: 'NUCPF',
       header: 'CPF',
-      body: row => <th style={{ }}> {parseFloat(row.NUCPF)}</th>,
+      body: row => <th style={{ }}> {row.NUCPF}</th>,
       sortable: true,
     },
     {

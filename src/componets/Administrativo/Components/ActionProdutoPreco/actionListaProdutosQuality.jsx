@@ -25,13 +25,16 @@ export const ActionListaProdutosQuality = ({ dadosProdutosQuality }) => {
   const exportToPDF = () => {
     const doc = new jsPDF();
     doc.autoTable({
-      head: [['Nº', 'NUCODBARRAS', 'DSNOME', 'DTULTALTERACAO', 'PRECO_VENDA']],
+      head: [['Nº', 'NUCODBARRAS', 'DSNOME', 'DTULTALTERACAO', 'PRECO_VENDA', 'GRUPO', 'SUBGRUPO', 'IDPRODUTO']],
       body: dados.map(item => [
         item.contador,
         item.NUCODBARRAS,
         item.DSNOME,
         item.DTULTALTERACAO,
-        item.PRECO_VENDA
+        item.PRECO_VENDA,
+        item.GRUPO,
+        item.SUBGRUPO,
+        item.IDPRODUTO
       ]),
       horizontalPageBreak: true,
       horizontalPageBreakBehaviour: 'immediately'
@@ -42,37 +45,48 @@ export const ActionListaProdutosQuality = ({ dadosProdutosQuality }) => {
   const exportToExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(dados);
     const workbook = XLSX.utils.book_new();
-    const header = ['Nº', 'NUCODBARRAS', 'DSNOME', 'DTULTALTERACAO', 'PRECO_VENDA'];
+    const header = ['Nº', 'NUCODBARRAS', 'DSNOME', 'DTULTALTERACAO', 'PRECO_VENDA', 'GRUPO', 'SUBGRUPO', 'IDPRODUTO'];
     worksheet['!cols'] = [
-      { wpx: 50, caption: 'Nº' }, 
+      { wpx: 50, caption: 'Nº' },
       { wpx: 100, caption: 'NUCODBARRAS' },
       { wpx: 200, caption: 'DSNOME' },
       { wpx: 100, caption: 'DTULTALTERACAO' },
-      { wpx: 100, caption: 'PRECO_VENDA' }
-    ]; 
+      { wpx: 100, caption: 'PRECO_VENDA' },
+      { wpx: 100, caption: 'GRUPO' },
+      { wpx: 100, caption: 'SUBGRUPO' },
+      { wpx: 100, caption: 'IDPRODUTO' },
+    ];
     XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Produtos Quality');
     XLSX.writeFile(workbook, 'produto_quality.xlsx');
   };
 
+
   const dados = dadosProdutosQuality.map((item, index) => {
     let contador = index + 1;
     return {
-      
       contador,
       NUCODBARRAS: item.NUCODBARRAS,
       DSNOME: item.DSNOME,
       DTULTALTERACAO: item.DTULTALTERACAO,
       PRECO_VENDA: item.PRECO_VENDA,
-   
+      GRUPO: item.GRUPO,
+      SUBGRUPO: item.SUBGRUPO,
+      IDPRODUTO: item.IDPRODUTO
     }
   });
 
   const colunasQuality = [
     {
       field: 'contador',
-      header: '#',	
+      header: '#',
       body: row => <th>{row.contador}</th>,
+      sortable: true,
+    },
+    {
+      field: 'IDPRODUTO',
+      header: 'Código',
+      body: row => <th>{parseFloat(row.IDPRODUTO)}</th>,
       sortable: true,
     },
     {
@@ -85,6 +99,18 @@ export const ActionListaProdutosQuality = ({ dadosProdutosQuality }) => {
       field: 'DSNOME',
       header: 'Descrição',
       body: row => <th>{row.DSNOME}</th>,
+      sortable: true,
+    },
+    {
+      field: 'GRUPO',
+      header: 'Grupo',
+      body: row => <th>{row.GRUPO}</th>,
+      sortable: true,
+    },
+    {
+      field: 'SUBGRUPO',
+      header: 'Subgrupo',
+      body: row => <th>{row.SUBGRUPO}</th>,
       sortable: true,
     },
     {
@@ -133,6 +159,7 @@ export const ActionListaProdutosQuality = ({ dadosProdutosQuality }) => {
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
             filterDisplay="menu"
             showGridlines
+            cellMemo={false}
             stripedRows
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado </div>}
           >
@@ -147,11 +174,11 @@ export const ActionListaProdutosQuality = ({ dadosProdutosQuality }) => {
                 sortable={coluna.sortable}
                 headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '1rem' }}
                 footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem' }}
-                bodyStyle={{ fontSize: '1rem', border: '1px solid #e9e9e9'}}
+                bodyStyle={{ fontSize: '1rem', border: '1px solid #e9e9e9' }}
 
               />
             ))}
-    
+
           </DataTable>
         </div>
       </div>

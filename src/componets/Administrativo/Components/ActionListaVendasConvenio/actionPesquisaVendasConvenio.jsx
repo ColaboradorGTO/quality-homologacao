@@ -32,7 +32,7 @@ export const ActionPesquisaVendasConvenio = () => {
   const { data: optionsEmpresas = [],} = useFetchEmpresas(marcaSelecionada);
   
   const fetchListaVendasConvenioDescontoFuncionario = async () => {
-    const urlBase = `/desconto-motivo-vendas-adm?idEmpresa=${empresaSelecionada}&idGrupo=${marcaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&dsMotivoDesc=Desconto Funcionario`;
+    const urlBase = `/vendaConvenio?idEmpresa=${empresaSelecionada}&idMarca=${marcaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&dsmotdesc=Desconto Funcionario`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
@@ -71,7 +71,7 @@ export const ActionPesquisaVendasConvenio = () => {
   );
 
   const fetchListaVendasConvenio = async () => {
-    const urlBase = `/desconto-motivo-vendas-adm?idEmpresa=${empresaSelecionada}&idGrupo=${marcaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&dsMotivoDesc=Convenio`;
+    const urlBase = `/vendaConvenio?idEmpresa=${empresaSelecionada}&idMarca=${marcaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&dsmotdesc=Convenio`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
@@ -104,7 +104,7 @@ export const ActionPesquisaVendasConvenio = () => {
   };
 
   const { data: dadosVendasConvenio = [], error: errorVendasConvenio, isLoading: isLoadingVendasConvenio, refetch: refetchListaVendasConvenio } = useQuery(
-    ['desconto-motivo-vendas-adm',],
+    ['vendaConvenio',],
     () => fetchListaVendasConvenio(),
     { enabled: false, staleTime: 60 * 60 * 1000,}
   );
