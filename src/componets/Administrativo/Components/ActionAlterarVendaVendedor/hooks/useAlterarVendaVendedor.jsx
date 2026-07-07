@@ -71,8 +71,8 @@ export const useAlterarVendaVendedor = ({ optionsModulos, usuarioLogado, handleC
         }
 
         const putData = {
-            IDVENDADETALHE: String(selectedIds),
-            IDVENDEDOR: vendedorSelecionado,
+            IDVENDADETALHE: selectedIds,
+            IDVENDEDOR: Number(vendedorSelecionado),
         }
 
         try {

@@ -18,14 +18,14 @@ import { ButtonType } from "../../../../Buttons/ButtonType";
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal";
 import { useQuery } from "react-query";
 
-export const ActionListaProduto = ({ 
-  dadosColetorBalanco, 
-  empresaSelecionada, 
-  quantidade, 
-  usuarioLogado, 
-  optionsModulos, 
+export const ActionListaProduto = ({
+  dadosColetorBalanco,
+  empresaSelecionada,
+  quantidade,
+  usuarioLogado,
+  optionsModulos,
   refetch,
-  handleClose 
+  handleClose
 }) => {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const [ipUsuario, setIpUsuario] = useState('')
@@ -109,7 +109,7 @@ export const ActionListaProduto = ({
   };
 
   const { data: dadosBalancoAvulso = [], error: errorBalanco, isLoading: isLoadingBalanco, refetch: refetchBalanco } = useQuery(
-    [ 'detalheBalancoAvulso', empresaSelecionada, usuarioLogado?.id],
+    ['detalheBalancoAvulso', empresaSelecionada, usuarioLogado?.id],
     async () => {
       const response = await get(`/detalheBalancoAvulso?idFilial=${empresaSelecionada}&coletor=${usuarioLogado.id}`);
       return response.data;
@@ -276,7 +276,7 @@ export const ActionListaProduto = ({
     },
   ]
 
- 
+
   const onSubmit = async (IDPRODUTO, quantidade) => {
     if (optionsModulos[0]?.CRIAR == 'False') {
       Swal.fire({
@@ -290,21 +290,25 @@ export const ActionListaProduto = ({
       const response = await get(`/detalheBalancoAvulso?idFilial=${empresaSelecionada}&coletor=${usuarioLogado.id}`)
       const produtos = response.data || [];
 
+      const produtoSelecionado = dadosColetorBalanco.find(
+        (p) => p.IDPRODUTO == IDPRODUTO
+      );
+
       const produtoExistente = produtos.find(p => p.IDPRODUTO == IDPRODUTO);
-      
-      if(produtoExistente) {
+
+      if (produtoExistente) {
         const novaQuantidade = (Number(produtoExistente.TOTALCONTAGEMGERAL) || 0) + (Number(quantidade) || 1);
-        
+
         const putData = {
           IDEMPRESA: Number(empresaSelecionada),
           NUMEROCOLETOR: Number(usuarioLogado.id),
           DSCOLETOR: usuarioLogado.NOFUNCIONARIO,
           IDPRODUTO: IDPRODUTO,
-          CODIGODEBARRAS: dadosColetorBalanco[0].NUCODBARRAS,
-          DSPRODUTO: dadosColetorBalanco[0].DSNOME,
+          CODIGODEBARRAS: produtoSelecionado.NUCODBARRAS,
+          DSPRODUTO: produtoSelecionado.DSNOME,
           TOTALCONTAGEMGERAL: novaQuantidade,
-          PRECOCUSTO: Number(dadosColetorBalanco[0].PRECOCUSTO),
-          PRECOVENDA: Number(dadosColetorBalanco[0].PRECOVENDA),
+          PRECOCUSTO: Number(produtoSelecionado.PRECOCUSTO),
+          PRECOVENDA: Number(produtoSelecionado.PRECOVENDA),
           STCANCELADO: 'False',
           INSBALANCO: parseInt(0),
         };
@@ -338,15 +342,15 @@ export const ActionListaProduto = ({
       } else {
 
         const createData = {
-          CODIGODEBARRAS: dadosColetorBalanco[0].NUCODBARRAS,
+          CODIGODEBARRAS: produtoSelecionado.NUCODBARRAS,
           DSCOLETOR: 'COLETOR WEB - ' + usuarioLogado.NOFUNCIONARIO,
-          DSPRODUTO: dadosColetorBalanco[0].DSNOME,
+          DSPRODUTO: produtoSelecionado.DSNOME,
           IDEMPRESA: Number(empresaSelecionada),
           IDPRODUTO: IDPRODUTO,
           INSBALANCO: parseInt(0),
           NUMEROCOLETOR: Number(usuarioLogado.id),
-          PRECOCUSTO: Number(dadosColetorBalanco[0].PRECOCUSTO),
-          PRECOVENDA: Number(dadosColetorBalanco[0].PRECOVENDA),
+          PRECOCUSTO: Number(produtoSelecionado.PRECOCUSTO),
+          PRECOVENDA: Number(produtoSelecionado.PRECOVENDA),
           STCANCELADO: 'False',
           TOTALCONTAGEMGERAL: Number(quantidade) || 1,
         }
@@ -355,16 +359,16 @@ export const ActionListaProduto = ({
         const textDados = JSON.stringify(createData)
         let textoFuncao = 'ADMINISTRATIVO/CADASTRO BALANÇO AVULSO';
         const ipUsuario = await getIPUsuario();
-  
+
         const postData = {
           IDFUNCIONARIO: String(usuarioLogado.id),
           PATHFUNCAO: textoFuncao,
           DADOS: textDados,
           IP: ipUsuario
         }
-  
+
         const responsePost = await post('/log-web', postData)
-  
+
         Swal.fire({
           title: 'Sucesso',
           text: 'Cadastro Realizado com Sucesso',
@@ -381,17 +385,20 @@ export const ActionListaProduto = ({
       }
 
 
-    } catch(error) {
+    } catch (error) {
+      const produtoSelecionado = dadosColetorBalanco.find(
+        (p) => p.IDPRODUTO == IDPRODUTO
+      );
       const postData = {
         TOTALCONTAGEMGERAL: Number(quantidade),
-        IDEMPRESA: dadosColetorBalanco[0].IDEMPRESA,
+        IDEMPRESA: produtoSelecionado.IDEMPRESA,
         NUMEROCOLETOR: usuarioLogado.id,
         IDPRODUTO: IDPRODUTO,
         DSCOLETOR: 'COLETOR WEB - ' + usuarioLogado.NOFUNCIONARIO,
-        CODIGODEBARRAS: dadosColetorBalanco[0].NUCODBARRAS,
-        DSPRODUTO: dadosColetorBalanco[0].DSNOME,
-        PRECOCUSTO: Number(dadosColetorBalanco[0].PRECOCUSTO),
-        PRECOVENDA: Number(dadosColetorBalanco[0].PRECOVENDA),
+        CODIGODEBARRAS: produtoSelecionado.NUCODBARRAS,
+        DSPRODUTO: produtoSelecionado.DSNOME,
+        PRECOCUSTO: Number(produtoSelecionado.PRECOCUSTO),
+        PRECOVENDA: Number(produtoSelecionado.PRECOVENDA),
         STCANCELADO: 'False',
         INSBALANCO: parseInt(0),
       }
@@ -523,55 +530,55 @@ export const ActionListaProduto = ({
         {produtosVisiveis && (
           <Fragment>
 
-          <div className="panel-hdr">
-            <h2> Lista de Produtos </h2>
-          </div>
+            <div className="panel-hdr">
+              <h2> Lista de Produtos </h2>
+            </div>
 
-          <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
-            <HeaderTable
-              globalFilterValue={globalFilterValue}
-              onGlobalFilterChange={onGlobalFilterChange}
-              handlePrint={handlePrint}
-              exportToExcel={exportToExcel}
-              exportToPDF={exportToPDF}
-            />
+            <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
+              <HeaderTable
+                globalFilterValue={globalFilterValue}
+                onGlobalFilterChange={onGlobalFilterChange}
+                handlePrint={handlePrint}
+                exportToExcel={exportToExcel}
+                exportToPDF={exportToPDF}
+              />
 
-          </div>
-          <div className="card" ref={dataTableRef}>
-            <DataTable
-              title="Lista de Produtos"
-              value={dadosSearch}
-              size="small"
-              sortOrder={-1}
-              paginator={true}
-              rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
-              first={first}
-              rows={rows}
-              onPage={onPageChange}
-              paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-              currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
-              filterDisplay="menu"
-              showGridlines
-              stripedRows
-              emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
-            >
-              {colunasProdutos.map(coluna => (
-                <Column
-                  key={coluna.field}
-                  field={coluna.field}
-                  header={coluna.header}
+            </div>
+            <div className="card" ref={dataTableRef}>
+              <DataTable
+                title="Lista de Produtos"
+                value={dadosSearch}
+                size="small"
+                sortOrder={-1}
+                paginator={true}
+                rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
+                first={first}
+                rows={rows}
+                onPage={onPageChange}
+                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+                filterDisplay="menu"
+                showGridlines
+                stripedRows
+                emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
+              >
+                {colunasProdutos.map(coluna => (
+                  <Column
+                    key={coluna.field}
+                    field={coluna.field}
+                    header={coluna.header}
 
-                  body={coluna.body}
-                  footer={coluna.footer}
-                  sortable={coluna.sortable}
-                  headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
-                  footerStyle={{ color: '#212529', backgroundColor: "#6e4e9e", border: '1px solid #ccc', fontSize: '0.8rem' }}
-                  bodyStyle={{ fontSize: '0.8rem' }}
+                    body={coluna.body}
+                    footer={coluna.footer}
+                    sortable={coluna.sortable}
+                    headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+                    footerStyle={{ color: '#212529', backgroundColor: "#6e4e9e", border: '1px solid #ccc', fontSize: '0.8rem' }}
+                    bodyStyle={{ fontSize: '0.8rem' }}
 
-                />
-              ))}
-            </DataTable>
-          </div>
+                  />
+                ))}
+              </DataTable>
+            </div>
           </Fragment>
         )}
 
