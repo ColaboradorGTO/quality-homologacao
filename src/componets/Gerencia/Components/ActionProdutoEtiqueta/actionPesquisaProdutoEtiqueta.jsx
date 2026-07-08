@@ -23,7 +23,7 @@ export const ActionPesquisaProdutoEtiqueta = ({ usuarioLogado }) => {
   const [dadosAcumuladorEtiquetas, setDadosAcumuladorEtiquetas] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
-   
+   const [copia, setCopia] = useState(1);
 
   const { data: dadosListaPrecos = [], error: errorListaPrecos, isLoading: isLoadingListaPrecos, refetch } = useQuery(
     'listas-de-precos-sap',
@@ -153,7 +153,10 @@ export const ActionPesquisaProdutoEtiqueta = ({ usuarioLogado }) => {
             );
 
             if (indexExistente !== -1) {
-              listaAtualizada[indexExistente].quantidade += produto.quantidade;
+              listaAtualizada[indexExistente] = {
+                ...listaAtualizada[indexExistente],
+                quantidade: produto.quantidade,
+              };
             } else {
               listaAtualizada.push({
                 quantidade: produto.quantidade,
@@ -188,6 +191,7 @@ export const ActionPesquisaProdutoEtiqueta = ({ usuarioLogado }) => {
       }
     }
   };
+
 
   return (
 
@@ -267,6 +271,8 @@ export const ActionPesquisaProdutoEtiqueta = ({ usuarioLogado }) => {
         setSelectAll={setSelectAll}
         selectedIds={selectedIds}
         setSelectedIds={setSelectedIds}
+        copia={copia}
+        setCopia={setCopia}
       />
     </Fragment>
   )

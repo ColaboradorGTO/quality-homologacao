@@ -22,6 +22,8 @@ export const ActionListaProdutoEtiqueta = ({
   setSelectAll,
   selectedIds,
   setSelectedIds,
+  copia,
+  setCopia
 }) => {
 
   const [globalFilterValue, setGlobalFilterValue] = useState('');
@@ -30,22 +32,6 @@ export const ActionListaProdutoEtiqueta = ({
   const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(10);
   const dataTableRef = useRef();
-
-  const setQtdProduto = (idProduto, novaQuantidade) => {
-    setProdutosSelecionados((prevProdutos) => {
-      const produtoExiste = prevProdutos.some((produto) => produto.IDPRODUTO === idProduto);
-
-      if (!produtoExiste) {
-        return [...prevProdutos, { IDPRODUTO: idProduto, quantidade: Number(novaQuantidade) }];
-      }
-
-      return prevProdutos.map((produto) =>
-        produto.IDPRODUTO === idProduto
-          ? { ...produto, quantidade: Number(novaQuantidade) }
-          : produto
-      );
-    });
-  };
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -251,21 +237,37 @@ export const ActionListaProdutoEtiqueta = ({
               type="checkbox"
               checked={selectedIds.includes(rowData.IDPRODUTO)}
               onChange={(e) => {
-                const isChecked = e.target.checked
-                const updatedSelectedIds = e.target.checked
+                const isChecked = e.target.checked;
+                const updatedSelectedIds = isChecked
                   ? [...selectedIds, rowData.IDPRODUTO]
                   : selectedIds.filter(id => id !== rowData.IDPRODUTO);
+
                 setSelectedIds(updatedSelectedIds);
-                setQtdProduto(rowData.IDPRODUTO, isChecked)
                 setSelectAll(updatedSelectedIds.length === dados.length);
-                setProdutosSelecionados(isChecked ? [...produtosSelecionados, rowData] : produtosSelecionados.filter(item => item.IDPRODUTO !== rowData.IDPRODUTO));
-                if (isChecked) {
-                  setBtnVisivel(true);
+                setSelectedItems((prevItems) =>
+                  isChecked
+                    ? [...prevItems, rowData]
+                    : prevItems.filter(item => item.IDPRODUTO !== rowData.IDPRODUTO)
+                );
 
-                } else {
-                  setBtnVisivel(false);
+                setProdutosSelecionados((prevProdutos) => {
+                  if (!isChecked) {
+                    return prevProdutos.filter(item => item.IDPRODUTO !== rowData.IDPRODUTO);
+                  }
 
-                }
+                  const produtoExistente = prevProdutos.find(item => item.IDPRODUTO === rowData.IDPRODUTO);
+                  const quantidadeAtual = Number(produtoExistente?.quantidade) || 1;
+
+                  if (produtoExistente) {
+                    return prevProdutos.map((item) =>
+                      item.IDPRODUTO === rowData.IDPRODUTO
+                        ? { ...item, ...rowData, quantidade: quantidadeAtual }
+                        : item
+                    );
+                  }
+
+                  return [...prevProdutos, { ...rowData, quantidade: quantidadeAtual }];
+                });
               }}
               disabled={rowData.stDisabled === 'disabled'}
             />
@@ -301,20 +303,51 @@ export const ActionListaProdutoEtiqueta = ({
       field: 'quantidade',
       header: 'Quantidade',
       body: (row) => {
+        const produtoSelecionado = produtosSelecionados.find(p => p.IDPRODUTO === row.IDPRODUTO);
+        const quantidadeAtual = produtoSelecionado 
+          ? (produtoSelecionado.quantidade ?? 1) 
+          : 1;
+
         return (
           <div style={{ background: '', width: '50%' }}>
             <input
               type="number"
-              value={produtosSelecionados.find(p => p.IDPRODUTO === row.IDPRODUTO)?.quantidade || 1}
+              value={quantidadeAtual}
               onChange={(e) => {
-                const novaQuantidade = parseInt(e.target.value, 10) || 1;
-                setProdutosSelecionados(prevProdutos =>
-                  prevProdutos.map(prod =>
+                const novaQuantidade = e.target.value;
+                const produtoJaSelecionado = selectedIds.includes(row.IDPRODUTO);
+
+                if (!produtoJaSelecionado) {
+                  setSelectedIds((prevIds) => [...prevIds, row.IDPRODUTO]);
+                  setSelectedItems((prevItems) => [...prevItems, row]);
+                  setSelectAll(false);
+                  setBtnVisivel(true);
+                }
+
+                setProdutosSelecionados((prevProdutos) => {
+                  const produtoExiste = prevProdutos.some((prod) => prod.IDPRODUTO === row.IDPRODUTO);
+
+                  if (!produtoExiste) {
+                    return [...prevProdutos, { ...row, quantidade: novaQuantidade }];
+                  }
+
+                  return prevProdutos.map((prod) =>
                     prod.IDPRODUTO === row.IDPRODUTO
                       ? { ...prod, quantidade: novaQuantidade }
                       : prod
-                  )
-                );
+                  );
+                });
+              }}
+              onBlur={(e) => {
+                const valor = e.target.value === '' ? 1 : parseInt(e.target.value, 10) || 1;
+
+                setProdutosSelecionados((prevProdutos) => {
+                  return prevProdutos.map((prod) =>
+                    prod.IDPRODUTO === row.IDPRODUTO
+                      ? { ...prod, quantidade: valor }
+                      : prod
+                  );
+                });
               }}
               style={{ width: '100%' }}
             />
@@ -372,6 +405,19 @@ export const ActionListaProdutoEtiqueta = ({
           <h2>Lista de Produtos </h2>
         </div>
 
+        <div style={{ background: '', width: '15%', display: 'flex', alignItems: 'center', gap: '1rem', marginLeft: '1rem' }}>
+          <span style={{ fontWeight: 'bold', textWrap: 'nowrap' }}>QTD CÓPIAS:</span>
+          <input
+            type="number"
+            defaultValue={1}
+            value={copia}
+            min={1}
+            onChange={(e) => setCopia(e.target.value)}
+            style={{ width: '50%' }}
+          />
+
+        </div>
+
         <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
 
           <HeaderTable
@@ -424,6 +470,7 @@ export const ActionListaProdutoEtiqueta = ({
         setProdutosSelecionados={setProdutosSelecionados}
         dadosAcumuladorEtiquetas={dadosAcumuladorEtiquetas}
         setDadosAcumuladorEtiquetas={setDadosAcumuladorEtiquetas}
+        copia={copia}
       />
 
     </Fragment>

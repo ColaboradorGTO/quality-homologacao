@@ -23,6 +23,7 @@ export const ActionDetalharProdutosEtiquetaModal = ({
   dadosAcumuladorEtiquetas,
   setDadosAcumuladorEtiquetas,
   setProdutosSelecionados,
+  copia,
 }) => {
 
   const [globalFilterValue, setGlobalFilterValue] = useState("");
@@ -238,7 +239,7 @@ export const ActionDetalharProdutosEtiquetaModal = ({
                   <h2>LISTA DE PRODUTOS PARA IMPRIMIR</h2>
                 </div>
 
-                <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
+                {/* <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
                   <HeaderTable
                     globalFilterValue={globalFilterValue}
                     onGlobalFilterChange={onGlobalFilterChange}
@@ -246,7 +247,7 @@ export const ActionDetalharProdutosEtiquetaModal = ({
                     exportToExcel={exportToExcel}
                     exportToPDF={exportToPDF}
                   />
-                </div>
+                </div> */}
                 <div className="card" ref={dataTableRef}>
                   <DataTable
                     value={dados}
@@ -302,6 +303,7 @@ export const ActionDetalharProdutosEtiquetaModal = ({
               setTabelaVisivel={setTabelaVisivel}
               dadosAcumuladorEtiquetas={dadosAcumuladorEtiquetas}
               produtosSelecionados={produtosSelecionados}
+              copia={copia}
             />
           }
         </Modal.Body>
