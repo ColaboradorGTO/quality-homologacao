@@ -3,7 +3,6 @@ import { post, put } from "../../../../../api/funcRequest";
 import { useState } from "react";
 import axios from "axios";
 
-
 export const useAlterarVendaVendedor = ({ optionsModulos, usuarioLogado, handleClose}) => {
     const [selectAll, setSelectAll] = useState(false);
     const [selectedIds, setSelectedIds] = useState([]);
@@ -12,7 +11,6 @@ export const useAlterarVendaVendedor = ({ optionsModulos, usuarioLogado, handleC
 
     const getIPUsuario = async () => {
         let usuarioIP = null;
-
         try {
         const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
         usuarioIP = ipWhoisData?.ip;
@@ -73,8 +71,8 @@ export const useAlterarVendaVendedor = ({ optionsModulos, usuarioLogado, handleC
         }
 
         const putData = {
-            IDVENDADETALHE: String(selectedIds),
-            IDVENDEDOR: vendedorSelecionado,
+            IDVENDADETALHE: selectedIds,
+            IDVENDEDOR: Number(vendedorSelecionado),
         }
 
         try {
