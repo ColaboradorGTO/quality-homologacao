@@ -20,8 +20,13 @@ export const FormularioIncluirProdutoPedido = ({
     handleClose,
     tipoPedidoSelecionado,
     marcaSelecionada,
+    fornecedorSelecionado,
     idResumoPedido,
-    dadosUltimosPedidos
+    dadosUltimosPedidos,
+    dadosDetalhePedido,
+    refetchListaProdutoPedidos,
+    setDadosDetalhe,
+    checked
 }) => {
     const { register, handleSubmit, formState: { errors }, clearErrors, setError, control } = useForm({
         mode: "onChange"
@@ -130,6 +135,11 @@ export const FormularioIncluirProdutoPedido = ({
         handleClose,
         tipoPedidoSelecionado,
         marcaSelecionada,
+        fornecedorSelecionado,
+        checked,
+        dadosDetalhePedido,
+        refetchListaProdutoPedidos,
+        setDadosDetalhe,
         dadosUltimosPedidos
     });
 
@@ -1021,7 +1031,7 @@ export const FormularioIncluirProdutoPedido = ({
                     corFechar={"secondary"}
 
                     ButtonTypeCadastrar={ButtonTypeModal}
-                    onClickButtonCadastrar
+                    onClickButtonCadastrar={handleSubmit(handleValidatedSubmit)}
                     textButtonCadastrar={"Salvar"}
                     corCadastrar={"success"}
                     loadingTextCadastrar={"Cadastrando..."}

@@ -116,7 +116,7 @@ export const ActionVisualizarPedido = ({
     dadosDetalhesPedidos,
     dadosProdutosPedidos,
     dadosUltimosPedidos,
-    clonarCabecalho,
+    // clonarCabecalho,
     handleIncluir,
     handleSalvarPedido,
     refetchListaDetalhePedidos,

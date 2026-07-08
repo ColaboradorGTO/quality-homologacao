@@ -6,14 +6,19 @@ import { optionsReposicao, optionsTipoCadastro } from "../../../../../../../parc
 import Swal from "sweetalert2";
 import { removerFormatacaoMoeda } from "../../../../../../utils/formatMoeda";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../../../utils/animationCarregamento";
+import { toFloat } from "../../../../../../utils/toFloat";
 
 export const useIncluirProduto = ({
     usuarioLogado,
     optionsModulos,
     tipoPedidoSelecionado,
     marcaSelecionada,
+    fornecedorSelecionado,
     dadosUltimosPedidos,
+    checked,
     dadosDetalhePedido,
+    setDadosDetalhe,
+    refetchListaProdutoPedidos
 }) => {
     const [ipUsuario, setIpUsuario] = useState('');
     const [nomeMarca, setNomeMarca] = useState('')
@@ -49,7 +54,7 @@ export const useIncluirProduto = ({
     const [observacao, setObservacao] = useState('')
     const [idResumoPedido, setIdResumoPedido] = useState('')
     const [stPedidoPorIntermediario, setStPedidoPorIntermediario] = useState('')
-    const [fornecedorSelecionado, setFornecedorSelecionado] = useState('')
+    const [fornecedorSelecionadoProduto, setFornecedorSelecionadoProduto] = useState('')
     const [quantidadePorTamanho, setQuantidadePorTamanho] = useState({});
     const [errosValidacao, setErrosValidacao] = useState([]);
     const [produtoDadosGrade, setProdutoDadosGrade] = useState([]);
@@ -61,12 +66,16 @@ export const useIncluirProduto = ({
     const [tamanhosAtivosEdicao, setTamanhosAtivosEdicao] = useState(new Set());
     const [dadosPedidoAtual, setDadosPedidoAtual] = useState([])
     const [gradeDetalhes, setGradeDetalhes] = useState({});
+    const [codBarras, setCodBarras] = useState('');
+    const [idProduto, setIdProduto] = useState(null);
+
+
 
     const pendingTamanhoIdRef = useRef(null);
 
     useEffect(() => {
         if (dadosUltimosPedidos && dadosUltimosPedidos.length > 0) {
-            setFornecedorSelecionado(dadosUltimosPedidos[0]?.MODPEDIDO)
+            setFornecedorSelecionadoProduto(dadosUltimosPedidos[0]?.MODPEDIDO)
             setIdResumoPedido(dadosUltimosPedidos[0]?.IDRESUMOPEDIDO)
         }
     }, [])
@@ -74,43 +83,43 @@ export const useIncluirProduto = ({
     const { data: dadosCores = [], error: errorCores, isLoading: isLoadingCores, refetch: refetchCores } = useQuery(
         'listaCores',
         async () => { const response = await get(`/listaCores`); return response.data },
-        { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+        { enabled: true,  }
     );
 
     const { data: dadosUnidadeMedida = [], error: errorUnidadeMedida, isLoading: isLoadingUnidadeMedida, refetch: refetchUnidadeMedida } = useQuery(
         'unidadeMedida',
         async () => { const response = await get(`/unidadeMedida`); return response.data },
-        { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+        { enabled: true, }
     );
 
     const { data: dadosTipoTecidos = [], error: errorTipoTecidos, isLoading: isLoadingTipoTecidos, refetch: refetchTipoTecidos } = useQuery(
         'tipoTecidos',
         async () => { const response = await get(`/tipoTecidos`); return response.data },
-        { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+        { enabled: true,  }
     );
 
     const { data: dadosCategoriaPedidos = [], error: errorCategoriaPedidos, isLoading: isLoadingCategoriaPedidos, refetch: refetchCategoriaPedidos } = useQuery(
         'categoriasProdutos',
         async () => { const response = await get(`/categoriasProdutos?idCategoriaPedido=${tipoPedidoSelecionado?.value}`); return response.data },
-        { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+        { enabled: true,  }
     );
  
     const { data: dadosCategoriaPedidoGrade  = [], error: errorCategoriaPedidoGrade, isLoading: isLoadingCategoriaPedidoGrade, refetch: refetchCategoriaPedidoGrade } = useQuery(
         'categoria-pedido',
         async () => { const response = await get(`/categoria-pedido?idCategoriaPedido=${tipoPedidoSelecionado?.value}`); return response.data},
-        { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+        { enabled: true, }
     );
 
     const { data: dadosCategoriasProdutos = [], error: errorCategoriasProdutos, isLoading: isLoadingCategoriasProdutos, refetch: refetchCategoriasProdutos } = useQuery(
         'categoriasProdutos',
         async () => { const response = await get(`/categoriasProdutos?idTipoPedido=${tipoPedidoSelecionado?.value}`); return response.data },
-        { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+        { enabled: true, }
     );
 
     const { data: dadosSubGrupoProduto = [], error: errorSubGrupoProduto, isLoading: isLoadingSubGrupoProduto, refetch: refetchSubGrupoProduto } = useQuery(
         'subgrupo-produto',
         async () => { const response = await get(`/subgrupo-produto`); return response.data },
-        { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+        { enabled: true,  }
     );
 
     const { data: dadosFabricantePedido = [], error: errorFabricantePedido, isLoading: isLoadingFabricantePedido, refetch: refetchFabricantePedido } = useQuery(
@@ -118,14 +127,14 @@ export const useIncluirProduto = ({
         async () => {
             const response = await get(`/vincularFabricanteFornecedor?idFornecedorPedido=${fornecedorSelecionado?.value}`);
             return response.data
-        },
-        { enabled: true, staleTime: 60 * 60 * 1000 }
+        }, 
+        { enabled: true,  }
     );
-
+   
     const { data: dadosLocalExposicao = [], error: errorLocalExposicao, isLoading: isLoadingLocalExposicao, refetch: refetchLocalExposicao } = useQuery(
         'localExposicao',
         async () => { const response = await get(`/localExposicao`); return response.data },
-        { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+        { enabled: true,  }
     );
 
     const { data: dadosGrade = [], error: errorGrade, isLoading: isLoadingGrade, refetch: refetchGrade } = useQuery(
@@ -134,7 +143,7 @@ export const useIncluirProduto = ({
             const response = await get(`/vinculo-tamanho-categoria?idCategoriaPedido=${categoriaGradeSelecionada?.value}`);
             return response.data
         },
-        { enabled: Boolean(categoriaGradeSelecionada?.value), staleTime: 60 * 60 * 1000 }
+        { enabled: Boolean(categoriaGradeSelecionada?.value),  }
     );
 
     const { data: dadosVinculoEstiloGrupo = [], error: errorVinculoEstiloGrupo, isLoading: isLoadingVinculoEstiloGrupo, refetch: refetchVinculoEstiloGrupo } = useQuery(
@@ -189,7 +198,7 @@ export const useIncluirProduto = ({
     const { data: dadosProdutosPedidos  = [], error: errorProdutosPedidos, isLoading: isLoadingProdutosPedidos, refetch: refetchProdutosPedidos } = useQuery(
         ['produtos-pedido', referenciaProduto],
         () => fetchListaProdutosPedidos(),
-        { enabled: false, staleTime: 60 * 60 * 1000 }
+        { enabled: false,  }
     )
     
     const handleBlurPesquisaProduto = async () => {
@@ -268,7 +277,7 @@ export const useIncluirProduto = ({
         }
     };
 
-
+    
     useEffect(() => {
         if (dadosDetalhePedido && dadosDetalhePedido.length > 0) {
 
@@ -583,7 +592,6 @@ export const useIncluirProduto = ({
         setRedeSocialSelecionada(rs ? { value: rs.value, label: rs.label } : null);
     };
 
-  
     const onSubmit = async () => {
         if (stReposicao === 'False') {
             const responseProdutoExistente = await get(`/produtos-pedido?referenciaProduto=${descricaoProduto}`);
@@ -659,28 +667,28 @@ export const useIncluirProduto = ({
             QTDTOTAL: parseFloat(quantidade),
             NUCAIXA: parseFloat(quantidadeCaixa),
             UND: parseInt(unidadeSelecionada?.value),
-            VRUNITBRUTO: parseFloat(converterParaNumero(vrBruto)),
-            DESC01: parseFloat(converterParaNumero(percDescontoI)),
-            DESC02: parseFloat(converterParaNumero(percDescontoII)),
-            DESC03: parseFloat(converterParaNumero(percDescontoIII)),
-            VRUNITLIQUIDO: parseFloat(converterParaNumero(vrLiquido)),
-            VRVENDA: parseFloat(converterParaNumero(vrSugerido)),
-            VRTOTAL: parseFloat(converterParaNumero(vrTotal)),
+            VRUNITBRUTO:toFloat(vrBruto),
+            DESC01: toFloat(percDescontoI),
+            DESC02: toFloat(percDescontoII),
+            DESC03: toFloat(percDescontoIII),
+            VRUNITLIQUIDO: toFloat(vrLiquido),
+            VRVENDA: removerFormatacaoMoeda(vrSugerido),
+            VRTOTAL: removerFormatacaoMoeda(vrTotal), 
             STRECEBIDO: 'False',
             STECOMMERCE: ecommerceSelecionado?.value,
             STREDESOCIAL: redeSocialSelecionada?.value,
             STCANCELADO: 'False',
-            GRADE: grade,
             VRCUSTOPRODATUAL: removerFormatacaoMoeda(vrCusto),
             VRVENDAPRODATUAL: removerFormatacaoMoeda(vrVenda),
             OBSPRODUTO: observacao,
             STTRANSFORMADO: 'False',
             IDCATEGORIAS: parseInt(categoriaSelecionada?.value),
             STREPOSICAO: reposicaoSelecionado?.value,
-            NUCODBARRAS: stReposicao === 'True' ? referencia : '',
-            IDPRODUTO: stReposicao === 'True' ? produtoSelecionado?.IDPRODUTO : '',
+            NUCODBARRAS: codBarras ? codBarras : '',
+            IDPRODUTO: idProduto ? idProduto : '',
             IDRESPCADASTRO: parseInt(usuarioLogado?.id),
-            STPEDIDOPORINTEMEDIARIO: stPedidoPorIntermediario,
+            GRADE: grade,
+            STPEDIDOPORINTEMEDIARIO: checked ? 'True' : 'False',
         };
 
         try {
@@ -710,6 +718,7 @@ export const useIncluirProduto = ({
 
             const responseUltimoPedido = await get(`/lista-detalhe-pedidos?idPedido=${idResumoPedido}`);
             setDadosPedidoAtual(responseUltimoPedido.data);
+            setDadosDetalhe(responseUltimoPedido.data);
             return response.data;
         } catch (error) {
             const textDados = JSON.stringify(data);

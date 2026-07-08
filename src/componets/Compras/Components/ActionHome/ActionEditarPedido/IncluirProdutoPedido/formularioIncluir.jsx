@@ -489,7 +489,7 @@ export const FormularioIncluirProdutoPedido = ({
                                         name="vrHojeCusto"
                                         type="text"
                                         value={formatMoeda(vrCusto)}
-                                        onChange={(e) => setVrCusto(e.target.value)}
+                                        onChange={(e) => setVrCusto(formatarMoeda(e.target.value))}
                                         errors={errors}
                                         clearErrors={clearErrors}
                                         readOnly={true}
@@ -507,7 +507,7 @@ export const FormularioIncluirProdutoPedido = ({
                                         name="vrVendaHoje"
                                         type="text"
                                         value={formatMoeda(vrVenda)}
-                                        onChange={(e) => setVrVenda(e.target.value)}
+                                        onChange={(e) => setVrVenda(formatarMoeda(e.target.value))}
                                         errors={errors}
                                         clearErrors={clearErrors}
                                         readOnly={true}
@@ -530,8 +530,9 @@ export const FormularioIncluirProdutoPedido = ({
                                         type="text"
                                         value={quantidade}
                                         onChange={(e) => {
-                                            setQuantidade(e.target.value);
-                                            atualiza_valor_QtdUnit();
+                                            const val = e.target.value;
+                                            setQuantidade(val);
+                                            atualiza_valor_QtdUnit({ quantidade: val });
                                         }}
 
                                         errors={errors}

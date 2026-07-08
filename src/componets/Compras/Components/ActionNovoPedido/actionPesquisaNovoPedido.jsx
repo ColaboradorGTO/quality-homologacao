@@ -125,10 +125,11 @@ export const ActionPesquisaNovoPedido = ({
     dadosPagamentos,
     dadosTransportador,
     dadosDetalhe, 
+    setDadosDetalhe,
     dadosDetalhesPedidos,
     dadosProdutosPedidos,
     dadosUltimosPedidos,
-    clonarCabecalho,
+    dadosCabecalhoClonado,
     handleIncluir,
     handleSalvarPedido,
     refetchListaDetalhePedidos,
@@ -138,6 +139,7 @@ export const ActionPesquisaNovoPedido = ({
     handleClonarCabecalhoPedido,
     titleSubheader,
     setTituloSubheader,
+    tituloSubheader,
     camposHabilitados,
     setCamposHabilitados,
     checkboxIntermediario,
@@ -152,17 +154,23 @@ export const ActionPesquisaNovoPedido = ({
     clonarCabecalho: true,
     novoPedido: true
   });
-
+  
   useEffect(() => {
-      // console.log('🔍 dadosVisualizarPedido:', dadosVisualizarPedido); // DEBUG
-      
-      // VALIDAÇÃO MAIS ROBUSTA
-      if (!dadosVisualizarPedido || !Array.isArray(dadosVisualizarPedido) || dadosVisualizarPedido.length === 0) {
-        console.log('❌ Dados não disponíveis ou inválidos');
+      const origemDados =
+        Array.isArray(dadosVisualizarPedido) && dadosVisualizarPedido.length > 0
+          ? dadosVisualizarPedido
+          : dadosCabecalhoClonado;
+
+      if (!Array.isArray(origemDados) || origemDados.length === 0) {
+        console.log('❌ Nenhum dado disponível');
         return;
       }
-  
-      const dados = dadosVisualizarPedido[0];
+
+      const totalLiquidoCalculado = (dadosDetalhe || []).reduce( (acc, item) => acc + toFloat(item?.VRTOTALDETALHEPEDIDO),0);
+      
+      setTotalLiq(totalLiquidoCalculado)
+
+      const dados = origemDados[0];
       // console.log('📋 Dados do pedido:', dados); // DEBUG
   
       // ========== VARIÁVEIS COM VALIDAÇÃO ==========
@@ -170,12 +178,13 @@ export const ActionPesquisaNovoPedido = ({
       const StCancelaPedido = String(dados?.STCANCELADO || 'False').trim();
       const IDPEDIDORESUMO = String(dados?.IDPEDIDO || '');
       const dsSetorAndamentoPedido = String(dados?.DSSETOR || '');
-      const stCancelado = StCancelaPedido === 'True';
-      const stMigradoSap = String(dados?.STMIGRADOSAP || 'False') === 'True';
+      const stCancelado = dados?.STCANCELADO == 'True';
+      const stMigradoSap = dados?.STMIGRADOSAP == 'True';
       const stPedidoPorIntermediario = String(dados?.STPEDIDOPRIMARIO || 'False') === 'True';
-      const idPedidoPrimario = parseInt(dados?.IDPEDIDOPRIMARIO || '0', 10);
+      const idPedidoPrimario = parseInt(dados?.IDPEDIDOPRIMARIO || 0);
       const isPedidoSecundario = idPedidoPrimario > 0;
-  
+      const isPedidoRN = dados?.STPEDIPRIMARIO == 'True';
+
       // console.log('🎯 Variáveis processadas:', {
       //   IdAndamentoPedido,
       //   StCancelaPedido,
@@ -186,7 +195,12 @@ export const ActionPesquisaNovoPedido = ({
       // }); // DEBUG
   
       // ========== LÓGICA PRINCIPAL ==========
-      const clonarVisivelPadrao = !(stCancelado && IdAndamentoPedido !== 2 && IdAndamentoPedido !== 5);
+      // const clonarVisivelPadrao = !(stCancelado && IdAndamentoPedido !== 2 && IdAndamentoPedido !== 5);
+         const clonarVisivelPadrao = stMigradoSap
+        ? false
+        : stCancelado
+          ? (IdAndamentoPedido === 2 || IdAndamentoPedido === 5)
+          : dsSetorAndamentoPedido !== 'COMPRAS';
   
       let novosBotoesVisiveis = {
         incluir: false,
@@ -246,13 +260,6 @@ export const ActionPesquisaNovoPedido = ({
         camposDevemEstarHabilitados = false;
       }
   
-      // console.log('🎯 Estados finais:', {
-      //   novosBotoesVisiveis,
-      //   camposDevemEstarHabilitados,
-      //   novoTitulo
-      // }); // DEBUG
-  
-      // ========== APLICAR ESTADOS ==========
       let statusTitleSubHeader = stCancelado
         ? (
           <span className="text-danger fw-900 pl-1">
@@ -303,13 +310,13 @@ export const ActionPesquisaNovoPedido = ({
       setTituloSubheader(novoTitulo);
       
       setCheckboxIntermediario({
-        disabled: idPedidoPrimario > 0 || stPedidoPorIntermediario || stMigradoSap,
-        checked: idPedidoPrimario > 0 || stPedidoPorIntermediario
+        disabled: (isPedidoSecundario  || isPedidoRN || stMigradoSap || stCancelado),
+        checked: (isPedidoSecundario || isPedidoRN)
       });
       
       setIdPedidoPrimario(idPedidoPrimario);
       
-  }, [dadosVisualizarPedido]);  
+  }, [dadosVisualizarPedido, dadosCabecalhoClonado, dadosDetalhe]);  
 
 
   const calcularTotal = (field) => {
@@ -399,7 +406,7 @@ export const ActionPesquisaNovoPedido = ({
 
     setCamposHabilitados(true);
     setTituloSubheader('Novo Pedido');
-
+    setDadosDetalhe([]);
     window.location.replace('/DashBoardCompras#');
   }
 
@@ -546,8 +553,9 @@ export const ActionPesquisaNovoPedido = ({
       <ActionMainNovoPedido
         linkComponentAnterior={["Home"]}
         linkComponent={["Novo Pedido"]}
-        title="Novo Pedido"
-        subTitle="Nome da Loja"
+        // title="Novo Pedido"
+        subTitle={tituloSubheader}
+        // subTitle="Nome da Loja"
         
         cardVendas={true}
         valorVendas={calcularTotalDetalhe()}
@@ -774,33 +782,11 @@ export const ActionPesquisaNovoPedido = ({
         styleTXT={botoesVisiveis.salvar}
       />
 
-      <div id="resultadoListaPdido" style={{ backgroundColor: "#fff", padding: "15px" }}>
-
-        <ActionListaNovoPedidos 
-          dadosVisualizarPedido={dadosVisualizarPedido} 
-          dadosDetalhe={dadosDetalhe} 
-        />
-
-      </div>
-
-      {/* {tabelaCadastroProduto && (
-        <ActionListaProdutosParaCadastro dadosProdutosPedidos={dadosProdutosPedidos}/>
-      )} */}
-
-      
-      {/* <ActionPDFPedido 
-        show={modalPedidoNota}
-        handleClose={() => setModalPedidoNota(false)}
-        dadosPedido={dadosPedido}
-        dadosDetalhesPedidos={dadosDetalhesPedidos}
-      /> */}
-      
-      {/* <ActionPDFPedidoSemPreco
-        show={modalPedidoNotaSemPreco}
-        handleClose={() => setModalPedidoNotaSemPreco(false)}
-        dadosPedidoSemPreco={dadosPedidoSemPreco}
-        dadosDetalhePedido={dadosDetalhePedido}
-      /> */}
+     
+      <ActionListaNovoPedidos 
+        dadosVisualizarPedido={dadosVisualizarPedido} 
+        dadosDetalhe={dadosDetalhe} 
+      />
 
       <ActionIncluirProdutoPedidoModal
         show={modalIncluirProdutoPedido}
@@ -809,11 +795,16 @@ export const ActionPesquisaNovoPedido = ({
         optionsModulos={optionsModulos}
         tipoPedidoSelecionado={tipoPedidoSelecionado}
         marcaSelecionada={marcaSelecionada}
+        fornecedorSelecionado={fornecedorSelecionado}
         idResumoPedido={idResumoPedido}
         dadosUltimosPedidos={dadosUltimosPedidos}
+        dadosDetalhePedido={dadosDetalhePedido}
+        setDadosDetalhe={setDadosDetalhe}
+        checkboxIntermediario={checkboxIntermediario}
+        checked={checked}
       />
       
-      
+    
     </Fragment>
   )
 }

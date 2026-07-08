@@ -467,7 +467,7 @@ export const ActionMainNovoPedido = ({
                     </div>
 
                     <div className="col-sm-4 col-md-4 col-xl-3 mt-2">
-                      <label htmlFor="">{labelInputDTFim}</label>
+                      <label htmlFor="">{labelInputDTInicio}</label>
                       {InputFieldDTInicioComponent && (
                         <InputFieldDTInicioComponent
                           label={labelInputDTInicio}
