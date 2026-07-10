@@ -8,6 +8,7 @@ import { useQuery } from "react-query"
 import { InputSelectAction } from "../../../Inputs/InputSelectAction"
 import { ActionImprimirEtiquetaModal } from "./actionImprimirEtiquetaModal"
 import { useEffect } from "react"
+import Swal from "sweetalert2"
 
 export const ActionPesquisaEtiquetasVolumes = ({ usuarioLogado }) => {
   const [tipoSelecionado, setTipoSelecionado] = useState('DEVOLUÇÃO');
@@ -32,6 +33,15 @@ export const ActionPesquisaEtiquetasVolumes = ({ usuarioLogado }) => {
   );
 
   const handleImprimir = () => {
+    if(tipoSelecionado == 'REMANEJAMENTO' && (empresaDestinoSelecionada?.value == null || empresaDestinoSelecionada?.value == undefined || empresaDestinoSelecionada?.value == '')){ 
+      Swal.fire({
+        icon: 'error',
+        title: 'Erro',
+        text: 'Selecione a empresa destino novamente para remanejamento.',
+      })
+      return;
+    }
+
     const dados = [{
       tipoSelecionado,
       numeroOR,
@@ -39,7 +49,7 @@ export const ActionPesquisaEtiquetasVolumes = ({ usuarioLogado }) => {
       descricao,
       categoria,
       empresaOrigem: usuarioLogado?.NOFANTASIA,
-      empresaDestinoSelecionada: '0101 - TO - CD (Depósito)',
+      empresaDestinoSelecionada: empresaDestinoSelecionada || (tipoSelecionado == 'DEVOLUÇÃO' ? "0101 - TO - CD (Depósito)" : ''),
       solicitanteSelecionado,
       quantidade: quantidade
     }];
@@ -59,13 +69,21 @@ export const ActionPesquisaEtiquetasVolumes = ({ usuarioLogado }) => {
     { value: 'Diretoria', label: 'Diretoria' },
   ]
 
-  useEffect(() => {
-    if (tipoSelecionado === 'DEVOLUÇÃO') {
+  // useEffect(() => {
+  //   if (tipoSelecionado === 'DEVOLUÇÃO') {
+  //     setSolicitanteSelecionado('');
+  //     setEmpresaDestinoSelecionada('');
+  //   }
+  // }, [tipoSelecionado, setSolicitanteSelecionado, setEmpresaDestinoSelecionada])
+  
+
+  const handleChangeTipoSelecionado = (e) => {
+    setTipoSelecionado(e.value);
+    if (e.value == 'DEVOLUÇÃO') {
       setSolicitanteSelecionado('');
       setEmpresaDestinoSelecionada('');
     }
-  }, [tipoSelecionado, setSolicitanteSelecionado, setEmpresaDestinoSelecionada])
-  
+  }
 
   return (
 
@@ -84,7 +102,7 @@ export const ActionPesquisaEtiquetasVolumes = ({ usuarioLogado }) => {
         }))}
         valueSelectEmpresa={tipoSelecionado}
         defaultValueSelectEmpresa={{ value: 'DEVOLUÇÃO', label: 'DEVOLUÇÃO' }}
-        onChangeSelectEmpresa={(e) => setTipoSelecionado(e.value)}
+        onChangeSelectEmpresa={handleChangeTipoSelecionado}
 
         InputSelectGrupoComponent={InputSelectAction}
         labelSelectGrupo={"Solicitante"}
@@ -109,9 +127,10 @@ export const ActionPesquisaEtiquetasVolumes = ({ usuarioLogado }) => {
             label: item.NOFANTASIA,
           }))
         ]}
-        valueSelectSubGrupo={empresaDestinoSelecionada}
+        
+          valueSelectSubGrupo={empresaDestinoSelecionada ? { value: empresaDestinoSelecionada, label: empresaDestinoSelecionada } : null}
         defaultValueSelectSubGrupo={{ value: '101', label: '0101 - TO - CD (Depósito)' }}
-        onChangeSelectSubGrupo={(e) => setEmpresaDestinoSelecionada(e.value)}
+        onChangeSelectSubGrupo={(e) => setEmpresaDestinoSelecionada(e)}
         styleSubGrupo={tipoSelecionado == 'DEVOLUÇÃO'}
 
         InputSelectMarcasComponent={InputSelectAction}

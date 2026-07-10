@@ -11,6 +11,7 @@ import { useQuery } from "react-query";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
 import { IoIosAdd } from "react-icons/io";
 import Swal from "sweetalert2";
+import { situacao } from "../../../../../parceiro.json";
 
 export const ActionPesquisaFuncionarios = ({ usuarioLogado, ID }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
@@ -18,6 +19,7 @@ export const ActionPesquisaFuncionarios = ({ usuarioLogado, ID }) => {
   const [empresaSelecionadaNome, setEmpresaSelecionadaNome] = useState('');
   const [cpfInput, setCpfInput] = useState("");
   const [cpfFiltro, setCpfFiltro] = useState("");
+  const [situacaoSelecionada, setSituacaoSelecionada] = useState('');
   const [modalCadastro, setModalCadastro] = useState(false);
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
@@ -52,7 +54,7 @@ export const ActionPesquisaFuncionarios = ({ usuarioLogado, ID }) => {
   );
 
   const fetchListaFuncionarios = async () => {
-    const urlBase = `/funcionarios-loja?idEmpresa=${empresaSelecionada}&noFuncionarioCPF=${cpfFiltro}`;
+    const urlBase = `/funcionarios-loja?idEmpresa=${empresaSelecionada}&noFuncionarioCPF=${cpfFiltro}&situacao=${situacaoSelecionada}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
@@ -124,6 +126,7 @@ export const ActionPesquisaFuncionarios = ({ usuarioLogado, ID }) => {
     refetch();
   }
 
+  
   return (
 
     <Fragment>
@@ -150,6 +153,16 @@ export const ActionPesquisaFuncionarios = ({ usuarioLogado, ID }) => {
         labelSelectEmpresa={"Empresas"}
         valueSelectEmpresa={empresaSelecionada}
         onChangeSelectEmpresa={handlChangeEmpresa}
+
+        InputSelectGrupoComponent={InputSelectAction}
+        optionsGrupos={situacao?.map((item) => ({
+          value: item.value,
+          label: item.label
+        }))
+        }
+        labelSelectGrupo={"Situação"}
+        valueSelectGrupo={situacaoSelecionada}
+        onChangeSelectGrupo={(e) => setSituacaoSelecionada(e.value)}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}

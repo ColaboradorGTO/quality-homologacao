@@ -76,9 +76,24 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
   };
 
   const exportToExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(dados);
+    const worksheet = XLSX.utils.json_to_sheet(dados.map(item => ({
+      'Nº': item.contador,
+      'CPF': item.NUCPF,
+      'Funcionário': item.NOFUNCIONARIO,
+      'Login': item.NOLOGIN,
+      'Função': item.DSFUNCAO,
+      'Localização': item.STLOJA == 'True' ? 'Loja' : 'Escritório',
+      'TP. Contratação': item.STCONVENIO == 'True' ? 'CLT' : 'PJ',
+      'Tipo': item.DSTIPO == 'PN' ? 'PARCEIRO DE NEGÓCIOS' : 'FUNCIÓNARIO',
+      'Telefone': item.TELEFONE,
+      'Departamento': item.DEPARTAMENTO,
+      'Desconto %': item.PERC,
+      'Situação': item.STATIVO == 'True' ? 'Ativo' : 'Inativo',
+      'DT Desl.': dataFormatada(item.DTDEMISSAO)
+    })));
+    
     const workbook = XLSX.utils.book_new();
-    const header = ['Nº', 'CPF', 'Funcionário', 'Login', 'Função', 'Localização', 'TP. Contratação', 'Tipo', 'Desconto %', 'Situação', 'DT Desl.'];
+    const header = ['Nº', 'CPF', 'Funcionário', 'Login', 'Função', 'Localização', 'TP. Contratação', 'Tipo', 'Telefone', 'Departamento', 'Desconto %', 'Situação', 'DT Desl.'];
     worksheet['!cols'] = [
       { wpx: 70, caption: 'Nº' },
       { wpx: 100, caption: 'CPF' },
@@ -88,6 +103,8 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
       { wpx: 100, caption: 'Localização' },
       { wpx: 100, caption: 'TP. Contratação' },
       { wpx: 100, caption: 'Tipo' },
+      { wpx: 100, caption: 'Telefone' },
+      { wpx: 100, caption: 'Departamento' },
       { wpx: 100, caption: 'Desconto %' },
       { wpx: 100, caption: 'Situação' },
       { wpx: 100, caption: 'DT Desl.' },
@@ -107,11 +124,11 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
       NOFUNCIONARIO: item.NOFUNCIONARIO,
       NOLOGIN: item.NOLOGIN,
       DSFUNCAO: item.DSFUNCAO,
-      STLOJA: item.STLOJA,
-      STCONVENIO: item.STCONVENIO,
-      DSTIPO: item.DSTIPO,
+      STLOJA: item.STLOJA == 'True' ? 'Loja' : 'Escritório',
+      STCONVENIO: item.STCONVENIO == 'True' ? 'CLT' : 'PJ',
+      DSTIPO: item.DSTIPO == 'PN' ? 'PARCEIRO DE NEGÓCIOS' : 'FUNCIÓNARIO',
       PERC: toFloat(item.PERC),
-      STATIVO: item.STATIVO,
+      STATIVO: item.STATIVO == 'True' ? 'Ativo' : 'Inativo',
       DATA_DEMISSAO: item.DATA_DEMISSAO,
       ID: item.ID,
       IDFUNCIONARIO: item.IDFUNCIONARIO,
@@ -166,7 +183,7 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
       header: 'Localização',
       body: (row) => (
         <th>
-          {row.STLOJA == 'True' ? 'Loja' : 'Escritório'}
+          {row.STLOJA }
         </th>
       ),
       sortable: true,
@@ -178,7 +195,7 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
       body: (
         (row) => (
           <th>
-            {row.STCONVENIO == 'True' ? 'CLT' : 'PJ'}
+            {row.STCONVENIO}
 
           </th>
         )
@@ -191,7 +208,7 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
       body: (row) => (
         <div style={{ width: '150px' }}>
           <th>
-            {row.DSTIPO == 'PN' ? 'PARCEIRO DE NEGÓCIOS' : 'FUNCIÓNARIO'}
+            {row.DSTIPO }
           </th>
         </div>
       ),
@@ -239,8 +256,8 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
       header: 'Situação',
       body: (
         (row) => (
-          <th style={{ color: row.STATIVO == 'True' ? 'blue' : 'red' }}>
-            {row.STATIVO == 'True' ? 'Ativo' : 'Inativo'}
+          <th style={{ color: row.STATIVO == 'Ativo' ? 'blue' : 'red' }}>
+            {row.STATIVO}
 
           </th>
         )

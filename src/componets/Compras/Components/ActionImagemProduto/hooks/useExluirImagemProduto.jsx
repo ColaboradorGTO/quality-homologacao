@@ -5,26 +5,13 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 
-export const useExcluirImagemProduto = () => {
-    const [usuarioLogado, setUsuarioLogado] = useState(null);
+export const useExcluirImagemProduto = ({
+    usuarioLogado,
+    optionsModulos,
+    handleClick
+}) => {
     const [ipUsuario, setIpUsuario] = useState('');
 
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        const usuarioArmazenado = localStorage.getItem('usuario');
-
-        if (usuarioArmazenado) {
-            try {
-                const parsedUsuario = JSON.parse(usuarioArmazenado);
-                setUsuarioLogado(parsedUsuario);;
-            } catch (error) {
-                console.error('Erro ao parsear o usuário do localStorage:', error);
-            }
-        } else {
-            navigate('/');
-        }
-    }, [navigate]);
 
     const getIPUsuario = async () => {
         let usuarioIP = null;
@@ -59,8 +46,8 @@ export const useExcluirImagemProduto = () => {
             cancelButtonText: 'Cancelar',
             confirmButtonText: 'OK',
             customClass: {
-              confirmButton: 'btn btn-primary',
-              cancelButton: 'btn btn-danger',
+              confirmButton: 'btn btn-primary mr-2',
+              cancelButton: 'btn btn-danger  ',
               loader: 'custom-loader'
             },
             buttonsStyling: false
@@ -71,7 +58,7 @@ export const useExcluirImagemProduto = () => {
                 IDIMAGEM: IDIMAGEM,
                 STATIVO: STATIVO
             }
-            const response = await put(`/imagemProdutos/:id`, putData)
+            const response = await put(`/atualiza-imagem/:id`, putData)
             const textDados = JSON.stringify(putData)
             let textoFuncao = 'COMPRAS/EXCLUSÃO IMAGEM PRODUTO'
             const ipUsuario = await getIPUsuario()

@@ -4,7 +4,7 @@ import { useState } from "react";
 import axios from "axios";
 
 
-export const useCadastrarVinculoFabricanteFornecedor = ({
+export const useCadastrarVinculoFornecedorFabricante = ({
     dadosVinculosFornecedores, 
     usuarioLogado, 
     optionsModulos, 
@@ -118,7 +118,7 @@ export const useCadastrarVinculoFabricanteFornecedor = ({
                 STATIVO: 'True',
             }
 
-            const response = await post('/cadastrar-fabricante-fornecedor', postData)
+            const response = await post('/cadastrar-fornecedor-fabricante', postData)
             const textDados = JSON.stringify(postData)
             let textFuncao = 'COMPRAS/VINCULO DO FORNECEDOR-FABRICANTE';
             const ipUsuario = await getIPUsuario();

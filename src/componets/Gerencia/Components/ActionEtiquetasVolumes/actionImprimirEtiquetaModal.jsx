@@ -48,6 +48,8 @@ export const ActionImprimirEtiquetaModal = ({ show, handleClose, dadosAcumulador
           quantidade
         } = dadosAcumuladorEtiquetas[itemIndex]
 
+        const empresaDestinada = titulo == 'DEVOLUÇÃO' ? "0101 - TO - CD (Depósito)" : empresaDestinoSelecionada?.label;
+        console.log(empresaDestinada, 'empresaDestinada')
         const qtd = Number(quantidade) || 1;
 
         for (let i = 0; i < qtd; i++) {
@@ -83,7 +85,7 @@ export const ActionImprimirEtiquetaModal = ({ show, handleClose, dadosAcumulador
 
           ^FO180,20^FB980,2,1,L,0^FDREMETENTE: ${empresaOrigem}^FS
 
-          ^FO80,20^FB980,2,1,L,0^FDDESTINATÁRIO: ${empresaDestino}^FS
+          ^FO80,20^FB980,2,1,L,0^FDDESTINATÁRIO: ${empresaDestinada}^FS
 
           ^CF0,40
           ^FO40,550^FDQTD: ${i + 1}/${qtd}^FS
@@ -105,14 +107,14 @@ export const ActionImprimirEtiquetaModal = ({ show, handleClose, dadosAcumulador
 
   const etiquetas = dadosAcumuladorEtiquetas.flatMap((item) => {
     const quantidade = Number(item.quantidade) || 1;
-
+    
     return Array.from({ length: quantidade }, (_, i) => ({
       titulo: item.tipoSelecionado,
       descricao: item.descricao,
       categoria: item.categoria,
       numeroOR: item.numeroOR || 'N/A',
       numeroOT: item.numeroOT || 'N/A',
-      empresaDestino: item.tipoSelecionado == 'DEVOLUÇÃO' ? " 0101 - TO - CD (DEPÓSITO)" : item.empresaDestinoSelecionada,
+      empresaDestino: item.tipoSelecionado == 'DEVOLUÇÃO' ? " 0101 - TO - CD (DEPÓSITO)" : item.empresaDestinoSelecionada?.label,
       empresaOrigem: item.empresaOrigem,
       solicitante: item.solicitanteSelecionado,
       quantidade,
