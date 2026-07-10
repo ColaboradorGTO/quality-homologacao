@@ -166,7 +166,6 @@ export const useCadastrarPromocaoLoja = ({handleClose, usuarioLogado, optionsMod
         }
 
         const postData = {
-
             DSPROMOCAOMARKETING: descricao,
             DTHORAINICIO: dataInicio,
             DTHORAFIM: dataFim,
@@ -184,7 +183,7 @@ export const useCadastrarPromocaoLoja = ({handleClose, usuarioLogado, optionsMod
         }
         try {
 
-            const response = await post('/criar-listaPromocoes', postData)
+            const response = await post('/criar-lista-promocao', postData)
 
             Swal.fire({
                 position: 'center',
@@ -215,6 +214,7 @@ export const useCadastrarPromocaoLoja = ({handleClose, usuarioLogado, optionsMod
             
             let textFuncao = 'COMPRASADM/ERRO AO CADASTRAR PROGRAMAÇÃO DE PROMOÇÕES'
             const textDados = JSON.stringify(postData)
+            const ipUsuario = await getIPUsuario();
             const createtLog = {
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textFuncao,

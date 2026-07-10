@@ -91,7 +91,7 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
       'Situação': item.STATIVO == 'True' ? 'Ativo' : 'Inativo',
       'DT Desl.': dataFormatada(item.DTDEMISSAO)
     })));
-    
+
     const workbook = XLSX.utils.book_new();
     const header = ['Nº', 'CPF', 'Funcionário', 'Login', 'Função', 'Localização', 'TP. Contratação', 'Tipo', 'Telefone', 'Departamento', 'Desconto %', 'Situação', 'DT Desl.'];
     worksheet['!cols'] = [
@@ -124,11 +124,11 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
       NOFUNCIONARIO: item.NOFUNCIONARIO,
       NOLOGIN: item.NOLOGIN,
       DSFUNCAO: item.DSFUNCAO,
-      STLOJA: item.STLOJA == 'True' ? 'Loja' : 'Escritório',
-      STCONVENIO: item.STCONVENIO == 'True' ? 'CLT' : 'PJ',
-      DSTIPO: item.DSTIPO == 'PN' ? 'PARCEIRO DE NEGÓCIOS' : 'FUNCIÓNARIO',
+      STLOJA: item.STLOJA,
+      STCONVENIO: item.STCONVENIO,
+      DSTIPO: item.DSTIPO,
       PERC: toFloat(item.PERC),
-      STATIVO: item.STATIVO == 'True' ? 'Ativo' : 'Inativo',
+      STATIVO: item.STATIVO,
       DATA_DEMISSAO: item.DATA_DEMISSAO,
       ID: item.ID,
       IDFUNCIONARIO: item.IDFUNCIONARIO,
@@ -183,7 +183,7 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
       header: 'Localização',
       body: (row) => (
         <th>
-          {row.STLOJA }
+          {row.STLOJA == 'True' ? 'Loja' : 'Escritório'}
         </th>
       ),
       sortable: true,
@@ -195,7 +195,7 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
       body: (
         (row) => (
           <th>
-            {row.STCONVENIO}
+            {row.STCONVENIO == 'True' ? 'CLT' : 'PJ'}
 
           </th>
         )
@@ -205,20 +205,29 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
     {
       field: 'DSTIPO',
       header: 'Tipo',
-      body: (row) => (
-        <div style={{ width: '150px' }}>
-          <th>
-            {row.DSTIPO }
-          </th>
-        </div>
-      ),
+      body: (row) => {
+
+        let tipo = row.DSTIPO;
+
+        if (tipo === 'PN') {
+          tipo = 'PARCEIRO DE NEGÓCIOS';
+        } else if (tipo === 'PNC') {
+          tipo = 'PARCEIRO DE NEGÓCIOS CONVÊNIO';
+        }
+
+        return (
+          <div style={{ width: '220px' }}>
+            <th>{tipo}</th>
+          </div>
+        );
+      },
       sortable: true,
     },
     {
       field: 'TELEFONE',
       header: 'Telefone',
       body: (row) => (
-        <div style={{ }}>
+        <div style={{}}>
           <th>
             {row.TELEFONE}
           </th>
@@ -230,7 +239,7 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
       field: 'DEPARTAMENTO',
       header: 'Departamento',
       body: (row) => (
-        <div style={{ }}>
+        <div style={{}}>
           <th>
             {row.DEPARTAMENTO}
           </th>
@@ -256,8 +265,8 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
       header: 'Situação',
       body: (
         (row) => (
-          <th style={{ color: row.STATIVO == 'Ativo' ? 'blue' : 'red' }}>
-            {row.STATIVO}
+          <th style={{ color: row.STATIVO == 'True' ? 'blue' : 'red' }}>
+            {row.STATIVO == 'True' ? 'Ativo' : 'Inativo'}
 
           </th>
         )

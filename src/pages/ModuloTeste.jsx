@@ -67,7 +67,7 @@ export const ModuloTeste = () => {
     
     const modulos = optionsModulosPage[0]?.modulos || [];
     const moduloEncontrado = modulos.find(modulo => modulo.DSMODULO === moduloURL);
-
+    console.log(modulos, 'moduloEncontrado')
     if (moduloEncontrado) {
       localStorage.setItem('moduloselecionado', JSON.stringify(moduloEncontrado));
       setSelectedModule(moduloEncontrado);
