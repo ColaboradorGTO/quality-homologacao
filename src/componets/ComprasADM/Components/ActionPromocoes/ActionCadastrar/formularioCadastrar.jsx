@@ -44,7 +44,7 @@ export const FormularioCadastrar = ({ handleClose, usuarioLogado, optionsModulos
     const handleValidatedSubmit = async () => {
         try {
             const dadosParaValidar = {
-                descricaPromo: descricao,
+                descricaoPromo: descricao,
             };
             
             await schema.validate(dadosParaValidar, { abortEarly: false });
@@ -81,7 +81,7 @@ export const FormularioCadastrar = ({ handleClose, usuarioLogado, optionsModulos
     }
     return (
         <Fragment>
-            <form >
+            <form onSubmit={handleSubmit(handleValidatedSubmit)} >
 
                 <div className="form-group">
                     <div className="row">
@@ -353,7 +353,7 @@ export const FormularioCadastrar = ({ handleClose, usuarioLogado, optionsModulos
 
                     // ButtonTypeCadastrar={ButtonTypeModal}
                     // textButtonCadastrar={"Cadastrar"}
-                    // onClickButtonCadastrar={() =>  console.log("clicou")}
+                    // onClickButtonCadastrar={handleSubmit(handleValidatedSubmit)}
                     // corCadastrar="success"
                     // loadingTextCadastrar={"Cadastrando..."}
                     // autoLoadingCadastrar={true}

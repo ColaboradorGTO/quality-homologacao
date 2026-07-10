@@ -79,8 +79,27 @@ export const ActionPesquisaProduto = ({ usuarioLogado }) => {
     { enabled: false, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
   )
 
-  const { data: dadosMercadoria = [], error: errorFornecedor, isLoading: isLoadingFornecedor } = useFetchData('subGrupoEstrutura', '/subGrupoEstrutura');
-  const { data: dadosFabricantes = [], error: errorFabricantes, isLoading: isLoadingFabricantes } = useFetchData('fabricantes', '/fabricantes');
+  const { data: dadosSubGrupoEstrutura = [], error: errorSubGrupoEstrutura, isLoading: isLoadingSubGrupoEstrutura, refetch: refetchSubGrupoEstrutura } = useQuery(
+    ['subGrupoEstrutura'],
+    async () => {
+      const response = await get(`/subGrupoEstrutura`);
+      
+      return response.data;
+    },
+    { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+  );
+
+  const { data: dadosFabricantes = [], error: errorFabricantes, isLoading: isLoadingFabricantes, refetch: refetchFabricantes } = useQuery(
+    ['fabricantes'],
+    async () => {
+      const response = await get(`/fabricantes`);
+      
+      return response.data;
+    },
+    { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+  );
+
+
   
   const handleClick = () => {
     refetchListaProdutos()
@@ -115,7 +134,7 @@ export const ActionPesquisaProduto = ({ usuarioLogado }) => {
         InputSelectFornecedorComponent={InputSelectAction}
         optionsFornecedores={[
           { value: '', label: 'selecione' },
-          ...dadosMercadoria.map(item => ({
+          ...dadosSubGrupoEstrutura?.map(item => ({
             value: item.IDSUBGRUPOESTRUTURA,
             label: `${item.IDSUBGRUPOESTRUTURA} - ${item.DSGRUPOESTRUTURA} - ${item.DSSUBGRUPOESTRUTURA} `
 

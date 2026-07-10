@@ -258,10 +258,10 @@ export const ActionListaDistribuicaoSugestoesHistorico = ({ dadosSugestoesHistor
 
   // ✅ 13. Template para header das filiais (rotacionado)
   const createFilialHeader = (filial) => (
-    <div style={{ height: '280px', display: 'flex', alignItems: 'end' }}>
+    <div style={{ height: '200px', display: 'flex', alignItems: 'end' }}>
       <span
         className="rotate-270 text-nowrap h-200 d-flex pos-top"
-        style={{ width: '45px' }}
+        style={{ width: '45px', fontSize: '13px', lineHeight: '19px' }}
       >
         &nbsp;&nbsp;{filial.DescFilial}
       </span>

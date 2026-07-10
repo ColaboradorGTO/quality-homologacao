@@ -202,7 +202,7 @@ export const ActionPesquisaDistribuicaoHistorico = ({ usuarioLogado }) => {
             FINALIZAR: 2
           }
 
-          const response = await put(`/distribuicao-compras-historico/:id`, putData)
+          const response = await put(`/distribuicao-compras-historico-adm/:id`, putData)
           const textDados = JSON.stringify(putData)
           let textoFuncao = 'COMPRASADM/FINALIZAR DISTRIBUICAO HISTORICO'
           const ipUsuario = await getIPUsuario()
@@ -284,14 +284,14 @@ export const ActionPesquisaDistribuicaoHistorico = ({ usuarioLogado }) => {
           ButtonTypeCancelar={ButtonType}
           onButtonClickCancelar={handleClickCheckVisualizar}
           linkCancelar={"Visualizar"}
-          corCancelar={"success"}
+          corCancelar={"info"}
           IconCancelar={MdMenu}
           // styleCancelar={}
 
           ButtonTypeVendasEstrutura={ButtonType}
           linkNomeVendasEstrutura={"Finalizar"}
           onButtonClickVendasEstrutura={handleFinalizar}
-          corVendasEstrutura={"danger"}
+          corVendasEstrutura={"success"}
           IconVendasEstrutura={FaCheck}
           // styleVendasEstrutura={{ display: tabelaVisualizar ? 'block' : 'none' }}
           // btnVisivelEstrutura

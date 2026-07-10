@@ -4,7 +4,7 @@ import { useState } from "react";
 import axios from "axios";
 
 
-export const useExcluirImagemProduto = ({usuarioLogado, optionsModulos}) => {
+export const useExcluirImagemProduto = ({usuarioLogado, optionsModulos, handleClick}) => {
     const [ipUsuario, setIpUsuario] = useState('');
 
     const getIPUsuario = async () => {
@@ -52,8 +52,8 @@ export const useExcluirImagemProduto = ({usuarioLogado, optionsModulos}) => {
             cancelButtonText: 'Cancelar',
             confirmButtonText: 'OK',
             customClass: {
-              confirmButton: 'btn btn-primary',
-              cancelButton: 'btn btn-danger',
+              confirmButton: 'btn btn-primary mr-2',
+              cancelButton: 'btn btn-danger ml-2',
               loader: 'custom-loader'
             },
             buttonsStyling: false
@@ -69,14 +69,14 @@ export const useExcluirImagemProduto = ({usuarioLogado, optionsModulos}) => {
             let textoFuncao = 'COMPRASADM/ATUALIZA IMAGEM PRODUTO'
             const ipUsuario = await getIPUsuario()
             const postData = {
-                IDFUNCIONARIO: usuarioLogado.id,
+                IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
                 IP: ipUsuario || 'Indisponível'
             }
     
             await post('/log-web', postData)
-    
+            handleClick()
             return response.data;
             } catch (error) {
             Swal.fire({
