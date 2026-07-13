@@ -63,7 +63,7 @@ export const useCancelarVenda = ({
         const putData = {
             IDVENDA: dadosCancelarVenda?.IDVENDA,
             IDUSUARIOCANCELAMENTO: usuarioLogado.id,
-            TXTMOTIVOCANCELAMENTO: motivo,
+            TXTMOTIVOCANCELAMENTO: motivo?.value,
         }
 
         try {

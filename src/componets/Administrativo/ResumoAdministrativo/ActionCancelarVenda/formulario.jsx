@@ -5,12 +5,12 @@ import { ButtonTypeModal } from '../../../Buttons/ButtonTypeModal';
 import { useCancelarVenda } from './hook/useCancelarVenda';
 import { useForm, Controller } from "react-hook-form";
 
-export const FormularioCancelarVenda = ({ 
+export const FormularioCancelarVenda = ({
   handleClose,
-  handleClick, 
-  optionsModulos, 
+  handleClick,
+  optionsModulos,
   usuarioLogado,
-  dadosCancelarVenda 
+  dadosCancelarVenda
 }) => {
   const { register, handleSubmit, formState: { errors }, clearErrors, setError, control } = useForm({
     mode: "onChange"
@@ -22,18 +22,18 @@ export const FormularioCancelarVenda = ({
     dadosMotivoDevolucao,
     onSubmit
   } = useCancelarVenda({ optionsModulos, usuarioLogado, handleClose, dadosCancelarVenda })
-  console.log('dadosCancelarVenda no formulario:', dadosCancelarVenda);
+  
   const handleValidatedSubmit = async () => {
     try {
       const dadosParaValidar = {
         motivo: motivo
       }
-  
+
       // await schema.validate(dadosParaValidar, { abortEarly: false });
 
       await onSubmit();
       await handleClose();
-      
+
     } catch (validationError) {
       clearErrors();
 
@@ -47,9 +47,9 @@ export const FormularioCancelarVenda = ({
           }
         });
       }
-   
+
       const errorMessages = validationError.errors || [validationError.message];
-      
+
     }
   };
 
@@ -69,12 +69,12 @@ export const FormularioCancelarVenda = ({
                 })) || []
               }
               value={motivo}
-              onChange={(e) => setMotivo(e.value)}
+              onChange={(selectedOption) => { setMotivo(selectedOption) }}
             />
           </div>
         </div>
-    
-        <FooterModal     
+
+        <FooterModal
           ButtonTypeCadastrar={ButtonTypeModal}
           textButtonCadastrar={"Finalizar"}
           onClickButtonCadastrar={handleValidatedSubmit}
@@ -87,7 +87,7 @@ export const FormularioCancelarVenda = ({
           onClickButtonCancelar={handleClose}
           corCancelar="secondary"
         />
-   
+
       </form>
 
     </Fragment>

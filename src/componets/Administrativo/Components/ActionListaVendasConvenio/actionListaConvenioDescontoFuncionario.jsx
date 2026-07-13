@@ -186,7 +186,6 @@ export const ActionListaConvenioDescontoFuncionario = ({ dadosVendasConvenioFunc
   }
   const dadosListaConvenio = dadosVendasConvenioFuncionario.map((item, index) => {
     let contador = index + 1;
-    console.log(item)
     return {
       NOFANTASIA: item.NOFANTASIA,
       NumeroVenda: item.NumeroVenda,

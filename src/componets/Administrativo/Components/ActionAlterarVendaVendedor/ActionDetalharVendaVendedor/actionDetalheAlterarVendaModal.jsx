@@ -278,6 +278,7 @@ export const ActionDetalheAlterarVendaModal = ({ show, handleClose, dadosVendasD
                 rows={10}
                 rowsPerPageOptions={[10, 20, 50, 100, dadosDetalhadosModal.length]}
                 showGridlines
+                cellMemo={false}
                 stripedRows
                 emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
               >
