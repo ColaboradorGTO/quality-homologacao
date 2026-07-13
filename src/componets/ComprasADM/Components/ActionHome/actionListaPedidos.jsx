@@ -49,7 +49,7 @@ export const ActionListaPedidos = ({
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
-
+  console.log(optionsModulos, 'options')
   const { handleReativarPedido } = useReativarPedido({ usuarioLogado, optionsModulos, handleClick });
   const { handleCancelarPedido } = useCancelarPedido({ usuarioLogado, optionsModulos, handleClick });
   const { handleEnviarPedido } = useEnviarPedido({ usuarioLogado, optionsModulos, handleClick });
@@ -628,7 +628,8 @@ export const ActionListaPedidos = ({
       if (response.data && response.data.length > 0) {
         Swal.close();
         setDadosDetalheProdutos(response.data);
-        setModalDetalhe(true);
+        setModalProdutoImagem(true)
+        // setModalDetalhe(true);
         return response.data;
       } else {
         Swal.fire({
@@ -721,6 +722,8 @@ export const ActionListaPedidos = ({
         show={modalProdutoImagem}
         handleClose={() => setModalProdutoImagem(false)}
         dadosDetalheProdutos={dadosDetalheProdutos}
+        usuarioLogado={usuarioLogado}
+        optionsModulos={optionsModulos}
       />
     </Fragment>
   )

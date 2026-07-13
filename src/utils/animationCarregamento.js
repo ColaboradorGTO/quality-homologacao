@@ -1,12 +1,29 @@
 import Swal from 'sweetalert2';
 
-export function animacaoCarregamento(msgLoading = 'Carregando', ctrlClose = true) {
+let cancelado = false;
+
+export function resetCancelamento() {
+  cancelado = false;
+}
+
+export function foiCancelado() {
+  return cancelado;
+}
+
+export function animacaoCarregamento(msgLoading = 'Carregando', ctrlClose = true, permitirCancelar = false, onCancelar) {
   // Se já existe um modal aberto, só atualiza o texto
   if (Swal.isVisible()) {
     const loadingDiv = Swal.getHtmlContainer()?.querySelector('.loading h2');
     if (loadingDiv) loadingDiv.textContent = msgLoading;
     return;
   }
+
+  cancelado = false;
+
+  const mensagemCancelamento = permitirCancelar
+    ? 'Pressione ESC para cancelar e manter os dados já carregados'
+    : 'Caso queira cancelar, recarregue a página';
+
   // Se não existe, abre o modal normalmente
   return Swal.fire({
     title: 'Aguarde...',
@@ -36,15 +53,20 @@ export function animacaoCarregamento(msgLoading = 'Carregando', ctrlClose = true
       <div class="loading animacaoLoading">
         <h2>${msgLoading}</h2>
         <h2 id="numPagesLoading"></h2>
-        <small class="${ctrlClose ? 'd-block' : 'd-none'} ">Caso queira cancelar, recarregue a página</small>
+        <small class="${ctrlClose ? 'd-block' : 'd-none'} ">${mensagemCancelamento}</small>
         <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
       </div>
     `,
     allowOutsideClick: false,
-    allowEscapeKey: false,
+    allowEscapeKey: permitirCancelar,
     showConfirmButton: false,
     customClass: {
       container: 'custom-swal'
+    }
+  }).then((result) => {
+    if (result.dismiss === Swal.DismissReason.esc) {
+      cancelado = true;
+      onCancelar?.();
     }
   });
 }

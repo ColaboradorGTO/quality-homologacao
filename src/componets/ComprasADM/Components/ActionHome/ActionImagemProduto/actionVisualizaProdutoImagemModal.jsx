@@ -14,12 +14,13 @@ import { ButtonTable } from "../../../../ButtonsTabela/ButtonTable"
 import { BsTrash3 } from "react-icons/bs"
 import { GrView } from "react-icons/gr"
 import { Image } from 'primereact/image';
+import {useExcluirImagemProduto} from "./useExluirImagemProduto";
 
-
-export const ActionVisualizarProdutoImagemModal = ({ show, handleClose, dadosDetalheProdutos }) => {
+export const ActionVisualizarProdutoImagemModal = ({ show, handleClose, dadosDetalheProdutos, usuarioLogado, optionsModulos }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const dataTableRef = useRef();
-
+ 
+  const { handleExcluir } = useExcluirImagemProduto({usuarioLogado, optionsModulos});
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -61,13 +62,13 @@ export const ActionVisualizarProdutoImagemModal = ({ show, handleClose, dadosDet
     XLSX.writeFile(workbook, 'relatorio_produtos.xlsx');
   };
 
-  const dados = dadosDetalheProdutos.map((item, index) => {
+  const dados = dadosDetalheProdutos?.map((item, index) => {
     let contador = index + 1;
 
-    const imagemProduto = item?.IMAGEM?.map((byte) => {
-      return String.fromCharCode(byte)
-    }).join('')
-
+    // const imagemProduto = item?.IMAGEM?.map((byte) => {
+    //   return String.fromCharCode(byte)
+    // }).join('')
+  const imagemProduto = item?.IMAGEM || '';
     return {
       contador,
       IDRESUMOPEDIDO: item.IDRESUMOPEDIDO,
@@ -145,7 +146,7 @@ export const ActionVisualizarProdutoImagemModal = ({ show, handleClose, dadosDet
                 Icon={BsTrash3}
                 cor={"danger"}
                 iconColor={"white"}
-                // onClickButton={() => handleExcluir(row.IDIMAGEM, 'False')}
+                onClickButton={() => handleExcluir(row.IDIMAGEM, 'False')}
                 titleButton={"Cancelar Imagem do Produto"}
                 iconSize={25}
                 width="35px"

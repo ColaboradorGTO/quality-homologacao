@@ -36,7 +36,7 @@ export const put = async (endpoint, data) => {
   }
 };
 
-export const get = async (endpoint) => {
+export const get = async (endpoint, { signal } = {}) => {
   try {
     const token = localStorage.getItem('token');
 
@@ -44,7 +44,8 @@ export const get = async (endpoint) => {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json"
-      }
+      },
+      signal
     });
     return response.data;
   } catch (error) {
