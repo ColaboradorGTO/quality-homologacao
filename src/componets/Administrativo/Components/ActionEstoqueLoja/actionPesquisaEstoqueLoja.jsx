@@ -12,8 +12,7 @@ import { get } from "../../../../api/funcRequest";
 import { InputSelectAction } from "../../../Inputs/InputSelectAction";
 import { ActionListaEstoqueUltimaPosicao } from "./actionListaEstoqueUltimaPosicao";
 import { useQuery } from "react-query";
-import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
-
+import { animacaoCarregamento, fecharAnimacaoCarregamento, foiCancelado } from "../../../../utils/animationCarregamento";
 
 export const ActionPesquisaEstoqueLoja = () => {
   const [tabelaEstoqueAtual, setTabelaEstoqueAtual] = useState(false);
@@ -44,7 +43,7 @@ export const ActionPesquisaEstoqueLoja = () => {
       const response = await get(`/lista-fornecedor-produto?idMarca=${marcaSelecionada}`);
       return response.data;
     },
-    {enabled: false, staleTime: 60 * 60 * 1000, }
+    { enabled: false, staleTime: 60 * 60 * 1000, }
   );
 
   const { data: dadosGrupos = [], error: errorGrupos, isLoading: isLoadingGrupos, refetch: refetchGrupos } = useQuery(
@@ -55,7 +54,7 @@ export const ActionPesquisaEstoqueLoja = () => {
     },
     { staleTime: 60 * 60 * 1000, }
   );
-  
+
   const { data: dadosSubGrupos = [], error: errorSubGrupos, isLoading: isLoadingSubGrupos, refetch: refetchSubGrupos } = useQuery(
     'subgrupo-produto',
     async () => {
@@ -87,37 +86,45 @@ export const ActionPesquisaEstoqueLoja = () => {
     const urlBase = `/inventariomovimento?idEmpresa=${empresaSelecionada}&idGrupo=${grupoSelecionado}&idSubGrupo=${subGrupoSelecionado}&idMarca=${marcaSelecionada}&idFornecedor=${fornecedorSelecionado}&descricaoProduto=${codBarra}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&stAtivo=True`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+
+    const controller = new AbortController();
+    let allData = [];
+
     try {
-      animacaoCarregamento('Carregando dados...', true);
-                                                                      
+      animacaoCarregamento('Carregando dados...', true, true, () => controller.abort());
+
       const primeiraPagina = 1;
-      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`, { signal: controller.signal });
       const page = primeiraResposta.page || primeiraPagina;
       const pageSize = primeiraResposta.pageSize || 1000;
       const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
       const totalPages = Math.ceil(totalRows / pageSize);
 
-      let allData = [...(primeiraResposta.data || [])];
+      allData = [...(primeiraResposta.data || [])];
 
       if (totalPages > 1) {
         for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
-          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
-          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          if (foiCancelado()) break;
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`, { signal: controller.signal });
           allData.push(...(responsePage.data || []));
         }
       }
 
       return allData;
     } catch (error) {
-      console.error('Erro ao buscar dados da api:', error);
+      if (error.code === 'ERR_CANCELED') {
+        return allData;
+      }
+      console.error('Erro ao buscar dados:', error);
       throw error;
     } finally {
       fecharAnimacaoCarregamento();
     }
   };
-   
+
   const { data: dadosEstoqueAtual = [], error: errorEstoque, isLoading: isLoadingEstoque, refetch: refetchListaEstoque } = useQuery(
-    ['inventariomovimento', ],
+    ['inventariomovimento',],
     () => fetchListaEstoque(),
     { enabled: false, }
   );
@@ -127,29 +134,37 @@ export const ActionPesquisaEstoqueLoja = () => {
     const urlBase = `/inventariomovimento?idEmpresa=${empresaSelecionada}&idGrupo=${grupoSelecionado}&idSubGrupo=${subGrupoSelecionado}&idMarca=${marcaSelecionada}&idFornecedor=${fornecedorSelecionado}&descricaoProduto=${codBarra}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&stAtivo=`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+
+    const controller = new AbortController();
+    let allData = [];
+
     try {
-      animacaoCarregamento('Carregando dados...', true);
-                                                                      
+      animacaoCarregamento('Carregando dados...', true, true, () => controller.abort());
+
       const primeiraPagina = 1;
-      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`, { signal: controller.signal });
       const page = primeiraResposta.page || primeiraPagina;
       const pageSize = primeiraResposta.pageSize || 1000;
       const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
       const totalPages = Math.ceil(totalRows / pageSize);
 
-      let allData = [...(primeiraResposta.data || [])];
+      allData = [...(primeiraResposta.data || [])];
 
       if (totalPages > 1) {
         for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
-          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
-          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          if (foiCancelado()) break;
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`, { signal: controller.signal });
           allData.push(...(responsePage.data || []));
         }
       }
 
       return allData;
     } catch (error) {
-      console.error('Erro ao buscar dados da api:', error);
+      if (error.code === 'ERR_CANCELED') {
+        return allData;
+      }
+      console.error('Erro ao buscar dados:', error);
       throw error;
     } finally {
       fecharAnimacaoCarregamento();
@@ -157,7 +172,7 @@ export const ActionPesquisaEstoqueLoja = () => {
   };
 
   const { data: dadosEstoqueRotatividade = [], error: errorEstoqueRotatividade, isLoading: isLoadingEstoqueRotatividade, refetch: refetchListaEstoqueRotatividade } = useQuery(
-    ['inventariomovimento', ],
+    ['inventariomovimento',],
     () => fetchListaEstoqueRotatividade(),
     { enabled: false, }
   );
@@ -166,41 +181,49 @@ export const ActionPesquisaEstoqueLoja = () => {
     const urlBase = `/ultimaPosicaoEstoque?idEmpresa=${empresaSelecionada}&idGrupo=${grupoSelecionado}&idSubGrupo=${subGrupoSelecionado}&idMarca=${marcaSelecionada}&idFornecedor=${fornecedorSelecionado}&descricaoProduto=${codBarra}&dataPesquisaInicio=${dataPesquisaInicio}&stAtivo=`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+
+    const controller = new AbortController();
+    let allData = [];
+
     try {
-      animacaoCarregamento('Carregando dados...', true);
-                                                                      
+      animacaoCarregamento('Carregando dados...', true, true, () => controller.abort());
+
       const primeiraPagina = 1;
-      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`, { signal: controller.signal });
       const page = primeiraResposta.page || primeiraPagina;
       const pageSize = primeiraResposta.pageSize || 1000;
       const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
       const totalPages = Math.ceil(totalRows / pageSize);
 
-      let allData = [...(primeiraResposta.data || [])];
+      allData = [...(primeiraResposta.data || [])];
 
       if (totalPages > 1) {
         for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
-          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
-          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          if (foiCancelado()) break;
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`, { signal: controller.signal });
           allData.push(...(responsePage.data || []));
         }
       }
 
       return allData;
     } catch (error) {
-      console.error('Erro ao buscar dados da api:', error);
+      if (error.code === 'ERR_CANCELED') {
+        return allData;
+      }
+      console.error('Erro ao buscar dados:', error);
       throw error;
     } finally {
       fecharAnimacaoCarregamento();
     }
   };
-   
+
   const { data: dadosEstoqueUltima = [], error: errorEstoqueUltima, isLoading: isLoadingEstoqueUltima, refetch: refetchListaEstoqueUltima } = useQuery(
-    ['ultimaPosicaoEstoque', ],
+    ['ultimaPosicaoEstoque',],
     () => fetchListaEstoqueUltima(),
     { enabled: false, }
   );
- 
+
   const handleChangeGrupos = (selectedOptions) => {
     const values = selectedOptions.map(option => option.value);
     setGrupoSelecionado(values);
@@ -209,7 +232,7 @@ export const ActionPesquisaEstoqueLoja = () => {
     const values = selectedOptions.map(option => option.value);
     setSubGrupoSelecionado(values);
   };
-  
+
   const handleChangeFornecedor = (selectedOptions) => {
     const values = selectedOptions.map(option => option.value);
     setFornecedorSelecionado(values);
@@ -237,9 +260,9 @@ export const ActionPesquisaEstoqueLoja = () => {
     refetchListaEstoqueRotatividade()
     setTabelaEstoqueRotatividade(true)
     setTabelaEstoqueAtual(false)
-    setTabelaEstoqueUltimaPosicao(false)    
+    setTabelaEstoqueUltimaPosicao(false)
   }
-  
+
   const handleClickEstoqueUltimaPosicao = () => {
     refetchListaEstoqueUltima()
     setTabelaEstoqueUltimaPosicao(true)
@@ -250,7 +273,7 @@ export const ActionPesquisaEstoqueLoja = () => {
   return (
 
     <Fragment>
-        
+
       <ActionMain
         linkComponentAnterior={["Home"]}
         linkComponent={["Relatório"]}
@@ -272,11 +295,11 @@ export const ActionPesquisaEstoqueLoja = () => {
         placeHolderInputFieldCodBarra={"Cód.Barras / Nome Produto"}
         valueInputFieldCodBarra={codBarra}
         onChangeInputFieldCodBarra={(e) => setCodBarra(e.target.value)}
-        
+
         InputSelectEmpresaComponent={InputSelectAction}
         labelSelectEmpresa={"Selecione uma Loja"}
         optionsEmpresas={[
-         ...dadosEmpresas.map((item) => {
+          ...dadosEmpresas.map((item) => {
             return {
               value: item.IDEMPRESA,
               label: item.NOFANTASIA,
@@ -287,7 +310,7 @@ export const ActionPesquisaEstoqueLoja = () => {
         onChangeSelectEmpresa={handleChangeEmpresa}
 
         MultSelectGrupoComponent={MultSelectAction}
-        optionsMultSelectGrupo={dadosGrupos.map((grupo) => ( {
+        optionsMultSelectGrupo={dadosGrupos.map((grupo) => ({
           value: grupo.ID_GRUPO,
           label: grupo.GRUPO,
         }))}
@@ -295,7 +318,7 @@ export const ActionPesquisaEstoqueLoja = () => {
         onChangeMultSelectGrupo={handleChangeGrupos}
         animatedComponentsGrupo={animatedComponents}
         labelMultSelectGrupo={"Grupo"}
-        
+
         MultSelectSubGrupoComponent={MultSelectAction}
         optionsMultSelectSubGrupo={dadosSubGrupos.map((subGrupo) => ({
           value: subGrupo.ID_ESTRUTURA,
@@ -305,18 +328,18 @@ export const ActionPesquisaEstoqueLoja = () => {
         onChangeMultSelectSubGrupo={handleChangeSubGrupos}
         animatedComponentsSubGrupo={animatedComponents}
         labelMultSelectSubGrupo={"Subgrupo"}
-        
+
         MultSelectMarcaComponent={MultSelectAction}
         optionsMultSelectMarca={dadosMarca.map((marca) => ({
           value: marca.ID_MARCA,
           label: marca.MARCA,
         }))}
-        
+
         valueMultSelectMarca={marcaSelecionada}
         onChangeMultSelectMarca={handleChangeMarca}
         animatedComponentsMarca={animatedComponents}
         labelMultSelectMarca={"Marca"}
-        
+
         MultSelectFornecedorComponent={MultSelectAction}
         optionsMultSelectFornecedor={dadosFornecedor.map((fornecedor) => ({
           value: fornecedor.ID_FORNECEDOR,
@@ -326,7 +349,7 @@ export const ActionPesquisaEstoqueLoja = () => {
         onChangeMultSelectFornecedor={handleChangeFornecedor}
         animatedComponentsFornecedor={animatedComponents}
         labelMultSelectFornecedor={"Fornecedor"}
-        
+
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Estoque Atual"}
@@ -339,7 +362,7 @@ export const ActionPesquisaEstoqueLoja = () => {
         onButtonClickCadastro={handleClickEstoqueRotatividade}
         corCadastro={"success"}
         IconCadastro={AiOutlineSearch}
-        
+
         ButtonTypeCancelar={ButtonType}
         linkCancelar={"Estoque Anterior"}
         corCancelar={"info"}
@@ -353,11 +376,11 @@ export const ActionPesquisaEstoqueLoja = () => {
 
       />
 
-      {tabelaEstoqueAtual &&  (   
+      {tabelaEstoqueAtual && (
         <ActionListaEstoqueAtual dadosEstoqueAtual={dadosEstoqueAtual} />
       )}
 
-      {tabelaEstoqueRotatividade && (   
+      {tabelaEstoqueRotatividade && (
         <ActionListaEstoqueRotatividade dadosEstoqueRotatividade={dadosEstoqueRotatividade} />
       )}
 

@@ -7,14 +7,12 @@ import { AiOutlineSearch } from "react-icons/ai";
 import { getDataAtual } from "../../../../utils/dataAtual";
 import { InputSelectAction } from "../../../Inputs/InputSelectAction";
 import { useQuery } from "react-query";
-import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
+import { animacaoCarregamento, fecharAnimacaoCarregamento, foiCancelado } from "../../../../utils/animationCarregamento";
 import { MdKeyboardDoubleArrowLeft } from "react-icons/md";
 import { ActionListaVendasAutorizarTroca } from "./actionListaVendasAutorizarTroca";
 import { CiEdit } from "react-icons/ci";
 import { useAutorizarTroca } from "./hooks/useAutorizarTroca";
 import Swal from "sweetalert2";
-
-
 
 export const ActionPesquisaAutorizaTroca = ({ usuarioLogado }) => {
   const [tabelaPrincipal, setTabelaPrincipal] = useState(true);
@@ -46,64 +44,70 @@ export const ActionPesquisaAutorizaTroca = ({ usuarioLogado }) => {
       setMenuFilhoAtual(menuParsed);
     }
   }, []);
-  
+
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
     ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
       const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
-      
+
       return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
   );
 
   const { data: optionsEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas } = useQuery(
     'empresas',
     async () => {
       const response = await get(`/empresas`);
-      
+
       return response.data;
     },
-    {enabled: true, staleTime: 5 * 60 * 1000, cacheTime: 30 * 60 * 1000 }
+    { enabled: true, staleTime: 5 * 60 * 1000, cacheTime: 30 * 60 * 1000 }
   );
 
-  const fetchListaVendasPrazoExcedido = async ( ) => {
-    
-    const urlBase = `/vendas-prazo-excedido?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&cpfOUidVenda=${cpfNumeroVenda}&nff=${numeroNFCE}&serie=${numeroSerie}&idSubGrupoEmpresarial=${marcaSelecionada}&idEmpresa=${empresaSelecionada}`;    
+  const fetchListaVendasPrazoExcedido = async () => {
+    const urlBase = `/vendas-prazo-excedido?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&cpfOUidVenda=${cpfNumeroVenda}&nff=${numeroNFCE}&serie=${numeroSerie}&idSubGrupoEmpresarial=${marcaSelecionada}&idEmpresa=${empresaSelecionada}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+
+    const controller = new AbortController();
+    let allData = [];
+
     try {
-      animacaoCarregamento('Carregando dados...', true);
-      
+      animacaoCarregamento('Carregando dados...', true, true, () => controller.abort());
+
       const primeiraPagina = 1;
-      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`, { signal: controller.signal });
       const page = primeiraResposta.page || primeiraPagina;
       const pageSize = primeiraResposta.pageSize || 1000;
       const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
       const totalPages = Math.ceil(totalRows / pageSize);
 
-      let allData = [...(primeiraResposta.data || [])];
+      allData = [...(primeiraResposta.data || [])];
 
       if (totalPages > 1) {
         for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
-          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
-          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          if (foiCancelado()) break;
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`, { signal: controller.signal });
           allData.push(...(responsePage.data || []));
         }
       }
 
       return allData;
     } catch (error) {
-      console.error('Erro ao buscar dados da api:', error);
+      if (error.code === 'ERR_CANCELED') {
+        return allData;
+      }
+      console.error('Erro ao buscar dados:', error);
       throw error;
     } finally {
       fecharAnimacaoCarregamento();
     }
   };
-   
 
   const { data: dadosVendasPrazoExcedido = [], error: errorVendasPrazoExcedido, isLoading: isLoadingVendasPrazoExcedido, refetch: refetchListaVendasPrazoExcedido } = useQuery(
-    ['vendas-prazo-excedido', ],
+    ['vendas-prazo-excedido',],
     () => fetchListaVendasPrazoExcedido(),
     { enabled: false, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
   )
@@ -113,7 +117,7 @@ export const ActionPesquisaAutorizaTroca = ({ usuarioLogado }) => {
   }
 
   const handleClick = () => {
-    refetchListaVendasPrazoExcedido()  
+    refetchListaVendasPrazoExcedido()
     setTabelaPrincipal(true)
     setTabelaSecundaria(false)
   }
@@ -124,7 +128,7 @@ export const ActionPesquisaAutorizaTroca = ({ usuarioLogado }) => {
     setBtnVisivel(false)
   }
 
-    const handleKeyPress = (e) => {
+  const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       handleClick();
@@ -133,17 +137,17 @@ export const ActionPesquisaAutorizaTroca = ({ usuarioLogado }) => {
 
   const handleAutorizarExcecao = () => {
 
-    if(optionsModulos[0]?.ALTERAR == 'False') {
-        Swal.fire({
+    if (optionsModulos[0]?.ALTERAR == 'False') {
+      Swal.fire({
         icon: 'warning',
         title: 'Acesso Negado!',
         html: `${usuarioLogado?.NOFUNCIONARIO} </br> Você não tem permissão para autorizar exceção.`,
         confirmButtonText: 'OK',
         customClass: {
-            container: 'custom-swal',
+          container: 'custom-swal',
         },
-        });
-        return;
+      });
+      return;
     } else {
       onAuthFuncionario()
     }
@@ -154,7 +158,7 @@ export const ActionPesquisaAutorizaTroca = ({ usuarioLogado }) => {
     selectedRows,
     setSelectedRows,
     handleClick
-})
+  })
   return (
 
     <Fragment>
@@ -163,7 +167,6 @@ export const ActionPesquisaAutorizaTroca = ({ usuarioLogado }) => {
         linkComponentAnterior={["Home"]}
         linkComponent={["Vendas"]}
         title="Vendas Vouchers"
-
 
         InputFieldDTInicioComponent={InputField}
         valueInputFieldDTInicio={dataPesquisaInicio}
@@ -176,11 +179,11 @@ export const ActionPesquisaAutorizaTroca = ({ usuarioLogado }) => {
         valueInputFieldDTFim={dataPesquisaFim}
         onChangeInputFieldDTFim={(e) => setDataPesquisaFim(e.target.value)}
         onKeyDownInputFieldDTFim={handleKeyPress}
-   
+
         InputSelectEmpresaComponent={InputSelectAction}
         labelSelectEmpresa={"Lojas"}
         optionsEmpresas={[
-          {value: '', label: 'Todas'},
+          { value: '', label: 'Todas' },
           ...optionsEmpresas.map((empresa) => ({
             value: empresa.IDEMPRESA,
             label: empresa.NOFANTASIA,
@@ -232,10 +235,10 @@ export const ActionPesquisaAutorizaTroca = ({ usuarioLogado }) => {
 
       />
 
-      <ActionListaVendasAutorizarTroca 
-        dadosVendasPrazoExcedido={dadosVendasPrazoExcedido} 
+      <ActionListaVendasAutorizarTroca
+        dadosVendasPrazoExcedido={dadosVendasPrazoExcedido}
         setTabelaPrincipal={setTabelaPrincipal}
-        setTabelaSecundaria={setTabelaSecundaria}  
+        setTabelaSecundaria={setTabelaSecundaria}
         tabelaPrincipal={tabelaPrincipal}
         tabelaSecundaria={tabelaSecundaria}
         setBtnVisivel={setBtnVisivel}
@@ -243,8 +246,8 @@ export const ActionPesquisaAutorizaTroca = ({ usuarioLogado }) => {
         selectedRows={selectedRows}
         setSelectedRows={setSelectedRows}
       />
-    
-      
+
+
     </Fragment>
   )
 }
