@@ -8,7 +8,6 @@ import { mascaraTelefone, removerMascaraTelefone } from "../../../../../../utils
 import FormField from "../../../../../Formularios/FormField"
 import { schema } from "./schemaValidationCPF"
 
-
 export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos, optionsCPF }) => {
   const { register, handleSubmit, formState: { errors }, clearErrors, setError, control } = useForm({
     mode: "onChange"
@@ -53,7 +52,8 @@ export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos,
     setEstado,
     onSubmit,
     readOnlyCpf,
-    setCepDigitado
+    setCepDigitado,
+    handleBlurCpf
   } = useCadastrarClienteCPF({ usuarioLogado, optionsModulos, handleClose });
 
   const fecharModal = () => {
@@ -204,6 +204,8 @@ export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos,
                     maxLength={14}
                     errors={errors}
                     clearErrors={clearErrors}
+                    onBlur={handleBlurCpf}
+
                   />
                 )}
               />
@@ -248,7 +250,6 @@ export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos,
                   />
                 )}
               />
-              {/* {console.log(sobrenome, 'sobrenome')} */}
             </div>
           </div>
 
@@ -276,15 +277,15 @@ export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos,
             <div className="col-sm-4 col-md-3 col-xl-3">
 
               <Controller
-                name="TelefoneCliente"
+                name="telefoneDoCliente"
                 control={control}
                 render={({ field }) => (
                   <FormField
-                    name="TelefoneDoCliente"
+                    name="telefoneDoCliente"
                     label={"Telefone"}
                     placeholder={"DIGITE O TELEFONE"}
                     type="text"
-                    id={"TelefoneDoCliente"}
+                    id={"telefoneDoCliente"}
                     value={mascaraTelefone(telefoneCliente)}
                     onChange={(e) => setTelefoneCliente(e.target.value)}
                     errors={errors}

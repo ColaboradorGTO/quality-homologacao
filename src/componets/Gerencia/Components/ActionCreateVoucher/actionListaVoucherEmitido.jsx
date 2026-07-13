@@ -136,7 +136,7 @@ export const ActionListaVoucherEmitido = ({
     {
       field: 'NUVOUCHER',
       header: 'Nº Voucher',
-      body: row => <th style={{color: 'blue'}}>{ocultaParteDosDadosVoucher(row.NUVOUCHER)}</th>,
+      body: row => <th style={{ color: 'blue' }}>{ocultaParteDosDadosVoucher(row.NUVOUCHER)}</th>,
       sortable: true,
     },
     {
@@ -370,6 +370,7 @@ export const ActionListaVoucherEmitido = ({
             sortOrder={-1}
             paginator={true}
             rows={10}
+            cellMemo={false}
             rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"

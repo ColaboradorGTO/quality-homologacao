@@ -201,7 +201,7 @@ export const ActionPesquisaCreateVoucher = ({usuarioLogado, optionsEmpresas }) =
           linkComponentAnterior={["Home"]}
           linkComponent={["Vouchers"]}
           title="Vouchers "
-          subTitle="Nome da Loja"
+          subTitle="Nome da Loja "
 
           InputSelectPendenciaComponent={InputSelectAction}
           labelSelectPendencia="Selecione a Empresa"

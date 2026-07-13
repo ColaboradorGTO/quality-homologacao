@@ -310,7 +310,7 @@ export const useCadastrarClienteCPFVoucher = ({ usuarioLogado, optionsModulos, h
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario || "IP NÃO DISPONIVEL"
+                IP: ipUsuario || "INDISPONIVEL"
             }
 
             await post('/log-web', postData)
@@ -347,7 +347,7 @@ export const useCadastrarClienteCPFVoucher = ({ usuarioLogado, optionsModulos, h
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: '',
-                IP: ipUsuario || "IP NÃO DISPONIVEL"
+                IP: ipUsuario || "INDISPONIVEL"
             }
             await post('/log-web', postData);
 
