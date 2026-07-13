@@ -98,6 +98,7 @@ export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos,
 
       await schema.validate(dadosParaValidar, { abortEarly: false });
 
+
       await onSubmit();
 
     } catch (validationError) {
@@ -107,7 +108,6 @@ export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos,
       if (validationError.inner && validationError.inner.length > 0) {
         validationError.inner.forEach(error => {
           if (error.path) {
-            S
             setError(error.path, {
               type: 'manual',
               message: error.message
@@ -249,7 +249,6 @@ export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos,
                   />
                 )}
               />
-              {/* {console.log(sobrenome, 'sobrenome')} */}
             </div>
           </div>
 
@@ -272,21 +271,21 @@ export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos,
                 )}
               />
             </div>
-
-
+            
             <div className="col-sm-4 col-md-3 col-xl-3">
 
               <Controller
-                name="TelefoneCliente"
+                name="telefoneDoCliente"
                 control={control}
                 render={({ field }) => (
                   <FormField
-                    name="TelefoneDoCliente"
+                    name="telefoneDoCliente"
                     label={"Telefone"}
                     placeholder={"DIGITE O TELEFONE"}
                     type="text"
-                    id={"TelefoneDoCliente"}
+                    id={"telefoneDoCliente"}
                     value={mascaraTelefone(telefoneCliente)}
+                    //value={mascaraTelefone(telefoneCliente)}
                     onChange={(e) => setTelefoneCliente(e.target.value)}
                     errors={errors}
                     clearErrors={clearErrors}
