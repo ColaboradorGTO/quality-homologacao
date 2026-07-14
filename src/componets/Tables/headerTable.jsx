@@ -32,7 +32,7 @@ const HeaderTable = ({
         placeholder="Pesquisar"
 
       />
-
+ 
       <div style={{ display: "flex",  justifyContent: "space-around" }}>
         {handlePrint && (
           <ButtonHeaderTable
