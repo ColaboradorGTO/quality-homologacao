@@ -33,7 +33,7 @@ const HeaderTable = ({
 
       />
 
-      <div style={{ display: "flex", gap: '5px'  }}>
+      <div style={{ display: "flex",  justifyContent: "space-around" }}>
         {handlePrint && (
           <ButtonHeaderTable
             Icon={MdOutlineLocalPrintshop}
