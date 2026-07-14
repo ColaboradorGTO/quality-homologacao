@@ -4,8 +4,9 @@ import { SiMicrosoftexcel } from "react-icons/si";
 import { BsFiletypePdf } from "react-icons/bs";
 import { InputSearch } from '../Buttons/InputSearch';
 import { ButtonHeaderTable } from '../Buttons/ButtonHeaderTable';
+import { BiSolidFileTxt } from "react-icons/bi";
 
-const HeaderTable = ({ globalFilterValue, onGlobalFilterChange, handlePrint, exportToExcel, exportToPDF }) => {
+const HeaderTable = ({ globalFilterValue, onGlobalFilterChange, handlePrint, exportToExcel, exportToPDF, exportTXT }) => {
   return (
     <div
       className="row col-sm-6 col-md-12"
@@ -45,6 +46,7 @@ const HeaderTable = ({ globalFilterValue, onGlobalFilterChange, handlePrint, exp
           onClickButtonType={exportToPDF}
           cor="warning"
         />
+
       </div>
     </div>
   );

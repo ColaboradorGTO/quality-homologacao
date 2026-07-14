@@ -7,6 +7,8 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../../Tables/headerTable";
+import { ButtonType } from "../../../Buttons/ButtonType";
+import { BiSolidFileTxt } from "react-icons/bi";
 
 export const ActionListaVendasConciliacao = ({ dadosVendasConciliacao }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
@@ -21,6 +23,41 @@ export const ActionListaVendasConciliacao = ({ dadosVendasConciliacao }) => {
     content: () => dataTableRef.current,
     documentTitle: 'Lista de Vendas Conciliação',
   });
+
+  const exportToTXT = () => {
+  const linhas = dadosVendasConciliacao.map(item => [
+    item.contador,
+    item.IDEMPRESA,
+    item.NOFANTASIA,
+    item.IDVENDA,
+    item.DATA,
+    formatMoeda(item.VRTOTALPAGO),
+    formatMoeda(item.VRTOTALDESCONTO),
+    formatMoeda(item.VRPAGO),
+    item.DSTIPOPAGAMENTO,
+    item.NSU,
+    item.NUAUTORIZACAO,
+    item.DSADQUIRENTE
+  ].join(';'));
+
+    const conteudo = linhas.join('\n');
+
+    const blob = new Blob([conteudo], {
+      type: 'text/plain;charset=utf-8'
+    });
+
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'vendas_conciliacao.txt';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    window.URL.revokeObjectURL(url);
+  };
 
   const exportToPDF = () => {
     const doc = new jsPDF();
@@ -173,6 +210,13 @@ export const ActionListaVendasConciliacao = ({ dadosVendasConciliacao }) => {
       <div className="panel" >
         <div className="panel-hdr">
           <h2>Vendas Conciliação</h2>
+
+          <ButtonType
+            onClickButtonType={exportToTXT}
+            cor={"info"}
+            textButton={"Baixar TXT"}
+            Icon={BiSolidFileTxt}
+          />
         </div>
         <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
           <HeaderTable

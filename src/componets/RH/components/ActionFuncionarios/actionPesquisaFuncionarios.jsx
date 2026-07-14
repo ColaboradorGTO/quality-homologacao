@@ -175,6 +175,7 @@ export const ActionPesquisaFuncionarios = ({ usuarioLogado, ID }) => {
         onButtonClickCadastro={handleCadastro}
         corCadastro={"success"}
         IconCadastro={IoIosAdd}
+       
       />
 
       <ActionListaFuncionarios

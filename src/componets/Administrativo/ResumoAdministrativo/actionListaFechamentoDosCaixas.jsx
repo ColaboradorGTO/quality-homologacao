@@ -132,7 +132,7 @@ export const ActionListaFechamentoDosCaixas = ({
       TOTALFECHAMENTOPOS: item.TOTALFECHAMENTOPOS,
       TOTALFECHAMENTOVOUCHER: item.TOTALFECHAMENTOVOUCHER,
       TOTALFECHAMENTOFATURA: item.TOTALFECHAMENTOFATURA,
-      STCONFERIDO: item.STCONFERIDO > 0 ? 'Conferido' : 'Sem Conferir',
+      STCONFERIDO: item.STCONFERIDO,
 
       // DSCAIXAFECHAMENTO: item.DSCAIXAFECHAMENTO,
 
@@ -267,13 +267,14 @@ export const ActionListaFechamentoDosCaixas = ({
     {
       field: 'STCONFERIDO',
       header: 'Situação',
-      body: row => <th style={{ color: row.STCONFERIDO == 'Conferido' ? 'blue' : 'red' }} >{row.STCONFERIDO}</th>,
+      body: row => <th style={{ color: row.STCONFERIDO == 'Conferido' ? 'blue' : 'red' }} >{row.STCONFERIDO > 0 ? 'Conferido' : 'Sem Conferir'}</th>,
       sortable: true,
     },
     {
       field: 'OPTIONS',
       header: 'Opções',
       body: row => {
+        console.log(row.STCONFERIDO, 'STCONFERIDO')
         if (row.STCONFERIDO > 0) {
           return (
 
@@ -288,6 +289,7 @@ export const ActionListaFechamentoDosCaixas = ({
                 iconSize={25}
                 width="40px"
                 height="40px"
+                disabledBTN={optionsModulos[0]?.ALTERAR == 'False' ? true : false}
               />
 
             </div>
@@ -306,6 +308,7 @@ export const ActionListaFechamentoDosCaixas = ({
                 iconSize={25}
                 width="40px"
                 height="40px"
+                disabledBTN={optionsModulos[0]?.ALTERAR == 'False' ? true : false}
               />
 
             </div>
@@ -317,7 +320,17 @@ export const ActionListaFechamentoDosCaixas = ({
   ]
 
   const handleConferir = async (row) => {
+    if(optionsModulos[0]?.ALTERAR == 'False') {
+      Swal.fire({
+        icon: 'error',
+        title: 'Acesso Negado',
+        text: 'Você não tem permissão para conferir ou abrir caixa.',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#3085d6'
 
+      })
+      return;
+    }
 
     Swal.fire({
       icon: 'question',

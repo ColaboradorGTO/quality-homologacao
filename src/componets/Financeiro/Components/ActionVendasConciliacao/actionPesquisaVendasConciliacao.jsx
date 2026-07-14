@@ -10,6 +10,8 @@ import { ActionListaVendasConciliacao } from "./actionListaVendasConciliacao"
 import { useQuery } from 'react-query';
 import { animacaoCarregamento, fecharAnimacaoCarregamento, foiCancelado } from "../../../../utils/animationCarregamento"
 import { useFetchData, useFetchEmpresas } from "../../../../hooks/useFetchData"
+import { BiSolidFileTxt } from "react-icons/bi";
+import { formatMoeda } from "../../../../utils/formatMoeda"
 
 export const ActionPesquisaVendasConciliacao = () => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
@@ -112,13 +114,14 @@ export const ActionPesquisaVendasConciliacao = () => {
     setTabelaVisivel(true)
     refetch();
   }
+ 
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       handleClick();
     }
-  };
+  }; 
 
   return (
 
@@ -173,7 +176,7 @@ export const ActionPesquisaVendasConciliacao = () => {
         IconSearch={AiOutlineSearch}
         corSearch={"primary"}
 
-      />
+      />  
 
       {tabelaVisivel && (
         <ActionListaVendasConciliacao dadosVendasConciliacao={dadosVendasConciliacao} />
