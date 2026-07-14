@@ -5,8 +5,17 @@ import { BsFiletypePdf } from "react-icons/bs";
 import { InputSearch } from '../Buttons/InputSearch';
 import { ButtonHeaderTable } from '../Buttons/ButtonHeaderTable';
 import { BiSolidFileTxt } from "react-icons/bi";
+import { FaFileCsv } from 'react-icons/fa';
 
-const HeaderTable = ({ globalFilterValue, onGlobalFilterChange, handlePrint, exportToExcel, exportToPDF, exportTXT }) => {
+const HeaderTable = ({ 
+  globalFilterValue, 
+  onGlobalFilterChange, 
+  handlePrint, 
+  exportToExcel, 
+  exportToPDF, 
+  exportTXT,
+  exportCSV 
+}) => {
   return (
     <div
       className="row col-sm-6 col-md-12"
@@ -24,29 +33,51 @@ const HeaderTable = ({ globalFilterValue, onGlobalFilterChange, handlePrint, exp
 
       />
 
-      <div style={{ display: "flex", justifyContent: 'space-around' }}>
-        <ButtonHeaderTable
-          // textButton="Imprimir"
-          Icon={MdOutlineLocalPrintshop}
-          iconSize={18}
-          onClickButtonType={handlePrint}
-          cor="primary"
-        />
-        <ButtonHeaderTable
-          // textButton="Excel"
-          Icon={SiMicrosoftexcel}
-          iconSize={18}
-          onClickButtonType={exportToExcel}
-          cor="success"
-        />
-        <ButtonHeaderTable
-          // textButton="PDF"
-          Icon={BsFiletypePdf}
-          iconSize={18}
-          onClickButtonType={exportToPDF}
-          cor="warning"
-        />
+      <div style={{ display: "flex", gap: '5px'  }}>
+        {handlePrint && (
+          <ButtonHeaderTable
+            Icon={MdOutlineLocalPrintshop}
+            iconSize={18}
+            onClickButtonType={handlePrint}
+            cor="primary"
+          />
+        )}
 
+        {exportToExcel && (
+          <ButtonHeaderTable
+            Icon={SiMicrosoftexcel}
+            iconSize={18}
+            onClickButtonType={exportToExcel}
+            cor="success"
+          />
+        )}
+
+        {exportToPDF && (
+          <ButtonHeaderTable
+            Icon={BsFiletypePdf}
+            iconSize={18}
+            onClickButtonType={exportToPDF}
+            cor="warning"
+          />
+        )}
+
+        {exportTXT && (
+          <ButtonHeaderTable
+            Icon={BiSolidFileTxt}
+            iconSize={18}
+            onClickButtonType={exportTXT}
+            cor="info"
+          />
+        )}
+       
+        {exportCSV && (
+          <ButtonHeaderTable
+            Icon={FaFileCsv}
+            iconSize={18}
+            onClickButtonType={exportCSV}
+            cor="success"
+          />
+        )}
       </div>
     </div>
   );

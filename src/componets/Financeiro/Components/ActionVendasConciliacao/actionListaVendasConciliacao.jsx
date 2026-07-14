@@ -9,11 +9,13 @@ import * as XLSX from 'xlsx';
 import HeaderTable from "../../../Tables/headerTable";
 import { ButtonType } from "../../../Buttons/ButtonType";
 import { BiSolidFileTxt } from "react-icons/bi";
+import { CSVLink } from "react-csv";
 
 export const ActionListaVendasConciliacao = ({ dadosVendasConciliacao }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
+  const csvLinkRef = useRef(null);
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -23,6 +25,11 @@ export const ActionListaVendasConciliacao = ({ dadosVendasConciliacao }) => {
     content: () => dataTableRef.current,
     documentTitle: 'Lista de Vendas Conciliação',
   });
+
+  const exportToCSV = () => {
+    csvLinkRef.current?.link.click();
+  };
+
 
   const exportToTXT = () => {
   const linhas = dadosVendasConciliacao.map(item => [
@@ -109,7 +116,7 @@ export const ActionListaVendasConciliacao = ({ dadosVendasConciliacao }) => {
     XLSX.writeFile(workbook, 'vendas_conciliacao.xlsx');
   };
 
-  const dados = Array.isArray(dadosVendasConciliacao) ? dadosVendasConciliacao.map((item, index) => {
+  const dados = dadosVendasConciliacao.map((item, index) => {
     let contador = index + 1;
     return {
 
@@ -126,7 +133,23 @@ export const ActionListaVendasConciliacao = ({ dadosVendasConciliacao }) => {
       DSADQUIRENTE: item.DSADQUIRENTE,
       contador
     }
-  }) : [];
+  });
+
+    const csvData = dados?.map(item => ({
+
+      "ID EMPRESA": item.IDEMPRESA,
+      "EMPRESA": item.NOFANTASIA,
+      "ID VENDA": item.IDVENDA,
+      "DT VENDA": item.DATA,
+      "VR TOTAL": formatMoeda(item.VRTOTALPAGO),
+      "DESCONTO": formatMoeda(item.VRTOTALDESCONTO),
+      "VR PAGO": formatMoeda(item.VRPAGO),
+      "TP PAGAMENTO": item.DSTIPOPAGAMENTO,
+      "NSU": item.NSU,
+      "Nº AUTORIZAÇÃO": item.NUAUTORIZACAO,
+      "ADQUIRENTE": item.DSADQUIRENTE,
+    }));
+
 
   const colunasVendasLoja = [
     {
@@ -210,14 +233,15 @@ export const ActionListaVendasConciliacao = ({ dadosVendasConciliacao }) => {
       <div className="panel" >
         <div className="panel-hdr">
           <h2>Vendas Conciliação</h2>
-
-          <ButtonType
-            onClickButtonType={exportToTXT}
-            cor={"info"}
-            textButton={"Baixar TXT"}
-            Icon={BiSolidFileTxt}
-          />
         </div>
+          <CSVLink
+            data={csvData}
+            filename="vendas_conciliacao.csv"
+            ref={csvLinkRef}
+            separator=";"
+            enclosingCharacter=""
+            style={{ display: "none" }}
+          />
         <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
           <HeaderTable
             globalFilterValue={globalFilterValue}
@@ -225,6 +249,8 @@ export const ActionListaVendasConciliacao = ({ dadosVendasConciliacao }) => {
             handlePrint={handlePrint}
             exportToExcel={exportToExcel}
             exportToPDF={exportToPDF}
+            exportTXT={exportToTXT}
+            exportCSV={exportToCSV}
           />
         </div>
         <div className="card" ref={dataTableRef}>

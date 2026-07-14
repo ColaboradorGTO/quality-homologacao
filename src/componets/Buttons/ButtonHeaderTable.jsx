@@ -33,7 +33,7 @@ export const ButtonHeaderTable = ({
   return (
     <Fragment>
 
-      <div className="col-sm-3 col-md-3 col-lg-4 col-xl-4">
+      <div className="col-sm-2 col-md-2 col-lg-2 col-xl-2">
         <button
          
           id={id}

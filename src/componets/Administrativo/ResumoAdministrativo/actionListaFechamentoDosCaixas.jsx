@@ -417,6 +417,7 @@ export const ActionListaFechamentoDosCaixas = ({
               </h2>
             </header>
 
+          
             <div style={{ marginBottom: "1rem" }}>
               <HeaderTable
                 globalFilterValue={globalFilterValue}
