@@ -8,7 +8,7 @@ import { getDataAtual } from "../../../../utils/dataAtual";
 import { ActionListaDespesaLoja } from "./actionListaDespesaLoja";
 import { InputSelectAction } from "../../../Inputs/InputSelectAction";
 import { useQuery } from 'react-query';
-import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento"
+import { animacaoCarregamento, fecharAnimacaoCarregamento, foiCancelado } from "../../../../utils/animationCarregamento"
 import { useFetchData } from "../../../../hooks/useFetchData"
 import { MdOutlineCloudUpload } from "react-icons/md"
 import { useMigrarTodasDespesasSAP } from "./hooks/useMigrarTodasDespesas"
@@ -49,37 +49,59 @@ export const ActionPesquisaDespesaLoja = ({ usuarioLogado }) => {
     { enabled: Boolean(usuarioLogado?.id) }
   );
 
-  const { data: optionsEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas } = useFetchData('listaEmpresasIformatica', '/listaEmpresasIformatica');
-  const { data: optionsCategorias = [], error: errorCategorias, isLoading: isLoadingCategorias } = useFetchData('categoriaReceitaDespesaFinanceira', '/categoriaReceitaDespesaFinanceira');
+  const { data: optionsEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas } = useQuery(
+    'listaEmpresaComercial',
+    async () => {
+      const response = await get(`/listaEmpresaComercial`);
+
+      return response.data;
+    },
+    { enabled: true, staleTime: 60 * 60 * 1000, }
+  );
+
+  const { data: optionsCategorias = [], error: errorCategorias, isLoading: isLoadingCategorias, refetch: refetchCategorias } = useQuery(
+    'categoriaReceitaDespesaFinanceira',
+    async () => {
+      const response = await get(`/categoriaReceitaDespesaFinanceira`);
+
+      return response.data;
+    },
+    { enabled: true, staleTime: 60 * 60 * 1000, }
+  );
 
   const fetchListaDespesasLoja = async () => {
     const urlBase = `/despesa-loja?idEmpresa=${empresaSelecionada}&idCategoria=${categoriaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
-    try {
+    const controller = new AbortController();
+    let allData = [];
 
-      animacaoCarregamento('Carregando dados...', true);
+    try {
+      animacaoCarregamento('Carregando dados...', true, true, () => controller.abort());
 
       const primeiraPagina = 1;
-      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`, { signal: controller.signal });
       const page = primeiraResposta.page || primeiraPagina;
       const pageSize = primeiraResposta.pageSize || 1000;
       const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
       const totalPages = Math.ceil(totalRows / pageSize);
 
-      let allData = [...(primeiraResposta.data || [])];
+      allData = [...(primeiraResposta.data || [])];
 
       if (totalPages > 1) {
         for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
-          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
-          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          if (foiCancelado()) break;
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`, { signal: controller.signal });
           allData.push(...(responsePage.data || []));
         }
       }
 
-      return allData
-
+      return allData;
     } catch (error) {
+      if (error.code === 'ERR_CANCELED') {
+        return allData;
+      }
       console.error('Erro ao buscar dados:', error);
       throw error;
     } finally {

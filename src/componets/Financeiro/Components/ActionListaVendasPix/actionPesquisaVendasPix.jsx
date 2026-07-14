@@ -15,7 +15,7 @@ import { getDataAtual } from "../../../../utils/dataAtual"
 import { InputSelectAction } from "../../../Inputs/InputSelectAction"
 import { useQuery } from 'react-query';
 import Swal from 'sweetalert2';
-import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento"
+import { animacaoCarregamento, fecharAnimacaoCarregamento, foiCancelado } from "../../../../utils/animationCarregamento"
 import { useFetchData, useFetchEmpresas } from "../../../../hooks/useFetchData"
 
 
@@ -33,8 +33,6 @@ export const ActionPesquisaVendasPix = () => {
   const [tabelaFaturaPixConsolidadoLoja, setTabelaFaturaPixConsolidadoLoja] = useState(false);
   const [tabelaVendasFaturaPixVisivel, setTabelaVendasFaturaPixVisivel] = useState(false);
 
-
-
   useEffect(() => {
     const dataInicial = getDataAtual();
     const dataFinal = getDataAtual();
@@ -43,36 +41,60 @@ export const ActionPesquisaVendasPix = () => {
    
   }, [])
   
-  const { data: optionsMarcas = [], error: errorMarcas, isLoading: isLoadingMarcas } = useFetchData('marcasLista', '/marcasLista');
-  const { data: optionsEmpresas = [],} = useFetchEmpresas(marcaSelecionada);
+  const { data: optionsMarcas = [], error: errorMarcas, isLoading: isLoadingMarcas, refetch: refetchMarcas } = useQuery(
+    'marcasLista',
+    async () => {
+      const response = await get(`/marcasLista`);
+
+      return response.data;
+    },
+    { enabled: true, staleTime: 60 * 60 * 1000, }
+  );
+
+  const { data: optionsEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas } = useQuery(
+    'listaEmpresaComercial',
+    async () => {
+      const response = await get(`/listaEmpresaComercial?idMarca=${marcaSelecionada}`);
+
+      return response.data;
+    },
+    { enabled: true, staleTime: 60 * 60 * 1000, }
+  );
 
 
   const fetchListaVendasPix = async ( ) => {
     const urlBase = `/venda-pix-periodo?idMarca=${marcaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idLoja=${empresaSelecionada}&listaEmpresas=${empresaLivre}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+    const controller = new AbortController();
+    let allData = [];
+
     try {
-      animacaoCarregamento('Carregando dados...', true);
-        
+      animacaoCarregamento('Carregando dados...', true, true, () => controller.abort());
+
       const primeiraPagina = 1;
-      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`, { signal: controller.signal });
       const page = primeiraResposta.page || primeiraPagina;
       const pageSize = primeiraResposta.pageSize || 1000;
       const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
       const totalPages = Math.ceil(totalRows / pageSize);
 
-      let allData = [...(primeiraResposta.data || [])];
+      allData = [...(primeiraResposta.data || [])];
 
       if (totalPages > 1) {
         for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
-          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
-          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          if (foiCancelado()) break;
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`, { signal: controller.signal });
           allData.push(...(responsePage.data || []));
         }
       }
 
       return allData;
     } catch (error) {
+      if (error.code === 'ERR_CANCELED') {
+        return allData;
+      }
       console.error('Erro ao buscar dados:', error);
       throw error;
     } finally {
@@ -82,8 +104,8 @@ export const ActionPesquisaVendasPix = () => {
   
   
   const { data: dadosVendasPix = [], error: errorVendasPix, isLoading: isLoadingVendasPix, refetch: refetchVendasPix } = useQuery(
-    ['venda-pix-periodo', marcaSelecionada, empresaSelecionada, empresaLivre],
-    () => fetchListaVendasPix(marcaSelecionada, empresaSelecionada, empresaLivre),
+    ['venda-pix-periodo'],
+    () => fetchListaVendasPix(),
     { enabled: false, staleTime: 60 * 60 * 1000 }
   );
   
@@ -92,28 +114,35 @@ export const ActionPesquisaVendasPix = () => {
     const urlBase = `/venda-pix-consolidado-loja?idMarca=${marcaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idLoja=${empresaSelecionada}&listaEmpresas=${empresaLivre}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+    const controller = new AbortController();
+    let allData = [];
+
     try {
-      animacaoCarregamento('Carregando dados...', true);
-        
+      animacaoCarregamento('Carregando dados...', true, true, () => controller.abort());
+
       const primeiraPagina = 1;
-      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`, { signal: controller.signal });
       const page = primeiraResposta.page || primeiraPagina;
       const pageSize = primeiraResposta.pageSize || 1000;
       const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
       const totalPages = Math.ceil(totalRows / pageSize);
 
-      let allData = [...(primeiraResposta.data || [])];
+      allData = [...(primeiraResposta.data || [])];
 
       if (totalPages > 1) {
         for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
-          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
-          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          if (foiCancelado()) break;
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`, { signal: controller.signal });
           allData.push(...(responsePage.data || []));
         }
       }
 
       return allData;
     } catch (error) {
+      if (error.code === 'ERR_CANCELED') {
+        return allData;
+      }
       console.error('Erro ao buscar dados:', error);
       throw error;
     } finally {
@@ -122,8 +151,8 @@ export const ActionPesquisaVendasPix = () => {
   }
 
   const { data: dadosVendasPixConsolidado = [], error: errorVendasPixConsolidado, isLoading: isLoadingVendasPixConsolidado, refetch: refetchVendasPixConsolidado } = useQuery(
-    ['venda-pix-consolidado-loja', marcaSelecionada, empresaSelecionada, empresaLivre],
-    () => fetchListaVendasPixConsolidado(marcaSelecionada, empresaSelecionada, empresaLivre),
+    ['venda-pix-consolidado-loja'],
+    () => fetchListaVendasPixConsolidado(),
     { enabled: false, staleTime: 60 * 60 * 1000 }
   );
 
@@ -131,28 +160,35 @@ export const ActionPesquisaVendasPix = () => {
     const urlBase = `/fatura-pix-periodo?idMarca=${marcaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idLoja=${empresaSelecionada}&listaEmpresas=${empresaLivre}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+    const controller = new AbortController();
+    let allData = [];
+
     try {
-      animacaoCarregamento('Carregando dados...', true);
-        
+      animacaoCarregamento('Carregando dados...', true, true, () => controller.abort());
+
       const primeiraPagina = 1;
-      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`, { signal: controller.signal });
       const page = primeiraResposta.page || primeiraPagina;
       const pageSize = primeiraResposta.pageSize || 1000;
       const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
       const totalPages = Math.ceil(totalRows / pageSize);
 
-      let allData = [...(primeiraResposta.data || [])];
+      allData = [...(primeiraResposta.data || [])];
 
       if (totalPages > 1) {
         for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
-          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
-          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          if (foiCancelado()) break;
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`, { signal: controller.signal });
           allData.push(...(responsePage.data || []));
         }
       }
 
       return allData;
     } catch (error) {
+      if (error.code === 'ERR_CANCELED') {
+        return allData;
+      }
       console.error('Erro ao buscar dados:', error);
       throw error;
     } finally {
@@ -161,8 +197,8 @@ export const ActionPesquisaVendasPix = () => {
   }
 
   const {data: dadosVendasFaturasPix = [], error: errorVendasFaturaPix, isLoading: isLoadingVendasFaturaPix, refetch: refetchVendasFaturaPix} = useQuery(
-    ['fatura-pix-periodo', marcaSelecionada, empresaSelecionada, empresaLivre],
-    () => fetchVendasFaturaPix(marcaSelecionada, empresaSelecionada, empresaLivre),
+    ['fatura-pix-periodo'],
+    () => fetchVendasFaturaPix(),
     {enabled: false, staleTime: 60 * 60 * 1000}
   );
 
@@ -171,37 +207,45 @@ export const ActionPesquisaVendasPix = () => {
     const urlBase = `/venda-pix-consolidado?idMarca=${marcaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+    const controller = new AbortController();
+    let allData = [];
+
     try {
-      animacaoCarregamento('Carregando dados...', true);
-        
+      animacaoCarregamento('Carregando dados...', true, true, () => controller.abort());
+
       const primeiraPagina = 1;
-      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`, { signal: controller.signal });
       const page = primeiraResposta.page || primeiraPagina;
       const pageSize = primeiraResposta.pageSize || 1000;
       const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
       const totalPages = Math.ceil(totalRows / pageSize);
 
-      let allData = [...(primeiraResposta.data || [])];
+      allData = [...(primeiraResposta.data || [])];
 
       if (totalPages > 1) {
         for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
-          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
-          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          if (foiCancelado()) break;
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`, { signal: controller.signal });
           allData.push(...(responsePage.data || []));
         }
       }
 
-      return allData;  
+      return allData;
     } catch (error) {
+      if (error.code === 'ERR_CANCELED') {
+        return allData;
+      }
       console.error('Erro ao buscar dados:', error);
       throw error;
     } finally {
       fecharAnimacaoCarregamento();
     }
   }
+
   const {data: dadosVendasPixConsolidadoMarca = [], error: errorVendasPixConsolidadoMarca, isLoading: isLoadingVendasPixConsolidadoMarca, refetch: refetchVendasPixConsolidadoMarca} = useQuery(
-    ['venda-pix-consolidado', marcaSelecionada, empresaSelecionada, empresaLivre],
-    () => fetchVendasPixConsolidadoMarca(marcaSelecionada, empresaSelecionada, empresaLivre),
+    ['venda-pix-consolidado'],
+    () => fetchVendasPixConsolidadoMarca(),
     {enabled: false, staleTime: 60 * 60 * 1000}
   );
   
@@ -209,37 +253,45 @@ export const ActionPesquisaVendasPix = () => {
     const urlBase = `fatura-pix-periodo-consolidado?idMarca=${marcaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idLoja=${empresaSelecionada}&listaEmpresas=${empresaLivre}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+    const controller = new AbortController();
+    let allData = [];
+
     try {
-      animacaoCarregamento('Carregando dados...', true);
-        
+      animacaoCarregamento('Carregando dados...', true, true, () => controller.abort());
+
       const primeiraPagina = 1;
-      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`, { signal: controller.signal });
       const page = primeiraResposta.page || primeiraPagina;
       const pageSize = primeiraResposta.pageSize || 1000;
       const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
       const totalPages = Math.ceil(totalRows / pageSize);
 
-      let allData = [...(primeiraResposta.data || [])];
+      allData = [...(primeiraResposta.data || [])];
 
       if (totalPages > 1) {
         for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
-          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
-          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          if (foiCancelado()) break;
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`, { signal: controller.signal });
           allData.push(...(responsePage.data || []));
         }
       }
 
       return allData;
     } catch (error) {
+      if (error.code === 'ERR_CANCELED') {
+        return allData;
+      }
       console.error('Erro ao buscar dados:', error);
       throw error;
     } finally {
       fecharAnimacaoCarregamento();
     }
   }
+
   const {data: dadosFaturasPixConsolidadoPeriodo = [], error: errorFaturasPixConsolidadoPeriodo, isLoading: isLoadingFaturasPixConsolidadoPeriodo, refetch: refetchVendasFaturasPixConsolidadoPeriodo} = useQuery(
-    ['fatura-pix-periodo-consolidado', marcaSelecionada, empresaSelecionada, empresaLivre],
-    () => fetchVendasFaturasPixConsolidadoPeriodo(marcaSelecionada, empresaSelecionada, empresaLivre),
+    ['fatura-pix-periodo-consolidado'],
+    () => fetchVendasFaturasPixConsolidadoPeriodo(),
     {enabled: false, staleTime: 60 * 60 * 1000}
   );
 
@@ -247,37 +299,45 @@ export const ActionPesquisaVendasPix = () => {
     const urlBase = `/faturaPixConsolidadoLoja?idMarca=${marcaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idLoja=${empresaSelecionada}&empresa=${empresaLivre}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+    const controller = new AbortController();
+    let allData = [];
+
     try {
-      animacaoCarregamento('Carregando dados...', true);
-        
+      animacaoCarregamento('Carregando dados...', true, true, () => controller.abort());
+
       const primeiraPagina = 1;
-      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`, { signal: controller.signal });
       const page = primeiraResposta.page || primeiraPagina;
       const pageSize = primeiraResposta.pageSize || 1000;
       const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
       const totalPages = Math.ceil(totalRows / pageSize);
 
-      let allData = [...(primeiraResposta.data || [])];
+      allData = [...(primeiraResposta.data || [])];
 
       if (totalPages > 1) {
         for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
-          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
-          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          if (foiCancelado()) break;
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`, { signal: controller.signal });
           allData.push(...(responsePage.data || []));
         }
       }
 
       return allData;
     } catch (error) {
+      if (error.code === 'ERR_CANCELED') {
+        return allData;
+      }
       console.error('Erro ao buscar dados:', error);
       throw error;
     } finally {
       fecharAnimacaoCarregamento();
     }
   }
+
   const {data: dadosFaturasPixConsolidadoLoja = [], error: errorFaturasPixConsolidadoLoja, isLoading: isLoadingFaturasPixConsolidadoLoja, refetch: refetchFaturasPixConsolidadoLoja} = useQuery(
-    ['faturaPixConsolidadoLoja', marcaSelecionada, empresaSelecionada, empresaLivre],
-    () => fetchFaturasPixConsolidadoLoja(marcaSelecionada, empresaSelecionada, empresaLivre),
+    ['faturaPixConsolidadoLoja'],
+    () => fetchFaturasPixConsolidadoLoja(),
     {enabled: false, staleTime: 60 * 60 * 1000}
   );
   

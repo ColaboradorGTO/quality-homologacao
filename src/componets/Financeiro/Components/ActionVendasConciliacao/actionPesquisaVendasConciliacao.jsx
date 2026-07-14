@@ -8,7 +8,7 @@ import { getDataAtual } from "../../../../utils/dataAtual"
 import { InputSelectAction } from "../../../Inputs/InputSelectAction"
 import { ActionListaVendasConciliacao } from "./actionListaVendasConciliacao"
 import { useQuery } from 'react-query';
-import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento"
+import { animacaoCarregamento, fecharAnimacaoCarregamento, foiCancelado } from "../../../../utils/animationCarregamento"
 import { useFetchData, useFetchEmpresas } from "../../../../hooks/useFetchData"
 
 export const ActionPesquisaVendasConciliacao = () => {
@@ -27,35 +27,60 @@ export const ActionPesquisaVendasConciliacao = () => {
     setDataPesquisaFim(dataFinal);
   }, [])
   
-  const { data: optionsMarcas = [], error: errorMarcas, isLoading: isLoadingMarcas } = useFetchData('marcasLista', '/marcasLista');
-  const { data: optionsEmpresas = [],} = useFetchEmpresas(marcaSelecionada);
+
+  const { data: dadosMarcas = [], error: errorMarcas, isLoading: isLoadingMarcas, refetch: refetchMarcas } = useQuery(
+    'marcasLista',
+    async () => {
+      const response = await get(`/marcasLista`);
+
+      return response.data;
+    },
+    { enabled: true, staleTime: 60 * 60 * 1000, }
+  );
+
+  const { data: dadosEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas } = useQuery(
+    'listaEmpresaComercial',
+    async () => {
+      const response = await get(`/listaEmpresaComercial?idMarca=${marcaSelecionada}`);
+
+      return response.data;
+    },
+    { enabled: true, staleTime: 60 * 60 * 1000, }
+  );
 
   const fetchListaVendasConciliacao = async () => {
     const urlBase = `/venda-conciliacao?idGrupo=${marcaSelecionada}&idLoja=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+    const controller = new AbortController();
+    let allData = [];
+
     try {
-      animacaoCarregamento('Carregando dados...', true);
+      animacaoCarregamento('Carregando dados...', true, true, () => controller.abort());
 
       const primeiraPagina = 1;
-      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`, { signal: controller.signal });
       const page = primeiraResposta.page || primeiraPagina;
       const pageSize = primeiraResposta.pageSize || 1000;
       const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
       const totalPages = Math.ceil(totalRows / pageSize);
 
-      let allData = [...(primeiraResposta.data || [])];
+      allData = [...(primeiraResposta.data || [])];
 
       if (totalPages > 1) {
         for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
-          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
-          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          if (foiCancelado()) break;
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`, { signal: controller.signal });
           allData.push(...(responsePage.data || []));
         }
       }
 
-      return allData
+      return allData;
     } catch (error) {
+      if (error.code === 'ERR_CANCELED') {
+        return allData;
+      }
       console.error('Erro ao buscar dados:', error);
       throw error;
     } finally {
@@ -77,7 +102,7 @@ export const ActionPesquisaVendasConciliacao = () => {
     if( e.value === '') {
       setEmpresaSelecionada('');
     } else {
-      const empresa = optionsEmpresas.find((item) => item.IDEMPRESA === e.value);
+      const empresa = dadosEmpresas?.find((item) => item.IDEMPRESA === e.value);
       setEmpresaSelecionada(e.value);
       setEmpresaSelecionadaNome(empresa.NOFANTASIA);
     }
@@ -119,7 +144,7 @@ export const ActionPesquisaVendasConciliacao = () => {
         labelSelectMarcas={"Por Marca"}
         optionsMarcas={[
           { value: '0', label: 'Selecione uma Marca' },
-          ...optionsMarcas.map((item) => ({
+          ...dadosMarcas?.map((item) => ({
             value: item.IDGRUPOEMPRESARIAL,
             label: item.DSGRUPOEMPRESARIAL,
 
@@ -132,7 +157,7 @@ export const ActionPesquisaVendasConciliacao = () => {
         InputSelectEmpresaComponent={InputSelectAction}
         optionsEmpresas={[
           { value: '', label: 'Selecione uma loja' },
-          ...optionsEmpresas.map((empresa) => ({
+          ...dadosEmpresas?.map((empresa) => ({
             value: empresa.IDEMPRESA,
             label: empresa.NOFANTASIA,
           }))

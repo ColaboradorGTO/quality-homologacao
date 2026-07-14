@@ -34,8 +34,25 @@ export const ActionPesquisaRemessaVenda = ({ usuarioLogado, ID }) => {
     setDataPesquisaFim(dataFinal);
   }, []);
 
-  const { data: optionsMarcas = [], error: errorMarcas, isLoading: isLoadingMarcas } = useFetchData('marcasLista', '/marcasLista');
-  const { data: optionsEmpresas = [],} = useFetchEmpresas(marcaSelecionada); 
+  const { data: optionsMarcas = [], error: errorMarcas, isLoading: isLoadingMarcas, refetch: refetchMarcas } = useQuery(
+    'marcasLista',
+    async () => {
+      const response = await get(`/marcasLista`);
+
+      return response.data;
+    },
+    { enabled: true, staleTime: 60 * 60 * 1000, }
+  );
+
+  const { data: optionsEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas } = useQuery(
+    'listaEmpresaComercial',
+    async () => {
+      const response = await get(`/listaEmpresaComercial?idMarca=${marcaSelecionada}`);
+
+      return response.data;
+    },
+    { enabled: true, staleTime: 60 * 60 * 1000, }
+  );
   
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
     'menus-usuario-excecao',

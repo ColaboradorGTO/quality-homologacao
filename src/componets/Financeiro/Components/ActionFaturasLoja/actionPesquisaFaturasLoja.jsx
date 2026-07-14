@@ -8,7 +8,7 @@ import { getDataAtual } from "../../../../utils/dataAtual";
 import { ActionListaFaturasLoja } from "./actionListaFaturasLoja";
 import { useQuery } from 'react-query';
 import Swal from 'sweetalert2';
-import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento"
+import { animacaoCarregamento, fecharAnimacaoCarregamento, foiCancelado } from "../../../../utils/animationCarregamento"
 import { InputSelectAction } from "../../../Inputs/InputSelectAction"
 import { useFetchData } from "../../../../hooks/useFetchData"
 import { ActionImportacaoArquivo } from "./actionImportacaoArquivo"
@@ -35,7 +35,15 @@ export const ActionPesquisaFaturasLoja = ({ usuarioLogado, ID }) => {
     setDataPesquisaFim(dataFinal);
   }, [])
 
-  const { data: optionsEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas } = useFetchData('listaEmpresasIformatica', '/listaEmpresasIformatica');
+  const { data: optionsEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas } = useQuery(
+    'listaEmpresaComercial',
+    async () => {
+      const response = await get(`/listaEmpresaComercial`);
+
+      return response.data;
+    },
+    { enabled: true, staleTime: 60 * 60 * 1000, }
+  );
 
   useEffect(() => {
     const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
@@ -55,51 +63,44 @@ export const ActionPesquisaFaturasLoja = ({ usuarioLogado, ID }) => {
     { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
   );
 
-  useEffect(() => {
-    if (errorEmpresas) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Oops...',
-        text: 'Erro ao buscar empresas!',
-      });
-    }
-  }, [errorEmpresas]);
-
-
   const fetchFatura = async () => {
     const urlBase = `/detalhe-faturas?idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&codigoFatura=${codigoFatura}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+    const controller = new AbortController();
+    let allData = [];
 
     try {
-
-      animacaoCarregamento('Carregando dados...', true);
+      animacaoCarregamento('Carregando dados...', true, true, () => controller.abort());
 
       const primeiraPagina = 1;
-      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`, { signal: controller.signal });
       const page = primeiraResposta.page || primeiraPagina;
       const pageSize = primeiraResposta.pageSize || 1000;
       const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
       const totalPages = Math.ceil(totalRows / pageSize);
 
-      let allData = [...(primeiraResposta.data || [])];
+      allData = [...(primeiraResposta.data || [])];
 
       if (totalPages > 1) {
         for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
-          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
-          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          if (foiCancelado()) break;
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`, { signal: controller.signal });
           allData.push(...(responsePage.data || []));
         }
       }
 
       return allData;
     } catch (error) {
-      console.error('Error fetching data:', error);
+      if (error.code === 'ERR_CANCELED') {
+        return allData;
+      }
+      console.error('Erro ao buscar dados:', error);
       throw error;
     } finally {
       fecharAnimacaoCarregamento();
     }
-
   }
   const { data: dadosDetalheFatura = [], error: erroFatura, isLoading: isLoadingFatura, refetch: refetchFatura } = useQuery(
     'detalhe-faturas',
@@ -285,7 +286,7 @@ export const ActionPesquisaFaturasLoja = ({ usuarioLogado, ID }) => {
           setActionMain={setActionMain}
         />
       )}
-
+    
     </Fragment>
   )
 }

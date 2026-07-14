@@ -6,7 +6,7 @@ import { FooterMain } from "../componets/Footer";
 import { SidebarProvider } from "../componets/Sidebar/SidebarContext";
 import { MenuSidebarAdmin } from "../componets/Sidebar/sidebar";
 import { get } from "../api/funcRequest";
-import { useQuery } from "react-query";
+import { useQuery } from "react-query"; 
 
 const ResumoDashBoardFinaneiro = lazy(() => import('../componets/Financeiro/Components/ResumoFinanceiro/ResumoDashBoardFinanceiro').then(module => ({ default: module.ResumoDashBoardFinaneiro })));
 const ActionPesquisaVendasLoja = lazy(() => import('../componets/Financeiro/Components/ActionVendasLoja/actionPesquisaVendasLoja').then(module => ({ default: module.ActionPesquisaVendasLoja })));
