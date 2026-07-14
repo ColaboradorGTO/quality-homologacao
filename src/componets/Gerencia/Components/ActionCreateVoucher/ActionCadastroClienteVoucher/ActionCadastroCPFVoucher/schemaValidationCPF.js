@@ -18,10 +18,11 @@ export const schema = yup.object({
     }),
   // dataNascimentoCliente: yup.string()
   //   .required("Data de nascimento é obrigatória"),
-  telefoneDoCliente: yup.string()
+   telefoneDoCliente: yup.string()
     .required('Telefone Obrigatório')
     .matches(/^(\(?\d{2}\)?\s?)?(\d{1}\s?\d{4}\-?\d{4}|\d{4,5}\-?\d{4})$/, 'Numero de Telefone Inválido, verifique o TELEFONE e tente novamente!'),
-  emailCliente: yup.string()
+
+    emailCliente: yup.string()
     .email('Email inválido')
     .required('Email Obrigatório')
     .matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'E-mail Inválido, verifique o E-MAIL e tente novamente!'),

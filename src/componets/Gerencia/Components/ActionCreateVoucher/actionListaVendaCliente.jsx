@@ -464,7 +464,7 @@ export const ActionListaVendaCLiente = ({
                   </span>
                 </h2>
               ) : (
-                <h2>Produtos Vendas</h2>
+                <h2>Produtos Vendas </h2>
               )}
             </div>
 
@@ -494,6 +494,7 @@ export const ActionListaVendaCLiente = ({
                 rowsPerPageOptions={[10, 20, 50, 100, dadosProdutos.length]}
                 showGridlines
                 stripedRows
+                cellMemo={false}
                 rowClassName={(row) => row.STTROCA == 'True' ? 'row-disabled' : ''}
          
                 

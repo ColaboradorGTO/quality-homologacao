@@ -120,13 +120,15 @@ export const useCadastrarClienteCPF = ({ usuarioLogado, optionsModulos, handleCl
         return usuarioIP;
     };
 
-    const { data: optionsCPF = [], error: errorCPF, isLoading: isLoadingCPF } = useQuery(
+
+
+    const { data: optionsCPF = [], error: errorCPF, isLoading: isLoadingCPF, refetch: refetchCPF } = useQuery(
         ['cliente-todos', cpf],
         async () => {
             const response = await get(`/cliente-todos?numeroCpfCnpj=${removerMascaraCPF(cpf)}`);
             return response.data;
         },
-        { enabled: cpf?.length >= 8, staleTime: 5 * 60 * 1000 }
+         { enabled: false, staleTime: 5 * 60 * 1000 }
     );
 
     useEffect(() => {
@@ -192,6 +194,12 @@ export const useCadastrarClienteCPF = ({ usuarioLogado, optionsModulos, handleCl
         }
     };
 
+    const handleBlurCpf = () => {
+        if (cpf?.length >= 8) {
+            console.log('caiu aqui')
+            refetchCPF();
+        }
+    }
 
     useEffect(() => {
         if (optionsCPF.length > 0) {
@@ -208,7 +216,7 @@ export const useCadastrarClienteCPF = ({ usuarioLogado, optionsModulos, handleCl
             setCep(cliente?.NUCEP || "");
             setEndereco(cliente?.EENDERECO || "");
             setNumero(cliente?.NUENDERECO || "");
-            setComplemento(cliente?.ECOMPLEMENTO);
+            setComplemento(cliente?.ECOMPLEMENTO || "");
             setBairro(cliente?.EBAIRRO || "");
             setNuIBGE(cliente?.NUIBGE || "");
             setCidade(cliente?.ECIDADE || "");
@@ -269,7 +277,7 @@ export const useCadastrarClienteCPF = ({ usuarioLogado, optionsModulos, handleCl
                 NUIBGE: parseInt(nuIBGE),
                 EENDERECO: endereco,
                 NUENDERECO: numero,
-                ECOMPLEMENTO: complemento,
+                ECOMPLEMENTO: String(complemento),
                 EBAIRRO: bairro,
                 ECIDADE: cidade,
                 SGUF: estado,
@@ -325,7 +333,7 @@ export const useCadastrarClienteCPF = ({ usuarioLogado, optionsModulos, handleCl
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: '',
-                IP: ipUsuario || "IP NÃO DISPONIVEL"
+                IP: ipUsuario || "INDISPONIVEL"
             }
             await post('/log-web', postData);
 
@@ -384,6 +392,7 @@ export const useCadastrarClienteCPF = ({ usuarioLogado, optionsModulos, handleCl
         optionsIndicacaoIE,
         onSubmit,
         readOnlyCpf,
-        setCepDigitado
+        setCepDigitado,
+        handleBlurCpf
     }
 }

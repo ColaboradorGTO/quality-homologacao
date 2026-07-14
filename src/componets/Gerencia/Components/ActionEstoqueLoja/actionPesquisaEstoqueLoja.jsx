@@ -218,7 +218,6 @@ export const ActionPesquisaEstoqueLoja = ({ usuarioLogado, optionsEmpresas }) =>
     }
   }
 
-
   return (
 
     <Fragment>
@@ -227,7 +226,7 @@ export const ActionPesquisaEstoqueLoja = ({ usuarioLogado, optionsEmpresas }) =>
         linkComponentAnterior={["Home"]}
         linkComponent={["Relatório"]}
         title="Estoque"
-        subTitle="Nome da Loja"
+        subTitle={''}
 
         InputSelectPendenciaComponent={InputSelectAction}
         labelSelectPendencia="Selecione a Empresa"
