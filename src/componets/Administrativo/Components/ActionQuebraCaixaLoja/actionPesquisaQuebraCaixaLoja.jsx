@@ -276,7 +276,7 @@ export const ActionPesquisaQuebraCaixaLoja = ({ usuarioLogado }) => {
       <ActionMain
         linkComponentAnterior={["Home"]}
         linkComponent={["Quebra de Caixas "]}
-        title="Quebra de Caixas das Lojas -"
+        title="Quebra de Caixas das Lojas "
         subTitle={empresaSelecionadaNome}
 
         InputFieldDTInicioComponent={InputField}

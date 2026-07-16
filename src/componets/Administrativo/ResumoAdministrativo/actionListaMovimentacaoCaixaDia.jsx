@@ -541,6 +541,8 @@ export const ActionListaMovimentacaoCaixaDia = ({
                   width="85px"
                   height="40px"
                   textButton={malotes[0]?.STATUSMALOTE === 'Recepcionado' ? "Conferir" : "Detalhes"}
+                  disabledBTN={optionsModulos[0]?.ALTERAR == 'False' ? true : false}
+                  
                 />
               ) : null}
             </Fragment>

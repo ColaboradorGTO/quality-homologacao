@@ -173,6 +173,7 @@ export const ActionListaAlterarVendaVendedor = ({ dadosVendasAtivas, empresaSele
               iconSize={25}
               width="35px"
               height="35px"
+              disabledBTN={optionsModulos[0]?.ALTERAR == 'False' ? true : false}
             />
           </div>
         </div>
@@ -248,6 +249,7 @@ export const ActionListaAlterarVendaVendedor = ({ dadosVendasAtivas, empresaSele
             sortOrder={-1}
             paginator={true}
             rows={10}
+            cellMemo={false}
             rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"

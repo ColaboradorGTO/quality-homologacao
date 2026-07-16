@@ -21,7 +21,7 @@ import { TbFileTypeXml } from "react-icons/tb";
 import { ActionVendaXMLModal } from "../ActionVendasContigencia/actionVendaXMLModal";
 import Swal from "sweetalert2";
 
-export const ActionListaVendasCanceladas = ({ dadosVendasCanceladas, optionsModulos, usuarioLogado  }) => {
+export const ActionListaVendasCanceladas = ({ dadosVendasCanceladas, optionsModulos, usuarioLogado }) => {
   const [modalVisivel, setModalVisivel] = useState(false);
   const [modalVendaVisivel, setModalVendaVisivel] = useState(false);
   const [modalProdutoVisivel, setModalProdutoVisivel] = useState(false);
@@ -50,7 +50,7 @@ export const ActionListaVendasCanceladas = ({ dadosVendasCanceladas, optionsModu
     doc.autoTable({
       head: [['Nº', 'Empresa', 'Caixa', 'Nº Venda', 'NFE/NFCe', 'Abertura', 'Operador', 'Vr.Dinheiro', 'Vr.Cartão', 'Vr.Convênio', 'Vr.POS', 'Vr.Voucher', 'Vr.Venda', 'ST Nota', 'Cancelado Por', 'Função', 'Motivo']],
       body: dadosVendasAtivas.map(item => [
-        item.contador, 
+        item.contador,
         item.NOFANTASIA,
         item.DSCAIXA,
         item.IDVENDA,
@@ -97,13 +97,13 @@ export const ActionListaVendasCanceladas = ({ dadosVendasCanceladas, optionsModu
       { wpx: 100, caption: 'Cancelado Por' },
       { wpx: 200, caption: 'Função' },
       { wpx: 150, caption: 'Motivo' },
-      
+
     ];
     XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Vendas Canceladas');
     XLSX.writeFile(workbook, 'vendas_canceladas.xlsx');
   };
-  
+
   const calcularTotal = (field) => {
     return dadosVendasAtivas.reduce((total, item) => total + parseFloat(item[field]), 0);
   };
@@ -198,81 +198,81 @@ export const ActionListaVendasCanceladas = ({ dadosVendasCanceladas, optionsModu
     {
       field: 'contador',
       header: 'Nº',
-      body: row => <th style={{ }}> {row.contador}</th>,
+      body: row => <th style={{}}> {row.contador}</th>,
       sortable: true,
       width: '3%',
     },
     {
       field: 'NOFANTASIA',
       header: 'Empresa',
-      body: row => <p style={{  width: '200px', fontWeight: 600, margin: 0 }}> {row.NOFANTASIA}</p>,
+      body: row => <p style={{ width: '200px', fontWeight: 600, margin: 0 }}> {row.NOFANTASIA}</p>,
       sortable: true,
     },
     {
       field: 'DSCAIXA',
       header: 'Caixa',
-      body: row => <th style={{ }}> {row.DSCAIXA}</th>,
+      body: row => <th style={{}}> {row.DSCAIXA}</th>,
       sortable: true,
     },
     {
       field: 'IDVENDA',
       header: 'Nº Venda',
-      body: row => <p style={{  width: '100px', fontWeight: 600, margin: 0 }}> {row.IDVENDA}</p>,
+      body: row => <p style={{ width: '100px', fontWeight: 600, margin: 0 }}> {row.IDVENDA}</p>,
       sortable: true,
 
     },
     {
       field: 'NFE_INFNFE_IDE_NNF',
       header: 'NFE/NFCe',
-      body: row => <th style={{ }}> {row.NFE_INFNFE_IDE_NNF}</th>,
+      body: row => <th style={{}}> {row.NFE_INFNFE_IDE_NNF}</th>,
       sortable: true,
     },
     {
       field: 'DTHORAFECHAMENTO',
       header: 'Abertura',
-      body: row => <th style={{ }}> {row.DTHORAFECHAMENTO}</th>,
+      body: row => <th style={{}}> {row.DTHORAFECHAMENTO}</th>,
       sortable: true,
     },
     {
       field: 'NOFUNCIONARIO',
       header: 'Operador',
-      body: row => <th style={{  width: '250px',fontWeight: 600, margin: 0 }}> {row.NOFUNCIONARIO}</th>,
+      body: row => <th style={{ width: '250px', fontWeight: 600, margin: 0 }}> {row.NOFUNCIONARIO}</th>,
       sortable: true,
     },
     {
       field: 'VRRECDINHEIRO',
       header: 'Vr.Dinheiro',
-      body: row => <th style={{ }}> {formatMoeda(row.VRRECDINHEIRO)}</th>,
+      body: row => <th style={{}}> {formatMoeda(row.VRRECDINHEIRO)}</th>,
       sortable: true,
     },
     {
       field: 'VRRECCARTAO',
       header: 'Vr.Cartão',
-      body: row => <th style={{ }}> {formatMoeda(row.VRRECCARTAO)}</th>,
+      body: row => <th style={{}}> {formatMoeda(row.VRRECCARTAO)}</th>,
       sortable: true,
     },
     {
       field: 'VRRECCONVENIO',
       header: 'Vr.Convênio',
-      body: row => <th style={{ }}> {formatMoeda(row.VRRECCONVENIO)}</th>,
+      body: row => <th style={{}}> {formatMoeda(row.VRRECCONVENIO)}</th>,
       sortable: true,
     },
     {
       field: 'VRRECPOS',
       header: 'Vr.POS',
-      body: row => <th style={{ }}> {formatMoeda(row.VRRECPOS)}</th>,
+      body: row => <th style={{}}> {formatMoeda(row.VRRECPOS)}</th>,
       sortable: true,
     },
     {
       field: 'VRRECVOUCHER',
       header: 'Vr.Voucher',
-      body: row => <th style={{ }}> {formatMoeda(row.VRRECVOUCHER)}</th>,
+      body: row => <th style={{}}> {formatMoeda(row.VRRECVOUCHER)}</th>,
       sortable: true,
     },
     {
       field: 'VRTOTALVENDA',
       header: 'Vr.Venda',
-      body: row => <th style={{ }}> {formatMoeda(row.VRTOTALVENDA)}</th>,
+      body: row => <th style={{}}> {formatMoeda(row.VRTOTALVENDA)}</th>,
       sortable: true,
     },
     {
@@ -285,7 +285,7 @@ export const ActionListaVendasCanceladas = ({ dadosVendasCanceladas, optionsModu
           )
         } else {
           return (
-            <th style={{  textTransform: 'uppercase' }}> {row.VRTOTALVENDA > 0 ? 'Emitida' : 'Não Emitida'}</th>
+            <th style={{ textTransform: 'uppercase' }}> {row.VRTOTALVENDA > 0 ? 'Emitida' : 'Não Emitida'}</th>
           )
         }
       },
@@ -295,7 +295,7 @@ export const ActionListaVendasCanceladas = ({ dadosVendasCanceladas, optionsModu
     {
       field: 'NOFUNCIOCANCEL',
       header: 'Cancelado Por',
-      body: row => <th style={{ textTransform: 'uppercase'}}> {row.NOFUNCIOCANCEL}</th>,
+      body: row => <th style={{ textTransform: 'uppercase' }}> {row.NOFUNCIOCANCEL}</th>,
       sortable: true,
     },
     {
@@ -307,7 +307,7 @@ export const ActionListaVendasCanceladas = ({ dadosVendasCanceladas, optionsModu
     {
       field: 'TXTMOTIVOCANCELAMENTO',
       header: 'Motivo',
-      body: row => <th style={{margin: 0, width: '200px', textTransform: 'uppercase' }}> {row.TXTMOTIVOCANCELAMENTO}</th>,
+      body: row => <th style={{ margin: 0, width: '200px', textTransform: 'uppercase' }}> {row.TXTMOTIVOCANCELAMENTO}</th>,
       sortable: true,
 
     },
@@ -349,22 +349,23 @@ export const ActionListaVendasCanceladas = ({ dadosVendasCanceladas, optionsModu
               cor={"success"}
               width="30px"
               height="30px"
+              disabledBTN={optionsModulos[0]?.ALTERAR == 'False' ? true : false}
             />
           </div>
 
-           <div className="p-1">
-              <ButtonTable
-                titleButton={`${row.XML_FORMATADO?.length > 0 ? 'Visualizar Xml da Venda' : 'Venda Sem XML'}`}
-                disabledBTN={!row.XML_FORMATADO || row.XML_FORMATADO.length == 0}
-                onClickButton={() => clickDetalharVendaXML(row)}
-                Icon={TbFileTypeXml}
-                iconSize={20}
-                iconColor={"#fff"}
-                cor={"primary"}
-                width="30px"
-                height="30px"
-              />
-            </div>
+          <div className="p-1">
+            <ButtonTable
+              titleButton={`${row.XML_FORMATADO?.length > 0 ? 'Visualizar Xml da Venda' : 'Venda Sem XML'}`}
+              disabledBTN={!row.XML_FORMATADO || row.XML_FORMATADO.length == 0}
+              onClickButton={() => clickDetalharVendaXML(row)}
+              Icon={TbFileTypeXml}
+              iconSize={20}
+              iconColor={"#fff"}
+              cor={"primary"}
+              width="30px"
+              height="30px"
+            />
+          </div>
         </div>
       ),
     },
@@ -451,7 +452,7 @@ export const ActionListaVendasCanceladas = ({ dadosVendasCanceladas, optionsModu
   }
 
   const handleClickPagamento = (row) => {
-    if(optionsModulos[0]?.ALTERAR == 'False') {
+    if (optionsModulos[0]?.ALTERAR == 'False') {
       Swal.fire({
         icon: 'warning',
         title: 'Atenção',
@@ -475,7 +476,7 @@ export const ActionListaVendasCanceladas = ({ dadosVendasCanceladas, optionsModu
   const handleDetalharVendaXML = async (IDVENDA) => {
     try {
       const response = await get(`/venda-xml?idVenda=${IDVENDA}`);
-      if(response.data && response.data.length > 0) { 
+      if (response.data && response.data.length > 0) {
         setModalXmlVisivel(true);
         setDadosVendasXML(response.data)
       } else {
@@ -502,7 +503,7 @@ export const ActionListaVendasCanceladas = ({ dadosVendasCanceladas, optionsModu
   const footerGroup = (
     <ColumnGroup>
 
-      <Row> 
+      <Row>
         <Column footer="Total " colSpan={7} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem', textAlign: 'center' }} />
         <Column footer={`Total Dinheiro: ${formatMoeda(calcularTotalValorDinheiro())}`} footerStyle={{ color: 'blue', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
         <Column footer={`Total Cartao: ${formatMoeda(calcularTotalValorCartao())}`} footerStyle={{ color: 'blue', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
@@ -510,7 +511,7 @@ export const ActionListaVendasCanceladas = ({ dadosVendasCanceladas, optionsModu
         <Column footer={`Total POS: ${formatMoeda(calcularTotalValorPos())}`} footerStyle={{ color: 'blue', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
         <Column footer={`Total Voucher: ${formatMoeda(calcularTotalValorVoucher())}`} footerStyle={{ color: 'blue', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
         <Column footer={`Total Pago:  ${formatMoeda(calcularTotalValorVenda())}`} footerStyle={{ color: 'blue', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
-        <Column footer={""} colSpan={5}  footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}/>
+        <Column footer={""} colSpan={5} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
       </Row>
     </ColumnGroup>
   )
@@ -532,7 +533,7 @@ export const ActionListaVendasCanceladas = ({ dadosVendasCanceladas, optionsModu
           />
 
         </div>
-        
+
         <div className="card" ref={dataTableRef}>
 
           <DataTable
@@ -551,6 +552,7 @@ export const ActionListaVendasCanceladas = ({ dadosVendasCanceladas, optionsModu
             sortOrder={-1}
             paginator={true}
             rows={10}
+            cellMemo={false}
             showGridlines
             stripedRows
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}

@@ -143,6 +143,8 @@ export const ActionListaQuebraCaixaLojaPositiva = ({ dadosQuebraDeCaixaPositiva,
                   width="35px"
                   height="35px"
                   onClickButton={() => handleClickCancelar(row.IDQUEBRACAIXA, false)}
+                  disabledBTN={optionsModulos[0]?.ALTERAR == 'False' ? true : false}
+
                 />
 
               </div>
@@ -155,6 +157,7 @@ export const ActionListaQuebraCaixaLojaPositiva = ({ dadosQuebraDeCaixaPositiva,
                   width="35px"
                   height="35px"
                   onClickButton={() => handleClickImprimir(row)}
+
                 />
               </div>
             </div>
@@ -170,6 +173,7 @@ export const ActionListaQuebraCaixaLojaPositiva = ({ dadosQuebraDeCaixaPositiva,
                 width="35px"
                 height="35px"
                 onClickButton={() => handleClickCancelar(row.IDQUEBRACAIXA, true)}
+                disabledBTN={optionsModulos[0]?.ALTERAR == 'False' ? true : false}
               />
             </div>
           )
@@ -251,6 +255,7 @@ export const ActionListaQuebraCaixaLojaPositiva = ({ dadosQuebraDeCaixaPositiva,
             filterDisplay="menu"
             showGridlines
             stripedRows
+            cellMemo={false}
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado positiva</div>}
           >
             {colunasQuebraDeCaixaPositiva.map(coluna => (

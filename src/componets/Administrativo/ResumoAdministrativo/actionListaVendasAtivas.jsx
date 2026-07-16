@@ -244,6 +244,8 @@ export const ActionListaVendasAtivas = ({
                   iconSize={20}
                   width="30px"
                   height="30px"
+                  disabledBTN={optionsModulos[0]?.ALTERAR == 'False' ? true : false}
+
                 />
               </div>
               <div className="p-1">
@@ -309,6 +311,8 @@ export const ActionListaVendasAtivas = ({
                   iconSize={20}
                   width="30px"
                   height="30px"
+                  disabledBTN={optionsModulos[0]?.ALTERAR == 'False' ? true : false}
+
                 />
               </div>
               <div className="p-1">
@@ -462,6 +466,7 @@ export const ActionListaVendasAtivas = ({
             rowsPerPageOptions={[5, 10, 20, 50, 100, dadosAtivasVendas.length]}
             showGridlines
             stripedRows
+            cellMemo={false}
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
           >
             {colunaVendasAtivas.map(coluna => (

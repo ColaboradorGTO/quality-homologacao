@@ -36,12 +36,12 @@ export const ActionListaVendasContigencia = ({ dadosVendasAtivasContigencia, usu
   const [rows, setRows] = useState(10);
   const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
-    
+
   const onPageChange = (event) => {
     setFirst(event.first);
     setRows(event.rows);
-  }  
-  
+  }
+
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -95,7 +95,7 @@ export const ActionListaVendasContigencia = ({ dadosVendasAtivasContigencia, usu
       { wpx: 100, caption: 'Cancelado Por' },
       { wpx: 200, caption: 'Função' },
       { wpx: 150, caption: 'Motivo' },
-      
+
     ];
     XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Vendas Contigência');
@@ -151,17 +151,17 @@ export const ActionListaVendasContigencia = ({ dadosVendasAtivasContigencia, usu
   const calcularTotal = (field) => {
     const firstIndex = first * rows;
     const lastIndex = firstIndex + rows;
-    const dataPaginada = dados.slice(firstIndex, lastIndex); 
+    const dataPaginada = dados.slice(firstIndex, lastIndex);
     return dataPaginada.reduce((total, item) => total + toFloat(item[field] || 0), 0);
   };
 
   const calcularTotalValor = () => {
     const totalDinheiro = calcularTotal('VRTOTALPAGO');
-    const totalVendas = calcularTotalPagina('VRTOTALPAGO' );
+    const totalVendas = calcularTotalPagina('VRTOTALPAGO');
     return `${formatMoeda(totalDinheiro)}   (${formatMoeda(totalVendas)} total)`;
   };
 
-  
+
 
   const colunasVendasAtiva = [
     {
@@ -174,21 +174,21 @@ export const ActionListaVendasContigencia = ({ dadosVendasAtivasContigencia, usu
     {
       field: 'NOFANTASIA',
       header: 'Empresa',
-      body: row => <p style={{fontWeight: 600, width: '200px', margin: '0px'}}>{row.NOFANTASIA}</p>,
+      body: row => <p style={{ fontWeight: 600, width: '200px', margin: '0px' }}>{row.NOFANTASIA}</p>,
       sortable: true,
 
     },
     {
       field: 'DSCAIXA',
       header: 'Caixa',
-      body: row => <p style={{fontWeight: 600, width: '100px', margin: '0px'}}>{row.DSCAIXA}</p>,
+      body: row => <p style={{ fontWeight: 600, width: '100px', margin: '0px' }}>{row.DSCAIXA}</p>,
       sortable: true,
 
     },
     {
       field: 'IDVENDA',
       header: 'Nº Venda',
-      body: row => <p style={{fontWeight: 600, width: '100px', margin: '0px'}}>{row.IDVENDA}</p>,
+      body: row => <p style={{ fontWeight: 600, width: '100px', margin: '0px' }}>{row.IDVENDA}</p>,
       sortable: true,
 
     },
@@ -202,7 +202,7 @@ export const ActionListaVendasContigencia = ({ dadosVendasAtivasContigencia, usu
     {
       field: 'DTHORAFECHAMENTO',
       header: 'Abertura',
-      body: row => <p style={{fontWeight: 600, width: '150px', margin: '0px'}}>{row.DTHORAFECHAMENTO}</p>,
+      body: row => <p style={{ fontWeight: 600, width: '150px', margin: '0px' }}>{row.DTHORAFECHAMENTO}</p>,
       sortable: true,
 
     },
@@ -216,7 +216,7 @@ export const ActionListaVendasContigencia = ({ dadosVendasAtivasContigencia, usu
       field: 'VRTOTALPAGO',
       header: 'Valor',
       body: row => {
-        if(row.VRTOTALPAGO > 0) {
+        if (row.VRTOTALPAGO > 0) {
           return (
             <th>{formatMoeda(row.VRTOTALPAGO)}</th>
           )
@@ -266,7 +266,7 @@ export const ActionListaVendasContigencia = ({ dadosVendasAtivasContigencia, usu
     {
       field: 'TXTMOTIVOCANCELAMENTO',
       header: 'Motivo',
-      body: row => <p style={{fontWeight: 600, width: '100px', margin: '0px'}}>{row.TXTMOTIVOCANCELAMENTO}</p>,
+      body: row => <p style={{ fontWeight: 600, width: '100px', margin: '0px' }}>{row.TXTMOTIVOCANCELAMENTO}</p>,
       sortable: true,
 
     },
@@ -277,7 +277,7 @@ export const ActionListaVendasContigencia = ({ dadosVendasAtivasContigencia, usu
       width: '10%',
       body: (row) => (
         <div className="p-1 "
-          style={{ justifyContent: "space-between", display: "flex"}}
+          style={{ justifyContent: "space-between", display: "flex" }}
         >
           <div className="p-1">
             <ButtonTable
@@ -310,6 +310,8 @@ export const ActionListaVendasContigencia = ({ dadosVendasAtivasContigencia, usu
               iconSize={20}
               width="30px"
               height="30px"
+              disabledBTN={optionsModulos[0]?.ALTERAR == 'False' ? true : false}
+
             />
           </div>
           <div className="p-1">
@@ -337,7 +339,7 @@ export const ActionListaVendasContigencia = ({ dadosVendasAtivasContigencia, usu
   const handleDetalharVenda = async (IDVENDA) => {
     try {
       const response = await get(`/resumo-venda-caixa-detalhado?idVenda=${IDVENDA}`);
-      if(response.data && response.data.length > 0) {
+      if (response.data && response.data.length > 0) {
         setDadosVendas(response.data);
         setDetalheVendaModal(true)
 
@@ -363,7 +365,7 @@ export const ActionListaVendasContigencia = ({ dadosVendasAtivasContigencia, usu
   const handleDetalharProduto = async (IDVENDA) => {
     try {
       const response = await get(`/detalhe-venda?idVenda=${IDVENDA}`);
-      if(response.data && response.data.length > 0) {
+      if (response.data && response.data.length > 0) {
         setDadosDetalheProduto(response.data);
         setDetalheVendaProdutoModal(true)
       } else {
@@ -380,7 +382,7 @@ export const ActionListaVendasContigencia = ({ dadosVendasAtivasContigencia, usu
   }
 
   const clickDetalharRecebimentos = (row) => {
-    if(optionsModulos[0]?.ALTERAR == 'True') {
+    if (optionsModulos[0]?.ALTERAR == 'True') {
       if (row && row.IDVENDA) {
         handleDetalharRecebimentos(row.IDVENDA);
       }
@@ -389,7 +391,7 @@ export const ActionListaVendasContigencia = ({ dadosVendasAtivasContigencia, usu
         icon: 'warning',
         title: 'Atenção',
         html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para alterar pagamento!`,
-        
+
       })
     }
   };
@@ -397,7 +399,7 @@ export const ActionListaVendasContigencia = ({ dadosVendasAtivasContigencia, usu
   const handleDetalharRecebimentos = async (IDVENDA) => {
     try {
       const response = await get(`/recebimento?idVenda=${IDVENDA}`);
-      if(response.data && response.data.length > 0) {
+      if (response.data && response.data.length > 0) {
         setDetalheRecebimentoModal(true);
         setDadosDetalheRecebimentos(response.data)
       } else {
@@ -421,7 +423,7 @@ export const ActionListaVendasContigencia = ({ dadosVendasAtivasContigencia, usu
   const handleDetalharVendaXML = async (IDVENDA) => {
     try {
       const response = await get(`/venda-xml?idVenda=${IDVENDA}`);
-      if(response.data && response.data.length > 0) {
+      if (response.data && response.data.length > 0) {
         setDetalheVendaXMLModal(true);
         setDadosVendasXML(response.data)
       } else {
@@ -440,10 +442,10 @@ export const ActionListaVendasContigencia = ({ dadosVendasAtivasContigencia, usu
 
   const footerGroup = (
     <ColumnGroup>
-      <Row> 
+      <Row>
         <Column footer="Total Pago" colSpan={7} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem', textAlign: 'center' }} />
-        <Column footer={calcularTotalValor()} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />  
-        <Column footer={""} colSpan={6}  footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}/>
+        <Column footer={calcularTotalValor()} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
+        <Column footer={""} colSpan={6} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
       </Row>
     </ColumnGroup>
   )
@@ -489,6 +491,7 @@ export const ActionListaVendasContigencia = ({ dadosVendasAtivasContigencia, usu
                 rows={rows}
                 onPage={onPageChange}
                 showGridlines
+                cellMemo={false}
                 stripedRows
                 emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
               >
@@ -501,7 +504,7 @@ export const ActionListaVendasContigencia = ({ dadosVendasAtivasContigencia, usu
                     footer={coluna.footer}
                     sortable={coluna.sortable}
                     headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
-                    footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc',fontSize: '0.8rem' }}
+                    footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}
                     bodyStyle={{ fontSize: '0.8rem' }}
 
                   />
@@ -512,7 +515,7 @@ export const ActionListaVendasContigencia = ({ dadosVendasAtivasContigencia, usu
         </div>
       </div>
 
-      <ActionDetalheVendaModal 
+      <ActionDetalheVendaModal
         show={detalheVendaModal}
         handleClose={() => setDetalheVendaModal(false)}
         dadosVendas={dadosVendas}
@@ -524,11 +527,11 @@ export const ActionListaVendasContigencia = ({ dadosVendasAtivasContigencia, usu
         dadosDetalheProduto={dadosDetalheProduto}
       />
 
-      <ActionRelacaoRecebimentosModal 
+      <ActionRelacaoRecebimentosModal
         show={detalheRecebimentoModal}
         handleClose={() => setDetalheRecebimentoModal(false)}
         dadosDetalheRecebimentos={dadosDetalheRecebimentos}
-        usuarioLogado={usuarioLogado} 
+        usuarioLogado={usuarioLogado}
         optionsModulos={optionsModulos}
       />
 

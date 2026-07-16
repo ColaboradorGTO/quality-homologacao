@@ -226,6 +226,7 @@ export const ActionListaVendasCanceladas = ({ dadosVendasCanceladas, empresaSele
               cor={"success"}
               width="30px"
               height="30px"
+              disabledBTN={optionsModulos[0]?.ALTERAR == 'False' ? true : false}
             />
           </div>
           <div className="p-1">
@@ -407,6 +408,7 @@ export const ActionListaVendasCanceladas = ({ dadosVendasCanceladas, empresaSele
             rows={10}
             rowsPerPageOptions={[10, 20, 50, 100, dadosVendasAtivas.length]}
             showGridlines
+            cellMemo={false}
             stripedRows
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
           >

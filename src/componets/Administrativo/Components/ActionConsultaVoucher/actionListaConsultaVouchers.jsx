@@ -497,6 +497,8 @@ export const ActionListaConsultaVouchers = ({dadosVoucher, usuarioLogado, option
           iconSize={20}
           width="32px"
           height="32px"
+          disabledBTN={optionsModulos[0]?.ALTERAR == 'False' ? true : false}
+
         />
         <ButtonTable
           titleButton={"Imprimir"}
@@ -672,6 +674,7 @@ export const ActionListaConsultaVouchers = ({dadosVoucher, usuarioLogado, option
             sortOrder={-1}
             paginator={true}
             rows={10}
+            cellMemo={false}
             rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
