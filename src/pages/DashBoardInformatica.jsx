@@ -101,7 +101,7 @@ export const DashBoardInformatica = () => {
       component = <InformaticaActionHome usuarioLogado={usuarioLogado} ID={ID} />;
       break;
     case "/informatica/ActionPesquisaVendas":
-      component = <ActionPesquisaVendas />;
+      component = <ActionPesquisaVendas  usuarioLogado={usuarioLogado} ID={ID} />;
       break;
     case "/informatica/ActionPesquisaFuncionarios":
       component = <ActionPesquisaFuncionarios usuarioLogado={usuarioLogado} ID={ID} />;

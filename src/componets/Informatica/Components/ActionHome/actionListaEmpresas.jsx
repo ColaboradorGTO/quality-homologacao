@@ -17,7 +17,6 @@ import * as XLSX from 'xlsx';
 import { useReactToPrint } from "react-to-print";
 import Swal from "sweetalert2";
 
-
 export const ActionListaEmpresas = ({ dadosEmpresas, setActionVisivel, optionsModulos, usuarioLogado }) => {
   const [modalCertificado, setModalCertificado] = useState(false);
   const [modalEditarEmpresa, setModalEditarEmpresa] = useState(false);
@@ -88,6 +87,7 @@ export const ActionListaEmpresas = ({ dadosEmpresas, setActionVisivel, optionsMo
       IDEMPRESA: item.IDEMPRESA,
       IDCONFIGURACAO: item.IDCONFIGURACAO,
       DTVALIDADECERTIFICADOFORMATADA: item.DTVALIDADECERTIFICADOFORMATADA,
+      STLOJAABERTA: item.STLOJAABERTA
 
     };
   });
@@ -135,6 +135,12 @@ export const ActionListaEmpresas = ({ dadosEmpresas, setActionVisivel, optionsMo
       sortable: true,
     },
     {
+      field: 'STLOJAABERTA',
+      header: 'ST Loja Aberta',
+      body: row => <th style={{ color: row.STLOJAABERTA == "True" ? 'blue' : 'red' }} >{row.STLOJAABERTA == "True" ? "Aberta" : "Fechada"}</th>,
+      sortable: true,
+    },
+    {
       field: '',
       header: 'Opções',
       button: true,
@@ -153,7 +159,6 @@ export const ActionListaEmpresas = ({ dadosEmpresas, setActionVisivel, optionsMo
                   height="35px"
                   iconColor={"#fff"}
                   cor={"success"}
-
                 />
 
               </div>
@@ -167,6 +172,7 @@ export const ActionListaEmpresas = ({ dadosEmpresas, setActionVisivel, optionsMo
                   height="35px"
                   iconColor={"#fff"}
                   cor={"primary"}
+                  disabledBTN={optionsModulos[0]?.ALTERAR == 'False' ? true : false}
                 />
 
               </div>
@@ -255,7 +261,7 @@ export const ActionListaEmpresas = ({ dadosEmpresas, setActionVisivel, optionsMo
       return;
     }
   }
-  
+
   const handleAtualizarEmpresa = async (IDEMPRESA) => {
     try {
       const response = await get(`/lista-caixas?idEmpresa=${IDEMPRESA}`);
@@ -351,7 +357,7 @@ export const ActionListaEmpresas = ({ dadosEmpresas, setActionVisivel, optionsMo
           <div className="panel-hdr">
             <h2>Lista de Empresas</h2>
           </div>
-  
+
           <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
             <HeaderTable
               globalFilterValue={globalFilterValue}
@@ -377,6 +383,7 @@ export const ActionListaEmpresas = ({ dadosEmpresas, setActionVisivel, optionsMo
               paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
               currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
               filterDisplay="menu"
+              cellMemo={false}
               showGridlines
               stripedRows
               emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
@@ -427,6 +434,7 @@ export const ActionListaEmpresas = ({ dadosEmpresas, setActionVisivel, optionsMo
           setActionListaCaixaVisivel={setActionListaCaixaVisivel}
           refetchListaCaixa={refetchListaCaixa}
           usuarioLogado={usuarioLogado}
+          optionsModulos={optionsModulos}
         />
 
       )}

@@ -11,13 +11,15 @@ import { AlertError } from "../../../../Inputs/alertError";
 import FormField from "../../../../Formularios/FormField";
 import { schema } from "./schamaValidarFuncionario";
 import { mascaraTelefone } from "../../../../../utils/mascaraTelefone";
+import { formatarMoeda } from "../../../../../utils/formatMoeda";
+import { schemaLogin } from "./schamaValidarLogin";
 
 export const FormularioEditar = ({
-  handleClose, 
+  handleClose,
   dadosAtualizarFuncionarios,
   handleClick,
   optionsModulos,
-  usuarioLogado  
+  usuarioLogado
 }) => {
   const { handleSubmit, formState: { errors }, clearErrors, control, setError, setValue } = useForm({
     mode: "onChange"
@@ -84,6 +86,36 @@ export const FormularioEditar = ({
 
   } = useEditarFuncionario({ handleClose, dadosAtualizarFuncionarios, handleClick, optionsModulos, usuarioLogado });
 
+  const handleValidatedLogin = async () => {
+    try {
+      const dadosParaValidar = {
+        matriculaFuncionario: usuario,
+        senhaFuncionario: senhaLogin,
+      };
+
+      await schemaLogin.validate(dadosParaValidar, { abortEarly: false });
+      loginConfirmacao();
+    } catch (validationError) {
+      console.error('❌ Erro de validação:', validationError);
+
+      clearErrors();
+
+      if (validationError.inner && validationError.inner.length > 0) {
+        validationError.inner.forEach(error => {
+          if (error.path) {
+            setError(error.path, {
+              type: 'manual',
+              message: error.message
+            });
+          }
+        });
+      }
+
+      const errorMessages = validationError.errors || [validationError.message];
+      console.log(`Erro de validação:\n${errorMessages.join('\n')}`);
+    }
+  }
+
   const handleValidatedSubmit = async () => {
     try {
       const dadosParaValidar = {
@@ -123,7 +155,6 @@ export const FormularioEditar = ({
       const errorMessages = validationError.errors || [validationError.message];
       console.log(`Erro de validação:\n${errorMessages.join('\n')}`);
     }
-
   }
 
   const maxDataAdmissao = format(new Date(), "yyyy-MM-dd");
@@ -170,7 +201,10 @@ export const FormularioEditar = ({
 
                   }))}
                   value={funcaoSelecionada}
-                  onChange={(e) => setFuncaoSelecionada(e)}
+                  onChange={(selected) => {
+                    setFuncaoSelecionada(selected)
+                    clearErrors("funcaoFuncionario");
+                  }}
                 />
                 {errors.funcaoFuncionario && (
                   <AlertError
@@ -196,7 +230,10 @@ export const FormularioEditar = ({
 
                   }))}
                   value={tipoSelecionado}
-                  onChange={(e) => setTipoSelecionado(e)}
+                  onChange={(selected) => {
+                    setTipoSelecionado(selected)
+                    clearErrors("tipoFuncionario");
+                  }}
                 />
 
                 {errors.tipoFuncionario && (
@@ -284,14 +321,15 @@ export const FormularioEditar = ({
               </div>
 
               <div className="col-sm-6 col-xl-8">
-                <label htmlFor="">Departamento *</label>
+
+                <label htmlFor="departamentoFuncionario">Departamento *</label>
+
                 <Select
-                  className="basic-single"
-                  classNamePrefix={"select"}
-                  name="departamentoFuncionario"
+                  closeMenuOnSelect={false}
                   options={Departamentos.map((item) => ({
                     value: item.value,
                     label: item.label
+
                   }))}
                   value={departamentoSelecionado}
                   onChange={(selected) => {
@@ -301,7 +339,7 @@ export const FormularioEditar = ({
                 />
                 {errors.departamentoFuncionario && (
                   <AlertError
-                    error={errors.departamentoFuncionario}
+                    error={errors.departamentoFuncionario?.value || errors.departamentoFuncionario}
                     onClose={clearErrors}
                     fieldName="departamentoFuncionario"
                   />
@@ -387,7 +425,7 @@ export const FormularioEditar = ({
                     onChange={() => { setFormularioVisivelLogin(true), setFormularioVisivel(false) }}
                   />
 
-
+                  {console.log(isChecked, "isChecked")}
                 </div>
 
               </div>
@@ -497,53 +535,93 @@ export const FormularioEditar = ({
       )}
 
       {formularioVisivelLogin && (
+
         <Fragment>
+
 
           <header style={{ display: 'flex', width: '100%' }}>
 
             <h1 style={{ textAlign: 'center', width: '100%' }}>Autorização</h1>
           </header>
-          <div className="form-group" style={{ marginTop: '2rem' }}>
-            <div className="row">
-              <div className="col-sm-4 col-md-5 col-xl-4">
 
-                <InputFieldModal
+          <form onSubmit={handleSubmit(handleValidatedLogin)}>
+            <div className="form-group" style={{ marginTop: '2rem' }}>
+              <div className="row">
+                <div className="col-sm-4 col-md-5 col-xl-4">
+
+                  <Controller
+                    name="matriculaFuncionario"
+                    control={control}
+                    render={({ field }) => (
+                      <FormField
+                        name="matriculaFuncionario"
+                        label={"Matrícula"}
+                        type="text"
+                        placeholder={"Digite sua matrícula"}
+                        errors={errors}
+                        clearErrors={clearErrors}
+                        value={usuario}
+                        onChangeModal={(e) => setUsuario(e.target.value)}
+                      />
+                    )}
+                  />
+
+                  {/*          <InputFieldModal
                   type="text"
                   className="form-control input"
                   label="Matrícula"
                   value={usuario}
                   onChangeModal={(e) => setUsuario(e.target.value)}
                   placeholder={"Digite sua matrícula"}
-                />
+                /> */}
+                </div>
+
+                <div className="col-sm-4 col-md-4 col-xl-4">
+
+                  <Controller
+                    name="senhaFuncionario"
+                    control={control}
+                    render={({ field }) => (
+                      <FormField
+                        name="senhaFuncionario"
+                        label={"Senha"}
+                        type="password"
+                        placeholder={"Digite sua senha"}
+                        errors={errors}
+                        clearErrors={clearErrors}
+                        value={senhaLogin}
+                        onChangeModal={(e) => setSenhaLogin(e.target.value)}
+                      />
+                    )}
+                  />
+
+                  {/*             <InputFieldModal
+                    type="password"
+                    className="form-control input"
+                    label="Senha"
+                    value={senha}
+                    onChangeModal={(e) => setSenha(e.target.value)}
+                    placeholder={"Digite sua senha"}
+                  /> */}
+                </div>
               </div>
+              <div className="row mt-4">
+                <FooterModal
+                  ButtonTypeFechar={ButtonTypeModal}
+                  textButtonFechar={"Voltar"}
+                  onClickButtonFechar={() => { setFormularioVisivel(true), setFormularioVisivelLogin(false) }}
+                  corFechar="secondary"
 
-              <div className="col-sm-4 col-md-4 col-xl-4">
+                  ButtonTypeCadastrar={ButtonTypeModal}
+                  textButtonCadastrar={"Confirmar"}
+                  onClickButtonCadastrar={handleSubmit(handleValidatedLogin)}
+                  //onClickButtonCadastrar={loginConfirmacao}
+                  corCadastrar="success"
 
-                <InputFieldModal
-                  type="password"
-                  className="form-control input"
-                  label="Senha"
-                  value={senha}
-                  onChangeModal={(e) => setSenha(e.target.value)}
-                  placeholder={"Digite sua senha"}
                 />
               </div>
             </div>
-            <div className="row mt-4">
-              <FooterModal
-                ButtonTypeFechar={ButtonTypeModal}
-                textButtonFechar={"Voltar"}
-                onClickButtonFechar={() => { setFormularioVisivel(true), setFormularioVisivelLogin(false) }}
-                corFechar="secondary"
-
-                ButtonTypeCadastrar={ButtonTypeModal}
-                textButtonCadastrar={"Confirmar"}
-                onClickButtonCadastrar={loginConfirmacao}
-                corCadastrar="success"
-
-              />
-            </div>
-          </div>
+          </form>
         </Fragment>
       )}
     </Fragment>

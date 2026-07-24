@@ -415,6 +415,7 @@ export const ActionListaPerfilPermissao = ({
             rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+            cellMemo={false}
             filterDisplay="menu"
             stripedRows
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}

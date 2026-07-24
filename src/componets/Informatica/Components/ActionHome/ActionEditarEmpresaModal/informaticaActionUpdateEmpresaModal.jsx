@@ -207,6 +207,7 @@ export const InformaticaActionUpdateEmpresaModal = ({ show, handleClose, dadosLi
                 currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
                 filterDisplay="menu"
                 showGridlines
+                cellMemo={false}
                 stripedRows
               >
                 {colunasCaixa.map(coluna => (

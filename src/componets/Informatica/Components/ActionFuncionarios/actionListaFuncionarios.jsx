@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState, useRef } from "react"
 import { ButtonTable } from "../../../ButtonsTabela/ButtonTable";
-import { dataFormatada } from "../../../../utils/dataFormatada";
+import { dataFormatada, dataHoraFormatada, formatarDataDTW, formatarDataParaBR } from "../../../../utils/dataFormatada";
 import { get } from "../../../../api/funcRequest";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -21,6 +21,7 @@ import { ActionEditarFuncionario } from "./ActionEditar/actionEditarFuncionario"
 import { useDesligarFuncionario } from "./hooks/useDesligarFuncionario";
 import { useAtivarFuncionario } from "./hooks/useAtivarFuncionario";
 import { ActionEditarDescontoFuncionarioModal } from "./ActionDesconto/actionEditarDescontoFuncionarioModal";
+import { dataFormatadaa } from "../../../../utils/dataFormatadas";
 
 export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usuarioLogado, handleClick, refetch }) => {
   const [modalAlterarFuncionarioVisivel, setModalAlterarFuncionarioVisivel] = useState(false);
@@ -107,11 +108,11 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
       NOFUNCIONARIO: item.NOFUNCIONARIO,
       NOLOGIN: item.NOLOGIN,
       DSFUNCAO: item.DSFUNCAO,
-      STLOJA: item.STLOJA,
-      STCONVENIO: item.STCONVENIO,
+      STLOJA: item.STLOJA == 'True' ? 'Loja' : 'Escritório',
+      STCONVENIO: item.STCONVENIO == 'True' ? 'CLT' : 'PJ',
       DSTIPO: item.DSTIPO,
       PERC: toFloat(item.PERC),
-      STATIVO: item.STATIVO,
+      STATIVO: item.STATIVO == 'True' ? 'Ativo' : 'Inativo',
       DTDEMISSAO: item.DTDEMISSAO,
       ID: item.ID,
       IDFUNCIONARIO: item.IDFUNCIONARIO,
@@ -226,7 +227,9 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
     {
       field: 'DTDEMISSAO',
       header: 'DT Desl.',
-      body: row => <th>{dataFormatada(row.DTDEMISSAO)}</th>,
+      body: row =>
+        <th>{dataFormatadaa(row.DTDEMISSAO)}</th>,
+      //<th>{row.DTDEMISSAO}</th>,
       sortable: true,
     },
 
@@ -248,7 +251,7 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
                   cor={"primary"}
                   width="35px"
                   height="35px"
-
+                  disabledBTN={optionsModulos[0]?.ADMINISTRADOR == 'True' ? false : true}
                 />
 
               </div>
@@ -263,6 +266,7 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
                   cor={"info"}
                   width="35px"
                   height="35px"
+                  disabledBTN={optionsModulos[0]?.N1 == 'True' ? false : true}
                 />
 
               </div>
@@ -277,6 +281,7 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
                   cor={"warning"}
                   width="35px"
                   height="35px"
+                  disabledBTN={optionsModulos[0]?.ADMINISTRADOR == 'True' ? false : true}
                 />
 
               </div>
@@ -291,6 +296,7 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
                   cor={"danger"}
                   width="35px"
                   height="35px"
+                  disabledBTN={optionsModulos[0]?.ADMINISTRADOR == 'True' ? false : true}
                 />
 
               </div>
@@ -302,15 +308,18 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
           return (
             <div className="p-1">
               <ButtonTable
+                lineHeight={0.9}
+                textFontSize={"11px"}
                 titleButton={"ativar"}
                 textButton={"Ativar"}
                 onClickButton={() => handleAtivarFuncionario(row, true)}
                 Icon={FaCheck}
-                iconSize={25}
-                width="35px"
-                height="35px"
+                iconSize={17}
+                width="37px"
+                height="37px"
                 iconColor={"#fff"}
                 cor={"danger"}
+                disabledBTN={optionsModulos[0]?.ADMINISTRADOR == 'True' ? false : true}
               />
 
             </div>
@@ -321,7 +330,6 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
     },
 
   ]
-
 
   const handleEdit = async (ID) => {
     try {
@@ -441,6 +449,7 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
             rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+            cellMemo={false}
             filterDisplay="menu"
             stripedRows
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
@@ -471,7 +480,7 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
         handleClose={() => setModalAlterarFuncionarioVisivel(false)}
         dadosAtualizarFuncionarios={dadosAtualizarFuncionarios}
         handleClick={handleClick}
-        optionsModulos={optionsModulos} 
+        optionsModulos={optionsModulos}
         usuarioLogado={usuarioLogado}
       />
 

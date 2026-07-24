@@ -96,7 +96,7 @@ export const useEditarRelatorioBi = ({
             await post('/log-web', postData);
             
             Swal.fire({
-                position: 'top-end',
+                position: 'center',
                 icon: 'success',
                 title: 'Relatório atualizado com sucesso!',
                 customClass: {
@@ -120,7 +120,7 @@ export const useEditarRelatorioBi = ({
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario || 'IP não disponível',
+                IP: ipUsuario || 'INDISPONIVEL',
             };
     
             const responsePost = await post('/log-web', postData);

@@ -3,24 +3,38 @@ import * as yup from 'yup';
 export const schema = yup.object({
 
   empresaFuncionario: yup
-  .object()
-  .nullable()
-  .required('Empresa é obrigatória')
-  .typeError('Empresa é obrigatória'),
+    .object()
+    .nullable()
+    .required('Empresa é obrigatória')
+    .typeError('Empresa é obrigatória'),
 
-  funcaoFuncionario: yup.object()
+  funcaoFuncionario: yup
+    .object()
     .nullable()
     .required('Função Obrigatória')
-    .typeError('Função Obrigatória'),
+    .test(
+      'funcao-valida',
+      'Função Obrigatória',
+      (value) => {
+        return value && value.value && value.label !== 'Selecione...';
+      }
+    ),
 
-  tipoFuncionario: yup.object()
+  tipoFuncionario: yup
+    .object()
     .nullable()
     .required('Tipo Obrigatório')
-    .typeError('Tipo Obrigatório'),
-     
+    .test(
+      'Tipo-valido',
+      'Tipo Obrigatório',
+      (value) => {
+        return value && value.value && value.label !== 'Selecione...';
+      }
+    ),
+
 
   dataAdmissaoFuncionario: yup
-    .date()
+    .string()
     .required('Data de Admissão Obrigatória'),
 
   nome: yup
@@ -35,18 +49,25 @@ export const schema = yup.object({
       }
     ),
 
-  localizacaoFuncionario: yup.object()
+  localizacaoFuncionario: yup
+    .object()
     .nullable()
-    .required('Localização Obrigatória')
-    .typeError('Localização Obrigatória'),
+    .required('Localização Obrigatório')
+    .test(
+      'localizacao-valido',
+      'Localização Obrigatório',
+      (value) => {
+        return value && value.value && value.label !== 'Selecione...';
+      }
+    ),
 
   salarioFuncionario: yup
     .number()
     .transform((value) => {
-        if(typeof value === 'string') {
-            return value.replace(/\./g, '').replace(',', '.');
-        }
-        return value;
+      if (typeof value === 'string') {
+        return value.replace(/\./g, '').replace(',', '.');
+      }
+      return value;
     })
     .typeError('Salário deve ser um número')
     .required('Salário Obrigatório'),
@@ -68,17 +89,26 @@ export const schema = yup.object({
 
   telefoneFuncionario: yup.string()
     .transform((value) => {
-        if (typeof value === 'string') {
-            return value.replace(/\D/g, ''); // Remove espaços e caracteres especiais
-        }
-        return value;
+      if (typeof value === 'string') {
+        return value.replace(/\D/g, ''); // Remove espaços e caracteres especiais
+      }
+      return value;
     })
     .required('Telefone Obrigatório')
     .matches(/^\d{10,11}$/, 'Telefone deve conter 10 ou 11 números'),
-  
-  
-  departamentoFuncionario: yup.object()
+
+
+  departamentoFuncionario: yup
+    .object()
     .nullable()
-    .required('Departamento Obrigatório')
-    .typeError('Departamento Obrigatório'),
+    .required('departamento Obrigatório')
+    .test(
+      'departamento-valido',
+      'departamento Obrigatório',
+      (value) => {
+        return value && value.value && value.label !== 'Selecione...';
+      }
+    ),
+
+
 });

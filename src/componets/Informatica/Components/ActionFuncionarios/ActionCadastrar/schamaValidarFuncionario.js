@@ -3,25 +3,19 @@ import * as yup from 'yup';
 export const schema = yup.object().shape({
 
   empresaFuncionario: yup
-    .object({
-      value: yup.string().required('Empresa Obrigatória'),
-      label: yup.string(),
-    }),
+    .string()
+    .required('Empresa Obrigatória'),
 
   funcaoFuncionario: yup
-    .object({
-      value: yup.string().required('Função Obrigatória'),
-      label: yup.string(),
-    }),
+    .string()
+    .required('Função Obrigatória'),
 
   tipoFuncionario: yup
-    .object({
-      value: yup.string().required('Tipo Obrigatório'),
-      label: yup.string(),
-    }),
+    .string()
+    .required('Tipo Obrigatório'),
 
   dataAdmissaoFuncionario: yup
-    .date()
+    .string()
     .required('Data de Admissão Obrigatória'),
 
   nome: yup
@@ -37,10 +31,8 @@ export const schema = yup.object().shape({
     ),
 
   localizacaoFuncionario: yup
-    .object({
-      value: yup.string().required('Localização Obrigatória'),
-      label: yup.string(),
-    }),
+    .string()
+    .required('Localização Obrigatória'),
 
   salarioFuncionario: yup
     .number()
@@ -56,15 +48,23 @@ export const schema = yup.object().shape({
     .string()
     .nullable(),
 
-  situacaoFuncionario: yup
-    .object({
-      value: yup.string().required('Situação Obrigatória'),
-      label: yup.string(),
-    }),
-
-    cpf: yup
+  cpf: yup
     .string()
     .required('CPF Obrigatório')
     .matches(/^\d{11}$/, 'CPF deve conter exatamente 11 números'),
+
+  situacaoFuncionario: yup
+    .string()
+    .required('Situação Obrigatória'),
+
+
+  telefoneFuncionario: yup
+    .string()
+    .required('Telefone Obrigatório')
+    .matches(/^\d{10,11}$/, 'Telefone deve conter 10 ou 11 números'),
+
+  departamentoFuncionario: yup
+    .string()
+    .required('Departamento Obrigatório'),
 
 });

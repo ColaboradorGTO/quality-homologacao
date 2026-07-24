@@ -48,11 +48,13 @@ export const FormularioEditar = ({
         try {
             const dadosParaValidar = {
                 descontoAutorizado: percentualDesconto,
-
+                motivoDescontoFuncionario: motivoDesconto,
+                dataInicioDesconto: dataInicioDesconto,
+                dataFimDesconto: dataFimDesconto
             };
 
             await schema.validate(dadosParaValidar, { abortEarly: false });
-            onSubmit();
+            await onSubmit();
         } catch (validationError) {
             console.error('❌ Erro de validação:', validationError);
 
@@ -70,11 +72,9 @@ export const FormularioEditar = ({
             }
 
             const errorMessages = validationError.errors || [validationError.message];
-            alert(`Erro de validação:\n${errorMessages.join('\n')}`);
+            //console.log(`Erro de validação:\n${errorMessages.join('\n')}`);
         }
-
     }
-
 
     return (
         <Fragment>
@@ -220,7 +220,6 @@ export const FormularioEditar = ({
                                             clearErrors={clearErrors}
                                             value={dataFimDesconto}
                                             onChangeModal={(e) => setDataFimDesconto(e.target.value)}
-                                            
                                         />
                                     )}
                                 />

@@ -115,7 +115,6 @@ export const useEditarFuncionario = ({ handleClose, dadosAtualizarFuncionarios, 
     }
   };
 
-
   const loginConfirmacao = async () => {
     setFormularioVisivelLogin(true);
     setFormularioVisivel(false);
@@ -125,6 +124,7 @@ export const useEditarFuncionario = ({ handleClose, dadosAtualizarFuncionarios, 
       senha: senhaLogin,
       modulo: selectedModule?.nome
     }
+
     try {
       const response = await post('/login', postData);
 
@@ -140,9 +140,11 @@ export const useEditarFuncionario = ({ handleClose, dadosAtualizarFuncionarios, 
 
       const responsePost = await post('/log-web', createLog)
 
+      setIsChecked(true);
       setFormularioVisivelLogin(false);
       setFormularioVisivel(true);
       setIsLoading(true);
+
       return responsePost.data;
     } catch (error) {
       Swal.showValidationMessage(`Erro ao autenticar: ${error.message}`);
@@ -210,10 +212,10 @@ export const useEditarFuncionario = ({ handleClose, dadosAtualizarFuncionarios, 
       NOFUNCIONARIO: String(nomeFuncionario),
       NUCPF: cpfSemMascara,
       NOLOGIN: dadosAtualizarFuncionarios[0]?.NOLOGIN,
-      PWSENHA: senha,
+      PWSENHA: String(senha),
       IDEMPRESA: parseInt(empresaSelecionada.value),
       IDSUBGRUPOEMPRESARIAL: Number(subGrupoEmpresarialSelecionado),
-      IDFUNCIONARIO: dadosAtualizarFuncionarios[0]?.IDFUNCIONARIO,
+      IDFUNCIONARIO: Number(dadosAtualizarFuncionarios[0]?.IDFUNCIONARIO),
       DSTIPO: tipoSelecionado.value,
       PERC: parseFloat(valorDesconto),
       VALORSALARIO: removerFormatacaoMoeda(valorSalario),

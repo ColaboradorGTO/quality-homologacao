@@ -23,6 +23,7 @@ export const ActionListaVendas = ({ dadosVendasLoja }) => {
   const [totalVRTOTALPAGO, setTotalVRTOTALPAGO] = useState(0);
   const [dadosVendas, setDadosVendas] = useState([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
 
   const onGlobalFilterChange = (e) => {
@@ -311,6 +312,8 @@ export const ActionListaVendas = ({ dadosVendasLoja }) => {
             sortOrder={-1}
             paginator={true}
             rows={10}
+            selectionMode="single"
+            rowSelection={rowSelection}
             rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"

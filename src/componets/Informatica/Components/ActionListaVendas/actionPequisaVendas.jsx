@@ -8,10 +8,9 @@ import { getDataAtual } from "../../../../utils/dataAtual"
 import { ButtonType } from "../../../Buttons/ButtonType"
 import { AiOutlineSearch } from "react-icons/ai"
 import { useQuery } from "react-query"
-import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento"
+import { animacaoCarregamento, fecharAnimacaoCarregamento, foiCancelado } from "../../../../utils/animationCarregamento"
 
-
-export const ActionPesquisaVendas = () => {
+export const ActionPesquisaVendas = ({ usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [empresaSelecionada, setEmpresaSelecionada] = useState('');
   const [empresaSelecionadaNome, setEmpresaSelecionadaNome] = useState('');
@@ -19,6 +18,8 @@ export const ActionPesquisaVendas = () => {
   const [dataPesquisaFim, setDataPesquisaFim] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(1000);
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
+
 
   useEffect(() => {
     const dataInicio = getDataAtual();
@@ -26,6 +27,24 @@ export const ActionPesquisaVendas = () => {
     setDataPesquisaInicio(dataInicio);
     setDataPesquisaFim(dataFim);
   }, []);
+
+  useEffect(() => {
+    const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
+    if (menuSalvo) {
+      const menuParsed = JSON.parse(menuSalvo);
+      setMenuFilhoAtual(menuParsed);
+    }
+  }, []);
+
+  const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
+    ['menus-usuario-excecao', menuFilhoAtual?.ID],
+    async () => {
+      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
+
+      return response.data;
+    },
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 5 * 60 * 1000, }
+  );
 
   const { data: optionsEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch } = useQuery(
     'listaEmpresasIformatica',
@@ -39,40 +58,46 @@ export const ActionPesquisaVendas = () => {
     }
   );
 
-    const fetchListaVendas = async () => {
+  const fetchListaVendas = async () => {
     const urlBase = `/vendas-loja-informatica?idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&status=False`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+
+    const controller = new AbortController();
+    let allData = [];
+
     try {
-      animacaoCarregamento('Carregando dados...', true);
-                                            
+      animacaoCarregamento('Carregando dados...', true, true, () => controller.abort());
+
       const primeiraPagina = 1;
-      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`, { signal: controller.signal });
       const page = primeiraResposta.page || primeiraPagina;
       const pageSize = primeiraResposta.pageSize || 1000;
       const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
       const totalPages = Math.ceil(totalRows / pageSize);
 
-      let allData = [...(primeiraResposta.data || [])];
+      allData = [...(primeiraResposta.data || [])];
 
       if (totalPages > 1) {
-      for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
-          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
-          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+          if (foiCancelado()) break;
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`, { signal: controller.signal });
           allData.push(...(responsePage.data || []));
-      }
+        }
       }
 
       return allData;
-  
     } catch (error) {
-      console.error('Erro ao buscar dados da api', error);
+      if (error.code === 'ERR_CANCELED') {
+        return allData;
+      }
+      console.error('Erro ao buscar dados:', error);
       throw error;
     } finally {
       fecharAnimacaoCarregamento();
     }
   };
-
 
   const { data: dadosVendasLoja = [], error: erroCliente, isLoading: isLoadingCliente, refetch: refetchListaVendas } = useQuery(
     'vendas-loja-informatica',
@@ -80,7 +105,7 @@ export const ActionPesquisaVendas = () => {
     { enabled: false, staleTime: 60 * 60 * 1000 }
   );
 
-  
+
   const handlChangeEmpresa = (e) => {
     const selectedEmpresa = optionsEmpresas.find(empresa => empresa.IDEMPRESA === e.value);
     setEmpresaSelecionadaNome(selectedEmpresa.NOFANTASIA);
@@ -90,6 +115,19 @@ export const ActionPesquisaVendas = () => {
   const handleTabelaVisivel = () => {
     refetchListaVendas();
     setTabelaVisivel(true);
+  };
+
+  const handleClick = () => {
+    setCurrentPage(prevPage => prevPage + 1);
+    refetchListaVendas();
+    setTabelaVisivel(true);
+  };
+
+    const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
   };
 
 
@@ -131,9 +169,12 @@ export const ActionPesquisaVendas = () => {
         corSearch={"primary"}
         IconSearch={AiOutlineSearch}
       />
-      
-      <ActionListaVendas dadosVendasLoja={dadosVendasLoja} />
-      
+
+      <ActionListaVendas
+        dadosVendasLoja={dadosVendasLoja}
+        optionsModulos={optionsModulos}
+      />
+
     </Fragment>
   )
 }

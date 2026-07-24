@@ -74,6 +74,13 @@ export const ActionPesquisaNfce = ({usuarioLogado, ID}) => {
     });
   }
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
+
 
   return (
 

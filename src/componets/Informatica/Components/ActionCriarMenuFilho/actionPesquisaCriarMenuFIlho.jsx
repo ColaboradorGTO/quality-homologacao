@@ -16,7 +16,6 @@ import { useState } from "react";
 import { ActionMain } from "../../../Actions/actionMain";
 import { ActionListaMenuFilho } from "./actionListaMenuFilho";
 
-
 export const ActionPesquisaCriarMenuFilho = ({
 
     moduloSelecionado,
@@ -105,6 +104,7 @@ export const ActionPesquisaCriarMenuFilho = ({
     );
 
 
+
     return (
         <Fragment>
             <h2 style={{ marginBottom: "20px", fontWeight: "bold", color: "#fff" }}>
@@ -124,6 +124,7 @@ export const ActionPesquisaCriarMenuFilho = ({
                 usuarioLogado={usuarioLogado}
                 optionsModulos={optionsModulos}
                 refetchMenuFilho={refetchMenuFilho}
+                dadosMenuPai={dadosMenuPai}
             />
 
         </Fragment>
