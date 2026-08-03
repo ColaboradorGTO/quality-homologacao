@@ -43,7 +43,7 @@ export const ModuloTeste = () => {
 
   // }, [usuarioLogado]);
 
- 
+ console.log(usuarioLogado, 'usuarioLo')
   const navigate = useNavigate();
   const { data: optionsModulosPage = [], error: errorFuncionarios, isLoading: isLoadingFuncionarios, refetch: refetchFuncionarios } = useQuery(
     'menus-usuario',

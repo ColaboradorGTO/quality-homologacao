@@ -55,7 +55,8 @@ export const DashBoardRecursosHumanos = ({}) => {
     },
     { enabled: Boolean(usuarioLogado?.id), staleTime: 5 * 60 * 1000, }
   );
-
+  console.log(usuarioLogado?.id, 'usuarioLogado?.id')
+  
   function handleShowComponent(componentName) {
     const menuFilhoSelecionado = selectedModule.menuPai.menuFilho.find(
       menu => menu.URL === componentName

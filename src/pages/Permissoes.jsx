@@ -285,13 +285,13 @@ export const Permissoes = ({}) => {
 
                                     <Select
                                         options={dadosFuncionarios?.map((item) => ({
-                                            value: item.ID,
+                                            value: item.IDFUNCIONARIO,
                                             label: `${item.NOLOGIN} - ${item.NOFUNCIONARIO} `
                                         }))}
                                         value={funcionarioSelecionado}
                                         onChange={(e) => setFuncionarioSelecionado(e)}
                                     />
-                                    {console.log(funcionarioSelecionado, 'funcionarioSelecionado')}
+                                   
                                 </div>
                             </div>
 

@@ -12,7 +12,7 @@ import { ModalAjusteExtratoModal } from "./ActionCadastroAjuste/actionCadastroAj
 import { BsTrash3 } from "react-icons/bs";
 import { ButtonTable } from "../../../ButtonsTabela/ButtonTable";
 
-export const ActionListaExtratoLoja = ({
+export const ActionListaExtratoLojaTeste = ({
   dadosExtratoLojaPeriodo,
   optionsModulos,
   usuarioLogado,

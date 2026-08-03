@@ -480,8 +480,8 @@ export const ActionListaExtratoContaCorrenteLoja = ({
       console.error('Erro ao buscar detalhes da venda: ', error);
     }
   };
-
-
+ 
+  
   const handleClickEdit = (row) => {
     if (optionsModulos[0]?.ALTERAR == 'True') {
 
