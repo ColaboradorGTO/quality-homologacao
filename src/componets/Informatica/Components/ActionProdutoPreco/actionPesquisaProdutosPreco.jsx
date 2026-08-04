@@ -38,7 +38,7 @@ export const ActionPesquisaProdutosPreco = () => {
         return [];
       }
     },
-    { enabled: Boolean(marcaSelecionada), staleTime: 60 * 60 * 1000 }
+    { enabled: Boolean(marcaSelecionada) }
   );
 
 const fetchProdutoSap = async () => {

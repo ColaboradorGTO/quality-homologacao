@@ -11,7 +11,7 @@ import { MdUpdate } from "react-icons/md";
 import { InputSelectAction } from "../../../Inputs/InputSelectAction";
 import { animacaoCarregamento, fecharAnimacaoCarregamento, foiCancelado } from "../../../../utils/animationCarregamento";
 
-export const InformaticaActionHome = ({ usuarioLogado, ID }) => {
+export const InformaticaActionHome = ({ usuarioLogado }) => {
   const [clickContador, setClickContador] = useState(0);
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [actionVisivel, setActionVisivel] = useState(true);
@@ -37,7 +37,7 @@ export const InformaticaActionHome = ({ usuarioLogado, ID }) => {
 
       return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
+    { enabled: Boolean(usuarioLogado?.id) }
   );
 
   const { data: dadosMarca = [], error: errorMarca, isLoading: isLoadingMarca, refetch: refetchMarca } = useQuery(

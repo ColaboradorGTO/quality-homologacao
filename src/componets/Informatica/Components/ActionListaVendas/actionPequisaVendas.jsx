@@ -43,7 +43,7 @@ export const ActionPesquisaVendas = ({ usuarioLogado }) => {
 
       return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 5 * 60 * 1000, }
+    { enabled: Boolean(usuarioLogado?.id) }
   );
 
   const { data: optionsEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch } = useQuery(
