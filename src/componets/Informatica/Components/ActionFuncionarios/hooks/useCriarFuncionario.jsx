@@ -178,7 +178,6 @@ export const useCriarFuncionario = ({ handleClose, usuarioLogado, optionsModulos
     }
 
   };
-
   
   const onSubmit = async (e) => {
     let maximoDesconto = 0;
@@ -277,7 +276,7 @@ export const useCriarFuncionario = ({ handleClose, usuarioLogado, optionsModulos
     const putData = {
       ID: idFuncionario,
       DATA_ADMISSAO: dataAdmissao,
-      IDFUNCIONARIOULTALTERACAO: usuarioLogado.id,
+      IDFUNCALTERACAO: usuarioLogado.id,
       NOFUNCIONARIO: nomeFuncionario,
       NUCPF: cpfSemMascara,
       NOLOGIN: noLogin,
@@ -297,6 +296,7 @@ export const useCriarFuncionario = ({ handleClose, usuarioLogado, optionsModulos
       STLOJA: localizacaoSelcionada.value == 'Loja' ? "True" : "False",
       TELEFONE: removerMascaraTelefone(telefone),
       DEPARTAMENTO: departamentoSelecionado?.value
+      
     }
 
     try {

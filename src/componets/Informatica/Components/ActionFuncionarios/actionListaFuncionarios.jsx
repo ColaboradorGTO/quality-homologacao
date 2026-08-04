@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState, useRef } from "react"
 import { ButtonTable } from "../../../ButtonsTabela/ButtonTable";
-import { dataFormatada } from "../../../../utils/dataFormatada";
+import { dataFormatada, dataHoraFormatada, formatarDataDTW, formatarDataParaBR } from "../../../../utils/dataFormatada";
 import { get } from "../../../../api/funcRequest";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -21,6 +21,7 @@ import { ActionEditarFuncionario } from "./ActionEditar/actionEditarFuncionario"
 import { useDesligarFuncionario } from "./hooks/useDesligarFuncionario";
 import { useAtivarFuncionario } from "./hooks/useAtivarFuncionario";
 import { ActionEditarDescontoFuncionarioModal } from "./ActionDesconto/actionEditarDescontoFuncionarioModal";
+import { dataFormatadaa } from "../../../../utils/dataFormatadas";
 
 export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usuarioLogado, handleClick, refetch }) => {
   const [modalAlterarFuncionarioVisivel, setModalAlterarFuncionarioVisivel] = useState(false);
@@ -33,7 +34,6 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
   const [rowSelection, setRowSelection] = useState(null);
   const { handleDesligarFuncionario } = useDesligarFuncionario({ optionsModulos, usuarioLogado, handleClick, refetch })
   const { handleAtivarFuncionario } = useAtivarFuncionario({ optionsModulos, usuarioLogado, handleClick, refetch })
-
 
 
   useEffect(() => {
@@ -76,9 +76,24 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
   };
 
   const exportToExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(dados);
+    const worksheet = XLSX.utils.json_to_sheet(dados.map(item => ({
+      'Nº': item.contador,
+      'CPF': item.NUCPF,
+      'Funcionário': item.NOFUNCIONARIO,
+      'Login': item.NOLOGIN,
+      'Função': item.DSFUNCAO,
+      'Localização': item.STLOJA == 'True' ? 'Loja' : 'Escritório',
+      'TP. Contratação': item.STCONVENIO == 'True' ? 'CLT' : 'PJ',
+      'Tipo': item.DSTIPO == 'PN' ? 'PARCEIRO DE NEGÓCIOS' : 'FUNCIÓNARIO',
+      'Telefone': item.TELEFONE,
+      'Departamento': item.DEPARTAMENTO,
+      'Desconto %': item.PERC,
+      'Situação': item.STATIVO == 'True' ? 'Ativo' : 'Inativo',
+      'DT Desl.': dataFormatada(item.DTDEMISSAO)
+    })));
+
     const workbook = XLSX.utils.book_new();
-    const header = ['Nº', 'CPF', 'Funcionário', 'Login', 'Função', 'Localização', 'TP. Contratação', 'Tipo', 'Desconto %', 'Situação', 'DT Desl.'];
+    const header = ['Nº', 'CPF', 'Funcionário', 'Login', 'Função', 'Localização', 'TP. Contratação', 'Tipo', 'Telefone', 'Departamento', 'Desconto %', 'Situação', 'DT Desl.'];
     worksheet['!cols'] = [
       { wpx: 70, caption: 'Nº' },
       { wpx: 100, caption: 'CPF' },
@@ -88,6 +103,8 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
       { wpx: 100, caption: 'Localização' },
       { wpx: 100, caption: 'TP. Contratação' },
       { wpx: 100, caption: 'Tipo' },
+      { wpx: 100, caption: 'Telefone' },
+      { wpx: 100, caption: 'Departamento' },
       { wpx: 100, caption: 'Desconto %' },
       { wpx: 100, caption: 'Situação' },
       { wpx: 100, caption: 'DT Desl.' },
@@ -97,7 +114,6 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Lista de Funcionarios');
     XLSX.writeFile(workbook, 'lista_funcionarios.xlsx');
   };
-
   const dados = dadosFuncionarios.map((item, index) => {
     let contador = index + 1;
 
@@ -112,9 +128,11 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
       DSTIPO: item.DSTIPO,
       PERC: toFloat(item.PERC),
       STATIVO: item.STATIVO,
-      DTDEMISSAO: item.DTDEMISSAO,
+      DATA_DEMISSAO: item.DATA_DEMISSAO,
       ID: item.ID,
       IDFUNCIONARIO: item.IDFUNCIONARIO,
+      TELEFONE: item.TELEFONE,
+      DEPARTAMENTO: item.DEPARTAMENTO
 
     };
   });
@@ -226,7 +244,9 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
     {
       field: 'DTDEMISSAO',
       header: 'DT Desl.',
-      body: row => <th>{dataFormatada(row.DTDEMISSAO)}</th>,
+      body: row =>
+        <th>{formatarDataParaBR(row.DATA_DEMISSAO)}</th>,
+      //<th>{row.DATA_DEMISSAO}</th>,
       sortable: true,
     },
 
@@ -248,7 +268,7 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
                   cor={"primary"}
                   width="35px"
                   height="35px"
-
+                  disabledBTN={optionsModulos[0]?.ADMINISTRADOR == 'True' ? false : true}
                 />
 
               </div>
@@ -263,6 +283,7 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
                   cor={"info"}
                   width="35px"
                   height="35px"
+                  disabledBTN={optionsModulos[0]?.N1 == 'True' ? false : true}
                 />
 
               </div>
@@ -277,6 +298,7 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
                   cor={"warning"}
                   width="35px"
                   height="35px"
+                  disabledBTN={optionsModulos[0]?.ADMINISTRADOR == 'True' ? false : true}
                 />
 
               </div>
@@ -291,10 +313,10 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
                   cor={"danger"}
                   width="35px"
                   height="35px"
+                  disabledBTN={optionsModulos[0]?.ADMINISTRADOR == 'True' ? false : true}
                 />
 
               </div>
-
             </div>
           )
 
@@ -302,15 +324,18 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
           return (
             <div className="p-1">
               <ButtonTable
+                lineHeight={0.9}
+                textFontSize={"11px"}
                 titleButton={"ativar"}
                 textButton={"Ativar"}
                 onClickButton={() => handleAtivarFuncionario(row, true)}
                 Icon={FaCheck}
-                iconSize={25}
-                width="35px"
-                height="35px"
+                iconSize={17}
+                width="37px"
+                height="37px"
                 iconColor={"#fff"}
                 cor={"danger"}
+                disabledBTN={optionsModulos[0]?.ADMINISTRADOR == 'True' ? false : true}
               />
 
             </div>
@@ -321,7 +346,6 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
     },
 
   ]
-
 
   const handleEdit = async (ID) => {
     try {
@@ -345,7 +369,6 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
       console.error('Erro ao buscar detalhes da venda: ', error);
     }
   };
-
 
   const handleClickEdit = (row) => {
     if (optionsModulos[0]?.ALTERAR == 'True') {
@@ -441,6 +464,7 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
             rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+            cellMemo={false}
             filterDisplay="menu"
             stripedRows
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
@@ -471,7 +495,7 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
         handleClose={() => setModalAlterarFuncionarioVisivel(false)}
         dadosAtualizarFuncionarios={dadosAtualizarFuncionarios}
         handleClick={handleClick}
-        optionsModulos={optionsModulos} 
+        optionsModulos={optionsModulos}
         usuarioLogado={usuarioLogado}
       />
 

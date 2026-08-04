@@ -91,7 +91,7 @@ export const FormularioEditar = ({ show, handleClose, dadosListaCaixa, refetchLi
                 type="text"
                 className="form-control input"
                 label="Empresa"
-                readOnly={false}
+                readOnly={true}
                 value={empresa}
                 onChangeModal={(e) => setEmpresa(e.target.value)}
               />

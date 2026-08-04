@@ -65,7 +65,7 @@ export const useAtivarFuncionario = ({ handleClose, optionsModulos, usuarioLogad
   
         Swal.fire({
           title: 'Atualização',
-          text: 'Atualizção Realizada com Sucesso',
+          text: 'Atualização Realizada com Sucesso',
           icon: 'success',
           timer: 3000,
           customClass: {

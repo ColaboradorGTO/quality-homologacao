@@ -57,7 +57,7 @@ export const useAtualizarTodosCaixas = ({ usuarioLogado, optionsModulos }) => {
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textFuncao,
                 DADOS: textDados,
-                IP: ipUsuario || 'IP não disponível'
+                IP: ipUsuario || 'INDISPONIVEL'
             }
 
             await post('/log-web', postData)
@@ -81,7 +81,7 @@ export const useAtualizarTodosCaixas = ({ usuarioLogado, optionsModulos }) => {
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textFuncao,
                 DADOS: textDados,
-                IP: ipUsuario || 'IP não disponível'
+                IP: ipUsuario || 'INDISPONIVEL'
             }
 
             await post('/log-web', postData)

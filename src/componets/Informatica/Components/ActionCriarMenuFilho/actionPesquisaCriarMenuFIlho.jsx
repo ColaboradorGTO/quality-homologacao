@@ -16,7 +16,6 @@ import { useState } from "react";
 import { ActionMain } from "../../../Actions/actionMain";
 import { ActionListaMenuFilho } from "./actionListaMenuFilho";
 
-
 export const ActionPesquisaCriarMenuFilho = ({
 
     moduloSelecionado,
@@ -28,7 +27,6 @@ export const ActionPesquisaCriarMenuFilho = ({
     nomeMenu,
     setNomeMenu,
     onSubmit,
-
     usuarioLogado
 }) => {
 
@@ -50,7 +48,7 @@ export const ActionPesquisaCriarMenuFilho = ({
 
             return response.data;
         },
-        { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
+        { enabled: Boolean(usuarioLogado?.id) }
     );
 
     const fetchListaMenuFilho = async () => {
@@ -105,6 +103,7 @@ export const ActionPesquisaCriarMenuFilho = ({
     );
 
 
+
     return (
         <Fragment>
             <h2 style={{ marginBottom: "20px", fontWeight: "bold", color: "#fff" }}>
@@ -124,6 +123,7 @@ export const ActionPesquisaCriarMenuFilho = ({
                 usuarioLogado={usuarioLogado}
                 optionsModulos={optionsModulos}
                 refetchMenuFilho={refetchMenuFilho}
+                dadosMenuPai={dadosMenuPai}
             />
 
         </Fragment>

@@ -11,13 +11,15 @@ import { Fragment, useRef, useState } from "react"
 import { get } from "../../../../api/funcRequest";
 import HeaderTable from "../../../Tables/headerTable";
 import { ButtonTable } from "../../../ButtonsTabela/ButtonTable";
+import { ActionEditarMenuFilho } from './ActionAtualizarMenuFilho/actionEditarMenuFilho';
 
 export const ActionListaMenuFilho = ({
     dadosEmpresas,
     optionsModulos,
     usuarioLogado,
     dadosMenuFilho,
-    refetchMenuFilho
+    refetchMenuFilho,
+    dadosMenuPai
 }) => {
 
     const [modalVisivel, setModalVisivel] = useState(false)
@@ -25,6 +27,8 @@ export const ActionListaMenuFilho = ({
     const [globalFilterValue, setGlobalFilterValue] = useState("")
     const [modalEditar, setModalEditar] = useState(false)
     const [dadosEditarEmpresa, setDadosEditarEmpresa] = useState([])
+    const [dadosDetalhesMenuFilho, setDadosDetalhesMenuFilho] = useState([])
+    const [modalEditarMenuFilho, setModalEditarMenuFilho] = useState(false)
     const [rowSelected, setRowSelected] = useState(null);
     const dataTableRef = useRef();
 
@@ -34,40 +38,39 @@ export const ActionListaMenuFilho = ({
 
     const handlePrint = useReactToPrint({
         content: () => dataTableRef.current,
-        documentTitle: "Lista Empresa"
+        documentTitle: "Menus Filhos"
     });
 
     const exportToPDF = () => {
         const doc = new jsPDF();
         doc.autoTable({
-            head: [['ID Empresa', 'Empresa', 'E-mail', 'Telefone']],
+            head: [['ID', 'Nome Menu', 'ID Menu Pai', 'URL']],
             body: dados.map(item => [
                 item.ID,
                 item.DSNOME,
                 item.IDMENUPAI,
                 item.URL,
-
             ]),
             horizontalPageBreak: true,
             horizontalPageBreakBehaviour: "immediately"
         });
-        doc.save("lista_empresas.pdf");
+        doc.save("lista_menu_filho.pdf");
     };
 
     const exportToExcel = () => {
         const worksheet = XLSX.utils.json_to_sheet(dados);
         const workbook = XLSX.utils.book_new();
-        const header = ["ID Empresa", "Empresa", "E-mail", "Telefone"];
+        const header = ["ID", "Nome Menu", "ID Menu Pai", "URL"];
         worksheet["!cols"] = [
-            { wpx: 50, captions: "ID Empresa" },
-            { wpx: 200, captions: "Empresa" },
-            { wpx: 100, captions: "E-mail" },
-            { wpx: 100, captions: "Telefone" },
+            { wpx: 50, captions: "ID" },
+            { wpx: 200, captions: "Nome Menu" },
+            { wpx: 100, captions: "ID Menu Pai" },
+            { wpx: 100, captions: "URL" },
         ];
 
         XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: "A1" });
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Lista Empresas")
-        XLSX.writeFile(workbook, "lista_empresas.xlsx");
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Lista Menus Filhos")
+        XLSX.writeFile(workbook, "lista_menu_filho.xlsx");
     };
 
     const dados = dadosMenuFilho.map((item, index) => {
@@ -103,8 +106,68 @@ export const ActionListaMenuFilho = ({
             header: 'URL',
             body: row => <th>{row.URL}</th>,
             sortable: true,
+        },
+        {
+            filed: 'Opçoes',
+            header: 'Opções',
+            body: row =>
+                <div>
+                    <ButtonTable
+                        titleButton={"Editar"}
+                        onClickButton={() => handleClickEdit(row)}
+                        Icon={CiEdit}
+                        iconSize={30}
+                        iconColor={"#fff"}
+                        cor={"primary"}
+                        width="35px"
+                        height="35px"
+                        disabledBTN={optionsModulos[0]?.ALTERAR == 'True' ? false : true}
+                    />
+                </div>
         }
     ]
+
+
+    const handleEdit = async (ID) => {
+        try {
+            const response = await get(`/listaMenusFilhos?idMenuFilho=${ID}`)
+            if (response.data && response.data.length > 0) {
+                setDadosDetalhesMenuFilho(response.data)
+                setModalEditarMenuFilho(true);
+            } else {
+                Swal.fire({
+                    title: 'Erro',
+                    text: 'Dados do Menu não encontrado.',
+                    icon: 'error',
+                    timer: 3000,
+                    customClass: {
+                        container: 'custom-swal',
+                    }
+                })
+                return;
+            }
+        } catch (error) {
+            console.error('Erro ao Buscar Lista de Menus Filhos: ', error);
+        }
+    };
+
+    const handleClickEdit = (row) => {
+        if (optionsModulos[0]?.ALTERAR == 'True') {
+            if (row && row.ID) {
+                handleEdit(row.ID);
+            }
+        } else {
+            Swal.fire({
+                title: 'Acesso Negado',
+                text: 'Você não tem permissão para acessar está funcionalidade.',
+                icon: 'warning',
+                timer: 3000,
+                customClass: {
+                    container: 'custom-swal',
+                }
+            })
+        }
+    };
 
     return (
         <Fragment>
@@ -138,6 +201,7 @@ export const ActionListaMenuFilho = ({
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
                         filterDisplay="menu"
+                        cellMemo={false}
                         showGridlines
                         stripedRows
                         emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
@@ -160,6 +224,17 @@ export const ActionListaMenuFilho = ({
                 </div>
 
             </div>
+
+            <ActionEditarMenuFilho
+                show={modalEditarMenuFilho}
+                handleClose={() => setModalEditarMenuFilho(false)}
+                dadosDetalhesMenuFilho={dadosDetalhesMenuFilho}
+                refetchMenuFilho={refetchMenuFilho}
+                optionsModulos={optionsModulos}
+                usuarioLogado={usuarioLogado}
+                dadosMenuPai={dadosMenuPai}
+            />
+
         </Fragment>
     )
 }

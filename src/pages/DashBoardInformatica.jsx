@@ -95,16 +95,16 @@ export const DashBoardInformatica = () => {
 
 
   let component = null;
-
+  
   switch (componentToShow) {
     case "/informatica/InformaticaActionHome":
-      component = <InformaticaActionHome usuarioLogado={usuarioLogado} ID={ID} />;
+      component = <InformaticaActionHome usuarioLogado={usuarioLogado}  />;
       break;
     case "/informatica/ActionPesquisaVendas":
-      component = <ActionPesquisaVendas />;
+      component = <ActionPesquisaVendas  usuarioLogado={usuarioLogado}  />;
       break;
     case "/informatica/ActionPesquisaFuncionarios":
-      component = <ActionPesquisaFuncionarios usuarioLogado={usuarioLogado} ID={ID} />;
+      component = <ActionPesquisaFuncionarios usuarioLogado={usuarioLogado}  />;
       break;
     case "/informatica/ActionPesquisaProdutosPreco":
       component = <ActionPesquisaProdutosPreco />;
@@ -119,28 +119,28 @@ export const DashBoardInformatica = () => {
       component = <ActionPesquisaCliente />;
       break;
     case "/informatica/ActionPesquisaExportarDadosCSVCredSystem":
-      component = <ActionPesquisaExportarDadosCSVCredSystem usuarioLogado={usuarioLogado} ID={ID} />;
+      component = <ActionPesquisaExportarDadosCSVCredSystem usuarioLogado={usuarioLogado}  />;
       break;
     case "/informatica/ActionPesquisaRelatorioBI":
-      component = <ActionPesquisaRelatorioBI usuarioLogado={usuarioLogado} ID={ID} />;
+      component = <ActionPesquisaRelatorioBI usuarioLogado={usuarioLogado}  />;
       break;
     case "/informatica/ActionPesquisaLinkRelatorioBi":
-      component = <ActionPesquisaLinkRelatorioBi usuarioLogado={usuarioLogado} ID={ID} />;
+      component = <ActionPesquisaLinkRelatorioBi usuarioLogado={usuarioLogado}  />;
       break;
     case "/informatica/ActionPesquisaDuplicarPermissao":
-      component = <ActionPesquisaDuplicarPermissao usuarioLogado={usuarioLogado} ID={ID} />;
+      component = <ActionPesquisaDuplicarPermissao usuarioLogado={usuarioLogado}  />;
       break;
     case "/informatica/ActionPesquisaEmpresas":
-      component = <ActionPesquisEmpresa usuarioLogado={usuarioLogado} ID={ID} />;
+      component = <ActionPesquisEmpresa usuarioLogado={usuarioLogado}  />;
       break;
     case "/informatica/ActionPesquisaNfce":
-      component = <ActionPesquisaNfce usuarioLogado={usuarioLogado} ID={ID} />;
+      component = <ActionPesquisaNfce usuarioLogado={usuarioLogado}  />;
       break;
     case "/informatica/CriacaoMenuFilho":
-      component = <ActionPesquisaCriarMenuFilho usuarioLogado={usuarioLogado} ID={ID} />;
+      component = <ActionPesquisaCriarMenuFilho usuarioLogado={usuarioLogado}  />;
       break;
     case "/informatica/ActionPesquisaPermissao":
-      component = <ActionPesquisaPermissao usuarioLogado={usuarioLogado} ID={ID} />;
+      component = <ActionPesquisaPermissao usuarioLogado={usuarioLogado}  />;
       break;
     default:
       component = null;

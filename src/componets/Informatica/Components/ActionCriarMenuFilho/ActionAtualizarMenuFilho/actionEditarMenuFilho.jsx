@@ -3,14 +3,14 @@ import Modal from 'react-bootstrap/Modal';
 import { HeaderModal } from "../../../../Modais/HeaderModal/HeaderModal";
 import { FormularioEditar } from "./formularioEditar";
 
-
-export const ActionEditarFuncionario = ({ 
+export const ActionEditarMenuFilho = ({ 
   show, 
   handleClose, 
-  dadosAtualizarFuncionarios,
-  handleClick,
+  dadosDetalhesMenuFilho,
+  refetchMenuFilho,
   optionsModulos,
-  usuarioLogado 
+  usuarioLogado,
+  dadosMenuPai
 }) => {
 
 
@@ -27,18 +27,19 @@ export const ActionEditarFuncionario = ({
       >
 
         <HeaderModal
-          title={"Dados do Funcionário"}
-          subTitle={" Atualizar Informações do Funcionário"}
+          title={"Dados do Menu Filho"}
+          subTitle={"Atualizar Informações do Menu Filho"}
           handleClose={handleClose}
         />
 
         <Modal.Body>
           <FormularioEditar 
             handleClose={handleClose} 
-            dadosAtualizarFuncionarios={dadosAtualizarFuncionarios} 
-            handleClick={handleClick}
+            dadosDetalhesMenuFilho={dadosDetalhesMenuFilho} 
+            refetchMenuFilho={refetchMenuFilho}
             optionsModulos={optionsModulos} 
             usuarioLogado={usuarioLogado}
+            dadosMenuPai={dadosMenuPai}
           />
 
         </Modal.Body>

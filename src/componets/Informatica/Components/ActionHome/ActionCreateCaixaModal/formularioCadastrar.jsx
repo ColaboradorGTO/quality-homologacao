@@ -59,7 +59,8 @@ export const FormularioCadastrar = ({ show, handleClose, dadosListaCaixa, refetc
       };
 
       await schema.validate(dadosParaValidar, { abortEarly: false });
-      onSubmit(dadosParaValidar);
+      await onSubmit();
+
     } catch (validationError) {
       console.error('❌ Erro de validação:', validationError);
 
@@ -112,7 +113,7 @@ export const FormularioCadastrar = ({ show, handleClose, dadosListaCaixa, refetc
                     errors={errors}
                     clearErrors={clearErrors}
                     value={dsCaixa}
-                    onChangeModal={(e) => setDSCaixa(e.target.value)}
+                    onChangeModal={(e) => setDSCaixa(e.target.value.toUpperCase())}
                   />
                 )}
               />
@@ -297,9 +298,12 @@ export const FormularioCadastrar = ({ show, handleClose, dadosListaCaixa, refetc
 
         <FooterModal
           ButtonTypeCadastrar={ButtonTypeModal}
-          textButtonCadastrar={"Atualizar"}
-          onClickButtonCadastrar={handleValidatedSubmit}
+          textButtonCadastrar={"Cadastrar"}
+          tipoBtnCadastrar={"submit"}
+          //onClickButtonCadastrar={handleSubmit(handleValidatedSubmit)}
           corCadastrar="success"
+          autoLoadingCadastrar={true}
+          loadingTextCadastrar={"Cadastrando..."}
 
           ButtonTypeFechar={ButtonTypeModal}
           textButtonFechar={"Fechar"}

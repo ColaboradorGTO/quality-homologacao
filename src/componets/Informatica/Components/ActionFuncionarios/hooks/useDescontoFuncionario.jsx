@@ -4,7 +4,6 @@ import axios from 'axios';
 import { post, put } from "../../../../../api/funcRequest";
 import { getDataAtual } from "../../../../../utils/dataAtual";
 
-
 export const useEditarDescontoFuncionario = ({
     handleClose,
     dadosDescontoFuncionarios,
@@ -78,7 +77,7 @@ export const useEditarDescontoFuncionario = ({
             DTINICIODESC: String(dataInicioDesconto),
             DTFIMDESC: String(dataFimDesconto),
             PERCDESCUSUAUTORIZADO: percentualDesconto ? parseFloat(percentualDesconto) : 0,
-            TXTMOTIVODESCONTO: motivoDesconto,
+            MOTIVODESC: motivoDesconto,
             IDFUNCALTERACAO: Number(usuarioLogado?.id),
             ID: Number(dadosDescontoFuncionarios[0]?.ID),
 

@@ -12,11 +12,19 @@ import { format, subDays } from "date-fns";
 import FormField from "../../../../Formularios/FormField";
 import { formatarMoeda, removerFormatacaoMoeda } from "../../../../../utils/formatMoeda";
 import { mascaraTelefone } from "../../../../../utils/mascaraTelefone";
+import { schemaLogin } from "./schamaValidarLogin";
 
-export const FormularioCadastrar = ({ handleClose, usuarioLogado, optionsModulos, refetch }) => {
+export const FormularioCadastrar = ({
+    handleClose,
+    usuarioLogado,
+    optionsModulos,
+    refetch
+}) => {
+
     const { handleSubmit, formState: { errors }, clearErrors, control, setError, setValue } = useForm({
         mode: "onChange"
     });
+
     const {
         empresaSelecionada,
         setEmpresaSelecionada,
@@ -75,24 +83,29 @@ export const FormularioCadastrar = ({ handleClose, usuarioLogado, optionsModulos
         setTelefone,
         departamentoSelecionado,
         setDepartamentoSelecionado
-    } = useCriarFuncionario({ handleClose, usuarioLogado, optionsModulos, refetch });
+    } = useCriarFuncionario({
+        handleClose,
+        usuarioLogado,
+        optionsModulos,
+        refetch
+    });
 
     const handleValidatedSubmit = async () => {
         try {
             const dadosParaValidar = {
-                empresaFuncionario: empresaSelecionada,
-                funcaoFuncionario: funcaoSelecionada,
-                tipoFuncionario: tipoSelecionado,
+                empresaFuncionario: empresaSelecionada.value,
+                funcaoFuncionario: funcaoSelecionada.value,
+                tipoFuncionario: tipoSelecionado.value,
                 dataAdmissaoFuncionario: dataAdmissao,
                 cpf: cpfFuncionario,
                 nome: nomeFuncionario,
                 telefoneFuncionario: telefone,
-                departamentoFuncionario: departamentoSelecionado,
-                localizacaoFuncionario: localizacaoSelcionada,
+                departamentoFuncionario: departamentoSelecionado.value,
+                localizacaoFuncionario: localizacaoSelcionada.value,
                 salarioFuncionario: removerFormatacaoMoeda(valorSalario),
                 valorDesconroFuncionario: valorDesconto,
                 execaoDescFuncionario: excecao,
-                situacaoFuncionario: situacaoSelecionada,
+                situacaoFuncionario: situacaoSelecionada.value,
             };
 
             await schema.validate(dadosParaValidar, { abortEarly: false });
@@ -116,37 +129,63 @@ export const FormularioCadastrar = ({ handleClose, usuarioLogado, optionsModulos
             const errorMessages = validationError.errors || [validationError.message];
             console.log(`Erro de validação:\n${errorMessages.join('\n')}`);
         }
+    }
 
+    const handleValidatedLogin = async () => {
+        try {
+            const dadosParaValidar = {
+                matriculaFuncionario: usuario,
+                senhaFuncionario: senhaLogin,
+            };
+
+            await schemaLogin.validate(dadosParaValidar, { abortEarly: false });
+            loginConfirmacao();
+        } catch (validationError) {
+            console.error('❌ Erro de validação:', validationError);
+
+            clearErrors();
+
+            if (validationError.inner && validationError.inner.length > 0) {
+                validationError.inner.forEach(error => {
+                    if (error.path) {
+                        setError(error.path, {
+                            type: 'manual',
+                            message: error.message
+                        });
+                    }
+                });
+            }
+
+            const errorMessages = validationError.errors || [validationError.message];
+            console.log(`Erro de validação:\n${errorMessages.join('\n')}`);
+        }
     }
 
     const maxDataAdmissao = format(new Date(), "yyyy-MM-dd");
     const minDataAdmissao = format(subDays(new Date(), 45), "yyyy-MM-dd");
+
     return (
         <Fragment>
             {formularioVisivel && (
                 <form onSubmit={handleSubmit(handleValidatedSubmit)}>
                     <div className="row">
                         <div className="col-sm-6 col-md-6 col-xl-6">
-                            <label className="form-label" htmlFor="empresaFuncionario">Empresa *</label>
+                            <label className="form-label" htmlFor="empresaFuncionario">Empresa*</label>
 
                             <Select
-                                className="basic-single"
-                                classNamePrefix={"select"}
-                                name="empresaFuncionario"
-                                options={optionsEmpresas.map((item) => ({
-                                    value: item.IDEMPRESA,
-                                    label: item.NOFANTASIA
-                                }))}
+                                closeMenuOnSelect={false}
+                                options={optionsEmpresas.map((item) => {
+                                    return {
+                                        value: item.IDEMPRESA,
+                                        label: item.NOFANTASIA
+                                    }
+                                })}
                                 value={empresaSelecionada}
                                 onChange={(selected) => {
                                     setEmpresaSelecionada(selected);
                                     clearErrors("empresaFuncionario");
                                 }}
-                                isClearable={true}
-                                isSearchable={true}
-                                placeholder="Selecione a Empresa"
                             />
-
                             {errors.empresaFuncionario && (
                                 <AlertError
                                     error={errors.empresaFuncionario}
@@ -155,64 +194,61 @@ export const FormularioCadastrar = ({ handleClose, usuarioLogado, optionsModulos
                                 />
                             )}
 
+
                         </div>
                         <div className="col-sm-6 col-md-6 col-xl-6">
                             <label className="form-label" htmlFor="funcaoFuncionario">Função *</label>
+
                             <Select
-                                className="basic-single"
-                                classNamePrefix={"select"}
-                                name="funcaoFuncionario"
+                                closeMenuOnSelect={false}
                                 options={Funcoes.map((item) => ({
                                     value: item.value,
                                     label: item.label
+
                                 }))}
                                 value={funcaoSelecionada}
                                 onChange={(selected) => {
                                     setFuncaoSelecionada(selected)
                                     clearErrors("funcaoFuncionario");
                                 }}
-                                isClearable={true}
-                                isSearchable={true}
                             />
-
                             {errors.funcaoFuncionario && (
                                 <AlertError
-                                    error={errors.funcaoFuncionario}
+                                    error={errors.funcaoFuncionario?.value || errors.funcaoFuncionario}
                                     onClose={clearErrors}
                                     fieldName="funcaoFuncionario"
                                 />
                             )}
-
                         </div>
 
                     </div>
                     <div className="row mt-4">
                         <div className="col-sm-6 col-md-6 col-xl-6">
                             <label className="form-label">Tipo *</label>
+
                             <Select
                                 className="basic-single"
                                 classNamePrefix={"select"}
-                                name="tipoFuncionario"
                                 options={Parceiro.map((item) => ({
                                     value: item.value,
                                     label: item.label
+
                                 }))}
                                 value={tipoSelecionado}
                                 onChange={(selected) => {
                                     setTipoSelecionado(selected)
                                     clearErrors("tipoFuncionario");
                                 }}
-                                isClearable={true}
-                                isSearchable={true}
                             />
 
                             {errors.tipoFuncionario && (
                                 <AlertError
-                                    error={errors.tipoFuncionario}
+                                    error={errors.tipoFuncionario?.value || errors.tipoFuncionario}
                                     onClose={clearErrors}
                                     fieldName="tipoFuncionario"
                                 />
                             )}
+
                         </div>
                         <div className="col-sm-6 col-xl-6">
                             <Controller
@@ -235,7 +271,6 @@ export const FormularioCadastrar = ({ handleClose, usuarioLogado, optionsModulos
 
                         </div>
                     </div>
-
 
                     <div className="row mt-4">
                         <div className="col-sm-4 col-xl-4">
@@ -302,14 +337,14 @@ export const FormularioCadastrar = ({ handleClose, usuarioLogado, optionsModulos
                         </div>
 
                         <div className="col-sm-6 col-xl-8">
-                            <label htmlFor="">Departamento *</label>
+                            <label htmlFor="departamentoFuncionario">Departamento *</label>
+
                             <Select
-                                className="basic-single"
-                                classNamePrefix={"select"}
-                                name="departamentoFuncionario"
+                                closeMenuOnSelect={false}
                                 options={Departamentos.map((item) => ({
                                     value: item.value,
                                     label: item.label
+
                                 }))}
                                 value={departamentoSelecionado}
                                 onChange={(selected) => {
@@ -319,7 +354,7 @@ export const FormularioCadastrar = ({ handleClose, usuarioLogado, optionsModulos
                             />
                             {errors.departamentoFuncionario && (
                                 <AlertError
-                                    error={errors.departamentoFuncionario}
+                                    error={errors.departamentoFuncionario?.value || errors.departamentoFuncionario}
                                     onClose={clearErrors}
                                     fieldName="departamentoFuncionario"
                                 />
@@ -367,7 +402,6 @@ export const FormularioCadastrar = ({ handleClose, usuarioLogado, optionsModulos
                                         checked={categoriaContratacao === 'CLT'}
                                         onChange={handleRadioChange}
                                     /> CLT
-
                                 </label>
 
                                 <label className="form-check-label" htmlFor="radioPJ">
@@ -381,7 +415,6 @@ export const FormularioCadastrar = ({ handleClose, usuarioLogado, optionsModulos
                                         onChange={handleRadioChange}
                                     /> PJ
                                 </label>
-
                             </div>
 
                         </div>
@@ -465,9 +498,7 @@ export const FormularioCadastrar = ({ handleClose, usuarioLogado, optionsModulos
                                 />
                                 <label className="form-check-label" htmlFor="">Exceção Desconto</label>
                             </div>
-
                         </div>
-
                     </div>
                     <div className="row mt-4">
 
@@ -517,50 +548,68 @@ export const FormularioCadastrar = ({ handleClose, usuarioLogado, optionsModulos
                 <Fragment>
 
                     <header style={{ display: 'flex', width: '100%' }}>
-
                         <h1 style={{ textAlign: 'center', width: '100%' }}>Autorização</h1>
                     </header>
-                    <div className="form-group" style={{ marginTop: '2rem' }}>
-                        <div className="row">
-                            <div className="col-sm-4 col-md-4 col-xl-4">
 
-                                <InputFieldModal
-                                    type="text"
-                                    className="form-control input"
-                                    label="Matrícula"
-                                    value={usuario}
-                                    onChangeModal={(e) => setUsuario(e.target.value)}
-                                    placeholder={"Digite sua matrícula"}
-                                />
+                    <form onSubmit={handleSubmit(handleValidatedLogin)}>
+                        <div className="form-group" style={{ marginTop: '2rem' }}>
+                            <div className="row">
+                                <div className="col-sm-4 col-md-4 col-xl-4">
+
+                                    <Controller
+                                        name="matriculaFuncionario"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <FormField
+                                                name="matriculaFuncionario"
+                                                label={"Matrícula"}
+                                                type="text"
+                                                placeholder={"Digite sua matrícula"}
+                                                errors={errors}
+                                                clearErrors={clearErrors}
+                                                value={usuario}
+                                                onChangeModal={(e) => setUsuario(e.target.value)}
+                                            />
+                                        )}
+                                    />
+                                </div>
+
+                                <div className="col-sm-4 col-md-4 col-xl-4">
+
+                                    <Controller
+                                        name="senhaFuncionario"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <FormField
+                                                name="senhaFuncionario"
+                                                label={"Senha"}
+                                                type="password"
+                                                placeholder={"Digite sua senha"}
+                                                errors={errors}
+                                                clearErrors={clearErrors}
+                                                value={senhaLogin}
+                                                onChangeModal={(e) => setSenhaLogin(e.target.value)}
+                                            />
+                                        )}
+                                    />
+                                </div>
                             </div>
+                            <div className="row mt-4">
+                                <FooterModal
+                                    ButtonTypeFechar={ButtonTypeModal}
+                                    textButtonFechar={"Voltar"}
+                                    onClickButtonFechar={() => { setFormularioVisivel(true), setFormularioVisivelLogin(false) }}
+                                    corFechar="secondary"
 
-                            <div className="col-sm-4 col-md-4 col-xl-4">
+                                    ButtonTypeCadastrar={ButtonTypeModal}
+                                    textButtonCadastrar={"Confirmar"}
+                                    onClickButtonCadastrar={handleSubmit(handleValidatedLogin)}
+                                    corCadastrar="success"
 
-                                <InputFieldModal
-                                    type="password"
-                                    className="form-control input"
-                                    label="Senha"
-                                    value={senhaLogin}
-                                    onChangeModal={(e) => setSenhaLogin(e.target.value)}
-                                    placeholder={"Digite sua senha"}
                                 />
                             </div>
                         </div>
-                        <div className="row mt-4">
-                            <FooterModal
-                                ButtonTypeFechar={ButtonTypeModal}
-                                textButtonFechar={"Voltar"}
-                                onClickButtonFechar={() => { setFormularioVisivel(true), setFormularioVisivelLogin(false) }}
-                                corFechar="secondary"
-
-                                ButtonTypeCadastrar={ButtonTypeModal}
-                                textButtonCadastrar={"Confirmar"}
-                                onClickButtonCadastrar={loginConfirmacao}
-                                corCadastrar="success"
-
-                            />
-                        </div>
-                    </div>
+                    </form>
                 </Fragment>
             )}
         </Fragment>

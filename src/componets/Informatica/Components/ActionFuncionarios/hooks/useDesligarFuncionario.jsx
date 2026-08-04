@@ -64,7 +64,7 @@ export const useDesligarFuncionario = ({ handleClose, optionsModulos, usuarioLog
 
       Swal.fire({
         title: 'Atualização',
-        text: 'Atualizção Realizada com Sucesso',
+        text: 'Atualização Realizada com Sucesso',
         icon: 'success',
         timer: 3000,
         customClass: {
@@ -86,7 +86,7 @@ export const useDesligarFuncionario = ({ handleClose, optionsModulos, usuarioLog
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || 'INDISPONIVEL'
       }
 
       const responsePost = await post('/log-web', createData)
@@ -108,7 +108,7 @@ export const useDesligarFuncionario = ({ handleClose, optionsModulos, usuarioLog
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || 'INDISPONIVEL'
       }
       const responsePost = await post('/log-web', createData)
       Swal.fire({

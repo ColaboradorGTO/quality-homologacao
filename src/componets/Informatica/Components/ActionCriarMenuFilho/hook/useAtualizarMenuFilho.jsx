@@ -3,18 +3,24 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { get, post, put } from "../../../../../api/funcRequest";
-import { useQuery } from "react-query";
+import { set } from "react-hook-form";
 
-export const useCriarMenuFilho = ({
+export const useAtualizarMenuFilho = ({
+  dadosDetalhesMenuFilho,
   usuarioLogado,
   optionsModulos,
-  refetchMenuFilho
+  refetchMenuFilho,
+  dadosMenuPai,
+  handleClose
 }) => {
 
   const [moduloSelecionado, setModuloSelecionado] = useState(null);
-  const [complementoUrl, setComplementoUrl] = useState("");
-  const [urlFinal, setUrlFinal] = useState("");
-  const [nomeMenu, setNomeMenu] = useState("");
+  const [idMenu, setIdMenu] = useState('');
+  const [urlFinal, setUrlFinal] = useState('');
+  const [url, setUrl] = useState('');
+  const [nomeMenu, setNomeMenu] = useState('');
+  const [complementoUrl, setComplementoUrl] = useState('');
+
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedModule, setSelectedModule] = useState(null)
   const [moduloUsuario, setModuloUsuario] = useState(null);
@@ -42,16 +48,44 @@ export const useCriarMenuFilho = ({
     return usuarioIP;
   };
 
+  const moduloSelecionadoChange = dadosMenuPai.find((item) => item.IDMODULO == dadosDetalhesMenuFilho[0]?.IDMENUPAI);
+
+  useEffect(() => {
+    if (dadosDetalhesMenuFilho[0]) {
+      setIdMenu(dadosDetalhesMenuFilho[0]?.ID);
+      setModuloSelecionado({ value: moduloSelecionadoChange.IDMODULO, label: moduloSelecionadoChange.DSMENU });
+      setNomeMenu(dadosDetalhesMenuFilho[0]?.DSNOME);
+      setUrl(dadosDetalhesMenuFilho[0]?.URL);
+    }
+
+  }, [dadosDetalhesMenuFilho]);
+
+
+  useEffect(() => {
+    if (url && moduloSelecionado) {
+      trocarModuloUrl(url, moduloSelecionado);
+    }
+  }, [url, moduloSelecionado]);
+
+  const trocarModuloUrl = (url, modulo) => {
+    const nomeAction = url.split("/")[2];
+    console.log(moduloSelecionado, "MODULO SELECIONADO CHANGE");
+    const urlFinal = `/${modulo.label.toLowerCase()}/${nomeAction}`
+    setUrlFinal(urlFinal);
+    console.log(urlFinal, "URL FINAL");
+
+  }
+
   const modulos = {
-    1:  "IDMODULOADMINISTRATIVO",
-    2:  "IDMODULOGERENCIA",
-    3:  "IDMODULOINFORMATICA",
-    4:  "IDMODULOFINANCEIRO",
-    5:  "IDMODULOCOMERCIAL",
-    6:  "IDMODULOCOMPRAS",
-    7:  "IDMODULOCONTABILIDADE",
-    8:  "IDMODULOMARKETING",
-    9:  "IDMODULORH",
+    1: "IDMODULOADMINISTRATIVO",
+    2: "IDMODULOGERENCIA",
+    3: "IDMODULOINFORMATICA",
+    4: "IDMODULOFINANCEIRO",
+    5: "IDMODULOCOMERCIAL",
+    6: "IDMODULOCOMPRAS",
+    7: "IDMODULOCONTABILIDADE",
+    8: "IDMODULOMARKETING",
+    9: "IDMODULORH",
     10: "IDMODULOCOMPRASADM",
     11: "IDMODULOEXPEDICAO",
     12: "IDMODULOCONFERENCIACEGA",
@@ -77,55 +111,18 @@ export const useCriarMenuFilho = ({
       return;
     }
 
-    if (moduloSelecionado == '') {
-      Swal.fire({
-        type: 'error',
-        title: 'Atenção',
-        text: 'Selecione um módulo',
-        showConfirmButton: false,
-        timer: 1500
-      });
-      return;
-    }
-
-    Swal.fire({
-      title: 'Verificando permissões...',
-      text: 'Aguarde...',
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading()
-      }
-    });
-
-    const postData = {
+    const putData = {
       DSNOME: String(nomeMenu),
       IDMENUPAI: Number(moduloSelecionado?.value),
-      URL: String(urlFinal)
+      URL: String(urlFinal),
+      ID: Number(idMenu)
     }
 
     try {
 
-      const responseLista = await get(`/listaMenusFilhos?urlMenu=${urlFinal}`);
+      const response = await put(`/menu-filho/:id`, putData);
 
-      if (responseLista.data.length > 0) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Atenção',
-          text: 'Já existe um menu cadastrado com essa URL.',
-          showConfirmButton: false,
-          timer: 2000
-        });
-
-        return;
-      }
-
-      const response = await post(`/criar-menu-filho`, postData);
-
-      const getListaMenuFilho = await get(`/listaMenusFilhos?urlMenu=${urlFinal}`);
-      const responseMenuFilho = getListaMenuFilho.data;
-
-      const idMenuPai = responseMenuFilho[0].IDMENUPAI;
-      const campoModulo = modulos[idMenuPai];
+      const campoModulo = modulos[moduloSelecionado?.value];
 
       const payload = {
         IDUSUARIO: Number(usuarioLogado.id),
@@ -147,9 +144,10 @@ export const useCriarMenuFilho = ({
         IDMODULOMALOTE: '',
         IDMODULORESUMOVENDAS: '',
         IDMODULOPROMOCAO: '',
+        IDMODULO: '',
         IDPERMISSAO: '',
-        IDMENU: idMenuPai,
-        IDMENUFILHO: responseMenuFilho[0].ID,
+        IDMENU: moduloSelecionado?.value,
+        IDMENUFILHO: idMenu,
         CRIAR: 'True',
         ALTERAR: 'True',
         ADMINISTRADOR: 'False',
@@ -161,15 +159,15 @@ export const useCriarMenuFilho = ({
       };
 
       if (campoModulo) {
-        payload[campoModulo] = String(idMenuPai);
+        payload[campoModulo] = String(moduloSelecionado?.value);
       }
 
-      const responsePermissao = await post(`/criar-perfil-usuario`, payload);
+      const responsePermissao = await put(`/perfil-usuario/:id`, payload);
 
       Swal.fire({
         position: 'center',
         icon: 'success',
-        title: 'Menu Filho criado com sucesso!',
+        title: 'Menu Filho atualizado com sucesso!',
         customClass: {
           container: 'custom-swal',
         },
@@ -177,27 +175,22 @@ export const useCriarMenuFilho = ({
         timer: 1500,
       });
 
-      const textDados = JSON.stringify(postData);
-      const textoFuncao = `MENU FILHO/ NOVO MENU FILHO`;
+      const textDados = JSON.stringify(putData);
+      const textoFuncao = `MENU FILHO/ ATUALIZAR MENU FILHO`;
       const ipUsuario = await getIPUsuario();
 
-      const createData = {
+      const updateData = {
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
         IP: ipUsuario || "INDISPONIVEL",
       };
 
-      const responsePost = await post('/log-web', createData);
-
-      setNomeMenu("");
-      setComplementoUrl("");
-      setUrlFinal("");
-      setModuloSelecionado(null);
-
+      const responsePost = await post('/log-web', updateData);
+      handleClose()
       refetchMenuFilho()
 
-      return createData.data;
+      return updateData.data;
 
     } catch (error) {
 
@@ -205,19 +198,19 @@ export const useCriarMenuFilho = ({
       const textoFuncao = `MENU FILHO/ NOVO MENU FILHO`;
       const ipUsuario = await getIPUsuario();
 
-      const createData = {
+      const updateData = {
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
         IP: ipUsuario || "INDISPONIVEL",
       };
 
-      await post('/log-web', createData);
+      await post('/log-web', updateData);
 
       Swal.fire({
         position: 'center',
         icon: 'error',
-        title: 'Erro ao criar menu filho',
+        title: 'Erro ao atualizar menu filho',
         customClass: {
           container: 'custom-swal',
         },
@@ -227,7 +220,7 @@ export const useCriarMenuFilho = ({
 
       console.error('Erro ao processar permissões:', error);
 
-      return createData.data;
+      return updateData.data;
 
     }
   }
@@ -235,16 +228,18 @@ export const useCriarMenuFilho = ({
   return {
     moduloSelecionado,
     setModuloSelecionado,
-    complementoUrl,
-    setComplementoUrl,
     urlFinal,
     setUrlFinal,
     nomeMenu,
     setNomeMenu,
+    idMenu,
+    setIdMenu,
     currentPage,
     setCurrentPage,
     selectedModule,
     setSelectedModule,
+    complementoUrl,
+    setComplementoUrl,
     moduloUsuario,
     setModuloUsuario,
     onSubmit

@@ -59,7 +59,7 @@ export const FormularioEditar = ({ handleClose, dadosEditarEmpresa, refetch, usu
   const handleValidatedSubmit = async () => {
     try {
       const dadosParaValidar = {
-        situacaoSelecionada: situacao,
+        situacaoSelecionada: situacao.value,
         cepSelecionado: cep,
         enderecoSelecionado: endereco,
         bairroSelecionado: bairro,

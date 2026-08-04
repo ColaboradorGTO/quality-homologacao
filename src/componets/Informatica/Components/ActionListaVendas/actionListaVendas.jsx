@@ -18,7 +18,7 @@ import { ColumnGroup } from "primereact/columngroup";
 import { Row } from "primereact/row";
 import Swal from "sweetalert2";
 
-export const ActionListaVendas = ({ dadosVendasLoja }) => {
+export const ActionListaVendas = ({ dadosVendasLoja, optionsModulos }) => {
   const [dadosPagamentoModal, setDadosPagamentoModal] = useState([]);
   const [modalPagamentoVisivel, setModalPagamentoVisivel] = useState(false);
   const [modalDetalheVendasVisivel, setModalDetalheVendasVisivel] = useState(false);
@@ -357,6 +357,7 @@ export const ActionListaVendas = ({ dadosVendasLoja }) => {
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
             filterDisplay="menu"
+            cellMemo={false}
             showGridlines
             stripedRows
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}

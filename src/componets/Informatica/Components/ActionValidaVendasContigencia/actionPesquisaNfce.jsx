@@ -44,7 +44,7 @@ export const ActionPesquisaNfce = ({usuarioLogado, ID}) => {
       
       return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
+    { enabled: Boolean(usuarioLogado?.id)}
   );
 
   const { data: dadosVendas = [], error: errorVendas, isLoading: isLoadingVendas, refetch: refetchListaVendas } = useQuery(
@@ -73,6 +73,13 @@ export const ActionPesquisaNfce = ({usuarioLogado, ID}) => {
       console.error('Erro ao validar consulta:', error);
     });
   }
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
 
 
   return (
