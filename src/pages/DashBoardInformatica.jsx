@@ -95,7 +95,7 @@ export const DashBoardInformatica = () => {
 
 
   let component = null;
-
+  
   switch (componentToShow) {
     case "/informatica/InformaticaActionHome":
       component = <InformaticaActionHome usuarioLogado={usuarioLogado} ID={ID} />;

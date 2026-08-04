@@ -14,7 +14,6 @@ import Swal from "sweetalert2";
 import { useEffect } from "react";
 import { situacao } from "../../../../../parceiro.json";
 
-
 export const ActionPesquisaFuncionarios = ({ usuarioLogado}) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [empresaSelecionada, setEmpresaSelecionada] = useState('');
@@ -56,14 +55,14 @@ export const ActionPesquisaFuncionarios = ({ usuarioLogado}) => {
   );
 
 const fetchListaFuncionarios = async () => {
-    const urlBase = `/funcionarios-loja?idEmpresa=${empresaSelecionada}&noFuncionarioCPF=${cpf}&situacao=${situacaoSelecionada}`;
+    const urlBase = `/funcionarios-loja?idEmpresa=${empresaSelecionada}&noFuncionarioCPF=${cpf}&situacao=${situacaoSelecionada || ''}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
 
     const controller = new AbortController();
     let allData = [];
 
-    try {
+    try { 
       animacaoCarregamento('Carregando dados...', true, true, () => controller.abort());
 
       const primeiraPagina = 1;

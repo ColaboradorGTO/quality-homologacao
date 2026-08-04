@@ -183,7 +183,7 @@ export const ActionPesquisaPerfilPermissao = ({ usuarioLogado }) => {
         InputSelectEmpresaComponent={InputSelectAction}
         optionsEmpresas={[
           ...dadosFuncionarios.map((item) => ({
-            value: item.ID,
+            value: item.IDFUNCIONARIO,
             label: `${item.NOLOGIN} -  ${item.NOFUNCIONARIO} - ${item.DEPARTAMENTO}`
           }))
         ]}
@@ -196,7 +196,7 @@ export const ActionPesquisaPerfilPermissao = ({ usuarioLogado }) => {
         optionsGrupos={[
           { value: '', label: 'Selecione...' },
           ...dadosFuncionarios.map((item) => ({
-            value: item.ID,
+            value: item.IDFUNCIONARIO,
             label: `${item.NOLOGIN} -  ${item.NOFUNCIONARIO} - ${item.DEPARTAMENTO}`
           }))
         ]}

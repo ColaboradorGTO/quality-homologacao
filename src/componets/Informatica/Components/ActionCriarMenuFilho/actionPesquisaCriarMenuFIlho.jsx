@@ -27,7 +27,6 @@ export const ActionPesquisaCriarMenuFilho = ({
     nomeMenu,
     setNomeMenu,
     onSubmit,
-
     usuarioLogado
 }) => {
 

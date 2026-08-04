@@ -425,7 +425,6 @@ export const FormularioEditar = ({
                     onChange={() => { setFormularioVisivelLogin(true), setFormularioVisivel(false) }}
                   />
 
-                  {console.log(isChecked, "isChecked")}
                 </div>
 
               </div>
@@ -495,7 +494,6 @@ export const FormularioEditar = ({
 
                   />
                 </div>
-
                 <div className="col-sm-4 col-md-4 col-xl-4">
                   <label className="form-label" htmlFor="stativofuncionario">Situação</label>
 

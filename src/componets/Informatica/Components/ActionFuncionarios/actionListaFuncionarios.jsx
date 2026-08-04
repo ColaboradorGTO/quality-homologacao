@@ -36,7 +36,6 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
   const { handleAtivarFuncionario } = useAtivarFuncionario({ optionsModulos, usuarioLogado, handleClick, refetch })
 
 
-
   useEffect(() => {
     const dataAtualCampo = getDataAtual();
     setData(dataAtualCampo);
@@ -77,9 +76,24 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
   };
 
   const exportToExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(dados);
+    const worksheet = XLSX.utils.json_to_sheet(dados.map(item => ({
+      'Nº': item.contador,
+      'CPF': item.NUCPF,
+      'Funcionário': item.NOFUNCIONARIO,
+      'Login': item.NOLOGIN,
+      'Função': item.DSFUNCAO,
+      'Localização': item.STLOJA == 'True' ? 'Loja' : 'Escritório',
+      'TP. Contratação': item.STCONVENIO == 'True' ? 'CLT' : 'PJ',
+      'Tipo': item.DSTIPO == 'PN' ? 'PARCEIRO DE NEGÓCIOS' : 'FUNCIÓNARIO',
+      'Telefone': item.TELEFONE,
+      'Departamento': item.DEPARTAMENTO,
+      'Desconto %': item.PERC,
+      'Situação': item.STATIVO == 'True' ? 'Ativo' : 'Inativo',
+      'DT Desl.': dataFormatada(item.DTDEMISSAO)
+    })));
+
     const workbook = XLSX.utils.book_new();
-    const header = ['Nº', 'CPF', 'Funcionário', 'Login', 'Função', 'Localização', 'TP. Contratação', 'Tipo', 'Desconto %', 'Situação', 'DT Desl.'];
+    const header = ['Nº', 'CPF', 'Funcionário', 'Login', 'Função', 'Localização', 'TP. Contratação', 'Tipo', 'Telefone', 'Departamento', 'Desconto %', 'Situação', 'DT Desl.'];
     worksheet['!cols'] = [
       { wpx: 70, caption: 'Nº' },
       { wpx: 100, caption: 'CPF' },
@@ -89,6 +103,8 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
       { wpx: 100, caption: 'Localização' },
       { wpx: 100, caption: 'TP. Contratação' },
       { wpx: 100, caption: 'Tipo' },
+      { wpx: 100, caption: 'Telefone' },
+      { wpx: 100, caption: 'Departamento' },
       { wpx: 100, caption: 'Desconto %' },
       { wpx: 100, caption: 'Situação' },
       { wpx: 100, caption: 'DT Desl.' },
@@ -98,7 +114,6 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Lista de Funcionarios');
     XLSX.writeFile(workbook, 'lista_funcionarios.xlsx');
   };
-
   const dados = dadosFuncionarios.map((item, index) => {
     let contador = index + 1;
 
@@ -108,14 +123,16 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
       NOFUNCIONARIO: item.NOFUNCIONARIO,
       NOLOGIN: item.NOLOGIN,
       DSFUNCAO: item.DSFUNCAO,
-      STLOJA: item.STLOJA == 'True' ? 'Loja' : 'Escritório',
-      STCONVENIO: item.STCONVENIO == 'True' ? 'CLT' : 'PJ',
+      STLOJA: item.STLOJA,
+      STCONVENIO: item.STCONVENIO,
       DSTIPO: item.DSTIPO,
       PERC: toFloat(item.PERC),
-      STATIVO: item.STATIVO == 'True' ? 'Ativo' : 'Inativo',
-      DTDEMISSAO: item.DTDEMISSAO,
+      STATIVO: item.STATIVO,
+      DATA_DEMISSAO: item.DATA_DEMISSAO,
       ID: item.ID,
       IDFUNCIONARIO: item.IDFUNCIONARIO,
+      TELEFONE: item.TELEFONE,
+      DEPARTAMENTO: item.DEPARTAMENTO
 
     };
   });
@@ -228,8 +245,8 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
       field: 'DTDEMISSAO',
       header: 'DT Desl.',
       body: row =>
-        <th>{dataFormatadaa(row.DTDEMISSAO)}</th>,
-      //<th>{row.DTDEMISSAO}</th>,
+        <th>{formatarDataParaBR(row.DATA_DEMISSAO)}</th>,
+      //<th>{row.DATA_DEMISSAO}</th>,
       sortable: true,
     },
 
@@ -300,7 +317,6 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
                 />
 
               </div>
-
             </div>
           )
 
@@ -353,7 +369,6 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
       console.error('Erro ao buscar detalhes da venda: ', error);
     }
   };
-
 
   const handleClickEdit = (row) => {
     if (optionsModulos[0]?.ALTERAR == 'True') {

@@ -38,40 +38,39 @@ export const ActionListaMenuFilho = ({
 
     const handlePrint = useReactToPrint({
         content: () => dataTableRef.current,
-        documentTitle: "Lista Empresa"
+        documentTitle: "Menus Filhos"
     });
 
     const exportToPDF = () => {
         const doc = new jsPDF();
         doc.autoTable({
-            head: [['ID Empresa', 'Empresa', 'E-mail', 'Telefone']],
+            head: [['ID', 'Nome Menu', 'ID Menu Pai', 'URL']],
             body: dados.map(item => [
                 item.ID,
                 item.DSNOME,
                 item.IDMENUPAI,
                 item.URL,
-
             ]),
             horizontalPageBreak: true,
             horizontalPageBreakBehaviour: "immediately"
         });
-        doc.save("lista_empresas.pdf");
+        doc.save("lista_menu_filho.pdf");
     };
 
     const exportToExcel = () => {
         const worksheet = XLSX.utils.json_to_sheet(dados);
         const workbook = XLSX.utils.book_new();
-        const header = ["ID Empresa", "Empresa", "E-mail", "Telefone"];
+        const header = ["ID", "Nome Menu", "ID Menu Pai", "URL"];
         worksheet["!cols"] = [
-            { wpx: 50, captions: "ID Empresa" },
-            { wpx: 200, captions: "Empresa" },
-            { wpx: 100, captions: "E-mail" },
-            { wpx: 100, captions: "Telefone" },
+            { wpx: 50, captions: "ID" },
+            { wpx: 200, captions: "Nome Menu" },
+            { wpx: 100, captions: "ID Menu Pai" },
+            { wpx: 100, captions: "URL" },
         ];
 
         XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: "A1" });
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Lista Empresas")
-        XLSX.writeFile(workbook, "lista_empresas.xlsx");
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Lista Menus Filhos")
+        XLSX.writeFile(workbook, "lista_menu_filho.xlsx");
     };
 
     const dados = dadosMenuFilho.map((item, index) => {
@@ -115,7 +114,6 @@ export const ActionListaMenuFilho = ({
                 <div>
                     <ButtonTable
                         titleButton={"Editar"}
-                    
                         onClickButton={() => handleClickEdit(row)}
                         Icon={CiEdit}
                         iconSize={30}
@@ -149,10 +147,9 @@ export const ActionListaMenuFilho = ({
                 return;
             }
         } catch (error) {
-            console.error('Erro ao buscar detalhes da venda: ', error);
+            console.error('Erro ao Buscar Lista de Menus Filhos: ', error);
         }
     };
-
 
     const handleClickEdit = (row) => {
         if (optionsModulos[0]?.ALTERAR == 'True') {
@@ -162,7 +159,7 @@ export const ActionListaMenuFilho = ({
         } else {
             Swal.fire({
                 title: 'Acesso Negado',
-                text: 'Você não tem permissão para acessar esta funcionalidade.',
+                text: 'Você não tem permissão para acessar está funcionalidade.',
                 icon: 'warning',
                 timer: 3000,
                 customClass: {
