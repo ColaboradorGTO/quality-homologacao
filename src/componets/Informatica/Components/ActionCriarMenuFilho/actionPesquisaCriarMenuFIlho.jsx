@@ -27,7 +27,8 @@ export const ActionPesquisaCriarMenuFilho = ({
     nomeMenu,
     setNomeMenu,
     onSubmit,
-    usuarioLogado
+    usuarioLogado,
+    refetchModulos
 }) => {
 
     const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
@@ -41,7 +42,7 @@ export const ActionPesquisaCriarMenuFilho = ({
         }
     }, []);
 
-    const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
+    const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulosExcecao } = useQuery(
         ['menus-usuario-excecao', menuFilhoAtual?.ID],
         async () => {
             const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
@@ -115,6 +116,7 @@ export const ActionPesquisaCriarMenuFilho = ({
                 usuarioLogado={usuarioLogado}
                 optionsModulos={optionsModulos}
                 refetchMenuFilho={refetchMenuFilho}
+                refetchModulos={refetchModulos}
 
             />
 

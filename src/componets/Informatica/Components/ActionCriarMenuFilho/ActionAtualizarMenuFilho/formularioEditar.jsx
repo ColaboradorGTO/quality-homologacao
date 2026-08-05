@@ -22,7 +22,8 @@ export const FormularioEditar = ({
   refetchMenuFilho,
   optionsModulos,
   usuarioLogado,
-  dadosMenuPai
+  dadosMenuPai,
+  refetchModulos
 
 }) => {
   const { handleSubmit, formState: { errors }, clearErrors, control, setError, setValue } = useForm({
@@ -57,7 +58,8 @@ export const FormularioEditar = ({
     refetchMenuFilho,
     optionsModulos,
     usuarioLogado,
-    dadosMenuPai
+    dadosMenuPai,
+    refetchModulos
   });
 
 

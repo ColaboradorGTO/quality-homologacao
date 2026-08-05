@@ -10,7 +10,8 @@ export const ActionEditarMenuFilho = ({
   refetchMenuFilho,
   optionsModulos,
   usuarioLogado,
-  dadosMenuPai
+  dadosMenuPai,
+  refetchModulos
 }) => {
 
 
@@ -40,6 +41,7 @@ export const ActionEditarMenuFilho = ({
             optionsModulos={optionsModulos} 
             usuarioLogado={usuarioLogado}
             dadosMenuPai={dadosMenuPai}
+            refetchModulos={refetchModulos}
           />
 
         </Modal.Body>
