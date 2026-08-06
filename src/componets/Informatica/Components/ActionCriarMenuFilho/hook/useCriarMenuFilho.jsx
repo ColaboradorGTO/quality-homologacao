@@ -8,7 +8,8 @@ import { useQuery } from "react-query";
 export const useCriarMenuFilho = ({
   usuarioLogado,
   optionsModulos,
-  refetchMenuFilho
+  refetchMenuFilho,
+  refetchModulos
 }) => {
 
   const [moduloSelecionado, setModuloSelecionado] = useState(null);
@@ -19,6 +20,7 @@ export const useCriarMenuFilho = ({
   const [selectedModule, setSelectedModule] = useState(null)
   const [moduloUsuario, setModuloUsuario] = useState(null);
   const [ipUsuario, setIpUsuario] = useState('');
+  const navigate = useNavigate();
 
   const getIPUsuario = async () => {
     let usuarioIP = null;
@@ -42,16 +44,17 @@ export const useCriarMenuFilho = ({
     return usuarioIP;
   };
 
+
   const modulos = {
-    1:  "IDMODULOADMINISTRATIVO",
-    2:  "IDMODULOGERENCIA",
-    3:  "IDMODULOINFORMATICA",
-    4:  "IDMODULOFINANCEIRO",
-    5:  "IDMODULOCOMERCIAL",
-    6:  "IDMODULOCOMPRAS",
-    7:  "IDMODULOCONTABILIDADE",
-    8:  "IDMODULOMARKETING",
-    9:  "IDMODULORH",
+    1: "IDMODULOADMINISTRATIVO",
+    2: "IDMODULOGERENCIA",
+    3: "IDMODULOINFORMATICA",
+    4: "IDMODULOFINANCEIRO",
+    5: "IDMODULOCOMERCIAL",
+    6: "IDMODULOCOMPRAS",
+    7: "IDMODULOCONTABILIDADE",
+    8: "IDMODULOMARKETING",
+    9: "IDMODULORH",
     10: "IDMODULOCOMPRASADM",
     11: "IDMODULOEXPEDICAO",
     12: "IDMODULOCONFERENCIACEGA",
@@ -195,7 +198,10 @@ export const useCriarMenuFilho = ({
       setUrlFinal("");
       setModuloSelecionado(null);
 
-      refetchMenuFilho()
+      refetchMenuFilho();
+      refetchModulos();
+
+
 
       return createData.data;
 

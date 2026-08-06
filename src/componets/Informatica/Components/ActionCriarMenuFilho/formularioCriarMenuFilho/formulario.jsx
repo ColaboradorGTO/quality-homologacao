@@ -15,7 +15,8 @@ export const FormularioPesquisaCriarMenuFilho = ({
     dadosMenuPai,
     usuarioLogado,
     optionsModulos,
-    refetchMenuFilho
+    refetchMenuFilho,
+    refetchModulos
 
 }) => {
 
@@ -42,7 +43,8 @@ export const FormularioPesquisaCriarMenuFilho = ({
     } = useCriarMenuFilho({
         usuarioLogado,
         optionsModulos,
-        refetchMenuFilho
+        refetchMenuFilho,
+        refetchModulos
     });
 
 

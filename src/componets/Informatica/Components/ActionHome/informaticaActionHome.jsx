@@ -140,7 +140,6 @@ export const InformaticaActionHome = ({ usuarioLogado }) => {
     }
   };
 
-
   return (
 
     <Fragment>

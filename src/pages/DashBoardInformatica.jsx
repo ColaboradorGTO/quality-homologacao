@@ -50,7 +50,7 @@ export const DashBoardInformatica = () => {
   }, [usuarioLogado]);
 
   const { data: optionsModulosPage = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
-    'menus-usuario',
+    [ 'menus-usuario', usuarioLogado?.id, selectedModule?.ID ],
     async () => {
       const response = await get(`/menus-usuario?idUsuario=${usuarioLogado?.id}&idModulo=${selectedModule?.ID}`);
 
@@ -137,7 +137,7 @@ export const DashBoardInformatica = () => {
       component = <ActionPesquisaNfce usuarioLogado={usuarioLogado}  />;
       break;
     case "/informatica/CriacaoMenuFilho":
-      component = <ActionPesquisaCriarMenuFilho usuarioLogado={usuarioLogado}  />;
+      component = <ActionPesquisaCriarMenuFilho usuarioLogado={usuarioLogado} refetchModulos={refetchModulos}  />;
       break;
     case "/informatica/ActionPesquisaPermissao":
       component = <ActionPesquisaPermissao usuarioLogado={usuarioLogado}  />;

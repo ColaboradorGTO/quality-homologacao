@@ -11,7 +11,8 @@ export const useAtualizarMenuFilho = ({
   optionsModulos,
   refetchMenuFilho,
   dadosMenuPai,
-  handleClose
+  handleClose,
+  refetchModulos
 }) => {
 
   const [moduloSelecionado, setModuloSelecionado] = useState(null);
@@ -69,10 +70,8 @@ export const useAtualizarMenuFilho = ({
 
   const trocarModuloUrl = (url, modulo) => {
     const nomeAction = url.split("/")[2];
-    console.log(moduloSelecionado, "MODULO SELECIONADO CHANGE");
     const urlFinal = `/${modulo.label.toLowerCase()}/${nomeAction}`
     setUrlFinal(urlFinal);
-    console.log(urlFinal, "URL FINAL");
 
   }
 
@@ -189,6 +188,7 @@ export const useAtualizarMenuFilho = ({
       const responsePost = await post('/log-web', updateData);
       handleClose()
       refetchMenuFilho()
+      refetchModulos()
 
       return updateData.data;
 
