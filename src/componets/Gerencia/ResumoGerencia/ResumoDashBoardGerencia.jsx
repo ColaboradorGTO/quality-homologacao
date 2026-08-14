@@ -23,8 +23,7 @@ import { useQuery } from "react-query";
 import Swal from "sweetalert2";
 import { InputSelectAction } from "../../Inputs/InputSelectAction";
 import { useFetchData } from "../../../hooks/useFetchData";
-
-
+      
 export const ResumoDashBoardGerencia = ({ usuarioLogado }) => {
   const [actionVisivel, setActionVisivel] = useState(true);
   const [resumoVisivel, setResumoVisivel] = useState(false);
@@ -277,7 +276,6 @@ export const ResumoDashBoardGerencia = ({ usuarioLogado }) => {
     },
     { enabled: false }
   );
-
 
 
   const getListaSaldoExtratoLoja = async () => {
