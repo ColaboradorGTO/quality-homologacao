@@ -49,7 +49,7 @@ export const useCriarVoucher = ({
             title: 'Autorização',
             html: `
               <div class="text-dark fw-900">
-                <label class="form-label" for="matricula">Matrícula</label>F
+                <label class="form-label" for="matricula">Matrícula</label>
                 <div class="input-group">
     
                   <input type="text" id="matricula" class="swal2-input" placeholder="Matrícula" style="text-align: center;" oninput="this.value = this.value.replace(/[^0-9]/g, '')">

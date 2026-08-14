@@ -95,14 +95,14 @@ export const useEnviarMalote = ({
       });
       return;
     }
-    const putData = [
+    const putData = 
       {
         IDMALOTE: dadosDetalhesMalote[0]?.IDMALOTE,
         STATUS: 'Reenviado',
         OBSERVACAOLOJA: formataStringComEspaco(observacaoLoja).trim()?.toUpperCase(),
         IDUSERULTIMAALTERACAO: usuarioLogado?.id,
-      },
-    ];
+      }
+    
 
     const response = await put('/malotes-por-loja/:id', putData);
     const textDados = JSON.stringify(putData);

@@ -565,6 +565,7 @@ export const ActionListaVendasAutorizarTroca = ({
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                 currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
                 filterDisplay="menu"
+                cellMemo = {false}
                 showGridlines
                 stripedRows
                 rowClassName={(row) => row.isDisabled ? 'row-disabled' : ''}
