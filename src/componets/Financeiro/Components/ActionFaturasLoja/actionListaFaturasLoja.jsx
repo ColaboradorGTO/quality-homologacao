@@ -292,6 +292,7 @@ export const ActionListaFaturasLoja = ({
     {
       field: 'STCANCELADO',
       header: 'Situação',
+      sortable: true,
       body: row => {
         if (row.STCANCELADO == 'False') {
           return <p style={{ color: 'blue', width: '150px', margin: 0, padding: 0, fontWeight: 600 }}>ATIVO / {row.STCONFERIDOFATURA == 'True' ? 'CONFERIDO' : <p style={{ color: 'red',width: '150px', margin: 0, padding: 0, fontWeight: 600 }}>NÃO CONFERIDO</p>} {row.IDCONSOLIDACAOFATURA ? ' / CONSOLIDADO' : ''}</p>
@@ -300,7 +301,7 @@ export const ActionListaFaturasLoja = ({
           return (
 
             <p style={{ color: 'red', width: '150px', margin: 0, padding: 0, fontWeight: 600 }}>
-              NÃO CONFERIDO  {row.IDCONSOLIDACAOFATURA ? ' / CONSOLIDADO ' : ''}
+              CANCELADO  {row.IDCONSOLIDACAOFATURA ? ' / CONSOLIDADO ' : ''}
             </p>
           )
         }

@@ -24,13 +24,15 @@ export const ActionListaConciliarPorBanco = ({
   usuarioLogado,
   optionsModulos,
   handleClick,
+  selectedItems,
+  setSelectedItems,
+  setBtnVisivel
+
 }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
-  const [selectedItems, setSelectedItems] = useState([]);
   const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(10);
   const [selectAllChecked, setSelectAllChecked] = useState(false);
-  const [btnVisivel, setBtnVisivel] = useState(false);
   const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
 
@@ -44,10 +46,6 @@ export const ActionListaConciliarPorBanco = ({
   const {
     handleConciliar
   } = useIntegrarConciliarDepositoNoSAP({ optionsModulos, usuarioLogado, handleClick });
-
-  const {
-    handleSubmit
-  } = useIntegrarTodasConciliacoesDepositosNoSAP({ optionsModulos, usuarioLogado, handleClick });
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -166,47 +164,131 @@ export const ActionListaConciliarPorBanco = ({
 
   }, [selectedItems, dadosListaConciliarBanco, first, rows]);
 
+
   const onSelectAllChange = (e) => {
-    if (e.checked) {
+    if (!e.checked) {
+      setBtnVisivel(false);
+      setSelectedItems([]);
+      return;
+    }
+
+    const itensSelecionaveis = dadosListaConciliarBanco.filter(item =>
+      item.STCONFERIDO === 'True' &&
+      !item.STINTEGRADOSAP &&
+      !item.STATUS_BLOQUEIO_ATUALIZACAO
+    );
+
+    if (itensSelecionaveis.length === 0) {
+      Swal.fire({
+        icon: 'info',
+        title: 'Não há registros para serem selecionados.',
+        showConfirmButton: true,
+        showCloseButton: true,
+        allowOutsideClick: false,
+        confirmButtonText: 'Entendi',
+        confirmButtonColor: '#2196F3',
+      });
+
+      return;
+    }
+
+    const todosRegistrosNaTela =
+      first === 0 &&
+      rows >= dadosListaConciliarBanco.length;
+
+    if (todosRegistrosNaTela) {
       Swal.fire({
         icon: 'question',
-        title: 'Selecione o modo de seleção',
-        text: 'Deseja selecionar todos da tabela ou somente o que está em tela?',
+        title: 'Selecionar todos os registros?',
+        text: 'Todos os registros estão sendo exibidos na tela.',
         showConfirmButton: true,
         showCancelButton: true,
-        showCloseButton: true,
         confirmButtonText: 'Todos os registros',
-        cancelButtonText: 'Apenas o que está tela',
-        cancelButtonColor: '#2196F3',
+        cancelButtonText: 'Cancelar',
         allowOutsideClick: false,
       }).then((result) => {
         if (result.isConfirmed) {
-          const itensSelecionaveis = dadosListaConciliarBanco.filter(item =>
-            item.STCONFERIDO === 'True' &&
-            !item.STINTEGRADOSAP &&
-            !item.STATUS_BLOQUEIO_ATUALIZACAO
-          );
           setBtnVisivel(true);
           setSelectedItems([...itensSelecionaveis]);
-        } else if (result.dismiss === Swal.DismissReason.cancel) {
-          const dadosPaginaAtual = dadosListaConciliarBanco.slice(first, first + rows);
-
-          const itensSelecionaveisPaginaAtual = dadosPaginaAtual.filter(item =>
-            item.STCONFERIDO === 'True' &&
-            !item.STINTEGRADOSAP &&
-            !item.STATUS_BLOQUEIO_ATUALIZACAO
-          );
-          setBtnVisivel(true);
-          setSelectedItems([...itensSelecionaveisPaginaAtual]);
         } else {
           setBtnVisivel(false);
           setSelectedItems([]);
         }
       });
-    } else {
-      setBtnVisivel(false);
-      setSelectedItems([]);
+
+      return;
     }
+
+
+    Swal.fire({
+      icon: 'question',
+      title: 'Selecione o modo de seleção',
+
+      html: `
+      <div>
+        <p>
+          Você pode selecionar apenas os registros exibidos nesta página.
+        </p>
+
+        <small>
+          Para habilitar <b>Todos os registros</b>,
+          exiba todos os registros da tabela.
+        </small>
+      </div>
+    `,
+
+      showConfirmButton: true,
+      showCancelButton: true,
+      showCloseButton: true,
+
+      confirmButtonText: 'Todos os registros',
+      cancelButtonText: 'Apenas o que está em tela',
+
+      confirmButtonColor: '#6c757d',
+      cancelButtonColor: '#2196F3',
+
+      didOpen: () => {
+        const btnTodos = Swal.getConfirmButton();
+
+        btnTodos.disabled = true;
+        btnTodos.style.cursor = 'not-allowed';
+        btnTodos.style.opacity = '0.6';
+      },
+
+      allowOutsideClick: false,
+    }).then((result) => {
+
+      if (result.dismiss === Swal.DismissReason.cancel) {
+        const dadosPaginaAtual = dadosListaConciliarBanco.slice(
+          first,
+          first + rows
+        );
+
+        const itensSelecionaveisPaginaAtual = dadosPaginaAtual.filter(item =>
+          item.STCONFERIDO === 'True' &&
+          !item.STINTEGRADOSAP &&
+          !item.STATUS_BLOQUEIO_ATUALIZACAO
+        );
+
+        if (itensSelecionaveisPaginaAtual.length === 0) {
+          Swal.fire({
+            icon: 'info',
+            title: 'Não há registros selecionáveis nesta página.',
+            confirmButtonText: 'Entendi',
+            confirmButtonColor: '#2196F3',
+          });
+
+          return;
+        }
+
+        setBtnVisivel(true);
+        setSelectedItems([...itensSelecionaveisPaginaAtual]);
+
+      } else {
+        setBtnVisivel(false);
+        setSelectedItems([]);
+      }
+    });
   };
 
   const colunasConciliarBanco = [
@@ -221,7 +303,7 @@ export const ActionListaConciliarPorBanco = ({
         );
 
         if (!podeMarcar) {
-          return <th></th>; 
+          return <th></th>;
         }
 
         return (
@@ -361,11 +443,11 @@ export const ActionListaConciliarPorBanco = ({
       },
     },
     {
-      field: 'STCONFERIDO',
+      field: 'OPCOES',
       header: 'Opções',
       button: true,
       body: (row) => {
-   
+
         const podeCanselar = !(row.DOCENTRY_SAP_CONTAS_A_PAGAR > 0 || row.DOCENTRY_SAP_CONTAS_A_RECEBER > 0);
 
         if (row.STCONFERIDO !== 'True') {
@@ -413,7 +495,7 @@ export const ActionListaConciliarPorBanco = ({
           );
         }
 
-       
+
         return (
           <div className="p-1" style={{
             display: "flex",
@@ -421,7 +503,7 @@ export const ActionListaConciliarPorBanco = ({
             gap: "5px",
             width: "250px"
           }}>
-           
+
             <ButtonTable
               titleButton={row.ERRORLOGSAP ? "Visualizar Status - Erro" : "Visualizar Status Integração"}
               textButton={"Status"}
@@ -450,7 +532,7 @@ export const ActionListaConciliarPorBanco = ({
               }}
             />
 
-           
+
             <ButtonTable
               titleButton={"Editar Data Movimento Conciliação"}
               textButton={"Editar"}
@@ -462,7 +544,7 @@ export const ActionListaConciliarPorBanco = ({
               onClickButton={() => onEitarDataMovimentoConciliacao(row.IDDEPOSITOLOJA, row.DTMOVDEP)}
             />
 
-          
+
             <ButtonTable
               titleButton={"Integrar Conciliação"}
               textButton={"Integrar"}
@@ -474,7 +556,7 @@ export const ActionListaConciliarPorBanco = ({
               onClickButton={() => handleClickIntegrar(row)}
             />
 
-          
+
             {podeCanselar && (
               <ButtonTable
                 titleButton={"Cancelar Conciliação"}
@@ -534,43 +616,6 @@ export const ActionListaConciliarPorBanco = ({
     }
   }
 
-
-  const handleClickIntegrarTodos = () => {
-    if (optionsModulos[0]?.ALTERAR == 'False') {
-      Swal.fire({
-        position: 'center',
-        icon: 'error',
-        title: 'Erro!',
-        text: 'Você não tem permissão para integrar os depósitos no SAP!',
-        customClass: {
-          container: 'custom-swal',
-        },
-        showConfirmButton: false,
-        timer: 4000
-      });
-      return
-    }
-
-    if (selectedItems.length === 0) {
-      Swal.fire({
-        position: 'center',
-        icon: 'warning',
-        title: 'Atenção!',
-        text: 'Nenhum item foi selecionado para integração!',
-        customClass: {
-          container: 'custom-swal',
-        },
-        showConfirmButton: false,
-        timer: 3000
-      });
-      return
-    }
-
-    const idsSelecionados = selectedItems.map(item => item.IDDEPOSITOLOJA);
-    handleSubmit(idsSelecionados);
-  }
-
-
   return (
     <Fragment>
       <div className="panel" >
@@ -599,17 +644,6 @@ export const ActionListaConciliarPorBanco = ({
             <span>
               {selectAllChecked ? "Desmarcar Todos" : "Marcar Todos"}
             </span>
-          </div>
-
-          <div>
-            <ButtonType
-              onClickButtonType={handleClickIntegrarTodos}
-              textButton={"Integrar Todos"}
-              cor={"success"}
-              Icon={BsCloudUpload}
-              iconSize={25}
-              style={{ display: btnVisivel ? 'block' : 'none' }}
-            />
           </div>
 
         </div>
