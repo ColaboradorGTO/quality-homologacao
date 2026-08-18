@@ -11,6 +11,7 @@ import { useQuery } from 'react-query';
 import { animacaoCarregamento, fecharAnimacaoCarregamento, foiCancelado } from "../../../../utils/animationCarregamento"
 import { useEffect } from "react"
 import Swal from "sweetalert2"
+import { useIntegrarTodasConciliacoesDepositosNoSAP } from "./hooks/useIntegrarTodasConciliacoesDepositosNoSAP"
 
 
 export const ActionPesquisaConciliarBanco = ({ usuarioLogado }) => {
@@ -24,6 +25,9 @@ export const ActionPesquisaConciliarBanco = ({ usuarioLogado }) => {
   const [dataPesquisaFimC, setDataPesquisaFimC] = useState('')
   const [contaSelecionada, setContaSelecionada] = useState('')
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [btnVisivel, setBtnVisivel] = useState(false);
+
 
   useEffect(() => {
     const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
@@ -194,6 +198,11 @@ export const ActionPesquisaConciliarBanco = ({ usuarioLogado }) => {
     refetchBancoConsolidado()
   }
 
+
+  const {
+    handleSubmit,
+  } = useIntegrarTodasConciliacoesDepositosNoSAP({ optionsModulos, usuarioLogado, handleClick, selectedItems });
+
   return (
 
     <Fragment>
@@ -261,6 +270,12 @@ export const ActionPesquisaConciliarBanco = ({ usuarioLogado }) => {
         IconCadastro={AiOutlineSearch}
         onButtonClickCadastro={handleClickConsolidado}
 
+        ButtonTypeImportar={ButtonType}
+        linkImportar={"Integrar Todos"}
+        corImportar={"info"}
+        onButtonClickImportar={handleSubmit}
+        styleImportar={{ display: btnVisivel ? 'block' : 'none' }}
+
       />
 
       {tabelaVisivel && (
@@ -269,6 +284,9 @@ export const ActionPesquisaConciliarBanco = ({ usuarioLogado }) => {
           usuarioLogado={usuarioLogado}
           optionsModulos={optionsModulos}
           handleClick={handleClick}
+          selectedItems={selectedItems}
+          setSelectedItems={setSelectedItems}
+          setBtnVisivel={setBtnVisivel}
         />
 
       )}

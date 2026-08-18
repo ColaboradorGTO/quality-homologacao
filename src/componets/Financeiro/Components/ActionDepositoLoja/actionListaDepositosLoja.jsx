@@ -73,6 +73,7 @@ export const ActionListaDepositosLoja = ({ dadosListaDepositosLoja }) => {
       VRDEPOSITO: item.VRDEPOSITO,
       DSHISTORIO: item.DSHISTORIO,
       NUDOCDEPOSITO: item.NUDOCDEPOSITO,
+      NOFANTASIA: item.NOFANTASIA,
 
       STCANCELADO: item.STCANCELADO,
       STCONFERIDO: item.STCONFERIDO,
@@ -89,6 +90,12 @@ export const ActionListaDepositosLoja = ({ dadosListaDepositosLoja }) => {
   };
 
   const colunasDepositosLoja = [
+    {
+      field:  'NOFANTASIA',
+      header: 'Loja',
+      body: row => <th style={{ color: 'blue' }}>{row.NOFANTASIA}</th>,
+      sortable: true,
+    },
     {
       field: 'DTMOVIMENTOCAIXA',
       header: 'Data Movimento',
