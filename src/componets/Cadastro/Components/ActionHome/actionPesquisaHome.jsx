@@ -18,17 +18,9 @@ import { ButtonTable } from "../../../ButtonsTabela/ButtonTable"
 import { MdOutlineLocalPrintshop, MdOutlineSend } from "react-icons/md"
 import { SiSap } from "react-icons/si"
 import { GrView } from "react-icons/gr"
-import { useReactToPrint } from "react-to-print";
-import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
-import * as XLSX from 'xlsx';
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
 import { ActionPDFPedido } from "./ActionPDF/actionPDFPedido"
 import { ActionPDFPedidoSemPreco } from "./ActionPDFSemPreco/actionPDFPedidoSemPreco"
 import { ActionNovoPedido } from "../ActionNovoPedido/actionNovoPedido"
-import { formatMoeda } from "../../../../utils/formatMoeda"
-import HeaderTable from "../../../Tables/headerTable"
 import { optionsSap } from "../../../../../parceiro.json"
 import { ActionEditarNovoPedido } from "../ActionNovoPedido/actionEditarNovoPedido"
 
@@ -64,6 +56,7 @@ export const ActionPesquisaHome = ({ usuarioLogado }) => {
     setDataFim(dataPesquisaFim)
   }, [])
 
+  
   useEffect(() => {
     const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
     if (menuSalvo) {
@@ -71,7 +64,7 @@ export const ActionPesquisaHome = ({ usuarioLogado }) => {
       setMenuFilhoAtual(menuParsed);
       setActionHome(true)
     }
-  }, [setActionHome]);
+  }, []);
 
 
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
@@ -81,7 +74,7 @@ export const ActionPesquisaHome = ({ usuarioLogado }) => {
 
       return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
+    { enabled: Boolean(usuarioLogado?.id) }
   );
 
   const { data: dadosFornecedores = [], error: errorFornecedor, isLoading: isLoadingFornecedo } = useQuery(

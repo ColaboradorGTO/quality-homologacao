@@ -9,6 +9,9 @@ import { AlertError } from "../../../../Inputs/alertError";
 import { schema } from "./Schema/schemaValidation";
 import { useCadastrarProdutoAvulso } from "../hooks/useCadastrarProdutoAvulso"
 import { SelectList } from "../../../../Buttons/menuList";
+import { MdLockOutline } from "react-icons/md";
+import Swal from "sweetalert2";
+import { formatarMoeda } from "../../../../../utils/formatMoeda";
 
 export const Formulario = ({ handleClose, usuarioLogado, optionsModulos }) => {
     const { handleSubmit, formState: { errors }, clearErrors, control, setError, setValue } = useForm({
@@ -68,6 +71,14 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos }) => {
         setReferenciaProduto,
         produtoPesquisado,
         setProdutoPesquisado,
+        categoriaGradeSelecionada,
+        setCategoriaGradeSelecionada,
+        produtoSelecionado, 
+        setProdutoSelecionado,
+        previaProduto, 
+        setPreviaProduto,
+        previaVisivel,
+        setPreviaVisivel,
         dadosUnidadeMedida,
         dadosTamanhos,
         dadosCores,
@@ -83,6 +94,12 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos }) => {
         dadosVinculoEstiloGrupo,
         dadosMarcas,
         dadosProdutosPedido,
+        dadosCategoriaPedido,
+        optionsEcommerce,
+        validarCamposProduto,
+        preencherDadosProdutoSelecionado,
+        handleBlurPesquisaProduto,
+        gerarPreviaProdutoAvulso,
         onSubmit
     } = useCadastrarProdutoAvulso({usuarioLogado, optionsModulos, handleClose})
 
@@ -95,31 +112,31 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos }) => {
         { value: 'ACESSORIOS', label: 'ACESSÓRIOS' }
     ]
 
-    const optionsEcommerce = [
-        { value: 'True', label: 'SIM' },
-        { value: 'False', label: 'NÃO' }
-    ]
 
     const handleValidatedSubmit = async () => {
         try {
             const dadosParaValidar = {
-                descricaoPedido: descricao,
+                marcaGrupoProduto: marcaSelecionada,
+                descProduto: descricao,
+                refProduto: referencia,
                 fornecedorProduto: fornecedor,
-                tamanhoProduto: tamanhoSelecionado,
                 fabricanteProduto: fabricante,
                 unidadeProduto: unidadeSelecionada,
                 corProduto: corSelecionada,
-                tecidoProduto: tipoTecidoSelecionado,
+                tipoTecidoProduto: tipoTecidoSelecionado,
+                categoriaGradeProduto: categoriaGradeSelecionada,
+                tamanhoProduto: tamanhoSelecionado,
                 estruturaProduto: estrutura,
                 estiloProduto: estilo,
-                categoriaProduto: categoriaProdutoSelecionado,
-                vrCustoProduto: vrCusto,
-                vrVendaProduto: vrVenda,
+                categoriaProduto: categoriaSelecionada,
+                localExposicaoProduto: localExposicaoSelecionado,
+                ecommerceProduto: ecommerceSelecionado,
+                redeSocialProduto: redeSocialSelecionado,
                 ncmProduto: ncmSelecionado,
                 tipoProduto: tipoProdutoSelecionado,
                 tipoFiscalProduto: tipoFiscalSelecionado,
-                barraProduto: codBarras
-
+                vrCustoProduto: vrCusto,
+                vrVendaProduto: vrVenda
             };
 
             await schema.validate(dadosParaValidar, { abortEarly: false });
@@ -153,10 +170,57 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos }) => {
         fontSize: "14px",
     };
 
+    const handleProdutoSelecionado = async (selectedOption) => {
+        setProdutoSelecionado(selectedOption);
+
+        if (!selectedOption) return;
+
+        const produto = dadosProdutosPedido.find(p => String(p.IDPRODUTO) === String(selectedOption.value));
+        if (!produto) return;
+
+        const { stValido, msgCamposVazios } = produto;
+
+        if (!stValido) {
+            const resultado = await Swal.fire({
+                title: 'Produto com campos vazios',
+                html: `Este produto possui campos vazios/divergentes:<br><b>${msgCamposVazios}</b><br><br>Deseja preencher os dados mesmo assim?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sim, preencher',
+                cancelButtonText: 'Cancelar',
+                customClass: {
+                    container: 'custom-swal',   
+                },
+            });
+            if (!resultado.isConfirmed) {
+                setProdutoSelecionado(null);
+                return;
+            }
+        } else {
+            const resultado = await Swal.fire({
+                title: 'Preencher dados do produto?',
+                text: 'Deseja preencher os dados do produto selecionado na pesquisa? Esta ação é recomendada para produtos de reposição.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Sim',
+                cancelButtonText: 'Não',
+                customClass: {
+                    container: 'custom-swal',   
+                },
+            });
+            if (!resultado.isConfirmed) {
+                setProdutoSelecionado(null);
+                return;
+            }
+        }
+
+        await preencherDadosProdutoSelecionado(produto);
+    };
+
     const formatSelectGroup = (data) => {
         const grupos = {};
 
-        data.forEach((item) => {
+        (data || []).forEach((item) => {
             if (!grupos[item.DS_GRUPO]) {
             grupos[item.DS_GRUPO] = {
                 label: item.DS_GRUPO,
@@ -165,7 +229,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos }) => {
             }
 
             grupos[item.DS_GRUPO].options.push({
-            value: item.ID_ESTRUTURA,
+            value:  `${item.ID_GRUPO}:${item.ID_ESTRUTURA}`,
             label: item.ESTRUTURA,
             original: item
             });
@@ -174,34 +238,153 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos }) => {
         return Object.values(grupos);
     };
 
-    const formatSelectCor = (data) => {
-        const grupos = {};
+    const formatSelectCor = (data = []) => {
+        const grupos = new Map();
 
         data.forEach((item) => {
-            if (!grupos[item.DS_GRUPOCOR]) {
-            grupos[item.DS_GRUPOCOR] = {
-                label: item.DS_GRUPOCOR,
+            const {
+            ID_COR,
+            DS_COR,
+            ID_GRUPOCOR,
+            DS_GRUPOCOR,
+            DSSIGLA,
+            STBLOQUEADOPARACADASTROPRODUTONOVO
+            } = item;
+
+            const nomeCor = (DS_COR || "").trim();
+            const nomeCorUpper = nomeCor.toUpperCase();
+
+            const bloqueadaPorNome = nomeCorUpper === "NENHUM" || nomeCorUpper === "NENHUMA";
+            const bloqueadaPorFlag = String(STBLOQUEADOPARACADASTROPRODUTONOVO) === "True";
+            const isDisabled = bloqueadaPorNome || bloqueadaPorFlag;
+
+            const sigla = (DSSIGLA || "").trim();
+            const labelCor = sigla ? `${nomeCor} - ${sigla}` : nomeCor;
+
+            const groupKey = String(ID_GRUPOCOR ?? "SEM_GRUPO");
+            if (!grupos.has(groupKey)) {
+            grupos.set(groupKey, {
+                label: String(DS_GRUPOCOR || "SEM GRUPO").toUpperCase(),
                 options: []
-            };
+            });
             }
 
-            grupos[item.DS_GRUPOCOR].options.push({
-            value: item.ID_COR,
-            label: item.DS_COR,
+            grupos.get(groupKey).options.push({
+            value: ID_COR,
+            label: labelCor,
+            isDisabled,
             original: item
             });
         });
 
-        return Object.values(grupos);
+        return Array.from(grupos.values());
     };
 
-    /*
-        Voltar daqui amanhã para finalizar esta modal e todos os select relacionada a ela.
-    */
+    const formatSelectMaterial = (data = []) => {
+        const opcoesBloqueadas = ["NENHUM", "NENHUMA"];
+        const optionsAtivas = [];
+        const optionsBloqueadas = [];
+
+        data.forEach((item) => {
+            const {
+            IDTPTECIDO,
+            DSTIPOTECIDO,
+            DSSIGLA,
+            STBLOQUEADOPARACADASTROPRODUTONOVO
+            } = item;
+
+            const nomeMaterial = (DSTIPOTECIDO || "").trim();
+            const nomeMaterialUpper = nomeMaterial.toUpperCase();
+
+            const bloqueadaPorNome = opcoesBloqueadas.includes(nomeMaterialUpper);
+            const bloqueadaPorFlag = String(STBLOQUEADOPARACADASTROPRODUTONOVO) === "True";
+            const isDisabled = bloqueadaPorNome || bloqueadaPorFlag;
+
+            const sigla = (DSSIGLA || "").trim();
+            const labelMaterial = sigla ? `${nomeMaterial} - ${sigla}` : nomeMaterial;
+
+            const option = {
+            value: IDTPTECIDO,
+            label: labelMaterial,
+            isDisabled,
+            color: isDisabled ? "#f63c97" : undefined,
+            original: item
+            };
+
+            if (isDisabled) {
+            optionsBloqueadas.push(option);
+            } else {
+            optionsAtivas.push(option);
+            }
+        });
+
+        return [...optionsAtivas, ...optionsBloqueadas];
+    }; 
+
+    const formatSelectProduto = (data = []) => {
+        return data.map((item) => ({
+            value: item.IDPRODUTO,
+            label: `${item.NUCODBARRAS} - ${item.DSNOME}`,
+            original: item
+        }));
+    }
+   
     return (
         <Fragment>
-            <form>
+            <form onSubmit={handleSubmit(handleValidatedSubmit)}>
                 <div className="form-group">
+                    <div className="row">
+                        
+                        <div className="col-sm-6 col-xl-4">
+                            <Controller
+                                name="referenciaProduto"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        name="referenciaProduto"
+                                        label={"Pesquisar Referência/Produto"}
+                                        type="text"
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        value={referenciaProduto}
+                                        onChangeModal={(e) => setReferenciaProduto(e.target.value)}
+                                        onBlur={handleBlurPesquisaProduto}
+                                    />
+                                )}
+                            />
+                        </div>
+                        <div className="col-sm-6 col-xl-8">
+                            <label className="form-label" htmlFor="tppedido">Lista dos Produtos da Pesquisa</label>
+                            <Select
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="categoriaProduto"
+                                value={produtoSelecionado}
+                                options={[
+                                    { value: '', label: 'Selecione...' },
+                                    ...(dadosProdutosPedido || []).map((item) => {
+                                        return {
+                                            value: item.IDPRODUTO,
+                                            label: `${item.DSNOME}`,
+                                        }
+                                    })
+                                ]}
+                                onChange={handleProdutoSelecionado}
+                            />
+                            
+                            {errors.categoriaProduto && (
+                                <AlertError
+                                    error={errors.categoriaProduto}
+                                    onClose={clearErrors}
+                                    fieldName="categoriaProduto"
+                                />
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="form-group">
+
                     <div className="row">
                         <div className="col-sm-6 col-xl-3">
                             <label className="form-label" htmlFor="tppedido">Marca do Grupo</label>
@@ -231,91 +414,6 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos }) => {
                                 />
                             )}
                         </div>
-                        <div className="col-sm-6 col-xl-3">
-                            <Controller
-                                name="referenciaProduto"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormField
-                                        name="referenciaProduto"
-                                        label={"Pesquisar Referência/Produto"}
-                                        type="text"
-                                        errors={errors}
-                                        clearErrors={clearErrors}
-                                        value={referenciaProduto}
-                                        onChangeModal={(e) => setReferenciaProduto(e.target.value)}
-                                    />
-                                )}
-                            />
-                        </div>
-                        <div className="col-sm-6 col-xl-6">
-                            <label className="form-label" htmlFor="tppedido">Lista dos Produtos da Pesquisa</label>
-                            <Select
-                                className="basic-single"
-                                classNamePrefix="select"
-                                name="categoriaProduto"
-                                options={[
-                                    { value: '', label: 'Selecione...' },
-                                    ...dadosProdutosPedido?.map((item) => {
-                                        return {
-                                            value: item.DSNOME,
-                                            label: item.DSNOME
-                                        }
-                                    })]}
-                                value={categoriaProdutoSelecionado}
-                                onChange={(e) => {
-                                    setCategoriaProdutoSelecionado(e)
-                                    clearErrors('categoriaProduto')
-                                }}
-                            />
-                            {errors.categoriaProduto && (
-                                <AlertError
-                                    error={errors.categoriaProduto}
-                                    onClose={clearErrors}
-                                    fieldName="categoriaProduto"
-                                />
-                            )}
-                        </div>
-                    </div>
-                </div>
-
-                <div className="form-group">
-
-                    <div className="row">
-                        <div className="col-sm-6 col-xl-2">
-                            <Controller
-                                name="qtdProduto"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormField
-                                        name="qtdProduto"
-                                        label={"Quantidade "}
-                                        type="text"
-                                        errors={errors}
-                                        clearErrors={clearErrors}
-                                        value={quantidade}
-                                        onChangeModal={(e) => setQuantidade(e.target.value)}
-                                    />
-                                )}
-                            />
-                        </div>
-                        <div className="col-sm-6 col-xl-2">
-                            <Controller
-                                name="refProduto"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormField
-                                        name="refProduto"
-                                        label={"Referência "}
-                                        type="text"
-                                        errors={errors}
-                                        clearErrors={clearErrors}
-                                        value={referencia}
-                                        onChangeModal={(e) => setReferencia(e.target.value)}
-                                    />
-                                )}
-                            />
-                        </div>
 
                         <div className="col-sm-6 col-xl-6">
                             <Controller
@@ -334,7 +432,25 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos }) => {
                                 )}
                             />
                         </div>
-                        <div className="col-sm-6 col-xl-2">
+
+                        <div className="col-sm-6 col-xl-3">
+                            <Controller
+                                name="refProduto"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        name="refProduto"
+                                        label={"Referência "}
+                                        type="text"
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        value={referencia}
+                                        onChangeModal={(e) => setReferencia(e.target.value)}
+                                    />
+                                )}
+                            />
+                        </div>
+                        {/* <div className="col-sm-6 col-xl-2">
                             <label className="form-label" htmlFor="tppedido">Categoria Produto</label>
                             <Select
                                 className="basic-single"
@@ -361,9 +477,195 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos }) => {
                                     fieldName="categoriaProduto"
                                 />
                             )}
+                        </div> */}
+                    </div>
+                </div>
+                <div className="form-group">
+                    <div className="row">
+
+                    
+                        <div className="col-sm-6 col-xl-8">
+                            <label className="form-label" htmlFor="notam">Fornecedor</label>
+                            <Select
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="fornecedorProduto"
+                                options={[
+                                    { value: '', label: 'Selecione...' },
+                                    ...dadosFornecedores?.map((item) => {
+                                        return {
+                                            value: item.IDFORNECEDOR,
+                                            label: `${item.NOFANTASIA} // ${item.NUCNPJ} // ${item.NORAZAOSOCIAL}`
+                                        }
+                                    })]}
+                                value={fornecedor}
+                                onChange={(e) => {
+                                    setFornecedor(e)
+                                    clearErrors('fornecedorProduto')
+                                }}
+                            />
+                            {errors.fornecedorProduto && (
+                                <AlertError
+                                    error={errors.fornecedorProduto}
+                                    onClose={clearErrors}
+                                    fieldName="fornecedorProduto"
+                                />
+                            )}
+                        </div>
+                        <div className="col-sm-6 col-xl-4">
+                            <label className="form-label" htmlFor="notam">Fabricante</label>
+                            <Select
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="fabricanteProduto"
+                                options={[
+                                    { value: '', label: 'Selecione...' },
+                                    ...dadosFabricantes?.map((item) => {
+                                        return {
+                                            value: item.IDFABRICANTE,
+                                            label: `${item.IDFABRICANTE} - ${item.DSFABRICANTE}`
+                                        }
+                                    })]}
+                                value={fabricante}
+                                onChange={(e) => {
+                                    setFabricante(e)
+                                    clearErrors('fabricanteProduto')
+                                }}
+                            />
+                            {errors.fabricanteProduto && (
+                                <AlertError
+                                    error={errors.fabricanteProduto}
+                                    onClose={clearErrors}
+                                    fieldName="fabricanteProduto"
+                                />
+                            )}
                         </div>
                     </div>
                 </div>
+                <div className="form-group">
+                    <div className="row">
+                        <div className="col-sm-6 col-xl-2">
+                            <label className="form-label" htmlFor="tpunid">Unidade</label>
+                            <Select
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="unidadeProduto"
+                                options={[
+                                    { value: '', label: 'Selecione...' },
+                                    ...dadosUnidadeMedida?.map((item) => {
+                                        return {
+                                            value: item.IDUNIDADEMEDIDA,
+                                            label: item.DSSIGLA
+                                        }
+                                    })]}
+                                value={unidadeSelecionada}
+                                onChange={(e) => {
+                                    setUnidadeSelecionada(e)
+                                    clearErrors('unidadeProduto')
+                                }}
+                            />
+                            {errors.unidadeProduto && (
+                                <AlertError
+                                    error={errors.unidadeProduto}
+                                    onClose={clearErrors}
+                                    fieldName="unidadeProduto"
+                                />
+                            )}
+                        </div>
+                        <div className="col-sm-6 col-xl-3">
+                            <label className="form-label" htmlFor="tpcor">Cor</label>
+                            <SelectList
+                                name={"corProduto"}
+                                value={corSelecionada}
+                                options={formatSelectCor(dadosCores)}
+                                menuHeaderTitle={"Selecione"}
+                                menuHeaderStyle={menuHeaderStyle}
+                                onChange={(e) => setCorSelecionada(e)}
+                                getOptionDisabled={(option) => !!option.isDisabled}
+                                styles={{
+                                    option: (base, state) => ({
+                                    ...base,
+                                    color: state.data?.isDisabled ? "#f63c97" : base.color,
+                                    cursor: state.data?.isDisabled ? "not-allowed" : "pointer"
+                                    }),
+                                    singleValue: (base, state) => ({
+                                    ...base,
+                                    color: state.data?.isDisabled ? "#f63c97" : base.color
+                                    })
+                                }}
+                            />
+                            {errors.corProduto && (
+                                <AlertError
+                                    error={errors.corProduto}
+                                    onClose={clearErrors}
+                                    fieldName="corProduto"
+                                />
+                            )}
+                        </div>
+                        <div className="col-sm-6 col-xl-3">
+                            <label className="form-label" htmlFor="tptecidoav">Tipo de Material</label>
+                          
+                            <Select
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="tipoTecidoProduto"
+                                value={tipoTecidoSelecionado}
+                                options={formatSelectMaterial(dadosTipoTecidos)}
+                                onChange={(e) => {
+                                    setTipoTecidoSelecionado(e)
+                                    clearErrors('tipoTecidoProduto')
+                                }}
+                                getOptionDisabled={(option) => !!option.isDisabled}
+                                styles={{
+                                    option: (base, state) => ({
+                                    ...base,
+                                    color: state.data?.isDisabled ? "#f63c97" : base.color,
+                                    cursor: state.data?.isDisabled ? "not-allowed" : "pointer",
+                                    fontSize: "13px"
+                                    }),
+                                    singleValue: (base, state) => ({
+                                    ...base,
+                                    color: state.data?.isDisabled ? "#f63c97" : base.color
+                                    })
+                                }}
+                            />
+                            {errors.tipoTecidoProduto && (
+                                <AlertError
+                                    error={errors.tipoTecidoProduto}
+                                    onClose={clearErrors}
+                                    fieldName="tipoTecidoProduto"
+                                />
+                            )}
+                        </div>
+
+                        <div className="col-sm-6 col-xl-4">
+                            <label className="form-label" htmlFor="categoriaGradeProduto">Categoria Grade</label>
+                            <SelectList
+                                id={"categoriaGradeProduto"}
+                                value={categoriaGradeSelecionada}
+                                options={dadosCategoriaPedido.map((item) => {
+                                    return {
+                                        value: item.IDCATEGORIAPEDIDO,
+                                        label: `${item.TIPOPEDIDO} - ${item.DSCATEGORIAPEDIDO}`
+                                    }
+                                })}
+                                menuHeaderTitle={"Selecione"}
+                                menuHeaderStyle={menuHeaderStyle}
+                                onChange={(e) => setCategoriaGradeSelecionada(e)}
+                                
+                            />
+                            {errors.categoriaGradeProduto && (
+                                <AlertError
+                                    error={errors.categoriaGradeProduto}
+                                    onClose={clearErrors}
+                                    fieldName="categoriaGradeProduto"
+                                />
+                            )} 
+                        </div>
+
+                    </div>
+                </div>
+
                 <div className="form-group">
                     <div className="row">
                         <div className="col-sm-6 col-xl-2">
@@ -393,144 +695,10 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos }) => {
                                     fieldName="tamanhoProduto"
                                 />
                             )}
-                        </div>
-                        <div className="col-sm-6 col-xl-5">
-                            <label className="form-label" htmlFor="notam">Fornecedor</label>
-                            <Select
-                                className="basic-single"
-                                classNamePrefix="select"
-                                name="fornecedorProduto"
-                                options={[
-                                    { value: '', label: 'Selecione...' },
-                                    ...dadosFornecedores?.map((item) => {
-                                        return {
-                                            value: item.IDFORNECEDOR,
-                                            label: `${item.NOFANTASIA} // ${item.NUCNPJ} // ${item.NORAZAOSOCIAL}`
-                                        }
-                                    })]}
-                                value={fornecedor}
-                                onChange={(e) => {
-                                    setFornecedor(e)
-                                    clearErrors('fornecedorProduto')
-                                }}
-                            />
-                            {errors.fornecedorProduto && (
-                                <AlertError
-                                    error={errors.fornecedorProduto}
-                                    onClose={clearErrors}
-                                    fieldName="fornecedorProduto"
-                                />
-                            )}
-                        </div>
-                        <div className="col-sm-6 col-xl-3">
-                            <label className="form-label" htmlFor="notam">Fabricante</label>
-                            <Select
-                                className="basic-single"
-                                classNamePrefix="select"
-                                name="fabricanteProduto"
-                                options={[
-                                    { value: '', label: 'Selecione...' },
-                                    ...dadosFabricantes?.map((item) => {
-                                        return {
-                                            value: item.IDFABRICANTE,
-                                            label: `${item.IDFABRICANTE} - ${item.DSFABRICANTE}`
-                                        }
-                                    })]}
-                                value={fabricante}
-                                onChange={(e) => {
-                                    setFabricante(e)
-                                    clearErrors('fabricanteProduto')
-                                }}
-                            />
-                            {errors.fabricanteProduto && (
-                                <AlertError
-                                    error={errors.fabricanteProduto}
-                                    onClose={clearErrors}
-                                    fieldName="fabricanteProduto"
-                                />
-                            )}
-                        </div>
-                        <div className="col-sm-6 col-xl-2">
-                            <label className="form-label" htmlFor="tpunid">Unidade</label>
-                            <Select
-                                className="basic-single"
-                                classNamePrefix="select"
-                                name="unidadeProduto"
-                                options={[
-                                    { value: '', label: 'Selecione...' },
-                                    ...dadosUnidadeMedida?.map((item) => {
-                                        return {
-                                            value: item.IDUNIDADEMEDIDA,
-                                            label: item.DSSIGLA
-                                        }
-                                    })]}
-                                value={unidadeSelecionada}
-                                onChange={(e) => {
-                                    setUnidadeSelecionada(e)
-                                    clearErrors('unidadeProduto')
-                                }}
-                            />
-                            {errors.unidadeProduto && (
-                                <AlertError
-                                    error={errors.unidadeProduto}
-                                    onClose={clearErrors}
-                                    fieldName="unidadeProduto"
-                                />
-                            )}
-                        </div>
-                    </div>
-                </div>
-                <div className="form-group">
-                    <div className="row">
-                        <div className="col-sm-6 col-xl-2">
-                            <label className="form-label" htmlFor="tpcor">Cor</label>
-                            <SelectList
-                                name={"corProduto"}
-                                value={corSelecionada}
-                                options={formatSelectCor(dadosCores)}
-                                menuHeaderTitle={"Selecione"}
-                                menuHeaderStyle={menuHeaderStyle}
-                                onChange={(e) => setCorSelecionada(e)}
-                                
-                            />
-                            {errors.corProduto && (
-                                <AlertError
-                                    error={errors.corProduto}
-                                    onClose={clearErrors}
-                                    fieldName="corProduto"
-                                />
-                            )}
-                        </div>
-                        <div className="col-sm-6 col-xl-2">
-                            <label className="form-label" htmlFor="tptecidoav">Tipo de Material</label>
-                          
-                            <Select
-                                className="basic-single"
-                                classNamePrefix="select"
-                                name="tipoTecidoProduto"
-                                value={tipoTecidoSelecionado}
-                                options={[
-                                    { value: '', label: 'Selecione...' },
-                                    ...dadosTipoTecidos?.map((item) => {
-                                        return {
-                                            value: item.IDTIPOTECIDO,
-                                            label: item.DSTIPOTECIDO
-                                        }
-                                    })]}
-                                onChange={(e) => {
-                                    setTipoTecidoSelecionado(e)
-                                    clearErrors('tipoTecidoProduto')
-                                }}
-                            />
-                            {errors.tipoTecidoProduto && (
-                                <AlertError
-                                    error={errors.tipoTecidoProduto}
-                                    onClose={clearErrors}
-                                    fieldName="tipoTecidoProduto"
-                                />
-                            )}
-                        </div>
-                        <div className="col-sm-6 col-xl-3">
+                        </div> 
+
+
+                        <div className="col-sm-6 col-xl-4">
                              <label className="form-label" htmlFor="tptecidoav">Estrutura</label>
                             <SelectList
                                 id={"tipoTecidoProduto"}
@@ -549,7 +717,8 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos }) => {
                                 />
                             )} 
                         </div>
-                        <div className="col-sm-6 col-xl-2">
+
+                        <div className="col-sm-6 col-xl-3">
                             <label className="form-label" htmlFor="tpcats">Estilos</label>
                             <Select
                                 className="basic-single"
@@ -605,11 +774,12 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos }) => {
                                 />
                             )}
                         </div>
+
                     </div>
                 </div>
                 <div className="form-group">
                     <div className="row">
-                        <div className="col-sm-6 col-xl-4">
+                        <div className="col-sm-6 col-xl-3">
                             <label className="form-label" htmlFor="locexp">Local Exposição</label>
                             <Select
                                 className="basic-single"
@@ -693,45 +863,8 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos }) => {
                                 />
                             )}
                         </div>
+
                         <div className="col-sm-6 col-xl-2">
-                            <Controller
-                                name="vrCustoProduto"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormField
-                                        name="vrCustoProduto"
-                                        label={"Vr Custo"}
-                                        type="text"
-                                        errors={errors}
-                                        clearErrors={clearErrors}
-                                        value={vrCusto}
-                                        onChangeModal={(e) => setVrCusto(e.target.value)}
-                                    />
-                                )}
-                            />
-                        </div>
-                        <div className="col-sm-6 col-xl-2">
-                            <Controller
-                                name="vrVendaProduto"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormField
-                                        name="vrVendaProduto"
-                                        label={"Vr Venda"}
-                                        type="text"
-                                        errors={errors}
-                                        clearErrors={clearErrors}
-                                        value={vrVenda}
-                                        onChangeModal={(e) => setVrVenda(e.target.value)}
-                                    />
-                                )}
-                            />
-                        </div>
-                    </div>
-                </div>
-                <div className="form-group">
-                    <div className="row">
-                        <div className="col-sm-6 col-xl-3">
                             <label className="form-label" htmlFor="tpncm">NCM</label>
                             <Select
                                 className="basic-single"
@@ -759,6 +892,8 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos }) => {
                                 />
                             )}
                         </div>
+                       
+
                         <div className="col-sm-6 col-xl-3">
                             <label className="form-label" htmlFor="tpprod">Tipo Produto</label>
                             <Select
@@ -787,7 +922,13 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos }) => {
                                 />
                             )}
                         </div>
-                        <div className="col-sm-6 col-xl-6">
+                    </div>
+                </div>
+                <div className="form-group">
+                    <div className="row">
+
+
+                        <div className="col-sm-6 col-xl-8">
                             <label className="form-label" htmlFor="tpfiscal">Tipo Fiscal</label>
                             <Select
                                 className="basic-single"
@@ -815,21 +956,76 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos }) => {
                                 />
                             )}
                         </div>
+
+                         <div className="col-sm-6 col-xl-2">
+                            <Controller
+                                name="vrCustoProduto"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        name="vrCustoProduto"
+                                        label={"Vr Custo"}
+                                        type="text"
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        value={vrCusto}
+                                        onChangeModal={(e) => setVrCusto(formatarMoeda(e.target.value))}
+                                    />
+                                )}
+                            />
+                        </div>
+
+                        <div className="col-sm-6 col-xl-2">
+                            <Controller
+                                name="vrVendaProduto"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        name="vrVendaProduto"
+                                        label={"Vr Venda"}
+                                        type="text"
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        value={vrVenda}
+                                        onChangeModal={(e) => setVrVenda(formatarMoeda(e.target.value))}
+                                    />
+                                )}
+                            />
+                        </div>
                     </div>
                 </div>
 
+                
                 <div className="form-group">
                     <div className="row">
-                        <p>
-                            PRÉVIA DO PRODUTO
-                        </p>
-                        <button
-                            type="button"
-                            className="btn btn-danger"
-                        >
-                            Prévia do Produto Avulso    
-                        </button> 
+                        <div className="col-sm-6 col-xl-6">
+                            <p> PRÉVIA DO PRODUTO  </p>
+                        
+
+                            <button type="button" className="btn btn-danger" onClick={gerarPreviaProdutoAvulso}>
+                                Prévia do Produto Avulso
+                            </button>
+                            
+                        </div>
                     </div>
+
+                    {previaVisivel && (
+                        <div className="row mt-3">
+
+                            <div className="col-sm-6 col-xl-6" style={{ backgroundColor: '#f8f9fa' }}>
+                                <textarea
+                                    value={previaProduto}
+                                    onChange={(e) => setPreviaProduto(e.target.value)}
+                                    width="100px"
+                                    height="200px"
+                                    style={{ width: '100%', height: '100%' }}
+                                >
+
+                                </textarea>
+                            </div>
+                        </div>
+                    )}
+
                 </div>
                 <FooterModal
                     ButtonTypeFechar={ButtonTypeModal}

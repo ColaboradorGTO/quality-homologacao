@@ -30,7 +30,8 @@ export const useMigrarSAP = ({ handleClose, usuarioLogado, optionsModulos, handl
     };
 
 
-    const onSubmit = async (IDRESUMOENTRADA) => {
+    const handleMigrarSap = async (IDRESUMOENTRADA) => {
+        console.log(IDRESUMOENTRADA, 'IDRESUMOENTRADA')
         if (optionsModulos[0]?.CRIAR == 'False') {
             Swal.fire({
                 icon: 'error',
@@ -48,66 +49,82 @@ export const useMigrarSAP = ({ handleClose, usuarioLogado, optionsModulos, handl
             IDRESUMOENTRADA: IDRESUMOENTRADA
         }
 
-        try {
-            
-            const response = await put('/nf-avulsa/:id', putData)
+        Swal.fire({
+            icon: 'question',
+            title: 'Deseja Migarar a Nota Fiscal para SAP?',
+            showCancelButton: true,
+            showConfirmButton: true,
+            confirmButtonText: 'Sim',
+            cancelButtonText: 'Não',
+            customClass: {
+                container: 'custom-swal',
+            },
 
-            const textDados = JSON.stringify(putData)
-            let textFuncao = 'CADASTRO / MIGRANDO NOTA FISCAL PARA SAP';
-            const ipUsuario = await getIPUsuario();
+            preconfirm: async () => {
 
-            const createtLog = {
-                IDFUNCIONARIO: String(usuarioLogado.id),
-                PATHFUNCAO: textFuncao,
-                DADOS: textDados,
-                IP: ipUsuario || 'Indisponível'
-            }
-
-            await post('/log-web', createtLog)
-
-            Swal.fire({
-                position: 'center',
-                icon: 'success',
-                title: 'Atualizado!',
-                text: 'Nota fiscal migrada para SAP com sucesso.',
-                showConfirmButton: false,
-                timer: 3000,
-                customClass: {
-                    container: 'custom-swal',
+                try {
+                    
+                    const response = await put('/nf-avulsa/:id', putData)
+        
+                    const textDados = JSON.stringify(putData)
+                    let textFuncao = 'CADASTRO / MIGRANDO NOTA FISCAL PARA SAP';
+                    const ipUsuario = await getIPUsuario();
+        
+                    const createtLog = {
+                        IDFUNCIONARIO: String(usuarioLogado.id),
+                        PATHFUNCAO: textFuncao,
+                        DADOS: textDados,
+                        IP: ipUsuario || 'Indisponível'
+                    }
+        
+                    await post('/log-web', createtLog)
+        
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'success',
+                        title: 'Atualizado!',
+                        text: 'Nota fiscal migrada para SAP com sucesso.',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        customClass: {
+                            container: 'custom-swal',
+                        }
+                    })
+                    handleClick();
+           
+                    return response.data;
+                } catch (error) {
+                    const textDados = JSON.stringify(putData)
+                    let textFuncao = 'CADASTRO / ERRO AO MIGRAR NOTA FISCAL PARA SAP';
+                    const ipUsuario = await getIPUsuario();
+                    const createtLog = {
+                        IDFUNCIONARIO: String(usuarioLogado.id),
+                        PATHFUNCAO: textFuncao,
+                        DADOS: textDados,
+                        IP: ipUsuario || 'Indisponível'
+                    }
+        
+                    await post('/log-web', createtLog)
+        
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'error',
+                        title: 'Ocorreu um erro ao migrar a nota fiscal para SAP. Por favor, tente novamente.',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        customClass: {
+                            container: 'custom-swal',
+                        },
+                    });
+                    console.error('Erro ao migrar nota fiscal para SAP:', error);
                 }
-            })
-            handleClick();
-   
-            return response.data;
-        } catch (error) {
-            const textDados = JSON.stringify(putData)
-            let textFuncao = 'CADASTRO / ERRO AO MIGRAR NOTA FISCAL PARA SAP';
-            const ipUsuario = await getIPUsuario();
-            const createtLog = {
-                IDFUNCIONARIO: String(usuarioLogado.id),
-                PATHFUNCAO: textFuncao,
-                DADOS: textDados,
-                IP: ipUsuario || 'Indisponível'
             }
+        })
 
-            await post('/log-web', createtLog)
-
-            Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'Ocorreu um erro ao migrar a nota fiscal para SAP. Por favor, tente novamente.',
-                showConfirmButton: false,
-                timer: 3000,
-                customClass: {
-                    container: 'custom-swal',
-                },
-            });
-            console.error('Erro ao migrar nota fiscal para SAP:', error);
-        }
     }
 
     return {
-        onSubmit,
+        handleMigrarSap
     }
 }
 

@@ -1,72 +1,125 @@
-## Modelo de Pull Request ##
+REVIEW COMPLETO DO FRONTEND — REACT.JS
 
-## Prefixo Descrição  ##
-- [] Feat: Nova Funcionalidade
-- [] Fix: Correção de bugs
-- [] Refactor: Refatoração sem mudar comportamento
-- [] Docs: Documentação
-- [] Test: Testes Automatizados
-- [] Style: Ajuste de formatação de css
-- [] Chore: Manutenção e tarefas menores
-- [] Build: Alterações no build
+Quero que você faça uma análise técnica completa exclusivamente do frontend deste projeto, que foi desenvolvido utilizando React.js.
 
-## Problema ##
-[Descreva o problema ou a necessidade que este pull request está resolvendo. Inclua links para problemas ou tarefas relacionadas, se houver.]
-
-## Solução Proposta ##
-[Explique como você resolveu o problema. Descreva as mudanças específicas feitas no código ou na documentação.]
-
-## Testes Realizados ##
-[Descreva os testes que foram realizados para garantir que as mudanças funcionem conforme o esperado.]
-
-## Capturas de Tela (Opcional)
-[Se as mudanças forem visuais, adicione capturas de tela para ilustrar as alterações.]
-
-## Checklist
- [] Criação de Action
- [] Criação de Modal
- [] Criação de Tabelas
- [] Transformando a Lógica Existente, Para ReactJS
- [] Link do Card do Trello da Action Criada / Alterada
- [] Nome Branch
-
-## Notas Adicionais
-[Adicione quaisquer notas adicionais que você julgue relevantes.]
+O objetivo desta primeira etapa é entender profundamente o frontend existente, identificar problemas, riscos e oportunidades de melhoria e produzir um relatório técnico antes de qualquer alteração no código.
 
 
-## Comandos Git essenciais:
-git init: Inicializa um novo repositório Git em um diretório vazio.
+1. LEIA TODO O FRONTEND ANTES DE FAZER RECOMENDAÇÕES
 
-git clone : Cria uma cópia de um repositório Git existente, como de um servidor remoto. 
+Primeiro, faça uma leitura e análise da estrutura do frontend.
 
-git status: Mostra o status atual do repositório, indicando arquivos modificados, adicionados ou removidos. 
+Identifique e compreenda:
 
-git add : Adiciona um arquivo ou arquivos à área de preparação (staging area) para o próximo commit. 
+Estrutura de pastas.
+Componentes.
+Páginas.
+Hooks.
+Context API.
+Services.
+Utils.
+Configurações.
+Rotas.
+Gerenciamento de estado.
+Formulários.
+Tabelas.
+Modais.
+Chamadas HTTP.
+Tratamento de erros.
+Validações.
+Autenticação no frontend.
+Controle de permissões.
+Estilos.
+Assets.
+Variáveis de ambiente.
+Dependências.
+Configurações de build.
 
-git commit -m "mensagem": Cria um novo commit com as alterações preparadas, adicionando uma mensagem descritiva. 
+Antes de sugerir qualquer alteração, procure entender como o frontend funciona como um todo.
 
-git push : Envia os commits locais para um repositório remoto, atualizando-o. 
+Não faça alterações no código nesta primeira etapa.
 
-git pull : Baixa e integra as alterações de um repositório remoto para o repositório local. 
+2. ENTENDA A ARQUITETURA ATUAL
 
-git branch: Lista, cria ou exclui branches. 
+Analise como o React está estruturado atualmente.
 
-git checkout : Muda para uma branch específica. 
+Identifique:
 
-git log: Exibe o histórico de commits do repositório. 
+Como os componentes estão organizados.
+Onde estão concentradas as regras de negócio.
+Onde estão as chamadas para API.
+Como os dados são compartilhados entre componentes.
+Como o estado global é gerenciado.
+Como o estado local é utilizado.
+Como os componentes pai e filho se comunicam.
+Como as props são utilizadas.
+Como os hooks são utilizados.
+Como as páginas estão estruturadas.
+Como a navegação funciona.
+Como os componentes reutilizáveis estão organizados.
 
-git remote: Gerencia as conexões com repositórios remotos. 
+Determine qual padrão arquitetural está sendo utilizado atualmente, mesmo que não exista uma arquitetura formalmente definida.
 
-git merge : Integra as alterações de uma branch em outra. 
+Explique claramente:
 
-git rebase : Reorganiza commits, movendo a base de uma branch para outra, para um histórico mais linear. 
+"Como o frontend está estruturado atualmente?"
 
-git reset : Desfaz alterações em arquivos ou remove arquivos da área de preparação. 
+3. CODE REVIEW
 
-git revert : Cria um novo commit que reverte as alterações de um commit anterior. 
+Faça uma análise detalhada do código React.
 
-git fetch: Baixa as alterações de um repositório remoto sem integrá-las ao branch atual. 
+Procure principalmente por:
 
-git stash: Armazena temporariamente alterações não commitadas. 
+Código duplicado
+Componentes duplicados.
+Funções duplicadas.
+Lógicas repetidas.
+Validações repetidas.
+Chamadas de API repetidas.
+Código que poderia virar um componente reutilizável.
+Código que poderia virar um hook.
+Código que poderia virar uma função utilitária.
+Componentes
 
-git config: Configura as opções do Git, como nome de usuário e e-mail.
+Identifique componentes:
+
+Muito grandes.
+Com muitas responsabilidades.
+Com lógica de negócio misturada com apresentação.
+Com muitos estados.
+Com muitos useEffects.
+Com muitas props.
+Difíceis de testar.
+Difíceis de reutilizar.
+Funções
+
+Identifique:
+
+Funções muito grandes.
+Funções complexas.
+Funções com muitas responsabilidades.
+Funções com muitos parâmetros.
+Funções com nomes inadequados.
+Funções que poderiam ser divididas.
+React Hooks
+
+Analise especialmente:
+
+useState.
+useEffect.
+useMemo.
+useCallback.
+useRef.
+Hooks personalizados.
+
+Procure por:
+
+useEffect desnecessários.
+Dependências incorretas.
+Loops de renderização.
+Estados derivados desnecessários.
+Estados duplicados.
+useMemo/useCallback utilizados sem necessidade.
+Problemas de stale closure.
+Atualizações de estado incorretas.
+Efeitos que poderiam ser substituídos por outra abordagem.

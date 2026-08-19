@@ -9,7 +9,7 @@ import { AlertError } from "../../../../Inputs/alertError";
 import { schema } from "./schema/schemaValidation";
 import { ActionEditarListasPrecos } from "./actionEditarListasPreco";
 
-export const Formulario = ({dadosListaLoja , handleClose, optionsModulos, usuarioLogado}) => {
+export const Formulario = ({dadosListaLoja , handleClose, optionsModulos, usuarioLogado, refetchListaPreco}) => {
   const { handleSubmit, formState: { errors }, clearErrors, control, setError, setValue } = useForm({
     mode: "onChange"
   });
@@ -22,7 +22,7 @@ export const Formulario = ({dadosListaLoja , handleClose, optionsModulos, usuari
     setNomeListaPreco,
     situacao,
     onSubmit,
-  } = useEditarListaPrecos({ optionsModulos, usuarioLogado, dadosListaLoja, handleClose })
+  } = useEditarListaPrecos({ optionsModulos, usuarioLogado, dadosListaLoja, handleClose, refetchListaPreco })
 
 
   const handleValidatedSubmit = async () => {

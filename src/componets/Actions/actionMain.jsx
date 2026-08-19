@@ -603,6 +603,7 @@ export const ActionMain = ({
   stylesGrupo,
   styleProdutoVendido,
   styleVendedor,
+  styleVendasResumida,
   // Funções
 
   onButtonClickSearch,
@@ -1965,6 +1966,7 @@ export const ActionMain = ({
                         Icon={iconVendasResumida}
                         iconColor="#fff"
                         iconSize={16}
+                        style={styleVendasResumida}
                       />
                     )}
 

@@ -15,9 +15,10 @@ import HeaderTable from "../../../Tables/headerTable";
 import Swal from "sweetalert2";
 
 export const ActionListaPrecos = ({
-  dadosListaPedidos,
+  dadosListaPreco,
   usuarioLogado,
-  optionsModulos
+  optionsModulos,
+  refetchListaPreco
 }) => {
   const [modalVisualizar, setModalVisualizar] = useState(false);
   const [modalEditar, setModalEditar] = useState(false);
@@ -74,9 +75,10 @@ export const ActionListaPrecos = ({
     XLSX.writeFile(workbook, 'lista_preco.xlsx');
   };
 
-  const dados = dadosListaPedidos.map((item, index) => {
-    let contador = index + 1;
   
+  const dados = dadosListaPreco?.map((item, index) => {
+    let contador = index + 1;
+
     return {
       contador,
       IDRESUMOLISTAPRECO: item.listaPreco?.IDRESUMOLISTAPRECO,
@@ -265,7 +267,7 @@ export const ActionListaPrecos = ({
             selectionMode="single"
             selection={rowSelection}
             onSelectionChange={(e) => setRowSelection(e.value)}
-            rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
+            rowsPerPageOptions={[10, 20, 50, 100, dados?.length]}
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
             filterDisplay="menu"
@@ -304,6 +306,7 @@ export const ActionListaPrecos = ({
         dadosListaLoja={dadosListaLoja}
         optionsModulos={optionsModulos}
         usuarioLogado={usuarioLogado}
+        refetchListaPreco={refetchListaPreco}
       />
     </Fragment>
   )

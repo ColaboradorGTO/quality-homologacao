@@ -10,6 +10,10 @@ import { ButtonType } from "../../../Buttons/ButtonType"
 import { useFetchData } from "../../../../hooks/useFetchData"
 import { useQuery } from "react-query"
 import { animacaoCarregamento, fecharAnimacaoCarregamento, foiCancelado } from "../../../../utils/animationCarregamento"
+import { GoDownload } from "react-icons/go"
+import { MdOutlineLocalPrintshop } from "react-icons/md"
+import { BsTrash3 } from "react-icons/bs"
+import Swal from "sweetalert2"
 
 
 
@@ -25,6 +29,7 @@ export const ActionPesquisaProdutoEtiqueta = ({ usuarioLogado }) => {
   const [dadosEmpresas, setDadosEmpresas] = useState([])
   const [selectAll, setSelectAll] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
+  const [copia, setCopia] = useState(1);
 
   useEffect(() => {
 
@@ -64,27 +69,42 @@ export const ActionPesquisaProdutoEtiqueta = ({ usuarioLogado }) => {
     }));
 
   const getListaEmpresas = async () => {
-  try {
-    const response = await get(`/lista-de-preco`);
+    try {
+      const response = await get('/lista-de-preco');
 
-    if (response.data && response.data.length > 0) {
-      const empresas = response.data
-        .filter(item => item.listaPreco?.STATIVO === 'True')
-        .map(item => ({
-          value: item.listaPreco.IDRESUMOLISTAPRECO,
-          label: item.listaPreco.NOMELISTA
-        }))
-        .filter(item => item.value && item.label);
+      if (response.data?.length) {
+        const empresas = response.data
+          .filter(item => item.listaPreco?.STATIVO === 'True')
+          .flatMap(item => {
+            const lista = [
+              {
+                tipo: 'lista',
+                value: item.listaPreco.IDRESUMOLISTAPRECO,
+                label: item.listaPreco.NOMELISTA,
+                listaPreco: item.listaPreco
+              }
+            ];
 
-      setDadosEmpresas(empresas);
-      console.log(empresas, 'empresas');
+            const lojas = item.detalheLista
+              .filter(det => det.loja?.STATIVO === 'True')
+              .map(det => ({
+                tipo: 'loja',
+                value: det.loja.IDEMPRESA,
+                label: det.loja.NOFANTASIA,
+                loja: det.loja
+              }));
+
+            return [...lista, ...lojas];
+          });
+
+        setDadosEmpresas(empresas);
+      }
+
+      return response.data;
+    } catch (error) {
+      console.log('Erro ao buscar empresas:', error);
     }
-
-    return response.data;
-  } catch (error) {
-    console.log('Erro ao buscar empresas: ', error);
-  }
-};
+  };
 
   const fetchListaPrecosSap = async () => {
     const urlBase = `/lista-produtos-etiqueta-sap?idLista=${empresaSelecionada}&idProduto=${idProduto}&descricao=${descricaoProduto}&codBarras=${codBarrasProduto}`;
@@ -138,9 +158,96 @@ export const ActionPesquisaProdutoEtiqueta = ({ usuarioLogado }) => {
     setEmpresaSelecionada(e.value)
   }
 
+  const handleCancelar = async (isChecked) => {
+    const result = await Swal.fire({
+      icon: 'question',
+      title: `Deseja Limpar as Etiquetas Guardadas?`,
+      text: `Esta ação não poderá ser desfeita!`,
+      showCloseButton: true,
+      showCancelButton: true,
+      cancelButtonColor: '#FD1381',
+      confirmButtonColor: '#7352A5',
+      confirmButtonText: 'Sim, Limpar!',
+      cancelButtonText: 'Não, Voltar!',
+      customClass: {
+        container: 'custom-swal',
+      },
+    });
+
+    if (!result.isConfirmed) {
+      return;
+    }
+    setSelectAll(isChecked);
+    const updatedSelectedIds = isChecked ? [] : [];
+    setSelectedIds(updatedSelectedIds);
+    setProdutosSelecionados([]);
+    setDadosAcumuladorEtiquetas([]);
+    Swal.fire({
+      icon: 'success',
+      title: 'Cancelado com sucesso',
+      showConfirmButton: false,
+      timer: 1500
+    })
+  }
+
   const handleClick = () => {
     refetchListaPrecosSap();
   }
+
+  const handleImprimir = () => {
+    setModalImprimir(true);
+  }
+
+  const handleAcumuladorEtiquetas = async () => {
+    if (produtosSelecionados.length > 0) {
+      try {
+        setDadosAcumuladorEtiquetas((prev) => {
+          let listaAtualizada = [...prev];
+
+          produtosSelecionados.forEach((produto) => {
+            const indexExistente = listaAtualizada.findIndex(
+              (item) => item.IDPRODUTO === produto.IDPRODUTO
+            );
+
+            if (indexExistente !== -1) {
+              listaAtualizada[indexExistente] = {
+                ...listaAtualizada[indexExistente],
+                quantidade: produto.quantidade,
+              };
+            } else {
+              listaAtualizada.push({
+                quantidade: produto.quantidade,
+                NUCODBARRAS: produto.NUCODBARRAS,
+                DSNOME: produto.DSNOME,
+                TAMANHO: produto.TAMANHO,
+                PRECOVENDA: produto.PRECOVENDA,
+                DSESTILO: produto.DSESTILO,
+                DSLISTAPRECO: produto.DSLISTAPRECO,
+                DSLOCALEXPOSICAO: produto.DSLOCALEXPOSICAO,
+                IDPRODUTO: produto.IDPRODUTO,
+                MARCA: produto.MARCA,
+              });
+            }
+          });
+
+          return listaAtualizada;
+        });
+
+        Swal.fire({
+          icon: "success",
+          title: "Dados Salvos",
+          text: "Os dados foram adicionados à lista!",
+        });
+
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Valor Inválido",
+          text: "O valor deve ser maior que 0 para imprimir etiquetas!",
+        });
+      }
+    }
+  };
 
   return (
 
@@ -184,10 +291,31 @@ export const ActionPesquisaProdutoEtiqueta = ({ usuarioLogado }) => {
         onButtonClickSearch={handleClick}
         corSearch={"primary"}
         IconSearch={AiOutlineSearch}
+
+        ButtonTypeCadastro={ButtonType}
+        linkNome={'Guardar'}
+        onButtonClickCadastro={handleAcumuladorEtiquetas}
+        corCadastro={"success"}
+        IconCadastro={GoDownload}
+        styleCadastro={{ display: btnVisivel ? 'block' : 'none' }}
+
+        ButtonTypeCancelar={ButtonType}
+        onButtonClickCancelar={handleImprimir}
+        linkCancelar={"Imprimir"}
+        corCancelar={"info"}
+        IconCancelar={MdOutlineLocalPrintshop}
+        styleCancelar={{ display: btnVisivel || dadosAcumuladorEtiquetas.length > 0 ? 'block' : 'none' }}
+
+        ButtonTypeVendasEstrutura={ButtonType}
+        onButtonClickVendasEstrutura={handleCancelar}
+        linkNomeVendasEstrutura={"Cancelar"}
+        corVendasEstrutura={"danger"}
+        iconVendasEstrutura={BsTrash3}
+        styleVendasEstrutura={{ display: dadosAcumuladorEtiquetas.length > 0 ? 'block' : 'none' }}
       />
 
-      <ActionListaProdutoEtiqueta 
-        dadosListaPrecosSap={dadosListaPrecosSap} 
+      <ActionListaProdutoEtiqueta
+        dadosListaPrecosSap={dadosListaPrecosSap}
         btnVisivel={btnVisivel}
         setBtnVisivel={setBtnVisivel}
         setModalImprimir={setModalImprimir}
@@ -201,6 +329,8 @@ export const ActionPesquisaProdutoEtiqueta = ({ usuarioLogado }) => {
         setSelectAll={setSelectAll}
         selectedIds={selectedIds}
         setSelectedIds={setSelectedIds}
+        copia={copia}
+        setCopia={setCopia}
       />
     </Fragment>
   )

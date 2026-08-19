@@ -6,6 +6,7 @@ import { get, post, put } from "../../../../../api/funcRequest"
 import { useQuery } from "react-query"
 import { useFetchData } from "../../../../../hooks/useFetchData"
 import { validarCNPJ } from "../../../../../utils/mascaraCNPJ"
+import { formatMoeda } from "../../../../../utils/formatMoeda"
 import { optionsReposicao, optionsTipoFreteComercial } from "../../../../../../parceiro.json"
 import { use } from "react"
 
@@ -42,18 +43,70 @@ export const useVisualizarNFEdeEntrada = ({ handleClose, dadosVisualizarNFE }) =
     const [valorAplicado, setValorAplicado] = useState('');
     const [saldo, setSaldo] = useState('');
 
+    const optionsUsoPrincipal = [
+        { value: '10', label: 'Compra Comercial' },
+    ]
+
+    const optionsTipoNFE = [
+        { value: '-2', label: 'Externo' },
+    ]
+
+    const optionsModeloNFE = [
+        { value: '55', label: 'NFe(55)' },
+    ]
+
     useEffect(() => {
 
         if(dadosVisualizarNFE.length && dadosVisualizarNFE.length > 0) {
             const dados = dadosVisualizarNFE[0];
+            console.log(dados, 'condicao');
+            const totalNotaEntrada = formatMoeda(parseFloat(dados?.VNF || 0));
+
             setNumeroPedido(dados?.IDRESUMOPEDIDO);
-            setCondicaoPagamento({ value: dados?.IDCONDPAGAMENTO, label: dados?.NOME_CONDICAO_PAGAMENTO });
-            setFornecedorSelecionado({ value: dados?.IDFORNECEDOR, label: `${dados?.EMIT_XFANT} // ${dados?.EMIT_CNPJ}` });
-            setSaldo({ value: dados?.STSALDO, label: dados?.STSALDO == 'True' ? 'SIM' : 'NÃO' });
-           
-        }
+            // setFornecedorSelecionado({ value: dados?.IDFORNECEDOR, label: `${dados?.EMIT_XFANT} // ${dados?.EMIT_CNPJ}` });
+            // setUsoPrincipalSelecionado({ value: dados?.IDUSOPRINCIPAL, label: 'Compra Comercial' });
+            setStatusSelecionado('Fechado');
+            setSaldoSelecionado({ value: dados?.STSALDO, label: dados?.STSALDO == 'True' ? 'SIM' : 'NÃO' });
+            setDataCadastro(String(dados?.DTCADASTRO || '').substring(0, 10));
+            setDataEmissao(String(dados?.DEMI || '').substring(0, 10));
+            setNumeroNFE(dados?.NNF || '');
+            setSerieNFE(dados?.SERIE || 0);
+            setModeloNFE(dados?.XMOD || '');
+            setChaveNFE(dados?.CHNFE || '');
+            setObservacao(dados?.OBSERVACOES || '');
+            setTotalAntesDesconto(totalNotaEntrada);
+            setTotalPagar(totalNotaEntrada);
+            setSaldo(totalNotaEntrada);
+
+            const condicaoEncontrada = dadosCondicoesPagamento.find((item) => item.IDCONDICAOPAGAMENTO == dados?.IDCONDPAGAMENTO);
+            if(condicaoEncontrada) {
+                setCondicaoPagamento({
+                    value: condicaoEncontrada.IDCONDICAOPAGAMENTO,
+                    label: condicaoEncontrada.DSCONDICAOPAG
+                })
+            }
+            
+            const usoPrincipalEncontrado = dadosUsoPrincipal.find((item) => item.ID == dados?.IDUSOPRINCIPAL);
+            if(usoPrincipalEncontrado) {
+                setUsoPrincipalSelecionado({
+                    value: usoPrincipalEncontrado.IDUSOPRINCIPAL,
+                    label: usoPrincipalEncontrado.Usage
+                })
+            }
   
-    }, [])
+            const tipoFreteEncontrado = optionsTipoFreteComercial?.find((item) => String(item.value) === String(dados?.MODFRETE));
+            if(tipoFreteEncontrado) setTipoFrete(tipoFreteEncontrado);
+
+            // const tipoNFEEncontrado = optionsTipoNFE?.find((item) => String(item.value) === String(dados?.MOD))
+            // if(tipoNFEEncontrado) {
+            //     setTipoNFESelecionada({
+            //         value: tipoNFEEncontrado.value,
+            //         label: tipoNFEEncontrado.label
+            //     })
+            // }
+        }
+
+    }, [dadosVisualizarNFE])
 
 
     
@@ -98,8 +151,20 @@ export const useVisualizarNFEdeEntrada = ({ handleClose, dadosVisualizarNFE }) =
     );
 
     useEffect(() => {
-         setFilialSelecionada({value: dadosEmpresas[0]?.IDEMPRESA, label: dadosEmpresas[0]?.NOFANTASIA})
-    }, [])
+        if(!(dadosVisualizarNFE.length > 0) || !(dadosEmpresas.length > 0)) return;
+
+        const dados = dadosVisualizarNFE[0];
+        const filialEncontrada = dadosEmpresas.find((item) => String(item.IDEMPRESA) === String(dados?.IDEMPRESA));
+
+        if(filialEncontrada) {
+            setFilialSelecionada({
+                value: filialEncontrada.IDEMPRESA,
+                label: `${filialEncontrada.NOFANTASIA} - ${filialEncontrada.NORAZAOSOCIAL}`,
+                cnpj: filialEncontrada.NUCNPJ
+            });
+            setCnpjFilial(filialEncontrada.NUCNPJ);
+        }
+    }, [dadosVisualizarNFE, dadosEmpresas])
 
     const { data: dadosUsoPrincipal = [], error: errorUsoPrincipal, isLoading: isLoadingUsoPrincipal, refetch: refetchUsoPrincipal } = useQuery(
         'uso-principal',
@@ -114,12 +179,21 @@ export const useVisualizarNFEdeEntrada = ({ handleClose, dadosVisualizarNFE }) =
     const { data: dadosFornecedores = [], error: errorFornecedor, isLoading: isLoadingFornecedo } = useQuery(
         'fornecedores',
         async () => {
-        const response = await get(`/fornecedores`);
-
+        const response = await get(`/fornecedores?idFornecedor=${dadosVisualizarNFE[0]?.IDFORNECEDOR}`);
+    
         return response.data;
         },
-        { enabled: true, staleTime: 60 * 60 * 1000, }
+        { enabled: true }
     );
+
+    useEffect(() => {
+        if(dadosFornecedores.length > 0) {
+            setFornecedorSelecionado({
+                value: dadosFornecedores[0]?.IDFORNECEDOR,
+                label: `${dadosFornecedores[0]?.NORAZAOSOCIAL} // ${dadosFornecedores[0]?.NUCNPJ} // ${dadosFornecedores[0]?.NOFANTASIA}`
+            })
+        }
+    }, [])
 
 
     const { data: dadosNfePedido = [], error: errorNFE, isLoading: isLoadingNFE } = useQuery(
@@ -141,6 +215,28 @@ export const useVisualizarNFEdeEntrada = ({ handleClose, dadosVisualizarNFE }) =
         },
         { enabled: true, staleTime: 60 * 60 * 1000, }
     );
+
+    useEffect(() => {
+        if(!(dadosVisualizarNFE.length > 0) || !(dadosFabricantes.length > 0)) return;
+
+        const dados = dadosVisualizarNFE[0];
+        const marcaEncontrada = dadosFabricantes.find((item) => String(item.IDFABRICANTE) === String(dados?.IDMARCA));
+
+        if(marcaEncontrada) {
+            setMarcaSelecionada({ value: marcaEncontrada.IDFABRICANTE, label: `${marcaEncontrada.IDFABRICANTE} - ${marcaEncontrada.DSFABRICANTE}` });
+        }
+    }, [dadosVisualizarNFE, dadosFabricantes])
+
+    useEffect(() => {
+        if(!(dadosVisualizarNFE.length > 0) || !(dadosComprador.length > 0)) return;
+
+        const dados = dadosVisualizarNFE[0];
+        const compradorEncontrado = dadosComprador.find((item) => String(item.IDFUNCIONARIO) === String(dados?.IDCOMPRADOR));
+
+        if(compradorEncontrado) {
+            setCompradorSelecionado({ value: compradorEncontrado.IDFUNCIONARIO, label: compradorEncontrado.NOFUNCIONARIO });
+        }
+    }, [dadosVisualizarNFE, dadosComprador])
 
     const { data: dadosCNPJ = [], error: errorCNPJ, isLoading: isLoadingCNPJ } = useQuery(
         ['fornecedores'],

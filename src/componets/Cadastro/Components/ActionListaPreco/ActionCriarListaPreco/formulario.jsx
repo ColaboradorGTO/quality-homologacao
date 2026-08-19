@@ -9,7 +9,7 @@ import { schema } from "./schema/schemaValidation";
 import { ActionCriarListasPrecos } from "./actionCriarListasPreco"
 import { useCriarListaPrecos } from "../hooks/useCriarListaPrecos";
 
-export const Formulario = ({handleClose, optionsModulos, usuarioLogado}) => {
+export const Formulario = ({handleClose, optionsModulos, usuarioLogado, dadosListaPreco, refetchListaPreco}) => {
   const { handleSubmit, formState: { errors }, clearErrors, control, setError, setValue } = useForm({
     mode: "onChange"
   });
@@ -23,8 +23,13 @@ export const Formulario = ({handleClose, optionsModulos, usuarioLogado}) => {
     dataCriacao,
     setDataCriacao,
     situacao,
+    dadosEmpresas,
+    selectedIds,
+    setSelectedIds,
+    selectAllChecked,
+    setSelectAllChecked,
     onSubmit,
-  } = useCriarListaPrecos({ optionsModulos, usuarioLogado, handleClose })
+  } = useCriarListaPrecos({ optionsModulos, usuarioLogado, handleClose, dadosListaPreco, refetchListaPreco })
 
 
   const handleValidatedSubmit = async () => {
@@ -148,8 +153,13 @@ export const Formulario = ({handleClose, optionsModulos, usuarioLogado}) => {
 
         </div>
         <ActionCriarListasPrecos
-          optionsModulos={optionsModulos}
-          usuarioLogado={usuarioLogado}
+          dadosEmpresas={dadosEmpresas}
+          empresaSelecionada={empresaSelecionada}
+          setEmpresaSelecionada={setEmpresaSelecionada}
+          selectedIds={selectedIds}
+          setSelectedIds={setSelectedIds}
+          selectAllChecked={selectAllChecked}
+          setSelectAllChecked={setSelectAllChecked}
         />
 
         <FooterModal

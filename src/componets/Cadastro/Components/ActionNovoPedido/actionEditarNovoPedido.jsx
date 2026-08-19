@@ -309,31 +309,28 @@ export const ActionEditarNovoPedido = ({dadosEditarPedido, dadosDetalhePedido}) 
   return (
 
     <Fragment>
-      <ResultadoResumo
+      <ActionMainNovoPedido
+        linkComponentAnterior={["Home"]}
+        linkComponent={[" Dados do Pedido"]}
+        title={`Cadastro dos Produtos do Pedido: `}
+        subTitle="CADASTRO"
+        
         cardVendas={true}
         valorVendas={calcularTotalDetalhe()}
         nomeVendas="Valor Bruto Pedido"
         IconVendas={MdOutlinePayment}
         iconSize={100}
         iconColor={"#fff"}
-
+        
         cardTicketMedio={true}
         valorTicketMedio={calcularTotalDetalhe()}
         nomeTicketMedio="Valor Líquido Pedido"
         IconTicketMedio={MdOutlinePayment}
-
+        
         cardCliente={true}
         numeroCliente={calcularTotalQuantidade()}
-        nomeCliente="QTD Produtos"
         IconNumeroCliente={MdOutlinePayment}
-      />
-
-      <ActionMainNovoPedido
-        linkComponentAnterior={["Home"]}
-        linkComponent={[" Dados do Pedido"]}
-        title={`Cadastro dos Produtos do Pedido: ${dadosEditarPedido[0]?.IDPEDIDO}`}
-        subTitle="CADASTRO"
-
+        nomeCliente="QTD Produtos"
 
         InputFieldDTInicioComponent={InputFieldAction}
         labelInputDTInicio={"Data Pedido"}

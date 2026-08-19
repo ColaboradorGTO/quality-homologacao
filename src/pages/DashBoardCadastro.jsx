@@ -9,12 +9,12 @@ import { get } from "../api/funcRequest";
 import { useQuery } from "react-query";
 
 const ActionPesquisaHome = lazy(() => import("../componets/Cadastro/Components/ActionHome/actionPesquisaHome").then(module => ({ default: module.ActionPesquisaHome })));
-const ActionPesquisaNFE = lazy(() => import("../componets/Cadastro/Components/ActionNotasFiscais/actionPesquisaNotasNFE").then(module => ({ default: module.ActionPesquisaNFE })));
 const ActionPesquisaProdutosAvulso = lazy(() => import("../componets/Cadastro/Components/ActionProdutosAvulso/actionPesquisaProdutosAvulso").then(module => ({ default: module.ActionPesquisaProdutosAvulso })));
 const ActionPesquisaEstilos = lazy(() => import("../componets/Cadastro/Components/ActionEstilos/actionPesquisaEstilos").then(module => ({ default: module.ActionPesquisaEstilos })));
+const ActionPesquisaNFE = lazy(() => import("../componets/Cadastro/Components/ActionNotasFiscais/actionPesquisaNotasNFE").then(module => ({ default: module.ActionPesquisaNFE })));
+const ActionPesquisaPreco = lazy(() => import("../componets/Cadastro/Components/ActionListaPreco/actionPesquisaPreco").then(module => ({ default: module.ActionPesquisaPreco })));
 const ActionPesquisaAlteracaoPreco = lazy(() => import("../componets/Cadastro/Components/ActionAlteracaoPrecoProduto/actionPesquisaAlteracaoPreco").then(module => ({ default: module.ActionPesquisaAlteracaoPreco })));
 const ActionPesquisaProdutoEtiqueta = lazy(() => import("../componets/Cadastro/Components/ActionProdutoEtiqueta/actionPesquisaProdutoEtiqueta").then(module => ({ default: module.ActionPesquisaProdutoEtiqueta })));
-const ActionPesquisaPreco = lazy(() => import("../componets/Cadastro/Components/ActionListaPreco/actionPesquisaPreco").then(module => ({ default: module.ActionPesquisaPreco })));
 
 export const DashBoardCadastro = () => {
   const [usuarioLogado, setUsuarioLogado] = useState(null);
@@ -24,6 +24,7 @@ export const DashBoardCadastro = () => {
   const [componentToShow, setComponentToShow] = useState("");
   const [menuSelected, setMenuSelected] = useState(null);
   const navigate = useNavigate();
+
 
   useEffect(() => {
     const usuarioArmazenado = localStorage.getItem('usuario');
@@ -44,15 +45,15 @@ export const DashBoardCadastro = () => {
 
 
   const { data: optionsModulosPage = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
-    'menus-usuario',
+    ['menus-usuario', usuarioLogado, selectedModule],
     async () => {
+   
       const response = await get(`/menus-usuario?idUsuario=${usuarioLogado?.id}&idModulo=${selectedModule?.ID}`);
-      
       return response.data;
     },
     { enabled: Boolean(usuarioLogado?.id), staleTime: 5 * 60 * 1000, }
   );
-
+  
   function handleShowComponent(componentName) {
     const menuFilhoSelecionado = selectedModule.menuPai.menuFilho.find(
       menu => menu.URL === componentName

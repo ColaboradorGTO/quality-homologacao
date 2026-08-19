@@ -9,7 +9,8 @@ export const ActionEditarListasPrecosModal = ({
   handleClose, 
   dadosListaLoja,
   optionsModulos,
-  usuarioLogado
+  usuarioLogado,
+  refetchListaPreco
 }) => {
 
 
@@ -38,6 +39,7 @@ export const ActionEditarListasPrecosModal = ({
             handleClose={handleClose}
             optionsModulos={optionsModulos}
             usuarioLogado={usuarioLogado}
+            refetchListaPreco={refetchListaPreco}
           />
         </Modal.Body>
 

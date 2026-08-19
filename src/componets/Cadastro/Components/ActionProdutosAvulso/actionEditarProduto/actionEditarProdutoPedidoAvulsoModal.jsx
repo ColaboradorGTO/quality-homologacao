@@ -10,7 +10,8 @@ export const ActionEditarProodutodPedidoAvulsoModal = ({
   handleClose, 
   usuarioLogado, 
   optionsModulos,
-  dadosDetalheProduto 
+  dadosDetalheProduto,
+  handleClick 
 }) => {
 
   return (
@@ -35,6 +36,7 @@ export const ActionEditarProodutodPedidoAvulsoModal = ({
             usuarioLogado={usuarioLogado} 
             optionsModulos={optionsModulos}
             dadosDetalheProduto={dadosDetalheProduto}
+            handleClick={handleClick}
           />
         </Modal.Body>
       </Modal>

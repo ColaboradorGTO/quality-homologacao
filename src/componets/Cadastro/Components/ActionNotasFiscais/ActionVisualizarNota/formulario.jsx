@@ -83,21 +83,11 @@ export const Formulario = ({ handleClose, dadosVisualizarNFE }) => {
         dadosFabricantes,
         optionsTipoFreteComercial,
         optionsReposicao,
+        optionsUsoPrincipal,
+        optionsTipoNFE,
+        optionsModeloNFE,
     } = useVisualizarNFEdeEntrada({ handleClose, dadosVisualizarNFE });
    
-
-
-    const optionsUsoPrincipal = [
-        { value: '10', label: 'Compra Comercial' },
-    ]
-
-    const optionsTipoNFE = [
-        { value: '2', label: 'Externo' },
-    ]
-
-    const optionsModeloNFE = [
-        { value: '55', label: 'NFe(55)' },
-    ]
 
     const preencheDadosComCHNFE = (chaveNFE) => {
         chaveNFE = chaveNFE.replace(/\D/g, ''); 
@@ -142,7 +132,7 @@ export const Formulario = ({ handleClose, dadosVisualizarNFE }) => {
 
                             <div className="form-group">
                                 <div className="row">
-                                    <div className="col-sm-6 col-xl-6">
+                                    <div className="col-sm-6 col-xl-8">
                                         <label className="form-label" htmlFor="notam">Fornecedor</label>
                                         <Select
                                             className="basic-single"
@@ -166,7 +156,7 @@ export const Formulario = ({ handleClose, dadosVisualizarNFE }) => {
        
                                     </div>
                                
-                                    <div className="col-sm-6 col-xl-6">
+                                    <div className="col-sm-6 col-xl-4">
                                         <label>Condições de Pagamento</label>
 
                                         <Select
@@ -462,18 +452,19 @@ export const Formulario = ({ handleClose, dadosVisualizarNFE }) => {
                                             className="basic-single"
                                             classNamePrefix="select"
                                             name="tipoNFEPedido"
-                                            options={optionsTipoNFE.map((item) => {
-                                                return {
+                                            options={[
+                                                { value: '-2', label: 'Externo' },
+                                                ...(optionsTipoNFE?.map((item) => ({
                                                     value: item.value,
                                                     label: item.label
-                                                }
-                                            })}
+                                                })) || [])
+                                            ]}
                                             value={tipoNFESelecionada}
                                             onChange={(e) => {
                                                 setTipoNFESelecionada(e)
                                                 clearErrors("tipoNFEPedido")
                                             }}
-                                            isDisabled={true}
+                                            // isDisabled={true}
                                         />
                                         
                                     </div>
@@ -521,8 +512,24 @@ export const Formulario = ({ handleClose, dadosVisualizarNFE }) => {
                                     </div>
                                     <div className="col-sm-3 col-xl-4">
                                        
-                                        <label htmlFor="">Modelo NF</label>
-                                        <Select
+                                        <Controller
+                                            name="serieNFEPedido"
+                                            control={control}
+                                            render={({ field }) => (
+                                                <FormField
+                                                    label={"Modelo NF "}
+                                                    name="modeloNFEPedido"
+                                                    type="text"
+                                                    value={'NFe(55)'}
+                                                    onChange={(e) => setModeloNFE(e.target.value)}
+                                                    errors={errors}
+                                                    clearErrors={clearErrors}
+                                                    readOnly={true}
+                                                />
+                                            )}
+                                        />
+                                                    {/* <label htmlFor="">Modelo NF</label> */}
+                                        {/* <Select
                                             className="basic-single"
                                             classNamePrefix="select"
                                             name="modeloNFEPedido"
@@ -538,7 +545,7 @@ export const Formulario = ({ handleClose, dadosVisualizarNFE }) => {
                                                 clearErrors("modeloNFEPedido")
                                             }}
                                             isDisabled={true}
-                                        />
+                                        /> */}
                                         
                                     </div>
                                     <div className="col-sm-3 col-xl-4">

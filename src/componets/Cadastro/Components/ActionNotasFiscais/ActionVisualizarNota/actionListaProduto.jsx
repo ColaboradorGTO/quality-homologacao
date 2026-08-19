@@ -62,19 +62,18 @@ export const ActionListaNotasNFE = ({ dadosVisualizarNFE }) => {
     XLSX.writeFile(workbook, 'produtos_pedido.xlsx');
   };
 
-
-  const dados = dadosVisualizarNFE?.map((item, index) => {
-    let contador = index + 1;
+  const dados = dadosVisualizarNFE[0]?.detalheProdutosNotaEntrada?.map((item, index) => {
+    let contador = item?.nItem ?? (index + 1);
 
     return {
       contador,
-      IDPRODUTO: item.detalheProdutosNotaEntrada[0]?.IDPRODUTO,
-      DSPRODUTO: item.detalheProdutosNotaEntrada[0]?.DSPRODUTO,
-      NUCODBARRAS: item.detalheProdutosNotaEntrada[0]?.NUCODBARRAS,
-      QTD: item.detalheProdutosNotaEntrada[0]?.QTD,
-      EMPDESTINO: item.detalheProdutosNotaEntrada[0]?.EMPDESTINO,
-      VRUNITARIO: formatMoeda(item.detalheProdutosNotaEntrada[0]?.VRUNITARIO),
-      VRTOTALPROD: formatMoeda(item.detalheProdutosNotaEntrada[0]?.VRTOTALPROD),
+      IDPRODUTO: item?.IDPRODUTO,
+      DSPRODUTO: item?.DSPRODUTO,
+      NUCODBARRAS: item?.NUCODBARRAS,
+      QTD: parseFloat(item?.QTD),
+      EMPDESTINO: item?.EMPDESTINO,
+      VRUNITARIO: formatMoeda(item?.VRUNITARIO),
+      VRTOTALPROD: formatMoeda(item?.VRTOTALPROD),
     }
   })
 
@@ -182,7 +181,7 @@ export const ActionListaNotasNFE = ({ dadosVisualizarNFE }) => {
             sortOrder={-1}
             paginator={true}
             rows={10}
-            rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
+            rowsPerPageOptions={[10, 20, 50, 100, dados?.length]}
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
             filterDisplay="menu"

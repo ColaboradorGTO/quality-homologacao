@@ -6,7 +6,7 @@ import { situacao } from "../../../../../../parceiro.json"
 import { useQuery } from "react-query"
 
 
-export const useEditarListaPrecos = ({optionsModulos, usuarioLogado, dadosListaLoja }) => {
+export const useEditarListaPrecos = ({ optionsModulos, usuarioLogado, dadosListaLoja, handleClose, refetchListaPreco }) => {
   const [descricao, setDescricao] = useState('')
   const [statusSelecionado, setStatusSelecionado] = useState([])
   const [ipUsuario, setIpUsuario] = useState('');
@@ -33,12 +33,12 @@ export const useEditarListaPrecos = ({optionsModulos, usuarioLogado, dadosListaL
         STATIVO: detalhe.loja?.STATIVO,
         IDGRUPOEMPRESARIAL: detalhe.loja?.IDGRUPOEMPRESARIAL,
       })) || [];
-      
+
       const empresaIds = empresas.map(empresa => empresa.IDEMPRESA);
-      
+
       setEmpresaSelecionada(empresas);
       setSelectedIds(empresaIds);
-      
+
       if (dadosEmpresas.length > 0 && empresaIds.length === dadosEmpresas.length) {
         setSelectAllChecked(true);
       }
@@ -70,12 +70,12 @@ export const useEditarListaPrecos = ({optionsModulos, usuarioLogado, dadosListaL
   };
 
   useEffect(() => {
-    if (dadosListaLoja && dadosListaLoja.length > 0) { 
+    if (dadosListaLoja && dadosListaLoja.length > 0) {
       setStatusSelecionado({ value: dadosListaLoja[0]?.listaPreco.STATIVO == 'True' ? 'True' : 'False', label: dadosListaLoja[0]?.listaPreco.STATIVO == 'True' ? 'ATIVO' : 'INATIVO' })
       setNomeListaPreco(dadosListaLoja[0]?.listaPreco.NOMELISTA)
     }
   }, [dadosListaLoja])
-  
+
   const onSubmit = async () => {
 
     if (optionsModulos[0]?.ALTERAR == 'False') {
@@ -93,27 +93,27 @@ export const useEditarListaPrecos = ({optionsModulos, usuarioLogado, dadosListaL
 
     const IDRESUMOLISTAPRECO = Number(dadosListaLoja[0]?.listaPreco.IDRESUMOLISTAPRECO);
     const NOMELISTA = nomeListaPreco;
-    const IDUSERALTERACAO = usuarioLogado?.id; 
+    const IDUSERALTERACAO = usuarioLogado?.id;
     const STATIVO = statusSelecionado?.value;
 
     let dadosDetalheLista = [];
 
     if (empresaSelecionada && empresaSelecionada.length > 0) {
       empresaSelecionada.forEach((empresa) => {
-        const detalheExistente = dadosListaLoja?.find(item => 
+        const detalheExistente = dadosListaLoja?.find(item =>
           item.detalheLista?.some(detalhe => detalhe.IDEMPRESA === empresa.IDEMPRESA)
         );
 
         const IDDETALHELISTAPRECO = detalheExistente?.detalheLista?.find(
           detalhe => detalhe.IDEMPRESA === empresa.IDEMPRESA
-        )?.IDDETALHELISTAPRECO || '';
-        
-        const IDGRUPOEMPRESARIAL = empresa.IDGRUPOEMPRESARIAL ? Number(empresa.IDGRUPOEMPRESARIAL) : '';
-        const IDEMPRESA = empresa.IDEMPRESA ? Number(empresa.IDEMPRESA) : '';
+        )?.IDDETALHELISTAPRECO || null;
+
+        const IDGRUPOEMPRESARIAL = empresa.IDGRUPOEMPRESARIAL ? Number(empresa.IDGRUPOEMPRESARIAL) : null;
+        const IDEMPRESA = empresa.IDEMPRESA ? Number(empresa.IDEMPRESA) : null;
         const STATIVOLOJA = empresa.STATIVO;
 
         dadosDetalheLista.push({
-          IDDETALHELISTAPRECO: IDDETALHELISTAPRECO ? Number(IDDETALHELISTAPRECO) : '',
+          IDDETALHELISTAPRECO: IDDETALHELISTAPRECO ? Number(IDDETALHELISTAPRECO) : null,
           IDRESUMOLISTAPRECO,
           IDGRUPOEMPRESARIAL,
           IDEMPRESA,
@@ -131,11 +131,11 @@ export const useEditarListaPrecos = ({optionsModulos, usuarioLogado, dadosListaL
       lojas: dadosDetalheLista
     };
 
-    
+
     if (!dadosDetalheLista.length) {
       Swal.fire({
         icon: 'warning',
-        title: 'Atenção', 
+        title: 'Atenção',
         text: 'Lista Sem Lojas Selecionadas, favor selecionar as lojas e tentar novamente!',
         timer: 10000,
         showConfirmButton: true,
@@ -146,14 +146,14 @@ export const useEditarListaPrecos = ({optionsModulos, usuarioLogado, dadosListaL
       return;
     }
 
-    const loadingAlert = Swal.fire({
-      title: 'Atualizando...',
-      text: 'Por favor aguarde.',
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      }
-    });
+    // const loadingAlert = Swal.fire({
+    //   title: 'Atualizando...',
+    //   text: 'Por favor aguarde.',
+    //   allowOutsideClick: false,
+    //   didOpen: () => {
+    //     Swal.showLoading();
+    //   }
+    // });
 
     try {
       const response = await put('/lista-de-preco/:id', dadosLista);
@@ -169,7 +169,7 @@ export const useEditarListaPrecos = ({optionsModulos, usuarioLogado, dadosListaL
       };
 
       await post('/log-web', createtLog);
-      
+
       Swal.fire({
         icon: 'success',
         title: 'Sucesso',
@@ -179,12 +179,15 @@ export const useEditarListaPrecos = ({optionsModulos, usuarioLogado, dadosListaL
           container: 'custom-swal',
         },
       })
+
+      handleClose();
+      refetchListaPreco();
       return response.data;
     } catch (error) {
       console.error('Erro ao atualizar lista de preço:', error);
-      Swal.close();
+
       const textDados = JSON.stringify(dadosLista);
-      let textFuncao = 'CADASTRO / ALTERAÇÃO DE LISTA DE PREÇOS';
+      let textFuncao = 'CADASTRO / ERRO AO ALTERAR DE LISTA DE PREÇOS';
       const ipUsuario = await getIPUsuario();
       const createtLog = {
         IDFUNCIONARIO: String(usuarioLogado.id),
@@ -192,7 +195,7 @@ export const useEditarListaPrecos = ({optionsModulos, usuarioLogado, dadosListaL
         DADOS: textDados,
         IP: ipUsuario || 'Indisponível'
       };
-  
+
       await post('/log-web', createtLog);
       Swal.fire({
         icon: 'error',

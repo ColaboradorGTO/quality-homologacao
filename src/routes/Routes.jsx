@@ -19,11 +19,11 @@ const DashBoardMarketing = lazy(() => import("../pages/DashBoardMarketing").then
 const DashBoardGerencia = lazy(() => import("../pages/DashBoardGerencia").then(module => ({ default: module.DashBoardGerencia })));
 const DashBoardEtiquetagem = lazy(() => import("../pages/DashBoardEtiquetagem").then(module => ({ default: module.DashBoardEtiquetagem })));
 const DashBoardConferenciaCega = lazy(() => import("../pages/DashBoardConferenciaCega").then(module => ({ default: module.DashBoardConferenciaCega })));
-const DashBoardComprasDM = lazy(() => import("../pages/DashBoardComprasDm").then(module => ({ default: module.DashBoardComprasDM })));
 
 
-const DashBoardCadastro = lazy(() => import("../pages/DashBoardCadastro").then(module => ({ default: module.DashBoardCadastro })));
 const DashBoardCompras = lazy(() => import("../pages/DashBoardCompras").then(module => ({ default: module.DashBoardCompras })));
+const DashBoardCadastro = lazy(() => import("../pages/DashBoardCadastro").then(module => ({ default: module.DashBoardCadastro })));
+const DashBoardComprasDM = lazy(() => import("../pages/DashBoardComprasDm").then(module => ({ default: module.DashBoardComprasDM })));
 const DashBoardExpedicao = lazy(() => import("../pages/DashBoardExpedicao").then(module => ({ default: module.DashBoardExpedicao })));
 
 const DashBoardMenus = lazy(() => import("../pages/DashBoardMenus").then(module => ({ default: module.DashBoardMenus })));

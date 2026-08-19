@@ -13,6 +13,8 @@ export const useDesvincularPedidoNFE = ({
 }) => {
     const [ipUsuario, setIpUsuario] = useState('');
     const [selectedItems, setSelectedItems] = useState([]);
+    const [btnVisivel, setBtnVisivel] = useState(false);
+
     const getIPUsuario = async () => {
         let usuarioIP = null;
 
@@ -35,7 +37,16 @@ export const useDesvincularPedidoNFE = ({
         return usuarioIP;
     };
 
-
+   
+   
+    
+    useEffect(() => {
+        if (selectedItems?.length === 0) {
+            setBtnVisivel(false);
+        } else {
+            setBtnVisivel(true);
+        }
+    }, [selectedItems]);
   
     const onSubmit = async () => {
         if (optionsModulos[0]?.CRIAR == 'False') {
@@ -192,6 +203,7 @@ export const useDesvincularPedidoNFE = ({
     return {
         selectedItems,
         setSelectedItems,
+        btnVisivel,
         onSubmit,
     }
 }

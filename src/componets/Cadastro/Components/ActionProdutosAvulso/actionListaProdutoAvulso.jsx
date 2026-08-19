@@ -7,7 +7,7 @@ import { MdOutlineLocalPrintshop, MdOutlineSend } from "react-icons/md";
 import { formatMoeda } from "../../../../utils/formatMoeda";
 import { CiEdit } from "react-icons/ci";
 import { AiOutlineDelete } from "react-icons/ai";
-import { FaCashRegister, FaCheck } from "react-icons/fa";
+import { FaCheck } from "react-icons/fa";
 import { SiSap } from "react-icons/si";
 import { BsTrash3 } from "react-icons/bs";
 import { toFloat } from "../../../../utils/toFloat";
@@ -20,8 +20,8 @@ import * as XLSX from 'xlsx';
 import 'jspdf-autotable';
 import { get } from "../../../../api/funcRequest";
 import { useAtivarCancelarProduto } from "./hooks/useAtivarCancelarProduto";
-import { useIncluirProduto } from "./hooks/useIncluirProduto";
 import { useMigrarProduto } from "./hooks/useMigrarProduto";
+import { dataHoraFormatada } from "../../../../utils/dataFormatada";
 
 export const ActionListaProdutoAvulso = ({
   dadosProdutosAvulso,
@@ -40,12 +40,19 @@ export const ActionListaProdutoAvulso = ({
   } = useAtivarCancelarProduto({ usuarioLogado, optionsModulos, handleClick });
 
   const {
-    handleIncluirProduto
-  } = useIncluirProduto({ usuarioLogado, optionsModulos, handleClick });
-
-  const {
     handleMigrarProduto
   } = useMigrarProduto({ usuarioLogado, optionsModulos, handleClick });
+
+  const handleVerMotivoErro = (row) => {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Motivo:',
+      text: row.ERRORLOGSAP,
+      customClass: {
+        container: 'custom-swal',
+      }
+    });
+  };
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -68,8 +75,8 @@ export const ActionListaProdutoAvulso = ({
         item.NUREF,
         toFloat(item.QTDPRODUTO),
         item.DSFABRICANTE,
-        formatMoeda(item.VRCUSTO),
-        formatMoeda(item.VRVENDA),
+        formatMoeda(item.PRECOCUSTO),
+        formatMoeda(item.PRECOVENDA),
         item.STCANCELADO == 'True' ? 'CANCELADO' : 'ATIVO',
         item.STMIGRADOSAP == 'True' ? (item.STCADASTRADO == 'True' ? 'INCLUIDO PDV / MIGRADO SAP' : 'NÃO INCLUIDO PDV / MIGRADO SAP') : (item.STCADASTRADO == 'True' ? 'INCLUIDO PDV / NÃO MIGRADO SAP' : 'NÃO INCLUIDO PDV / NÃO MIGRADO SAP')
 
@@ -103,55 +110,62 @@ export const ActionListaProdutoAvulso = ({
   };
 
   const dados = dadosProdutosAvulso.map((item, index) => {
-
+    // console.log(item, 'item')
     return {
-      DTCADASTROFORMAT: item.DTCADASTROFORMAT,
-      CODBARRAS: item.CODBARRAS,
-      DSPRODUTO: item.DSPRODUTO,
-      NUREF: item.NUREF,
+      DTCADASTRO: item.DTCADASTRO || item.DTULTALTERACAO,
+      DTULTALTERACAO: item.DTULTALTERACAO,
+      IDPRODUTO: item.IDPRODUTO,
+      NUCODBARRAS: item.NUCODBARRAS,
+      DSNOME: item.DSNOME,
+      NUREFERENCIA: item.NUREFERENCIA,
       QTDPRODUTO: item.QTDPRODUTO,
       DSFABRICANTE: item.DSFABRICANTE,
-      VRCUSTO: item.VRCUSTO,
-      VRVENDA: item.VRVENDA,
-      STCANCELADO: item.STCANCELADO == 'True' ? 'CANCELADO' : 'ATIVO',
+      PRECOCUSTO: item.PRECOCUSTO,
+      PRECOVENDA: item.PRECOVENDA,
+      STCANCELADO: item.STATIVO == 'False' ? 'CANCELADO' : 'ATIVO',
       STMIGRADOSAP: item.STMIGRADOSAP,
       STCADASTRADO: item.STCADASTRADO,
       IDDETALHEPRODUTOPEDIDO: item.IDDETALHEPRODUTOPEDIDO,
+      ERRORLOGSAP: item.ERRORLOGSAP,
     }
   });
 
 
   const colunasPedidos = [
-
     {
-      field: 'DTCADASTROFORMAT',
-      header: 'Data',
-      body: row => <th>{row.DTCADASTROFORMAT}</th>,
+      field: 'DTCADASTRO',
+      header: 'Data Cadastro',
+      body: row => <th>{dataHoraFormatada(row.DTCADASTRO)}</th>,
       sortable: true,
     },
     {
-      field: 'CODBARRAS',
+      field: 'DTULTALTERACAO',
+      header: 'Data Atualização',
+      body: row => <th>{dataHoraFormatada(row.DTULTALTERACAO)}</th>,
+      sortable: true,
+    },
+    {
+      field: 'IDPRODUTO',
+      header: 'Id.Produto',
+      body: row => <th>{row.IDPRODUTO}</th>,
+      sortable: true,
+    },
+    {
+      field: 'NUCODBARRAS',
       header: 'Cod. Barras',
-      body: row => <th>{row.CODBARRAS}</th>,
+      body: row => <th>{row.NUCODBARRAS}</th>,
       sortable: true,
     },
     {
-      field: 'DSPRODUTO',
+      field: 'DSNOME',
       header: 'Descrição',
-      body: row => <th>{row.DSPRODUTO}</th>,
+      body: row => <th>{row.DSNOME}</th>,
       sortable: true,
     },
     {
-      field: 'NUREF',
+      field: 'NUREFERENCIA',
       header: 'Ref',
-      body: row => <th>{row.NUREF}</th>,
-      sortable: true,
-    },
-    {
-      field: 'QTDPRODUTO',
-      header: 'QTD',
-      body: row => <th>{toFloat(row.QTDPRODUTO)}</th>,
-      footer: 'Total ',
+      body: row => <th>{row.NUREFERENCIA}</th>,
       sortable: true,
     },
     {
@@ -162,15 +176,15 @@ export const ActionListaProdutoAvulso = ({
       sortable: true,
     },
     {
-      field: 'VRCUSTO',
+      field: 'PRECOCUSTO',
       header: 'Vl. Custo',
-      body: row => <th>{formatMoeda(row.VRCUSTO)}</th>,
+      body: row => <th>{formatMoeda(row.PRECOCUSTO)}</th>,
       sortable: true,
     },
     {
-      field: 'VRVENDA',
+      field: 'PRECOVENDA',
       header: 'Vl. Venda',
-      body: row => <th>{formatMoeda(row.VRVENDA)}</th>,
+      body: row => <th>{formatMoeda(row.PRECOVENDA)}</th>,
       sortable: true,
     },
     {
@@ -179,11 +193,7 @@ export const ActionListaProdutoAvulso = ({
       body: row => {
         return (
           <div>
-            <th style={{
-              color:
-                row.STCANCELADO == 'CANCELADO' ? 'red' : 'blue'
-            }}
-            >
+            <th style={{color:  row.STCANCELADO == 'CANCELADO' ? 'red' : 'blue' }}>
               {row.STCANCELADO}
             </th>
           </div>
@@ -195,53 +205,28 @@ export const ActionListaProdutoAvulso = ({
       field: 'STMIGRADOSAP',
       header: 'Situação',
       body: (row) => {
-        if (row.STMIGRADOSAP == 'True') {
-          if (row.STCADASTRADO == 'True') {
-            return (
-              <th style={{ color: 'blue' }}>
-                INCLUIDO PDV / MIGRADO SAP
-              </th>
-            )
+        const migrado = row.STMIGRADOSAP == 'True';
+        const temErroSap = migrado && row.ERRORLOGSAP?.length > 0;
 
-          } else {
-            return (
-              <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-                <th style={{ color: 'red' }} >
-                  NÃO INCLUIDO PDV
-                </th>
-                <th> / </th>
-                <th style={{ color: 'blue' }}>
-                  MIGRADO SAP
-                </th>
-              </div>
-            )
-          }
-
-        } else {
-          if (row.STCADASTRADO == 'True') {
-            return (
-              <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-                <th style={{ color: 'blue' }} >
-                  INCLUIDO PDV
-                </th>
+        return (
+          <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+            <th style={{ color: 'blue' }}>
+              INCLUIDO PDV
+            </th>
+            <th>/</th>
+            <th style={{ color: migrado ? 'blue' : 'red' }}>
+              {migrado ? 'MIGRADO SAP' : 'NÃO MIGRADO SAP'}
+            </th>
+            {temErroSap && (
+              <>
                 <th>/</th>
                 <th style={{ color: 'red' }}>
-                  NÃO MIGRADO SAP
+                  ERRO AO ATUALIZAR NO SAP
                 </th>
-              </div>
-            )
-
-          } else {
-            return (
-              <div>
-                <th style={{ color: 'red' }}>
-                  NÃO INCLUIDO PDV NÃO MIGRADO SAP
-                </th>
-              </div>
-            )
-          }
-
-        }
+              </>
+            )}
+          </div>
+        )
       },
       sortable: true
     },
@@ -249,14 +234,14 @@ export const ActionListaProdutoAvulso = ({
       field: 'IDDETALHEPRODUTOPEDIDO',
       header: 'Opções',
       body: (row) => {
-        if (row.STCANCELADO == 'TRUE') {
+        if (row.STCANCELADO == 'CANCELADO') {
           return (
             <div className="p-1 "
               style={{ justifyContent: "space-between", display: "flex" }}
             >
               <div className="p-1">
                 <ButtonTable
-                  titleButton={"Ativar Produto Avulso"}
+                  titleButton={"Reativar Produto"}
                   onClickButton={() => handleCancelar(row, 'False')}
                   Icon={FaCheck}
                   cor={"success"}
@@ -268,137 +253,75 @@ export const ActionListaProdutoAvulso = ({
               </div>
             </div>
           )
-        } else {
-          if (row.STCADASTRADO == 'True') {
-            if (row.STMIGRADOSAP == 'True') {
-              return (
-                <div className="p-1 "
-                  style={{ justifyContent: "space-between", display: "flex" }}
-                >
-                  <div className="p-1">
-                    <ButtonTable
-                      titleButton={"Cancelar Produto Avulso"}
-                      onClickButton={() => handleCancelar(row, 'True')}
-                      Icon={BsTrash3}
-                      cor={"danger"}
-                      iconColor={"white"}
-                      iconSize={20}
-                      width="30px"
-                      height="30px"
-                    />
-                  </div>
-                </div>
-              )
-
-            } else {
-              return (
-                <div className="p-1 "
-                  style={{ justifyContent: "space-between", display: "flex" }}
-                >
-                  <div className="p-1">
-                    <ButtonTable
-                      titleButton={"Migrar para SAP"}
-                      onClickButton={() => handleMigrarProduto(row)}
-                      Icon={SiSap}
-                      cor={"primary"}
-                      iconColor={"white"}
-                      iconSize={20}
-                      width="30px"
-                      height="30px"
-                    />
-                  </div>
-                  <div className="p-1">
-                    <ButtonTable
-                      titleButton={"Cancelar Produto Avulso"}
-                      onClickButton={() => handleCancelar(row, 'True')}
-                      Icon={BsTrash3}
-                      cor={"danger"}
-                      iconColor={"white"}
-                      iconSize={20}
-                      width="30px"
-                      height="30px"
-                    />
-                  </div>
-                </div>
-              )
-
-            }
-          } else {
-            if (row.STMIGRADOSAP == 'True') {
-              return (
-                <div className="p-1 "
-                  style={{ justifyContent: "space-between", display: "flex" }}
-                >
-                  <div className="p-1">
-                    <ButtonTable
-                      titleButton={"Cancelar Produto Avulso"}
-                      onClickButton={() => handleCancelar(row, 'True')}
-                      Icon={BsTrash3}
-                      cor={"danger"}
-                      iconColor={"white"}
-                      iconSize={20}
-                      width="30px"
-                      height="30px"
-                    />
-                  </div>
-                </div>
-              )
-
-            } else {
-              return (
-                <div className="p-1 "
-                  style={{ justifyContent: "space-between", display: "flex" }}
-                >
-                  <div className="p-1">
-                    <ButtonTable
-                      titleButton={"Editar Produto Avulso"}
-                      onClickButton={() => handleClickEdit(row)}
-                      Icon={CiEdit}
-                      cor={"primary"}
-                      iconColor={"white"}
-                      iconSize={20}
-                      width="30px"
-                      height="30px"
-                    />
-                  </div>
-                  <div className="p-1">
-                    <ButtonTable
-                      titleButton={"Cancelar Produto Avulso"}
-                      onClickButton={() => handleCancelar(row, 'True')}
-                      Icon={BsTrash3}
-                      cor={"danger"}
-                      iconColor={"white"}
-                      iconSize={20}
-                      width="30px"
-                      height="30px"
-                    />
-                  </div>
-                  <div className="p-1">
-                    <ButtonTable
-                      titleButton={"Incluir para PDV"}
-                      onClickButton={() => handleIncluirProduto(row)}
-                      Icon={FaCashRegister}
-                      cor={"success"}
-                      iconColor={"white"}
-                      iconSize={20}
-                      width="30px"
-                      height="30px"
-                    />
-                  </div>
-                </div>
-              )
-
-            }
-          }
         }
+
+        return (
+          <div className="p-1 "
+            style={{ justifyContent: "space-between", display: "flex" }}
+          >
+            <div className="p-1">
+              <ButtonTable
+                titleButton={"Editar Produto Avulso"}
+                onClickButton={() => handleClickEdit(row)}
+                Icon={CiEdit}
+                cor={"primary"}
+                iconColor={"white"}
+                iconSize={20}
+                width="30px"
+                height="30px"
+              />
+            </div>
+            {row.ERRORLOGSAP?.length > 0 && (
+              <div className="p-1">
+                <ButtonTable
+                  titleButton={"Status de Alteração de Produto no SAP"}
+                  onClickButton={() => handleVerMotivoErro(row)}
+                  Icon={GrView}
+                  cor={"info"}
+                  iconColor={"white"}
+                  iconSize={20}
+                  width="30px"
+                  height="30px"
+                />
+              </div>
+            )}
+            {row.STMIGRADOSAP != 'True' && (
+              <div className="p-1">
+                <ButtonTable
+                  titleButton={"Migrar para SAP"}
+                  onClickButton={() => handleMigrarProduto(row)}
+                  Icon={SiSap}
+                  cor={"primary"}
+                  iconColor={"white"}
+                  iconSize={20}
+                  width="30px"
+                  height="30px"
+                />
+              </div>
+            )}
+            <div className="p-1">
+              <ButtonTable
+                titleButton={"Cancelar Produto Avulso"}
+                onClickButton={() => handleCancelar(row, 'True')}
+                Icon={BsTrash3}
+                cor={"danger"}
+                iconColor={"white"}
+                iconSize={20}
+                width="30px"
+                height="30px"
+              />
+            </div>
+          </div>
+        )
       },
     },
 
   ]
 
-  const handleEdit = async (IDDETALHEPRODUTOPEDIDO) => {
+  const handleEdit = async (IDPRODUTO) => {
+    console.log(IDPRODUTO, 'IDPRODUTO')
     try {
-      const response = await get(`/produtoAvulso?idDetalhePedidoProduto=${IDDETALHEPRODUTOPEDIDO}`)
+      const response = await get(`/produtos-cadastrados-avulso?idProduto=${IDPRODUTO}`)
 
       if (response.data && response.data.length > 0) {
         setDadosDetalheProduto(response.data)
@@ -420,8 +343,8 @@ export const ActionListaProdutoAvulso = ({
   }
 
   const handleClickEdit = async (row) => {
-    if (row.IDDETALHEPRODUTOPEDIDO) {
-      handleEdit(row.IDDETALHEPRODUTOPEDIDO)
+    if (row.IDPRODUTO) {
+      handleEdit(row.IDPRODUTO)
     }
   }
 
@@ -488,6 +411,7 @@ export const ActionListaProdutoAvulso = ({
         dadosDetalheProduto={dadosDetalheProduto}
         usuarioLogado={usuarioLogado}
         optionsModulos={optionsModulos}
+        handleClick={handleClick}
       />
     </Fragment>
   )

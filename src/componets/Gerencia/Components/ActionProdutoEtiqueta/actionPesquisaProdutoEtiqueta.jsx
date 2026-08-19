@@ -23,7 +23,7 @@ export const ActionPesquisaProdutoEtiqueta = ({ usuarioLogado }) => {
   const [dadosAcumuladorEtiquetas, setDadosAcumuladorEtiquetas] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
-   const [copia, setCopia] = useState(1);
+  const [copia, setCopia] = useState(1);
 
   const { data: dadosListaPrecos = [], error: errorListaPrecos, isLoading: isLoadingListaPrecos, refetch } = useQuery(
     'listas-de-precos-sap',

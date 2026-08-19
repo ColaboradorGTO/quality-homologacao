@@ -1,7 +1,6 @@
 import { Fragment, useRef, useState } from "react"
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { useEditarListaPrecos } from "../hooks/useEditarListaPrecos";
 import HeaderTable from "../../../../Tables/headerTable";
 import { useReactToPrint } from "react-to-print";
 import { jsPDF } from 'jspdf';
@@ -9,17 +8,15 @@ import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
 
-export const ActionCriarListasPrecos = ({ dadosListaLoja, optionsModulos, usuarioLogado }) => {
-  const {
-    dadosEmpresas,
-    empresaSelecionada,
-    setEmpresaSelecionada,
-    selectedIds,
-    setSelectedIds,
-    selectAllChecked,
-    setSelectAllChecked,
-  } = useEditarListaPrecos({optionsModulos, usuarioLogado, dadosListaLoja});
-  
+export const ActionCriarListasPrecos = ({
+  dadosEmpresas,
+  empresaSelecionada,
+  setEmpresaSelecionada,
+  selectedIds,
+  setSelectedIds,
+  selectAllChecked,
+  setSelectAllChecked,
+}) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowClick, setRowClick] = useState(false);
   const dataTableRef = useRef();
@@ -149,8 +146,6 @@ export const ActionCriarListasPrecos = ({ dadosListaLoja, optionsModulos, usuari
                   ? [...selectedIds, rowData.IDEMPRESA]
                   : selectedIds.filter(id => id !== rowData.IDEMPRESA);
                 setSelectedIds(updatedSelectedIds);
-                // setQtdProduto(rowData.IDEMPRESA, isChecked)
-                // setSelectAll(updatedSelectedIds.length === dados.length);
                 setEmpresaSelecionada(isChecked ? [...empresaSelecionada, rowData] : empresaSelecionada.filter(item => item.IDEMPRESA !== rowData.IDEMPRESA));
 
               }}

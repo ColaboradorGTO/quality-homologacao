@@ -1,4 +1,4 @@
-import { Fragment } from "react"
+import { Fragment, useEffect } from "react"
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal"
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal"
 import { InputFieldModal } from "../../../../Buttons/InputFieldModal"
@@ -9,43 +9,42 @@ import { AlertError } from "../../../../Inputs/alertError";
 import { schema } from "./Schema/schemaValidation";
 import { useEditarProdutoAvulso } from "../hooks/useEditarProdutoAvulso"
 import { SelectList } from "../../../../Buttons/menuList";
+import { formatMoeda } from "../../../../../utils/formatMoeda";
 
-export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDetalheProduto }) => {
+export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDetalheProduto, handleClick }) => {
     const { handleSubmit, formState: { errors }, clearErrors, control, setError, setValue } = useForm({
         mode: "onChange"
     });
 
     const {
-        quantidade,
-        setQuantidade,
-        referencia,
-        setReferencia,
+        marcaSelecionada,
+        setMarcaSelecionada,
+        idProduto, 
+        setIdProduto,
         codBarras,
         setCodBarras,
         descricao,
         setDescricao,
+        referencia,
+        setReferencia,
         fornecedor,
         setFornecedor,
         fabricante,
         setFabricante,
-        estrutura,
-        setEstrutura,
-        estilo,
-        setEstilo,
-        vrCusto,
-        setVrCusto,
-        vrVenda,
-        setVrVenda,
-        categoriaProdutoSelecionado,
-        setCategoriaProdutoSelecionado,
-        tamanhoSelecionado,
-        setTamanhoSelecionado,
         unidadeSelecionada,
         setUnidadeSelecionada,
         corSelecionada,
         setCorSelecionada,
         tipoTecidoSelecionado,
         setTipoTecidoSelecionado,
+        categoriaGradeSelecionada,
+        setCategoriaGradeSelecionada,
+        tamanhoSelecionado,
+        setTamanhoSelecionado,
+        estrutura,
+        setEstrutura,
+        estilo,
+        setEstilo,
         categoriaSelecionada,
         setCategoriaSelecionada,
         localExposicaoSelecionado,
@@ -59,15 +58,11 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
         tipoProdutoSelecionado,
         setTipoProdutoSelecionado,
         tipoFiscalSelecionado,
-        estoque, 
-        setEstoque,
         setTipoFiscalSelecionado,
-        marcaSelecionada,
-        setMarcaSelecionada,
-        referenciaProduto,
-        setReferenciaProduto,
-        produtoPesquisado,
-        setProdutoPesquisado,
+        vrCusto,
+        setVrCusto,
+        vrVenda,
+        setVrVenda,
         dadosUnidadeMedida,
         dadosTamanhos,
         dadosCores,
@@ -79,47 +74,40 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
         dadosFornecedores,
         dadosFabricantes,
         dadosSubGrupoProduto,
+        dadosCategoriaPedido, 
         dadosNCM,
         dadosVinculoEstiloGrupo,
         dadosMarcas,
         dadosProdutosPedido,
+        optionsEcommerce,
         onSubmit
-    } = useEditarProdutoAvulso({usuarioLogado, optionsModulos, handleClose, dadosDetalheProduto})
+    } = useEditarProdutoAvulso({usuarioLogado, optionsModulos, handleClose, dadosDetalheProduto, handleClick})
 
-
-
-    const optionsCategoriaProduto = [
-        { value: 'VESTUARIO', label: 'VESTUARIO' },
-        { value: 'CALCADOS', label: 'CALÇADOS' },
-        { value: 'ARTIGOS', label: 'ARTIGOS' },
-        { value: 'ACESSORIOS', label: 'ACESSÓRIOS' }
-    ]
-
-    const optionsEcommerce = [
-        { value: 'True', label: 'SIM' },
-        { value: 'False', label: 'NÃO' }
-    ]
 
     const handleValidatedSubmit = async () => {
         try {
             const dadosParaValidar = {
-                descricaoPedido: descricao,
+                marcaGrupoProduto: marcaSelecionada,
+                descProduto: descricao,
+                refProduto: referencia,
                 fornecedorProduto: fornecedor,
-                tamanhoProduto: tamanhoSelecionado,
                 fabricanteProduto: fabricante,
                 unidadeProduto: unidadeSelecionada,
                 corProduto: corSelecionada,
-                tecidoProduto: tipoTecidoSelecionado,
+                tipoTecidoProduto: tipoTecidoSelecionado,
+                categoriaGradeProduto: categoriaGradeSelecionada,
+                tamanhoProduto: tamanhoSelecionado,
                 estruturaProduto: estrutura,
                 estiloProduto: estilo,
-                categoriaProduto: categoriaProdutoSelecionado,
-                vrCustoProduto: vrCusto,
-                vrVendaProduto: vrVenda,
+                categoriaProduto: categoriaSelecionada,
+                localExposicaoProduto: localExposicaoSelecionado,
+                ecommerceProduto: ecommerceSelecionado,
+                redeSocialProduto: redeSocialSelecionado,
                 ncmProduto: ncmSelecionado,
                 tipoProduto: tipoProdutoSelecionado,
                 tipoFiscalProduto: tipoFiscalSelecionado,
-                barraProduto: codBarras
-
+                vrCustoProduto: vrCusto,
+                vrVendaProduto: vrVenda
             };
 
             await schema.validate(dadosParaValidar, { abortEarly: false });
@@ -156,7 +144,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
     const formatSelectGroup = (data) => {
         const grupos = {};
 
-        data.forEach((item) => {
+        (data || []).forEach((item) => {
             if (!grupos[item.DS_GRUPO]) {
             grupos[item.DS_GRUPO] = {
                 label: item.DS_GRUPO,
@@ -165,7 +153,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
             }
 
             grupos[item.DS_GRUPO].options.push({
-            value: item.ID_ESTRUTURA,
+            value:  `${item.ID_GRUPO}:${item.ID_ESTRUTURA}`,
             label: item.ESTRUTURA,
             original: item
             });
@@ -174,33 +162,93 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
         return Object.values(grupos);
     };
 
-    const formatSelectCor = (data) => {
-        const grupos = {};
+    const formatSelectCor = (data = []) => {
+        const grupos = new Map();
 
         data.forEach((item) => {
-            if (!grupos[item.DS_GRUPOCOR]) {
-            grupos[item.DS_GRUPOCOR] = {
-                label: item.DS_GRUPOCOR,
+            const {
+            ID_COR,
+            DS_COR,
+            ID_GRUPOCOR,
+            DS_GRUPOCOR,
+            DSSIGLA,
+            STBLOQUEADOPARACADASTROPRODUTONOVO
+            } = item;
+
+            const nomeCor = (DS_COR || "").trim();
+            const nomeCorUpper = nomeCor.toUpperCase();
+
+            const bloqueadaPorNome = nomeCorUpper === "NENHUM" || nomeCorUpper === "NENHUMA";
+            const bloqueadaPorFlag = String(STBLOQUEADOPARACADASTROPRODUTONOVO) === "True";
+            const isDisabled = bloqueadaPorNome || bloqueadaPorFlag;
+
+            const sigla = (DSSIGLA || "").trim();
+            const labelCor = sigla ? `${nomeCor} - ${sigla}` : nomeCor;
+
+            const groupKey = String(ID_GRUPOCOR ?? "SEM_GRUPO");
+            if (!grupos.has(groupKey)) {
+            grupos.set(groupKey, {
+                label: String(DS_GRUPOCOR || "SEM GRUPO").toUpperCase(),
                 options: []
-            };
+            });
             }
 
-            grupos[item.DS_GRUPOCOR].options.push({
-            value: item.ID_COR,
-            label: item.DS_COR,
+            grupos.get(groupKey).options.push({
+            value: ID_COR,
+            label: labelCor,
+            isDisabled,
             original: item
             });
         });
 
-        return Object.values(grupos);
+        return Array.from(grupos.values());
     };
 
-    /*
-        Voltar daqui amanhã para finalizar esta modal e todos os select relacionada a ela.
-    */
+    const formatSelectMaterial = (data = []) => {
+        const opcoesBloqueadas = ["NENHUM", "NENHUMA"];
+        const optionsAtivas = [];
+        const optionsBloqueadas = [];
+
+        data.forEach((item) => {
+            const {
+            IDTPTECIDO,
+            DSTIPOTECIDO,
+            DSSIGLA,
+            STBLOQUEADOPARACADASTROPRODUTONOVO
+            } = item;
+
+            const nomeMaterial = (DSTIPOTECIDO || "").trim();
+            const nomeMaterialUpper = nomeMaterial.toUpperCase();
+
+            const bloqueadaPorNome = opcoesBloqueadas.includes(nomeMaterialUpper);
+            const bloqueadaPorFlag = String(STBLOQUEADOPARACADASTROPRODUTONOVO) === "True";
+            const isDisabled = bloqueadaPorNome || bloqueadaPorFlag;
+
+            const sigla = (DSSIGLA || "").trim();
+            const labelMaterial = sigla ? `${nomeMaterial} - ${sigla}` : nomeMaterial;
+
+            const option = {
+            value: IDTPTECIDO,
+            label: labelMaterial,
+            isDisabled,
+            color: isDisabled ? "#f63c97" : undefined,
+            original: item
+            };
+
+            if (isDisabled) {
+            optionsBloqueadas.push(option);
+            } else {
+            optionsAtivas.push(option);
+            }
+        });
+
+        return [...optionsAtivas, ...optionsBloqueadas];
+    }; 
+
+  
     return (
         <Fragment>
-            <form>
+            <form onSubmit={handleSubmit(handleValidatedSubmit)}>
                 <div className="form-group">
                     <div className="row">
                         <div className="col-sm-6 col-xl-3">
@@ -211,7 +259,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
                                 name="marcaGrupoProduto"
                                 options={[
                                     { value: '', label: 'Selecione...' },
-                                    ...dadosMarcas?.map((item) => {
+                                    ...(dadosMarcas || []).map((item) => {
                                         return {
                                             value: item.IDGRUPOEMPRESARIAL,
                                             label: item.DSGRUPOEMPRESARIAL
@@ -231,51 +279,8 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
                                 />
                             )}
                         </div>
-                        <div className="col-sm-6 col-xl-3">
-                            <Controller
-                                name="referenciaProduto"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormField
-                                        name="referenciaProduto"
-                                        label={"Pesquisar Referência/Produto"}
-                                        type="text"
-                                        errors={errors}
-                                        clearErrors={clearErrors}
-                                        value={referenciaProduto}
-                                        onChangeModal={(e) => setReferenciaProduto(e.target.value)}
-                                    />
-                                )}
-                            />
-                        </div>
-                        <div className="col-sm-6 col-xl-6">
-                            <label className="form-label" htmlFor="tppedido">Lista dos Produtos da Pesquisa</label>
-                            <Select
-                                className="basic-single"
-                                classNamePrefix="select"
-                                name="categoriaProduto"
-                                options={[
-                                    { value: '', label: 'Selecione...' },
-                                    ...dadosProdutosPedido?.map((item) => {
-                                        return {
-                                            value: item.DSNOME,
-                                            label: item.DSNOME
-                                        }
-                                    })]}
-                                value={categoriaProdutoSelecionado}
-                                onChange={(e) => {
-                                    setCategoriaProdutoSelecionado(e)
-                                    clearErrors('categoriaProduto')
-                                }}
-                            />
-                            {errors.categoriaProduto && (
-                                <AlertError
-                                    error={errors.categoriaProduto}
-                                    onClose={clearErrors}
-                                    fieldName="categoriaProduto"
-                                />
-                            )}
-                        </div>
+
+
                     </div>
                 </div>
 
@@ -284,21 +289,62 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
                     <div className="row">
                         <div className="col-sm-6 col-xl-2">
                             <Controller
-                                name="qtdProduto"
+                                name="nItemProduto"
                                 control={control}
                                 render={({ field }) => (
                                     <FormField
-                                        name="qtdProduto"
-                                        label={"Quantidade "}
+                                        name="nItemProduto"
+                                        label={"id.Produto"}
                                         type="text"
                                         errors={errors}
                                         clearErrors={clearErrors}
-                                        value={quantidade}
-                                        onChangeModal={(e) => setQuantidade(e.target.value)}
+                                        value={idProduto}
+                                        onChangeModal={(e) => setIdProduto(e.target.value)}
+                                        readOnly={true}
                                     />
                                 )}
                             />
                         </div>
+
+                        <div className="col-sm-6 col-xl-3">
+                            <Controller
+                                name="codBarraProduto"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        name="codBarraProduto"
+                                        label={"cod.Barras"}
+                                        type="text"
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        value={codBarras}
+                                        onChangeModal={(e) => setCodBarras(e.target.value)}
+                                        readOnly={true}
+                                    />
+                                )}
+                            />
+                        </div>
+                       
+                        
+
+                        <div className="col-sm-6 col-xl-5">
+                            <Controller
+                                name="descProduto"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        name="descProduto"
+                                        label={"Descrição Produto"}
+                                        type="text"
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        value={descricao}
+                                        onChangeModal={(e) => setDescricao(e.target.value)}
+                                    />
+                                )}
+                            />
+                        </div>
+
                         <div className="col-sm-6 col-xl-2">
                             <Controller
                                 name="refProduto"
@@ -317,84 +363,14 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
                             />
                         </div>
 
-                        <div className="col-sm-6 col-xl-6">
-                            <Controller
-                                name="descProduto"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormField
-                                        name="descProduto"
-                                        label={"Descrição Produto"}
-                                        type="text"
-                                        errors={errors}
-                                        clearErrors={clearErrors}
-                                        value={descricao}
-                                        onChangeModal={(e) => setDescricao(e.target.value)}
-                                    />
-                                )}
-                            />
-                        </div>
-                        <div className="col-sm-6 col-xl-2">
-                            <label className="form-label" htmlFor="tppedido">Categoria Produto</label>
-                            <Select
-                                className="basic-single"
-                                classNamePrefix="select"
-                                name="categoriaProduto"
-                                options={[
-                                    { value: '', label: 'Selecione...' },
-                                    ...optionsCategoriaProduto.map((item) => {
-                                        return {
-                                            value: item.value,
-                                            label: item.label
-                                        }
-                                    })]}
-                                value={categoriaProdutoSelecionado}
-                                onChange={(e) => {
-                                    setCategoriaProdutoSelecionado(e)
-                                    clearErrors('categoriaProduto')
-                                }}
-                            />
-                            {errors.categoriaProduto && (
-                                <AlertError
-                                    error={errors.categoriaProduto}
-                                    onClose={clearErrors}
-                                    fieldName="categoriaProduto"
-                                />
-                            )}
-                        </div>
+            
+
                     </div>
                 </div>
                 <div className="form-group">
                     <div className="row">
-                        <div className="col-sm-6 col-xl-2">
-                            <label className="form-label" htmlFor="notam">Tamanho</label>
-                            <Select
-                                className="basic-single"
-                                classNamePrefix="select"
-                                name="tamanhoProduto"
-                                options={[
-                                    { value: '', label: 'Selecione...' },
-                                    ...dadosTamanhos?.map((item) => {
-                                        return {
-                                            value: item.IDTAMANHO,
-                                            label: item.DSTAMANHO
-                                        }
-                                    })]}
-                                value={tamanhoSelecionado}
-                                onChange={(e) => {
-                                    setTamanhoSelecionado(e)
-                                    clearErrors('tamanhoProduto')
-                                }}
-                            />
-                            {errors.tamanhoProduto && (
-                                <AlertError
-                                    error={errors.tamanhoProduto}
-                                    onClose={clearErrors}
-                                    fieldName="tamanhoProduto"
-                                />
-                            )}
-                        </div>
-                        <div className="col-sm-6 col-xl-5">
+                    
+                        <div className="col-sm-6 col-xl-9">
                             <label className="form-label" htmlFor="notam">Fornecedor</label>
                             <Select
                                 className="basic-single"
@@ -402,7 +378,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
                                 name="fornecedorProduto"
                                 options={[
                                     { value: '', label: 'Selecione...' },
-                                    ...dadosFornecedores?.map((item) => {
+                                    ...(dadosFornecedores || []).map((item) => {
                                         return {
                                             value: item.IDFORNECEDOR,
                                             label: `${item.NOFANTASIA} // ${item.NUCNPJ} // ${item.NORAZAOSOCIAL}`
@@ -430,7 +406,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
                                 name="fabricanteProduto"
                                 options={[
                                     { value: '', label: 'Selecione...' },
-                                    ...dadosFabricantes?.map((item) => {
+                                    ...(dadosFabricantes || []).map((item) => {
                                         return {
                                             value: item.IDFABRICANTE,
                                             label: `${item.IDFABRICANTE} - ${item.DSFABRICANTE}`
@@ -450,6 +426,13 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
                                 />
                             )}
                         </div>
+
+
+                    </div>
+                </div>
+                <div className="form-group">
+                    <div className="row">
+
                         <div className="col-sm-6 col-xl-2">
                             <label className="form-label" htmlFor="tpunid">Unidade</label>
                             <Select
@@ -458,7 +441,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
                                 name="unidadeProduto"
                                 options={[
                                     { value: '', label: 'Selecione...' },
-                                    ...dadosUnidadeMedida?.map((item) => {
+                                    ...(dadosUnidadeMedida || []).map((item) => {
                                         return {
                                             value: item.IDUNIDADEMEDIDA,
                                             label: item.DSSIGLA
@@ -478,11 +461,8 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
                                 />
                             )}
                         </div>
-                    </div>
-                </div>
-                <div className="form-group">
-                    <div className="row">
-                        <div className="col-sm-6 col-xl-2">
+
+                        <div className="col-sm-6 col-xl-3">
                             <label className="form-label" htmlFor="tpcor">Cor</label>
                             <SelectList
                                 name={"corProduto"}
@@ -491,7 +471,18 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
                                 menuHeaderTitle={"Selecione"}
                                 menuHeaderStyle={menuHeaderStyle}
                                 onChange={(e) => setCorSelecionada(e)}
-                                
+                                getOptionDisabled={(option) => !!option.isDisabled}
+                                styles={{
+                                    option: (base, state) => ({
+                                    ...base,
+                                    color: state.data?.isDisabled ? "#f63c97" : base.color,
+                                    cursor: state.data?.isDisabled ? "not-allowed" : "pointer"
+                                    }),
+                                    singleValue: (base, state) => ({
+                                    ...base,
+                                    color: state.data?.isDisabled ? "#f63c97" : base.color
+                                    })
+                                }}
                             />
                             {errors.corProduto && (
                                 <AlertError
@@ -501,7 +492,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
                                 />
                             )}
                         </div>
-                        <div className="col-sm-6 col-xl-2">
+                        <div className="col-sm-6 col-xl-3">
                             <label className="form-label" htmlFor="tptecidoav">Tipo de Material</label>
                           
                             <Select
@@ -509,17 +500,23 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
                                 classNamePrefix="select"
                                 name="tipoTecidoProduto"
                                 value={tipoTecidoSelecionado}
-                                options={[
-                                    { value: '', label: 'Selecione...' },
-                                    ...dadosTipoTecidos?.map((item) => {
-                                        return {
-                                            value: item.IDTIPOTECIDO,
-                                            label: item.DSTIPOTECIDO
-                                        }
-                                    })]}
+                                options={formatSelectMaterial(dadosTipoTecidos)}
                                 onChange={(e) => {
                                     setTipoTecidoSelecionado(e)
                                     clearErrors('tipoTecidoProduto')
+                                }}
+                                getOptionDisabled={(option) => !!option.isDisabled}
+                                styles={{
+                                    option: (base, state) => ({
+                                    ...base,
+                                    color: state.data?.isDisabled ? "#f63c97" : base.color,
+                                    cursor: state.data?.isDisabled ? "not-allowed" : "pointer",
+                                    fontSize: "13px"
+                                    }),
+                                    singleValue: (base, state) => ({
+                                    ...base,
+                                    color: state.data?.isDisabled ? "#f63c97" : base.color
+                                    })
                                 }}
                             />
                             {errors.tipoTecidoProduto && (
@@ -530,10 +527,66 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
                                 />
                             )}
                         </div>
-                        <div className="col-sm-6 col-xl-3">
+                        <div className="col-sm-6 col-xl-4">
+                             <label className="form-label" htmlFor="categoriaGradeProduto">Categoria Grade</label>
+                            <SelectList
+                                id={"categoriaGradeProduto"}
+                                value={categoriaGradeSelecionada}
+                                options={formatSelectGroup(dadosCategoriaPedido)}
+                                menuHeaderTitle={"Selecione"}
+                                menuHeaderStyle={menuHeaderStyle}
+                                onChange={(e) => setCategoriaGradeSelecionada(e)}
+                                
+                            />
+                            {errors.categoriaGradeProduto && (
+                                <AlertError
+                                    error={errors.categoriaGradeProduto}
+                                    onClose={clearErrors}
+                                    fieldName="categoriaGradeProduto"
+                                />
+                            )} 
+                        </div>
+                   
+                      
+
+
+                    </div>
+                </div>
+                <div className="form-group">
+                    <div className="row">
+                        <div className="col-sm-6 col-xl-2">
+                            <label className="form-label" htmlFor="notam">Tamanho</label>
+                            <Select
+                                className="basic-single"
+                                classNamePrefix="select"
+                                name="tamanhoProduto"
+                                options={[
+                                    { value: '', label: 'Selecione...' },
+                                    ...(dadosTamanhos || []).map((item) => {
+                                        return {
+                                            value: item.IDTAMANHO,
+                                            label: item.DSTAMANHO
+                                        }
+                                    })]}
+                                value={tamanhoSelecionado}
+                                onChange={(e) => {
+                                    setTamanhoSelecionado(e)
+                                    clearErrors('tamanhoProduto')
+                                }}
+                            />
+                            {errors.tamanhoProduto && (
+                                <AlertError
+                                    error={errors.tamanhoProduto}
+                                    onClose={clearErrors}
+                                    fieldName="tamanhoProduto"
+                                />
+                            )}
+                        </div> 
+
+                        <div className="col-sm-6 col-xl-4">
                              <label className="form-label" htmlFor="tptecidoav">Estrutura</label>
                             <SelectList
-                                id={"tipoTecidoProduto"}
+                                id={"estruturaProduto"}
                                 value={estrutura}
                                 options={formatSelectGroup(dadosSubGrupoProduto)}
                                 menuHeaderTitle={"Selecione"}
@@ -548,8 +601,9 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
                                     fieldName="estruturaProduto"
                                 />
                             )} 
-                        </div>
-                        <div className="col-sm-6 col-xl-2">
+                        </div> 
+
+                        <div className="col-sm-6 col-xl-3">
                             <label className="form-label" htmlFor="tpcats">Estilos</label>
                             <Select
                                 className="basic-single"
@@ -557,7 +611,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
                                 name="estiloProduto"
                                 options={[
                                     { value: '', label: 'Selecione...' },
-                                    ...dadosVinculoEstiloGrupo?.map((item) => {
+                                    ...(dadosVinculoEstiloGrupo || []).map((item) => {
                                         return {
                                             value: item.IDESTILO,
                                             label: `${item.IDESTILO} - ${item.DSESTILO}`
@@ -578,14 +632,14 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
                             )}
                         </div>
                         <div className="col-sm-6 col-xl-3">
-                            <label className="form-label" htmlFor="tpcats">Categorias</label>
+                            <label className="form-label" htmlFor="categoriaProduto">Categorias</label>
                             <Select
                                 className="basic-single"
                                 classNamePrefix="select"
                                 name="categoriaProduto"
                                 options={[
                                     { value: '', label: 'Selecione...' },
-                                    ...dadosCategoriasProdutos?.map((item) => {
+                                    ...(dadosCategoriasProdutos || []).map((item) => {
                                         return {
                                             value: item.IDCATEGORIAS,
                                             label: `${item.IDCATEGORIAS} - ${item.DSCATEGORIAS} - ${item.TPCATEGORIAS}`
@@ -605,11 +659,12 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
                                 />
                             )}
                         </div>
+
                     </div>
                 </div>
                 <div className="form-group">
                     <div className="row">
-                        <div className="col-sm-6 col-xl-4">
+                        <div className="col-sm-6 col-xl-3">
                             <label className="form-label" htmlFor="locexp">Local Exposição</label>
                             <Select
                                 className="basic-single"
@@ -617,7 +672,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
                                 name="localExposicaoProduto"
                                 options={[
                                     { value: '', label: 'Selecione...' },
-                                    ...dadosLocalExposicao?.map((item) => {
+                                    ...(dadosLocalExposicao || []).map((item) => {
                                         return {
                                             value: item.IDLOCALEXPOSICAO,
                                             label: item.DSLOCALEXPOSICAO
@@ -637,6 +692,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
                                 />
                             )}
                         </div>
+
                         <div className="col-sm-6 col-xl-2">
                             <label className="form-label" htmlFor="ecommercest">E-commerce</label>
                             <Select
@@ -645,7 +701,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
                                 name="ecommerceProduto"
                                 options={[
                                     { value: '', label: 'Selecione...' },
-                                    ...optionsEcommerce.map((item) => {
+                                    ...(optionsEcommerce || []).map((item) => {
                                         return {
                                             value: item.value,
                                             label: item.label
@@ -665,6 +721,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
                                 />
                             )}
                         </div>
+
                         <div className="col-sm-6 col-xl-2">
                             <label className="form-label" htmlFor="redesocialst">Rede Social</label>
                             <Select
@@ -673,7 +730,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
                                 name="redeSocialProduto"
                                 options={[
                                     { value: '', label: 'Selecione...' },
-                                    ...optionsEcommerce.map((item) => {
+                                    ...(optionsEcommerce || []).map((item) => {
                                         return {
                                             value: item.value,
                                             label: item.label
@@ -693,45 +750,8 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
                                 />
                             )}
                         </div>
+
                         <div className="col-sm-6 col-xl-2">
-                            <Controller
-                                name="vrCustoProduto"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormField
-                                        name="vrCustoProduto"
-                                        label={"Vr Custo"}
-                                        type="text"
-                                        errors={errors}
-                                        clearErrors={clearErrors}
-                                        value={vrCusto}
-                                        onChangeModal={(e) => setVrCusto(e.target.value)}
-                                    />
-                                )}
-                            />
-                        </div>
-                        <div className="col-sm-6 col-xl-2">
-                            <Controller
-                                name="vrVendaProduto"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormField
-                                        name="vrVendaProduto"
-                                        label={"Vr Venda"}
-                                        type="text"
-                                        errors={errors}
-                                        clearErrors={clearErrors}
-                                        value={vrVenda}
-                                        onChangeModal={(e) => setVrVenda(e.target.value)}
-                                    />
-                                )}
-                            />
-                        </div>
-                    </div>
-                </div>
-                <div className="form-group">
-                    <div className="row">
-                        <div className="col-sm-6 col-xl-3">
                             <label className="form-label" htmlFor="tpncm">NCM</label>
                             <Select
                                 className="basic-single"
@@ -739,7 +759,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
                                 name="ncmProduto"
                                 options={[
                                     { value: '', label: 'Selecione...' },
-                                    ...dadosNCM?.map((item) => {
+                                    ...(dadosNCM || []).map((item) => {
                                         return {
                                             value: item.NUNCM,
                                             label: item.NUNCM
@@ -759,6 +779,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
                                 />
                             )}
                         </div>
+
                         <div className="col-sm-6 col-xl-3">
                             <label className="form-label" htmlFor="tpprod">Tipo Produto</label>
                             <Select
@@ -767,7 +788,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
                                 name="tipoProduto"
                                 options={[
                                     { value: '', label: 'Selecione...' },
-                                    ...dadosTipoProdutos.map((item) => {
+                                    ...(dadosTipoProdutos || []).map((item) => {
                                         return {
                                             value: item.IDTIPOPRODUTO,
                                             label: `${item.CODTIPOPRODUTO} - ${item.DSTIPOPRODUTO}`
@@ -787,7 +808,17 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
                                 />
                             )}
                         </div>
-                        <div className="col-sm-6 col-xl-6">
+
+
+                      
+
+                    </div>
+                </div>
+                <div className="form-group">
+                    <div className="row">
+                        
+
+                        <div className="col-sm-6 col-xl-8">
                             <label className="form-label" htmlFor="tpfiscal">Tipo Fiscal</label>
                             <Select
                                 className="basic-single"
@@ -795,7 +826,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
                                 name="tipoFiscalProduto"
                                 options={[
                                     { value: '', label: 'Selecione...' },
-                                    ...dadosTipoFiscalProdutos?.map((item) => {
+                                    ...(dadosTipoFiscalProdutos || []).map((item) => {
                                         return {
                                             value: item.IDTIPOFISCALPRODUTO,
                                             label: `${item.CODTIPOFISCALPRODUTO} - ${item.DSTIPOFISCALPRODUTO}`
@@ -814,6 +845,42 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
                                     fieldName="tipoFiscalProduto"
                                 />
                             )}
+                        </div>
+
+                          <div className="col-sm-6 col-xl-2">
+                            <Controller
+                                name="vrCustoProduto"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        name="vrCustoProduto"
+                                        label={"Vr Custo"}
+                                        type="text"
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        value={vrCusto}
+                                        onChangeModal={(e) => setVrCusto(e.target.value)}
+                                    />
+                                )}
+                            />
+                        </div>
+
+                        <div className="col-sm-6 col-xl-2">
+                            <Controller
+                                name="vrVendaProduto"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        name="vrVendaProduto"
+                                        label={"Vr Venda"}
+                                        type="text"
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        value={vrVenda}
+                                        onChangeModal={(e) => setVrVenda(e.target.value)}
+                                    />
+                                )}
+                            />
                         </div>
                     </div>
                 </div>
@@ -839,7 +906,7 @@ export const Formulario = ({ handleClose, usuarioLogado, optionsModulos, dadosDe
 
                     ButtonTypeCadastrar={ButtonTypeModal}
                     onClickButtonCadastrar={handleValidatedSubmit}
-                    textButtonCadastrar={"Salvar"}
+                    textButtonCadastrar={"Atualizar"}
                     corCadastrar={"success"}
                     loadingTextCadastrar={"Cadastrando..."}
                     autoLoadingCadastrar={true}

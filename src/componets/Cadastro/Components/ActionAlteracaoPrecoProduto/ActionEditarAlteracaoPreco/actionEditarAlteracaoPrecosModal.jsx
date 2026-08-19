@@ -13,34 +13,6 @@ export const ActionEditarAlteracaoPrecosModal = ({
   usuarioLogado
  }) => {
   
-  const getIPUsuario = async () => {
-    let usuarioIP = null;
-
-    try {
-        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
-        usuarioIP = ipWhoisData?.ip;
-    } catch (error) {
-        console.error("Erro ao buscar IP via ifconfig.me:", error);
-    }
-
-    if (!usuarioIP) {
-    try {
-        const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-        usuarioIP = ipifyData?.ip;
-    } catch (error) {
-        console.error("Erro ao buscar IP via ipify.org:", error);
-    }
-    }
-    setIpUsuario(usuarioIP);
-    return usuarioIP;
-  };
-
-
-  const optionsStatus = [
-    { value: 'True', label: 'CANCELADA' },
-    { value: 'False', label: 'EM ESPERA' },
-    { value: 'FINALIZADA', label: 'FINALIZADA' }
-  ]
 
   return (
 

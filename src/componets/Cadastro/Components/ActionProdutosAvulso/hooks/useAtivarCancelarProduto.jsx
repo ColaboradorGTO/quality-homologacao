@@ -71,10 +71,12 @@ export const useAtivarCancelarProduto = ({ usuarioLogado, optionsModulos, handle
                 title: `Motivo para ${msgtitulo} o Produto?`,
                 html: `
                 <div class="input-group pt-0">
-                    <input type="text" id="motivoCancelItem" 
+                    <input 
+                        type="text" id="motivoCancelItem" 
                         class="swal2-input m-0"
                         placeholder="Motivo para ${msgtitulo} o produto!"
-                        style="text-transform: uppercase">
+                        style="text-transform: uppercase"
+                    >
                 </div>
             `,
                 width: '25rem',

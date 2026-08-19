@@ -11,7 +11,7 @@ import { useQuery } from "react-query";
 import { ActionCadastrarEstilosModal } from "./ActionCadastrar/actionCadastrarEstilosModal";
 import { MdAdd } from "react-icons/md";
 import Swal from "sweetalert2";
-
+ 
 
 export const ActionPesquisaEstilos = ({ usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
@@ -38,7 +38,7 @@ export const ActionPesquisaEstilos = ({ usuarioLogado }) => {
 
       return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
+    { enabled: Boolean(usuarioLogado?.id) }
   );
  
   const { data: dadosEstilos = [], error: errorDadosEstilos, isLoading: isLoadingDadosEstilos, refetch: refetchEstilos } = useQuery(

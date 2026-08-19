@@ -19,6 +19,7 @@ export const Formulario = ({
     const {
         selectedItems,
         setSelectedItems,    
+        btnVisivel,
         onSubmit
     } = useDesvincularPedidoNFE({
         dadosPedidosVinculados, 
@@ -51,6 +52,7 @@ export const Formulario = ({
                 corCadastrar={"success"}
                 loadingTextCadastrar={"Desvinculando..."}
                 autoLoadingCadastrar={true}
+                styleCadastrar={{display: btnVisivel ? 'block' : 'none'}}
 
             />
         </form>

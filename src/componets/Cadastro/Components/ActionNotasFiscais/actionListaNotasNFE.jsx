@@ -23,6 +23,7 @@ import { ActionVisualizarNFE } from "./ActionVisualizarNota/actionVisualizarNFE"
 import { ActionVincularPedidoNFE } from "./ActionVincularPedidoNFE/actionVincularPedidoNFE";
 import { ActionCriarDevolucaoNFE } from "./CriarNFEDevolucao/actionCriarDevolucao";
 import { useCancelarNFEntrada } from "./hooks/useCancelarNFEntrada";
+import { useMigrarSAP } from "./hooks/useMigrarSAP";
 
 export const ActionListaNotasNFE = ({ 
   dadosNFE, 
@@ -49,6 +50,15 @@ export const ActionListaNotasNFE = ({
     optionsModulos,
     usuarioLogado,
   });
+
+  const {
+    handleMigrarSap
+  } = useMigrarSAP({
+    handleClick,
+    optionsModulos,
+    usuarioLogado,
+  });
+
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
   };
@@ -201,10 +211,10 @@ export const ActionListaNotasNFE = ({
               <div className="p-1">
                 <ButtonTable
                   titleButton={"Migrar Para o SAP"}
-                  onClickButton={() => clickVincular(row)}
+                  onClickButton={() => handleMigrarSap(row.IDRESUMOENTRADA)}
                   cor={"primary"}
                   Icon={SiSap}
-                  iconSize={25}
+                  iconSize={25} 
                   iconColor={"#fff"}
                   width="30px"
                   height="30px"

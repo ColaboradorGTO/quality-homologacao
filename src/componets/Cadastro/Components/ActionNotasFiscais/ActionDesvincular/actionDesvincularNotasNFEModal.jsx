@@ -11,9 +11,7 @@ export const ActionDesvincularNotasNFEModal = ({
     handleClick,
     dadosPedidosVinculados,
     usuarioLogado,
-    optionsModulos,
-    selectedItems,
-    setSelectedItems 
+    optionsModulos
 }) => {
   
     return (

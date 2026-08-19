@@ -4,11 +4,13 @@ import { HeaderModal } from "../../../../Modais/HeaderModal/HeaderModal";
 import { Formulario } from "./formulario";
 
 
-export const ActionCriarListasPrecosModal = ({ 
-  show, 
-  handleClose, 
+export const ActionCriarListasPrecosModal = ({
+  show,
+  handleClose,
   optionsModulos,
-  usuarioLogado
+  usuarioLogado,
+  dadosListaPreco,
+  refetchListaPreco
 }) => {
 
   return (
@@ -27,10 +29,12 @@ export const ActionCriarListasPrecosModal = ({
         />
 
         <Modal.Body>
-          <Formulario 
+          <Formulario
             handleClose={handleClose}
             optionsModulos={optionsModulos}
             usuarioLogado={usuarioLogado}
+            dadosListaPreco={dadosListaPreco}
+            refetchListaPreco={refetchListaPreco}
           />
         </Modal.Body>
 

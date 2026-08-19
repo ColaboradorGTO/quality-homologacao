@@ -6,7 +6,7 @@ import { ActionListaProdutoAvulso } from "./actionListaProdutoAvulso";
 import { ActionMain } from "../../../Actions/actionMain";
 import { InputField } from "../../../Buttons/Input";
 import { ButtonType } from "../../../Buttons/ButtonType";
-import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
+import { animacaoCarregamento, fecharAnimacaoCarregamento, foiCancelado } from "../../../../utils/animationCarregamento";
 import { useQuery } from "react-query";
 import { getDataAtual } from "../../../../utils/dataAtual";
 import { ActionCadastrarProodutodPedidoAvulsoModal } from "./actionCadastarProduto/actionCadastroProdutoPedidoAvulsoModal";
@@ -17,6 +17,7 @@ export const ActionPesquisaProdutosAvulso = ({ usuarioLogado }) => {
   const [dataPesquisaFim, setDataPesquisaFim] = useState('')
   const [descricao, setDescricao] = useState('')
   const [codBarra, setCodBarra] = useState('')
+  const [codProduto, setCodProduto] = useState('')
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [modalVisivel, setModalVisivel] = useState(false);
   const [clickContador, setClickContador] = useState(0);
@@ -47,36 +48,43 @@ export const ActionPesquisaProdutosAvulso = ({ usuarioLogado }) => {
 
       return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
+    { enabled: Boolean(usuarioLogado?.id) }
   );
 
   const fetchListaProdutos = async () => {
-    const urlBase = `/produtoAvulso?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&descricao=${descricao}&codigoBarra=${codBarra}`;
+    const urlBase = `/produtos-cadastrados-avulso?idProduto=${codProduto}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&nomeProduto=${descricao}&codBarras=${codBarra}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+    const controller = new AbortController();
+    let allData = [];
+
     try {
-      animacaoCarregamento('Carregando dados...', true);
+      animacaoCarregamento('Carregando dados...', true, true, () => controller.abort());
 
       const primeiraPagina = 1;
-      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`, { signal: controller.signal });
       const page = primeiraResposta.page || primeiraPagina;
       const pageSize = primeiraResposta.pageSize || 1000;
       const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
       const totalPages = Math.ceil(totalRows / pageSize);
 
-      let allData = [...(primeiraResposta.data || [])];
+      allData = [...(primeiraResposta.data || [])];
 
       if (totalPages > 1) {
         for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
-          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
-          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          if (foiCancelado()) break;
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`, { signal: controller.signal });
           allData.push(...(responsePage.data || []));
         }
       }
 
       return allData;
     } catch (error) {
-      console.error('Erro ao buscar dados da api:', error);
+      if (error.code === 'ERR_CANCELED') {
+        return allData;
+      }
+      console.error('Erro ao buscar dados:', error);
       throw error;
     } finally {
       fecharAnimacaoCarregamento();
@@ -84,7 +92,7 @@ export const ActionPesquisaProdutosAvulso = ({ usuarioLogado }) => {
   };
 
   const { data: dadosProdutosAvulso = [], error: errorProdutos, isLoading: isLoadingProdutos, refetch: refetchProdutos } = useQuery(
-    ['produtoAvulso', ],
+    ['produtos-cadastrados-avulso', ],
     () => fetchListaProdutos(),
     { enabled: false, staleTime: 60 * 60 * 1000, }
   );
@@ -108,8 +116,8 @@ export const ActionPesquisaProdutosAvulso = ({ usuarioLogado }) => {
 
 
       <ActionMain
-        title="Dashboard Cadastros"
-        subTitle="Movimento de Caixa"
+        title="Lista de Produtos"
+        subTitle="Produtos"
         linkComponentAnterior={["Home"]}
         linkComponent={["Tela Principal"]}
 
@@ -124,14 +132,19 @@ export const ActionPesquisaProdutosAvulso = ({ usuarioLogado }) => {
         onChangeInputFieldDTFim={(e) => setDataPesquisaFim(e.target.value)}
 
         InputFieldCodBarraComponent={InputField}
-        labelInputFieldCodBarra="Cod. Barras"
-        valueInputFieldCodBarra={codBarra}
-        onChangeInputFieldCodBarra={(e) => setCodBarra(e.target.value)}
+        labelInputFieldCodBarra="Cód.Produto"
+        valueInputFieldCodBarra={codProduto}
+        onChangeInputFieldCodBarra={(e) => setCodProduto(e.target.value)}
 
         InputFieldComponent={InputField}
-        labelInputField="Descrição"
-        valueInputField={descricao}
-        onChangeInputField={(e) => setDescricao(e.target.value)}
+        labelInputField="Cód.Barras"
+        valueInputField={codBarra}
+        onChangeInputField={(e) => setCodBarra(e.target.value)}
+
+        InputFieldNumeroNFComponent={InputField}
+        labelInputFieldNumeroNF={"Descrição"}
+        valueInputFieldNumeroNF={descricao}
+        onChangeInputFieldNumeroNF={(e) => setDescricao(e.target.value)}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar Produtos"}

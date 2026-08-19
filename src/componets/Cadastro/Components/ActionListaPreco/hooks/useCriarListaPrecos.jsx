@@ -7,7 +7,7 @@ import { useQuery } from "react-query"
 import { getDataAtual } from "../../../../../utils/dataAtual"
 
 
-export const useCriarListaPrecos = ({optionsModulos, usuarioLogado }) => {
+export const useCriarListaPrecos = ({optionsModulos, usuarioLogado, dadosListaPreco, handleClose, refetchListaPreco }) => {
   const [descricao, setDescricao] = useState('')
   const [statusSelecionado, setStatusSelecionado] = useState({ value: 'True', label: 'ATIVO' })
   const [ipUsuario, setIpUsuario] = useState('');
@@ -53,7 +53,8 @@ export const useCriarListaPrecos = ({optionsModulos, usuarioLogado }) => {
     setIpUsuario(usuarioIP);
     return usuarioIP;
   };
-
+  console.log(empresaSelecionada, 'empresaSelecionada fora do submit')
+   
   const onSubmit = async () => {
 
     if (optionsModulos[0]?.CRIAR == 'False') {
@@ -77,16 +78,16 @@ export const useCriarListaPrecos = ({optionsModulos, usuarioLogado }) => {
    
     let dadosDetalheLista = [];
 
-   
+   console.log(empresaSelecionada, 'empresaSelecionada dentro do submit')
     if (empresaSelecionada && empresaSelecionada.length > 0) {
       empresaSelecionada.forEach((empresa) => {
-        const IDGRUPOEMPRESARIAL = empresa.IDGRUPOEMPRESARIAL ? Number(empresa.IDGRUPOEMPRESARIAL) : '';
-        const IDEMPRESA = empresa.IDEMPRESA ? Number(empresa.IDEMPRESA) : '';
+        const IDGRUPOEMPRESARIAL = empresa.IDGRUPOEMPRESARIAL ? Number(empresa.IDGRUPOEMPRESARIAL) : null;
+        const IDEMPRESA = empresa.IDEMPRESA ? Number(empresa.IDEMPRESA) : null;
         const STATIVOLOJA = empresa.STATIVO;
 
         dadosDetalheLista.push({
-          IDDETALHELISTAPRECO: '', 
-          IDRESUMOLISTAPRECO: '',
+          IDDETALHELISTAPRECO: null,
+          IDRESUMOLISTAPRECO: null,
           IDGRUPOEMPRESARIAL,
           IDEMPRESA,
           STATIVO: STATIVOLOJA
@@ -94,18 +95,16 @@ export const useCriarListaPrecos = ({optionsModulos, usuarioLogado }) => {
       });
     }
 
-   
-    const dadosLista = [{
-      IDRESUMOLISTAPRECO: '', 
+    const dadosLista = {
+      IDRESUMOLISTAPRECO: null,
       NOMELISTA,
       IDUSERCRIACAO,
-      IDUSERALTERACAO: '', 
+      IDUSERALTERACAO: null,
       STATIVO,
       lojas: dadosDetalheLista
-    }];
+    };
 
-   
-    if (!dadosLista[0]?.NOMELISTA.length || dadosLista[0]?.NOMELISTA.length < 10) {
+    if (!dadosLista?.NOMELISTA.length || dadosLista?.NOMELISTA.length < 10) {
       Swal.fire({
         icon: 'warning',
         title: 'Atenção',
@@ -118,7 +117,7 @@ export const useCriarListaPrecos = ({optionsModulos, usuarioLogado }) => {
       });
       return;
     }
-
+   
     if (!dadosDetalheLista.length) {
       Swal.fire({
         icon: 'warning',
@@ -133,54 +132,55 @@ export const useCriarListaPrecos = ({optionsModulos, usuarioLogado }) => {
       return;
     }
 
-   
-    const loadingAlert = Swal.fire({
-      title: 'Criando...',
-      text: 'Por favor aguarde.',
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      }
-    });
-
     try {
 
-      const response = await post('/listas-de-precos', dadosLista);
+      const response = await post('/criar-lista-de-preco', dadosLista);
 
-      Swal.close();
+      await Swal.fire({
+        icon: 'success',
+        title: 'Sucesso!',
+        text: response.msg,
+        customClass: {
+          container: 'custom-swal',
+        }
+      });
 
-      if (response.typeMsg === "success") {
-        await Swal.fire({
-          icon: 'success',
-          title: 'Sucesso!',
-          text: response.msg,
-          customClass: {
-            container: 'custom-swal',
-          }
-        });
+      handleClose();
+      refetchListaPreco();
 
-        setNomeListaPreco('');
-        setEmpresaSelecionada([]);
-        setSelectedIds([]);
-        setSelectAllChecked(false);
-        setStatusSelecionado({ value: 'True', label: 'ATIVO' });
-        
-        return response;
-      } else {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Atenção',
-          text: response.msg,
-          customClass: {
-            container: 'custom-swal',
-          },
-        });
-      }
+      const textDados = JSON.stringify(dadosLista);
+      const textFuncao = 'CADASTRO /CRIAÇÃO DE LISTA DE PREÇOS';
+      const ipUsuario = await getIPUsuario();
+      const createtLog = {
+        IDFUNCIONARIO: String(usuarioLogado.id),
+        PATHFUNCAO: textFuncao,
+        DADOS: textDados,
+        IP: ipUsuario || 'Indisponível'
+      };
+      
+      await post('/log-web', createtLog);
 
+      setNomeListaPreco('');
+      setEmpresaSelecionada([]);
+      setSelectedIds([]);
+      setSelectAllChecked(false);
+      setStatusSelecionado({ value: 'True', label: 'ATIVO' });
+
+      return response.data;
     } catch (error) {
       console.error('Erro ao criar lista de preço:', error);
-      Swal.close();
-
+      const textDados = JSON.stringify(dadosLista);
+      let textFuncao = 'CADASTRO /ERRO AO CRIAR LISTA DE PREÇOS';
+      const ipUsuario = await getIPUsuario();
+      const createtLog = {
+        IDFUNCIONARIO: String(usuarioLogado.id),
+        PATHFUNCAO: textFuncao,
+        DADOS: textDados,
+        IP: ipUsuario || 'Indisponível'
+      };
+      
+      await post('/log-web', createtLog);
+      
       Swal.fire({
         icon: 'error',
         title: 'Erro',
@@ -189,23 +189,7 @@ export const useCriarListaPrecos = ({optionsModulos, usuarioLogado }) => {
           container: 'custom-swal',
         },
       });
-    }
 
-    
-    try {
-      const textDados = JSON.stringify(dadosLista);
-      let textFuncao = 'CADASTRO / CRIAÇÃO DE LISTA DE PREÇOS';
-      const ipUsuario = await getIPUsuario();
-      const createtLog = {
-        IDFUNCIONARIO: String(usuarioLogado.id),
-        PATHFUNCAO: textFuncao,
-        DADOS: textDados,
-        IP: ipUsuario || 'Indisponível'
-      };
-
-      await post('/log-web', createtLog);
-    } catch (logError) {
-      console.error('Erro ao criar log:', logError);
     }
   }
 

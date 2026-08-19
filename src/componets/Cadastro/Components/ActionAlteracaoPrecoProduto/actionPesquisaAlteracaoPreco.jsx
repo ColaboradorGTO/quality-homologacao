@@ -9,7 +9,7 @@ import { ButtonType } from "../../../Buttons/ButtonType";
 import { getDataAtual } from "../../../../utils/dataAtual";
 import { get } from "../../../../api/funcRequest";
 import { useQuery } from "react-query";
-import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
+import { animacaoCarregamento, fecharAnimacaoCarregamento, foiCancelado } from "../../../../utils/animationCarregamento";
 import { useFetchData } from "../../../../hooks/useFetchData";
 import { ActionManualAlteracaoPreco } from "./ManualAlteracaoPreco/actionManualAlteracaoPreco";
 
@@ -32,6 +32,7 @@ export const ActionPesquisaAlteracaoPreco = ({ usuarioLogado }) => {
   const [actionMainVisivel, setActionMainVisivel] = useState(true);
   const [actionSecundariaVisivel, setActionSecundariaVisivel] = useState(false);
 
+
   useEffect(() => {
     const dataInicial = getDataAtual()
     const dataFim = getDataAtual()
@@ -46,64 +47,80 @@ export const ActionPesquisaAlteracaoPreco = ({ usuarioLogado }) => {
       setMenuFilhoAtual(menuParsed);
     }
   }, []);
-  
+
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
     ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
       const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
-      
+
       return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
+    { enabled: Boolean(usuarioLogado?.id) }
   );
-     
+  
+  const { data: dadosResponsaveisAlteracao = [], error: errorResponsaveis, isLoading: isLoadingResponsaveis, refetch: refetchResponsaveis } = useQuery(
+    ['responsaveisAlteracaoPrecos'],
+    async () => {
+      const response = await get(`/responsaveisAlteracaoPrecos`);
 
-  const { data: dadosResponsaveisAlteracao = [] } = useFetchData('responsaveisAlteracaoPrecos', '/responsaveisAlteracaoPrecos');
-  // const { data: dadosMarcas = [] } = useFetchData('listaMarcaProduto', '/listaMarcaProduto');
-  const { data: dadosListaPreco = [] } = useFetchData('lista-de-preco', '/lista-de-preco');
-  
+      return response.data;
+    },
+    { enabled: true }
+  );
+
+  const { data: dadosListaPreco = [], error: errorListaPreco, isLoading: isLoadingListaPreco, refetch: refetchListaPreco } = useQuery(
+    ['lista-de-preco'],
+    async () => {
+      const response = await get(`/lista-de-preco`);
+
+      return response.data;
+    },
+    { enabled: true }
+  );
+
+
   const fetchListaPreco = async () => {
+    const urlBase = `/alteracoes-de-precos-resumo?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idLista=${listaPrecoSelecionada}&idUsuario=${responsavelSelcionado}&descproduto${descricaoProduto}`;
+    let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
+    urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+    const controller = new AbortController();
+    let allData = [];
+
     try {
-      const urlApi = `/alteracoes-de-precos-resumo?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idLista=${listaPrecoSelecionada}&idUsuario=${responsavelSelcionado}&descproduto${descricaoProduto}`;
-      const response = await get(urlApi);
-      
-      if (response.data.length && response.data.length === pageSize) {
-        let allData = [...response.data];
-        animacaoCarregamento(`Carregando... Página ${currentPage} de ${response.data.length}`, true);
-  
-        async function fetchNextPage(currentPage) {
-          try {
-            currentPage++;
-            const responseNextPage = await get(`${urlApi}&page=${currentPage}`);
-            if (responseNextPage.length) {
-              allData.push(...responseNextPage.data);
-              return fetchNextPage(currentPage);
-            } else {
-              return allData;
-            }
-          } catch (error) {
-            console.error('Erro ao buscar próxima página:', error);
-            throw error;
-          }
+      animacaoCarregamento('Carregando dados...', true, true, () => controller.abort());
+
+      const primeiraPagina = 1;
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`, { signal: controller.signal });
+      const page = primeiraResposta.page || primeiraPagina;
+      const pageSize = primeiraResposta.pageSize || 1000;
+      const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
+      const totalPages = Math.ceil(totalRows / pageSize);
+
+      allData = [...(primeiraResposta.data || [])];
+
+      if (totalPages > 1) {
+        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+          if (foiCancelado()) break;
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`, { signal: controller.signal });
+          allData.push(...(responsePage.data || []));
         }
-  
-        await fetchNextPage(currentPage);
-        return allData;
-      } else {
-       
-        return response.data;
       }
-  
+
+      return allData;
     } catch (error) {
-      console.error('Error fetching data:', error);
+      if (error.code === 'ERR_CANCELED') {
+        return allData;
+      }
+      console.error('Erro ao buscar dados:', error);
       throw error;
     } finally {
       fecharAnimacaoCarregamento();
     }
   };
-   
-  const { data: dadosAlteracaoPreco = [], error: errorEstilos, isLoading: isLoadingEstilos, refetch: refetchListaPreco } = useQuery(
-    ['alteracoes-de-precos-resumo', ],
+
+  const { data: dadosAlteracaoPreco = [], error: errorEstilos, isLoading: isLoadingEstilos, refetch: refetchListaAlteracaoPreco } = useQuery(
+    ['alteracoes-de-precos-resumo',],
     () => fetchListaPreco(),
     {
       enabled: false,
@@ -112,21 +129,21 @@ export const ActionPesquisaAlteracaoPreco = ({ usuarioLogado }) => {
 
   const handleTabelaVisivel = () => {
     setCurrentPage(prevPage => prevPage + 1);
-    refetchListaPreco();
-    setTabelaVisivel(false);
+    refetchListaAlteracaoPreco();
+    setTabelaVisivel(true);
   };
 
   const handleActionVisivel = () => {
     setActionMainVisivel(false);
     setTabelaVisivel(false);
     setActionSecundariaVisivel(true);
-  
+
   };
 
   const optionsEmpresas = dadosListaPreco.map((item) => ({
     value: item.IDRESUMOLISTAPRECO,
     label: item.NOMELISTA,
-    title: item.TITLE, 
+    title: item.TITLE,
   }));
 
   return (
@@ -212,16 +229,16 @@ export const ActionPesquisaAlteracaoPreco = ({ usuarioLogado }) => {
 
       {tabelaVisivel && (
 
-        <ActionListaAlteracaoPreco 
-          dadosAlteracaoPreco={dadosAlteracaoPreco} 
+        <ActionListaAlteracaoPreco
+          dadosAlteracaoPreco={dadosAlteracaoPreco}
           optionsModulos={optionsModulos}
-          usuarioLogado={usuarioLogado} 
+          usuarioLogado={usuarioLogado}
         />
       )}
 
       {actionSecundariaVisivel && (
 
-        <ActionManualAlteracaoPreco 
+        <ActionManualAlteracaoPreco
           usuarioLogado={usuarioLogado}
           optionsModulos={optionsModulos}
         />
