@@ -7,12 +7,20 @@ import { GoDownload } from "react-icons/go";
 import { ActionListaEmpresas } from "./actionListaEmpresas";
 import { useQuery } from "react-query";
 import { useAtualizarTodosCaixas } from "./hooks/useAtualizarTodosCaixas";
+import { MdUpdate } from "react-icons/md";
+import { InputSelectAction } from "../../../Inputs/InputSelectAction";
+import { animacaoCarregamento, fecharAnimacaoCarregamento, foiCancelado } from "../../../../utils/animationCarregamento";
 
-export const InformaticaActionHome = ({ usuarioLogado, ID }) => {
+export const InformaticaActionHome = ({ usuarioLogado }) => {
   const [clickContador, setClickContador] = useState(0);
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [actionVisivel, setActionVisivel] = useState(true);
-  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState('');
+  const [Ufselecionada, setUfselecionada] = useState('');
+  const [marcaSelecionada, setMarcaSelecionada] = useState('');
+  const [empresaSelecionada, setEmpresaSelecionada] = useState('');
+  const [situacaoSelecionada, setSituacaoSelecionada] = useState('');
+
 
   useEffect(() => {
     const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
@@ -21,7 +29,7 @@ export const InformaticaActionHome = ({ usuarioLogado, ID }) => {
       setMenuFilhoAtual(menuParsed);
     }
   }, []);
-  
+
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
     ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
@@ -29,17 +37,87 @@ export const InformaticaActionHome = ({ usuarioLogado, ID }) => {
 
       return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
+    { enabled: Boolean(usuarioLogado?.id) }
   );
 
-
-  const { data: dadosEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch } = useQuery(
-    'listaEmpresasIformatica',
+  const { data: dadosMarca = [], error: errorMarca, isLoading: isLoadingMarca, refetch: refetchMarca } = useQuery(
+    'listaMarca',
     async () => {
-      const response = await get(`/listaEmpresasIformatica`);
+      const response = await get(`/marcasLista`);
       return response.data;
     },
     { staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+  );
+
+
+  const { data: dadosUf = [], error: errorUf, isLoading: isLoadingUf, refetch: refetchUf } = useQuery(
+    'listaUfInformatica',
+    async () => {
+      const response = await get(`/uf-empresa`);
+      return response.data;
+    },
+    { staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
+  );
+
+
+  const { data: todasEmpresas = [], error: errorTodasEmpresas, isLoading: isLoadingTodasEmpresas, refetch: refetchTodasEmpresas
+  } = useQuery(
+    ['empresasLista', marcaSelecionada, Ufselecionada],
+    async () => {
+      const response = await get(
+        `/todas-empresas?idSubGrupoEmpresa=${marcaSelecionada || ''}&uf=${Ufselecionada || ''}`
+      );
+
+      return response.data;
+    },
+    { staleTime: 60 * 60 * 1000 }
+  );
+
+  const fetchEmpresasInformatica = async () => {
+    const urlBase = `/listaEmpresasIformatica?idEmpresa=${String(empresaSelecionada)}&uf=${String(Ufselecionada)}&marcaEmpresa=${String(marcaSelecionada)}&stAberto=${String(situacaoSelecionada)}`;
+    let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
+    urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+
+    const controller = new AbortController();
+    let allData = [];
+
+    try {
+      animacaoCarregamento('Carregando dados...', true, true, () => controller.abort());
+
+      const primeiraPagina = 1;
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`, { signal: controller.signal });
+      const page = primeiraResposta.page || primeiraPagina;
+      const pageSize = primeiraResposta.pageSize || 1000;
+      const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
+      const totalPages = Math.ceil(totalRows / pageSize);
+
+      allData = [...(primeiraResposta.data || [])];
+
+      if (totalPages > 1) {
+        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+          if (foiCancelado()) break;
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`, { signal: controller.signal });
+          allData.push(...(responsePage.data || []));
+        }
+      }
+
+      return allData;
+    } catch (error) {
+      if (error.code === 'ERR_CANCELED') {
+        return allData;
+      }
+      console.error('Erro ao buscar dados:', error);
+      throw error;
+    } finally {
+      fecharAnimacaoCarregamento();
+    }
+  };
+
+  const { data: dadosEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresa } = useQuery(
+    ['fetchEmpresasInformatica'],
+    fetchEmpresasInformatica,
+    { enabled: true, staleTime: 60 * 60 * 1000 },
   );
 
 
@@ -47,12 +125,20 @@ export const InformaticaActionHome = ({ usuarioLogado, ID }) => {
 
   const handleClick = () => {
     setClickContador(prevContador => prevContador + 1);
-
-    if (clickContador % 2 === 0) {
-      setTabelaVisivel(true)
-      refetch();
-    }
+    setTabelaVisivel(true)
+    refetchEmpresa();
+    /*    if (clickContador % 2 === 0) {
+         setTabelaVisivel(true)
+         refetchEmpresa();
+       } */
   }
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
 
   return (
 
@@ -66,6 +152,55 @@ export const InformaticaActionHome = ({ usuarioLogado, ID }) => {
             title="Tela Principal Dashboard Informática"
             subTitle
 
+            InputSelectEmpresaComponent={InputSelectAction}
+            onChangeSelectEmpresa={(e) => setUfselecionada(e.value)}
+            valueSelectEmpresa={Ufselecionada}
+
+            optionsEmpresas={[
+              { value: '', label: 'Todos' },
+              ...dadosUf.map((uf) => ({
+                value: uf.SGUF,
+                label: uf.SGUF,
+              }))
+            ]}
+            labelSelectEmpresa={"UF"}
+
+            InputSelectGrupoComponent={InputSelectAction}
+            optionsGrupos={[
+              { value: '', label: 'Todos' },
+              ...dadosMarca.map((marca) => ({
+                value: marca.IDGRUPOEMPRESARIAL,
+                label: marca.DSGRUPOEMPRESARIAL,
+              }))
+            ]}
+            valueSelectGrupo={marcaSelecionada}
+            onChangeSelectGrupo={(e) => setMarcaSelecionada(e.value)}
+            labelSelectGrupo={'Marca'}
+
+
+            InputSelectSubGrupoComponent={InputSelectAction}
+            optionsSubGrupos={[
+              { value: '', label: 'Todas' },
+              ...todasEmpresas.map((empresa) => ({
+                value: empresa.IDEMPRESA,
+                label: empresa.NOFANTASIA,
+              }))
+            ]}
+            valueSelectSubGrupo={empresaSelecionada}
+            onChangeSelectSubGrupo={(e) => setEmpresaSelecionada(e.value)}
+            labelSelectSubGrupo={'Filiais'}
+
+            InputSelectStatusFiliaisComponent={InputSelectAction}
+            optionStatusFiliais={[
+              { value: '', label: 'Todos' },
+              { value: 'True', label: 'Aberta' },
+              { value: 'False', label: 'Fechada' },
+            ]
+            }
+            valueSelectStatusFiliais={situacaoSelecionada}
+            onChangeStatusFiliais={(e) => setSituacaoSelecionada(e.value)}
+            LabelSelectStatusFiliais={'Situação Filiais'}
+
             ButtonSearchComponent={ButtonType}
             linkNomeSearch={"Listar Caixas"}
             onButtonClickSearch={handleClick}
@@ -76,7 +211,7 @@ export const InformaticaActionHome = ({ usuarioLogado, ID }) => {
             linkNome={"Atualizar Todos os Caixas"}
             onButtonClickCadastro={atualizarDiariaEmpresa}
             corCadastro={"success"}
-            IconCadastro={AiOutlineSearch}
+            IconCadastro={MdUpdate}
 
             ButtonTypeCancelar={ButtonType}
             linkCancelar={"Exportar Caixas XLS"}

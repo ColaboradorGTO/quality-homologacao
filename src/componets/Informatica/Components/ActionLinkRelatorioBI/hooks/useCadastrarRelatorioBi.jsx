@@ -105,12 +105,12 @@ export const useCadastrarRelatorioBi = ({ handleClose, refetchListaRelatorio, op
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario || 'IP não disponível',
+        IP: ipUsuario || 'INDISPONIVEL',
       };
       
       const responsePost = await post('/log-web', createData);
       Swal.fire({
-        position: 'top-end',
+        position: 'center',
         icon: 'error',
         title: 'Erro ao atualizar Relatório!',
         customClass: {

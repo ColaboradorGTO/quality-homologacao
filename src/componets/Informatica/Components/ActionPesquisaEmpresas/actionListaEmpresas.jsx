@@ -105,7 +105,7 @@ export const ActionListaEmpresas = ({ dadosEmpresas, optionsModulos, usuarioLoga
             header: "Opções",
             body: row => {
                 return (
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    <div style={{ display: "flex", justifyContent: "start" , gap: "10px"}}>
                         <ButtonTable
                             titleButton={"Editar"}
                             onClickButton={() => handleClickEditar(row)}
@@ -127,6 +127,7 @@ export const ActionListaEmpresas = ({ dadosEmpresas, optionsModulos, usuarioLoga
                             iconColor={"#fff"}
                             cor={"primary"}
                         />
+
                     </div>
                 )
             }
@@ -251,6 +252,7 @@ export const ActionListaEmpresas = ({ dadosEmpresas, optionsModulos, usuarioLoga
                         rowsPerPageOptions={[10, 20, 30, 50, 100, dados.length]}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+                        cellMemo={false}
                         filterDisplay="menu"
                         showGridlines
                         stripedRows

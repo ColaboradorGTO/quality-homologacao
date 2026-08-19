@@ -16,7 +16,6 @@ import { useState } from "react";
 import { ActionMain } from "../../../Actions/actionMain";
 import { ActionListaMenuFilho } from "./actionListaMenuFilho";
 
-
 export const ActionPesquisaCriarMenuFilho = ({
 
     moduloSelecionado,
@@ -28,8 +27,8 @@ export const ActionPesquisaCriarMenuFilho = ({
     nomeMenu,
     setNomeMenu,
     onSubmit,
-
-    usuarioLogado
+    usuarioLogado,
+    refetchModulos
 }) => {
 
     const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
@@ -43,14 +42,14 @@ export const ActionPesquisaCriarMenuFilho = ({
         }
     }, []);
 
-    const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
+    const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulosExcecao } = useQuery(
         ['menus-usuario-excecao', menuFilhoAtual?.ID],
         async () => {
             const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
 
             return response.data;
         },
-        { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
+        { enabled: Boolean(usuarioLogado?.id) }
     );
 
     const fetchListaMenuFilho = async () => {
@@ -105,6 +104,7 @@ export const ActionPesquisaCriarMenuFilho = ({
     );
 
 
+
     return (
         <Fragment>
             <h2 style={{ marginBottom: "20px", fontWeight: "bold", color: "#fff" }}>
@@ -116,6 +116,7 @@ export const ActionPesquisaCriarMenuFilho = ({
                 usuarioLogado={usuarioLogado}
                 optionsModulos={optionsModulos}
                 refetchMenuFilho={refetchMenuFilho}
+                refetchModulos={refetchModulos}
 
             />
 
@@ -124,6 +125,7 @@ export const ActionPesquisaCriarMenuFilho = ({
                 usuarioLogado={usuarioLogado}
                 optionsModulos={optionsModulos}
                 refetchMenuFilho={refetchMenuFilho}
+                dadosMenuPai={dadosMenuPai}
             />
 
         </Fragment>

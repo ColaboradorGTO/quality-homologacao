@@ -4,7 +4,7 @@ export const schema = yup.object().shape({
 
   nomeCaixa: yup
     .string()
-    .required(' Nome Caixa Obrigatório'),
+    .required('Nome Caixa Obrigatório'),
 
   tipoDeEmissao: yup
     .string()

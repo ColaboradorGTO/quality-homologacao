@@ -23,7 +23,8 @@ export const InformaticaActionListCaixa = ({
   setTabelaVisivel,
   setActionListaCaixaVisivel,
   refetchListaCaixa,
-  usuarioLogado
+  usuarioLogado,
+  optionsModulos
 }) => {
 
   const [modalVisivel, setModalVisivel] = useState(false);
@@ -170,7 +171,7 @@ export const InformaticaActionListCaixa = ({
                 cor={"primary"}
                 width='50px'
                 height='auto'
-
+                disabledBTN={optionsModulos[0]?.ALTERAR == 'False' ? true : false}
               />
 
             </div>
@@ -204,8 +205,6 @@ export const InformaticaActionListCaixa = ({
       console.log('Erro ao buscar empresas: ', error)
     }
   }
-
-
 
   const handleClickDetalhar = (row) => {
     if (row.IDCAIXAWEB) {
@@ -272,6 +271,7 @@ export const InformaticaActionListCaixa = ({
             rowsPerPageOptions={[10, 20, 50, 100, dados.length]}
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+            cellMemo={false}
             filterDisplay="menu"
             showGridlines
             stripedRows

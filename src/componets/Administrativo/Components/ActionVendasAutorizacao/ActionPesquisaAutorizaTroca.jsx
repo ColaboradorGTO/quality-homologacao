@@ -157,7 +157,8 @@ export const ActionPesquisaAutorizaTroca = ({ usuarioLogado }) => {
   } = useAutorizarTroca({
     selectedRows,
     setSelectedRows,
-    handleClick
+    handleClick,
+    usuarioLogado
   })
   return (
 

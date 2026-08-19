@@ -8,7 +8,7 @@ import { getDataAtual } from "../../../../utils/dataAtual";
 import { MdAdd } from "react-icons/md";
 import { useQuery } from "react-query";
 import Swal from "sweetalert2";
-import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
+import { animacaoCarregamento, fecharAnimacaoCarregamento, foiCancelado } from "../../../../utils/animationCarregamento";
 import { InputSelectAction } from "../../../Inputs/InputSelectAction";
 import { ActionListaVendaCLiente } from "./actionListaVendaCliente";
 import { useCriarVoucher } from "./hooks/useCriarVoucher";
@@ -61,7 +61,7 @@ export const ActionPesquisaCreateVoucherCliente = ({
   }, []);
 
 
-  const fetchListaEmpresasVouchers = async () => {
+/*   const fetchListaEmpresasVouchers = async () => {
     try {
       const urlApi = `/empresasVoucher?idSubGrupoEmpresa=${usuarioLogado?.IDGRUPOEMPRESARIAL}&idEmpresa=${usuarioLogado?.IDEMPRESA}`;
       const response = await get(urlApi);
@@ -95,6 +95,48 @@ export const ActionPesquisaCreateVoucherCliente = ({
 
     } catch (error) {
       console.error('Error fetching data:', error);
+      throw error;
+    } finally {
+      fecharAnimacaoCarregamento();
+    }
+  }; */
+
+
+const fetchListaEmpresasVouchers = async () => {
+    const urlBase = `/empresasVoucher?idSubGrupoEmpresa=${usuarioLogado?.IDGRUPOEMPRESARIAL}&idEmpresa=${usuarioLogado?.IDEMPRESA}`;
+    let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
+    urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+
+    const controller = new AbortController();
+    let allData = [];
+
+    try {
+      animacaoCarregamento('Carregando dados...', true, true, () => controller.abort());
+
+      const primeiraPagina = 1;
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`, { signal: controller.signal });
+      const page = primeiraResposta.page || primeiraPagina;
+      const pageSize = primeiraResposta.pageSize || 1000;
+      const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
+      const totalPages = Math.ceil(totalRows / pageSize);
+
+      allData = [...(primeiraResposta.data || [])];
+
+      if (totalPages > 1) {
+        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+          if (foiCancelado()) break;
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`, { signal: controller.signal });
+          allData.push(...(responsePage.data || []));
+        }
+      }
+
+      return allData;
+    } catch (error) {
+      if (error.code === 'ERR_CANCELED') {
+        return allData;
+      }
+      console.error('Erro ao buscar dados:', error);
       throw error;
     } finally {
       fecharAnimacaoCarregamento();
@@ -141,6 +183,49 @@ export const ActionPesquisaCreateVoucherCliente = ({
     }
   };
 
+/* const fetchListaVendasClientes = async () => {
+    const urlBase = `/lista-venda-cliente?idEmpresa=${empresaSelecionada}&idSubGrupoEmpresarial=${usuarioLogado?.IDGRUPOEMPRESARIAL}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&cpfOUidVenda=${cpf}&nnf=${numeroNF}&serie=${serie}`;
+    let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
+    urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+
+    const controller = new AbortController();
+    let allData = [];
+
+    try {
+      animacaoCarregamento('Carregando dados...', true, true, () => controller.abort());
+
+      const primeiraPagina = 1;
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`, { signal: controller.signal });
+      const page = primeiraResposta.page || primeiraPagina;
+      const pageSize = primeiraResposta.pageSize || 1000;
+      const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
+      const totalPages = Math.ceil(totalRows / pageSize);
+
+      allData = [...(primeiraResposta.data || [])];
+
+      if (totalPages > 1) {
+        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+          if (foiCancelado()) break;
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`, { signal: controller.signal });
+          allData.push(...(responsePage.data || []));
+        }
+      }
+
+      return allData;
+    } catch (error) {
+      if (error.code === 'ERR_CANCELED') {
+        return allData;
+      }
+      console.error('Erro ao buscar dados:', error);
+      throw error;
+    } finally {
+      fecharAnimacaoCarregamento();
+    }
+  };
+ */
+
+  
   const { data: dadosVendasClientes = [], error: errorVendasClientes, isLoading: isLoadingVendas, refetch: refetchListaVendasClientes } = useQuery(
     ['lista-venda-cliente'],
     () => fetchListaVendasClientes(),

@@ -10,11 +10,11 @@ import { getDataAtual } from "../../../../utils/dataAtual";
 import { ActionListaProdutoVendido } from "./actionListaProdutoVendido";
 import { ActionListaVendasEstrutura } from "./actionListaVendasEstrutura";
 import { ActionListaVendasVendedor } from "./actionListaVendasVendedor";
-import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
+import { animacaoCarregamento, fecharAnimacaoCarregamento, foiCancelado } from "../../../../utils/animationCarregamento";
 import { useQuery } from "react-query";
 
 
-export const ActionPesquisaVendasEstrutura = ({usuarioLogado }) => {
+export const ActionPesquisaVendasEstrutura = ({ usuarioLogado }) => {
   const [tabelaProdutosMaisVendidos, setTabelaProdutosMaisVendidos] = useState(false);
   const [tabelaVendasPorVendedor, setTabelaVendasPorVendedor] = useState(false);
   const [tabelaVendasPorEstrutura, setTabelaVendasPorEstrutura] = useState(false);
@@ -74,92 +74,177 @@ export const ActionPesquisaVendasEstrutura = ({usuarioLogado }) => {
     { staleTime: 60 * 60 * 1000, cacheTime: 10 * 60 * 1000 }
   );
 
+  /*  const fetchVendasEstrutura = async () => {
+     const idEmpresa = empresaSelecionada == '' ? usuarioLogado?.IDEMPRESA : empresaSelecionada;
+     const urlBase = `/vendas-por-estrutura?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idEmpresa=${idEmpresa}&descricaoProduto=${codProduto}&idFornecedor=${fornecedorSelecionado}&idGrupo=${grupoSelecionado}&idSubGrupo=${subGrupoSelecionado}&idMarcaProduto=${marcaSelecionada}`;
+     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
+     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+     try {
+       animacaoCarregamento('Carregando dados...', true);
+                                   
+       const primeiraPagina = 1;
+       const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+       const page = primeiraResposta.page || primeiraPagina;
+       const pageSize = primeiraResposta.pageSize || 1000;
+       const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
+       const totalPages = Math.ceil(totalRows / pageSize);
+ 
+       let allData = [...(primeiraResposta.data || [])];
+ 
+       if (totalPages > 1) {
+         for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+           animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
+           const responsePage = await get(`${urlApi}&page=${currentPage}`);
+           allData.push(...(responsePage.data || []));
+         }
+       }
+ 
+       return allData;
+     } catch (error) {
+       console.error('Erro ao buscar dados da api:', error);
+       throw error;
+     } finally {
+       fecharAnimacaoCarregamento();
+     }
+   }; */
+
   const fetchVendasEstrutura = async () => {
     const idEmpresa = empresaSelecionada == '' ? usuarioLogado?.IDEMPRESA : empresaSelecionada;
     const urlBase = `/vendas-por-estrutura?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idEmpresa=${idEmpresa}&descricaoProduto=${codProduto}&idFornecedor=${fornecedorSelecionado}&idGrupo=${grupoSelecionado}&idSubGrupo=${subGrupoSelecionado}&idMarcaProduto=${marcaSelecionada}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+
+    const controller = new AbortController();
+    let allData = [];
+
     try {
-      animacaoCarregamento('Carregando dados...', true);
-                                  
+      animacaoCarregamento('Carregando dados...', true, true, () => controller.abort());
+
       const primeiraPagina = 1;
-      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`, { signal: controller.signal });
       const page = primeiraResposta.page || primeiraPagina;
       const pageSize = primeiraResposta.pageSize || 1000;
       const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
       const totalPages = Math.ceil(totalRows / pageSize);
 
-      let allData = [...(primeiraResposta.data || [])];
+      allData = [...(primeiraResposta.data || [])];
 
       if (totalPages > 1) {
         for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
-          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
-          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          if (foiCancelado()) break;
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`, { signal: controller.signal });
           allData.push(...(responsePage.data || []));
         }
       }
 
       return allData;
     } catch (error) {
-      console.error('Erro ao buscar dados da api:', error);
+      if (error.code === 'ERR_CANCELED') {
+        return allData;
+      }
+      console.error('Erro ao buscar dados:', error);
       throw error;
     } finally {
       fecharAnimacaoCarregamento();
     }
   };
 
-  const { data: dadosVendasEstrutura = [], error: erroVendasEstrutura , isLoading: isLoadingVendasEstrutura, refetch: refetchVendasEstrutura } = useQuery(
+
+  const { data: dadosVendasEstrutura = [], error: erroVendasEstrutura, isLoading: isLoadingVendasEstrutura, refetch: refetchVendasEstrutura } = useQuery(
     'vendas-por-estrutura',
     () => fetchVendasEstrutura(),
     { enabled: false, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
   );
 
+  /*   const fetchProdutosMaisVendidos = async () => {
+      const urlBase = `/produtos-mais-vendidos?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idEmpresa=${usuarioLogado.IDEMPRESA}&descricaoProduto=${codProduto}&idFornecedor=${fornecedorSelecionado}&idGrupo=${grupoSelecionado}&idGrade=${subGrupoSelecionado}`;
+      let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
+      urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+      try {
+        animacaoCarregamento('Carregando dados...', true);
+  
+        const primeiraPagina = 1;
+        const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+        const page = primeiraResposta.page || primeiraPagina;
+        const pageSize = primeiraResposta.pageSize || 1000;
+        const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
+        const totalPages = Math.ceil(totalRows / pageSize);
+  
+        let allData = [...(primeiraResposta.data || [])];
+  
+        if (totalPages > 1) {
+          for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+            animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
+            const responsePage = await get(`${urlApi}&page=${currentPage}`);
+            allData.push(...(responsePage.data || []));
+          }
+        }
+  
+        return allData;
+      } catch (error) {
+        console.error('Erro ao buscar dados da api:', error);
+        throw error;
+      } finally {
+        fecharAnimacaoCarregamento();
+      }
+    }; */
+
   const fetchProdutosMaisVendidos = async () => {
     const urlBase = `/produtos-mais-vendidos?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idEmpresa=${usuarioLogado.IDEMPRESA}&descricaoProduto=${codProduto}&idFornecedor=${fornecedorSelecionado}&idGrupo=${grupoSelecionado}&idGrade=${subGrupoSelecionado}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+
+    const controller = new AbortController();
+    let allData = [];
+
     try {
-      animacaoCarregamento('Carregando dados...', true);
-                                   
+      animacaoCarregamento('Carregando dados...', true, true, () => controller.abort());
+
       const primeiraPagina = 1;
-      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`, { signal: controller.signal });
       const page = primeiraResposta.page || primeiraPagina;
       const pageSize = primeiraResposta.pageSize || 1000;
       const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
       const totalPages = Math.ceil(totalRows / pageSize);
 
-      let allData = [...(primeiraResposta.data || [])];
+      allData = [...(primeiraResposta.data || [])];
 
       if (totalPages > 1) {
         for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
-          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
-          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          if (foiCancelado()) break;
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`, { signal: controller.signal });
           allData.push(...(responsePage.data || []));
         }
       }
 
       return allData;
     } catch (error) {
-      console.error('Erro ao buscar dados da api:', error);
+      if (error.code === 'ERR_CANCELED') {
+        return allData;
+      }
+      console.error('Erro ao buscar dados:', error);
       throw error;
     } finally {
       fecharAnimacaoCarregamento();
     }
   };
 
-  const { data: dadosProdutosMaisVendidos = [], error: erroProdutosMaisVendidos , isLoading: isLoadingProdutosMaisVendidos, refetch: refetchProdutosMaisVendidos } = useQuery(
+
+  const { data: dadosProdutosMaisVendidos = [], error: erroProdutosMaisVendidos, isLoading: isLoadingProdutosMaisVendidos, refetch: refetchProdutosMaisVendidos } = useQuery(
     'produtos-mais-vendidos',
     () => fetchProdutosMaisVendidos(),
     { enabled: false, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
   );
 
-  const fetchVendasVendedor = async () => {
+/*   const fetchVendasVendedor = async () => {
     const urlBase = `/vendas-vendedor-estrutura?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idEmpresa=${usuarioLogado.IDEMPRESA}&descricaoProduto=${codProduto}&idFornecedor=${fornecedorSelecionado}&idGrupo=${grupoSelecionado}&idGrade=${subGrupoSelecionado}&idMarca=${marcaSelecionada}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
       animacaoCarregamento('Carregando dados...', true);
-                                   
+
       const primeiraPagina = 1;
       const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
       const page = primeiraResposta.page || primeiraPagina;
@@ -184,9 +269,51 @@ export const ActionPesquisaVendasEstrutura = ({usuarioLogado }) => {
     } finally {
       fecharAnimacaoCarregamento();
     }
+  }; */
+
+const fetchVendasVendedor = async () => {
+   const urlBase = `/vendas-vendedor-estrutura?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idEmpresa=${usuarioLogado.IDEMPRESA}&descricaoProduto=${codProduto}&idFornecedor=${fornecedorSelecionado}&idGrupo=${grupoSelecionado}&idGrade=${subGrupoSelecionado}&idMarca=${marcaSelecionada}`;
+    let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
+    urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+
+    const controller = new AbortController();
+    let allData = [];
+
+    try {
+      animacaoCarregamento('Carregando dados...', true, true, () => controller.abort());
+
+      const primeiraPagina = 1;
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`, { signal: controller.signal });
+      const page = primeiraResposta.page || primeiraPagina;
+      const pageSize = primeiraResposta.pageSize || 1000;
+      const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
+      const totalPages = Math.ceil(totalRows / pageSize);
+
+      allData = [...(primeiraResposta.data || [])];
+
+      if (totalPages > 1) {
+        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+          if (foiCancelado()) break;
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`, { signal: controller.signal });
+          allData.push(...(responsePage.data || []));
+        }
+      }
+
+      return allData;
+    } catch (error) {
+      if (error.code === 'ERR_CANCELED') {
+        return allData;
+      }
+      console.error('Erro ao buscar dados:', error);
+      throw error;
+    } finally {
+      fecharAnimacaoCarregamento();
+    }
   };
 
-  const { data: dadosVendasVendedor = [], error: erroVendasVendedor , isLoading: isLoadingVendasVendedor, refetch: refetchVendasVendedor } = useQuery(
+
+  const { data: dadosVendasVendedor = [], error: erroVendasVendedor, isLoading: isLoadingVendasVendedor, refetch: refetchVendasVendedor } = useQuery(
     'vendas-vendedor-estrutura',
     () => fetchVendasVendedor(),
     { enabled: false, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
@@ -201,7 +328,7 @@ export const ActionPesquisaVendasEstrutura = ({usuarioLogado }) => {
     const values = selectedOptions.map(option => option.value);
     setSubGrupoSelecionado(values);
   };
-  
+
   const handleChangeFornecedor = (selectedOptions) => {
     const values = selectedOptions.map(option => option.value);
     setFornecedorSelecionado(values);
@@ -219,32 +346,32 @@ export const ActionPesquisaVendasEstrutura = ({usuarioLogado }) => {
       setTabelaProdutosMaisVendidos(true);
       setTabelaVendasPorEstrutura(false);
       setTabelaVendasPorVendedor(false);
-    } 
-          
+    }
+
   }
 
   const handleClickVendasEstrutura = () => {
-    
+
     if (usuarioLogado && usuarioLogado.IDEMPRESA) {
       setCurrentPage(+1);
-      refetchVendasEstrutura( );
+      refetchVendasEstrutura();
       setTabelaVendasPorEstrutura(true);
       setTabelaProdutosMaisVendidos(false);
       setTabelaVendasPorVendedor(false);
-    } 
-      
+    }
+
   }
 
   const handleClickVendasVendedor = () => {
-    
+
     if (usuarioLogado && usuarioLogado.IDEMPRESA) {
       setCurrentPage(+1);
       refetchVendasVendedor();
       setTabelaVendasPorVendedor(true);
       setTabelaProdutosMaisVendidos(false);
       setTabelaVendasPorEstrutura(false);
-    } 
-   
+    }
+
   }
 
 
@@ -336,17 +463,17 @@ export const ActionPesquisaVendasEstrutura = ({usuarioLogado }) => {
       />
 
 
-      {tabelaVendasPorEstrutura &&  (
+      {tabelaVendasPorEstrutura && (
         <ActionListaVendasEstrutura dadosVendasEstrutura={dadosVendasEstrutura} />
       )}
-    
-      {tabelaProdutosMaisVendidos &&  (
+
+      {tabelaProdutosMaisVendidos && (
         <ActionListaProdutoVendido dadosProdutosMaisVendidos={dadosProdutosMaisVendidos} />
       )}
 
-      {tabelaVendasPorVendedor &&  (
+      {tabelaVendasPorVendedor && (
         <ActionListaVendasVendedor dadosVendasVendedor={dadosVendasVendedor} />
-      )} 
+      )}
     </Fragment>
   )
 }

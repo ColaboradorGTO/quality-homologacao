@@ -6,7 +6,8 @@ import { post } from "../../../../../api/funcRequest";
 export const useAutorizarTroca = ({
     selectedRows,
     setSelectedRows,
-    handleClick
+    handleClick,
+    usuarioLogado
 }) => {
     const [ipUsuario, setIpUsuario] = useState('');
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -198,7 +199,6 @@ export const useAutorizarTroca = ({
         }
     };
 
-
     const onSubmit = async (dadosMotivo, dadosUsuarioAutorizado) => {
 
         const postData = {
@@ -209,7 +209,7 @@ export const useAutorizarTroca = ({
             MOTIVOEXCECAO: dadosMotivo?.mtExcecao,
             QTD: parseFloat(selectedRows[0]?.QTD),
             TIPOTROCA: dadosMotivo?.tipoTroca,
-            USERAUTORIZADOR: parseInt(dadosUsuarioAutorizado[0]?.IDFUNCIONARIO),
+            USERAUTORIZADOR: parseInt(usuarioLogado?.idFuncionario),
             VRPRODUTO: parseFloat(selectedRows[0]?.VPROD),
             VRTOTALLIQUIDO: parseFloat(selectedRows[0]?.VRTOTALLIQUIDO)
         }

@@ -8,7 +8,7 @@ import { ActionListaVendasContigencia } from "./actionListaVendasContigencia";
 import { getDataAtual } from "../../../../utils/dataAtual";
 import { AiOutlineSearch } from "react-icons/ai";
 import { useQuery } from "react-query";
-import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento";
+import { animacaoCarregamento, fecharAnimacaoCarregamento, foiCancelado } from "../../../../utils/animationCarregamento";
 
 export const ActionPesquisaVendasContigencia = () => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
@@ -22,7 +22,7 @@ export const ActionPesquisaVendasContigencia = () => {
     const dataFim = getDataAtual();
     setDataPesquisaInicio(dataInicio);
     setDataPesquisaFim(dataFim);
-    
+
   }, []);
 
 
@@ -38,45 +38,52 @@ export const ActionPesquisaVendasContigencia = () => {
     }
   );
 
-    const fetchVendasContigencia = async () => {
+  const fetchVendasContigencia = async () => {
     const urlBase = `/vendas-contigencia?idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+
+    const controller = new AbortController();
+    let allData = [];
+
     try {
-      animacaoCarregamento('Carregando dados...', true);
-                                            
+      animacaoCarregamento('Carregando dados...', true, true, () => controller.abort());
+
       const primeiraPagina = 1;
-      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`, { signal: controller.signal });
       const page = primeiraResposta.page || primeiraPagina;
       const pageSize = primeiraResposta.pageSize || 1000;
       const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
       const totalPages = Math.ceil(totalRows / pageSize);
 
-      let allData = [...(primeiraResposta.data || [])];
+      allData = [...(primeiraResposta.data || [])];
 
       if (totalPages > 1) {
-      for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
-          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
-          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+          if (foiCancelado()) break;
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`, { signal: controller.signal });
           allData.push(...(responsePage.data || []));
-      }
+        }
       }
 
       return allData;
-  
     } catch (error) {
-      console.error('Erro ao buscar dados da api', error);
+      if (error.code === 'ERR_CANCELED') {
+        return allData;
+      }
+      console.error('Erro ao buscar dados:', error);
       throw error;
     } finally {
       fecharAnimacaoCarregamento();
     }
   };
 
-  const { data: dadosVendasContigencia = [], error: errorVendas, isLoading: isLoadingVendas, refetch: refetchVendasContigencia} = useQuery(
+  const { data: dadosVendasContigencia = [], error: errorVendas, isLoading: isLoadingVendas, refetch: refetchVendasContigencia } = useQuery(
     ['venda-contigencia',],
     () => fetchVendasContigencia(),
     {
-      enabled: false, 
+      enabled: false,
       staleTime: 60 * 60 * 1000,
     }
   );
@@ -91,6 +98,13 @@ export const ActionPesquisaVendasContigencia = () => {
     refetchVendasContigencia()
     setTabelaVisivel(false)
   }
+
+    const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
 
   return (
 
@@ -131,9 +145,9 @@ export const ActionPesquisaVendasContigencia = () => {
         IconSearch={AiOutlineSearch}
 
       />
-      
-      <ActionListaVendasContigencia  dadosVendasContigencia={dadosVendasContigencia} />
-     
+
+      <ActionListaVendasContigencia dadosVendasContigencia={dadosVendasContigencia} />
+
     </Fragment>
   )
 }
