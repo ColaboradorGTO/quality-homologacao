@@ -603,11 +603,8 @@ export const ActionMain = ({
   stylesGrupo,
   styleProdutoVendido,
   styleVendedor,
-<<<<<<< HEAD
   styleVendasResumida,
-=======
   styleImportar,
->>>>>>> 671f02491bde28292ed96dc6858cfd02bc73a63d
   // Funções
 
   onButtonClickSearch,
