@@ -1,119 +1,32 @@
-import React, { Fragment, useEffect, useState, useRef } from "react"
-import { ButtonTable } from "../../../ButtonsTabela/ButtonTable";
+import React, { Fragment, useState } from "react"
 import { dataFormatada } from "../../../../utils/dataFormatada";
-import { get } from "../../../../api/funcRequest";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { CiEdit } from "react-icons/ci";
-import { MdOutlineAttachMoney } from "react-icons/md";
-import { FaUserAltSlash, FaUserTimes } from "react-icons/fa";
-import { useReactToPrint } from "react-to-print";
-import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
-import * as XLSX from 'xlsx';
 import HeaderTable from "../../../Tables/headerTable";
 import { toFloat } from "../../../../utils/toFloat";
 import { formatarPorcentagem } from "../../../../utils/formatarPorcentagem";
-import Swal from "sweetalert2";
-import { getDataAtual } from "../../../../utils/dataAtual";
-import { FaCheck } from "react-icons/fa6";
 import { ActionEditarFuncionario } from "./ActionEditar/actionEditarFuncionario";
 import { useDesligarFuncionario } from "./hooks/useDesligarFuncionario";
 import { useAtivarFuncionario } from "./hooks/useAtivarFuncionario";
+import { useFuncionarioModal } from "./hooks/useFuncionarioModal";
 import { ActionEditarDescontoFuncionarioModal } from "./ActionDesconto/actionEditarDescontoFuncionarioModal";
+import { useExportarTabela } from "../../../../hooks/useExportarTabela";
+import { executarComPermissao } from "../../../../utils/permissao";
+import { AcoesFuncionarioColuna } from "./AcoesFuncionarioColuna";
 
 export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usuarioLogado, handleClick, refetch }) => {
-  const [modalAlterarFuncionarioVisivel, setModalAlterarFuncionarioVisivel] = useState(false);
-  const [modalDescontoVisivel, setModalDescontoVisivel] = useState(false);
-  const [dadosAtualizarFuncionarios, setDadosAtualizarFuncionarios] = useState([]);
-  const [dadosDescontoFuncionarios, setDadosDescontoFuncionarios] = useState([]);
-  const [globalFilterValue, setGlobalFilterValue] = useState('');
-  const dataTableRef = useRef();
   const [rowSelection, setRowSelection] = useState(null);
   const { handleDesligarFuncionario } = useDesligarFuncionario({ optionsModulos, usuarioLogado, handleClick })
   const { handleAtivarFuncionario } = useAtivarFuncionario({ optionsModulos, usuarioLogado, handleClick })
-
-
-  const onGlobalFilterChange = (e) => {
-    setGlobalFilterValue(e.target.value);
-  };
-
-  const handlePrint = useReactToPrint({
-    content: () => dataTableRef.current,
-    documentTitle: 'Lista de Funcionarios',
-  });
+  const modalEditar = useFuncionarioModal();
+  const modalDesconto = useFuncionarioModal();
 
   function formatarDataBR(dataISO) {
-
     if (!dataISO || dataISO === "null" || dataISO === "undefined") return "";
     const d = new Date(dataISO);
     if (Number.isNaN(d.getTime())) return "";
     return d.toLocaleDateString("pt-BR");
   }
-
-  const exportToPDF = () => {
-    const doc = new jsPDF();
-    doc.autoTable({
-      head: [['Nº', 'CPF', 'Funcionário', 'Login', 'Função', 'Localização', 'TP. Contratação', 'Tipo', 'Desconto %', 'Situação', 'DT Desl.']],
-      body: dados.map(item => [
-        item.contador,
-        item.NUCPF,
-        item.NOFUNCIONARIO,
-        item.NOLOGIN,
-        item.DSFUNCAO,
-        item.STLOJA == 'True' ? 'Loja' : 'Escritório',
-        item.STCONVENIO == 'True' ? 'CLT' : 'PJ',
-        item.DSTIPO == 'PN' ? 'PARCEIRO DE NEGÓCIOS' : 'FUNCIÓNARIO',
-        item.PERC,
-        item.STATIVO == 'True' ? 'Ativo' : 'Inativo',
-        dataFormatada(item.DTDEMISSAO)
-
-      ]),
-      horizontalPageBreak: true,
-      horizontalPageBreakBehaviour: 'immediately'
-    });
-    doc.save('lista_funcionarios.pdf');
-  };
-
-  const exportToExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(dados.map(item => ({
-      'Nº': item.contador,
-      'CPF': item.NUCPF,
-      'Funcionário': item.NOFUNCIONARIO,
-      'Login': item.NOLOGIN,
-      'Função': item.DSFUNCAO,
-      'Localização': item.STLOJA == 'True' ? 'Loja' : 'Escritório',
-      'TP. Contratação': item.STCONVENIO == 'True' ? 'CLT' : 'PJ',
-      'Tipo': item.DSTIPO == 'PN' ? 'PARCEIRO DE NEGÓCIOS' : 'FUNCIÓNARIO',
-      'Telefone': item.TELEFONE,
-      'Departamento': item.DEPARTAMENTO,
-      'Desconto %': item.PERC,
-      'Situação': item.STATIVO == 'True' ? 'Ativo' : 'Inativo',
-      'DT Desl.': dataFormatada(item.DTDEMISSAO)
-    })));
-
-    const workbook = XLSX.utils.book_new();
-    const header = ['Nº', 'CPF', 'Funcionário', 'Login', 'Função', 'Localização', 'TP. Contratação', 'Tipo', 'Telefone', 'Departamento', 'Desconto %', 'Situação', 'DT Desl.'];
-    worksheet['!cols'] = [
-      { wpx: 70, caption: 'Nº' },
-      { wpx: 100, caption: 'CPF' },
-      { wpx: 200, caption: 'Funcionário' },
-      { wpx: 100, caption: 'Login' },
-      { wpx: 100, caption: 'Função' },
-      { wpx: 100, caption: 'Localização' },
-      { wpx: 100, caption: 'TP. Contratação' },
-      { wpx: 100, caption: 'Tipo' },
-      { wpx: 100, caption: 'Telefone' },
-      { wpx: 100, caption: 'Departamento' },
-      { wpx: 100, caption: 'Desconto %' },
-      { wpx: 100, caption: 'Situação' },
-      { wpx: 100, caption: 'DT Desl.' },
-
-    ];
-    XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Lista de Funcionarios');
-    XLSX.writeFile(workbook, 'lista_funcionarios.xlsx');
-  };
 
   const dados = dadosFuncionarios.map((item, index) => {
     let contador = index + 1;
@@ -137,6 +50,54 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
 
     };
   });
+
+  const colunasExportacao = [
+    { header: 'Nº', value: item => item.contador, width: 70 },
+    { header: 'CPF', value: item => item.NUCPF, width: 100 },
+    { header: 'Funcionário', value: item => item.NOFUNCIONARIO, width: 200 },
+    { header: 'Login', value: item => item.NOLOGIN, width: 100 },
+    { header: 'Função', value: item => item.DSFUNCAO, width: 100 },
+    { header: 'Localização', value: item => item.STLOJA == 'True' ? 'Loja' : 'Escritório', width: 100 },
+    { header: 'TP. Contratação', value: item => item.STCONVENIO == 'True' ? 'CLT' : 'PJ', width: 100 },
+    { header: 'Tipo', value: item => item.DSTIPO == 'PN' ? 'PARCEIRO DE NEGÓCIOS' : 'FUNCIÓNARIO', width: 100 },
+    { header: 'Telefone', value: item => item.TELEFONE, width: 100 },
+    { header: 'Departamento', value: item => item.DEPARTAMENTO, width: 100 },
+    { header: 'Desconto %', value: item => item.PERC, width: 100 },
+    { header: 'Situação', value: item => item.STATIVO == 'True' ? 'Ativo' : 'Inativo', width: 100 },
+    { header: 'DT Desl.', value: item => dataFormatada(item.DATA_DEMISSAO), width: 100 },
+  ];
+
+  const {
+    globalFilterValue,
+    onGlobalFilterChange,
+    dataTableRef,
+    handlePrint,
+    exportToPDF,
+    exportToExcel,
+  } = useExportarTabela({
+    dados,
+    colunas: colunasExportacao,
+    nomeArquivo: 'lista_funcionarios',
+    tituloDocumento: 'Lista de Funcionarios',
+    nomePlanilha: 'Lista de Funcionarios',
+  });
+
+  const handleClickEdit = (row) => {
+    executarComPermissao(optionsModulos[0]?.ALTERAR == 'True', () => {
+      if (row?.ID) {
+        modalEditar.abrir(row.ID);
+      }
+    });
+  };
+
+  const handleClickDesconto = (row) => {
+    executarComPermissao(optionsModulos[0]?.ALTERAR == 'True', () => {
+      if (row?.ID) {
+        modalDesconto.abrir(row.ID);
+      }
+    });
+  };
+
   const colunasFuncionarios = [
     {
       field: 'contador',
@@ -282,155 +243,22 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
     {
       field: 'ID',
       header: 'Opções',
-      body: (row) => {
-        if (row.STATIVO == 'True') {
-          return (
-            <div style={{ display: "flex", justifyContent: "space-around", width: "100%" }}>
-              <div className="p-1">
-                <ButtonTable
-                  titleButton={"Alterar"}
-                  onClickButton={() => handleClickEdit(row)}
-                  Icon={CiEdit}
-                  iconSize={30}
-                  iconColor={"#fff"}
-                  cor={"primary"}
-                  width="35px"
-                  height="35px"
-                  disabledBTN={optionsModulos[0]?.ADMINISTRADOR == 'True' ? false : true}
-                />
-
-              </div>
-              <div className="p-1">
-                <ButtonTable
-                  titleButton={"Alterar Desconto Autorizado"}
-                  onClickButton={() => handleClickDesconto(row)}
-                  Icon={MdOutlineAttachMoney}
-                  iconSize={30}
-                  iconColor={"#fff"}
-                  cor={"info"}
-                  width="35px"
-                  height="35px"
-                  disabledBTN={optionsModulos[0]?.N1 == 'True' ? false : true}
-                />
-
-              </div>
-              <div className="p-1">
-                <ButtonTable
-                  titleButton={"Inativar"}
-                  onClickButton={() => handleAtivarFuncionario(row, false)}
-                  Icon={FaUserAltSlash}
-                  iconSize={30}
-                  iconColor={"#fff"}
-                  cor={"warning"}
-                  width="35px"
-                  height="35px"
-                  disabledBTN={optionsModulos[0]?.ADMINISTRADOR == 'True' ? false : true}
-                />
-
-              </div>
-              <div className="p-1">
-                <ButtonTable
-                  titleButton={"Desligar"}
-                  onClickButton={() => handleDesligarFuncionario(row)}
-                  Icon={FaUserTimes}
-                  iconSize={30}
-                  iconColor={"#fff"}
-                  cor={"danger"}
-                  width="35px"
-                  height="35px"
-                  disabledBTN={optionsModulos[0]?.ADMINISTRADOR == 'True' ? false : true}
-                />
-
-              </div>
-
-            </div>
-          )
-        } else {
-          return (
-            <div className="p-1">
-              <ButtonTable
-                titleButton={"ativar"}
-                textButton={"Ativar"}
-                textFontSize={10}
-                onClickButton={() => handleAtivarFuncionario(row, true)}
-                Icon={FaCheck}
-                iconSize={25}
-                width="35px"
-                height="35px"
-                iconColor={"#fff"}
-                cor={"danger"}
-              />
-
-            </div>
-          )
-        }
-      },
+      body: (row) => (
+        <AcoesFuncionarioColuna
+          row={row}
+          optionsModulos={optionsModulos}
+          onEditar={handleClickEdit}
+          onDesconto={handleClickDesconto}
+          onAtivar={handleAtivarFuncionario}
+          onDesligar={handleDesligarFuncionario}
+        />
+      ),
       sortable: true,
     },
 
   ]
 
-  const handleEdit = async (ID) => {
-    try {
-      const response = await get(`/funcionarios-loja?byId=${ID}`)
-      if (response.data) {
-        setDadosAtualizarFuncionarios(response.data)
-
-        setModalAlterarFuncionarioVisivel(true);
-      }
-    } catch (error) {
-      console.error('Erro ao buscar detalhes da venda: ', error);
-    }
-  };
-
-  const handleClickEdit = (row) => {
-    if (optionsModulos[0]?.ALTERAR == 'True') {
-      if (row && row.ID) {
-        handleEdit(row.ID);
-      }
-    } else {
-      Swal.fire({
-        title: 'Acesso Negado',
-        text: 'Você não tem permissão para acessar esta funcionalidade.',
-        icon: 'warning',
-        timer: 3000,
-        customClass: {
-          container: 'custom-swal',
-        }
-      })
-    }
-  };
-
-  const handleDesconto = async (ID) => {
-    try {
-      const response = await get(`/funcionarios-loja?byId=${ID}`)
-      if (response.data) {
-        setDadosDescontoFuncionarios(response.data)
-        setModalDescontoVisivel(true);
-      }
-    } catch (error) {
-      console.error('Erro ao buscar detalhes da venda: ', error);
-    }
-  };
-
-  const handleClickDesconto = (row) => {
-    if (optionsModulos[0]?.ALTERAR == 'True') {
-      if (row && row.ID) {
-        handleDesconto(row.ID);
-      }
-    } else {
-      Swal.fire({
-        title: 'Acesso Negado',
-        text: 'Você não tem permissão para acessar esta funcionalidade.',
-        icon: 'warning',
-        timer: 3000,
-        customClass: {
-          container: 'custom-swal',
-        }
-      })
-    }
-  };
-
+  
   return (
 
     <Fragment>
@@ -490,9 +318,9 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
       </div>
 
       <ActionEditarFuncionario
-        show={modalAlterarFuncionarioVisivel}
-        handleClose={() => setModalAlterarFuncionarioVisivel(false)}
-        dadosAtualizarFuncionarios={dadosAtualizarFuncionarios}
+        show={modalEditar.visivel}
+        handleClose={modalEditar.fechar}
+        dadosAtualizarFuncionarios={modalEditar.dados}
         optionsModulos={optionsModulos}
         usuarioLogado={usuarioLogado}
         handleClick={handleClick}
@@ -500,9 +328,9 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
       />
 
       <ActionEditarDescontoFuncionarioModal
-        show={modalDescontoVisivel}
-        handleClose={() => setModalDescontoVisivel(false)}
-        dadosDescontoFuncionarios={dadosDescontoFuncionarios}
+        show={modalDesconto.visivel}
+        handleClose={modalDesconto.fechar}
+        dadosDescontoFuncionarios={modalDesconto.dados}
         optionsModulos={optionsModulos}
         usuarioLogado={usuarioLogado}
         handleClick={handleClick}
@@ -512,4 +340,3 @@ export const ActionListaFuncionarios = ({ dadosFuncionarios, optionsModulos, usu
     </Fragment>
   )
 }
-

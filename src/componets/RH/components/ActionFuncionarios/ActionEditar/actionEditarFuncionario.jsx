@@ -1,7 +1,7 @@
 import { Fragment } from "react";
 import Modal from 'react-bootstrap/Modal';
 import { HeaderModal } from "../../../../Modais/HeaderModal/HeaderModal";
-import { FormularioEditar } from "./formularioEditar";
+import { FormularioFuncionario } from "../FormularioFuncionario";
 
 
 export const ActionEditarFuncionario = ({ 
@@ -36,7 +36,8 @@ export const ActionEditarFuncionario = ({
 
 
         <Modal.Body>
-          <FormularioEditar
+          <FormularioFuncionario
+            modo="editar"
             handleClose={handleClose}
             dadosAtualizarFuncionarios={dadosAtualizarFuncionarios}
             optionsModulos={optionsModulos}
