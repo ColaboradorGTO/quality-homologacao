@@ -36,7 +36,7 @@ export const ButtonTable = ({
   textFontSize = '12px',
   lineHeight,
   flexDirection,
-
+  styleBtn
 }) => {
   let btnClasses = "btn  btn-icon";
 
@@ -67,7 +67,7 @@ export const ButtonTable = ({
   const typeButton = tipo === "button" ? "button" : "submit";
 
   return (
-    <Fragment>
+    <div style={styleBtn}>
       <button
         disabled={disabledBTN}
         type="button"
@@ -87,7 +87,7 @@ export const ButtonTable = ({
           </p>
         </div>  
       </button>
-    </Fragment>
+    </div>
   )
 }
 

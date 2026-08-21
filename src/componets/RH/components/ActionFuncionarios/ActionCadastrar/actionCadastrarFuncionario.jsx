@@ -1,7 +1,7 @@
 import { Fragment } from "react";
 import Modal from 'react-bootstrap/Modal';
 import { HeaderModal } from "../../../../Modais/HeaderModal/HeaderModal";
-import { FormularioCadastrar } from "./formularioCadastrar";
+import { FormularioFuncionario } from "../FormularioFuncionario";
 
 
 export const ActionCadastrarFuncionarioModal = ({ show, handleClose, usuarioLogado, optionsModulos, refetch }) => {
@@ -25,11 +25,12 @@ export const ActionCadastrarFuncionarioModal = ({ show, handleClose, usuarioLoga
 
         <Modal.Body>
 
-          <FormularioCadastrar 
+          <FormularioFuncionario
+            modo="criar"
             handleClose={handleClose}
             usuarioLogado={usuarioLogado}
             optionsModulos={optionsModulos}
-            refetch={refetch}  
+            refetch={refetch}
           />
         </Modal.Body>
 

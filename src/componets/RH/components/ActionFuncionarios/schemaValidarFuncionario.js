@@ -1,7 +1,6 @@
 import * as yup from 'yup';
 
-export const schema = yup.object({
-
+const camposComuns = {
   empresaFuncionario: yup
     .object()
     .nullable()
@@ -17,7 +16,6 @@ export const schema = yup.object({
     .nullable()
     .required('Tipo Obrigatório')
     .typeError('Tipo Obrigatório'),
-
 
   dataAdmissaoFuncionario: yup
     .string()
@@ -65,11 +63,6 @@ export const schema = yup.object({
     .required('Situação Obrigatória')
     .typeError('Situação Obrigatória'),
 
-
-  // cpf: yup.string()
-  //   .required('CPF Obrigatório')
-  //   .matches(/^\d{11}$/, 'CPF deve conter exatamente 11 números'),
-
   telefoneFuncionario: yup.string()
     .transform((value) => {
       if (typeof value === 'string') {
@@ -80,12 +73,6 @@ export const schema = yup.object({
     .required('Telefone Obrigatório')
     .matches(/^\d{10,11}$/, 'Telefone deve conter 10 ou 11 números'),
 
-
-  /*   departamentoFuncionario: yup.object()
-      .nullable()
-      .required('Departamento Obrigatório')
-      .typeError('Departamento Obrigatório'), */
-
   departamentoFuncionario: yup
     .object()
     .nullable()
@@ -94,5 +81,14 @@ export const schema = yup.object({
       'has-value',
       'Departamento Obrigatório',
       value => value?.value != null
-    )
+    ),
+};
+
+export const getSchemaFuncionario = (modo) => yup.object({
+  ...camposComuns,
+  ...(modo === 'criar' ? {
+    cpf: yup.string()
+      .required('CPF Obrigatório')
+      .matches(/^\d{11}$/, 'CPF deve conter exatamente 11 números'),
+  } : {}),
 });
