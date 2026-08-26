@@ -652,6 +652,9 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
     setModalEstProdOrigem(true);
   }
 
+  console.log(isCheckedGrupo ,'grupo' )
+  console.log(isCheckedProduto, 'produto' )
+  console.log(isCheckedGrupoProduto, 'grupo produto' )
   return (
     <Fragment>
 
@@ -970,7 +973,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
         corSearch={"primary"}
         IconSearch={IoIosSend}
         styleButtonSearch={isCheckedProduto ? false : true}
-
+        
         ButtonTypeEstruturaProduto={ButtonType}
         linkEstruturaProduto={"Atualizar Por Estrutura / Produto"}
         onButtonClickEstruturaProduto={onSubmitEstruturaProduto}

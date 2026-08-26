@@ -15,7 +15,7 @@ import { ButtonTypeCompras } from "../../../../Buttons/Button";
 import { CiLock } from "react-icons/ci";
 import { FaCheck } from "react-icons/fa";
 import { ActionPesquisaNovoPedido } from "../../ActionNovoPedido/actionPesquisaNovoPedido";
-
+ 
 export const ActionVisualizarPedido = ({
   usuarioLogado,
   optionsModulos,

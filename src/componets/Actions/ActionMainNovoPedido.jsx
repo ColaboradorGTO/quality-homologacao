@@ -280,7 +280,7 @@ export const ActionMainNovoPedido = ({
                   <small className="m-0 l-h-n"> {nomeVendas}</small>
                 </h3>
               </div>
-              {/* <AiOutlineUser size={100} style={{ fontSize: "8rem" }} class="fa position-absolute pos-right pos-bottom opacity-15 mb-n1 mr-n1" /> */}
+              {/* <AiOutlineUser size={100} style={{ fontSize: "8rem" }} className="fa position-absolute pos-right pos-bottom opacity-15 mb-n1 mr-n1" /> */}
               { IconVendas && 
                 <IconVendas 
                   className="position-absolute pos-right pos-bottom opacity-15 mb-n1 mr-n1"
@@ -450,7 +450,7 @@ export const ActionMainNovoPedido = ({
                   </div>
                   <div className="row mt-3" >
 
-                    <div class="col-sm-6 col-md-8 col-xl-6 mt-2">
+                    <div className="col-sm-6 col-md-8 col-xl-6 mt-2">
                       <label htmlFor="">{labelSelectFornecedor}</label>
                       {InputSelectFornecedorComponent && (
                         <InputSelectFornecedorComponent
@@ -500,7 +500,7 @@ export const ActionMainNovoPedido = ({
 
                   <div className="row mt-3">
                
-                    <div class="col-sm-6 col-xl-6 ">
+                    <div className="col-sm-6 col-xl-6 ">
                       <label htmlFor="">{labelSelectFiscal}</label>
                       {InputSelectFiscalComponent && (
                         <InputSelectFiscalComponent
@@ -517,7 +517,7 @@ export const ActionMainNovoPedido = ({
                       )}
                     </div>
 
-                    <div class="col-sm-6 col-xl-6 ">
+                    <div className="col-sm-6 col-xl-6 ">
                       <label htmlFor="">{labelSelectEnviar}</label>
                       {InputSelectEnviarComponent && (
                         <InputSelectEnviarComponent
@@ -584,7 +584,7 @@ export const ActionMainNovoPedido = ({
                   <hr />
 
                   <div className="row mt-3">
-                    <div class="col-sm-6 col-xl-4 ">
+                    <div className="col-sm-6 col-xl-4 ">
                       <label htmlFor="">{labelSelectCondicoesPagamentos}</label>
                       {InputSelectCondicoesPagamentos && (
                         <InputSelectCondicoesPagamentos
@@ -600,7 +600,7 @@ export const ActionMainNovoPedido = ({
                       )}
                     </div>
 
-                    <div class="col-sm-6 col-xl-4 ">
+                    <div className="col-sm-6 col-xl-4 ">
                       <label htmlFor="">{labelInputFieldObsFornecedor}</label>
                       {InputFieldObsFornecedor && (
                         <InputFieldObsFornecedor
@@ -616,7 +616,7 @@ export const ActionMainNovoPedido = ({
                       )}
                     </div>
 
-                    <div class="col-sm-6 col-xl-4 ">
+                    <div className="col-sm-6 col-xl-4 ">
                       <label htmlFor="">{labelInputFieldObsInterna}</label>
                       {InputFieldObsInterna && (
                         <InputFieldObsInterna
@@ -632,7 +632,7 @@ export const ActionMainNovoPedido = ({
                   </div>
                   <hr />
                   <div className="row">
-                    <div class="col-sm-6 col-xl-4 ">
+                    <div className="col-sm-6 col-xl-4 ">
                       <label htmlFor="">{labelSelectTipoPedido}</label>
                       {InputSelectTipoPedido && (
                         <InputSelectTipoPedido
@@ -647,7 +647,7 @@ export const ActionMainNovoPedido = ({
                         />
                       )}
                     </div>
-                    <div class="col-sm-6 col-xl-4">
+                    <div className="col-sm-6 col-xl-4">
                       <label htmlFor="">{labelInputFieldVendedor}</label>
                       {InputFieldVendedor && (
                         <InputFieldVendedor
@@ -660,7 +660,7 @@ export const ActionMainNovoPedido = ({
                         />
                       )}
                     </div>
-                    <div class="col-sm-6 col-xl-4 ">
+                    <div className="col-sm-6 col-xl-4 ">
                       <label htmlFor="">{labelInputFieldEmailVendedor}</label>
                       {InputFieldEmailVendedor && (
                         <InputFieldEmailVendedor
@@ -676,7 +676,7 @@ export const ActionMainNovoPedido = ({
                   </div>
                   <hr style={{}} />
                   <div className="row mt-3">
-                    <div class="col-sm-6 col-xl-2">
+                    <div className="col-sm-6 col-xl-2">
                       <label htmlFor="">{labelInputFieldDesconto1}</label>
                       {InputFieldDescontoComponent1 && (
                         <InputFieldDescontoComponent1
@@ -689,7 +689,7 @@ export const ActionMainNovoPedido = ({
                         />
                       )}
                     </div>
-                    <div class="col-sm-6 col-xl-2">
+                    <div className="col-sm-6 col-xl-2">
                       <label htmlFor="">{labelInputFieldDesconto2}</label>
                       {InputFieldDescontoComponent2 && (
                         <InputFieldDescontoComponent2
@@ -703,7 +703,7 @@ export const ActionMainNovoPedido = ({
                       )}
                     </div>
 
-                    <div class="col-sm-6 col-xl-2 ">
+                    <div className="col-sm-6 col-xl-2 ">
                       <label htmlFor="">{labelInputFieldDesconto3}</label>
                       {InputFieldDescontoComponent3 && (
                         <InputFieldDescontoComponent3
@@ -717,7 +717,7 @@ export const ActionMainNovoPedido = ({
                       )}
                     </div>
 
-                    <div class="col-sm-6 col-xl-4 ">
+                    <div className="col-sm-6 col-xl-4 ">
                       <label htmlFor="">{labelInputFieldTotalLiq}</label>
                       {InputFieldTotalLiq && (
                         <InputFieldTotalLiq
@@ -730,7 +730,7 @@ export const ActionMainNovoPedido = ({
                         />
                       )}
                     </div>
-                    <div class="col-sm-6 col-xl-2 ">
+                    <div className="col-sm-6 col-xl-2 ">
                       <label htmlFor="">{labelInputFieldComissao}</label>
                       {InputFieldComissao && (
                         <InputFieldComissao
@@ -746,7 +746,7 @@ export const ActionMainNovoPedido = ({
                   </div>
 
                   <div className="row mt-4">
-                    <div class="col-sm-6 col-xl-6 ">
+                    <div className="col-sm-6 col-xl-6 ">
                       <label htmlFor="">{labelSelectTransportadora}</label>
                       {InputSelectTransportadora && (
                         <InputSelectTransportadora
@@ -763,7 +763,7 @@ export const ActionMainNovoPedido = ({
 
                     </div>
 
-                    <div class="col-sm-6 col-xl-6 ">
+                    <div className="col-sm-6 col-xl-6 ">
                       <label htmlFor="">{labelSelectFrete}</label>
                       {InputSelectFreteComponent && (
 

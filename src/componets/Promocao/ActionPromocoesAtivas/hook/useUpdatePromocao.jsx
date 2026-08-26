@@ -1424,24 +1424,24 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
 
           let conflitos = Array.from(new Set([...conflitosDestino, ...conflitosOrigem]));
           console.log(conflitos, 'conflitos');
-          if (conflitos.length > 0) {
-            const conflitosString = conflitos
-              .filter(c => !Number.isNaN(c))
-              .map(c => String(c))
-              .join(", ");
+          // if (conflitos.length > 0) {
+          //   const conflitosString = conflitos
+          //     .filter(c => !Number.isNaN(c))
+          //     .map(c => String(c))
+          //     .join(", ");
 
 
-            const htmlMessage = "Nº em conflito: <b>" + conflitosDestino + "</b><br/>Ajuste os subgrupos para continuar.";
+          //   const htmlMessage = "Nº em conflito: <b>" + conflitosDestino + "</b><br/>Ajuste os subgrupos para continuar.";
 
-            Swal.fire({
-              icon: "warning",
-              title: "Subgrupo já está em promoção ativa",
-              html: htmlMessage,
-              customClass: { container: "custom-swal" },
-              confirmButtonText: "OK"
-            });
-            return;
-          }
+          //   Swal.fire({
+          //     icon: "warning",
+          //     title: "Subgrupo já está em promoção ativa",
+          //     html: htmlMessage,
+          //     customClass: { container: "custom-swal" },
+          //     confirmButtonText: "OK"
+          //   });
+          //   return;
+          // }
 
           const promocoesValidas = responseProdutoExistente.data;
           const promocaoPorParesAtiva = promocoesValidas.some(promo => promo.TPAPARTIRDE == 0);

@@ -3,29 +3,13 @@ import Swal from "sweetalert2";
 import { post, put } from "../../../../../api/funcRequest";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { registrarLogAuditoria } from "../../../../../services/auditLog";
 
-export const useEnviarPedidoComprasADM = () => {
+export const useEnviarPedidoComprasADM = ({
+    usuarioLogado
+}) => {
     const [loading, setLoading] = useState(false);
-    const [usuarioLogado, setUsuarioLogado] = useState(null);
     const [ipUsuario, setIpUsuario] = useState("");
-
-
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        const usuarioArmazenado = localStorage.getItem('usuario');
-    
-        if (usuarioArmazenado) {
-          try {
-            const parsedUsuario = JSON.parse(usuarioArmazenado);
-            setUsuarioLogado(parsedUsuario);;
-          } catch (error) {
-            console.error('Erro ao parsear o usuário do localStorage:', error);
-          }
-        } else {
-          navigate('/');
-        }
-    }, [navigate]);
     
     const getIPUsuario = async () => {
         let usuarioIP = null;
@@ -89,7 +73,12 @@ export const useEnviarPedidoComprasADM = () => {
             if (!motivo) return;
             
             setLoading(true);
-           
+            await registrarLogAuditoria({
+                idFuncionario: usuarioLogado.id,
+                pathFuncao: textoFuncao,
+                dados: dados
+            });
+
             const dados = {
               
                 IDANDAMENTO: parseInt(14),

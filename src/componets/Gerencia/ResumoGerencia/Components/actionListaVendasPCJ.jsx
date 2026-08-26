@@ -67,6 +67,7 @@ export const ActionListaVendasPCJ = ({ dadosVendasPCJ }) => {
   const calcularTotalPCJTotal = (item) => {
     const vrPCJ18 = toFloat(item.vendapcj[0]['venda-pcj'].TOTALPCJ18);
     const vrPCJ78 = toFloat(item.vendapcj[0]['venda-pcj'].TOTALPCJ78);
+    if (!vrPCJ18) return 0;
     const totalPCJ =  (vrPCJ78 / vrPCJ18) * 100;
     return totalPCJ;
   }
@@ -104,6 +105,7 @@ export const ActionListaVendasPCJ = ({ dadosVendasPCJ }) => {
   const calcularTotalPCJ = () => {
     const vrPCJ18 = calcularTotalPCJ18('TOTALPCJ18');
     const vrPCJ78 = calcularTotalPCJ78('TOTALPCJ78');
+    if (!vrPCJ18) return 0;
     const total = (vrPCJ78 / vrPCJ18) * 100;
 
     return parseFloat(total.toFixed(2));
@@ -158,7 +160,7 @@ export const ActionListaVendasPCJ = ({ dadosVendasPCJ }) => {
 
         return (
           <th style={{ color: cor }}>
-            {formatMoeda(pcj)}
+            {pcj}
           </th>
         );
       },
@@ -173,7 +175,7 @@ export const ActionListaVendasPCJ = ({ dadosVendasPCJ }) => {
         <Column footer="Total dos Caixas " colSpan={4} footerStyle={{ textAlign: 'center', color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem' }} />
         <Column footer={formatMoeda(calcularTotalPCJ18())} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem' }} />
         <Column footer={formatMoeda(calcularTotalPCJ78())} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem' }} />
-        <Column footer={formatMoeda(calcularTotalPCJ())} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem' }} />
+        <Column footer={calcularTotalPCJ()} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem' }} />
 
 
       </Row>

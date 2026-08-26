@@ -17,6 +17,7 @@ import { get, put } from "../../../../api/funcRequest";
 import { AiOutlineSearch } from "react-icons/ai";
 import Swal from "sweetalert2";
 import { ButtonType } from "../../../Buttons/ButtonType";
+import { GrView } from "react-icons/gr";
 
 export const ActionListaProdutosParaCadastro = ({ dadosVisualizarPedido, dadosProdutosPedidos }) => {
   const [modalEditarItemPedido, setModalEditarItemPedido] = useState(false);
@@ -106,6 +107,7 @@ export const ActionListaProdutosParaCadastro = ({ dadosVisualizarPedido, dadosPr
     }
   });
   
+
   const colunasPedidos = [
     {
       field: 'contador',
@@ -157,7 +159,7 @@ export const ActionListaProdutosParaCadastro = ({ dadosVisualizarPedido, dadosPr
     },
     {
       field: 'VRTOTALCUSTO',
-      header: 'Total Custo',
+      header: 'T.Custo',
       body: row => <th>{formatMoeda(row.VRTOTALCUSTO)}</th>,
       sortable: true,
     },
@@ -204,9 +206,90 @@ export const ActionListaProdutosParaCadastro = ({ dadosVisualizarPedido, dadosPr
       sortable: true,
     },
     {
-      field: 'contador',
+      field: 'OPCOES',
       header: 'Opções',
       body: row => {
+        let buttons = [];
+
+        const btnEditar = (
+          <div className="p-1">
+            <ButtonTable
+              Icon={CiEdit}
+              cor={"primary"}
+              iconColor={"white"}
+              iconSize={20}
+              onClickButton={() => handleClickEditar(row)}
+              titleButton={"Editar Produto do Pedido"}
+            />
+          </div>
+        )
+
+        const brnAvisoFaltaInclusaoMigracao = (
+          <div className="p-1">
+            <ButtonTable
+              Icon={GrView}
+              cor={"dark"}
+              iconColor={"white"}
+              iconSize={20}
+              onClickButton={() => handleClickStatusMigracaoSap(row)}
+              titleButton={"Aviso"}
+              width="30px"
+              height="30px"
+            />
+          </div>
+        )
+        const btnMigrarPdv = (
+          <div className="p-1">
+            <ButtonTable
+              Icon={CiEdit}
+              cor={"success"}
+              iconColor={"white"}
+              iconSize={20}
+              onClickButton={() => handleClickEditar(row)}
+              titleButton={"Incluir para PDV"}
+            />
+          </div>
+        )
+
+        const btnMigrarSapReposicao = (
+          <div className="p-1">
+            <ButtonTable
+              Icon={CiEdit}
+              cor={"primary"}
+              iconColor={"white"}
+              iconSize={20}
+              onClickButton={() => handleClickEditar(row)}
+              titleButton={"Migrar para SAP"}
+            />
+          </div>
+        )
+
+        const btnMigrarSap = (
+          <div className="p-1">
+            <ButtonTable
+              Icon={CiEdit}
+              cor={"primary"}
+              iconColor={"white"}
+              iconSize={20}
+              onClickButton={() => handleClickEditar(row)}
+              titleButton={"Migrar para SAP"}
+            />
+          </div>
+        )
+
+        const btnCancelar = (
+          <div className="p-1">
+            <ButtonTable
+              Icon={BsTrash3}
+              cor={"danger"}
+              iconColor={"white"}
+              iconSize={20}
+              onClickButton={() => handleClickVisualizarPedido(row)}
+              titleButton={"Cancelar Produto do Pedido"}
+            />
+          </div>
+        )
+
         if (row.STCADASTRO == 'True' && row.IDPRODCADASTRO > 0 && row.IDPRODCADASTRO != 'NULL') {
           if(row.STREPOSICAO == 'True' && row.STMIGRADOSAP != 'True') {
             return (
@@ -607,6 +690,15 @@ export const ActionListaProdutosParaCadastro = ({ dadosVisualizarPedido, dadosPr
       });
     }
   }
+
+  const handleClickStatusMigracaoSap = (row) => {
+    Swal.fire({
+      icon: 'info',
+      title: 'Realize a Inclusão/Migração!',
+      text: 'O produto só pode ser editado após o processo de Inclusão/Migração estar completo',
+    })
+  }
+
 
   return (
     <Fragment>

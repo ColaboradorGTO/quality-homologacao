@@ -19,9 +19,12 @@ import { InputFieldPedido } from "../../../Buttons/InputActionPedido";
 import { useIncluirProutoPedido } from "./hooks/useIncluirProdutoPedido";
 import { InputFieldCheckBox } from "../../../Inputs/InputChekBox";
 import { optionsTipoFrete, optionsTipoPedido, optionsEnviar, optionsFiscal } from "../../../../../parceiro.json";
+import { FaCheck } from "react-icons/fa6";
+import { CiLock } from "react-icons/ci";
 
 export const ActionNovoPedido = ({ 
   dadosVisualizarPedido, 
+  setDadosVisualizarPedido,
   dadosDetalhePedido,
   usuarioLogado,
   optionsModulos,
@@ -121,7 +124,7 @@ export const ActionNovoPedido = ({
     fechar: false,
     salvar: false,
     clonar: false,
-    clonarCabecalho: false,
+    clonarCabecalho: true,
     novoPedido: true
   });
 
@@ -135,58 +138,40 @@ export const ActionNovoPedido = ({
   const [tabelaVisivel, setTabelaVisivel] = useState(true);
   const [modalPedidoNota, setModalPedidoNota] = useState(false);
 
+   console.log(dadosVisualizarPedido, 'na action dadosVisualizarPedido')
   useEffect(() => {
-    // console.log('🔍 dadosVisualizarPedido:', dadosVisualizarPedido); // DEBUG
-    
-    // VALIDAÇÃO MAIS ROBUSTA
     if (!dadosVisualizarPedido || !Array.isArray(dadosVisualizarPedido) || dadosVisualizarPedido.length === 0) {
       console.log('❌ Dados não disponíveis ou inválidos');
       return;
     }
 
     const dados = dadosVisualizarPedido[0];
-    // console.log('📋 Dados do pedido:', dados); // DEBUG
-
-    // ========== VARIÁVEIS COM VALIDAÇÃO ==========
     const IdAndamentoPedido = parseInt(dados?.IDANDAMENTO || '0', 10);
     const StCancelaPedido = String(dados?.STCANCELADO || 'False').trim();
     const IDPEDIDORESUMO = String(dados?.IDPEDIDO || '');
+    const dsSetorAndamentoPedido = String(dados?.DSSETOR || '');
+    const stCancelado = StCancelaPedido === 'True';
     const stMigradoSap = String(dados?.STMIGRADOSAP || 'False') === 'True';
     const stPedidoPorIntermediario = String(dados?.STPEDIDOPRIMARIO || 'False') === 'True';
     const idPedidoPrimario = parseInt(dados?.IDPEDIDOPRIMARIO || '0', 10);
+    const isPedidoSecundario = idPedidoPrimario > 0;
+    const clonarVisivelPadrao = !(stCancelado && IdAndamentoPedido !== 2 && IdAndamentoPedido !== 5);
 
-    // console.log('🎯 Variáveis processadas:', {
-    //   IdAndamentoPedido,
-    //   StCancelaPedido,
-    //   IDPEDIDORESUMO,
-    //   stMigradoSap,
-    //   stPedidoPorIntermediario,
-    //   idPedidoPrimario
-    // }); // DEBUG
-
-    // ========== LÓGICA PRINCIPAL ==========
     let novosBotoesVisiveis = {
       incluir: false,
       fechar: false,
       salvar: false,
-      clonar: false,
-      clonarCabecalho: false,
+      clonar: clonarVisivelPadrao,
+      clonarCabecalho: true,
       novoPedido: true // SEMPRE VISÍVEL
     };
     
     let camposDevemEstarHabilitados = false;
     let novoTitulo = '';
 
-    // ========== CONDIÇÃO 1: Pedido cancelado OU em andamento (2-14) ==========
     if (StCancelaPedido === 'True' || (IdAndamentoPedido >= 2 && IdAndamentoPedido < 15)) {
-      // console.log('🚫 Condição 1: Pedido cancelado ou em andamento');
-      
-      // Botão clonar só aparece em condições específicas
-      const clonarVisivel = !(StCancelaPedido === 'True' && IdAndamentoPedido !== 2 && IdAndamentoPedido !== 5);
-      
       novosBotoesVisiveis = {
         ...novosBotoesVisiveis,
-        clonar: clonarVisivel
       };
       
       camposDevemEstarHabilitados = false;
@@ -195,16 +180,13 @@ export const ActionNovoPedido = ({
         novoTitulo = `Visualizar Pedido Nº: ${IDPEDIDORESUMO}`;
       }
     } 
-    // ========== CONDIÇÃO 2: Inclusão (1) OU Alteração (15) ==========
+
     else if (IdAndamentoPedido === 1 || IdAndamentoPedido === 15) {
-      // console.log('✅ Condição 2: Inclusão ou Alteração');
-      
       novosBotoesVisiveis = {
         ...novosBotoesVisiveis,
         incluir: true,
         fechar: true,
         salvar: true,
-        clonar: true,
         clonarCabecalho: true
       };
       
@@ -214,33 +196,67 @@ export const ActionNovoPedido = ({
       novoTitulo = `${tipoOperacao} - Pedido Nº: ${IDPEDIDORESUMO}`;
     }
 
-    // ========== CONDIÇÃO 3: Se migrado para SAP ==========
     if (stMigradoSap) {
-      // console.log('🔒 SAP: Desabilitando campos');
       camposDevemEstarHabilitados = false;
     }
     
-    // ========== CONDIÇÃO 4: Pedido secundário ==========
     if (idPedidoPrimario > 0) {
-      // console.log('🔗 Pedido secundário: Ocultando botões');
       novosBotoesVisiveis = {
         incluir: false,
         fechar: false,
         salvar: false,
         clonar: false,
         clonarCabecalho: false,
-        novoPedido: true // SEMPRE VISÍVEL
+        novoPedido: true 
       };
       camposDevemEstarHabilitados = false;
     }
 
-    // console.log('🎯 Estados finais:', {
-    //   novosBotoesVisiveis,
-    //   camposDevemEstarHabilitados,
-    //   novoTitulo
-    // }); // DEBUG
+    let statusTitleSubHeader = stCancelado
+      ? (
+        <span className="text-danger fw-900 pl-1">
+          CANCELADO <i className="fal fa-times ml-1"></i>
+        </span>
+      )
+      : (
+        <>
+          <span className="text-warning fw-900 pl-1">
+            Bloqueado <CiLock />
+          </span>
+          {` -> Está no Setor: ${dsSetorAndamentoPedido}`}
+        </>
+      );
 
-    // ========== APLICAR ESTADOS ==========
+    if (!stCancelado && (IdAndamentoPedido === 1 || IdAndamentoPedido === 15)) {
+      statusTitleSubHeader = IdAndamentoPedido === 1
+        ? (
+          <span className="text-primary fw-700 pl-1">
+            Inclusão Liberada <FaCheck />
+          </span>
+        )
+        : (
+          <span className="text-info fw-700 pl-1">
+            Alteração Liberada <FaCheck />
+          </span>
+        );
+    }
+
+    let prefixoTituloPedido = 'Pedido ';
+
+    if (isPedidoSecundario) {
+      prefixoTituloPedido += 'Secundário ';
+    } else if (stPedidoPorIntermediario) {
+      prefixoTituloPedido += 'Primário ';
+    }
+
+    novoTitulo = (
+      <>
+        {`${prefixoTituloPedido}Nº: ${IDPEDIDORESUMO}`}
+        {' - '}
+        {statusTitleSubHeader}
+      </>
+    );
+
     setBotoesVisiveis(novosBotoesVisiveis);
     setCamposHabilitados(camposDevemEstarHabilitados);
     setTituloSubheader(novoTitulo);
@@ -252,15 +268,16 @@ export const ActionNovoPedido = ({
     
     setIdPedidoPrimario(idPedidoPrimario);
     
-  }, [dadosVisualizarPedido]); 
+  }, [dadosVisualizarPedido]);  
 
+  console.log(dadosVisualizarPedido, 'dadosVisualizarPedido, actioNovo')
   useEffect(() => {
     if(dadosVisualizarPedido && dadosVisualizarPedido.length > 0) {
-      
+      console.log(dadosVisualizarPedido, 'dados')
       setDataPesquisaInicio(dadosVisualizarPedido[0]?.DTPEDIDOFORMATADA)
       setDataPesquisaFim(dadosVisualizarPedido[0]?.DTPREVENTREGAFORMATADA)
       setCompradorSelecionado({
-        value: dadosVisualizarPedido[0]?.IDCOMPRADOR , 
+        value: dadosVisualizarPedido[0]?.IDCOMPRADOR, 
         label: dadosVisualizarPedido[0]?.NOMECOMPRADOR
       })
     
@@ -351,6 +368,7 @@ export const ActionNovoPedido = ({
     try {
 
       const remessaData = await refetchListaCadastroProdutoPedidos();
+      console.log(remessaData, 'data')
       await gerarArquivoTxt(remessaData);
       setArquivoGerado(true);
       Swal.close();
@@ -480,12 +498,12 @@ export const ActionNovoPedido = ({
       <ActionMainNovoPedido
         lBinkComponentAnterior={["Home"]}
         linkComponent={["Novo Pedido"]}
-        title="Novo Pedido"
-        subTitle="Nome da Loja"
+        subTitle={tituloSubheader}
 
         InputCheckBoxPedido={InputFieldCheckBox}
         labelCheckBoxPedido={"Pedido Por Intermediário"}
         checkedCheckBoxPedido={checkboxIntermediario.checked}
+        disabledCheckBoxTipoPedido={checkboxIntermediario.disabled}
         valueCheckBoxPedido={checked}
         onChangeCheckBoxPedido={(e) => setChecked(e.target.checked)}
 
@@ -502,29 +520,33 @@ export const ActionNovoPedido = ({
         ]}
         valueSelectFornecedor={fornecedorSelecionado}
         onChangeSelectFornecedor={(e) => setFornecedorSelecionado(e)}
+        readOnlyFornecedor={!camposHabilitados}
 
         InputFieldDTInicioComponent={InputFieldPedido}
         labelInputDTInicio={"Data Pedido"}
         valueInputFieldDTInicio={dataPesquisaInicio}
         onChangeInputFieldDTInicio={(e) => setDataPesquisaInicio(e.target.value)}
-
+        readOnlyDTInicio={!camposHabilitados}
 
         InputFieldDTFimComponent={InputFieldPedido}
         labelInputDTFim={"Data Entrega"}
         valueInputFieldDTFim={dataPesquisaFim}
         onChangeInputFieldDTFim={(e) => setDataPesquisaFim(e.target.value)}
+        readOnlyDTFim={!camposHabilitados}
 
         InputSelectFiscalComponent={InputSelectActionPedido}
         labelSelectFiscal={"Tipo Fiscal"}
         optionsFiscal={optionsFiscal}
         valueSelectFiscal={fiscalSelecionado}
         onChangeSelectFiscal={(e) => setFiscalSelecionado(e.value)}
+        readOnlyFiscal={!camposHabilitados}
 
         InputSelectEnviarComponent={InputSelectActionPedido}
         labelSelectEnviar={"Enviar"}
         optionsSelectEnviar={optionsEnviar}
         valueSelectEnviar={enviarSelecionado}
         onChangeSelectEnviar={(e) => setEnviarSelecionado(e.value)}
+        readOnlyEnviar={!camposHabilitados}
 
         InputSelectCompradorComponent={InputSelectActionPedido}
         labelSelectComprador={"Comprador"}
@@ -536,7 +558,7 @@ export const ActionNovoPedido = ({
         })}
         valueSelectComprador={compradorSelecionado}
         onChangeSelectComprador={(e) => setCompradorSelecionado(e.value)}
-
+        readOnlyComprador={!camposHabilitados}
 
         InputSelectMarcasComponent={InputSelectActionPedido}
         labelSelectMarcas={"Marca"}
@@ -548,6 +570,7 @@ export const ActionNovoPedido = ({
         })}
         valueSelectMarca={marcaSelecionada}
         onChangeSelectMarcas={(e) => setMarcaSelecionada(e)}
+        readOnlyMarcas={!camposHabilitados}
 
         InputSelectCondicoesPagamentos={InputSelectActionPedido}
         labelSelectCondicoesPagamentos={"Condições de Pagamento"}
@@ -559,75 +582,80 @@ export const ActionNovoPedido = ({
         })}
         valueSelectCondicoesPagamentos={condicoesPagamentosSelecionado}
         onChangeSelectCondicoesPagamentos={(e) => setCondicoesPagamentosSelecionado(e.value)}
+        readOnlyCondicoesPagamentos={!camposHabilitados}
 
         InputFieldObsFornecedor={InputFieldPedido}
         labelInputFieldObsFornecedor={"Observação do Fornecedor - Max. 450 caracteres"}
         valueInputFieldObsFornecedor={obsFornecedor}
         onChangeInputFieldObsFornecedor={(e) => setObsFornecedor(e.target.value)}
-
+        readOnlyObsFornecedor={!camposHabilitados}
 
         InputFieldObsInterna={InputFieldPedido}
         labelInputFieldObsInterna={"Observação Interna - Max. 450 caracteres"}
         valueInputFieldObsInterna={obsInterna}
         onChangeInputFieldObsInternas={(e) => setObsInterna(e.target.value)}
+        readOnlyObsInterna={!camposHabilitados}
 
         InputSelectTipoPedido={InputSelectActionPedido}
         labelSelectTipoPedido={"Tipo de Pedido"}
         optionsTipoPedido={optionsTipoPedido}
         valueSelectTipoPedido={tipoPedidoSelecionado}
         onChangeSelectTipoPedido={(e) => setTipoPedidoSelecionado(e.value)}
+        readOnlyTipoPedido={!camposHabilitados}
 
         InputFieldVendedor={InputFieldPedido}
         labelInputFieldVendedor={"Vendedor"}
         valueInputFieldVendedor={vendedor}
         onChangeInputFieldVendedor={(e) => setVendedor(e.target.value)}
+        readOnlyVendedor={!camposHabilitados}
 
         InputFieldEmailVendedor={InputFieldPedido}
         labelInputFieldEmailVendedor={"Email do Vendedor"}
         valueInputFieldEmailVendedor={emailVendedor}
         onChangeInputFieldEmailVendedor={(e) => setEmailVendedor(e.target.value)}
+        readOnlyEmailVendedor={!camposHabilitados}
 
         InputFieldDescontoComponent1={InputFieldPedido}
         labelInputFieldDesconto1={"Desconto I(%)"}
         valueInputFieldDesconto1={desconto1}
         onChangeInputFieldDesconto1={(e) => setDesconto1(e.target.value)}
-        // readOnlyDesconto1={true}
+        readOnlyDesconto1={!camposHabilitados}
 
         InputFieldDescontoComponent2={InputFieldPedido}
         labelInputFieldDesconto2={"Desconto II(%)"}
         valueInputFieldDesconto2={desconto2}
         onChangeInputFieldDesconto2={(e) => setDesconto2(e.target.value)}
-        // readOnlyDesconto2={true}
+        readOnlyDesconto2={!camposHabilitados}
 
         InputFieldDescontoComponent3={InputFieldPedido}
         labelInputFieldDesconto3={"Desconto III(%)"}
         valueInputFieldDesconto3={desconto3}
         onChangeInputFieldDesconto3={(e) => setDesconto3(e.target.value)}
-        // readOnlyDesconto3={true}
+        readOnlyDesconto3={!camposHabilitados}
 
         InputFieldTotalLiq={InputFieldPedido}
         labelInputFieldTotalLiq={"Total Liquido"}
         valueInputFieldTotalLiq={formatMoeda(totalLiq)}
         onChangeInputFieldTotalLiq={(e) => setTotalLiq(e.target.value)}
-        readOnlyTotalLiq={true}
+        readOnlyTotalLiq={!camposHabilitados}
 
         InputFieldComissao={InputFieldPedido}
         labelInputFieldComissao={"Comissão (%)"}
         valueInputFieldComissao={comissao}
         onChangeInputFieldComissao={(e) => setComissao(e.target.value)}
-        // readOnlyComissao={true}
+        readOnlyComissao={!camposHabilitados}
 
         InputTransportadora={InputFieldPedido}
         labelTransportadora={"Transportadora"}
         valueTransportadora={transportadoraSelecionada}
         onChangeTransportadora={(e) => setTransportadoraSelecionada(e.value)}
-        readOnlyTransportadora={true}
+        readOnlyTransportadora={!camposHabilitados}
 
         InputFreteComponent={InputFieldPedido}
         labelFrete={"Tipo Frete"}
         valueFrete={freteSelecionado}
         onChangeFrete={(e) => setFreteSelecionado(e.value)}
-        readOnlyFrete={true}
+        readOnlyFrete={!camposHabilitados}
 
         InputSelectTransportadora={InputSelectActionPedido}
         labelSelectTransportadora={"Transportadora"}
@@ -653,6 +681,7 @@ export const ActionNovoPedido = ({
         onButtonClickSearch={() => handleClickPedido()}
         corSearch={"primary"}
         IconSearch={MdMenu}
+        // styleSearch={botoesVisiveis.incluir}
 
         ButtonTypeCancelar={ButtonType}
         linkCancelar={"Prévia Cadastro Produtos"}
@@ -660,11 +689,11 @@ export const ActionNovoPedido = ({
         corCancelar={"success"}
         IconCancelar={MdOutlineVisibility}
 
-        ButtonTypeCadastro={ButtonType}
-        linkNome={"Finalizar Cadastro dos Produtos"}
-        onButtonClickCadastro={() => handleClickDetalhePedido()}
-        corCadastro={"danger"}
-        IconCadastro={MdOutlineCheck}
+        // ButtonTypeCadastro={ButtonType}
+        // linkNome={"Finalizar Cadastro dos Produtos"}
+        // onButtonClickCadastro={() => handleClickDetalhePedido()}
+        // corCadastro={"danger"}
+        // IconCadastro={MdOutlineCheck}
 
         ButtonTypePedido={ButtonType}
         linkPedido={"Pedido de Compra PDF"}
@@ -687,7 +716,7 @@ export const ActionNovoPedido = ({
           usuarioLogado={usuarioLogado}
           optionsModulos={optionsModulos}
         />
-      )}
+      )} 
 
       {tabelaCadastroProduto && (
         <ActionListaProdutosParaCadastro dadosProdutosPedidos={dadosProdutosPedidos}/>

@@ -85,25 +85,26 @@ export const ActionListaCaixa = ({ dadosListaCaixa, dadosDespesas, dadosAdiantam
 
   const calcularTotalVendido = (item) => {
     return (
-      toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDODINHEIRO) +
-      toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOCARTAO) +
-      toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOPOS) +
-      toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOCONVENIO) +
-      toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOVOUCHER) +
-      toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOPIX) +
-      toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOMOOVPAY)
+      toFloat(item.venda[0]['venda-movimento']?.TOTALVENDIDODINHEIRO) +
+      toFloat(item.venda[0]['venda-movimento']?.TOTALVENDIDOCARTAO) +
+      toFloat(item.venda[0]['venda-movimento']?.TOTALVENDIDOPOS) +
+      toFloat(item.venda[0]['venda-movimento']?.TOTALVENDIDOCONVENIO) +
+      toFloat(item.venda[0]['venda-movimento']?.TOTALVENDIDOVOUCHER) +
+      toFloat(item.venda[0]['venda-movimento']?.TOTALVENDIDOPIX) +
+      toFloat(item.venda[0]['venda-movimento']?.TOTALVENDIDOMOOVPAY)
     );
   }
   const calcularTotalVrDisponivel = (item) => {
     return (
-      toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDODINHEIRO) +
-      toFloat(item.fatura[0]['fatura-movimento'].TOTALRECEBIDOFATURA)
+      toFloat(item.venda[0]['venda-movimento']?.TOTALVENDIDODINHEIRO) +
+      toFloat(item.fatura[0]['fatura-movimento']?.TOTALRECEBIDOFATURA)
     )
   }
 
   const calcularTotalPCJTotal = (item) => {
-    const vrPCJ18 = toFloat(item.vendapcj[0]['venda-pcj'].TOTALPCJ18);
-    const vrPCJ78 = toFloat(item.vendapcj[0]['venda-pcj'].TOTALPCJ78);
+    const vrPCJ18 = toFloat(item?.vendapcj[0]['venda-pcj']?.TOTALPCJ18);
+    const vrPCJ78 = toFloat(item?.vendapcj[0]['venda-pcj']?.TOTALPCJ78);
+    if (!vrPCJ18) return 0;
     const totalPCJ = (vrPCJ78 / vrPCJ18) * 100;
     return totalPCJ;
   }
@@ -113,23 +114,23 @@ export const ActionListaCaixa = ({ dadosListaCaixa, dadosDespesas, dadosAdiantam
     let vrDisponivel = calcularTotalVrDisponivel(item);
     let pcjTotal = calcularTotalPCJTotal(item)
     let contador = index + 1;
-    let vrFaturasTotal = parseFloat(item.fatura[0]['fatura-movimento'].TOTALRECEBIDOFATURA) + parseFloat(item.faturapix[0]['fatura-movimento-pix'].TOTALRECEBIDOFATURAPIX);
+    let vrFaturasTotal = parseFloat(item.fatura[0]['fatura-movimento']?.TOTALRECEBIDOFATURA) + parseFloat(item.faturapix[0]['fatura-movimento-pix']?.TOTALRECEBIDOFATURAPIX);
 
     return {
       ID: item.caixa.ID,
       IDCAIXAWEB: `${item.caixa.IDCAIXAWEB} - ${item.caixa.DSCAIXA}`,
       DTABERTURA: item.caixa.DTABERTURA,
       NOFUNCIONARIO: item.caixa.NOFUNCIONARIO,
-      TOTALRECEBIDOFATURA: toFloat(item.fatura[0]['fatura-movimento'].TOTALRECEBIDOFATURA),
-      TOTALRECEBIDOFATURAPIX: toFloat(item.faturapix[0]['fatura-movimento-pix'].TOTALRECEBIDOFATURAPIX),
+      TOTALRECEBIDOFATURA: toFloat(item.fatura[0]['fatura-movimento']?.TOTALRECEBIDOFATURA),
+      TOTALRECEBIDOFATURAPIX: toFloat(item.faturapix[0]['fatura-movimento-pix']?.TOTALRECEBIDOFATURAPIX),
       vrFaturasTotal,
-      TOTALVENDIDODINHEIRO: toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDODINHEIRO),
-      TOTALVENDIDOCARTAO: toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOCARTAO),
+      TOTALVENDIDODINHEIRO: toFloat(item.venda[0]['venda-movimento']?.TOTALVENDIDODINHEIRO),
+      TOTALVENDIDOCARTAO: toFloat(item.venda[0]['venda-movimento']?.TOTALVENDIDOCARTAO),
       pcjTotal: pcjTotal,
-      TOTALVENDIDOPOS: toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOPOS),
-      TOTALVENDIDOPIX: toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOPIX),
-      TOTALVENDIDOVOUCHER: toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOVOUCHER),
-      TOTALVENDIDOCONVENIO: toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOCONVENIO),
+      TOTALVENDIDOPOS: toFloat(item.venda[0]['venda-movimento']?.TOTALVENDIDOPOS),
+      TOTALVENDIDOPIX: toFloat(item.venda[0]['venda-movimento']?.TOTALVENDIDOPIX),
+      TOTALVENDIDOVOUCHER: toFloat(item.venda[0]['venda-movimento']?.TOTALVENDIDOVOUCHER),
+      TOTALVENDIDOCONVENIO: toFloat(item.venda[0]['venda-movimento']?.TOTALVENDIDOCONVENIO),
       totalVendido: totalVendido,
       vrDisponivel: vrDisponivel,
       STFECHADO: item.caixa.STFECHADO === 'FALSE' ? 'ABERTO' : 'FECHADO',
@@ -140,7 +141,7 @@ export const ActionListaCaixa = ({ dadosListaCaixa, dadosDespesas, dadosAdiantam
     let vrDisponivel = calcularTotalVrDisponivel(item);
     let pcjTotal = calcularTotalPCJTotal(item)
     let contador = index + 1;
-    let vrFaturasTotal = parseFloat(item.fatura[0]['fatura-movimento'].TOTALRECEBIDOFATURA) + parseFloat(item.faturapix[0]['fatura-movimento-pix'].TOTALRECEBIDOFATURAPIX);
+    let vrFaturasTotal = parseFloat(item.fatura[0]['fatura-movimento']?.TOTALRECEBIDOFATURA) + parseFloat(item.faturapix[0]['fatura-movimento-pix']?.TOTALRECEBIDOFATURAPIX);
 
     return {
       IDCAIXAWEB: item.caixa.IDCAIXAWEB,
@@ -153,21 +154,21 @@ export const ActionListaCaixa = ({ dadosListaCaixa, dadosDespesas, dadosAdiantam
       VRRECDINHEIRO: item.caixa.VRRECDINHEIRO,
 
 
-      TOTALRECEBIDOFATURA: toFloat(item.fatura[0]['fatura-movimento'].TOTALRECEBIDOFATURA),
-      TOTALRECEBIDOFATURAPIX: toFloat(item.faturapix[0]['fatura-movimento-pix'].TOTALRECEBIDOFATURAPIX),
+      TOTALRECEBIDOFATURA: toFloat(item.fatura[0]['fatura-movimento']?.TOTALRECEBIDOFATURA),
+      TOTALRECEBIDOFATURAPIX: toFloat(item.faturapix[0]['fatura-movimento-pix']?.TOTALRECEBIDOFATURAPIX),
 
-      TOTALVENDIDODINHEIRO: toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDODINHEIRO),
-      TOTALVENDIDOCARTAO: toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOCARTAO),
-      TOTALVENDIDOPOS: toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOPOS),
-      TOTALVENDIDOPIX: toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOPIX),
-      TOTALVENDIDOMOOVPAY: toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOMOOVPAY),
-      TOTALVENDIDOVOUCHER: toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOVOUCHER),
-      TOTALVENDIDOCONVENIO: toFloat(item.venda[0]['venda-movimento'].TOTALVENDIDOCONVENIO),
-      TOTALVENDIDO: item.venda[0]['venda-movimento'].TOTALVENDIDO,
-      TOTALNOTA: item.venda[0]['venda-movimento'].TOTALNOTA,
+      TOTALVENDIDODINHEIRO: toFloat(item.venda[0]['venda-movimento']?.TOTALVENDIDODINHEIRO),
+      TOTALVENDIDOCARTAO: toFloat(item.venda[0]['venda-movimento']?.TOTALVENDIDOCARTAO),
+      TOTALVENDIDOPOS: toFloat(item.venda[0]['venda-movimento']?.TOTALVENDIDOPOS),
+      TOTALVENDIDOPIX: toFloat(item.venda[0]['venda-movimento']?.TOTALVENDIDOPIX),
+      TOTALVENDIDOMOOVPAY: toFloat(item.venda[0]['venda-movimento']?.TOTALVENDIDOMOOVPAY),
+      TOTALVENDIDOVOUCHER: toFloat(item.venda[0]['venda-movimento']?.TOTALVENDIDOVOUCHER),
+      TOTALVENDIDOCONVENIO: toFloat(item.venda[0]['venda-movimento']?.TOTALVENDIDOCONVENIO),
+      TOTALVENDIDO: item.venda[0]['venda-movimento']?.TOTALVENDIDO,
+      TOTALNOTA: item.venda[0]['venda-movimento']?.TOTALNOTA,
 
-      TOTALPCJ18: item.vendapcj[0]['venda-pcj'].TOTALPCJ18,
-      TOTALPCJ78: item.vendapcj[0]['venda-pcj'].TOTALPCJ78,
+      TOTALPCJ18: item.vendapcj[0]['venda-pcj']?.TOTALPCJ18,
+      TOTALPCJ78: item.vendapcj[0]['venda-pcj']?.TOTALPCJ78,
 
       totalVendido: totalVendido,
       vrDisponivel: vrDisponivel,
@@ -282,6 +283,7 @@ export const ActionListaCaixa = ({ dadosListaCaixa, dadosDespesas, dadosAdiantam
   const calcularTotalPCJ = () => {
     const vrPCJ18 = calcularTotalvrPCJ18('TOTALPCJ18');
     const vrPCJ78 = calcularTotalvrPCJ78('TOTALPCJ78');
+    if (!vrPCJ18) return 0;
     const total = (vrPCJ78 / vrPCJ18) * 100;
 
     return parseFloat(total.toFixed(2));

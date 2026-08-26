@@ -1410,7 +1410,6 @@ export const useCreatePromocaoAtiva = ({ }) => {
         STEMPRESAPROMO: "True",
         STDETPROMOORIGEM: "True",
         STDETPROMODESTINO: "True",
-        STDETPROMODESTINO: "True",
         IDGRUPOEMDESTINO: grupoSelecionadoDestino,
         IDSUBGRUPOEMDESTINO: subGrupoDestino,
         IDMARCAEMDESTINO: marcaDestino,
@@ -1450,6 +1449,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
 
       
       const response = await post('/criar-promocoes-ativas-subGrupo', postData);
+    
 
       Swal.fire({
         position: 'center',
@@ -1734,38 +1734,38 @@ export const useCreatePromocaoAtiva = ({ }) => {
         }
       }
 
-      // if (aplicacaoDestinoSelecionada == 0 || aplicacaoDestinoSelecionada == 3) {
-      //   const origem = produtoSelecionadoEstProdOrigem;
-      //   const destino = produtoSelecionadoEstProdDestino;
+      if (aplicacaoDestinoSelecionada == 0 || aplicacaoDestinoSelecionada == 3) {
+        const origem = produtoSelecionadoEstProdOrigem;
+        const destino = produtoSelecionadoEstProdDestino;
         
-      //   const idsOrigem = origem.map(v => {
-      //     const id = typeof v === 'object' && v !== null ? v.IDPRODUTO : v;
-      //     return String(id);
-      //   }).sort();
+        const idsOrigem = origem.map(v => {
+          const id = typeof v === 'object' && v !== null ? v.IDPRODUTO : v;
+          return String(id);
+        }).sort();
         
-      //   const idsDestino = destino.map(v => {
-      //     const id = typeof v === 'object' && v !== null ? v.IDPRODUTO : v;
-      //     return String(id);
-      //   }).sort();
+        const idsDestino = destino.map(v => {
+          const id = typeof v === 'object' && v !== null ? v.IDPRODUTO : v;
+          return String(id);
+        }).sort();
         
-      //   const iguais = idsOrigem.length === idsDestino.length && 
-      //     idsOrigem.every((id, i) => id === idsDestino[i]);
+        const iguais = idsOrigem.length === idsDestino.length && 
+          idsOrigem.every((id, i) => id === idsDestino[i]);
           
-      //   if (!iguais) {
-      //     Swal.fire({
-      //       position: 'center',
-      //       icon: 'error',
-      //       title: 'Erro Produtos Origem e Destino AQUI',
-      //       text: 'Para Mecânica por pares ou menos na primeira, os produtos de origem e destino devem ser iguais.',
-      //       customClass: {
-      //         container: 'custom-swal',
-      //       },
-      //       showConfirmButton: false,
-      //       timer: 15000,
-      //     });
-      //     return;
-      //   }
-      // }
+        if (!iguais) {
+          Swal.fire({
+            position: 'center',
+            icon: 'error',
+            title: 'Erro Produtos Origem e Destino AQUI',
+            text: 'Para Mecânica por pares ou menos na primeira, os produtos de origem e destino devem ser iguais.',
+            customClass: {
+              container: 'custom-swal',
+            },
+            showConfirmButton: false,
+            timer: 15000,
+          });
+          return;
+        }
+      }
 
       // if (aplicacaoDestinoSelecionada == 1) {
       //   if (produtoSelecionadoEstProdDestino.length !== produtoSelecionadoEstProdOrigem.length) {
@@ -2017,23 +2017,23 @@ export const useCreatePromocaoAtiva = ({ }) => {
       }
 
       const postData = {
-        TPAPARTIRDE: aplicacaoDestinoSelecionada,
-        TPAPLICADOA: mecanicaSelecionada,
-        TPFATORPROMO: tipoDescontoSelecionado,
-        APARTIRDEQTD: Number(qtdInicio),
-        APARTIRDOVLR: valorInicio,
-        FATORPROMOVLR: vrDesconto,
-        FATORPROMOPERC: porcentoDesconto,
-        VLPRECOPRODUTO: Number(precoProduto),
+        DSPROMOCAOMARKETING: descricao,
         DTHORAINICIO: dataInicio,
         DTHORAFIM: dataFim ,
-        DSPROMOCAOMARKETING: descricao,
-        IDEMPRESA: empresaSelecionada,
-        STATIVO: "True",
+        TPAPLICADOA: mecanicaSelecionada,
+        APARTIRDEQTD: Number(qtdInicio),
+        APARTIRDOVLR: valorInicio,
+        TPFATORPROMO: tipoDescontoSelecionado,
+        FATORPROMOVLR: vrDesconto,
+        FATORPROMOPERC: porcentoDesconto,
+        TPAPARTIRDE: aplicacaoDestinoSelecionada,
+        VLPRECOPRODUTO: Number(precoProduto),
         STEMPRESAPROMO: "True",
-        ...status,
         STDETPROMOORIGEM: detalhesOrigem.length > 0 ? "True" : "False",
         STDETPROMODESTINO: detalhesDestino.length > 0 ? "True" : "False",
+        ...status,
+        STATIVO: "True",
+        IDEMPRESA: empresaSelecionada,
         detalhesDestino: detalhesDestino,
         detalhesOrigem: detalhesOrigem
       };

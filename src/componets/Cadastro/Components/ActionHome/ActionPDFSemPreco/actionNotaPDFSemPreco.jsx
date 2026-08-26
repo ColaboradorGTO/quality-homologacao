@@ -19,12 +19,12 @@ export const ActionNotaPDFSemPreco = ({ dadosPedidoSemPreco, dadosDetalhePedido 
         },
     });
     
-
+    console.log(dadosPedidoSemPreco, 'dadosPedidoSemPreco')
     const stOutlet = dadosPedidoSemPreco?.STOUTLET === "True";
     
     const dadosArray = Array.isArray(dadosPedidoSemPreco) 
         ? dadosPedidoSemPreco 
-        : [dadosPedidoSemPreco[0] || dadosPedidoSemPreco];
+        : [dadosPedidoSemPreco || dadosPedidoSemPreco];
     
     const logosEmpresas = [
         '../img/tesoura.png',      // posição 0 -> IDSUBGRUPOPEDIDO = 1
