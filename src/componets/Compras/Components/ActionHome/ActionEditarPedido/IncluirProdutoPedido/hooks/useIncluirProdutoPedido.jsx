@@ -1412,6 +1412,13 @@ export const useIncluirProutoPedido = ({
 
             if (!itensValidos) return;
 
+            const { stPedidoValidoParaFechar } = await validarSePedidoValidoParaFechar();
+
+            if (!stPedidoValidoParaFechar) {
+                Swal.close();
+                return;
+            }
+
             if (idResumoAtual == 0 || stRascunhoValue != 'False') {
                 const text = idResumoAtual == 0
                     ? 'Não existe Pedido Iniciado'
@@ -1526,6 +1533,8 @@ export const useIncluirProutoPedido = ({
             });
         }
     }
+
+
 
     return {
         tabelaVisivel,

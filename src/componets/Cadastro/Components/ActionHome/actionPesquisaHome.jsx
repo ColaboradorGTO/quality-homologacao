@@ -393,6 +393,7 @@ export const ActionPesquisaHome = ({ usuarioLogado }) => {
           setActionVisualizarPedido={setActionVisualizarPedido}
           actionHome={actionHome}
           setActionHome={setActionHome}
+          refetchListaPedidos={refetchListaPedidos}
         />
       )}
 

@@ -6,35 +6,16 @@ import { useNavigate } from "react-router-dom";
 import { registrarLogAuditoria } from "../../../../../services/auditLog";
 
 export const useEnviarPedidoComprasADM = ({
-    usuarioLogado
+    usuarioLogado,
+    optionsModulos
 }) => {
     const [loading, setLoading] = useState(false);
-    const [ipUsuario, setIpUsuario] = useState("");
-    
-    const getIPUsuario = async () => {
-        let usuarioIP = null;
 
-        try {
-        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
-        usuarioIP = ipWhoisData?.ip;
-        } catch (error) {
-        console.error("Erro ao buscar IP via ifconfig.me:", error);
-        }
-
-        if (!usuarioIP) {
-        try {
-            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-            usuarioIP = ipifyData?.ip;
-        } catch (error) {
-            console.error("Erro ao buscar IP via ipify.org:", error);
-        }
-        }
-        setIpUsuario(usuarioIP);
-        return usuarioIP;
-    };
 
     const enviarPedidoComprasADM = async (IDPEDIDO) => {
+        if(!optionsModulos[0]?.ALTERAR == 'True') {
 
+        }
         try {
             const confirmacao = await Swal.fire({
                 title: "Certeza que Deseja Enviar o Pedido para o Dep. Compras Adm?",
@@ -80,13 +61,12 @@ export const useEnviarPedidoComprasADM = ({
             });
 
             const dados = {
-              
                 IDANDAMENTO: parseInt(14),
                 TXTOBSDEVPEDIDO: motivo.toUpperCase(),
                 IDRESUMOPEDIDO: parseInt(IDPEDIDO),
             };
 
-            const response = await put("/andamentoPedido/:id", dados);
+            const response = await put("/andamento-pedido/:id", dados);
 
             const postData  = {
                 IDFUNCIONARIO: usuarioLogado?.id, 
@@ -94,8 +74,8 @@ export const useEnviarPedidoComprasADM = ({
                 DADOS: JSON.stringify(dados),
                 IP: ipUsuario
             }
-            // Registra o log da ação
-            const responsePost = await post("/log-web", postData);
+            
+            await post("/log-web", postData);
             
             await Swal.fire({
                 icon: "success",
@@ -103,6 +83,7 @@ export const useEnviarPedidoComprasADM = ({
                 text: "O pedido foi enviado com sucesso.",
             });
            
+            return response.data;
         } catch (error) {
             Swal.fire({
                 icon: "error",

@@ -86,7 +86,7 @@ export const ActionListaPedidosPeriodo = ({
     actionPedidoResumido,
   })
   const [rowSelection, setRowSelection] = useState(null);
-  const { enviarPedidoComprasADM } = useEnviarPedidoComprasADM({usuarioLogado});
+  const { enviarPedidoComprasADM } = useEnviarPedidoComprasADM({usuarioLogado, optionsModulos});
   const { enviarPedidoCompras } = useEnviarPedidoCompras();
   const { migrarPedidoSap } = useMigrarPedidoSap();
 
@@ -556,9 +556,7 @@ export const ActionListaPedidosPeriodo = ({
         setActionHome(false)
         setActionPedidoResumido(false)
       }
-      console.log(response.data, 'response.data lista')
-      console.log(dadosVisualizarPedido, 'dadosVisualizarPedido lista')
-      console.log(dadosDetalhePedido, 'dadosDetalhePedido lista')
+
     } catch (error) {
       console.log(error, "não foi possivel pegar os dados da tabela ")
     }

@@ -13,8 +13,10 @@ export const useIncluirProutoPedido = ({
     optionsModulos, 
     usuarioLogado,
     dadosVisualizarPedido, 
+    setDadosVisualizarPedido,
     dadosDetalhePedido,
-    dadosFornecedor 
+    dadosFornecedor,
+    refetchListaPedidos 
 }) => {
     const formatarDataParaInput = (valorData) => {
         if (!valorData) return '';
@@ -97,6 +99,8 @@ export const useIncluirProutoPedido = ({
     const [camposHabilitados, setCamposHabilitados] = useState(false);
     const [actionPesquisarNovoPedido, setActionPesquisarNovoPedido] = useState(false);
     const [tituloSubheader, setTituloSubheader] = useState('');
+    const [dadosProdutosPedido, setDadosProdutosPedido] = useState([]);
+    const [txtMotivo, setTxtMotivo] = useState('')
     const [checkboxIntermediario, setCheckboxIntermediario] = useState({
         disabled: false,
         checked: false
@@ -110,7 +114,6 @@ export const useIncluirProutoPedido = ({
         novoPedido: true
     });
 
-    const [dadosProdutosPedido, setDadosProdutosPedido] = useState([]);
 
 
     useEffect(() => {
@@ -212,11 +215,21 @@ export const useIncluirProutoPedido = ({
     const { data: dadosProdutosPedidos = [], error: errorProdutosPedido, isLoading: isLoadingProdutosPedidos, refetch: refetchListaCadastroProdutoPedidos } = useQuery(
         'cadastrar-produto-Pedido',
         async () => {
-            const response = await get(`/cadastrar-produto-Pedido?idResumoPedido=${dadosVisualizarPedido[0]?.IDPEDIDO}`);
+            const response = await get(`/cadastrar-produto-Pedido?NuPedidoPesquisa=${dadosVisualizarPedido[0]?.IDPEDIDO}`);
             return response.data;
         },
         { staleTime: 5 * 60 * 1000, enabled: false }
     );
+
+    const { data: dadosPedidos = [], error: errorPedidos, isLoading: isLoadingPedidos, refetch: refetchListaPedidosVisualizar } = useQuery(
+        'lista-pedidos',
+        async () => {
+            const response = await get(`/lista-pedidos?idPedido=${dadosVisualizarPedido[0]?.IDPEDIDO}`);
+            return response.data;
+        },
+        { staleTime: 5 * 60 * 1000, enabled: false }
+    );
+
 
     useEffect(() => {
         if(dadosVisualizarPedido?.length && dadosDetalhePedido?.length > 0) {
@@ -1528,21 +1541,134 @@ export const useIncluirProutoPedido = ({
         }
     }
     
-    const validarSeHaAlgumItemNaoTransformadoDoPedido = async () => {
-        const response = await get(`lista-detalhe-pedidos?sttransformado=False&idPedido=${dadosVisualizarPedido[0]?.IDPEDIDO}`)
+    // const validarSeHaAlgumItemNaoTransformadoDoPedido = async () => {
+    //     const response = await get(`lista-detalhe-pedidos?sttransformado=False&idPedido=${dadosVisualizarPedido[0]?.IDPEDIDO}`)
         
+    // }
+
+
+    const validarSeHaAlgumItemNaoTransformadoDoPedido = async () => {
+        let stHaItensParaTransformar = true;
+        const idPedidoAtual = idResumoPedido || dadosVisualizarPedido[0]?.IDPEDIDO;
+
+        try {
+            const { data: itens = [] } = await refetchListaDetalhePedidos();
+
+            if (itens?.length > 0) {
+                await Swal.fire({
+                    icon: 'warning',
+                    title: `Existe Itens do Pedido: ${idPedidoAtual} que não foram Transformados em Produtos`,
+                    text: `Itens não Transformados: ( ${itens.map((item) => item.DSPRODUTO).join(', ')} )`,
+                    confirmButtonText: 'OK'
+                });
+            } else {
+                stHaItensParaTransformar = false;
+            }
+        } catch (error) {
+            console.error('Erro ao validar itens não transformados do pedido:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro ao tentar validar os itens do pedido, recarregue e tente novamente!'
+            });
+        }
+
+        return { stHaItensParaTransformar };
     }
 
     const validarSeHaAlgumProdutoNaoMigradoParaSapDoPedido = async () => {
+        let stHaProdutosParaMigrarSap = true;
+        const idPedidoAtual = idResumoPedido || dadosVisualizarPedido[0]?.IDPEDIDO;
 
+        try {
+            const { data: produtos = [] } = await refetchListaCadastroProdutoPedidos();
+            const produtosNaoMigrados = (produtos || []).filter((item) => item.STMIGRADOSAP != 'True');
+
+            if (produtosNaoMigrados.length > 0) {
+                await Swal.fire({
+                    icon: 'warning',
+                    title: `Existem Produtos do Pedido: ${idPedidoAtual} Não Foram Migrados para o PDV ou Não Foram Migrados para o SAP`,
+                    text: `Produtos não Migrados: ( ${produtosNaoMigrados.map((item) => item.DSPRODUTO).join(', ')} )`,
+                    confirmButtonText: 'OK'
+                });
+            } else {
+                stHaProdutosParaMigrarSap = false;
+            }
+        } catch (error) {
+            console.error('Erro ao validar produtos não migrados para o SAP:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro ao tentar validar os produtos do pedido, recarregue e tente novamente!'
+            });
+        }
+
+        return { stHaProdutosParaMigrarSap };
     }
-    
+
+    const validarSeHaAlgumProdutoAdicionadoNaoMigradoParaPedidoNoSAP = async () => {
+        let stHaProdutosParaInserirNoPedidoSAP = true;
+        const idPedidoAtual = idResumoPedido || dadosVisualizarPedido[0]?.IDPEDIDO;
+
+        try {
+            const { data: produtos = [] } = await refetchListaCadastroProdutoPedidos();
+            const produtosNaoMigrados = (produtos || []).filter((item) => item.STLINHAPRODUTOMIGRADAPARAPEDIDOSAP != 'True');
+
+            if (produtosNaoMigrados.length > 0) {
+                await Swal.fire({
+                    icon: 'warning',
+                    title: `Existem Produtos do Pedido: ${idPedidoAtual} Que Não Foram Migrados Para o Pedido No SAP`,
+                    text: `Produtos não Migrados: ( ${produtosNaoMigrados.map((item) => item.DSPRODUTO).join(', ')} )`,
+                    confirmButtonText: 'OK'
+                });
+            } else {
+                stHaProdutosParaInserirNoPedidoSAP = false;
+            }
+        } catch (error) {
+            console.error('Erro ao validar produtos não migrados para o pedido no SAP:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro ao tentar validar os produtos do pedido, recarregue e tente novamente!'
+            });
+        }
+
+        return { stHaProdutosParaInserirNoPedidoSAP };
+    }
+
+    const validarSePedidoValidoParaFechar = async () => {
+        const { stHaItensParaTransformar } = await validarSeHaAlgumItemNaoTransformadoDoPedido();
+
+        if (stHaItensParaTransformar) {
+            return { stPedidoValidoParaFechar: false };
+        }
+
+        const { stHaProdutosParaMigrarSap } = await validarSeHaAlgumProdutoNaoMigradoParaSapDoPedido();
+
+        if (stHaProdutosParaMigrarSap) {
+            return { stPedidoValidoParaFechar: false };
+        }
+
+        // let { stHaProdutosParaInserirNoPedidoSAP } = await validarSeHaAlgumProdutoAdicionadoNaoMigradoParaPedidoNoSAP();
+        //
+        // if (stHaProdutosParaInserirNoPedidoSAP) {
+        //     return { stPedidoValidoParaFechar: false };
+        // }
+
+        return { stPedidoValidoParaFechar: true };
+    }
+
     const handleFinalizarCadastroPedido = async () => {
+        let idResPedido = dadosVisualizarPedido[0]?.IDPEDIDO || 0;
+
         const postData = {
             IDRESUMOPEDIDO: dadosVisualizarPedido[0]?.IDPEDIDO,
             IDANDAMENTO: dadosVisualizarPedido[0]?.IDANDAMENTO
         }
         try {
+            let {stPedidoValidoParaFechar} = await validarSePedidoValidoParaFechar(idResPedido)
+
+            if(!stPedidoValidoParaFechar) {
+                return;
+            }
+
             const confirmacao = await Swal.fire({
                 icon: 'warning',
                 title: 'Certeza que Deseja Finalizar o Pedido?',
@@ -1601,6 +1727,117 @@ export const useIncluirProutoPedido = ({
             return responsePost.data;
         }
         
+    }
+
+    const validarSePedidoPodeSerAjustado = async (idResPedido, ) => {
+        let stPedidoValidoParaAjuste = false;
+        const postData = {
+            IDRESUMOPEDIDO: dadosVisualizarPedido[0]?.IDPEDIDO,
+            IDFUNCIONARIO: usuarioLogado?.id
+        }
+
+        try {
+            let {STAUTORIZADO, STPEDIDOVALIDO, msg} = await post(`/validar-pedido-ajuste-compras`, postData)
+
+            if(STAUTORIZADO && STPEDIDOVALIDO) {
+                stPedidoValidoParaAjuste = true;
+            } else {
+                Swal.fire({
+                    position: 'center',
+                    icon: 'warning',
+                    text: 'Pedido não autorizado para devolução!',
+                    showConfirmButton: false,
+                    timer: 5000,
+                    customClass: {
+                        container: 'custom-swal',
+                    }
+                })
+            }
+        } catch(error) {
+            console.log('Erro ao tentar validar os dados do pedido, carregue e tente novamente!',error)
+            Swal.fire({
+                position: 'center',
+                icon: 'error',
+                text: 'Erro ao tentar validar os dados do pedido, carregue e tente novamente!',
+                showConfirmButton: false,
+                timer: 5000,
+                customClass: {
+                    container: 'custom-swal',
+                }
+            })
+        }
+    }
+
+    const handleEnviarAjustePedidoCompras = async () => {
+        let idResPedido = dadosVisualizarPedido[0]?.IDPEDIDO;
+        let idAndamentoPedido = dadosVisualizarPedido[0]?.IDANDAMENTO;
+        let textoMotivo = txtMotivo.value.replace(/[^a-zA-ZÀ-ÿ0-9, ]/g, '')?.replace(/\s{2,}/g, ' ')?.trim().toUpperCase();
+
+        let { stPedidoValidoParaAjuste } = await validarSePedidoPodeSerAjustado(idResPedido)
+
+        if (!stPedidoValidoParaAjuste) return; 
+
+        const confirmacao = await Swal.fire({
+            icon: 'warning',
+            title: 'Certeza que Deseja Finalizar o Pedido?',
+            text: 'Você não poderá reverter esta ação!',
+            showCancelButton: true,
+            showConfirmButton: true,
+            confirmButtonText: 'Sim',
+            cancelButtonText: 'Não',
+        });
+
+        if (!confirmacao.isConfirmed) return;
+
+        const putData = {
+            IDRESUMOPEDIDO: parseInt(idResPedido),
+            IDANDAMENTO: parseInt(idAndamentoPedido),
+            TXTOBSDEVPEDIDO: txtMotivo
+        };
+
+        try {
+            const response = await put(`/andamento-pedido/:id`, putData)
+            const responsePost = await registrarLogAuditoria({
+                idFuncionario: usuarioLogado.id,
+                pathFuncao: 'CADASTRO/ENVIAR PEDIDO PARA COMPRAS',
+                dados: putData
+            });
+    
+            Swal.fire({
+                position: 'center',
+                icon: 'success',
+                title: 'Pedido Enviado Com Sucesso!',
+                timer: 5000,
+                customClass: {
+                    container: 'custom-swal',
+                }
+            })
+
+            refetchListaPedidos()
+    
+            return response.data;
+
+        } catch(error) {
+            console.log('Erro ao tentar enviar o pedido para o Compras, carregue e tente novamente!')
+            const responsePost = await registrarLogAuditoria({
+                idFuncionario: usuarioLogado.id,
+                pathFuncao: 'CADASTRO/ERRO AO ENVIAR PEDIDO PARA COMPRAS',
+                dados: putData
+            });
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro ao Enviar Pedido Para o Compras',
+                timer: 5000,
+                showConfirmButton: false,
+                customClass: {
+                    container: 'custom-swal',
+                }
+            })
+
+            return responsePost.data;
+        }
+
     }
 
     return {
@@ -1725,7 +1962,9 @@ export const useIncluirProutoPedido = ({
         camposHabilitados,
         setCamposHabilitados,
         checkboxIntermediario,
-        setCheckboxIntermediario
+        setCheckboxIntermediario,
+        refetchListaPedidosVisualizar,
+        dadosPedidos
     }
 }
 

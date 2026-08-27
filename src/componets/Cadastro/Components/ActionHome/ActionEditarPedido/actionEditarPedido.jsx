@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useState } from "react"
 import { ButtonType } from "../../../../Buttons/ButtonType";
-import { MdContentCopy, MdMenu, MdMonetizationOn, MdOutlineCheck, MdOutlineCopyAll, MdOutlineEdit, MdOutlineKeyboardReturn, MdOutlinePayment, MdOutlinePictureAsPdf, MdOutlineVisibility } from "react-icons/md";
+import { MdContentCopy, MdMenu, MdMonetizationOn, MdOutlineCheck, MdOutlineCopyAll, MdOutlineEdit, MdOutlineKeyboardReturn, MdOutlinePayment, MdOutlinePictureAsPdf, MdOutlineSend, MdOutlineVisibility } from "react-icons/md";
 import { ResultadoResumo } from "../../../../ResultadoResumo/ResultadoResumo";
 import { formatMoeda } from "../../../../../utils/formatMoeda";
 import { toFloat } from "../../../../../utils/toFloat";
@@ -14,10 +14,12 @@ import { ActionListaPedidos } from "./actionListaPedidos";
 import { ButtonTypeCompras } from "../../../../Buttons/Button";
 import { ActionIncluirProdutoPedidoModal } from "./IncluirProdutoPedido/actionIncluirProdutoPedidoModal";
 import { ActionNovoPedido } from "../../ActionNovoPedido/actionNovoPedido";
-import { FaCheck, FaRegSave } from "react-icons/fa";
-import { CiLock } from "react-icons/ci";
+import { FaRegSave } from "react-icons/fa";
 import { FaListCheck } from "react-icons/fa6";
 import { get } from "../../../../../api/funcRequest";
+import { ActionPDFPedido } from "../../ActionNovoPedido/ActionPDF/actionPDFPedido";
+import { GrDocumentTxt } from "react-icons/gr";
+import Swal from "sweetalert2";
 
 export const ActionEditarPedido = ({
   usuarioLogado,
@@ -31,7 +33,8 @@ export const ActionEditarPedido = ({
   setActionEditarPedido,
   setActionVisualizarPedido,
   actionHome,
-  setActionHome
+  setActionHome,
+  refetchListaPedidos
 }) => {
 
   const {
@@ -71,6 +74,10 @@ export const ActionEditarPedido = ({
     setTransportadoraSelecionada,
     freteSelecionado,
     setFreteSelecionado,
+    modalPedidoNota,
+    setModalPedidoNota,
+    modalPedidoNotaSemPreco,
+    setModalPedidoNotaSemPreco,
     dataPesquisaFim,
     setDataPesquisaFim,
     dataPesquisaInicio,
@@ -134,8 +141,17 @@ export const ActionEditarPedido = ({
     dadosCabecalhoClonado,
     handleFecharPedido,
     refetchListaCadastroProdutoPedidos,
-    handleFinalizarCadastroPedido
-  } = useIncluirProutoPedido({ usuarioLogado, optionsModulos, dadosVisualizarPedido, dadosDetalhePedido });
+    handleFinalizarCadastroPedido,
+    refetchListaPedidosVisualizar,
+    dadosPedidos
+  } = useIncluirProutoPedido({ 
+    usuarioLogado, 
+    optionsModulos, 
+    dadosVisualizarPedido, 
+    setDadosVisualizarPedido,
+    dadosDetalhePedido,
+    refetchListaPedidos 
+  });
  
   // const [dadosDetalheProdutoPedido, setDadosDetalheProdutoPedido] = useState([]);
   // const [botoesVisiveis, setBotoesVisiveis] = useState({
@@ -157,140 +173,59 @@ export const ActionEditarPedido = ({
   
   useEffect(() => {
       if (!dadosVisualizarPedido || !Array.isArray(dadosVisualizarPedido) || dadosVisualizarPedido.length === 0) {
-        console.log('❌ Dados não disponíveis ou inválidos');
         return;
       }
-  
+
+      // Mesma lógica de retornoPreencherCabecalhoPedido (functionCadastro.js):
+      // esta tela é a "Cadastro dos Produtos do Pedido", cujos andamentos válidos são 4, 5, 16 e 17.
       const dados = dadosVisualizarPedido[0];
-      const IdAndamentoPedido = parseInt(dados?.IDANDAMENTO || '0', 10);
-      const StCancelaPedido = String(dados?.STCANCELADO || 'False').trim();
-      const IDPEDIDORESUMO = String(dados?.IDPEDIDO || '');
-      const dsSetorAndamentoPedido = String(dados?.DSSETOR || '');
-      const stCancelado = StCancelaPedido === 'True';
-      const stMigradoSap = String(dados?.STMIGRADOSAP || 'False') === 'True';
-      const stPedidoPorIntermediario = String(dados?.STPEDIDOPRIMARIO || 'False') === 'True';
-      const idPedidoPrimario = parseInt(dados?.IDPEDIDOPRIMARIO || '0', 10);
-      const isPedidoSecundario = idPedidoPrimario > 0;
-      // Regra alinhada ao legado (retornoVisualizarPedido):
-      // em COMPRAS e nao cancelado, o botao clonar fica oculto.
-      const clonarVisivelPadrao = stMigradoSap
-        ? false
-        : stCancelado
-          ? (IdAndamentoPedido === 2 || IdAndamentoPedido === 5)
-          : dsSetorAndamentoPedido !== 'COMPRAS';
-  
-      let novosBotoesVisiveis = {
-        incluir: false,
-        fechar: false,
-        salvar: false,
-        clonar: clonarVisivelPadrao,
-        clonarCabecalho: true,
-        novoPedido: true // SEMPRE VISÍVEL
-      };
-      
-      let camposDevemEstarHabilitados = false;
-      let novoTitulo = '';
-  
-      if (StCancelaPedido === 'True' || (IdAndamentoPedido >= 2 && IdAndamentoPedido < 15)) {
-        novosBotoesVisiveis = {
-          ...novosBotoesVisiveis,
-        };
-        
-        camposDevemEstarHabilitados = false;
-        
-        if (IdAndamentoPedido >= 2 && IdAndamentoPedido < 15) {
-          novoTitulo = `Visualizar Pedido Nº: ${IDPEDIDORESUMO}`;
-        }
-      } 
-  
-      else if (IdAndamentoPedido === 1 || IdAndamentoPedido === 15) {
-        novosBotoesVisiveis = {
-          ...novosBotoesVisiveis,
-          incluir: true,
-          fechar: true,
-          salvar: true,
-          clonarCabecalho: true
-        };
-        
-        camposDevemEstarHabilitados = true;
-        
-        const tipoOperacao = IdAndamentoPedido === 1 ? 'Inclusão' : 'Alteração';
-        novoTitulo = `${tipoOperacao} - Pedido Nº: ${IDPEDIDORESUMO}`;
+      const idsAndamentos = [4, 5, 16, 17];
+
+      const idResumoPedidoAtual = String(dados?.IDPEDIDO || '');
+      const IdAndamentoPedido = Number(dados?.IDANDAMENTO) || '';
+      let DsSetorAndamentoPedido = String(dados?.DSSETOR || '');
+      const StCancelaPedido = String(dados?.STCANCELADO || 'False');
+      const stMigradoSap = dados?.STMIGRADOSAP == 'True';
+      const idPedidoPrimarioAtual = parseInt(dados?.IDPEDIDOPRIMARIO || '0', 10);
+      const isPedidoPrimario = dados?.STPEDIDOPRIMARIO == 'True';
+      const isPedidoSecundario = idPedidoPrimarioAtual > 0;
+      const isPedidoRN = isPedidoPrimario || isPedidoSecundario;
+
+      const stPermitirFecharPedido = !isPedidoSecundario && (IdAndamentoPedido === 4 || IdAndamentoPedido === 16);
+      const stPermitirMigrarPedidoSAP = !isPedidoSecundario && !stMigradoSap && IdAndamentoPedido === 5;
+      const stPermitirAtualizarPedidoSAP = !isPedidoSecundario && stMigradoSap && IdAndamentoPedido === 17;
+      const stPermitirMudarStatusParaAjusteQuandoPedidoMigrado = !isPedidoSecundario && stMigradoSap && IdAndamentoPedido === 5;
+
+      if (IdAndamentoPedido === 5) {
+        DsSetorAndamentoPedido = 'Inclusão Finalizada';
       }
-  
-      if (stMigradoSap) {
-        camposDevemEstarHabilitados = false;
-      }
-      
-      if (idPedidoPrimario > 0) {
-        novosBotoesVisiveis = {
-          incluir: false,
-          fechar: false,
-          salvar: false,
-          clonar: false,
-          clonarCabecalho: false,
-          novoPedido: true 
-        };
-        camposDevemEstarHabilitados = false;
-      }
-  
-      let statusTitleSubHeader = stCancelado
-        ? (
-          <span className="text-danger fw-900 pl-1">
-            CANCELADO <i className="fal fa-times ml-1"></i>
-          </span>
-        )
-        : (
-          <>
-            <span className="text-warning fw-900 pl-1">
-              Bloqueado <CiLock />
-            </span>
-            {` -> Está no Setor: ${dsSetorAndamentoPedido}`}
-          </>
-        );
-  
-      if (!stCancelado && (IdAndamentoPedido === 1 || IdAndamentoPedido === 15)) {
-        statusTitleSubHeader = IdAndamentoPedido === 1
-          ? (
-            <span className="text-primary fw-700 pl-1">
-              Inclusão Liberada <FaCheck />
-            </span>
-          )
-          : (
-            <span className="text-info fw-700 pl-1">
-              Alteração Liberada <FaCheck />
-            </span>
-          );
-      }
-  
-      let prefixoTituloPedido = 'Pedido ';
-  
-      if (isPedidoSecundario) {
-        prefixoTituloPedido += 'Secundário ';
-      } else if (stPedidoPorIntermediario) {
-        prefixoTituloPedido += 'Primário ';
-      }
-  
-      novoTitulo = (
-        <>
-          {`${prefixoTituloPedido}Nº: ${IDPEDIDORESUMO}`}
-          {' - '}
-          {statusTitleSubHeader}
-        </>
-      );
-  
-      setBotoesVisiveis(novosBotoesVisiveis);
-      setCamposHabilitados(camposDevemEstarHabilitados);
-      setTituloSubheader(novoTitulo);
-      
-      setCheckboxIntermediario({
-        disabled: idPedidoPrimario > 0 || stPedidoPorIntermediario || stMigradoSap,
-        checked: idPedidoPrimario > 0 || stPedidoPorIntermediario
+
+      const dentroDoFluxoDeCadastro = idsAndamentos.includes(IdAndamentoPedido);
+
+      setBotoesVisiveis({
+        incluir: true,
+        salvar: true,
+        fechar: dentroDoFluxoDeCadastro && stPermitirFecharPedido,
+        novoPedido: dentroDoFluxoDeCadastro && !isPedidoSecundario,
+        clonarCabecalho: StCancelaPedido !== 'True',
+        clonar: StCancelaPedido !== 'True',
+        mudarStatusParaAjuste: dentroDoFluxoDeCadastro && stPermitirMudarStatusParaAjusteQuandoPedidoMigrado,
+        migrarPedidoSAP: dentroDoFluxoDeCadastro && stPermitirMigrarPedidoSAP,
+        atualizarPedidoSAP: dentroDoFluxoDeCadastro && stPermitirAtualizarPedidoSAP,
       });
-      
-      setIdPedidoPrimario(idPedidoPrimario);
-      
-    }, [dadosVisualizarPedido]); 
+
+      setTituloSubheader(`Cadastro dos Produtos do Pedido Nº: ${idResumoPedidoAtual} - ${DsSetorAndamentoPedido}`);
+
+      setCamposHabilitados(false);
+
+      setCheckboxIntermediario({
+        disabled: true,
+        checked: isPedidoRN
+      });
+
+      setIdPedidoPrimario(idPedidoPrimarioAtual);
+
+    }, [dadosVisualizarPedido]);
 
   // const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
   //   'menus-usuario-excecao',
@@ -361,10 +296,10 @@ export const ActionEditarPedido = ({
     }
   }, [dadosVisualizarPedido, dadosDetalhePedido])
 
-  console.log(dadosVisualizarPedido, 'dadosVisualizarPedido')
+  
   const handleVisualizarPedido = async () => {
     const IDPEDIDO = dadosVisualizarPedido[0]?.IDPEDIDO
-    console.log(IDPEDIDO, 'dados')
+
     try {
       const response = await get(`/pedido-compras-detalhado?idPedido=${IDPEDIDO}`)
       if (response.data && response.data.length > 0) {
@@ -390,10 +325,46 @@ export const ActionEditarPedido = ({
     // setTabelaVisivel(false)
   }
 
-  const handleNovoPedido = () => {
-    // setActionVisualizandoNovoPedido(false);
-    setActionPesquisarNovoPedido(true);
+  const handleClickCadstroPedidoPDF = () => {
+    refetchListaPedidosVisualizar()
+    setModalPedidoNota(true)
   }
+
+  const handleClickPedidoTXT = async () => {
+    Swal.fire({
+      title: "Gerando arquivo...",
+      html: "Aguarde um momento...",
+      showCancelButton: false,
+      showConfirmButton: false,
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+    });
+
+    try {
+
+      const remessaData = await refetchListaCadastroProdutoPedidos();
+      
+      await gerarArquivoTxt(remessaData);
+      setArquivoGerado(true);
+      Swal.close();
+    } catch (error) {
+      Swal.fire("Erro", "Erro ao gerar arquivo", "error");
+    }
+  };
+  
+  const gerarArquivoTxt = (data) => {
+    let textoFinalTXT = "";
+    textoFinalTXT = "DESCRIÇÃO;COR;TAMANHO;CÓDIGO BARRAS;QUANTIDADE;PREÇO VENDA;PEDIDO;ESTILO;LOCAL;";
+
+    const txtData = data.map(item => JSON.stringify(item)).join('\n');
+    const blob = new Blob([txtData, textoFinalTXT], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${dadosVisualizarPedido[0]?.IDPEDIDO}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const handleReturn = () => {
     setActionHome(true)
@@ -602,52 +573,52 @@ export const ActionEditarPedido = ({
         onChangeSelectFrete={(e) => setFreteSelecionado(e.value)}
 
         ButtonSearchComponent={ButtonTypeCompras}
-        linkNomeSearch={"Incluir Itens"}
-        onButtonClickSearch={handleIncluir}
+        linkNomeSearch={"Produtos do Pedido"}
+        onButtonClickSearch={handleVisualizarPedido}
         corSearch={"primary"}
         IconSearch={MdMenu}
         styleSearch={botoesVisiveis.incluir}
-      
+
         ButtonTypeCadastro={ButtonTypeCompras}
-        linkNome={"Salvar Cabeçalho Pedido"}
-        onButtonClickCadastro={handleSalvarPedido}
-        corCadastro={"info"}
+        linkNome={"Prévia Cadastro Produtos"}
+        onButtonClickCadastro={handleClickCadastroProduto}
+        corCadastro={"success"}
         IconCadastro={FaRegSave}
         styleCadastro={botoesVisiveis.salvar}
-        
+
         ButtonTypeCancelar={ButtonTypeCompras}
-        linkCancelar={"Fechar Pedido"}
-        onButtonClickCancelar={handleFecharPedido}
+        linkCancelar={"Finalizar Cadastro dos Produtos"}
+        onButtonClickCancelar={handleFinalizarCadastroPedido}
         corCancelar={"danger"}
         IconCancelar={FaListCheck}
         styleCancelar={botoesVisiveis.fechar}
 
         ButtonTypePedido={ButtonTypeCompras}
-        linkPedido={"Produtos do Pedido"}
+        linkPedido={"Enviar Para Ajuste Compras"}
         onButtonClickPedido={handleVisualizarPedido}
-        corPedido={"primary"}
-        IconPedido={MdOutlineEdit}
+        corPedido={"secondary"}
+        IconPedido={MdOutlineSend}
         stylePedido={botoesVisiveis.novoPedido}
         
         ButtonTypeTXT={ButtonTypeCompras}
-        linkTXT={"Prévia Cadastro Produtos"}
-        onButtonClickTXT={handleClickCadastroProduto}
-        corTXT={"success"}
-        IconTXT={MdOutlineCopyAll}
+        linkTXT={"Pedido de Compra PDF"}
+        onButtonClickTXT={handleClickCadstroPedidoPDF}
+        corTXT={"warning"}
+        IconTXT={MdOutlinePictureAsPdf}
         styleTXT={botoesVisiveis.clonarCabecalho}
 
         ButtonTypeClonar={ButtonTypeCompras}
-        linkClonar={"Finalizar Cadastro dos Produtos"}
-        onButtonClickClonar={handleFinalizarCadastroPedido}
+        linkClonar={"Pedido de Compra TXT"}
+        onButtonClickClonar={handleClickPedidoTXT}
         corClonar={"danger"}
-        IconClonar={FaCheck}
+        IconClonar={GrDocumentTxt}
         styleClonar={botoesVisiveis.clonar}
 
-        // ButtonTypeRetornar={ButtonType}
-        // linkRetornar={"Voltar"}
-        // onButtonClickRetornar={handleReturn}
-        // corRetornar={"danger"}
-        // IconRetornar={MdOutlineKeyboardReturn}
+        ButtonTypeRetornar={ButtonType}
+        linkRetornar={"Voltar"}
+        onButtonClickRetornar={handleReturn}
+        corRetornar={"danger"}
+        IconRetornar={MdOutlineKeyboardReturn}
         // styleRetornar
       />
       <ActionListaPedidos 
@@ -687,6 +658,16 @@ export const ActionEditarPedido = ({
           dadosDetalhePedido={dadosDetalhePedido}
         />
       )}
+
+      <ActionPDFPedido
+        show={modalPedidoNota}
+        handleClose={() => setModalPedidoNota(false)}
+        dadosPedidos={dadosPedidos}
+        dadosDetalhesPedidos={dadosDetalhesPedidos}
+      />
+
+      {console.log(modalPedidoNota, 'modal')}
+      {console.log(dadosPedidos, 'dadosPedidos')}
     </Fragment>
   )
 }
