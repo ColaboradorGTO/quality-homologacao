@@ -11,6 +11,7 @@ import { IoMdAdd, IoMdCheckmark } from "react-icons/io"
 import { ActionCadastrarModal } from "../Solicitar/CadastrarSolicitacao/actionCadastrarModal"
 import { ActionListaAdiantamento } from "./actionListaAdiantamento"
 import { animacaoCarregamento, fecharAnimacaoCarregamento, foiCancelado } from "../../../../../utils/animationCarregamento"
+import { Departamentos } from "../../../../../../parceiro.json";
 
 export const ActionPesquisaAdiantamento = ({usuarioLogado, ID }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
@@ -18,6 +19,7 @@ export const ActionPesquisaAdiantamento = ({usuarioLogado, ID }) => {
   const [dataPesquisaFim, setDataPesquisaFim] = useState('');
   const [empresaSelecionada, setEmpresaSelecionada] = useState('');
   const [statusSelecionado, setStatusSelecionado] = useState('');
+  const [departamentoSelecionado, setDepartamentoSelecionado] = useState('')
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
   const [modal, setModal] = useState(false)
   
@@ -57,7 +59,7 @@ export const ActionPesquisaAdiantamento = ({usuarioLogado, ID }) => {
   );
   
   const fetchListaAdiantamento = async () => {
-    const urlBase = `/lista-adiantamento-departamento?idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&status=${statusSelecionado}`;
+    const urlBase = `/lista-adiantamento-departamento?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&status=${statusSelecionado}&departamento=${departamentoSelecionado}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
 
@@ -146,6 +148,18 @@ export const ActionPesquisaAdiantamento = ({usuarioLogado, ID }) => {
         onChangeInputFieldDTFim={(e) => setDataPesquisaFim(e.target.value)}
         onKeyDownInputFieldDTFim={handleKeyPress}
 
+        InputSelectMarcasComponent={InputSelectAction}
+        labelSelectMarcas="Selecione Departamentos"
+        optionsMarcas={[
+          {value: '', label: 'Selecione um Departamento'},
+          ...Departamentos.map((item) => ({
+            value: item.value,
+            label: item.label
+          }))
+        ]}
+        valueSelectMarca={departamentoSelecionado}
+        onChangeSelectMarcas={(e) => setDepartamentoSelecionado(e.value)}
+        // Departamentos
         InputSelectEmpresaComponent={InputSelectAction}
         onChangeSelectEmpresa={(e) => setStatusSelecionado(e.value)}
         valueSelectEmpresa={statusSelecionado}
@@ -156,7 +170,7 @@ export const ActionPesquisaAdiantamento = ({usuarioLogado, ID }) => {
             label: empresa.label,
           }))
         ]}
-        labelSelectEmpresa={"Empresa"}
+        labelSelectEmpresa={"Status"}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}
@@ -164,13 +178,11 @@ export const ActionPesquisaAdiantamento = ({usuarioLogado, ID }) => {
         corSearch={"primary"}
         IconSearch={AiOutlineSearch}
 
-        ButtonTypeCadastro={ButtonType}
-        linkNome={"Cadastrar"}
-        corCadastro={"success"}
-        onButtonClickCadastro={handleShowModal}
-        IconCadastro={IoMdAdd}
-
-
+        // ButtonTypeCadastro={ButtonType}
+        // linkNome={"Cadastrar"}
+        // corCadastro={"success"}
+        // onButtonClickCadastro={handleShowModal}
+        // IconCadastro={IoMdAdd}
       />
 
       <ActionListaAdiantamento

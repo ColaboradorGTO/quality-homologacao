@@ -39,62 +39,60 @@ export const ActionListaAdiantamento = ({
 
   const handlePrint = useReactToPrint({
     content: () => dataTableRef.current,
-    documentTitle: 'Adiantamento Salarial das Lojas',
+    documentTitle: 'Adiantamento Departamento',
 
   });
 
   const exportToPDF = () => {
     const doc = new jsPDF();
     doc.autoTable({
-      head: [['Nº', 'Empresa', 'Data Mov', 'Funcionário', 'CPF', 'Valor', 'Situação']],
+      head: [['Nº', 'Departamento', 'CNPJ Faturado', 'Rz. Social', 'Vr.Lançado', 'Decrição', 'Status', 'Possui Nota', 'Orçamento']],
       body: dados.map(item => [
         item.contador,
-        item.NOFANTASIA,
-        item.DTLANCAMENTO,
-        item.NOFUNCIONARIO,
-        item.NUCPF,
-        formatMoeda(item.VRVALORDESCONTO),
-        item.STATIVO === 'True' ? 'Ativo' : 'Cancelado',
+        item.DEPARTAMENTO,
+        item.CNPJFATURAMENTO,
+        item.RAZAOSOCIALFATURAMENTO,
+        formatMoeda(item.VRSOLICITADO),
+        item.DESCRICAO,
+        item.STATUS,
+        item.POSSUINOTAFISCAL == 'True' ? 'SIM' : 'NÃO',
+        item.ANEXOORCAMENTO ? 'SIM' : 'NÃO'
       ]),
       horizontalPageBreak: true,
       horizontalPageBreakBehaviour: 'immediately'
     });
-    doc.save('adiantamento_salarial.pdf');
+    doc.save('adiantamento_departamento.pdf');
   };
 
   const exportToExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(dadosExcel);
+    const worksheet = XLSX.utils.json_to_sheet(dados.map(item => ({
+      'Nº': item.contador,
+      'Departamento': item.DEPARTAMENTO,
+      'CNPJ Faturado': item.CNPJFATURAMENTO,
+      'Rz. Social': item.RAZAOSOCIALFATURAMENTO,
+      'Vr.Lançado': formatMoeda(item.VRSOLICITADO),
+      'Decrição': item.DESCRICAO,
+      'Status': item.STATUS,
+      'Possui Nota': item.POSSUINOTAFISCAL == 'True' ? 'SIM' : 'NÃO',
+      'Orçamento': item.ANEXOORCAMENTO ? 'SIM' : 'NÃO'
+    })));
     const workbook = XLSX.utils.book_new();
-    const header = ['Nº', 'Empresa', 'Data Mov', 'Funcionário', 'CPF', 'Valor', 'Situação'];
+    const header = ['Nº', 'Departamento', 'CNPJ Faturado', 'Rz. Social', 'Vr.Lançado', 'Descrição', 'Status', 'Possui Nota', 'Orçamento'];
     worksheet['!cols'] = [
       { wpx: 50, caption: 'Nº' },
-      { wpx: 200, caption: 'Empresa' },
-      { wpx: 100, caption: 'Data Mov' },
-      { wpx: 250, caption: 'Funcionário' },
-      { wpx: 100, caption: 'CPF' },
-      { wpx: 100, caption: 'Valor' },
-      { wpx: 100, caption: 'Situação' },
+      { wpx: 100, caption: 'Departamento' },
+      { wpx: 100, caption: 'CNPJ Faturado' },
+      { wpx: 200, caption: 'Rz. Social' },
+      { wpx: 100, caption: 'Vr.Lançado' },
+      { wpx: 100, caption: 'Descrição' },
+      { wpx: 100, caption: 'Status' },
+      { wpx: 100, caption: 'Possui Nota' },
+      { wpx: 100, caption: 'Orçamento' },
     ];
     XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Adiantamento Salarial das Lojas');
-    XLSX.writeFile(workbook, 'adiantamento_salarial.xlsx');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Adiantamento Departamento');
+    XLSX.writeFile(workbook, 'adiantamento_departamento.xlsx');
   };
-
-
-  const dadosExcel = dadosAdiantamentos.map((item, index) => {
-    let contador = index + 1;
-
-    return {
-      contador,
-      NOFANTASIA: item.NOFANTASIA,
-      DTLANCAMENTO: item.DTLANCAMENTO,
-      NOFUNCIONARIO: item.NOFUNCIONARIO,
-      NUCPF: item.NUCPF,
-      VRVALORDESCONTO: item.VRVALORDESCONTO,
-      STATIVO: item.STATIVO === 'True' ? 'Ativo' : 'Cancelado',
-
-    }
-  });
 
   const arraySituacao = [
     { color: '#2196F3', txt: 'Pronto para Integrar SAP' },
@@ -114,20 +112,9 @@ export const ActionListaAdiantamento = ({
 
   const dados = dadosAdiantamentos.map((item, index) => {
     let contador = index + 1;
-    const idMovAdiantamento = item?.IDADIANTAMENTOSALARIO;
-    const stAdiantamento = item?.STATIVO === 'True';
-    const stMigrado = Number(item?.DOCENTRY_SAP_CONTAS_A_PAGAR || 0) > 0;
-    const logErrorIntegracao = item?.ERROR_LOG_SAP || '';
-    const stAguardandoEmFila = item?.STATUS_BLOQUEIO_ATUALIZACAO === 'True';
-    const indexSituacao = !stAdiantamento ? 4 : logErrorIntegracao.length ? 3 : stMigrado ? 2 : stAguardandoEmFila ? 1 : 0;
-    const colorSitucao = arraySituacao[indexSituacao].color;
 
-    const msgTitleIntegracao = (logErrorIntegracao.length) ? 'MOTIVO:' : arraySituacao[indexSituacao].txt
-    const msgTextIntegracao = logErrorIntegracao || arrayMsgStatusIntegracao[indexSituacao];
-    const txtSituacao = arraySituacao[indexSituacao].txt;
-
-    const tagStAdiantamento = `<span class="text-${colorSitucao} fw-900">${txtSituacao}</span>`;
     return {
+      contador,
       IDADIANTAMENTO: item.IDADIANTAMENTO,
       DEPARTAMENTO: item.DEPARTAMENTO,
       NUCNPJEMPRESA: item.NUCNPJEMPRESA,
@@ -146,11 +133,6 @@ export const ActionListaAdiantamento = ({
       DATAALTERACAO: item.DATAALTERACAO,
       DATAFINALIZACAO: item.DATAFINALIZACAO,
       STATIVO: item.STATIVO,
-      tagStAdiantamento,
-      colorSitucao,
-      msgTitleIntegracao,
-      msgTextIntegracao,
-      txtSituacao
     }
   });
 
@@ -233,12 +215,12 @@ export const ActionListaAdiantamento = ({
                 width="35px"
                 height="35px"
                 onClickButton={() => handleComprovantePagamento(row.IDADIANTAMENTO)}
-                // disabledBTN={!anexoNotaFiscal}
+              // disabledBTN={!anexoNotaFiscal}
               />
 
-          
+
             </div>
-     
+
             <div className="p-1">
               <ButtonTable
                 titleButton={"Editar"}
@@ -252,97 +234,54 @@ export const ActionListaAdiantamento = ({
             </div>
           </div>
         )
-    
+
       },
     },
   ]
 
-   async function exportarAnexo(caminhoArquivo) {
-      if (!caminhoArquivo) {
-          Swal.fire({
-              position: 'center',
-              icon: 'info',
-              title: 'Nenhum arquivo anexado.',
-              showConfirmButton: false,
-              timer: 3000,
-              customClass: { container: 'custom-swal' },
-          });
-          return;
-      }
+  async function exportarAnexo(caminhoArquivo) {
+    if (!caminhoArquivo) {
+      Swal.fire({
+        position: 'center',
+        icon: 'info',
+        title: 'Nenhum arquivo anexado.',
+        showConfirmButton: false,
+        timer: 3000,
+        customClass: { container: 'custom-swal' },
+      });
+      return;
+    }
 
-      const url = caminhoArquivo.startsWith('/files/')
-          ? `${BASE_URL}${caminhoArquivo}`
-          : `${BASE_URL}/download-anexo-adiantamento?path=${encodeURIComponent(caminhoArquivo)}`;
+    const url = caminhoArquivo.startsWith('/files/')
+      ? `${BASE_URL}${caminhoArquivo}`
+      : `${BASE_URL}/download-anexo-adiantamento?path=${encodeURIComponent(caminhoArquivo)}`;
 
-      try {
-          const response = await fetch(url);
+    try {
+      const response = await fetch(url);
 
-          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-          const blob = await response.blob();
-          const nomeArquivo = caminhoArquivo.substring(caminhoArquivo.lastIndexOf('/') + 1).replace(/^\d+-/, '');
+      const blob = await response.blob();
+      const nomeArquivo = caminhoArquivo.substring(caminhoArquivo.lastIndexOf('/') + 1).replace(/^\d+-/, '');
 
-          const blobUrl = URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = blobUrl;
-          link.download = nomeArquivo;
-          link.click();
-          URL.revokeObjectURL(blobUrl);
-      } catch (error) {
-          console.error('Erro ao baixar anexo:', error);
-          Swal.fire({
-              position: 'center',
-              icon: 'error',
-              title: 'Não foi possível baixar o arquivo. Por favor, tente novamente.',
-              showConfirmButton: false,
-              timer: 3000,
-              customClass: { container: 'custom-swal' },
-          });
-      }
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = nomeArquivo;
+      link.click();
+      URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error('Erro ao baixar anexo:', error);
+      Swal.fire({
+        position: 'center',
+        icon: 'error',
+        title: 'Não foi possível baixar o arquivo. Por favor, tente novamente.',
+        showConfirmButton: false,
+        timer: 3000,
+        customClass: { container: 'custom-swal' },
+      });
+    }
   }
-
-  const handleExportarComprovante = () => exportarAnexo(anexoComprovante);
-
-
-  const handleClickAtivar = (row) => {
-    if (optionsModulos[0]?.ALTERAR == 'True') {
-      if (row && row.IDADIANTAMENTOSALARIO) {
-        handleAtivar(row.IDADIANTAMENTOSALARIO);
-      }
-    } else {
-      Swal.fire({
-        position: 'center',
-        icon: 'error',
-        title: 'Acesso Negado!',
-        text: 'Você não tem permissão para editar esta despesa.',
-        showConfirmButton: false,
-        timer: 1500,
-        customClass: {
-          container: 'custom-swal',
-        }
-      })
-    }
-  };
-
-  const handleClickCancelar = (row) => {
-    if (optionsModulos[0]?.ALTERAR == 'True') {
-      if (row && row.IDADIANTAMENTOSALARIO) {
-        handleCancelar(row.IDADIANTAMENTOSALARIO);
-      }
-    } else {
-      Swal.fire({
-        position: 'center',
-        icon: 'error',
-        title: 'Acesso Negado!',
-        text: 'Você não tem permissão para editar esta despesa.',
-        showConfirmButton: false,
-        timer: 1500,
-        customClass: {
-          container: 'custom-swal',
-        }
-      })
-    }
-  };
 
   const handleComprovantePagamento = async (IDADIANTAMENTO) => {
     try {
@@ -485,7 +424,7 @@ export const ActionListaAdiantamento = ({
           </DataTable>
         </div>
 
-        <ActionEditarModal 
+        <ActionEditarModal
           show={modalEditarVisivel}
           handleClose={() => setModalEditarVisivel(false)}
           dadosDetalheAdiantamento={dadosDetalheAdiantamento}

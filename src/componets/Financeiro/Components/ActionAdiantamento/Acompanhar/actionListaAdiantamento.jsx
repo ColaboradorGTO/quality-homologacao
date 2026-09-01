@@ -15,6 +15,7 @@ import { MdEdit } from "react-icons/md";
 import { ActionEditarModal } from "./EditarSolicitacao/actionEditarModal";
 import { get } from "../../../../../api/funcRequest";
 import { ActionPagamentoModal } from "../Pagamento/actionPagamentoModal";
+import { useExportarTabela } from "../../../../../hooks/useExportarTabela";
 
 
 export const ActionListaAdiantamento = ({
@@ -23,13 +24,13 @@ export const ActionListaAdiantamento = ({
   usuarioLogado,
   handleClick
 }) => {
-  const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowSelection, setRowSelection] = useState(null);
   const [dadosDetalheAdiantamento, setDadosDetalheAdiantamento] = useState([]);
   const [modalEditarVisivel, setModalEditarVisivel] = useState(false);
   const [modalPagamento, setModalPagamento] = useState(false);
   
-
+  
+  const [globalFilterValue, setGlobalFilterValue] = useState('');
   const dataTableRef = useRef();
 
   const onGlobalFilterChange = (e) => {
@@ -38,62 +39,60 @@ export const ActionListaAdiantamento = ({
 
   const handlePrint = useReactToPrint({
     content: () => dataTableRef.current,
-    documentTitle: 'Adiantamento Salarial das Lojas',
+    documentTitle: 'Adiantamento Departamento',
 
   });
 
   const exportToPDF = () => {
     const doc = new jsPDF();
     doc.autoTable({
-      head: [['Nº', 'Empresa', 'Data Mov', 'Funcionário', 'CPF', 'Valor', 'Situação']],
+      head: [['Nº', 'Departamento', 'CNPJ Faturado', 'Rz. Social', 'Vr.Lançado', 'Decrição', 'Status', 'Possui Nota', 'Orçamento']],
       body: dados.map(item => [
         item.contador,
-        item.NOFANTASIA,
-        item.DTLANCAMENTO,
-        item.NOFUNCIONARIO,
-        item.NUCPF,
-        formatMoeda(item.VRVALORDESCONTO),
-        item.STATIVO === 'True' ? 'Ativo' : 'Cancelado',
+        item.DEPARTAMENTO,
+        item.CNPJFATURAMENTO,
+        item.RAZAOSOCIALFATURAMENTO,
+        formatMoeda(item.VRSOLICITADO),
+        item.DESCRICAO,
+        item.STATUS,
+        item.POSSUINOTAFISCAL == 'True' ? 'SIM' : 'NÃO',
+        item.ANEXOORCAMENTO  ? 'SIM' : 'NÃO'
       ]),
       horizontalPageBreak: true,
       horizontalPageBreakBehaviour: 'immediately'
     });
-    doc.save('adiantamento_salarial.pdf');
+    doc.save('adiantamento_departamento.pdf');
   };
 
   const exportToExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(dadosExcel);
+    const worksheet = XLSX.utils.json_to_sheet(dados.map(item => ({
+      'Nº': item.contador,
+      'Departamento': item.DEPARTAMENTO,
+      'CNPJ Faturado': item.CNPJFATURAMENTO,
+      'Rz. Social': item.RAZAOSOCIALFATURAMENTO,
+      'Vr.Lançado':  formatMoeda(item.VRSOLICITADO),
+      'Decrição': item.DESCRICAO,
+      'Status': item.STATUS,
+      'Possui Nota': item.POSSUINOTAFISCAL == 'True' ? 'SIM' : 'NÃO',
+      'Orçamento': item.ANEXOORCAMENTO  ? 'SIM' : 'NÃO'
+    })));
     const workbook = XLSX.utils.book_new();
-    const header = ['Nº', 'Empresa', 'Data Mov', 'Funcionário', 'CPF', 'Valor', 'Situação'];
+    const header = ['Nº', 'Departamento', 'CNPJ Faturado', 'Rz. Social', 'Vr.Lançado', 'Descrição', 'Status', 'Possui Nota', 'Orçamento'];
     worksheet['!cols'] = [
       { wpx: 50, caption: 'Nº' },
-      { wpx: 200, caption: 'Empresa' },
-      { wpx: 100, caption: 'Data Mov' },
-      { wpx: 250, caption: 'Funcionário' },
-      { wpx: 100, caption: 'CPF' },
-      { wpx: 100, caption: 'Valor' },
-      { wpx: 100, caption: 'Situação' },
+      { wpx: 100, caption: 'Departamento' },
+      { wpx: 100, caption: 'CNPJ Faturado' },
+      { wpx: 200, caption: 'Rz. Social' },
+      { wpx: 100, caption: 'Vr.Lançado' },
+      { wpx: 100, caption: 'Descrição' },
+      { wpx: 100, caption: 'Status' },
+      { wpx: 100, caption: 'Possui Nota' },
+      { wpx: 100, caption: 'Orçamento' },
     ];
     XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Adiantamento Salarial das Lojas');
-    XLSX.writeFile(workbook, 'adiantamento_salarial.xlsx');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Adiantamento Departamento');
+    XLSX.writeFile(workbook, 'adiantamento_departamento.xlsx');
   };
-
-
-  const dadosExcel = dadosAdiantamentos.map((item, index) => {
-    let contador = index + 1;
-
-    return {
-      contador,
-      NOFANTASIA: item.NOFANTASIA,
-      DTLANCAMENTO: item.DTLANCAMENTO,
-      NOFUNCIONARIO: item.NOFUNCIONARIO,
-      NUCPF: item.NUCPF,
-      VRVALORDESCONTO: item.VRVALORDESCONTO,
-      STATIVO: item.STATIVO === 'True' ? 'Ativo' : 'Cancelado',
-
-    }
-  });
 
   const arraySituacao = [
     { color: '#2196F3', txt: 'Pronto para Integrar SAP' },
@@ -113,19 +112,7 @@ export const ActionListaAdiantamento = ({
 
   const dados = dadosAdiantamentos.map((item, index) => {
     let contador = index + 1;
-    const idMovAdiantamento = item?.IDADIANTAMENTOSALARIO;
-    const stAdiantamento = item?.STATIVO === 'True';
-    const stMigrado = Number(item?.DOCENTRY_SAP_CONTAS_A_PAGAR || 0) > 0;
-    const logErrorIntegracao = item?.ERROR_LOG_SAP || '';
-    const stAguardandoEmFila = item?.STATUS_BLOQUEIO_ATUALIZACAO === 'True';
-    const indexSituacao = !stAdiantamento ? 4 : logErrorIntegracao.length ? 3 : stMigrado ? 2 : stAguardandoEmFila ? 1 : 0;
-    const colorSitucao = arraySituacao[indexSituacao].color;
 
-    const msgTitleIntegracao = (logErrorIntegracao.length) ? 'MOTIVO:' : arraySituacao[indexSituacao].txt
-    const msgTextIntegracao = logErrorIntegracao || arrayMsgStatusIntegracao[indexSituacao];
-    const txtSituacao = arraySituacao[indexSituacao].txt;
-
-    const tagStAdiantamento = `<span class="text-${colorSitucao} fw-900">${txtSituacao}</span>`;
     return {
       contador,
       IDADIANTAMENTO: item.IDADIANTAMENTO,
@@ -146,17 +133,12 @@ export const ActionListaAdiantamento = ({
       DATAALTERACAO: item.DATAALTERACAO,
       DATAFINALIZACAO: item.DATAFINALIZACAO,
       STATIVO: item.STATIVO,
-      tagStAdiantamento,
-      colorSitucao,
-      msgTitleIntegracao,
-      msgTextIntegracao,
-      txtSituacao
     }
   });
 
 
 
-  const colunasAdiantamentos = [
+  const colunasExportacao = [
     {
       field: 'contador',
       header: 'Nº',
@@ -187,12 +169,6 @@ export const ActionListaAdiantamento = ({
       field: 'VRSOLICITADO',
       header: 'Vr Lançado',
       body: row => <th style={{ color: 'blue' }}>{formatMoeda(row.VRSOLICITADO)}</th>,
-      sortable: true,
-    },
-    {
-      field: 'RAZAOSOCIALFATURAMENTO',
-      header: 'Rz. Social',
-      body: row => <th style={{ color: 'blue',  }}>{row.RAZAOSOCIALFATURAMENTO}</th>,
       sortable: true,
     },
     {
@@ -287,6 +263,7 @@ export const ActionListaAdiantamento = ({
     },
   ]
 
+
   const handleClickAprovar = (row) => {
     if (optionsModulos[0]?.ALTERAR == 'True') {
       if (row && row.IDADIANTAMENTO) {
@@ -327,26 +304,6 @@ export const ActionListaAdiantamento = ({
       }
     } catch (error) {
       console.error('Erro ao buscar detalhe conta bancária: ', error);
-    }
-  };
-
-  const handleClickCancelar = (row) => {
-    if (optionsModulos[0]?.ALTERAR == 'True') {
-      if (row && row.IDADIANTAMENTOSALARIO) {
-        handleCancelar(row.IDADIANTAMENTOSALARIO);
-      }
-    } else {
-      Swal.fire({
-        position: 'center',
-        icon: 'error',
-        title: 'Acesso Negado!',
-        text: 'Você não tem permissão para editar esta despesa.',
-        showConfirmButton: false,
-        timer: 1500,
-        customClass: {
-          container: 'custom-swal',
-        }
-      })
     }
   };
 
@@ -401,7 +358,7 @@ export const ActionListaAdiantamento = ({
     <Fragment>
       <div className="panel" >
         <div className="panel-hdr">
-          <h2>Adiantamentos</h2>
+          <h2>Acompanhar Adiantamentos</h2>
         </div>
         <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
           <HeaderTable
@@ -435,7 +392,7 @@ export const ActionListaAdiantamento = ({
             stripedRows
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado </div>}
           >
-            {colunasAdiantamentos.map(coluna => (
+            {colunasExportacao.map(coluna => (
               <Column
                 key={coluna.field}
                 field={coluna.field}
