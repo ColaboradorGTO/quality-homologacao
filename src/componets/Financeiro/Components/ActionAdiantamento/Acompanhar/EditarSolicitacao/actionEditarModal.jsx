@@ -26,8 +26,8 @@ export const ActionEditarModal = ({
         aria-hidden="true"
       >
         <HeaderModal
-          title={"Solicitação de Pagamento"}
-          subTitle={"Solicitação de Pagamento"}
+          title={"Solicitação de Adiantamento"}
+          subTitle={"Edição de Adiantamento"}
           handleClose={handleClose}
         />
        

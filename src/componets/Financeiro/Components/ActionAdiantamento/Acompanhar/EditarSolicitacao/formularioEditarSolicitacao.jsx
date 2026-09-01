@@ -78,12 +78,12 @@ export const Formulario = ({
         vrFaturamento: vrAdiantamento,
         descricaoFaturamento: descricao,
         possuiNotaFiscalFaturamento: possuiNota,
-        notaFiscalFaturamento: notaFiscal
+       
       }
-
+      
       await schema.validate(dadosParaValidar, { abortEarly: false });
 
-      onSubmit();
+      await onSubmit();
 
     } catch (validationError) {
       clearErrors();

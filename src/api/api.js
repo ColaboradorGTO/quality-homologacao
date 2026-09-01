@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export  const BASE_URL = "https://quality-api-homologacao.vercel.app/";
+export const BASE_URL = "https://quality-api-homologacao.vercel.app/";
   // export const BASE_URL = "http://localhost:6001";
 
 const axiosInstance = axios.create({

@@ -44,6 +44,12 @@ export const useEditarAdiantamento = ({
         {enabled: true, cacheTime: 60 * 60 * 1000,}
     );
 
+    const optionsAndamento = [
+        {value: 'APROVADO', label: 'APROVADO' },
+        {value: 'REPROVADO', label: 'REPROVADO' },
+        {value: 'PENDENTE', label: 'PENDENTE' }
+    ]
+
     useEffect(() => {   
         if(dadosDetalheAdiantamento.length && dadosDetalheAdiantamento.length > 0) {
             const departamentoEcontrado = Departamentos?.find(item => String(item.value) == String(dadosDetalheAdiantamento[0]?.DEPARTAMENTO))
@@ -68,10 +74,15 @@ export const useEditarAdiantamento = ({
             setAnexoOrcamento(dadosDetalheAdiantamento[0]?.ANEXOORCAMENTO || '')
             setAnexoNotaFiscal(dadosDetalheAdiantamento[0]?.ANEXONOTAFISCAL || '')
             setProposta(dadosDetalheAdiantamento[0]?.DSJUSTIFICATIVA || '')
+            const statusEncontrado = optionsAndamento?.find(item => String(item.value) == String(dadosDetalheAdiantamento[0]?.STATUS))
+            setStatatusSelecionado(
+                statusEncontrado ? { value: statusEncontrado.value, label: statusEncontrado.label } : null
+            )
         }
     }, [
         dadosDetalheAdiantamento,
-        Departamentos
+        Departamentos,
+        optionsEmpresas
     ])
 
     const handleEmpresaChange = (selected) => {
@@ -250,11 +261,7 @@ export const useEditarAdiantamento = ({
     const handleExportarOrcamento = () => exportarAnexo(anexoOrcamento);
     const handleExportarNotaFiscal = () => exportarAnexo(anexoNotaFiscal);
 
-    const optionsAndamento = [
-        {value: 'APROVADO', label: 'APROVADO' },
-        {value: 'REPROVADO', label: 'REPROVADO' },
-        {value: 'PENDENTE', label: 'PENDENTE' }
-    ]
+
     const onSubmit = async (data) => {
         if (optionsModulos[0]?.CRIAR == 'False') {
             Swal.fire({
@@ -313,6 +320,7 @@ export const useEditarAdiantamento = ({
             IDUSUARIOALTERACAO: usuarioLogado?.id
         }
 
+       
         try {
 
             const response = await put('/adiantamento-departamento/:id', postData)
@@ -335,7 +343,7 @@ export const useEditarAdiantamento = ({
                 },
             })
 
-            // handleClick();
+            handleClick();
             handleClose();
             return response.data;
 

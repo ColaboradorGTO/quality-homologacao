@@ -29,6 +29,7 @@ export const useAutorizarPagamento = ({
     const [observacao, setObservacao] = useState('')
     const [empresaSelecionada, setEmpresaSelecionada] = useState('')
     const [statusPagamento, setStatusPagamento] = useState('')
+    const [razaoSocial, setRazaoSocial] = useState('')
 
     const { data: optionsEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas } = useQuery(
         ['empresas', ],
@@ -47,6 +48,9 @@ export const useAutorizarPagamento = ({
             setEmpresaSelecionada(
                 empresaEncontrada ? { value: empresaEncontrada.IDEMPRESA, label: empresaEncontrada.NOFANTASIA } : null
             )
+             setRazaoSocial(empresaEncontrada?.NORAZAOSOCIAL || '');
+             console.log(empresaEncontrada, 'empresa')
+            setObservacao(dadosDetalheAdiantamento[0]?.DSJUSTIFICATIVA)
         }
     }, [optionsEmpresas, dadosDetalheAdiantamento])
 
@@ -265,6 +269,8 @@ export const useAutorizarPagamento = ({
         handleEmpresaChange,
         statusPagamento,
         setStatusPagamento,
+        razaoSocial,
+        setRazaoSocial,
         optionsFormaPagamento,
         optionsEmpresas,
         onSubmit,

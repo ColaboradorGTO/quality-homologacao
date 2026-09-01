@@ -21,6 +21,7 @@ export const ActionListaAdiantamento = ({
   dadosAdiantamentos,
   optionsModulos,
   usuarioLogado,
+  handleClick
 }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowSelection, setRowSelection] = useState(null);
@@ -209,7 +210,7 @@ export const ActionListaAdiantamento = ({
       header: 'Status',
       body: row => (
         <th style={{ 
-          color: row.STATUS == 'PAGO' ? '#1DC9B7' : row.STATUS == 'AGUARDANDO FINANCEIRO' ? 'blue' : '#FD1381', 
+          color: row.STATUS == 'PAGO' ? '#1DC9B7' : row.STATUS == 'AGUARDANDO FINANCEIRO' ? 'blue' : row.STATUS == 'APROVADO' ? 'blue' : '#FD1381', 
      
         }}>
 
@@ -454,6 +455,7 @@ export const ActionListaAdiantamento = ({
         <ActionEditarModal 
           show={modalEditarVisivel}
           handleClose={() => setModalEditarVisivel(false)}
+          handleClick={handleClick}
           dadosDetalheAdiantamento={dadosDetalheAdiantamento}
           optionsModulos={optionsModulos}
           usuarioLogado={usuarioLogado}
@@ -462,6 +464,7 @@ export const ActionListaAdiantamento = ({
         <ActionPagamentoModal
           show={modalPagamento}
           handleClose={() => setModalPagamento(false)}
+          handleClick={handleClick}
           dadosDetalheAdiantamento={dadosDetalheAdiantamento}
           optionsModulos={optionsModulos}
           usuarioLogado={usuarioLogado}

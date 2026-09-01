@@ -177,6 +177,7 @@ export const ActionPesquisaAdiantamento = ({usuarioLogado, ID }) => {
         dadosAdiantamentos={dadosAdiantamentos}
         optionsModulos={optionsModulos}
         usuarioLogado={usuarioLogado}
+        handleClick={handleClick}
       />
     
       <ActionCadastrarModal 

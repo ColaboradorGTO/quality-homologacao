@@ -32,6 +32,8 @@ export const Formulario = ({
     empresaSelecionada,
     statusPagamento,
     setStatusPagamento,
+    razaoSocial,
+    setRazaoSocial,
     handleUploadComprovante,
     handleExportarOrcamento,
     handleExportarNotaFiscal,
@@ -48,9 +50,9 @@ export const Formulario = ({
       const dadosParaValidar = {
         valorPagamentoDigitado: valorPagamento,
         dataPagamentoSelecionada: dataPagamento,
-        formaPagamentoSelecionada: formaPagamento,
         anexoComprovanteAnexado: anexoComprovante,
         observacaoDigitada: observacao
+        // formaPagamentoSelecionada: formaPagamento,
       }
 
       await schema.validate(dadosParaValidar, { abortEarly: false });
@@ -78,7 +80,7 @@ export const Formulario = ({
 
   const optionsStatus = [
     {value: 'PAGO', label: 'PAGO'},
-    {value: 'RECUSADO', label: 'RECUSADO'}
+    {value: 'REPROVADO FINANCEIRO', label: 'REPROVADO FINANCEIRO'}
   ]
   return (
     <Fragment>
@@ -143,11 +145,37 @@ export const Formulario = ({
                   )}
                 />
             </div>
-            <div className="col-sm-6 col-xl-3 d-flex align-items-end" style={{ gap: '8px' }}>
+            <div className="col-sm-6 col-xl-3">
+
+                <Controller
+                  name="cnpjSolicitante"
+                  control={control}
+                  render={({ field }) => (
+                    <FormField
+                      label={"Razão Social"}
+                      name="cnpjSolicitante"
+                      type="text"
+                      value={razaoSocial}
+                      // onChange={(e) => setCnpj(e.target.value)}
+                      readOnly={true}
+                      errors={errors}
+                      clearErrors={clearErrors}
+                    />
+
+                  )}
+                />
+            </div>
+          </div>
+        </div>
+        <div className="form-group">
+
+          <div className="row">
+
+            <div className="col-sm-6 col-xl-6 d-flex align-items-end" style={{ gap: '8px' }}>
               <ButtonTypeModal
                 textButton={"Exportar Orçamento"}
                 tipo={"button"}
-                cor={"info"}
+                cor={"primary"}
                 buttonDisabled={!dadosAdiantamento?.ANEXOORCAMENTO}
                 onClickButtonType={handleExportarOrcamento}
               />
@@ -208,6 +236,7 @@ export const Formulario = ({
                 className="basic-single"
                 classNamePrefix="select"
                 name="formaPagamentoSelecionada"
+                defaultValue={''}
                 value={formaPagamento}
                 options={optionsFormaPagamento}
                 onChange={(e) => {
