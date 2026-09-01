@@ -10,10 +10,11 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import Swal from "sweetalert2";
-import { IoMdClose } from "react-icons/io";
+import { IoMdClose, IoMdDownload } from "react-icons/io";
 import { MdEdit } from "react-icons/md";
 import { ActionEditarModal } from "./EditarSolicitacao/actionEditarModal";
 import { get } from "../../../../../api/funcRequest";
+import { BASE_URL } from "../../../../../api/api";
 
 
 export const ActionListaAdiantamento = ({
@@ -24,7 +25,9 @@ export const ActionListaAdiantamento = ({
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowSelection, setRowSelection] = useState(null);
   const [dadosDetalheAdiantamento, setDadosDetalheAdiantamento] = useState([]);
+  const [dadosDetalhePagamento, setDadosDetalhePagamento] = useState([]);
   const [modalEditarVisivel, setModalEditarVisivel] = useState(false);
+  const [anexoComprovante, setAnexoComprovante] = useState('')
   const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(10);
 
@@ -223,26 +226,19 @@ export const ActionListaAdiantamento = ({
           >
             <div className="p-1">
               <ButtonTable
-                titleButton={"Aprovar"}
+                titleButton={"Exporta Comprovante"}
                 cor={"success"}
-                Icon={FaCheck}
+                Icon={IoMdDownload}
                 iconSize={20}
                 width="35px"
                 height="35px"
-                onClickButton={() => handleClickAtivar(row)}
+                onClickButton={() => handleComprovantePagamento(row.IDADIANTAMENTO)}
+                // disabledBTN={!anexoNotaFiscal}
               />
+
+          
             </div>
-            <div className="p-1">
-              <ButtonTable
-                titleButton={"Reprovar"}
-                cor={"danger"}
-                Icon={IoMdClose}
-                iconSize={20}
-                width="35px"
-                height="35px"
-                onClickButton={() => handleClickAtivar(row)}
-              />
-            </div>
+     
             <div className="p-1">
               <ButtonTable
                 titleButton={"Editar"}
@@ -260,6 +256,53 @@ export const ActionListaAdiantamento = ({
       },
     },
   ]
+
+   async function exportarAnexo(caminhoArquivo) {
+      if (!caminhoArquivo) {
+          Swal.fire({
+              position: 'center',
+              icon: 'info',
+              title: 'Nenhum arquivo anexado.',
+              showConfirmButton: false,
+              timer: 3000,
+              customClass: { container: 'custom-swal' },
+          });
+          return;
+      }
+
+      const url = caminhoArquivo.startsWith('/files/')
+          ? `${BASE_URL}${caminhoArquivo}`
+          : `${BASE_URL}/download-anexo-adiantamento?path=${encodeURIComponent(caminhoArquivo)}`;
+
+      try {
+          const response = await fetch(url);
+
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+          const blob = await response.blob();
+          const nomeArquivo = caminhoArquivo.substring(caminhoArquivo.lastIndexOf('/') + 1).replace(/^\d+-/, '');
+
+          const blobUrl = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = blobUrl;
+          link.download = nomeArquivo;
+          link.click();
+          URL.revokeObjectURL(blobUrl);
+      } catch (error) {
+          console.error('Erro ao baixar anexo:', error);
+          Swal.fire({
+              position: 'center',
+              icon: 'error',
+              title: 'Não foi possível baixar o arquivo. Por favor, tente novamente.',
+              showConfirmButton: false,
+              timer: 3000,
+              customClass: { container: 'custom-swal' },
+          });
+      }
+  }
+
+  const handleExportarComprovante = () => exportarAnexo(anexoComprovante);
+
 
   const handleClickAtivar = (row) => {
     if (optionsModulos[0]?.ALTERAR == 'True') {
@@ -298,6 +341,45 @@ export const ActionListaAdiantamento = ({
           container: 'custom-swal',
         }
       })
+    }
+  };
+
+  const handleComprovantePagamento = async (IDADIANTAMENTO) => {
+    try {
+      const response = await get(`/pagamento-adiantamento?idAdiantamento=${IDADIANTAMENTO}`);
+
+      if (response.data && response.data.length > 0) {
+        setDadosDetalhePagamento(response.data);
+
+        const pagamentoComAnexo = response.data.find(item => item.ANEXOCOMPROVANTE);
+
+        if (!pagamentoComAnexo) {
+          Swal.fire({
+            position: 'center',
+            icon: 'info',
+            title: 'Nenhum comprovante anexado para este adiantamento.',
+            showConfirmButton: false,
+            timer: 3000,
+            customClass: { container: 'custom-swal' },
+          });
+          return;
+        }
+
+        setAnexoComprovante(pagamentoComAnexo.ANEXOCOMPROVANTE);
+        await exportarAnexo(pagamentoComAnexo.ANEXOCOMPROVANTE);
+      } else {
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: 'Detalhes da conta bancária não encontrados.',
+          customClass: {
+            container: 'custom-swal',
+          }
+        });
+        return;
+      }
+    } catch (error) {
+      console.error('Erro ao buscar detalhe conta bancária: ', error);
     }
   };
 

@@ -9,7 +9,7 @@ import { AiOutlineSearch } from "react-icons/ai"
 import { useQuery } from 'react-query';
 import { IoMdAdd, IoMdCheckmark } from "react-icons/io"
 import { ActionCadastrarModal } from "./CadastrarSolicitacao/actionCadastrarModal"
-import { ActionListaAdiantamento } from "./actionListaAdiantamento"
+import { ActionListaAdiantamento } from "./actionListaSolicitarAdiantamento"
 import { animacaoCarregamento, fecharAnimacaoCarregamento, foiCancelado } from "../../../../../utils/animationCarregamento"
 
 export const ActionPesquisaCriarAdiantamento = ({usuarioLogado, ID }) => {
