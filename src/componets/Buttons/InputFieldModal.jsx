@@ -1,20 +1,21 @@
 import { Fragment } from "react"
 import { useForm } from "react-hook-form"
 
-export const InputFieldModal = ({ 
+export const InputFieldModal = ({
   label,
   type,
   id,
-  nome, 
-  value, 
-  readOnly, 
-  placeholder, 
-  onChangeModal, 
+  nome,
+  value,
+  readOnly,
+  placeholder,
+  onChangeModal,
   onFocus,
   onBlur,
   styleInputFieldModal,
   min,
-  max
+  max,
+  accept
 
 }) => {
   const {
@@ -35,7 +36,7 @@ export const InputFieldModal = ({
           id={id}
           type={type}
           name={nome}
-          value={value}
+          {...(type !== 'file' ? { value } : {})}
           readOnly={readOnly}
           placeHolder={placeholder}
           onChange={onChangeModal}
@@ -44,6 +45,7 @@ export const InputFieldModal = ({
           style={styleInputFieldModal}
           min={min}
           max={max}
+          accept={accept}
         />
       </div>
     </Fragment>

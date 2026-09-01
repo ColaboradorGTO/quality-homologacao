@@ -147,63 +147,78 @@
   "Departamentos": [
     {
       "label": "Administrativo",
-      "value": "ADMINISTRATIVO"
+      "value": "ADMINISTRATIVO",
+      "id": 1
     },
     {
       "label": "Gerência",
-      "value": "GERENCIA"
+      "value": "GERENCIA",
+      "id": 2
     },
     {
       "label": "TI",
-      "value": "TI"
+      "value": "TI",
+      "id": 3
     },
     {
       "label": "Financeiro",
-      "value": "FINANCEIRO"
+      "value": "FINANCEIRO",
+      "id": 4
     },
     {
       "label": "Comercial",
-      "value": "COMERCIAL"
+      "value": "COMERCIAL",
+      "id": 5
     },
     {
       "label": "Compras",
-      "value": "COMPRAS"
+      "value": "COMPRAS",
+      "id": 6
     },
     {
       "label": "Contabilidade",
-      "value": "CONTABILIDADE"
+      "value": "CONTABILIDADE",
+      "id": 7
     },
     {
       "label": "Marketing",
-      "value": "MARKETING"
+      "value": "MARKETING",
+      "id": 8
     },
     {
       "label": "RH",
-      "value": "RH"
+      "value": "RH",
+      "id": 9
     },
     {
       "label": "Cadastro",
-      "value": "CADASTRO"
+      "value": "CADASTRO",
+      "id": 10
     },
     {
       "label": "CD",
-      "value": "CD"
+      "value": "CD",
+      "id": 11
     },
     {
       "label": "Controladoria",
-      "value": "CONTROLADORIA"
+      "value": "CONTROLADORIA",
+      "id": 12
     },
     {
       "label": "DP",
-      "value": "DP"
+      "value": "DP",
+      "id": 13
     },
     {
       "label": "Prevenção e Perdas",
-      "value": "PREVENCAOPERDAS"
+      "value": "PREVENCAOPERDAS",
+      "id": 14
     },
     {
       "label": "PSF",
-      "value": "PSF"
+      "value": "PSF",
+      "id": 15
     }
   ],
   "optionsQuebraDeCaixa": [
@@ -346,5 +361,9 @@
     { "value": "100137", "label": "100137 - ICMS Fundo Estadual de Combate à Pobreza por Apuração" },
     { "value": "100153", "label": "100153 - ICMS Monofásico por Operação" },
     { "value": "100161", "label": "100161 - ICMS Monofásico por Apuração" }
+  ],
+  "optionsNota": [
+    { "value": "65", "label": "NFC-e" },
+    { "value": "55", "label": "NF-e" }
   ]
 }
