@@ -8,11 +8,11 @@ import { getDataAtual } from "../../../../../utils/dataAtual"
 import { AiOutlineSearch } from "react-icons/ai"
 import { useQuery } from 'react-query';
 import { IoMdAdd, IoMdCheckmark } from "react-icons/io"
-import { ActionCadastrarModal } from "./CadastrarSolicitacao/actionCadastrarModal"
+import { ActionCadastrarModal } from "../Solicitar/CadastrarSolicitacao/actionCadastrarModal"
 import { ActionListaAdiantamento } from "./actionListaAdiantamento"
 import { animacaoCarregamento, fecharAnimacaoCarregamento, foiCancelado } from "../../../../../utils/animationCarregamento"
 
-export const ActionPesquisaCriarAdiantamento = ({usuarioLogado, ID }) => {
+export const ActionPesquisaAdiantamento = ({usuarioLogado, ID }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
   const [dataPesquisaFim, setDataPesquisaFim] = useState('');
@@ -131,8 +131,8 @@ export const ActionPesquisaCriarAdiantamento = ({usuarioLogado, ID }) => {
 
       <ActionMain
         linkComponentAnterior={["Home"]}
-        linkComponent={["Adiantamento Salarial"]}
-        title="Adiantamentos Departamentos"
+        linkComponent={["Adiantamentos Departamentos"]}
+        title="Acompanhar Adiantamentos"
         
         InputFieldDTInicioComponent={InputField}
         valueInputFieldDTInicio={dataPesquisaInicio}
