@@ -270,7 +270,7 @@ export const ActionListaAdiantamento = ({
         position: 'center',
         icon: 'error',
         title: 'Acesso Negado!',
-        text: 'Você não tem permissão para editar esta despesa.',
+        text: 'Você não tem permissão.',
         showConfirmButton: false,
         timer: 1500,
         customClass: {
@@ -291,7 +291,7 @@ export const ActionListaAdiantamento = ({
         Swal.fire({
           position: 'center',
           icon: 'error',
-          title: 'Detalhes da conta bancária não encontrados.',
+          title: 'Detalhes não encontrados.',
           customClass: {
             container: 'custom-swal',
           }
@@ -299,7 +299,7 @@ export const ActionListaAdiantamento = ({
         return;
       }
     } catch (error) {
-      console.error('Erro ao buscar detalhe conta bancária: ', error);
+      console.error('Erro ao buscar detalhes: ', error);
     }
   };
 
@@ -314,7 +314,7 @@ export const ActionListaAdiantamento = ({
         Swal.fire({
           position: 'center',
           icon: 'error',
-          title: 'Detalhes da conta bancária não encontrados.',
+          title: 'Detalhes não encontrados.',
           customClass: {
             container: 'custom-swal',
           }
@@ -322,7 +322,7 @@ export const ActionListaAdiantamento = ({
         return;
       }
     } catch (error) {
-      console.error('Erro ao buscar detalhe conta bancária: ', error);
+      console.error('Erro ao buscar detalhes ', error);
     }
   };
 
@@ -338,7 +338,7 @@ export const ActionListaAdiantamento = ({
         position: 'center',
         icon: 'error',
         title: 'Acesso Negado!',
-        html: `${usuarioLogado?.NOFUNCIONARIO} <br> Você não tem permissão para editar esta conta.`,
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br> Você não tem permissão.`,
         showConfirmButton: true,
         timer: 30000,
         customClass: {
