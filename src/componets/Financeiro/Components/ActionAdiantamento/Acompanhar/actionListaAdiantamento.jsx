@@ -15,8 +15,6 @@ import { MdEdit } from "react-icons/md";
 import { ActionEditarModal } from "./EditarSolicitacao/actionEditarModal";
 import { get } from "../../../../../api/funcRequest";
 import { ActionPagamentoModal } from "../Pagamento/actionPagamentoModal";
-import { useExportarTabela } from "../../../../../hooks/useExportarTabela";
-
 
 export const ActionListaAdiantamento = ({
   dadosAdiantamentos,
@@ -28,8 +26,6 @@ export const ActionListaAdiantamento = ({
   const [dadosDetalheAdiantamento, setDadosDetalheAdiantamento] = useState([]);
   const [modalEditarVisivel, setModalEditarVisivel] = useState(false);
   const [modalPagamento, setModalPagamento] = useState(false);
-  
-  
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const dataTableRef = useRef();
 
@@ -56,7 +52,7 @@ export const ActionListaAdiantamento = ({
         item.DESCRICAO,
         item.STATUS,
         item.POSSUINOTAFISCAL == 'True' ? 'SIM' : 'NÃO',
-        item.ANEXOORCAMENTO  ? 'SIM' : 'NÃO'
+        item.ANEXOORCAMENTO ? 'SIM' : 'NÃO'
       ]),
       horizontalPageBreak: true,
       horizontalPageBreakBehaviour: 'immediately'
@@ -70,11 +66,11 @@ export const ActionListaAdiantamento = ({
       'Departamento': item.DEPARTAMENTO,
       'CNPJ Faturado': item.CNPJFATURAMENTO,
       'Rz. Social': item.RAZAOSOCIALFATURAMENTO,
-      'Vr.Lançado':  formatMoeda(item.VRSOLICITADO),
+      'Vr.Lançado': formatMoeda(item.VRSOLICITADO),
       'Decrição': item.DESCRICAO,
       'Status': item.STATUS,
       'Possui Nota': item.POSSUINOTAFISCAL == 'True' ? 'SIM' : 'NÃO',
-      'Orçamento': item.ANEXOORCAMENTO  ? 'SIM' : 'NÃO'
+      'Orçamento': item.ANEXOORCAMENTO ? 'SIM' : 'NÃO'
     })));
     const workbook = XLSX.utils.book_new();
     const header = ['Nº', 'Departamento', 'CNPJ Faturado', 'Rz. Social', 'Vr.Lançado', 'Descrição', 'Status', 'Possui Nota', 'Orçamento'];
@@ -175,7 +171,7 @@ export const ActionListaAdiantamento = ({
       field: 'DESCRICAO',
       header: 'Descrição',
       body: row => (
-        <th style={{ color: 'blue',   }}>
+        <th style={{ color: 'blue', }}>
 
           {row.DESCRICAO}
         </th>
@@ -185,9 +181,9 @@ export const ActionListaAdiantamento = ({
       field: 'STATUS',
       header: 'Status',
       body: row => (
-        <th style={{ 
-          color: row.STATUS == 'PAGO' ? '#1DC9B7' : row.STATUS == 'AGUARDANDO FINANCEIRO' ? 'blue' : row.STATUS == 'APROVADO' ? 'blue' : '#FD1381', 
-     
+        <th style={{
+          color: row.STATUS == 'PAGO' ? '#1DC9B7' : row.STATUS == 'AGUARDANDO FINANCEIRO' ? 'blue' : row.STATUS == 'APROVADO' ? 'blue' : '#FD1381',
+
         }}>
 
           {row.STATUS}
@@ -208,9 +204,9 @@ export const ActionListaAdiantamento = ({
       field: 'ANEXOORCAMENTO',
       header: 'Orçamento',
       body: row => (
-        <th style={{color: row.ANEXOORCAMENTO ? 'blue' : '#FD1381' }}>
+        <th style={{ color: row.ANEXOORCAMENTO ? 'blue' : '#FD1381' }}>
 
-          {row.ANEXOORCAMENTO  ? 'SIM' : 'NÃO'}
+          {row.ANEXOORCAMENTO ? 'SIM' : 'NÃO'}
         </th>
       ),
     },
@@ -258,7 +254,7 @@ export const ActionListaAdiantamento = ({
             </div>
           </div>
         )
-    
+
       },
     },
   ]
@@ -353,6 +349,7 @@ export const ActionListaAdiantamento = ({
   };
 
 
+
   return (
 
     <Fragment>
@@ -408,8 +405,8 @@ export const ActionListaAdiantamento = ({
             ))}
           </DataTable>
         </div>
-       
-        <ActionEditarModal 
+
+        <ActionEditarModal
           show={modalEditarVisivel}
           handleClose={() => setModalEditarVisivel(false)}
           handleClick={handleClick}
