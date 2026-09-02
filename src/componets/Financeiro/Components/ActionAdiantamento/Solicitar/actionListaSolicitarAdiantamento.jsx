@@ -308,7 +308,7 @@ export const ActionListaAdiantamento = ({
         Swal.fire({
           position: 'center',
           icon: 'error',
-          title: 'Detalhes da conta bancária não encontrados.',
+          title: 'Comprovante não encontrados.',
           customClass: {
             container: 'custom-swal',
           }
