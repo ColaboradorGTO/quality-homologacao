@@ -196,7 +196,6 @@ export const useCadastrarAdiantamento = ({
                 actions: 'swal-button-spacing'
             },
             width: '500px',
-            buttonsStyling: false,
             didOpen: () => {
                 const style = document.createElement('style');
                 style.innerHTML = '.swal-button-spacing button { margin: 0 5px; }';
@@ -245,7 +244,7 @@ export const useCadastrarAdiantamento = ({
                 },
             })
 
-            handleClick();
+            // handleClick();
             handleClose();
             return response.data;
 

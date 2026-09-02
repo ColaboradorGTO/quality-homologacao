@@ -289,7 +289,6 @@ export const useEditarAdiantamento = ({
                 actions: 'swal-button-spacing'
             },
             width: '500px',
-            buttonsStyling: false,
             didOpen: () => {
                 const style = document.createElement('style');
                 style.innerHTML = '.swal-button-spacing button { margin: 0 5px; }';

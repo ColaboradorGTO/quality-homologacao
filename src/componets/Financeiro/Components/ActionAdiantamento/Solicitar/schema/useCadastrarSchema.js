@@ -28,8 +28,8 @@ export const schema = yup.object({
     .required('Possui Nota Fiscal é obrigatória')
     .typeError('Possui Nota Fiscal é obrigatória'),
   
-    notaFiscalFaturamento: yup.object()
-    .nullable()
-    .required('Nota Fiscal é obrigatória')
-    .typeError('Nota Fiscal é obrigatória'),
+    // notaFiscalFaturamento: yup.object()
+    // .nullable()
+    // .required('Nota Fiscal é obrigatória')
+    // .typeError('Nota Fiscal é obrigatória'),
 })
