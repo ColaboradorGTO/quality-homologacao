@@ -46,16 +46,6 @@ export const ActionPesquisaCriarAdiantamento = ({usuarioLogado, ID }) => {
     { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
   );
 
-  const { data: optionsEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas } = useQuery(
-    ['empresas'],
-    async () => {
-      const response = await get(`/empresas`);
-
-      return response.data;
-    },
-    { enabled: true, cacheTime: 60 * 60 * 1000}
-  );
-  
   const fetchListaAdiantamento = async () => {
     const urlBase = `/lista-adiantamento-departamento?idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&status=${statusSelecionado}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
@@ -156,7 +146,7 @@ export const ActionPesquisaCriarAdiantamento = ({usuarioLogado, ID }) => {
             label: empresa.label,
           }))
         ]}
-        labelSelectEmpresa={"Empresa"}
+        labelSelectEmpresa={"Status"}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}
