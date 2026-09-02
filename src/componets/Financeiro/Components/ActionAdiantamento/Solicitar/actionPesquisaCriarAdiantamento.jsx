@@ -7,6 +7,7 @@ import { AiOutlineSearch } from "react-icons/ai"
 import { IoMdAdd, IoMdCheckmark } from "react-icons/io"
 import { ActionCadastrarModal } from "./CadastrarSolicitacao/actionCadastrarModal"
 import { ActionListaAdiantamento } from "./actionListaSolicitarAdiantamento"
+import { Departamentos } from "../../../../../../parceiro.json";
 import { usePesquisa } from "../hooks/usePesquisa"
 
 export const ActionPesquisaCriarAdiantamento = ({usuarioLogado, ID }) => {
@@ -50,6 +51,18 @@ export const ActionPesquisaCriarAdiantamento = ({usuarioLogado, ID }) => {
         onChangeInputFieldDTFim={(e) => setDataPesquisaFim(e.target.value)}
         onKeyDownInputFieldDTFim={handleKeyPress}
 
+        InputSelectMarcasComponent={InputSelectAction}
+        labelSelectMarcas="Departamentos"
+        optionsMarcas={[
+          {value: '', label: 'Selecione um Departamento'},
+          ...Departamentos.map((item) => ({
+            value: item.value,
+            label: item.label
+          }))
+        ]}
+        valueSelectMarca={departamentoSelecionado}
+        onChangeSelectMarcas={(e) => setDepartamentoSelecionado(e.value)}
+
         InputSelectEmpresaComponent={InputSelectAction}
         onChangeSelectEmpresa={(e) => setStatusSelecionado(e.value)}
         valueSelectEmpresa={statusSelecionado}
@@ -81,11 +94,13 @@ export const ActionPesquisaCriarAdiantamento = ({usuarioLogado, ID }) => {
         dadosAdiantamentos={dadosAdiantamentos}
         optionsModulos={optionsModulos}
         usuarioLogado={usuarioLogado}
+        handleClick={handleClick}
       />
     
       <ActionCadastrarModal 
         show={modal}
         handleClose={() => setModal(false)}
+        handleClick={handleClick}
         optionsModulos={optionsModulos}
         usuarioLogado={usuarioLogado}
       />

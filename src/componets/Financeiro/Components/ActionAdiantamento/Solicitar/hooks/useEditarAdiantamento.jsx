@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { get, post, postFile } from "../../../../../../api/funcRequest";
 import Swal from "sweetalert2";
@@ -6,7 +6,7 @@ import { Departamentos, optionsReposicao, optionsNota } from "../../../../../../
 import { registrarLogAuditoria } from "../../../../../../services/auditLog";
 import { useQuery } from 'react-query';
 import { removeMascaraCNPJ, validarCNPJ } from "../../../../../../utils/mascaraCNPJ";
-import { useEffect } from "react";
+
 
 export const useEditarAdiantamento = ({
     dadosDetalheAdiantamento,
@@ -19,13 +19,10 @@ export const useEditarAdiantamento = ({
     const [razaoSocial, setRazaoSocial] = useState('')
     const [razaoSocialFaturamento, setRazaoSocialFaturamento] = useState('')
     const [cnpj, setCnpj] = useState('')
-    const [nfe, setNfe] = useState('')
     const [possuiNota, setPossuiNota] = useState('')
     const [cnpjFaturado, setCNPJFaturado] = useState('')
     const [vrAdiantamento, setVrAdiantamento] = useState('')
     const [descricao, setDescricao] = useState('')
-    const [orcamentoProposto, setOrcamentoProsposto] = useState('')
-    const [comprovante, setComprovante] = useState('')
     const [notaFiscal, setNotaFiscal] = useState('')
     const [empresaSelecionada, setEmpresaSelecionada] = useState('')
     const [anexoOrcamento, setAnexoOrcamento] = useState('')
@@ -312,8 +309,6 @@ export const useEditarAdiantamento = ({
         setRazaoSocial,
         cnpj,
         setCnpj,
-        nfe,
-        setNfe,
         possuiNota,
         setPossuiNota,
         cnpjFaturado,
@@ -322,10 +317,6 @@ export const useEditarAdiantamento = ({
         setVrAdiantamento,
         descricao,
         setDescricao,
-        orcamentoProposto,
-        setOrcamentoProsposto,
-        comprovante,
-        setComprovante,
         notaFiscal,
         setNotaFiscal,
         empresaSelecionada,

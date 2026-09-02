@@ -3,14 +3,13 @@ import { ButtonTable } from "../../../../ButtonsTabela/ButtonTable"
 import { formatMoeda } from "../../../../../utils/formatMoeda"
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { FaCheck, FaCloudUploadAlt } from "react-icons/fa"
 import HeaderTable from "../../../../Tables/headerTable"
 import { useReactToPrint } from "react-to-print";
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import Swal from "sweetalert2";
-import { IoMdClose, IoMdDownload } from "react-icons/io";
+import { IoMdDownload } from "react-icons/io";
 import { MdEdit } from "react-icons/md";
 import { ActionEditarModal } from "./EditarSolicitacao/actionEditarModal";
 import { get } from "../../../../../api/funcRequest";
@@ -21,6 +20,7 @@ export const ActionListaAdiantamento = ({
   dadosAdiantamentos,
   optionsModulos,
   usuarioLogado,
+  handleClick,
 }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowSelection, setRowSelection] = useState(null);
@@ -28,9 +28,6 @@ export const ActionListaAdiantamento = ({
   const [dadosDetalhePagamento, setDadosDetalhePagamento] = useState([]);
   const [modalEditarVisivel, setModalEditarVisivel] = useState(false);
   const [anexoComprovante, setAnexoComprovante] = useState('')
-  const [first, setFirst] = useState(0);
-  const [rows, setRows] = useState(10);
-
   const dataTableRef = useRef();
 
   const onGlobalFilterChange = (e) => {
@@ -345,7 +342,6 @@ export const ActionListaAdiantamento = ({
     }
   };
 
-
   const handleClickEditar = (row) => {
     if (optionsModulos[0]?.ALTERAR == 'True') {
       if (row && row.IDADIANTAMENTO) {
@@ -430,6 +426,7 @@ export const ActionListaAdiantamento = ({
           dadosDetalheAdiantamento={dadosDetalheAdiantamento}
           optionsModulos={optionsModulos}
           usuarioLogado={usuarioLogado}
+          handleClick={handleClick}
         />
       </div>
     </Fragment>

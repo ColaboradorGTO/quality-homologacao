@@ -17,13 +17,10 @@ export const useCadastrarAdiantamento = ({
     const [razaoSocial, setRazaoSocial] = useState('')
     const [razaoSocialFaturamento, setRazaoSocialFaturamento] = useState('')
     const [cnpj, setCnpj] = useState('')
-    const [nfe, setNfe] = useState('')
     const [possuiNota, setPossuiNota] = useState('')
     const [cnpjFaturado, setCNPJFaturado] = useState('')
     const [vrAdiantamento, setVrAdiantamento] = useState('')
     const [descricao, setDescricao] = useState('')
-    const [orcamentoProposto, setOrcamentoProsposto] = useState('')
-    const [comprovante, setComprovante] = useState('')
     const [notaFiscal, setNotaFiscal] = useState('')
     const [empresaSelecionada, setEmpresaSelecionada] = useState('')
     const [anexoOrcamento, setAnexoOrcamento] = useState('')
@@ -247,7 +244,7 @@ export const useCadastrarAdiantamento = ({
                 },
             })
 
-            // handleClick();
+            handleClick();
             handleClose();
             return response.data;
 
@@ -282,8 +279,6 @@ export const useCadastrarAdiantamento = ({
         setRazaoSocial,
         cnpj,
         setCnpj,
-        nfe,
-        setNfe,
         possuiNota,
         setPossuiNota,
         cnpjFaturado,
@@ -292,10 +287,6 @@ export const useCadastrarAdiantamento = ({
         setVrAdiantamento,
         descricao,
         setDescricao,
-        orcamentoProposto,
-        setOrcamentoProsposto,
-        comprovante,
-        setComprovante,
         notaFiscal,
         setNotaFiscal,
         empresaSelecionada,

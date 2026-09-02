@@ -24,8 +24,6 @@ export const Formulario = ({
     setRazaoSocial,
     cnpj,
     setCnpj,
-    nfe,
-    setNfe,
     possuiNota,
     setPossuiNota,
     cnpjFaturado,
@@ -34,10 +32,6 @@ export const Formulario = ({
     setVrAdiantamento,
     descricao,
     setDescricao,
-    orcamentoProposto,
-    setOrcamentoProsposto,
-    comprovante,
-    setComprovante,
     notaFiscal,
     setNotaFiscal,
     empresaSelecionada,
@@ -74,7 +68,7 @@ export const Formulario = ({
 
       await schema.validate(dadosParaValidar, { abortEarly: false });
 
-      onSubmit();
+      await onSubmit();
 
     } catch (validationError) {
       clearErrors();

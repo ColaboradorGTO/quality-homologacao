@@ -6,6 +6,7 @@ import { Formulario } from "./formulario";
 export const ActionCadastrarModal = ({ 
   show,
   handleClose, 
+  handleClick,
   optionsModulos,
   usuarioLogado,
 }) => {
@@ -34,6 +35,7 @@ export const ActionCadastrarModal = ({
        
           <Formulario
             handleClose={handleClose}
+            handleClick={handleClick}
             optionsModulos={optionsModulos}
             usuarioLogado={usuarioLogado}
 
