@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { get, post, postFile } from "../../../../../../api/funcRequest";
+import { get, post, postFile, put } from "../../../../../../api/funcRequest";
 import Swal from "sweetalert2";
 import { Departamentos, optionsReposicao, optionsNota } from "../../../../../../../parceiro.json";
 import { registrarLogAuditoria } from "../../../../../../services/auditLog";
 import { useQuery } from 'react-query';
 import { removeMascaraCNPJ, validarCNPJ } from "../../../../../../utils/mascaraCNPJ";
+import { removerFormatacaoMoeda } from "../../../../../../utils/formatMoeda";
 
 
 export const useEditarAdiantamento = ({
@@ -243,7 +244,7 @@ export const useEditarAdiantamento = ({
             NUCNPJEMPRESA: cnpj,
             POSSUINOTAFISCAL: possuiNota?.value,
             CNPJFATURAMENTO: cnpjFaturado,
-            VRSOLICITADO: vrAdiantamento,
+            VRSOLICITADO: removerFormatacaoMoeda(vrAdiantamento),
             DESCRICAO: descricao,
             ANEXOORCAMENTO: anexoOrcamento,
             ANEXONOTAFISCAL: anexoNotaFiscal,
@@ -254,11 +255,11 @@ export const useEditarAdiantamento = ({
 
         try {
 
-            const response = await post('/adiantamento-departamento', postData)
+            const response = await put('/adiantamento-departamento/:id', postData)
       
             await registrarLogAuditoria({
                 idFuncionario: usuarioLogado.id,
-                pathFuncao: 'FINANCEIRO/CRIAR ADIANTAMENTO PAGAMENTO',
+                pathFuncao: 'FINANCEIRO/EDITAR ADIANTAMENTO PAGAMENTO',
                 dados: postData
             });
 
@@ -281,21 +282,21 @@ export const useEditarAdiantamento = ({
         } catch (error) {
             const responsePost = await registrarLogAuditoria({
                 idFuncionario: usuarioLogado.id,
-                pathFuncao: 'FINANCEIRO/ERRO AO CRIAR ADIANTAMENTO PAGAMENTO',
+                pathFuncao: 'FINANCEIRO/ERRO AO EDITAR ADIANTAMENTO PAGAMENTO',
                 dados: postData
             });
 
             Swal.fire({
                 position: 'center',
                 icon: 'error',
-                title: 'Ocorreu um erro ao cadastrar a conta. Por favor, tente novamente.',
+                title: 'Ocorreu um erro ao cadastrar. Por favor, tente novamente.',
                 showConfirmButton: false,
                 timer: 3000,
                 customClass: {
                     container: 'custom-swal',
                 },
             });
-            console.error('Erro Cadastrar Conta Banco:', error);
+            console.error('Erro Cadastrar:', error);
             return responsePost.data;
         }
     }

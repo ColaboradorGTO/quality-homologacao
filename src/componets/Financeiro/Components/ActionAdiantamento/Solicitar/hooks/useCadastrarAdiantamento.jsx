@@ -6,6 +6,7 @@ import { Departamentos, optionsReposicao, optionsNota } from "../../../../../../
 import { registrarLogAuditoria } from "../../../../../../services/auditLog";
 import { useQuery } from 'react-query';
 import { removeMascaraCNPJ, validarCNPJ } from "../../../../../../utils/mascaraCNPJ";
+import { removerFormatacaoMoeda } from "../../../../../../utils/formatMoeda";
 
 export const useCadastrarAdiantamento = ({
     optionsModulos,
@@ -213,7 +214,7 @@ export const useCadastrarAdiantamento = ({
             NUCNPJEMPRESA: cnpj,
             POSSUINOTAFISCAL: possuiNota?.value,
             CNPJFATURAMENTO: cnpjFaturado,
-            VRSOLICITADO: vrAdiantamento,
+            VRSOLICITADO: removerFormatacaoMoeda(vrAdiantamento),
             DESCRICAO: descricao,
             ANEXOORCAMENTO: anexoOrcamento,
             ANEXONOTAFISCAL: anexoNotaFiscal,

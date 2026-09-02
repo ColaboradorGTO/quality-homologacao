@@ -11,7 +11,8 @@ import * as XLSX from 'xlsx';
 import Swal from "sweetalert2";
 import { IoMdDownload } from "react-icons/io";
 import { MdEdit } from "react-icons/md";
-import { ActionEditarModal } from "./EditarSolicitacao/actionEditarModal";
+// import { ActionEditarModal } from "./EditarSolicitacao/actionEditarModal";
+import { ActionEditarModal } from "../Acompanhar/EditarSolicitacao/actionEditarModal";
 import { get } from "../../../../../api/funcRequest";
 import { BASE_URL } from "../../../../../api/api";
 

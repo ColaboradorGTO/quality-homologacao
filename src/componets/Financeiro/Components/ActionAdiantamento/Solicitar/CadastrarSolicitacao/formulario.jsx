@@ -7,6 +7,7 @@ import { Fragment } from "react";
 import { schema } from "../schema/useCadastrarSchema";
 import { useCadastrarAdiantamento } from "../hooks/useCadastrarAdiantamento";
 import { AlertError } from "../../../../../Inputs/alertError"
+import { formatarMoeda } from "../../../../../../utils/formatMoeda";
 
 export const Formulario = ({
   handleClose,
@@ -242,7 +243,7 @@ export const Formulario = ({
                     name="vrFaturamento"
                     type="text"
                     value={vrAdiantamento}
-                    onChange={(e) => setVrAdiantamento(e.target.value)}
+                    onChange={(e) => setVrAdiantamento(formatarMoeda(e.target.value))}
                     errors={errors}
                     clearErrors={clearErrors}
                   />

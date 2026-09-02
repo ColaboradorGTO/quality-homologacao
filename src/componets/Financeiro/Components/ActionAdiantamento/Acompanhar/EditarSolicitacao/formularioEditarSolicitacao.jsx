@@ -7,6 +7,7 @@ import { Fragment } from "react";
 import { schema } from "../schema/useCadastrarSchema";
 import { AlertError } from "../../../../../Inputs/alertError"
 import { useEditarAdiantamento } from "../hooks/useEditarAdiantamento";
+import { formatarMoeda } from "../../../../../../utils/formatMoeda";
 
 export const Formulario = ({
   handleClose,
@@ -26,8 +27,6 @@ export const Formulario = ({
     setRazaoSocial,
     cnpj,
     setCnpj,
-    nfe,
-    setNfe,
     possuiNota,
     setPossuiNota,
     cnpjFaturado,
@@ -35,11 +34,7 @@ export const Formulario = ({
     vrAdiantamento,
     setVrAdiantamento,
     descricao,
-    setDescricao,
-    orcamentoProposto,
-    setOrcamentoProsposto,
-    comprovante,
-    setComprovante,
+    setDescricao,    
     notaFiscal,
     setNotaFiscal,
     empresaSelecionada,
@@ -257,7 +252,7 @@ export const Formulario = ({
                     name="vrFaturamento"
                     type="text"
                     value={vrAdiantamento}
-                    onChange={(e) => setVrAdiantamento(e.target.value)}
+                    onChange={(e) => setVrAdiantamento(formatarMoeda(e.target.value))}
                     errors={errors}
                     clearErrors={clearErrors}
                   />
@@ -362,21 +357,24 @@ export const Formulario = ({
 
 
             <div className="col-sm-6 col-xl-3">
-              {/* <Controller
-                name="orcamento"
-                control={control}
-                render={({ field }) => (
-                  <FormField
-                    label={"Anexar Orçarmento *"}
-                    name="orcamento"
-                    type="file"
-                    accept="application/pdf,image/png,image/jpeg,image/webp"
-                    onChange={handleUploadOrcamento}
-                    errors={errors}
-                    clearErrors={clearErrors}
-                  />
-                )}
-              /> */}
+              {optionsModulos[0]?.N4 == 'False' && ( 
+
+                <Controller
+                  name="orcamento"
+                  control={control}
+                  render={({ field }) => (
+                    <FormField
+                      label={"Anexar Orçarmento *"}
+                      name="orcamento"
+                      type="file"
+                      accept="application/pdf,image/png,image/jpeg,image/webp"
+                      onChange={handleUploadOrcamento}
+                      errors={errors}
+                      clearErrors={clearErrors}
+                    />
+                  )}
+                />
+              )}
               <ButtonTypeModal
                 textButton={"Exportar Orçamento"}
                 tipo={"button"}
@@ -388,21 +386,24 @@ export const Formulario = ({
             </div>
 
             <div className="col-sm-6 col-xl-3">
-              {/* <Controller
-                name="anxNotaFiscal"
-                control={control}
-                render={({ field }) => (
-                  <FormField
-                    label={"Anexar Nota Fiscal *"}
-                    name="anxNotaFiscal"
-                    type="file"
-                    accept="application/pdf,image/png,image/jpeg,image/webp"
-                    onChange={handleUploadNotaFiscal}
-                    errors={errors}
-                    clearErrors={clearErrors}
-                  />
-                )}
-              /> */}
+              {optionsModulos[0]?.N3 == 'False' && ( 
+
+                <Controller
+                  name="anxNotaFiscal"
+                  control={control}
+                  render={({ field }) => (
+                    <FormField
+                      label={"Anexar Nota Fiscal *"}
+                      name="anxNotaFiscal"
+                      type="file"
+                      accept="application/pdf,image/png,image/jpeg,image/webp"
+                      onChange={handleUploadNotaFiscal}
+                      errors={errors}
+                      clearErrors={clearErrors}
+                    />
+                  )}
+                />
+              )}
               <ButtonTypeModal
                 textButton={"Exportar Nota Fiscal"}
                 tipo={"button"}
