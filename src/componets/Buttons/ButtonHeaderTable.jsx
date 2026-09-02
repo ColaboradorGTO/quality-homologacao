@@ -40,6 +40,7 @@ export const ButtonHeaderTable = ({
           className={`${btnClasses} ${className}`}
           type={typeButton}
           onClick={() => onClickButtonType()}
+          aria-label="button-table"
         >
           {Icon && <Icon size={iconSize}  color={iconColor} />}
           
