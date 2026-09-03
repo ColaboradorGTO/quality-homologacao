@@ -239,15 +239,15 @@ export const useEditarPermissaoUsuario = () => {
         IDPERMISSAO: String(moduloSelecionado) == "18" ? String(moduloSelecionado) : '',
         IDMODULORESUMOVENDAS: String(moduloSelecionado) == "15" ? String(moduloSelecionado) : '',
         ADMINISTRADOR: administrador,
-        N4: 'N4',
-        N3: 'N3',
-        N2: 'N2',
-        N1: 'N1',
+        N4: 'True',
+        N3: 'False',
+        N2: 'False',
+        N1: 'False',
         IDMENU: menuPaiSelecionado,
         IDMENUFILHO: idMenuFilho,
         IDMODULOPROMOCAO: String(moduloSelecionado) == "19" ? String(moduloSelecionado) : '',
       };
-      console.log(payload, 'payload');  
+      
       const putFuncionarioData = {
         ID: funcionarioSelecionado?.value,
         DEPARTAMENTO: departamentoSelecionado?.value,
