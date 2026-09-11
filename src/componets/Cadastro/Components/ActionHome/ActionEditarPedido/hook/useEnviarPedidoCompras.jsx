@@ -1,11 +1,11 @@
 import { useState } from "react";
 import Swal from "sweetalert2";
-import { post, put } from "../../../../../api/funcRequest";
-import { registrarLogAuditoria } from "../../../../../services/auditLog";
+import { put } from "../../../../../../api/funcRequest";
+import { registrarLogAuditoria } from "../../../../../../services/auditLog";
 
 export const useEnviarPedidoCompras = ({
-    usuarioLogado,
-    optionsModulos
+    // usuarioLogado,
+    // optionsModulos
 }) => {
     const [loading, setLoading] = useState(false);
 
@@ -61,7 +61,7 @@ export const useEnviarPedidoCompras = ({
             const response = await put("/andamento-pedido/:id", dados);
 
             await registrarLogAuditoria({
-                idFuncionario: usuarioLogado?.id,
+                idFuncionario: '',
                 pathFuncao: "CADASTRO/ENVIAR PEDIDO PARA COMPRAS",
                 dados: dados
             });
@@ -80,7 +80,7 @@ export const useEnviarPedidoCompras = ({
             return response.data;
         } catch (error) {
             await registrarLogAuditoria({
-                idFuncionario: usuarioLogado?.id,
+                idFuncionario: '',
                 pathFuncao: "CADASTRO/ERRO AO ENVIAR PEDIDO PARA COMPRAS",
                 dados: dados
             });

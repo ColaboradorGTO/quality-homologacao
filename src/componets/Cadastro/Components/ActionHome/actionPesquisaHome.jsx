@@ -396,8 +396,6 @@ export const ActionPesquisaHome = ({ usuarioLogado }) => {
           refetchListaPedidos={refetchListaPedidos}
         />
       )}
-
-
     </Fragment>
   )
 }

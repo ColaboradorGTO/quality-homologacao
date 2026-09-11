@@ -139,11 +139,10 @@ export const usePesquisaLista = ({
 
     const handleEditarPedido = async (IDPEDIDO) => {
         try {
-            const response = await get(`/lista-pedidos?idPedido=${IDPEDIDO}`)
-            const responseDetlhe = await get(`/lista-detalhe-pedidos?idPedido=${IDPEDIDO}`)
-            if (response.data && responseDetlhe.data) {
+            const response = await get(`/pedido-compras-detalhado?idPedido=${IDPEDIDO}`)
+            if (response.data && response.data.length > 0) {
                 setDadosVisualizarPedido(response.data)
-                setDadosDetalhePedido(responseDetlhe.data)
+                setDadosDetalhePedido(response.data)
                 setActionEditarPedido(true)
                 setActionVisualizarPedido(false)
                 setActionHome(false)

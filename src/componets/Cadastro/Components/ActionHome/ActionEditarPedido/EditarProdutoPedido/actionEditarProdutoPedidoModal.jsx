@@ -15,12 +15,13 @@ export const ActionEditarProdutoPedidoModal = ({
   dadosVisualizarPedido,
   dadosUltimosPedidos,
   checkboxIntermediario,
-  handleClickEditarPedido
-}) => {
-  const stReposicao = dadosVisualizarPedido?.[0]?.STREPOSICAO;
-  const tipoCategoriaPedido = dadosVisualizarPedido?.[0]?.TIPOCATEGORIAPEDIDO || dadosVisualizarPedido?.[0]?.TIPOPEDIDO || "tipoPedido";
-  const idResumoPedido = dadosVisualizarPedido?.[0]?.IDPEDIDO;
+  handleClickEditarPedido,
 
+}) => {
+  const stReposicao = dadosDetalhePedido?.[0]?.STREPOSICAO;
+  const tipoCategoriaPedido = dadosDetalhePedido?.[0]?.TIPOCATEGORIAPEDIDO || dadosDetalhePedido?.[0]?.TIPOPEDIDO || "tipoPedido";
+  const idResumoPedido = dadosDetalhePedido?.[0]?.IDPEDIDO;
+  
   return (
 
     <Fragment>
@@ -28,7 +29,7 @@ export const ActionEditarProdutoPedidoModal = ({
         show={show}
         onHide={handleClose}
         class="modal-content"
-        size="lg"
+        size="xl"
         centered
       >
   

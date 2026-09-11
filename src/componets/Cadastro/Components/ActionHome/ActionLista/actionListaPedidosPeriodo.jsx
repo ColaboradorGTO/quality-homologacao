@@ -87,7 +87,7 @@ export const ActionListaPedidosPeriodo = ({
   })
   const [rowSelection, setRowSelection] = useState(null);
   const { enviarPedidoComprasADM } = useEnviarPedidoComprasADM({usuarioLogado, optionsModulos});
-  const { enviarPedidoCompras } = useEnviarPedidoCompras();
+  const { enviarPedidoCompras } = useEnviarPedidoCompras({usuarioLogado, optionsModulos});
   const { migrarPedidoSap } = useMigrarPedidoSap();
 
   const calcularTotalFabricante = () => {

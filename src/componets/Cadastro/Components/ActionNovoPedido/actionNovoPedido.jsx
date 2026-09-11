@@ -3,7 +3,8 @@ import { ActionMainEditarNovoPedido } from "../../../Actions/ActionMainEditarNov
 import { ButtonType } from "../../../Buttons/ButtonType";
 import { useQuery } from "react-query";
 import { InputFieldAction } from "../../../Buttons/InputAction";
-import { MdMenu, MdOutlineCheck, MdOutlinePayment, MdOutlinePictureAsPdf, MdOutlineVisibility } from "react-icons/md";
+import { MdMenu, MdOutlineCheck, MdOutlinePayment, MdOutlinePictureAsPdf, MdOutlineVisibility, MdOutlineSend, MdLockOpen } from "react-icons/md";
+import { SiSap } from "react-icons/si";
 import { ResultadoResumo } from "../../../ResultadoResumo/ResultadoResumo";
 import { ActionListaNovoPedido } from "./actionListaNovoPedido";
 import { formatMoeda } from "../../../../utils/formatMoeda";
@@ -19,8 +20,6 @@ import { InputFieldPedido } from "../../../Buttons/InputActionPedido";
 import { useIncluirProutoPedido } from "./hooks/useIncluirProdutoPedido";
 import { InputFieldCheckBox } from "../../../Inputs/InputChekBox";
 import { optionsTipoFrete, optionsTipoPedido, optionsEnviar, optionsFiscal } from "../../../../../parceiro.json";
-import { FaCheck } from "react-icons/fa6";
-import { CiLock } from "react-icons/ci";
 
 export const ActionNovoPedido = ({ 
   dadosVisualizarPedido, 
@@ -108,14 +107,18 @@ export const ActionNovoPedido = ({
     verificaDadosDoFornecedorSelecionado,
     pendenciasFornecedor,
     refetchListaCadastroProdutoPedidos,
-    onIncluirProdutoPedido,
     clonarCabecalho,
     handleIncluir,
     dadosUltimosPedidos,
     dadosCabecalhoClonado,
+    refetchListaProdutoPedidos,
+    handleFinalizarCadastroPedido,
     refetchListaPedidos,
     dadosPedidos,
-    handleFecharPedido
+    handleEnviarAjustePedidoCompras,
+    handleMigrarPedidoSap, 
+    handleAtualizarPedidoSap,
+    handleMudarStatusParaAjusteQuandoPedidoMigrado,
   } = useIncluirProutoPedido({ usuarioLogado, optionsModulos, dadosVisualizarPedido, dadosDetalhePedido });
 
   const [dadosDetalheProdutoPedido, setDadosDetalheProdutoPedido] = useState([]);
@@ -125,7 +128,10 @@ export const ActionNovoPedido = ({
     salvar: false,
     clonar: false,
     clonarCabecalho: true,
-    novoPedido: true
+    novoPedido: true,
+    mudarStatusParaAjuste: false,
+    migrarPedidoSAP: false,
+    atualizarPedidoSAP: false
   });
 
   const [camposHabilitados, setCamposHabilitados] = useState(false);
@@ -138,7 +144,7 @@ export const ActionNovoPedido = ({
   const [tabelaVisivel, setTabelaVisivel] = useState(true);
   const [modalPedidoNota, setModalPedidoNota] = useState(false);
 
-   console.log(dadosVisualizarPedido, 'na action dadosVisualizarPedido')
+   
   useEffect(() => {
     if (!dadosVisualizarPedido || !Array.isArray(dadosVisualizarPedido) || dadosVisualizarPedido.length === 0) {
       console.log('❌ Dados não disponíveis ou inválidos');
@@ -146,116 +152,59 @@ export const ActionNovoPedido = ({
     }
 
     const dados = dadosVisualizarPedido[0];
+    const idsAndamentos = [4, 5, 16, 17];
     const IdAndamentoPedido = parseInt(dados?.IDANDAMENTO || '0', 10);
     const StCancelaPedido = String(dados?.STCANCELADO || 'False').trim();
     const IDPEDIDORESUMO = String(dados?.IDPEDIDO || '');
-    const dsSetorAndamentoPedido = String(dados?.DSSETOR || '');
+    let dsSetorAndamentoPedido = String(dados?.DSSETOR || '');
     const stCancelado = StCancelaPedido === 'True';
     const stMigradoSap = String(dados?.STMIGRADOSAP || 'False') === 'True';
     const stPedidoPorIntermediario = String(dados?.STPEDIDOPRIMARIO || 'False') === 'True';
     const idPedidoPrimario = parseInt(dados?.IDPEDIDOPRIMARIO || '0', 10);
     const isPedidoSecundario = idPedidoPrimario > 0;
-    const clonarVisivelPadrao = !(stCancelado && IdAndamentoPedido !== 2 && IdAndamentoPedido !== 5);
 
-    let novosBotoesVisiveis = {
-      incluir: false,
-      fechar: false,
-      salvar: false,
-      clonar: clonarVisivelPadrao,
-      clonarCabecalho: true,
-      novoPedido: true // SEMPRE VISÍVEL
+    const stPermitirMudarStatusParaAjusteQuandoPedidoMigrado = !isPedidoSecundario && stMigradoSap && IdAndamentoPedido === 5;
+    const stPermitirFecharPedido = !isPedidoSecundario && (IdAndamentoPedido === 4 || IdAndamentoPedido === 16);
+    const stPermitirMigrarPedidoSAP = !isPedidoSecundario && !stMigradoSap && IdAndamentoPedido === 5;
+    const stPermitirAtualizarPedidoSAP = !isPedidoSecundario && stMigradoSap && IdAndamentoPedido === 17;
+    const dentroDoFluxoDeCadastro = idsAndamentos.includes(IdAndamentoPedido);
+    const stPedidoNaoCancelado = !stCancelado;
+
+    const novosBotoesVisiveis = {
+      incluir: stPedidoNaoCancelado,
+      salvar: stPedidoNaoCancelado,
+      fechar: stPedidoNaoCancelado && dentroDoFluxoDeCadastro && stPermitirFecharPedido,
+      novoPedido: stPedidoNaoCancelado && dentroDoFluxoDeCadastro && !isPedidoSecundario,
+      clonarCabecalho: stPedidoNaoCancelado,
+      clonar: stPedidoNaoCancelado,
+      mudarStatusParaAjuste: stPedidoNaoCancelado && dentroDoFluxoDeCadastro && stPermitirMudarStatusParaAjusteQuandoPedidoMigrado,
+      migrarPedidoSAP: stPedidoNaoCancelado && dentroDoFluxoDeCadastro && stPermitirMigrarPedidoSAP,
+      atualizarPedidoSAP: stPedidoNaoCancelado && dentroDoFluxoDeCadastro && stPermitirAtualizarPedidoSAP,
     };
-    
+
     let camposDevemEstarHabilitados = false;
-    let novoTitulo = '';
 
     if (StCancelaPedido === 'True' || (IdAndamentoPedido >= 2 && IdAndamentoPedido < 15)) {
-      novosBotoesVisiveis = {
-        ...novosBotoesVisiveis,
-      };
-      
       camposDevemEstarHabilitados = false;
-      
-      if (IdAndamentoPedido >= 2 && IdAndamentoPedido < 15) {
-        novoTitulo = `Visualizar Pedido Nº: ${IDPEDIDORESUMO}`;
-      }
-    } 
+    }
 
     else if (IdAndamentoPedido === 1 || IdAndamentoPedido === 15) {
-      novosBotoesVisiveis = {
-        ...novosBotoesVisiveis,
-        incluir: true,
-        fechar: true,
-        salvar: true,
-        clonarCabecalho: true
-      };
-      
       camposDevemEstarHabilitados = true;
-      
-      const tipoOperacao = IdAndamentoPedido === 1 ? 'Inclusão' : 'Alteração';
-      novoTitulo = `${tipoOperacao} - Pedido Nº: ${IDPEDIDORESUMO}`;
     }
 
     if (stMigradoSap) {
       camposDevemEstarHabilitados = false;
     }
-    
+
     if (idPedidoPrimario > 0) {
-      novosBotoesVisiveis = {
-        incluir: false,
-        fechar: false,
-        salvar: false,
-        clonar: false,
-        clonarCabecalho: false,
-        novoPedido: true 
-      };
       camposDevemEstarHabilitados = false;
     }
 
-    let statusTitleSubHeader = stCancelado
-      ? (
-        <span className="text-danger fw-900 pl-1">
-          CANCELADO <i className="fal fa-times ml-1"></i>
-        </span>
-      )
-      : (
-        <>
-          <span className="text-warning fw-900 pl-1">
-            Bloqueado <CiLock />
-          </span>
-          {` -> Está no Setor: ${dsSetorAndamentoPedido}`}
-        </>
-      );
-
-    if (!stCancelado && (IdAndamentoPedido === 1 || IdAndamentoPedido === 15)) {
-      statusTitleSubHeader = IdAndamentoPedido === 1
-        ? (
-          <span className="text-primary fw-700 pl-1">
-            Inclusão Liberada <FaCheck />
-          </span>
-        )
-        : (
-          <span className="text-info fw-700 pl-1">
-            Alteração Liberada <FaCheck />
-          </span>
-        );
+    if (IdAndamentoPedido === 5) {
+      dsSetorAndamentoPedido = 'Inclusão Finalizada';
     }
 
-    let prefixoTituloPedido = 'Pedido ';
-
-    if (isPedidoSecundario) {
-      prefixoTituloPedido += 'Secundário ';
-    } else if (stPedidoPorIntermediario) {
-      prefixoTituloPedido += 'Primário ';
-    }
-
-    novoTitulo = (
-      <>
-        {`${prefixoTituloPedido}Nº: ${IDPEDIDORESUMO}`}
-        {' - '}
-        {statusTitleSubHeader}
-      </>
-    );
+    const novoTitulo = `Cadastro dos Produtos do Pedido Nº: ${IDPEDIDORESUMO} - ${dsSetorAndamentoPedido}`;
 
     setBotoesVisiveis(novosBotoesVisiveis);
     setCamposHabilitados(camposDevemEstarHabilitados);
@@ -270,10 +219,10 @@ export const ActionNovoPedido = ({
     
   }, [dadosVisualizarPedido]);  
 
-  console.log(dadosVisualizarPedido, 'dadosVisualizarPedido, actioNovo')
+  
   useEffect(() => {
     if(dadosVisualizarPedido && dadosVisualizarPedido.length > 0) {
-      console.log(dadosVisualizarPedido, 'dados')
+     
       setDataPesquisaInicio(dadosVisualizarPedido[0]?.DTPEDIDOFORMATADA)
       setDataPesquisaFim(dadosVisualizarPedido[0]?.DTPREVENTREGAFORMATADA)
       setCompradorSelecionado({
@@ -349,10 +298,7 @@ export const ActionNovoPedido = ({
     setModalPedidoNota(true)
   }
 
-  const handleClickDetalhePedido = () => {
-    refetchListaDetalhePedidos()
-    handleFinalizarCadastro(dadosVisualizarPedido[0]?.IDRESUMOPEDIDIO)
-  }
+
 
 
   const handleClickPedidoTXT = async () => {
@@ -390,87 +336,6 @@ export const ActionNovoPedido = ({
     a.click();
     URL.revokeObjectURL(url);
   };
-
-  const handleFinalizarCadastro = async (IDRESUMOPEDIDIO) => {
-    if (dadosDetalhesPedidos != 0) {
-      Swal.fire({
-        icon: "warning",
-        title: `Existe Itens do Pedido: ${IDRESUMOPEDIDIO} que não foram Transformados em Produtos`,
-        showConfirmButton: false,
-        timer: 3000
-      });
-      return;
-    }
-
-    try {
-
-      Swal.fire({
-        title: 'Certeza que Deseja Finalizar o Pedido?',
-        text: 'Você não poderá reverter esta ação!',
-        icon: 'warning',
-        showCancelButton: true,
-        showConfirmButton: true,
-        cancelButtonText: 'Cancelar',
-        confirmButtonText: 'OK',
-        customClass: {
-          confirmButton: 'btn btn-primary',
-          cancelButton: 'btn btn-danger',
-          loader: 'custom-loader'
-        },
-        buttonsStyling: false
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          try {
-            const putData = {
-              IDRESUMOPEDIDIO: parseInt(IDRESUMOPEDIDIO),
-
-            }
-            const response = await put('/cadastrar_produtos/:id', putData)
-
-            const textDados = JSON.stringify(putData)
-            let textoFuncao = 'FINALIZAR CADASTRO DE TODOS PRODUTOS';
-
-            const postData = {
-              IDFUNCIONARIO: usuarioLogado.id,
-              PATHFUNCAO: textoFuncao,
-              DADOS: textDados,
-              IP: ipUsuario
-            }
-
-            const responsePost = await post('/log-web', postData)
-
-            Swal.fire({
-              title: 'Sucesso',
-              text: 'Cadastrado com Sucesso',
-              icon: 'success'
-            })
-
-            return responsePost;
-          } catch (error) {
-
-            let textoFuncao = 'ERRO AO CADASTRAR PRODUTO';
-
-            const postData = {
-              IDFUNCIONARIO: usuarioLogado.id,
-              PATHFUNCAO: textoFuncao,
-              DADOS: 'ERRO AO CADASTAR PRODUTO',
-              IP: ipUsuario
-            }
-
-            const responsePost = await post('/log-web', postData)
-          }
-        }
-      })
-    } catch (error) {
-
-      Swal.fire({
-        icon: "warning",
-        title: `Não Produtos do Pedido: ${IDRESUMOPEDIDIO} para serem cadastrados`,
-        showConfirmButton: false,
-        timer: 3000
-      });
-    }
-  }
 
 
   return (
@@ -678,34 +543,66 @@ export const ActionNovoPedido = ({
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Produtos do Pedido"}
-        onButtonClickSearch={() => handleClickPedido()}
+        onButtonClickSearch={handleClickPedido}
         corSearch={"primary"}
         IconSearch={MdMenu}
-        // styleSearch={botoesVisiveis.incluir}
+        styleSearch={botoesVisiveis.incluir}
 
         ButtonTypeCancelar={ButtonType}
         linkCancelar={"Prévia Cadastro Produtos"}
-        onButtonClickCancelar={() => handleClickCadastroPedido()}
+        onButtonClickCancelar={handleClickCadastroPedido}
         corCancelar={"success"}
         IconCancelar={MdOutlineVisibility}
+        styleCancelar={botoesVisiveis.salvar}
 
-        // ButtonTypeCadastro={ButtonType}
-        // linkNome={"Finalizar Cadastro dos Produtos"}
-        // onButtonClickCadastro={() => handleClickDetalhePedido()}
-        // corCadastro={"danger"}
-        // IconCadastro={MdOutlineCheck}
+        ButtonTypeCadastro={ButtonType}
+        linkNome={"Finalizar Cadastro dos Produtos"}
+        onButtonClickCadastro={handleFinalizarCadastroPedido}
+        corCadastro={"danger"}
+        IconCadastro={MdOutlineCheck}
+        styleCadastro={botoesVisiveis.fechar}
 
         ButtonTypePedido={ButtonType}
         linkPedido={"Pedido de Compra PDF"}
-        onButtonClickPedido={() => handleClickCadstroPedidoPDF()}
+        onButtonClickPedido={handleClickCadstroPedidoPDF}
         corPedido={"info"}
         IconPedido={MdOutlinePictureAsPdf}
+        stylePedido={botoesVisiveis.clonarCabecalho}
 
         ButtonTypeTXT={ButtonType}
         linkTXT={"Pedido de Compra TXT"}
-        onButtonClickTXT={() => handleClickPedidoTXT()}
+        onButtonClickTXT={handleClickPedidoTXT}
         corTXT={"warning"}
         IconTXT={GrDocumentTxt}
+        styleTXT={botoesVisiveis.clonar}
+
+        ButtonTypeClonar={ButtonType}
+        linkClonar={"Enviar Para Ajuste Compras"}
+        onButtonClickClonar={handleEnviarAjustePedidoCompras}
+        corClonar={"secondary"}
+        IconClonar={MdOutlineSend}
+        styleClonar={botoesVisiveis.novoPedido}
+
+        ButtonTypeRetornar={ButtonType}
+        linkRetornar={"Migrar Pedido"}
+        onButtonClickRetornar={handleMigrarPedidoSap}
+        corRetornar={"primary"}
+        IconRetornar={SiSap}
+        styleRetornar={botoesVisiveis.migrarPedidoSAP}
+
+        ButtonTypeMigrar={ButtonType}
+        linkMigrar={"Desbloquear Itens Para Ajuste"}
+        onButtonClickMigrar={handleMudarStatusParaAjusteQuandoPedidoMigrado}
+        corMigrar={"warning"}
+        IconMigrar={MdLockOpen}
+        styleMigrar={botoesVisiveis.mudarStatusParaAjuste}
+
+        ButtonTypeAtualizar={ButtonType}
+        linkAtualizar={"Migrar Atualizações"}
+        onButtonClickAtualizar={handleAtualizarPedidoSap}
+        corAtualizar={"info"}
+        IconAtualizar={SiSap}
+        styleAtualizar={botoesVisiveis.atualizarPedidoSAP}
       />
 
       {tabelaVisivel && (
@@ -715,11 +612,18 @@ export const ActionNovoPedido = ({
           setModalIncluirProdutoPedido={setModalIncluirProdutoPedido}
           usuarioLogado={usuarioLogado}
           optionsModulos={optionsModulos}
+          handleClickPedido={handleClickPedido}
         />
       )} 
 
       {tabelaCadastroProduto && (
-        <ActionListaProdutosParaCadastro dadosProdutosPedidos={dadosProdutosPedidos}/>
+        <ActionListaProdutosParaCadastro 
+          dadosProdutosPedidos={dadosProdutosPedidos}
+          dadosVisualizarPedido={dadosVisualizarPedido}
+          usuarioLogado={usuarioLogado}
+          optionsModulos={optionsModulos}
+          handleClickPedido={handleClickPedido}  
+        />
       )}
 
     

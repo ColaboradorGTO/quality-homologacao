@@ -1,11 +1,9 @@
-import { useEffect, useState, use } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios"
 import Swal from "sweetalert2";
 import { get, post, put } from "../../../../../../../api/funcRequest";
 import { getDataAtual } from "../../../../../../../utils/dataAtual";
 import { useQuery } from "react-query";
-import { toFloat } from "../../../../../../../utils/toFloat";
-
 
 
 export const useIncluirProutoPedido = ({ 
@@ -324,11 +322,10 @@ export const useIncluirProutoPedido = ({
 
     }
 
-    // console.log(dadosFornecedor, 'dadosFornecedor')
     const retornoDadosDoFonecedoNoPedido = async (dadosFornecedor) => {
         try {
             const dados = dadosFornecedor?.data?.[0] || dadosFornecedor?.[0];
-            console.log(dados, 'dados')
+        
             const NUCNPJ = dados?.CNPJFORN;
           
             if (!dados) return;
@@ -421,16 +418,13 @@ export const useIncluirProutoPedido = ({
         let indice = 0;
         let msgFormatada = '';
         
-        // Setando como rascunho (equivalente ao $('#stRascunho').val('True'))
         setStRascunho('True');
 
-        // Formatando as mensagens como no jQuery
         for (let msg of pendencias) {
             msgFormatada += `${msg}, `;
             indice++;
         }
 
-        // Condição para exibir SweetAlert baseada no andamento
         const andamentoNum = Number(idAndamento);
         const deveExibirSwal = andamentoNum == 1 || andamentoNum == 15 || !idAndamento;
 
@@ -448,7 +442,7 @@ export const useIncluirProutoPedido = ({
 
         }
 
-        return pendencias; // Retorna as pendências para serem usadas no componente
+        return pendencias;
     };
 
 
@@ -633,7 +627,6 @@ export const useIncluirProutoPedido = ({
     const validarCamposCabecalhoPedido = async () => {
         const errors = [];
 
-        // Validações equivalentes às do jQuery
         if (!compradorSelecionado?.value) {
             errors.push('Selecione um comprador');
         }
@@ -654,7 +647,6 @@ export const useIncluirProutoPedido = ({
             errors.push('Selecione um fornecedor');
         }
 
-        // Se houver erros, mostrar alerta
         if (errors.length) {
             await Swal.fire({
             icon: 'warning',
@@ -983,7 +975,7 @@ export const useIncluirProutoPedido = ({
                 allowOutsideClick: false,
                 didOpen: () => { Swal.showLoading(); }
             });
-            // Voltar daqui e verificar o payload
+           
             const data = {
                 IDRESUMOPEDIDO: Number(idResumoPedidoAtual) || dadosVisualizarPedido[0]?.IDPEDIDO,
                 IDGRUPOEMPRESARIAL: parseFloat(marcaSelecionada?.value) ? dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL : dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL,
@@ -1071,7 +1063,7 @@ export const useIncluirProutoPedido = ({
 
     const handleSalvarPedido = async () => {
         let idResumoAtual = Number(idResumoPedido || 0);
-        let idResumoPedidoPrimario = Number(1 || 0); // Ajuste conforme sua lógica
+        let idResumoPedidoPrimario = Number(1 || 0); 
         let stPedidoPorIntermediario = checked;
     
         if(!marcaSelecionada || marcaSelecionada == '') {

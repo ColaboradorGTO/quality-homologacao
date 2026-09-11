@@ -180,6 +180,8 @@ export const ActionMainNovoPedido = ({
   ButtonTypeTXT,
   ButtonTypeClonar,
   ButtonTypeRetornar,
+  ButtonTypeMigrar,
+  ButtonTypeAtualizar,
 
   linkNomeSearch,
   linkNome,
@@ -188,6 +190,8 @@ export const ActionMainNovoPedido = ({
   linkTXT,
   linkClonar,
   linkRetornar,
+  linkMigrar,
+  linkAtualizar,
 
   onButtonClickSearch,
   onButtonClickCadastro,
@@ -196,6 +200,8 @@ export const ActionMainNovoPedido = ({
   onButtonClickTXT,
   onButtonClickClonar,
   onButtonClickRetornar,
+  onButtonClickMigrar,
+  onButtonClickAtualizar,
 
   corSearch,
   corCadastro,
@@ -204,6 +210,8 @@ export const ActionMainNovoPedido = ({
   corTXT,
   corClonar,
   corRetornar,
+  corMigrar,
+  corAtualizar,
 
   IconSearch,
   IconCadastro,
@@ -212,6 +220,8 @@ export const ActionMainNovoPedido = ({
   IconTXT,
   IconClonar,
   IconRetornar,
+  IconMigrar,
+  IconAtualizar,
 
   readOnlyDTInicio,
   readOnlyDTFim,
@@ -254,6 +264,8 @@ export const ActionMainNovoPedido = ({
   styleTXT,
   styleClonar,
   styleRetornar,
+  styleMigrar,
+  styleAtualizar
 
 }) => {
   const handleSubmit = (e) => {
@@ -893,6 +905,36 @@ export const ActionMainNovoPedido = ({
                         iconSize={16}
                         // style={styleRetornar}
                         visibilityBTN={styleRetornar}
+
+                      />
+                    )}
+
+                    {ButtonTypeMigrar && (
+                      <ButtonType
+                        textButton={linkMigrar}
+                        onClickButtonType={onButtonClickMigrar}
+                        // cor="danger"
+                        cor={corMigrar}
+                        tipo="button"
+                        Icon={IconMigrar}
+                        iconColor="#000"
+                        iconSize={16}
+                        visibilityBTN={styleMigrar}
+
+                      />
+                    )}
+                    
+                    {ButtonTypeAtualizar && (
+                      <ButtonType
+                        textButton={linkAtualizar}
+                        onClickButtonType={onButtonClickAtualizar}
+                        // cor="danger"
+                        cor={corAtualizar}
+                        tipo="button"
+                        Icon={IconAtualizar}
+                        iconColor="#000"
+                        iconSize={16}
+                        visibilityBTN={styleAtualizar}
 
                       />
                     )}

@@ -174,16 +174,286 @@ export const optionsMecanica = [
     }
 ]
 
-/**
- * Todas as 30 combinações possíveis de mecânicas de promoção
- * 2 (TPAPLICADOA) × 5 (TPAPARTIRDE) × 3 (TPFATORPROMO) = 30 mecânicas
- * 
- * TPAPLICADOA: 1 = Valor, 2 = Quantidade
- * TPAPARTIRDE: 0 = Pares, 1 = Todos, 2 = Último, 3 = Menos primeira, 4 = Um produto
- * TPFATORPROMO: 0 = Valor final, 1 = Valor desconto, 2 = Percentual desconto
- */
+/* 
+
+  com base na optionsMecanicaCompleta
+  quero analisar a imagem anexada e verificar, quais as mecanicas
+  que podem ser utilizadas correspondente com a imagem, ou seja quais 
+*/
 export const optionsMecanicaCompleta = [
-  // QUANTIDADE (mecanica: 2) + PERCENTUAL DESCONTO (tipoDesconto: 2)
+  {
+    value: 1,
+    text: "Q-PAR-PF",
+    label: "LEVE N: a cada 2, um por R$ X",
+    aplicacaoDestino: 0,
+    mecanica: 2,
+    tipoDesconto: 0,
+    color: "silver"
+  },
+  {
+    value: 2,
+    text: "Q-PAR-RS",
+    label: "LEVE N: a cada 2, um com R$ X de desconto",
+    aplicacaoDestino: 0,
+    mecanica: 2,
+    tipoDesconto: 1,
+    color: "indigo"
+  },
+  {
+    value: 3,
+    text: "Q-PAR-PC",
+    label: "LEVE N: a cada 2, um com X% (a clássica 2ª unidade com X%) ",
+    aplicacaoDestino: 0,
+    mecanica: 2,
+    tipoDesconto: 2,
+    color: "blue"
+  },
+  {
+    value: 4,
+    text: "Q-TOD-PF",
+    label: "LEVE N: todos por R$ X",
+    aplicacaoDestino: 1,
+    mecanica: 2,
+    tipoDesconto: 0,
+    color: "blueviolet"
+  },
+  {
+    value: 5,
+    text: "Q-TOD-RS",
+    label: "LEVE N: R$ X de desconto em cada",
+    aplicacaoDestino: 1,
+    mecanica: 2,
+    tipoDesconto: 1,
+    color: "crimson"
+  },
+  {
+    value: 6,
+    text: "Q-TOD-PC",
+    label: "LEVE N: X% em todos",
+    aplicacaoDestino: 1,
+    mecanica: 2,
+    tipoDesconto: 2,
+    color: "green"
+  },
+  {
+    value: 7,
+    codigo: "Q-CAD-PF",
+    label: "A cada N, um por R$ X",
+    aplicacaoDestino: 2,
+    mecanica: 2,
+    tipoDesconto: 0,
+    color: "mediumpurple"
+  },
+  {
+    value: 8,
+    text: "Q-CAD-RS",
+    label: "A cada N, um com R$ X de desconto",
+    aplicacaoDestino: 2,
+    mecanica: 2,
+    tipoDesconto: 1,
+    color: "darkred"
+  },
+  {
+    value: 9,
+    text: "Q-CAD-PC",
+    label: "A cada N, um com X% (com 100% vira Leve N, pague N-1)",
+    aplicacaoDestino: 2,
+    mecanica: 2,
+    tipoDesconto: 2,
+    color: "cyan"
+  },
+  {
+    value: 10,
+    text: "Q-MPR-PF",
+    label: "Leve N: do 2º em diante por R$ x",
+    aplicacaoDestino: 3,
+    mecanica: 2,
+    tipoDesconto: 0,
+    color: "limegreen"
+  },
+  {
+    value: 11,
+    text: "Q-MPR-RS",
+    label: "Leve N: do 2º em diante com R$ X de desconto",
+    aplicacaoDestino: 3,
+    mecanica: 2,
+    tipoDesconto: 1,
+    color: "darkviolet"
+  },
+  {
+    value: 12,
+    text: "Q-MPR-PC",
+    label: "Leve N: do 2º em diante com X%",
+    aplicacaoDestino: 3,
+    mecanica: 2,
+    tipoDesconto: 2,
+    color: "yellowGreen"
+  },
+  {
+    value: 13,
+    text: "Q-UM-PF",
+    label: "Leve N: só um por R$ X",
+    aplicacaoDestino: 4,
+    mecanica: 2,
+    tipoDesconto: 0,
+    color: "coral"
+  },
+  {
+    value: 14,
+    text: "Q-UM-RS",
+    label: "Leve N: só um com R$ X de desconto",
+    aplicacaoDestino: 4,
+    mecanica: 2,
+    tipoDesconto: 1,
+    color: "darkslategray"
+  },
+  {
+    value: 15,
+    text: "Q-UM-PC",
+    label: "Leve N: só um com X% (com 100% vira brinde)",
+    aplicacaoDestino: 4,
+    mecanica: 2,
+    tipoDesconto: 2,
+    color: "purple"
+  },
+  {
+    value: 16,
+    text: "V-PAR-PF",
+    label: "Acima de R$ Y: a cada 2, um por R$ X",
+    aplicacaoDestino: 0,
+    mecanica: 1,
+    tipoDesconto: 0,
+    color: "steelblue"
+  },
+  {
+    value: 17,
+    text: "V-PAR-RS",
+    label: "Acima de R$ Y: a cada 2, um com R$ X de desconto",
+    aplicacaoDestino: 0,
+    mecanica: 1,
+    tipoDesconto: 1,
+    color: "teal"
+  },
+  {
+    value: 18,
+    text: "V-PAR-PC",
+    label: "Acima de R$ Y: a cada 2, um com X%",
+    aplicacaoDestino: 0,
+    mecanica: 1,
+    tipoDesconto: 2,
+    color: "orange"
+  },
+  {
+    value: 19,
+    text: "V-TOD-PF",
+    label: "Acima de R$ Y: todos por R$ X",
+    aplicacaoDestino: 1,
+    mecanica: 1,
+    tipoDesconto: 0,
+    color: "darkturquoise"
+  },
+  {
+    value: 20,
+    text: "V-TOD-RS",
+    label: "Acima de R$ Y: R$ X de desconto em cada",
+    aplicacaoDestino: 1,
+    mecanica: 1,
+    tipoDesconto: 1,
+    color: "lime"
+  },
+  {
+    value: 21,
+    text: "V-TOD-PC",
+    label: "Acima de R$ Y: X% em todos",
+    aplicacaoDestino: 1,
+    mecanica: 1,
+    tipoDesconto: 2,
+    color: "pink"
+  },
+  {
+    value: 22,
+    text: "V-CAD-PF",
+    label: "Acima de R$ Y: a cada N, um por R$ X",
+    aplicacaoDestino: 2,
+    mecanica: 1,
+    tipoDesconto: 0,
+    color: "cadetblue"
+  },
+  {
+    value: 23,
+    text: "V-CAD-RS",
+    label: "Acima de R$ Y: a cada N, um com R$ X de desconto",
+    aplicacaoDestino: 2,
+    mecanica: 1,
+    tipoDesconto: 1,
+    color: "lightgreen"
+  },
+  {
+    value: 24,
+    text: "V-CAD-PC",
+    label: "Acima de R$ Y: a cada N, um com X%",
+    aplicacaoDestino: 2,
+    mecanica: 1,
+    tipoDesconto: 2,
+    color: "lightcoral"
+  },
+  {
+    value: 25,
+    text: "V-MPR-PF",
+    label: "Acima de R$ Y: do 2º em diante por R$ X",
+    aplicacaoDestino: 3,
+    mecanica: 1,
+    tipoDesconto: 0,
+    color: "darkslateblue"
+  },
+  {
+    value: 26,
+    text: "V-MPR-RS",
+    label: "Acima de R$ Y: do 2º em diante com R$ X de desconto",
+    aplicacaoDestino: 3,
+    mecanica: 1,
+    tipoDesconto: 1,
+    color: "maroon"
+  },
+  {
+    value: 27,
+    text: "V-MPR-PC",
+    label: "Acima de R$ Y: do 2º em diante com X%",
+    aplicacaoDestino: 3,
+    mecanica: 1,
+    tipoDesconto: 2,
+    color: "brown"
+  },
+  {
+    value: 28,
+    text: "V-UM-PF",
+    label: "Acima de R$ Y: só um por R$ X",
+    aplicacaoDestino: 4,
+    mecanica: 1,
+    tipoDesconto: 0,
+    color: "navy"
+  },
+  {
+    value: 29,
+    text: "V-UM-RS",
+    label: "Acima de R$ Y: só um com R$ X de desconto",
+    aplicacaoDestino: 4,
+    mecanica: 1,
+    tipoDesconto: 1,
+    color: "olive"
+  },
+  {
+    value: 30,
+    text: "V-UM-PC",
+    label: "Acima de R$ Y: só um com X% (com 100% vira brinde)",
+    aplicacaoDestino: 4,
+    mecanica: 1,
+    tipoDesconto: 2,
+    color: "gray"
+  }
+];
+
+export const optionsMecanicaCompletaAnterior = [
   {
     value: 1,
     label: "PROMOÇÃO POR PARES // QUANTIDADE // PERCENTUAL DESCONTO",
@@ -224,9 +494,7 @@ export const optionsMecanicaCompleta = [
     tipoDesconto: 2,
     color: "purple"
   },
-
-  // QUANTIDADE (mecanica: 2) + VALOR DESCONTO (tipoDesconto: 1)
-  {
+  { // ok
     value: 6,
     label: "PROMOÇÃO POR PARES // QUANTIDADE // VALOR DESCONTO",
     aplicacaoDestino: 0,
@@ -266,9 +534,7 @@ export const optionsMecanicaCompleta = [
     tipoDesconto: 1,
     color: "darkslategray"
   },
-
-  // QUANTIDADE (mecanica: 2) + VALOR FINAL (tipoDesconto: 0)
-  {
+  { // ok
     value: 11,
     label: "PROMOÇÃO POR PARES // QUANTIDADE // VALOR FINAL",
     aplicacaoDestino: 0,
@@ -308,8 +574,6 @@ export const optionsMecanicaCompleta = [
     tipoDesconto: 0,
     color: "coral"
   },
-
-  // VALOR (mecanica: 1) + PERCENTUAL DESCONTO (tipoDesconto: 2)
   {
     value: 16,
     label: "PROMOÇÃO POR PARES // VALOR // PERCENTUAL DESCONTO",
@@ -350,8 +614,6 @@ export const optionsMecanicaCompleta = [
     tipoDesconto: 2,
     color: "gray"
   },
-
-  // VALOR (mecanica: 1) + VALOR DESCONTO (tipoDesconto: 1)
   {
     value: 21,
     label: "PROMOÇÃO POR PARES // VALOR // VALOR DESCONTO",
@@ -435,4 +697,3 @@ export const optionsMecanicaCompleta = [
     color: "navy"
   }
 ];
-

@@ -26,6 +26,7 @@ import { ActionEstruturaProdutoOrigemModal } from "./ActionProdutosOrigem/action
 import { ActionEstruturaProdutoDestinoModal } from "./ActionProdutosDestino/actionEstruturaProdutoDestinoModal";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../utils/animationCarregamento"
 import Swal from "sweetalert2";
+import { optionsMecanicaCompletaAnterior } from "../../../../mecanica";
 
 
 export const ActionPesquisaPromocao = ({ }) => {
@@ -81,6 +82,7 @@ export const ActionPesquisaPromocao = ({ }) => {
     optionsMarcas,
     optionsEmpresas,
     optionsMecanica,
+    optionsMecanicaCompleta,
     dadosMecanicas,
     mecanicaSelecionadaEdicao,
     setMecanicaSelecionadaEdicao,
@@ -197,16 +199,32 @@ export const ActionPesquisaPromocao = ({ }) => {
   }, [setSubGrupoOrigem]);
 
   const handleChangeMecanica = useCallback((selectedValue) => {
-    const selectedOption = dadosMecanicas.find(option => option.ID == selectedValue);
 
-    if (selectedOption) {
-      setMecanicaSelecionada(selectedOption.MECANICA);
-      setMecanicaSelecionadaEdicao(selectedOption.DESCRICAO)
-      setAplicacaoDestinoSelecionada(selectedOption.APLICACAODESTINO);
-      setTipoDescontoSelecionado(selectedOption.TIPODESCONTO);
-    }
+      console.log(selectedValue, 'selectedVALUE')
+      setMecanicaSelecionada(selectedValue.MECANICA);
+      setMecanicaSelecionadaEdicao(selectedValue.label)
+      setAplicacaoDestinoSelecionada(selectedValue.APLICAODESTINO);
+      setTipoDescontoSelecionado(selectedValue.TIPODESCONTO);
+    
+      // console.log(mecanicaSelecionada, 'mecanicaSelecionada')
+      // console.log(mecanicaSelecionadaEdicao, 'mecanicaSelecionadaEdicao')
+      // console.log(aplicacaoDestinoSelecionada, 'aplicaoDestinoSelecionada')
+      // console.log(tipoDescontoSelecionado, 'tipoDescontoSelecionado AQUI')
+  }, []);
+  // const handleChangeMecanica = useCallback((selectedValue) => {
+  //   const selectedOption = optionsMecanicaCompletaAnterior?.find(option => option.ID == selectedValue);
 
-  }, [dadosMecanicas, setMecanicaSelecionada, setAplicacaoDestinoSelecionada, setTipoDescontoSelecionado,]);
+  //   if (selectedOption) {
+  //     setMecanicaSelecionada(selectedOption.mecanica);
+  //     setMecanicaSelecionadaEdicao(selectedOption.label)
+  //     setAplicacaoDestinoSelecionada(selectedOption.aplicacaoDestino);
+  //     setTipoDescontoSelecionado(selectedOption.tipoDesconto);
+  //   }
+  //     console.log(mecanicaSelecionada, 'mecanicaSelecionada')
+  //     console.log(mecanicaSelecionadaEdicao, 'mecanicaSelecionadaEdicao')
+  //     console.log(aplicacaoDestinoSelecionada, 'aplicaoDestinoSelecionada')
+  //     console.log(tipoDescontoSelecionado, 'tipoDescontoSelecionado')
+  // }, [dadosMecanicas, setMecanicaSelecionada, setAplicacaoDestinoSelecionada, setTipoDescontoSelecionado,]);
 
   const handleEditarMecanica = () => {
     const selectedOption = dadosMecanicas.find(option => option.ID == mecanicaSelecionada);
@@ -568,6 +586,7 @@ export const ActionPesquisaPromocao = ({ }) => {
     // }
   }
 
+  // console.log(mecanicaSelecionada, 'mecanicaSelecionada')
   return (
     <Fragment>
       <ActionMainPromocao
@@ -575,16 +594,29 @@ export const ActionPesquisaPromocao = ({ }) => {
         linkComponent={["Cadastro de Promoções"]}
         title="Cadastro de Promoções"
 
+        // InputSelectMecanicaComponent={InputSelectActionPromocao}
+        // labelSelectMecanica={"Mecanica"}
+        // optionsMecanica={dadosMecanicas?.map((item) => ({
+        //   value: item.ID,
+        //   label: `${item.ID} - ${item.DESCRICAO}`,
+        //   APLICAODESTINO: item.APLICAODESTINO,
+        //   TIPODESCONTO: item.TIPODESCONTO
+        // }))}
+        // defaultValueSelectMecanica={mecanicaSelecionada}
+        // onChangeSelectMecanica={(e) => handleChangeMecanica(e.value)}
+        // styleMecanica={customStyles}
+     
         InputSelectMecanicaComponent={InputSelectActionPromocao}
         labelSelectMecanica={"Mecanica"}
-        optionsMecanica={dadosMecanicas.map((item) => ({
-          value: item.ID,
-          label: `${item.ID} - ${item.DESCRICAO}`,
-          APLICAODESTINO: item.APLICAODESTINO,
-          TIPODESCONTO: item.TIPODESCONTO
+        optionsMecanica={optionsMecanicaCompleta?.map((item) => ({
+          value: item.value,
+          label: `${item.value} - ${item.label}`,
+          APLICAODESTINO: item.aplicacaoDestino,
+          TIPODESCONTO: item.tipoDesconto,
+          MECANICA: item.mecanica
         }))}
         defaultValueSelectMecanica={mecanicaSelecionada}
-        onChangeSelectMecanica={(e) => handleChangeMecanica(e.value)}
+        onChangeSelectMecanica={(e) => handleChangeMecanica(e)}
         styleMecanica={customStyles}
         // valueSelectMecanica={mecanicaSelecionada}
         // readOnlyMecanica={mecanicaSelecionada === 0 ? true : false}
