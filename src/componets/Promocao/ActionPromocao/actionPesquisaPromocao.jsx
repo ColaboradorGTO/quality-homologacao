@@ -199,18 +199,12 @@ export const ActionPesquisaPromocao = ({ }) => {
   }, [setSubGrupoOrigem]);
 
   const handleChangeMecanica = useCallback((selectedValue) => {
-
-      console.log(selectedValue, 'selectedVALUE')
-      setMecanicaSelecionada(selectedValue.MECANICA);
-      setMecanicaSelecionadaEdicao(selectedValue.label)
-      setAplicacaoDestinoSelecionada(selectedValue.APLICAODESTINO);
-      setTipoDescontoSelecionado(selectedValue.TIPODESCONTO);
-    
-      // console.log(mecanicaSelecionada, 'mecanicaSelecionada')
-      // console.log(mecanicaSelecionadaEdicao, 'mecanicaSelecionadaEdicao')
-      // console.log(aplicacaoDestinoSelecionada, 'aplicaoDestinoSelecionada')
-      // console.log(tipoDescontoSelecionado, 'tipoDescontoSelecionado AQUI')
+    setMecanicaSelecionada(selectedValue.MECANICA);
+    setMecanicaSelecionadaEdicao(selectedValue.label)
+    setAplicacaoDestinoSelecionada(selectedValue.APLICAODESTINO);
+    setTipoDescontoSelecionado(selectedValue.TIPODESCONTO);
   }, []);
+
   // const handleChangeMecanica = useCallback((selectedValue) => {
   //   const selectedOption = optionsMecanicaCompletaAnterior?.find(option => option.ID == selectedValue);
 

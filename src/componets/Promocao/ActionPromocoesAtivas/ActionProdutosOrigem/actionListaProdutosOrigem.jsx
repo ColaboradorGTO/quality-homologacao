@@ -20,13 +20,21 @@ export const ActionListaProdutosOrigem = ({
   const dataTableRef = useRef();
 
   
-  const handleCheckboxChangeOrigem = (id) => {
-    const produto = dados.find(item => String(item.IDPRODUTO) === String(id));
-    setNovoProdutoOrigem(prevState => {
-      const exists = prevState.some(item => String(item.IDPRODUTO) === String(id));
-      return exists
-        ? prevState.filter(item => String(item.IDPRODUTO) !== String(id))
-        : [...prevState, produto];
+  const handleCheckboxChangeOrigem = (produto) => {
+    setNovoProdutoOrigem((prevState) => {
+      const existe = prevState.some(
+        item => String(item.IDPRODUTO) === String(produto.IDPRODUTO)
+      );
+      
+      if(existe) {
+        return prevState.filter(
+          item =>
+            String(item.IDPRODUTO) !==
+            String(produto.IDPRODUTO)
+        );
+      }
+
+      return [...prevState, produto];
     });
   }
 
@@ -71,18 +79,19 @@ export const ActionListaProdutosOrigem = ({
 
 
 
-  const dados = dadosProdutosPesquisa.map((item, index) => {
-    let contador = index + 1;
-   
-    return {
-      contador,
-      IDPRODUTO: item.IDPRODUTO,
-      NUCODBARRAS: item.NUCODBARRAS,
-      DSNOME: item.DSNOME,
-      IDRESUMOPROMOCAOMARKETING: item.IDRESUMOPROMOCAOMARKETING,
-      STATIVO: item.STATIVO,
-    }
-  });
+  const dados = dadosProdutosPesquisa.map((item, index) => ({
+    contador: index + 1,
+    rowKey: `${item.IDPRODUTO}_${item.NUCODBARRAS}_${index}`,
+    IDPRODUTO: item.IDPRODUTO,
+    NUCODBARRAS: item.NUCODBARRAS,
+    DSNOME: item.DSNOME,
+    IDRESUMOPROMOCAOMARKETING: item.IDRESUMOPROMOCAOMARKETING,
+    STATIVO: item.STATIVO,
+    selecionado: novoProdutoOrigem?.some(
+      selecionadoItem => String(selecionadoItem.IDPRODUTO) === String(item.IDPRODUTO)
+    ) ?? false,
+
+  }));
 
   const colunasProdutos = [
     {
@@ -92,7 +101,7 @@ export const ActionListaProdutosOrigem = ({
       sortable: true,
     },
     {
-      field: 'DPRODUTO',
+      field: 'IDPRODUTO',
       header: 'N.Item',
       body: row => <th>{row.IDPRODUTO}</th>,
       sortable: true,
@@ -110,19 +119,14 @@ export const ActionListaProdutosOrigem = ({
       sortable: true,
     },
     {
-      field: '',
+      field: 'Opcoes',
       header: 'Opções',
       body: row => {
         return (
           <input
             type="checkbox"
-            checked={novoProdutoOrigem?.some(item => String(item.IDPRODUTO) === String(row.IDPRODUTO))}
-            // checked={novoProdutoOrigem?.includes(row.IDPRODUTO)}
-            onChange={() =>
-              handleCheckboxChangeOrigem(
-                row.IDPRODUTO,
-              )
-            }
+            checked={row.selecionado}
+            onChange={() =>  handleCheckboxChangeOrigem(row)}
           />
         );
       },
@@ -154,7 +158,7 @@ export const ActionListaProdutosOrigem = ({
             title="Lista de Produtos"
             value={dados}
             size="small"
-            dataKey="IDPRODUTO"
+            dataKey={"rowKey"}
             globalFilter={globalFilterValue}
             sortOrder={-1}
             paginator={true}
