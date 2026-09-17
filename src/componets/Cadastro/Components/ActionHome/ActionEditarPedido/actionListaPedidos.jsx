@@ -31,8 +31,6 @@ export const ActionListaPedidos = ({
   optionsModulos,
   dadosUltimosPedidos,
   checkboxIntermediario,
-  idResumoPedido,
-  setIdResumoPedido
 }) => {
   const [modalEditarItemPedido, setModalEditarItemPedido] = useState(false);
   const [dadosItemPedido, setDadosItemPedido] = useState([]);
@@ -45,7 +43,7 @@ export const ActionListaPedidos = ({
 
   const {
     handleClickCancelarItem
-  } = useCancelarPedido({usuarioLogado, optionsModulos})
+  } = useCancelarPedido({usuarioLogado, optionsModulos, checkboxIntermediario})
   
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -502,6 +500,9 @@ export const ActionListaPedidos = ({
             handleClose={() => setModalEditarItemPedido(false)}
             dadosDetalhePedido={dadosDetalhePedido}
             setDadosDetalhePedido={setDadosDetalhePedido}
+            checkboxIntermediario={checkboxIntermediario}
+            usuarioLogado={usuarioLogado}
+            optionsModulos={optionsModulos}
           />
 
           <ActionIncluirProdutoPedidoModal

@@ -765,7 +765,7 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
 
     try {
       const response = await get(`/detalhe-promocoes-ativas?idResumoPromocao=${idResumoPromocao}`)
-      if (response && response.data) {
+      if (response.data && response.data.length > 0) {
         setDadosProdutosPromocaoDaPromocao(response?.data);
         setModalProdutoDaPromocao(true)
       }
@@ -968,7 +968,8 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
             : (produtoDestinoSelecionado && produtoDestinoSelecionado.length > 0)
               ? produtoDestinoSelecionado
               : [];
-
+      console.log(produtoDestino, 'produtoDestino')
+      console.log(produtoOrigem, 'produtoOrigem')
 
       if (promocoesAtivas && promocoesAtivas.length > 0) {
         const produtoDestinoArray = Array.isArray(produtosDestino) ? produtosDestino : [produtosDestino];
@@ -1029,16 +1030,16 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
             return;
           }
 
-          if (descontoAtivoPromocaoPorEmpresa) {
-            Swal.fire({
-              icon: 'warning',
-              title: 'Tipo Desconto já ativo nesta empresa!',
-              text: 'Já existe um desconto ativo com o mesmo tipo de desconto nesta empresa. Não é permitido cadastrar outro.',
-              customClass: { container: 'custom-swal' },
-              confirmButtonText: 'OK'
-            });
-            return;
-          }
+          // if (descontoAtivoPromocaoPorEmpresa) {
+          //   Swal.fire({
+          //     icon: 'warning',
+          //     title: 'Tipo Desconto já ativo nesta empresa!',
+          //     text: 'Já existe um desconto ativo com o mesmo tipo de desconto nesta empresa. Não é permitido cadastrar outro.',
+          //     customClass: { container: 'custom-swal' },
+          //     confirmButtonText: 'OK'
+          //   });
+          //   return;
+          // }
 
           const promocoesValidasNaEmpresaSelecionada = [];
           responseProdutoExistente.data.forEach(item => {
@@ -1194,6 +1195,10 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
         IDSUBGRUPOEMORIGEM: subGrupoSelecionado,
         IDMARCAEMORIGEM: marcaOrigem,
         IDFORNECEDOREMORIGEM: fornecedorSelecionado,
+        STESTRUTURA: dadosPromocao[0]?.STESTRUTURA,
+        STPRODUTO: dadosPromocao[0]?.STPRODUTO,
+        STESTRUTURAPRODUTO: dadosPromocao[0]?.STESTRUTURAPRODUTO,
+
         IDPRODUTO: Array.from(new Set([
           ...extractIds(produtosDestino),
           ...extractIds(produtoDestinoSelecionado),
@@ -1209,6 +1214,7 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
           ...extractIds(produtoOrigemSelecionado),
           ...extractIds(novoProdutoOrigem),
         ].filter(Boolean))),
+        NUTIPOPROMOCAO: mecanicaSelecionada
       };
 
 

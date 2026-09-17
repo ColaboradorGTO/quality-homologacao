@@ -4,7 +4,8 @@ import { registrarLogAuditoria } from "../../../../../services/auditLog";
 
 export const useCancelarPedido = ({
     usuarioLogado,
-    optionsModulos
+    optionsModulos,
+    checkboxIntermediario
 }) => {
 
     const handleClickCancelarItem = async (row) => {
@@ -58,10 +59,10 @@ export const useCancelarPedido = ({
             STCANCELADO: 'True',
             IDRESPCANCELAMENTO: usuarioLogado?.id,
             TXTOBSCANCELAMENTO: motivo.trim().toUpperCase(),
-            STPEDIDOPRIMARIO: ''
+            STPEDIDOPRIMARIO: checkboxIntermediario ? 'True' : 'False',
         };
+        
         try {
-
             
             const response = await put('/remover-item-referencia-pedido', dados);
 

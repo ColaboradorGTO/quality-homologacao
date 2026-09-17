@@ -1,12 +1,9 @@
 import { useEffect, useState } from "react";
-import axios from "axios"
 import Swal from "sweetalert2";
 import { get, post, put } from "../../../../../api/funcRequest";
 import { getDataAtual } from "../../../../../utils/dataAtual";
 import { useQuery } from "react-query";
 import { toFloat } from "../../../../../utils/toFloat";
-
-
 
 export const useIncluirProutoPedido = ({
     optionsModulos,
@@ -41,7 +38,6 @@ export const useIncluirProutoPedido = ({
     const [arquivoGerado, setArquivoGerado] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
-    const [ipUsuario, setIpUsuario] = useState('');
     const [dataPedido, setDataPedido] = useState('')
     const [dataAtual, setDataAtual] = useState('')
     const [dataPrevisaoEntrega, setDataPrevisaoEntrega] = useState('');
@@ -68,28 +64,6 @@ export const useIncluirProutoPedido = ({
         const data = getDataAtual();
         setDataAtual(data);
     }, [])
-
-    const getIPUsuario = async () => {
-        let usuarioIP = null;
-
-        try {
-            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
-            usuarioIP = ipWhoisData?.ip;
-        } catch (error) {
-            console.error("Erro ao buscar IP via ifconfig.me:", error);
-        }
-
-        if (!usuarioIP) {
-            try {
-                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-                usuarioIP = ipifyData?.ip;
-            } catch (error) {
-                console.error("Erro ao buscar IP via ipify.org:", error);
-            }
-        }
-        setIpUsuario(usuarioIP);
-        return usuarioIP;
-    };
 
     const { data: dadosFornecedores = [], error: errorFornecedor, isLoading: isLoadingFornecedor, refetch: refetchFornecedor } = useQuery(
         'fornecedores',
@@ -175,12 +149,8 @@ export const useIncluirProutoPedido = ({
 
     useEffect(() => {
         if (dadosVisualizarPedido && dadosVisualizarPedido.length > 0) {
-            // console.log((dadosVisualizarPedido[0]), 'dadosVisualizarPedido[0')
-
-
             setIdResumoPedido(dadosVisualizarPedido[0]?.IDPEDIDO || '');
             setCompradorSelecionado({ value: dadosVisualizarPedido[0]?.IDCOMPRADOR, label: dadosVisualizarPedido[0]?.NOMECOMPRADOR });
-
         }
     }, [dadosVisualizarPedido, dadosDetalhePedido])
 
@@ -530,57 +500,48 @@ export const useIncluirProutoPedido = ({
             return;
         }
 
+        let isUpdate = idResumoPedido.length > 0 && idResumoPedido;
+        const data = {
+            ...(isUpdate && { IDRESUMOPEDIDO: idResumoPedido }),
+            IDGRUPOEMPRESARIAL: '',
+            IDSUBGRUPOEMPRESARIAL: '',
+            IDCOMPRADOR: compradorSelecionado?.value,
+            IDCONDICAOPAGAMENTO: condicoesPagamentosSelecionado?.value,
+            IDFORNECEDOR: fornecedorSelecionado?.value,
+            IDTRANSPORTADORA: transportadoraSelecionada?.value,
+            IDANDAMENTO: '',
+            MODPEDIDO: tipoPedidoSelecionado?.value,
+            NOVENDEDOR: vendedor,
+            EEMAILVENDEDOR: emailVendedor,
+            DTPEDIDO: dataPedido,
+            DTPREVENTREGA: dataPrevisaoEntrega,
+            TPFRETE: freteSelecionado?.value,
+            DESCPERC01: desconto1,
+            DESCPERC02: desconto2,
+            DESCPERC03: desconto3,
+            PERCCOMISSAO: comissao,
+            VRTOTALLIQUIDO: totalLiq,
+            OBSPEDIDO: obsInterna,
+            OBSPEDIDO2: obsFornecedor,
+            DTFECHAMENTOPEDIDO: dataAtual,
+            DTCADASTRO: dataAtual,
+            TPARQUIVO: enviarSelecionado?.value,
+            STDISTRIBUIDO: 'False',
+            STAGRUPAPRODUTO: 'False',
+            STCANCELADO: 'False',
+            TPFISCAL: fiscalSelecionado?.value,
+            STRASCUNHO: stRascunho || 'False',
+            STPEDIDOPORINTEMEDIARIO: checked ? 'True' : 'False'
+        }
+
         try {
-
-
-            const isUpdate = idResumoPedido.length > 0 && idResumoPedido;
-            const data = {
-                ...(isUpdate && { IDRESUMOPEDIDO: idResumoPedido }),
-                IDGRUPOEMPRESARIAL: '',
-                IDSUBGRUPOEMPRESARIAL: '',
-                IDCOMPRADOR: compradorSelecionado?.value,
-                IDCONDICAOPAGAMENTO: condicoesPagamentosSelecionado?.value,
-                IDFORNECEDOR: fornecedorSelecionado?.value,
-                IDTRANSPORTADORA: transportadoraSelecionada?.value,
-                IDANDAMENTO: '',
-                MODPEDIDO: tipoPedidoSelecionado?.value,
-                NOVENDEDOR: vendedor,
-                EEMAILVENDEDOR: emailVendedor,
-                DTPEDIDO: dataPedido,
-                DTPREVENTREGA: dataPrevisaoEntrega,
-                TPFRETE: freteSelecionado?.value,
-                DESCPERC01: desconto1,
-                DESCPERC02: desconto2,
-                DESCPERC03: desconto3,
-                PERCCOMISSAO: comissao,
-                VRTOTALLIQUIDO: totalLiq,
-                OBSPEDIDO: obsInterna,
-                OBSPEDIDO2: obsFornecedor,
-                DTFECHAMENTOPEDIDO: dataAtual,
-                DTCADASTRO: dataAtual,
-                TPARQUIVO: enviarSelecionado?.value,
-                STDISTRIBUIDO: 'False',
-                STAGRUPAPRODUTO: 'False',
-                STCANCELADO: 'False',
-                TPFISCAL: fiscalSelecionado?.value,
-                STRASCUNHO: stRascunho || 'False',
-                STPEDIDOPORINTEMEDIARIO: checked ? 'True' : 'False'
-            }
-
             const response = isUpdate ? await put('/atualizar-pedido/:id', data) : await post('/pedido', data);
 
-            const textDados = JSON.stringify(data);
-            let textFuncao = isUpdate ? 'COMPRAS / ATUALIZAR PEDIDO' : 'COMPRAS / INCLUIR PEDIDO';
-            const ipUsuario = await getIPUsuario();
-
-            const createtLog = {
-                IDFUNCIONARIO: String(usuarioLogado.id),
-                PATHFUNCAO: textFuncao,
-                DADOS: textDados,
-                IP: ipUsuario || 'Indisponível'
-            }
-
-            await post('/log-web', createtLog)
+            await registrarLogAuditoria({
+                idFuncionario: usuarioLogado.id,
+                pathFuncao: isUpdate ? 'COMPRAS / ATUALIZAR PEDIDO' : 'COMPRAS / INCLUIR PEDIDO',
+                dados: data
+            });
 
             Swal.fire({
                 position: 'center',
@@ -595,16 +556,11 @@ export const useIncluirProutoPedido = ({
             })
             return response.data;
         } catch (error) {
-            const textDados = JSON.stringify('')
-            let textFuncao = isUpdate ? 'COMPRAS / ATUALIZAR PEDIDO' : 'COMPRAS / INCLUIR PEDIDO';
-            const ipUsuario = await getIPUsuario();
-            const createtLog = {
-                IDFUNCIONARIO: String(usuarioLogado.id),
-                PATHFUNCAO: textFuncao,
-                DADOS: textDados,
-                IP: ipUsuario || 'Indisponível'
-            }
-            await post('/log-web', createtLog)
+            await registrarLogAuditoria({
+                idFuncionario: usuarioLogado.id,
+                pathFuncao: 'COMPRAS / ATUALIZAR / INCLUIR PEDIDO',
+                dados: data
+            });
 
             Swal.fire({
                 position: 'center',
@@ -616,6 +572,7 @@ export const useIncluirProutoPedido = ({
                     container: 'custom-swal',
                 }
             });
+            return;
         }
     }
 
@@ -678,7 +635,7 @@ export const useIncluirProutoPedido = ({
 
             const response = await post('/finalizar-pedido-cadastro', postData)
 
-            const responsePost = await registrarLogAuditoria({
+            await registrarLogAuditoria({
                 idFuncionario: usuarioLogado.id,
                 pathFuncao: 'CADASTRO/FINALIZAR CADASTRO DE PRODUTOS DO PEDIDO',
                 dados: postData

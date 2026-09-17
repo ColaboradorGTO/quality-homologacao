@@ -728,8 +728,7 @@ export const useIncluirProutoPedido = ({
 
     const handleEnviarAjustePedidoCompras = async () => {
         let idResPedido = dadosVisualizarPedido[0]?.IDPEDIDO;
-        let textoMotivo = txtMotivo.value.replace(/[^a-zA-ZÀ-ÿ0-9, ]/g, '')?.replace(/\s{2,}/g, ' ')?.trim().toUpperCase();
-
+     
         let { stPedidoValidoParaAjuste } = await validarSePedidoPodeSerAjustado(idResPedido)
 
         if (!stPedidoValidoParaAjuste) return; 
@@ -743,16 +742,36 @@ export const useIncluirProutoPedido = ({
             confirmButtonText: 'Sim',
             cancelButtonText: 'Não',
         });
-
+        
         if (!confirmacao.isConfirmed) return;
+        
+        const { value: motivo } = await Swal.fire({
+            icon: 'question',
+            title: 'Motivo da Devolução do Pedido?',
+            input: 'textarea',
+            inputValidator: (value) => {
+                if (!value || value.trim().length < 10) {
+                    return 'Informe um motivo com no mínimo 10 caracteres';
+                }
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Confirmar',
+            cancelButtonText: 'Cancelar',
+        });
+      
+        
+        if (!motivo) {
+            return;
+        }
 
         const putData = {
             IDRESUMOPEDIDO: parseInt(idResPedido),
             IDANDAMENTO: parseInt(15),
-            TXTOBSDEVPEDIDO: txtMotivo
+            TXTOBSDEVPEDIDO: motivo?.value.replace(/[^a-zA-ZÀ-ÿ0-9, ]/g, '')?.replace(/\s{2,}/g, ' ')?.trim()?.toUpperCase()
         };
 
         try {
+            
             const response = await put(`/andamento-pedido/:id`, putData)
             await registrarLogAuditoria({
                 idFuncionario: usuarioLogado.id,

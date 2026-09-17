@@ -1,4 +1,4 @@
-import { Fragment, useRef, useState } from "react"
+import { Fragment, useState } from "react"
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { ButtonTable } from "../../../../ButtonsTabela/ButtonTable";
@@ -7,25 +7,18 @@ import { MdOutlineLocalPrintshop, MdOutlineSend } from "react-icons/md";
 import { formatMoeda } from "../../../../../utils/formatMoeda";
 import { CiEdit } from "react-icons/ci";
 import { SiSap } from "react-icons/si";
-import { useReactToPrint } from "react-to-print";
-import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
-import * as XLSX from 'xlsx';
 import HeaderTable from "../../../../Tables/headerTable";
 import { ActionPDFPedido } from "../ActionPDF/actionPDFPedido";
 import { get } from "../../../../../api/funcRequest";
-import { ActionNotaPDFSemPreco } from "../ActionPDFSemPreco/actionNotaPDFSemPreco";
 import { ActionPDFPedidoSemPreco } from "../ActionPDFSemPreco/actionPDFPedidoSemPreco";
-import { ActionNovoPedido } from "../../ActionNovoPedido/actionNovoPedido";
 import Swal from "sweetalert2";
 import { useEnviarPedidoComprasADM } from "../hooks/useEnviarPedidoComprasADM";
 import { useEnviarPedidoCompras } from "../hooks/useEnviarPedidoCompras";
 import { useMigrarPedidoSap } from "../hooks/useMigrarPedidoSap";
-import { ActionEditarNovoPedido } from "../../ActionNovoPedido/actionEditarNovoPedido";
 import { toFloat } from "../../../../../utils/toFloat";
 import { useExportarTabela } from "../../../../../hooks/useExportarTabela";
 import { usePesquisaLista } from "./usePesquisa";
-import { AcoesColunaPedido } from "./acoesPedido";
 import { useEffect } from "react";
 
 export const ActionListaPedidosPeriodo = ({
@@ -43,7 +36,8 @@ export const ActionListaPedidosPeriodo = ({
   setActionEditarPedido,
   actionPedidoResumido,
   usuarioLogado,
-  optionsModulos
+  optionsModulos,
+  handleClick
 }) => {
   const {
     modalPedidoNota,
@@ -54,23 +48,11 @@ export const ActionListaPedidosPeriodo = ({
     setDadosPedido,
     dadosPedidoSemPreco, 
     setDadoPedidoSemPreco,
-    dadosDetalheProdutoPedido,
-    setDadosDetalheProdutoPedido,
-    dadosEditarPedido,
-    setDadosEditarPedido,
-    dadosReceberPedido,
-    setDadosReceberPedido,
-    dadosEnviarComprasADM,
-    setDadosEnviarComprasADM,
-    // enviarPedidoComprasADM,
     handleImprimir,
     handleImprimirSemPreco,
-    // handleVisualizarPedido,
     handleEditarPedido,
     handleReceberPedido,
-    handleMigrarPedidio,
-    verificarExistenciaNF,
-    exibirBarraCarregamento,
+
   } = usePesquisaLista({
     dadosVisualizarPedido,
     setDadosVisualizarPedido,
@@ -86,9 +68,9 @@ export const ActionListaPedidosPeriodo = ({
     actionPedidoResumido,
   })
   const [rowSelection, setRowSelection] = useState(null);
-  const { enviarPedidoComprasADM } = useEnviarPedidoComprasADM({usuarioLogado, optionsModulos});
-  const { enviarPedidoCompras } = useEnviarPedidoCompras({usuarioLogado, optionsModulos});
-  const { migrarPedidoSap } = useMigrarPedidoSap();
+  const { enviarPedidoComprasADM } = useEnviarPedidoComprasADM({usuarioLogado, optionsModulos, handleClick});
+  const { enviarPedidoCompras } = useEnviarPedidoCompras({usuarioLogado, optionsModulos, handleClick});
+  const { handleMigrarPedidoSap } = useMigrarPedidoSap({usuarioLogado, optionsModulos, handleClick});
 
   const calcularTotalFabricante = () => {
     let total = 0;
@@ -103,7 +85,7 @@ export const ActionListaPedidosPeriodo = ({
     const totalFabricante = calcularTotalFabricante();
     let idPedidoPrimario = item.IDPEDIDOPRIMARIO || 0;
     let stPedidoSecundario = idPedidoPrimario > 0;
-    // console.log(item, 'item')
+    
     return {
       IDPEDIDO: item.IDPEDIDO,
       DTPEDIDO: item.DTPEDIDO,
@@ -523,6 +505,7 @@ export const ActionListaPedidosPeriodo = ({
 
   const handleClickEnviarComprasADM = async (row) => {
     if (row.IDPEDIDO) {
+      console.log(row.IDPEDIDO, 'row')
       enviarPedidoComprasADM(row.IDPEDIDO)
     }
   }
@@ -587,7 +570,7 @@ export const ActionListaPedidosPeriodo = ({
 
   const handleClickMigrarPedido = async (row) => {
     if (row && row.IDPEDIDO) {
-      handleMigrarPedidio(row.IDPEDIDO)
+      handleMigrarPedidoSap(row.IDPEDIDO)
     }
   }
 
@@ -674,4 +657,3 @@ export const ActionListaPedidosPeriodo = ({
     </Fragment >
   )
 }
-// 906

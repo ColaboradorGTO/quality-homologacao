@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { get, post, put } from "../../../../../../../api/funcRequest";
+import { get, put } from "../../../../../../../api/funcRequest";
 import { useQuery } from "react-query";
-import axios from "axios";
 import { toFloat } from "../../../../../../../utils/toFloat";
 import { optionsReposicao, optionsTipoCadastro, optionsTipoPedido } from "../../../../../../../../parceiro.json"
 import { removerFormatacaoMoeda } from "../../../../../../../utils/formatMoeda";
@@ -11,6 +10,7 @@ import Swal from "sweetalert2";
 export const useIncluirProduto = ({ 
     usuarioLogado, 
     optionsModulos,
+    handleClose,
     dadosDetalhePedido,
     setDadosDetalhePedido,
     dadosDetalheGradePedido,
@@ -65,7 +65,7 @@ export const useIncluirProduto = ({
     const { data: dadosVinculoEstiloGrupo = [], error: errorVinculoEstiloGrupo, isLoading: isLoadingVinculoEstiloGrupo, refetch: refetchVinculoEstiloGrupo } = useQuery(
         'vinculo-estilo-grupo',
         async () => { const response = await get(`/vinculo-estilo-grupo?idVinculoEstilo=${dadosDetalhePedido[0]?.IDVINCULOESTILO}`); return response.data },
-        { enabled: true }
+        { enabled: Boolean(dadosDetalhePedido[0]?.IDVINCULOESTILO) }
     );
 
     const { data: dadosCores = [], error: errorCores, isLoading: isLoadingCores, refetch: refetchCores } = useQuery(
@@ -90,7 +90,7 @@ export const useIncluirProduto = ({
     const { data: dadosCategoriaPedidos  = [], error: errorCategoriaPedidos, isLoading: isLoadingCategoriaPedidos, refetch: refetchCategoriaPedidos } = useQuery(
         'categoriasProdutos',
         async () => { const response = await get(`/categoriasProdutos?idCategoriaPedido=${dadosDetalhePedido[0]?.IDCATEGORIAPEDIDO}`); return response.data},
-        { enabled: true }
+        { enabled: Boolean(dadosDetalhePedido[0]?.IDCATEGORIAPEDIDO) }
     );
    
     const { data: dadosSubGrupoProduto  = [], error: errorSubGrupoProduto, isLoading: isLoadingSubGrupoProduto, refetch: refetchSubGrupoProduto } = useQuery(
@@ -102,7 +102,7 @@ export const useIncluirProduto = ({
     const { data: dadosFabricantePedido  = [], error: errorFabricantePedido, isLoading: isLoadingFabricantePedido, refetch: refetchFabricantePedido } = useQuery(
         'vincularFabricanteFornecedor',
         async () => { const response = await get(`/vincularFabricanteFornecedor?idFornecedorPedido=${dadosDetalhePedido[0]?.IDFORNECEDOR}`);  return response.data},
-        { enabled: true }
+        { enabled: Boolean(dadosDetalhePedido[0]?.IDFORNECEDOR) }
     );
     const { data: dadosLocalExposicao  = [], error: errorLocalExposicao, isLoading: isLoadingLocalExposicao, refetch: refetchLocalExposicao } = useQuery(
         'localExposicao',
@@ -124,35 +124,10 @@ export const useIncluirProduto = ({
         'lista-detalhe-pedidos-grade',
         async () => { 
             const response = await get(`/lista-detalhe-pedidos-grade?idDetalhePedido=${dadosDetalhePedido[0]?.IDDETPEDIDO}`);  
-            // setProdutoDadosGrade(response.data)
             return response.data
         },
-        { enabled: true }
+        { enabled: Boolean(dadosDetalhePedido[0]?.IDDETPEDIDO) }
     );
-
-
-    const getIPUsuario = async () => {
-        let usuarioIP = null;
-
-        try {
-        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
-        usuarioIP = ipWhoisData?.ip;
-        } catch (error) {
-        console.error("Erro ao buscar IP via ifconfig.me:", error);
-        }
-
-        if (!usuarioIP) {
-        try {
-            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-            usuarioIP = ipifyData?.ip;
-        } catch (error) {
-            console.error("Erro ao buscar IP via ipify.org:", error);
-        }
-        }
-        setIpUsuario(usuarioIP);
-        return usuarioIP;
-    };
-
 
     const formatarNumero = (valor, decimais = 2) => {
         if (valor === '' || valor === null || valor === undefined) return '';
@@ -205,7 +180,7 @@ export const useIncluirProduto = ({
     
     useEffect(() => {
         if(dadosDetalhePedido && dadosDetalhePedido.length > 0 && dadosDetalhePedido) {
-            
+            setIdResumoPedido(dadosDetalhePedido[0]?.IDPEDIDO)
             setFornecedor(`${dadosDetalhePedido[0]?.NORAZAOSOCIAL} - ${dadosDetalhePedido[0]?.NOFANTASIA} - ${dadosDetalhePedido[0]?.NUCNPJ}`)
             setDescricaoProduto(dadosDetalhePedido[0]?.DSPRODUTO)
             setQuantidade(toFloat(dadosDetalhePedido[0]?.QTDTOTAL))
@@ -217,7 +192,7 @@ export const useIncluirProduto = ({
             setTipoTecidoSelecionado({value: dadosDetalhePedido[0]?.IDTIPOTECIDO, label: dadosDetalhePedido[0]?.DSTIPOTECIDO})
             setCategoriaGradeSelecionada({
                 value: dadosDetalhePedido[0]?.IDCATEGORIAGRADE, 
-                label: `${dadosDetalhePedido[0]?.TPCATEGORIAPRODPEDIDO} - ${dadosDetalhePedido[0]?.DSCATEGORIAPEDIDO}`
+                label: `${dadosDetalhePedido[0]?.TPCATEGORIAPRODPEDIDO} `
             })
             
             setEstruturaSelecionada({value: dadosDetalhePedido[0]?.IDSUBGRUPOESTRUTURA, label: dadosDetalhePedido[0]?.DSSUBGRUPOESTRUTURA})
@@ -421,116 +396,11 @@ export const useIncluirProduto = ({
    
         return { disabled: false, readOnly: false };
     };
-   /*
-    ESTOU FAZENDO A MESMA COISA QUE  na validação de gradeamento no id #resultadoqtdtamanhos no jquery esta trazendo apenas 
-    as div do gradeamento porém no react js está trazendo varios mesmo a quantidade 0 e no jquery traz apenas as quantidades > 0
-   */
+
+      
     const onSubmit = async () => {
-        const qtdLetrasProd = String(descricaoProduto || '').length;
-
-        if (qtdLetrasProd < 5 || qtdLetrasProd > 50) {
-            Swal.fire({
-                title: 'Atenção!',
-                text: 'A descrição do Item deve ter entre 5 e 50 caracteres',
-                icon: 'warning',
-                customClass: {
-                    container: 'custom-swal',
-                },
-            });
-            return;
-        }
-
-        const camposObrigatorios = [
-            { valor: quantidade, label: 'Quantidade' },
-            { valor: quantidadeCaixa, label: 'QTD Caixas' },
-            { valor: referencia, label: 'Referência' },
-            { valor: unidadeSelecionada?.value, label: 'Unidade' },
-            { valor: corSelecionada?.value, label: 'Cor' },
-            { valor: tipoTecidoSelecionado?.value, label: 'Tipo de Material' },
-            { valor: categoriaSelecionada?.value, label: 'Categorias' },
-            { valor: localExposicaoSelecionado?.value, label: 'Local Exposição' },
-            { valor: ecommerceSelecionado?.value, label: 'E-commerce' },
-            { valor: redeSocialSelecionada?.value, label: 'Rede Social' },
-        ];
-
-        const errosCampos = camposObrigatorios
-            .filter(({ valor }) => valor === undefined || valor === null || valor === '')
-            .map(({ label }) => label);
-
-        if (converterParaNumero(vrCusto) === 0) errosCampos.push('VR Custo');
-        if (converterParaNumero(vrVenda) === 0) errosCampos.push('VR Venda');
-
-        if (errosCampos.length > 0) {
-            Swal.fire({
-                title: 'Preencha os campos:',
-                text: errosCampos.join(', \n'),
-                icon: 'warning',
-                customClass: {
-                    container: 'custom-swal',
-                },
-            });
-            return;
-        }
-
+        let idPedido = dadosDetalhePedido[0]?.IDPEDIDO
         if (!validarGradeamento()) {
-            return;
-        }
-
-        if (stReposicao == 'False') {
-            const responseProdutoExistente = await get(`/produtos-pedido?referenciaProduto=${descricaoProduto}`);
-            if (responseProdutoExistente.data.length > 0) {
-                Swal.fire({
-                    title: 'Edite e tente novamente!',
-                    text: 'Já existe um produto cadastrado com a mesma descrição digitada!',
-                    icon: 'warning',
-                    customClass: {
-                        container: 'custom-swal',   
-                    },
-                });
-                return;
-            }
-
-            const corOriginal = dadosCores.find(c => String(c.ID_COR) === String(corSelecionada?.value));
-            const corBloqueada = String(corOriginal?.STBLOQUEADOPARACADASTROPRODUTONOVO) === 'True'
-                || ['NENHUM', 'NENHUMA'].includes((corOriginal?.DS_COR || '').trim().toUpperCase());
-            if (corBloqueada) {
-                Swal.fire({
-                    title: 'Atenção!',
-                    text: 'A Cor selecionada está bloqueada para cadastro em novos produtos!',
-                    icon: 'warning',
-                    customClass: {
-                        container: 'custom-swal',   
-                    },
-                });
-                return;
-            }
-
-            const materialOriginal = dadosTipoTecidos.find(t => String(t.IDTPTECIDO) === String(tipoTecidoSelecionado?.value));
-            const materialBloqueado = String(materialOriginal?.STBLOQUEADOPARACADASTROPRODUTONOVO) === 'True'
-                || ['NENHUM', 'NENHUMA'].includes((materialOriginal?.DSTIPOTECIDO || '').trim().toUpperCase());
-            if (materialBloqueado) {
-                Swal.fire({
-                    title: 'Atenção!',
-                    text: 'O Tipo de Material está bloqueado para cadastro em novos produtos!',
-                    icon: 'warning',
-                    customClass: {
-                        container: 'custom-swal',   
-                    },
-                });
-                return;
-            }
-        }
-
-        const validarDuplicidadePedido = await get(`/lista-detalhe-pedidos?idPedido=${idResumoPedido}&dsProduto=${descricaoProduto}&refProduto=${referencia}`);
-        if (validarDuplicidadePedido.data.length > 0) {
-            Swal.fire({
-                title: 'Este Produto já existe no pedido!',
-                text: 'Caso queira incrementar quantidade, volte e edite o item referente!',
-                icon: 'warning',
-                customClass: {
-                    container: 'custom-swal',
-                },
-            });
             return;
         }
 
@@ -553,12 +423,12 @@ export const useIncluirProduto = ({
         const grade = montarPayloadGrade();
         const vrCustoAtual = converterParaNumero(vrCusto);
         const vrVendaAtual = converterParaNumero(vrVenda);
-
+        
         const data = {
-            IDRESUMOPEDIDO: parseInt(dadosDetalhePedido[0]?.IDRESUMOPEDIDO),
-            IDDETALHEPEDIDO: parseInt(dadosDetalhePedido[0]?.IDDETALHEPEDIDO),
+            IDRESUMOPEDIDO: parseInt(dadosDetalhePedido[0]?.IDPEDIDO),
+            IDDETALHEPEDIDO: parseInt(dadosDetalhePedido[0]?.IDDETPEDIDO),
             IDCOR: parseInt(corSelecionada?.value),
-            IDCATEGORIAPEDIDO: parseInt(categoriaSelecionada?.value),
+            IDCATEGORIAPEDIDO: parseInt(categoriaGradeSelecionada?.value) == 'VESTUARIO' ? 1 : 8,
             IDTIPOTECIDO: parseInt(tipoTecidoSelecionado?.value),
             IDLOCALEXPOSICAO: parseInt(localExposicaoSelecionado?.value),
             NUREF: referencia,
@@ -568,30 +438,23 @@ export const useIncluirProduto = ({
             UND: parseInt(unidadeSelecionada?.value),
             VRUNITBRUTO: vrCustoAtual,
             VRUNITLIQUIDO: vrCustoAtual,
-            VRVENDA: vrVendaAtual,
-            VRTOTAL: vrCustoAtual * parseInt(quantidade || 0),
+            VRVENDA: vrVenda,
+            VRTOTAL: vrCusto,
             STECOMMERCE: ecommerceSelecionado?.value,
             STREDESOCIAL: redeSocialSelecionada?.value,
             IDCATEGORIAS: parseInt(categoriaSelecionada?.value),
             STPEDIDOPRIMARIO: checkboxIntermediario ? 'True' : 'False',
-            GRADE: grade,
+            DETALHEGRADE: grade,
         }
         try {
          
-            const response = await put(`/detalhe-pedido/:id`, data); 
+            const response = await put(`/item-pedido/:id`, data); 
       
-            const responsePut = await put(`/lista-pedidos/:id?IDRESUMOPEDIDO=${idResumoPedido}`);
-            const textDados = JSON.stringify(data);
-            const ipUsuario = await getIPUsuario();
-            const textoFuncao = `COMPRAS/ALTERAR PRODUTO PEDIDO`;
-            const postData = {
-                IDFUNCIONARIO: String(usuarioLogado.id),
-                PATHFUNCAO: textoFuncao,
-                DADOS: textDados,
-                IP: ipUsuario || 'Indisponível'
-            };
-
-            await post('/log-web', postData);
+            await registrarLogAuditoria({
+                idFuncionario: usuarioLogado?.id,
+                pathFuncao: 'CADASTRO/EDICAO ITEM PEDIDO',
+                dados: data
+            })
 
             Swal.fire({
                 icon: 'success',
@@ -602,24 +465,21 @@ export const useIncluirProduto = ({
                     container: 'custom-swal',   
                 },
             });
-
-            const responseUltimoPedido = await get(`/lista-detalhe-pedidos?idPedido=${idResumoPedido}&somenteGradeAtiva=True`);
+            
+            const responseUltimoPedido = await get(`/pedido-compras-detalhado?idPedido=${idPedido}`);
             setDadosPedidoAtual(responseUltimoPedido.data);
             setDadosDetalhePedido(responseUltimoPedido.data);
+          
+            handleClose()
             return response.data;
         } catch (error) {
-            
-            const textDados = JSON.stringify(data);
-            const ipUsuario = await getIPUsuario();
-            const textoFuncao = `COMPRAS / ERRO AO ALTERAR PRODUTO NO PEDIDO `;
-            const postData = {
-                IDFUNCIONARIO: String(usuarioLogado.id),
-                PATHFUNCAO: textoFuncao,
-                DADOS: textDados,
-                IP: ipUsuario || 'Indisponível'
-            };
 
-            const responsePost = await post('/log-web', postData);
+            await registrarLogAuditoria({
+                idFuncionario: usuarioLogado?.id,
+                pathFuncao: 'CADASTRO/ERRO AO EDITAR ITEM PEDIDO',
+                dados: data
+            })
+
             Swal.fire({
                 icon: 'error',
                 title: 'Erro',
@@ -628,14 +488,11 @@ export const useIncluirProduto = ({
                     container: 'custom-swal',   
                 },
             });
-
-            return responsePost.data;
+            return;
         }
     }
 
     return {          
-        nomeMarca,
-        setNomeMarca,
         referenciaProduto,
         setReferenciaProduto,
         descricaoProduto,

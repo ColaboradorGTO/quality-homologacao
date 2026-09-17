@@ -26,8 +26,6 @@ export const FormularioEditarProdutoPedido = ({
         mode: "onChange"
     });
     const {
-        nomeMarca,
-        setNomeMarca,
         descricaoProduto,
         setDescricaoProduto,
         vrCusto,
@@ -93,6 +91,7 @@ export const FormularioEditarProdutoPedido = ({
     } = useIncluirProduto({ 
         usuarioLogado, 
         optionsModulos, 
+        handleClose,
         dadosDetalhePedido, 
         setDadosDetalhePedido, 
         dadosDetalheGradePedido, 
@@ -107,20 +106,24 @@ export const FormularioEditarProdutoPedido = ({
     const handleValidatedSubmit = async () => {
         try {
             const dadosParaValidar = {
-                nomeMarcaPedido: nomeMarca,
-                descricaoProdutoPedido: descricaoProduto,
                 qtd: quantidade,
                 qtdCaixa: quantidadeCaixa,
                 referenciaProduto: referencia,
-                estrututraProduto: estruturaSelecionada,
-                estiloProduto: estiloSelecionado,
+                unidadeProduto: unidadeSelecionada,
+                corProduto: corSelecionada,
+                tipoProduto: tipoTecidoSelecionado,
+                categoriaProduto: categoriaGradeSelecionada,
+                localExposicaoProduto: localExposicaoSelecionado,
+                ecommerceProduto: ecommerceSelecionado,
+                redeSocialProduto: redeSocialSelecionada,
+                descricaoProdutoPedido: descricaoProduto,
                 vrHojeCusto: vrCusto,
                 vrVendaHoje: vrVenda,
     
             }
 
             await schema.validate(dadosParaValidar, { abortEarly: false });
-
+            
             await onSubmit();
 
         } catch (validationError) {
@@ -137,7 +140,7 @@ export const FormularioEditarProdutoPedido = ({
                     }
                 });
             }
-
+           
             const errorMessages = validationError.errors || [validationError.message];
             console.log(`Erro de validação:\n${errorMessages.join('\n')}`);
         }
@@ -339,7 +342,7 @@ export const FormularioEditarProdutoPedido = ({
                                 )}
                             />
                         </div>
-                        
+                         
                         <div className="col-sm-4 col-xl-3">
                             <label className="form-label" htmlFor="tpcat">Categoria Produto</label>
                             <Select
@@ -706,10 +709,10 @@ export const FormularioEditarProdutoPedido = ({
                     corFechar={"secondary"}
 
                     ButtonTypeCadastrar={ButtonTypeModal}
-                    // onClickButtonCadastrar={handleValidatedSubmit}
-                    textButtonCadastrar={"Editar"}
+                    onClickButtonCadastrar={handleValidatedSubmit}
+                    textButtonCadastrar={"Atualizar"}
                     corCadastrar={"success"}
-                    loadingTextCadastrar={"Editando..."}
+                    loadingTextCadastrar={"Atualizando..."}
                     autoLoadingCadastrar={true}
                 />
             </form>

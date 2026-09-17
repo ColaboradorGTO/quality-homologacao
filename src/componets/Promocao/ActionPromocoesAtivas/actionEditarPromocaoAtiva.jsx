@@ -184,18 +184,21 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
   };
 
   const handleChangeMecanica = useCallback((selectedValue) => {
-    const selectedOption = optionsMecanicaCompleta?.find(option => option.value == selectedValue);
+    // const selectedOption = optionsMecanicaCompleta?.find(option => option.value == selectedValue);
 
-
-    if (selectedOption) {
-      setMecanicaSelecionada(selectedOption.value);
-      setMecanicaSelecionadaEdicao(selectedOption.label)
-      setAplicacaoDestinoSelecionada(selectedOption.aplicacaoDestino);
-      setTipoDescontoSelecionado(selectedOption.tipoDesconto);
+    
+    // console.log(selectedOption, 'selectedOption')
+    console.log(selectedValue, 'value')
+    if (selectedValue) {
+      setMecanicaSelecionada(selectedValue.value);
+      setMecanicaSelecionadaEdicao(selectedValue.label)
+      setAplicacaoDestinoSelecionada(selectedValue.aplicacaoDestino);
+      setTipoDescontoSelecionado(selectedValue.tipoDesconto);
+       console.log(mecanicaSelecionada, 'mecanica')
     } else {
-      console.log('Nenhuma opção encontrada para o valor:', selectedValue);
+      // console.log('Nenhuma opção encontrada para o valor:', selectedValue);
     }
-  }, []);
+  }, [optionsMecanicaCompleta]);
 
   // console.log(mecanicaSelecionada, 'mecanicaSelecionada')
   // console.log(mecanicaSelecionadaEdicao, 'mecanicaSelecionadaEdicao')
@@ -674,7 +677,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
     setModalEstProdOrigem(true);
   }
 
-
+ 
   return (
     <Fragment>
 

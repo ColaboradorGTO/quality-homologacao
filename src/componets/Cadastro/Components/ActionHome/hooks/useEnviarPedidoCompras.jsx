@@ -5,7 +5,8 @@ import { registrarLogAuditoria } from "../../../../../services/auditLog";
 
 export const useEnviarPedidoCompras = ({
     usuarioLogado,
-    optionsModulos
+    optionsModulos,
+    handleClick
 }) => {
     const [loading, setLoading] = useState(false);
 
@@ -76,14 +77,10 @@ export const useEnviarPedidoCompras = ({
                     container: 'custom-swal',
                 },
             });
-            
+
+            handleClick()
             return response.data;
         } catch (error) {
-            await registrarLogAuditoria({
-                idFuncionario: usuarioLogado?.id,
-                pathFuncao: "CADASTRO/ERRO AO ENVIAR PEDIDO PARA COMPRAS",
-                dados: dados
-            });
 
             Swal.fire({
                 icon: "error",

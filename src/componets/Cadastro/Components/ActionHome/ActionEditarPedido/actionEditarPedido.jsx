@@ -256,6 +256,8 @@ export const ActionEditarPedido = ({
         : toFloat(dadosVisualizarPedido[0]?.VRTOTALLIQUIDO);
 
       setTotalLiq(totalLiquidoFinal)
+      setTotalBruto(dadosVisualizarPedido[0]?.VRTOTALBRUTO)
+      setQtdProdutos(toFloat(dadosVisualizarPedido[0]?.QTDTOTPRODUTOS))
     }
   }, [dadosVisualizarPedido, dadosDetalhePedido])
 
@@ -598,17 +600,17 @@ export const ActionEditarPedido = ({
       {tabelaVisivel && ( 
 
         <ActionListaPedidos 
-            dadosDetalhePedido={dadosDetalhePedido}
-            setDadosDetalhePedido={setDadosDetalhePedido}
-            dadosVisualizarPedido={dadosVisualizarPedido}
-            setDadosVisualizarPedido={setDadosVisualizarPedido}
-            setModalIncluirProdutoPedido={setModalIncluirProdutoPedido}
-            usuarioLogado={usuarioLogado}
-            optionsModulos={optionsModulos}
-            dadosUltimosPedidos={dadosUltimosPedidos}
-            checkboxIntermediario={checkboxIntermediario}
-            idResumoPedido={idResumoPedido}
-            setIdResumoPedido={setIdResumoPedido}
+          dadosDetalhePedido={dadosDetalhePedido}
+          setDadosDetalhePedido={setDadosDetalhePedido}
+          dadosVisualizarPedido={dadosVisualizarPedido}
+          setDadosVisualizarPedido={setDadosVisualizarPedido}
+          setModalIncluirProdutoPedido={setModalIncluirProdutoPedido}
+          usuarioLogado={usuarioLogado}
+          optionsModulos={optionsModulos}
+          dadosUltimosPedidos={dadosUltimosPedidos}
+          checkboxIntermediario={checkboxIntermediario}
+          idResumoPedido={idResumoPedido}
+          setIdResumoPedido={setIdResumoPedido}
         />
       )}
     

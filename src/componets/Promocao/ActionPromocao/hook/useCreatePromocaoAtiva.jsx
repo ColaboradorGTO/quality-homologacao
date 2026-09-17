@@ -1103,6 +1103,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
           ...extractIds(produtoOrigemSelecionado),
           ...extractIds(novoProdutoOrigem),
         ].filter(Boolean))),
+        NUTIPOPROMOCAO: mecanicaSelecionada
       };
 
       let timerInterval;
