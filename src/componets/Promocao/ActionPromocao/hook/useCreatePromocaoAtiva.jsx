@@ -1203,6 +1203,8 @@ export const useCreatePromocaoAtiva = ({ }) => {
         },
         showConfirmButton: false,
         timer: 1500,
+      }).then(() => {
+        window.location.reload();
       });
 
       return response.data;

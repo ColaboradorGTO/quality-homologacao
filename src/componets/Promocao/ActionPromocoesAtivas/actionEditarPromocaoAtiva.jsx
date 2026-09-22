@@ -567,7 +567,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
   };
 
   const fetchProdutoSubGrupoDestino = async () => {
-    const urlBase = `/produto-subGrupo?idSubGrupo=${subGrupoDestino.join(',')}`;
+    const urlBase = `/produto-subGrupo?idSubGrupo=${subGrupoProdutoDestino.join(',')}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
@@ -600,13 +600,13 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
   };
 
   const { data: dadosProdutoSubGrupoDestino = [], error: errorProdutoSubGrupoDestino, isLoading: isLoadingProdutoSubGrupoDestino, refetch: refetchProdutoSubGrupoDestino } = useQuery(
-    ['produto-subGrupo', subGrupoDestino],
+    ['produto-subGrupo-destino', subGrupoProdutoDestino],
     async () => fetchProdutoSubGrupoDestino(),
-    { enabled: Boolean(subGrupoDestino.length), staleTime: 1000 * 60 * 60, cacheTime: 1000 * 60 * 60, }
+    { enabled: Boolean(subGrupoProdutoDestino.length), staleTime: 1000 * 60 * 60, cacheTime: 1000 * 60 * 60, }
   );
 
   const fetchProdutoSubGrupoOrigem = async () => {
-    const urlBase = `/produto-subGrupo?idSubGrupo=${subGrupoOrigem.join(',')}`;
+    const urlBase = `/produto-subGrupo?idSubGrupo=${subGrupoProdutoOrigem.join(',')}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
@@ -639,9 +639,9 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
   };
 
   const { data: dadosProdutoSubGrupoOrigem = [], error: errorProdutoSubGrupoOrigem, isLoading: isLoadingProdutoSubGrupoOrigem, refetch: refetchProdutoSubGrupoOrigem } = useQuery(
-    ['produto-subGrupo', subGrupoOrigem],
+    ['produto-subGrupo-origem', subGrupoProdutoOrigem],
     async () => fetchProdutoSubGrupoOrigem(),
-    { enabled: Boolean(subGrupoOrigem.length), staleTime: 1000 * 60 * 60, cacheTime: 1000 * 60 * 60, }
+    { enabled: Boolean(subGrupoProdutoOrigem.length), staleTime: 1000 * 60 * 60, cacheTime: 1000 * 60 * 60, }
   );
 
   const handleChangeGrupo = (e) => {
