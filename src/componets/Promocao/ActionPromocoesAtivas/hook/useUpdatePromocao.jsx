@@ -75,6 +75,7 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
   const [novoProdutoEstProdDestino, setNovoProdutoEstProdDestino] = useState([]);
   const [modalEstProdOrigem, setModalEstProdOrigem] = useState(false);
   const [modalEstProdDestino, setModalEstProdDestino] = useState(false);
+  const [ tipoPromocao, setTipoPromocao] = useState('')
 
   const navigate = useNavigate();
 
@@ -207,7 +208,7 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
       const statusValue = dados?.STATIVO == "True" ? "True" : "False";
 
       setStatusSelecionado(statusValue);
-
+      setTipoPromocao(dados?.NUTIPOPROMOCAO)
 
     }
 
@@ -235,13 +236,13 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
       }
     }
 
-    if (dadosPromocao && dadosPromocao[0]?.APARTIRDOVLR !== undefined) {
-      const valor = parseFloat(dadosPromocao[0].APARTIRDOVLR);
-      if (!isNaN(valor)) {
-        setValorInicio(valor);
-      }
-    }
-  }, [dadosPromocao, setQtdInicio, setValorInicio, valorInicio, setVrDesconto, setPrecoProduto, setPorcentoDesconto, setMecanicaSelecionadaEdicao, setDescricao, setDataInicio, setDataFim, setStatusSelecionado]);
+    // if (dadosPromocao && dadosPromocao[0]?.APARTIRDOVLR !== undefined) {
+    //   const valor = parseFloat(dadosPromocao[0].APARTIRDOVLR);
+    //   if (!isNaN(valor)) {
+    //     setValorInicio(valor);
+    //   }
+    // }
+  }, [dadosPromocao, setQtdInicio,  setVrDesconto, setPrecoProduto, setPorcentoDesconto, setMecanicaSelecionadaEdicao, setDescricao, setDataInicio, setDataFim, setStatusSelecionado]);
   // console.log(valorInicio, 'valorInicio')
 
   const optionsStatus = useMemo(() => [
@@ -968,24 +969,22 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
             : (produtoDestinoSelecionado && produtoDestinoSelecionado.length > 0)
               ? produtoDestinoSelecionado
               : [];
-      console.log(produtoDestino, 'produtoDestino')
-      console.log(produtoOrigem, 'produtoOrigem')
-
+    
       if (promocoesAtivas && promocoesAtivas.length > 0) {
         const produtoDestinoArray = Array.isArray(produtosDestino) ? produtosDestino : [produtosDestino];
         const idsResumo = promocoesAtivas.map(p => p.IDRESUMOPROMOCAOMARKETING).filter(Boolean);
         const existeAplicaoDestino = promocoesAtivas.some(ap => ap.TPAPARTIRDE == aplicacaoDestinoSelecionada);
 
-        // if (existeAplicaoDestino) {
-        //   Swal.fire({
-        //     icon: 'warning',
-        //     title: 'Aplicação de destino já existe!',
-        //     text: `Já existe uma promoção ativa com a mesma aplicação de destino nesta Empresa. Não é permitido cadastrar outra.`,
-        //     customClass: { container: 'custom-swal' },
-        //     confirmButtonText: 'OK'
-        //   });
-        //   return;
-        // }
+        if (existeAplicaoDestino) {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Aplicação de destino já existe!',
+            text: `Já existe uma promoção ativa com a mesma aplicação de destino nesta Empresa. Não é permitido cadastrar outra.`,
+            customClass: { container: 'custom-swal' },
+            confirmButtonText: 'OK'
+          });
+          return;
+        }
 
         if (idsResumo && idsResumo.length > 0) {
           const idResumo = idsResumo.join(',');
@@ -1030,16 +1029,16 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
             return;
           }
 
-          // if (descontoAtivoPromocaoPorEmpresa) {
-          //   Swal.fire({
-          //     icon: 'warning',
-          //     title: 'Tipo Desconto já ativo nesta empresa!',
-          //     text: 'Já existe um desconto ativo com o mesmo tipo de desconto nesta empresa. Não é permitido cadastrar outro.',
-          //     customClass: { container: 'custom-swal' },
-          //     confirmButtonText: 'OK'
-          //   });
-          //   return;
-          // }
+          if (descontoAtivoPromocaoPorEmpresa) {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Tipo Desconto já ativo nesta empresa!',
+              text: 'Já existe um desconto ativo com o mesmo tipo de desconto nesta empresa. Não é permitido cadastrar outro.',
+              customClass: { container: 'custom-swal' },
+              confirmButtonText: 'OK'
+            });
+            return;
+          }
 
           const promocoesValidasNaEmpresaSelecionada = [];
           responseProdutoExistente.data.forEach(item => {
@@ -1108,20 +1107,20 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
         }
       }
 
-      // if (aplicacaoDestinoSelecionada == 1) {
-      //   if (produtosDestino.length !== produtosOrigem.length) {
-      //     Swal.fire({
-      //       position: 'center',
-      //       icon: 'error',
-      //       title: 'Erro Aplicação Destino',
-      //       text: 'Para Mecânica por todos os produtos, os produtos de origem e destino devem ser iguais.',
-      //       customClass: { container: 'custom-swal' },
-      //       showConfirmButton: false,
-      //       timer: 8000,
-      //     });
-      //     return;
-      //   }
-      // }
+      if (aplicacaoDestinoSelecionada == 1) {
+        if (produtosDestino.length !== produtosOrigem.length) {
+          Swal.fire({
+            position: 'center',
+            icon: 'error',
+            title: 'Erro Aplicação Destino',
+            text: 'Para Mecânica por todos os produtos, os produtos de origem e destino devem ser iguais.',
+            customClass: { container: 'custom-swal' },
+            showConfirmButton: false,
+            timer: 8000,
+          });
+          return;
+        }
+      }
 
       if (aplicacaoDestinoSelecionada == 4) {
         if (produtosDestino.length !== 1 || produtosOrigem.length !== 1) {
@@ -1214,7 +1213,7 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
           ...extractIds(produtoOrigemSelecionado),
           ...extractIds(novoProdutoOrigem),
         ].filter(Boolean))),
-        NUTIPOPROMOCAO: mecanicaSelecionada
+        NUTIPOPROMOCAO: tipoPromocao
       };
 
 
@@ -2467,6 +2466,7 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao }) => {
     setGrupoSelecionadoDestino,
     downloadPlanilhaModelo,
     onSubmitEstrutura,
-    onSubmitEstruturaProduto
+    onSubmitEstruturaProduto,
+    tipoPromocao, setTipoPromocao
   }
 }

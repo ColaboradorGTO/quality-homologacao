@@ -164,6 +164,8 @@ export const ActionPesquisaPromocao = ({ }) => {
     setSubGrupoDestino,
     subGrupoOrigem,
     setSubGrupoOrigem,
+    tipoPromocao, 
+    setTipoPromocao,
     onSubmit,
     downloadPlanilhaModelo,
     onSubmitEstrutura,
@@ -199,12 +201,13 @@ export const ActionPesquisaPromocao = ({ }) => {
   }, [setSubGrupoOrigem]);
 
   const handleChangeMecanica = useCallback((selectedValue) => {
+    setTipoPromocao(selectedValue.value)
     setMecanicaSelecionada(selectedValue.MECANICA);
     setMecanicaSelecionadaEdicao(selectedValue.label)
     setAplicacaoDestinoSelecionada(selectedValue.APLICAODESTINO);
     setTipoDescontoSelecionado(selectedValue.TIPODESCONTO);
   }, []);
-
+ 
   // const handleChangeMecanica = useCallback((selectedValue) => {
   //   const selectedOption = optionsMecanicaCompletaAnterior?.find(option => option.ID == selectedValue);
 
@@ -580,7 +583,7 @@ export const ActionPesquisaPromocao = ({ }) => {
     // }
   }
 
-  // console.log(mecanicaSelecionada, 'mecanicaSelecionada')
+
   return (
     <Fragment>
       <ActionMainPromocao

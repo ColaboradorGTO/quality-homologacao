@@ -167,6 +167,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
     setGrupoSelecionadoOrigem,
     grupoSelecionadoDestino,
     setGrupoSelecionadoDestino,
+    tipoPromocao, setTipoPromocao,
     downloadPlanilhaModelo,
     onSubmitEstrutura,
     onSubmitEstruturaProduto
@@ -190,6 +191,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
     // console.log(selectedOption, 'selectedOption')
     console.log(selectedValue, 'value')
     if (selectedValue) {
+      setTipoPromocao(selectedValue?.value)
       setMecanicaSelecionada(selectedValue.value);
       setMecanicaSelecionadaEdicao(selectedValue.label)
       setAplicacaoDestinoSelecionada(selectedValue.aplicacaoDestino);
@@ -216,8 +218,8 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
 
   useEffect(() => {
     if (tipoDescontoSelecionado == 0) {
-      setVrDesconto(0);
-      setValorInicio(0);
+      // setVrDesconto(0);
+      // setValorInicio(0);
       if (!dadosPromocao[0]?.FATORPROMOVLR) {
         setVrDesconto(0);
       }
@@ -236,7 +238,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
       // setValorInicio(0);
     }
 
-  }, [mecanicaSelecionada, tipoDescontoSelecionado, setPrecoProduto, setVrDesconto, setValorInicio, setPorcentoDesconto]);
+  }, [mecanicaSelecionada, tipoDescontoSelecionado, setPrecoProduto, setVrDesconto,  setPorcentoDesconto]);
 
   const handleCadastrar = () => {
     onSubmit();
@@ -677,7 +679,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
     setModalEstProdOrigem(true);
   }
 
- 
+  
   return (
     <Fragment>
 
@@ -712,7 +714,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
         labelInputQTDFim={"Vr Apartir de"}
         valueInputFieldQTDFim={valorInicio}
         onChangeInputFieldQTDFim={(e) => setValorInicio(Number(e.target.value))}
-        readOnlyQTDFim={true}
+        // readOnlyQTDFim={true}
         // readOnlyQTDFim={mecanicaSelecionada == 1 ? false : true}
 
         InputFieldDescontoComponent1={InputFieldAction}
@@ -736,7 +738,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
           const valor = e.target.value.replace(/,/g, '.');
           setPrecoProduto(valor);
         }}
-        readOnlyVrInicio={true}
+        // readOnlyVrInicio={true}
         // readOnlyVrInicio={tipoDescontoSelecionado == 0 ? false : true}
 
 
@@ -757,7 +759,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
         valueInputFielDescription={descricao}
         onChangeInputFieldDescription={(e) => setDescricao(e.target.value)}
         styleDescription={{ textTransform: "uppercase" }}
-        readOnlyDescription={true}
+        // readOnlyDescription={true}
 
 
         InputSelectMarcasComponent={InputSelectActionPromocao}
@@ -995,7 +997,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
         onButtonClickSearch={handleCadastrar}
         corSearch={"primary"}
         IconSearch={IoIosSend}
-        styleButtonSearch={isCheckedProduto ? false : true}
+        // styleButtonSearch={isCheckedProduto ? false : true}
 
         ButtonTypeEstruturaProduto={ButtonType}
         linkEstruturaProduto={"Atualizar Por Estrutura / Produto"}

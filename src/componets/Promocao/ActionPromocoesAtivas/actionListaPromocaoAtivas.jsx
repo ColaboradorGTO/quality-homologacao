@@ -99,6 +99,7 @@ export const ActionListaPromocoesAtivas = ({
       STPRODUTO: item.STPRODUTO,
       STESTRUTURA: item.STESTRUTURA,
       STESTRUTURAPRODUTO: item.STESTRUTURAPRODUTO,
+      NUTIPOPROMOCAO: item.NUTIPOPROMOCAO
     }
   });
 
@@ -107,6 +108,13 @@ export const ActionListaPromocoesAtivas = ({
         field: 'IDRESUMOPROMOCAOMARKETING',
         header: 'ID',
         body: row => <th>{row.IDRESUMOPROMOCAOMARKETING}</th>,
+        style: { width: '10%' },
+        sortable: true,
+      },
+      {
+        field: 'item.NUTIPOPROMOCAO',
+        header: 'item.NUTIPOPROMOCAO',
+        body: row => <th>{row.NUTIPOPROMOCAO}</th>,
         style: { width: '10%' },
         sortable: true,
       },

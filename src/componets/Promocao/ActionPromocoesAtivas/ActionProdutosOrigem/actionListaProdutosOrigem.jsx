@@ -62,20 +62,27 @@ export const ActionListaProdutosOrigem = ({
     doc.save('produtos_promocoes.pdf');
   };
 
-  const exportToExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(dados);
-    const workbook = XLSX.utils.book_new();
-    const header = ['N.Itens', 'Código de Barras', 'Descrição'];
-    worksheet['!cols'] = [
-      { wpx: 100, caption: 'N.Itens' },
-      { wpx: 200, caption: 'Código de Barras' },
-      { wpx: 200, caption: 'Descrição' },
-
-    ];
-    XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Produtos Promoções Ativas');
-    XLSX.writeFile(workbook, 'produtos_promocoes.xlsx');
-  };
+    const exportToExcel = () => {
+      const worksheet = XLSX.utils.json_to_sheet(dados.map(item => ({
+         'Nº': item.contador,
+          'N.Itens': item.IDPRODUTO,
+          'Descrição': item.DSNOME,
+          'Código Barras': item.NUCODBARRAS,
+      
+      })));
+      const workbook = XLSX.utils.book_new();
+      const header = ['Nº', 'N.Itens', 'Código de Barras', 'Descrição'];
+      worksheet['!cols'] = [
+        { wpx: 100, caption: 'Nº' },
+        { wpx: 100, caption: 'N.Itens' },
+        { wpx: 200, caption: 'Código de Barras' },
+        { wpx: 200, caption: 'Descrição' },
+  
+      ];
+      XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Produtos Promoções Ativas');
+      XLSX.writeFile(workbook, 'produtos_origens.xlsx');
+    };
 
 
 

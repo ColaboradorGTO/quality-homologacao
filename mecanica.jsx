@@ -664,7 +664,7 @@ export const optionsMecanicaCompletaAnterior = [
     tipoDesconto: 0,
     color: "steelblue"
   },
-  {
+  { 
     value: 27,
     label: "PROMOÇÃO POR TODOS OS PRODUTOS // VALOR // VALOR FINAL",
     aplicacaoDestino: 1,

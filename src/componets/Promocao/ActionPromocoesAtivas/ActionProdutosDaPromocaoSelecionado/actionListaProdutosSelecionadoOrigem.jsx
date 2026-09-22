@@ -47,19 +47,27 @@ export const ActionListaProdutosSelecionadoOrigem = ({
     doc.save('produtos_promocoes.pdf');
   };
 
+
   const exportToExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(dados);
+    const worksheet = XLSX.utils.json_to_sheet(produtoOrigemSelecionado?.map(item => ({
+      'Nº': item.contador,
+      'N.Itens': item.IDPRODUTO,
+      'Descrição': item.DSNOME,
+      'Código Barras': item.NUCODBARRAS,
+
+    })));
     const workbook = XLSX.utils.book_new();
-    const header = ['N.Itens', 'Código de Barras', 'Descrição'];
+    const header = ['Nº', 'N.Itens', 'Descricao', 'Código de Barras'];
     worksheet['!cols'] = [
+      { wpx: 100, caption: 'Nº' },
       { wpx: 100, caption: 'N.Itens' },
       { wpx: 200, caption: 'Código de Barras' },
       { wpx: 200, caption: 'Descrição' },
 
     ];
     XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Produtos Promoções Ativas');
-    XLSX.writeFile(workbook, 'produtos_promocoes.xlsx');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Produtos Origem');
+    XLSX.writeFile(workbook, 'produtos_origem.xlsx');
   };
 
   // Detecta quando novos IDs chegam e precisa buscar dados completos
@@ -72,42 +80,42 @@ export const ActionListaProdutosSelecionadoOrigem = ({
       setIdsParaBuscar(produtoOrigemSelecionado);
     }
   }, [produtoOrigemSelecionado]);
- 
+
   // Busca os dados completos dos produtos quando IDs são definidos
   useEffect(() => {
     const fetchProdutosCompletos = async () => {
       if (idsParaBuscar.length > 0) {
         try {
           const ids = idsParaBuscar.join(',');
-          
+
           // Primeira tentativa: solicitar todos de uma vez
           let response = await post(`/criar-produto-promocao-ativa`, {
             idProduto: ids,
             pageSize: idsParaBuscar.length // Solicita todos os produtos de uma vez
           });
-          
+
           let allData = [];
-          
+
           if (response?.data?.data) {
             allData = [...response.data.data];
-            
+
             // Se há paginação e não obteve todos os dados, busca as páginas restantes
             if (response.data.rows > allData.length) {
               const totalPages = Math.ceil(response.data.rows / response.data.pageSize);
-              
+
               for (let page = 2; page <= totalPages; page++) {
                 const pageResponse = await post(`/criar-produto-promocao-ativa`, {
                   idProduto: ids,
                   page: page,
                   pageSize: response.data.pageSize
                 });
-                
+
                 if (pageResponse?.data?.data) {
                   allData = [...allData, ...pageResponse.data.data];
                 }
               }
             }
-            
+
             setProdutoOrigemSelecionado(allData);
             setIdsParaBuscar([]); // Limpa os IDs após buscar
           }
@@ -119,44 +127,44 @@ export const ActionListaProdutosSelecionadoOrigem = ({
     };
     fetchProdutosCompletos();
   }, [idsParaBuscar]);
- 
-  
-   // Transforma o array de IDs em objetos de produto, se necessário
-   let dados = [];
-   
-   // Verifica se é um objeto com propriedade data (resposta da API)
-   if (produtoOrigemSelecionado && typeof produtoOrigemSelecionado === 'object' && produtoOrigemSelecionado.data) {
-     dados = produtoOrigemSelecionado.data.map((item, index) => ({
-       contador: index + 1,
-       IDPRODUTO: item.IDPRODUTO,
-       NUCODBARRAS: item.NUCODBARRAS,
-       DSNOME: item.DSNOME,
-     }));
-    
-   }
-   // Verifica se é um array direto
-   else if (
-     Array.isArray(produtoOrigemSelecionado) &&
-     produtoOrigemSelecionado.length > 0
-   ) {
-     if (typeof produtoOrigemSelecionado[0] === "object") {
-       // Já é array de objetos
-       dados = produtoOrigemSelecionado.map((item, index) => ({
-         contador: index + 1,
-         IDPRODUTO: item.IDPRODUTO,
-         NUCODBARRAS: item.NUCODBARRAS,
-         DSNOME: item.DSNOME,
-       }));
-     } else {
-       // É array de IDs, precisa buscar os dados completos dos produtos
-       dados = produtoOrigemSelecionado.map((id, index) => ({
-         contador: index + 1,
-         IDPRODUTO: id,
-         NUCODBARRAS: "", // Preencha conforme necessário
-         DSNOME: "",      // Preencha conforme necessário
-       }));
-     }
-   }
+
+
+  // Transforma o array de IDs em objetos de produto, se necessário
+  let dados = [];
+
+  // Verifica se é um objeto com propriedade data (resposta da API)
+  if (produtoOrigemSelecionado && typeof produtoOrigemSelecionado === 'object' && produtoOrigemSelecionado.data) {
+    dados = produtoOrigemSelecionado.data.map((item, index) => ({
+      contador: index + 1,
+      IDPRODUTO: item.IDPRODUTO,
+      NUCODBARRAS: item.NUCODBARRAS,
+      DSNOME: item.DSNOME,
+    }));
+
+  }
+  // Verifica se é um array direto
+  else if (
+    Array.isArray(produtoOrigemSelecionado) &&
+    produtoOrigemSelecionado.length > 0
+  ) {
+    if (typeof produtoOrigemSelecionado[0] === "object") {
+      // Já é array de objetos
+      dados = produtoOrigemSelecionado.map((item, index) => ({
+        contador: index + 1,
+        IDPRODUTO: item.IDPRODUTO,
+        NUCODBARRAS: item.NUCODBARRAS,
+        DSNOME: item.DSNOME,
+      }));
+    } else {
+      // É array de IDs, precisa buscar os dados completos dos produtos
+      dados = produtoOrigemSelecionado.map((id, index) => ({
+        contador: index + 1,
+        IDPRODUTO: id,
+        NUCODBARRAS: "", // Preencha conforme necessário
+        DSNOME: "",      // Preencha conforme necessário
+      }));
+    }
+  }
 
   const colunasProdutos = [
     {
@@ -189,15 +197,15 @@ export const ActionListaProdutosSelecionadoOrigem = ({
       body: row => {
         return (
           <ButtonTable
-              titleButton={"Desativar Empresa"}
-              cor={"danger"}
-              Icon={IoMdClose}
-              iconSize={22}
-              onClickButton={() => handleRemoverProduto(row)}
-              width="40px"
-              height="40px"
-              disabledBTN={row.STATIVO === 'False'}
-            />
+            titleButton={"Desativar Empresa"}
+            cor={"danger"}
+            Icon={IoMdClose}
+            iconSize={22}
+            onClickButton={() => handleRemoverProduto(row)}
+            width="40px"
+            height="40px"
+            disabledBTN={row.STATIVO === 'False'}
+          />
         )
       }
     }
@@ -206,13 +214,13 @@ export const ActionListaProdutosSelecionadoOrigem = ({
   const handleRemoverProduto = (row) => {
     setProdutoOrigemSelecionado(prevState =>
       prevState.filter(item => item.IDPRODUTO !== row.IDPRODUTO)
-    ); 
+    );
     setNovoProdutoOrigem(prevState =>
       prevState.filter(item => item.IDPRODUTO !== row.IDPRODUTO)
     );
   }
 
- 
+
   return (
     <Fragment>
 
