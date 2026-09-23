@@ -9,12 +9,10 @@ import { useNavigate } from "react-router-dom"
 import axios from "axios";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
-import { sub } from "date-fns"
+import { registrarLogAuditoria } from "../../../../services/auditLog"
 
-// Total máximo de produtos permitido por promoção (planilha de origem/destino)
+
 const LIMITE_MAXIMO_PRODUTOS = 10000;
-// Tamanho de cada lote enviado ao backend por requisição (deve ficar alinhado
-// ao limite de 1000 produtos que o handleFileUpload já valida por arquivo)
 const TAMANHO_LOTE_PRODUTOS = 1000;
 
 export const useCreatePromocaoAtiva = ({ }) => {
@@ -101,27 +99,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
     }
   }, [navigate]);
 
-  const getIPUsuario = async () => {
-    let usuarioIP = null;
-
-    try {
-      const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
-      usuarioIP = ipWhoisData?.ip;
-    } catch (error) {
-      console.error("Erro ao buscar IP via ifconfig.me:", error);
-    }
-
-    if (!usuarioIP) {
-      try {
-        const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-        usuarioIP = ipifyData?.ip;
-      } catch (error) {
-        console.error("Erro ao buscar IP via ipify.org:", error);
-      }
-    }
-    setIpUsuario(usuarioIP);
-    return usuarioIP;
-  };
+ 
 
   useEffect(() => {
     const dataInicial = getDataAtual()
@@ -312,26 +290,23 @@ export const useCreatePromocaoAtiva = ({ }) => {
     try {
       const data = await processFile(file);
 
-      // ✅ VALIDAÇÃO: Limite de produtos
-      // O envio ao backend é feito em lotes de LOTE_MAXIMO_PRODUTOS (ver onSubmit),
-      // então o limite aqui é o total permitido por promoção, não por requisição.
+
       if (data.length > LIMITE_MAXIMO_PRODUTOS) {
-        // ✅ LIMPA ARQUIVO quando excede limite
         clearFileError(isOrigem);
 
         Swal.fire({
           icon: 'warning',
           title: 'Limite Excedido',
           html: `
-                      Limite máximo permitido: ${LIMITE_MAXIMO_PRODUTOS.toLocaleString('pt-BR')} produtos por promoção.<br>
-                      Produtos encontrados: ${data.length}<br>
-                      Caso contrário, os produtos não serão inseridos na promoção.
-                  `,
+            Limite máximo permitido: ${LIMITE_MAXIMO_PRODUTOS.toLocaleString('pt-BR')} produtos por promoção.<br>
+            Produtos encontrados: ${data.length}<br>
+            Caso contrário, os produtos não serão inseridos na promoção.
+          `,
         });
         return;
       }
 
-      // ✅ SUCESSO: Mostra quantos IDs foram encontrados
+
       await Swal.fire({
         icon: 'success',
         title: 'Arquivo Processado!',
@@ -791,6 +766,19 @@ export const useCreatePromocaoAtiva = ({ }) => {
         return;
       }
 
+      if (dataFim < dataInicio) {
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: 'Data fim inválida!',
+          text: 'A data fim deve ser maior ou igual à data início.',
+          customClass: { container: 'custom-swal' },
+          showConfirmButton: false,
+          timer: 3000,
+        })
+        return;
+      }
+
       if (descricao.length > 80) {
         Swal.fire({
           position: 'center',
@@ -823,6 +811,58 @@ export const useCreatePromocaoAtiva = ({ }) => {
               ? produtoDestinoSelecionado
               : [];
 
+      if (produtosOrigem.length === 0 || produtosDestino.length === 0) {
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: 'Origem e destino obrigatórios!',
+          text: 'Selecione ao menos um produto de origem e um produto de destino.',
+          customClass: { container: 'custom-swal' },
+          showConfirmButton: false,
+          timer: 3000,
+        })
+        return;
+      }
+
+      const isAplicadoAQuantidade = mecanicaSelecionada == 2; // TPAPLICADOA = 2
+      const isAplicadoAValor = mecanicaSelecionada == 1;      // TPAPLICADOA = 1
+      const isACadaN = aplicacaoDestinoSelecionada == 2;      // TPAPARTIRDE = 2 ("a cada N" / último após entrada)
+
+      // Só o campo de início do tipo é preenchido; nos tipos "a cada N" por valor, N e Y coexistem.
+      const apartirDeQtdFinal = (isAplicadoAQuantidade || isACadaN) ? Number(qtdInicio) : 0;
+      const apartirDoVlrFinal = isAplicadoAValor ? Number(valorInicio) : 0;
+
+      if (isACadaN && apartirDeQtdFinal < 1) {
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: 'Atenção!',
+          text: '"A cada N" precisa de N = 1 ou mais. Com N = 0 a promoção nunca dá desconto. verifique o campo QTD Aparti de',
+          customClass: { container: 'custom-swal' },
+          showConfirmButton: false,
+          timer: 5000,
+        })
+        return;
+      }
+
+
+      const vlPrecoProdutoFinal = tipoDescontoSelecionado == 0 ? Number(precoProduto) : 0;
+      const fatorPromoVlrFinal = tipoDescontoSelecionado == 1 ? Number(vrDesconto) : 0;
+      const fatorPromoPercFinal = tipoDescontoSelecionado == 2 ? Number(porcentoDesconto) : 0;
+
+      if (tipoDescontoSelecionado == 2 && !(fatorPromoPercFinal > 0 && fatorPromoPercFinal <= 100)) {
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: 'Percentual inválido!',
+          text: 'O percentual de desconto deve ser maior que 0 e no máximo 100 (100 = brinde).',
+          customClass: { container: 'custom-swal' },
+          showConfirmButton: false,
+          timer: 3000,
+        })
+        return;
+      }
+
       if (promocoesAtivas && promocoesAtivas.length > 0) {
         const produtoDestinoArray = Array.isArray(produtosDestino) ? produtosDestino : [produtosDestino];
         const idsResumo = promocoesAtivas.map(p => p.IDRESUMOPROMOCAOMARKETING).filter(Boolean);
@@ -847,61 +887,73 @@ export const useCreatePromocaoAtiva = ({ }) => {
             throw new Error('Falha ao verificar produtos existentes');
           }
 
-          const produtosExistentes = []
-          responseProdutoExistente.data.forEach(promocao => {
+          const idsDestinoSelecionados = produtoDestinoArray.map(produtoDestino => {
+            return typeof produtoDestino === 'object' && produtoDestino !== null
+              ? Number(produtoDestino.IDPRODUTO)
+              : Number(produtoDestino);
+          });
+
+          const idsEmpresasSelecionadas = (Array.isArray(empresaSelecionada) ? empresaSelecionada : [empresaSelecionada])
+            .map(id => Number(id));
+
+          const existeProduto = responseProdutoExistente.data.some(promocao => {
+            const produtosDaPromocao = [];
+
             if (promocao.empresaPromocaoDestino && Array.isArray(promocao.empresaPromocaoDestino)) {
               promocao.empresaPromocaoDestino.forEach(empresaItem => {
                 if (empresaItem.det) {
                   if (empresaItem.det.IDPRODUTO && empresaItem.det.IDPRODUTO !== null) {
-                    produtosExistentes.push(empresaItem.det.IDPRODUTO.toString());
+                    produtosDaPromocao.push(empresaItem.det.IDPRODUTO.toString());
                   }
-                  
+
                   if (empresaItem.det.IDPRODUTODESTINO && empresaItem.det.IDPRODUTODESTINO !== null) {
                     const idsDestino = empresaItem.det.IDPRODUTODESTINO.toString().split(',');
                     idsDestino.forEach(id => {
                       const idLimpo = id.trim();
-                      if (idLimpo) produtosExistentes.push(idLimpo);
+                      if (idLimpo) produtosDaPromocao.push(idLimpo);
                     });
                   }
                 }
               });
             }
-            
+
             if (promocao.empresaPromocaoOrigem && Array.isArray(promocao.empresaPromocaoOrigem)) {
               promocao.empresaPromocaoOrigem.forEach(empresaItem => {
                 if (empresaItem.det) {
                   if (empresaItem.det.IDPRODUTO && empresaItem.det.IDPRODUTO !== null) {
-                    produtosExistentes.push(empresaItem.det.IDPRODUTO.toString());
+                    produtosDaPromocao.push(empresaItem.det.IDPRODUTO.toString());
                   }
-                  
+
                   if (empresaItem.det.IDPRODUTOORIGEM && empresaItem.det.IDPRODUTOORIGEM !== null) {
                     const idsOrigem = empresaItem.det.IDPRODUTOORIGEM.toString().split(',');
                     idsOrigem.forEach(id => {
                       const idLimpo = id.trim();
-                      if (idLimpo) produtosExistentes.push(idLimpo);
+                      if (idLimpo) produtosDaPromocao.push(idLimpo);
                     });
                   }
                 }
               });
             }
+
+            const idsProdutosDaPromocao = [...new Set(produtosDaPromocao)].map(id => Number(id));
+            const temProdutoEmComum = idsProdutosDaPromocao.some(idExistente => idsDestinoSelecionados.includes(idExistente));
+
+            if (!temProdutoEmComum) return false;
+
+            const idsEmpresasDaPromocao = Array.isArray(promocao.empresa)
+              ? promocao.empresa
+                .map(empresaItem => Number(empresaItem?.det?.IDEMPRESA))
+                .filter(id => !Number.isNaN(id))
+              : [];
+
+            return idsEmpresasDaPromocao.some(idEmpresa => idsEmpresasSelecionadas.includes(idEmpresa));
           });
-
-          const idsUnicos = [...new Set(produtosExistentes)].map(id => Number(id));
-
-          const existeProduto = idsUnicos.some(idExistente =>
-            produtoDestinoArray.some(produtoDestino => {
-              const idDestino = typeof produtoDestino === 'object' && produtoDestino !== null 
-                ? Number(produtoDestino.IDPRODUTO) 
-                : Number(produtoDestino);
-              return idExistente === idDestino;
-            })
-          );
 
           if (existeProduto) {
             Swal.fire({
               icon: 'warning',
               title: 'Produto já está em uma promoção ativa!',
-              text: `Produtos  Nº ${produtoDestinoArray.map(p => typeof p === 'object' ? p.IDPRODUTO : p).join(', ')} já está vinculado a uma promoção ativa.`,
+              text: `Produtos  Nº ${produtoDestinoArray.map(p => typeof p === 'object' ? p.IDPRODUTO : p).join(', ')} já está vinculado a uma promoção ativa nesta empresa.`,
               customClass: { container: 'custom-swal' },
               confirmButtonText: 'OK'
             });
@@ -910,8 +962,11 @@ export const useCreatePromocaoAtiva = ({ }) => {
 
           const promocoesValidas = responseProdutoExistente.data;
           const promocaoPorParesAtiva = promocoesValidas.some(promo => promo.TPAPARTIRDE == 0);
-          const promocaoPorMenosNaPrimeira = promocoesValidas.some(promo => promo.TPAPARTIRDE == 3 && promo.TPAPARTIRDE == 0);
-          const promocaoPorParesEmUmProduto = promocoesValidas.some(promo => promo.TPAPARTIRDE == 0 && promo.TPAPARTIRDE == 4);
+          const promocaoPorMenosNaPrimeira = promocoesValidas.some(promo => promo.TPAPARTIRDE == 3);
+          const promocaoPorParesEmUmProduto = promocoesValidas.some(promo =>
+            (promo.TPAPARTIRDE == 0 && aplicacaoDestinoSelecionada == 4) ||
+            (promo.TPAPARTIRDE == 4 && aplicacaoDestinoSelecionada == 0)
+          );
           const descontoAtivoPromocaoPorEmpresa = promocoesValidas.some(promo => promo.TPFATORPROMO == tipoDescontoSelecionado)
 
           if (promocaoPorParesEmUmProduto) {
@@ -938,9 +993,10 @@ export const useCreatePromocaoAtiva = ({ }) => {
 
           const promocoesValidasNaEmpresaSelecionada = [];
           responseProdutoExistente.data.forEach(item => {
-            if (Array.isArray(item.empresaPromocaoMarketing)) {
-              item.empresaPromocaoMarketing.forEach(empresa => {
+            if (Array.isArray(item.empresa)) {
+              item.empresa.forEach(empresa => {
                 if (empresa.det.IDEMPRESA == empresaSelecionada) {
+                  console.log(empresa.det, 'empresa')
                   promocoesValidasNaEmpresaSelecionada.push(empresa.det.IDEMPRESA);
                 }
               });
@@ -1012,7 +1068,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
             text: 'Para Mecânica por todos os produtos, os produtos de origem e destino devem ser iguais.',
             customClass: { container: 'custom-swal' },
             showConfirmButton: false,
-            timer: 8000,
+            timer: 50000,
           });
           return;
         }
@@ -1081,13 +1137,13 @@ export const useCreatePromocaoAtiva = ({ }) => {
         TPAPARTIRDE: aplicacaoDestinoSelecionada,
         TPAPLICADOA: mecanicaSelecionada,
         TPFATORPROMO: tipoDescontoSelecionado,
-        APARTIRDEQTD: Number(qtdInicio),
-        APARTIRDOVLR: valorInicio,
-        FATORPROMOVLR: vrDesconto,
-        FATORPROMOPERC: porcentoDesconto,
-        VLPRECOPRODUTO: Number(precoProduto),
-        DTHORAINICIO: dataInicio,
-        DTHORAFIM: dataFim + ' 23:59:59',
+        APARTIRDEQTD: apartirDeQtdFinal,
+        APARTIRDOVLR: apartirDoVlrFinal,
+        FATORPROMOVLR: fatorPromoVlrFinal,
+        FATORPROMOPERC: fatorPromoPercFinal,
+        VLPRECOPRODUTO: vlPrecoProdutoFinal,
+        DTHORAINICIO: `${dataInicio} 00:00:00`,
+        DTHORAFIM: `${dataFim} 23:59:59`,
         DSPROMOCAOMARKETING: descricao.toUpperCase(),
         IDEMPRESA: empresaSelecionada,
         STATIVO: "True",
@@ -1105,7 +1161,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
         IDSUBGRUPOEMORIGEM: subGrupoSelecionado,
         IDMARCAEMORIGEM: marcaOrigem,
         IDFORNECEDOREMORIGEM: fornecedorSelecionado,
-        NUTIPOPROMOCAO: tipoPromocao
+        NUTIPOPROMOCAO: Number(tipoPromocao)
       };
 
       // Envia os produtos em lotes de até TAMANHO_LOTE_PRODUTOS para a MESMA promoção:
@@ -1172,6 +1228,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
           }
 
           response = await post('/criar-promocoes-ativas', lotePostData);
+
 
           if (!idPromocaoCriada) {
             idPromocaoCriada = response?.data?.IDRESUMOPROMOCAOMARKETING;
@@ -1294,7 +1351,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
         return [value];
       };
 
-      if(promocoesAtivas && promocoesAtivas.length > 0) {
+      if (promocoesAtivas && promocoesAtivas.length > 0) {
         const subGrupoProdutoOrigemArray = Array.isArray(subGrupoOrigem) ? subGrupoOrigem : [subGrupoOrigem];
         const subGrupoProdutoDestinoArray = Array.isArray(subGrupoDestino) ? subGrupoDestino : [subGrupoDestino];
         const idsResumo = promocoesAtivas.map(p => p.IDRESUMOPROMOCAOMARKETING).filter(Boolean);
@@ -1326,19 +1383,19 @@ export const useCreatePromocaoAtiva = ({ }) => {
 
           const conflitosDestino = subgruposDestinoSelecionados.filter(id => subgruposDestinoAtivos.includes(id));
           const conflitosOrigem = subgruposOrigemSelecionados.filter(id => subgruposOrigemAtivos.includes(id));
-  
+
 
           let conflitos = Array.from(new Set([...conflitosDestino, ...conflitosOrigem]));
           console.log(conflitos, 'conflitos');
-          if (conflitos.length > 0) {        
+          if (conflitos.length > 0) {
             const conflitosString = conflitos
-              .filter(c => !Number.isNaN(c)) 
-              .map(c => String(c)) 
+              .filter(c => !Number.isNaN(c))
+              .map(c => String(c))
               .join(", ");
-              
-            
+
+
             const htmlMessage = "Nº em conflito: <b>" + conflitosDestino + "</b><br/>Ajuste os subgrupos para continuar.";
-            
+
             Swal.fire({
               icon: "warning",
               title: "Subgrupo já está em promoção ativa",
@@ -1426,20 +1483,20 @@ export const useCreatePromocaoAtiva = ({ }) => {
       if (aplicacaoDestinoSelecionada == 0 || aplicacaoDestinoSelecionada == 3) {
         const origem = produtoSelecionadoEstProdOrigem;
         const destino = produtoSelecionadoEstProdDestino;
-        
+
         const idsOrigem = origem.map(v => {
           const id = typeof v === 'object' && v !== null ? v.IDPRODUTO : v;
           return String(id);
         }).sort();
-        
+
         const idsDestino = destino.map(v => {
           const id = typeof v === 'object' && v !== null ? v.IDPRODUTO : v;
           return String(id);
         }).sort();
-        
-        const iguais = idsOrigem.length === idsDestino.length && 
+
+        const iguais = idsOrigem.length === idsDestino.length &&
           idsOrigem.every((id, i) => id === idsDestino[i]);
-          
+
         if (!iguais) {
           Swal.fire({
             position: 'center',
@@ -1513,9 +1570,9 @@ export const useCreatePromocaoAtiva = ({ }) => {
         }
       });
 
-      
+
       const response = await post('/criar-promocoes-ativas-subGrupo', postData);
-    
+
 
       Swal.fire({
         position: 'center',
@@ -1596,7 +1653,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
         return;
       }
 
-      
+
       const normalizeToArray = (value) => {
         if (Array.isArray(value)) return value;
         if (value === null || value === undefined || value === "") return [];
@@ -1616,9 +1673,9 @@ export const useCreatePromocaoAtiva = ({ }) => {
           if (!responseProdutoExistente.data) {
             throw new Error('Falha ao verificar produtos existentes');
           }
-          
+
           const produtosExistentes = [];
-          
+
           responseProdutoExistente.data.forEach(promocao => {
             if (promocao.empresaPromocaoDestino && Array.isArray(promocao.empresaPromocaoDestino)) {
               promocao.empresaPromocaoDestino.forEach(empresaItem => {
@@ -1626,7 +1683,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
                   if (empresaItem.det.IDPRODUTO && empresaItem.det.IDPRODUTO !== null) {
                     produtosExistentes.push(empresaItem.det.IDPRODUTO.toString());
                   }
-                  
+
                   if (empresaItem.det.IDPRODUTODESTINO && empresaItem.det.IDPRODUTODESTINO !== null) {
                     const idsDestino = empresaItem.det.IDPRODUTODESTINO.toString().split(',');
                     idsDestino.forEach(id => {
@@ -1637,14 +1694,14 @@ export const useCreatePromocaoAtiva = ({ }) => {
                 }
               });
             }
-            
+
             if (promocao.empresaPromocaoOrigem && Array.isArray(promocao.empresaPromocaoOrigem)) {
               promocao.empresaPromocaoOrigem.forEach(empresaItem => {
                 if (empresaItem.det) {
                   if (empresaItem.det.IDPRODUTO && empresaItem.det.IDPRODUTO !== null) {
                     produtosExistentes.push(empresaItem.det.IDPRODUTO.toString());
                   }
-                  
+
                   if (empresaItem.det.IDPRODUTOORIGEM && empresaItem.det.IDPRODUTOORIGEM !== null) {
                     const idsOrigem = empresaItem.det.IDPRODUTOORIGEM.toString().split(',');
                     idsOrigem.forEach(id => {
@@ -1656,20 +1713,20 @@ export const useCreatePromocaoAtiva = ({ }) => {
               });
             }
           });
-          
+
           const idsUnicos = [...new Set(produtosExistentes)].map(id => Number(id));
 
 
           const existeProduto = idsUnicos.some(idExistente =>
             produtoDestinoArray.some(produtoDestino => {
-              const idDestino = typeof produtoDestino === 'object' && produtoDestino !== null 
-                ? Number(produtoDestino.IDPRODUTO) 
+              const idDestino = typeof produtoDestino === 'object' && produtoDestino !== null
+                ? Number(produtoDestino.IDPRODUTO)
                 : Number(produtoDestino);
               return idExistente === idDestino;
             })
           );
-       
-          
+
+
           if (existeProduto) {
             Swal.fire({
               icon: 'warning',
@@ -1703,19 +1760,19 @@ export const useCreatePromocaoAtiva = ({ }) => {
 
           const conflitosDestino = subgruposDestinoSelecionados.filter(id => subgruposDestinoAtivos.includes(id));
           const conflitosOrigem = subgruposOrigemSelecionados.filter(id => subgruposOrigemAtivos.includes(id));
-  
+
 
           let conflitos = Array.from(new Set([...conflitosDestino, ...conflitosOrigem]));
-  
-          if (conflitos.length > 0) {        
+
+          if (conflitos.length > 0) {
             const conflitosString = conflitos
-              .filter(c => !Number.isNaN(c)) 
-              .map(c => String(c)) 
+              .filter(c => !Number.isNaN(c))
+              .map(c => String(c))
               .join(", ");
-              
-            
+
+
             const htmlMessage = "Nº em conflito: <b>" + conflitosString + "</b><br/>Ajuste os subgrupos para continuar.";
-            
+
             Swal.fire({
               icon: "warning",
               title: "Subgrupo já está em promoção ativa",
@@ -1803,20 +1860,20 @@ export const useCreatePromocaoAtiva = ({ }) => {
       if (aplicacaoDestinoSelecionada == 0 || aplicacaoDestinoSelecionada == 3) {
         const origem = produtoSelecionadoEstProdOrigem;
         const destino = produtoSelecionadoEstProdDestino;
-        
+
         const idsOrigem = origem.map(v => {
           const id = typeof v === 'object' && v !== null ? v.IDPRODUTO : v;
           return String(id);
         }).sort();
-        
+
         const idsDestino = destino.map(v => {
           const id = typeof v === 'object' && v !== null ? v.IDPRODUTO : v;
           return String(id);
         }).sort();
-        
-        const iguais = idsOrigem.length === idsDestino.length && 
+
+        const iguais = idsOrigem.length === idsDestino.length &&
           idsOrigem.every((id, i) => id === idsDestino[i]);
-          
+
         if (!iguais) {
           Swal.fire({
             position: 'center',
@@ -1956,7 +2013,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
           if (!subDestino || subDestino === -1) return;
 
           const produtosDoSubgrupo = produtosPorSubgrupo[subDestino] || [];
-          
+
           if (produtosDoSubgrupo.length > 0) {
             produtosDoSubgrupo.forEach(idProduto => {
               const objetoDestino = {
@@ -2002,7 +2059,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
           if (!subOrigem || subOrigem === -1) return;
 
           const produtosDoSubgrupo = produtosPorSubgrupo[subOrigem] || [];
-         
+
           if (produtosDoSubgrupo.length > 0) {
             produtosDoSubgrupo.forEach(idProduto => {
               const objetoOrigem = {
@@ -2010,7 +2067,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
                 IDSUBGRUPOEMORIGEM: -1,
                 IDMARCAEMORIGEM: marcaOrigem || -1,
                 IDFORNECEDOREMORIGEM: fornecedorSelecionado || -1,
-                IDPRODUTOORIGEM: String(idProduto), 
+                IDPRODUTOORIGEM: String(idProduto),
                 STATIVO: "True"
               };
               detalhesOrigem.push(objetoOrigem);
@@ -2043,19 +2100,19 @@ export const useCreatePromocaoAtiva = ({ }) => {
         return;
       }
 
-      const temProdutos = [...detalhesDestino, ...detalhesOrigem].some(item => 
-        (item.IDPRODUTODESTINO && item.IDPRODUTODESTINO.length > 0) || 
+      const temProdutos = [...detalhesDestino, ...detalhesOrigem].some(item =>
+        (item.IDPRODUTODESTINO && item.IDPRODUTODESTINO.length > 0) ||
         (item.IDPRODUTOORIGEM && item.IDPRODUTOORIGEM.length > 0)
       );
-      
-      const temEstrutura = [...detalhesDestino, ...detalhesOrigem].some(item => 
-        (item.IDSUBGRUPOEMDESTINO && item.IDSUBGRUPOEMDESTINO !== -1) || 
+
+      const temEstrutura = [...detalhesDestino, ...detalhesOrigem].some(item =>
+        (item.IDSUBGRUPOEMDESTINO && item.IDSUBGRUPOEMDESTINO !== -1) ||
         (item.IDSUBGRUPOEMORIGEM && item.IDSUBGRUPOEMORIGEM !== -1)
       );
 
 
       let status = {};
-      
+
       if (temEstrutura && temProdutos) {
         status = {
           STESTRUTURA: "False",
@@ -2085,7 +2142,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
       const postData = {
         DSPROMOCAOMARKETING: descricao,
         DTHORAINICIO: dataInicio,
-        DTHORAFIM: dataFim ,
+        DTHORAFIM: dataFim,
         TPAPLICADOA: mecanicaSelecionada,
         APARTIRDEQTD: Number(qtdInicio),
         APARTIRDOVLR: valorInicio,
@@ -2181,15 +2238,12 @@ export const useCreatePromocaoAtiva = ({ }) => {
     try {
       const response = await post('/criar-mecanica', putData)
 
-      const textDados = JSON.stringify(putData)
-      let textoFuncao = 'PROMOÇÃO/CRIANDO UM NOVA MECÂNICA';
-      const ipUsuario = await getIPUsuario();
-      const postData = {
-        IDFUNCIONARIO: String(usuarioLogado.id),
-        PATHFUNCAO: textoFuncao,
-        DADOS: textDados,
-        IP: ipUsuario
-      }
+
+      await registrarLogAuditoria({
+        idFuncionario: usuarioLogado?.id,
+        pathFuncao: 'PROMOÇÃO/CRIANDO UM NOVA MECÂNICA',
+        dados: putData
+      })
 
       Swal.fire({
         title: 'Sucesso',
@@ -2201,22 +2255,17 @@ export const useCreatePromocaoAtiva = ({ }) => {
         }
       })
 
-      const responsePost = await post('/log-web', postData)
+   
       refetchMecanica();
       return response.data;
 
     } catch (error) {
 
-      let textoFuncao = 'PROMOÇÃO/ERRO AO CRIAR UMA NOVA MECÂNICA';
-      const ipUsuario = await getIPUsuario();
-      const postData = {
-        IDFUNCIONARIO: String(usuarioLogado.id),
-        PATHFUNCAO: textoFuncao,
-        DADOS: 'Erro ao criar mecânica',
-        IP: ipUsuario
-      }
-
-      const responsePost = await post('/log-web', postData)
+      await registrarLogAuditoria({
+        idFuncionario: usuarioLogado?.id,
+        pathFuncao: 'PROMOÇÃO/ERRO AO CRIAR UMA NOVA MECÂNICA',
+        dados: putData
+      })
 
       Swal.fire({
         title: 'Erro',
@@ -2228,7 +2277,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
         }
       })
 
-      return responsePost.data;
+      return;
     }
 
   }
@@ -2366,7 +2415,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
     setSubGrupoDestino,
     subGrupoOrigem,
     setSubGrupoOrigem,
-    tipoPromocao, 
+    tipoPromocao,
     setTipoPromocao,
     downloadPlanilhaModelo,
     onSubmitEstrutura,
@@ -2374,3 +2423,4 @@ export const useCreatePromocaoAtiva = ({ }) => {
   }
 }
 
+// 2446

@@ -714,7 +714,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
         labelInputQTDFim={"Vr Apartir de"}
         valueInputFieldQTDFim={valorInicio}
         onChangeInputFieldQTDFim={(e) => setValorInicio(Number(e.target.value))}
-        // readOnlyQTDFim={true}
+        readOnlyQTDFim={true}
         // readOnlyQTDFim={mecanicaSelecionada == 1 ? false : true}
 
         InputFieldDescontoComponent1={InputFieldAction}
@@ -738,7 +738,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
           const valor = e.target.value.replace(/,/g, '.');
           setPrecoProduto(valor);
         }}
-        // readOnlyVrInicio={true}
+        readOnlyVrInicio={true}
         // readOnlyVrInicio={tipoDescontoSelecionado == 0 ? false : true}
 
 
