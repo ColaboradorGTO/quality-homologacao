@@ -2330,4 +2330,4 @@ export const useUpdatePromocaoAtiva = ({ dadosPromocao, usuarioLogado, optionsMo
     tipoPromocao, setTipoPromocao
   }
 }
-// 2552
+// 2552 
