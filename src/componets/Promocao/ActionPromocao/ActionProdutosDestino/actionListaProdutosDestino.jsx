@@ -8,6 +8,7 @@ import * as XLSX from 'xlsx';
 import HeaderTable from "../../../Tables/headerTable";
 import Swal from "sweetalert2";
 import { Checkbox } from "primereact/checkbox";
+import { Row } from "react-bootstrap";
 
 export const ActionListaProdutosDestino = ({ 
   dadosProdutoSubGrupoDestino,
@@ -19,48 +20,30 @@ export const ActionListaProdutosDestino = ({
   const [selectAllChecked, setSelectAllChecked] = useState(false);
   const dataTableRef = useRef();
   
-  const dados = dadosProdutoSubGrupoDestino?.map((item, index) => {
-    let contador = index + 1;
-    return {
-      IDSUBGRUPO: item.IDSUBGRUPO,
-      DSGRUPOESTRUTURA: item.DSGRUPOESTRUTURA,
-      DSSUBGRUPOESTRUTURA: item.DSSUBGRUPOESTRUTURA,
-      IDPRODUTO: item.IDPRODUTO,
-      DSNOME: item.DSNOME,
-      NUCODBARRAS: item.NUCODBARRAS
-    }
-  });
+  const dados = dadosProdutoSubGrupoDestino?.map((item, index) => ({
+    contador: index + 1,
+    rowKey: `${item.IDPRODUTO}_${item.NUCODBARRAS}_${index}`,
+    IDSUBGRUPO: item.IDSUBGRUPO,
+    DSGRUPOESTRUTURA: item.DSGRUPOESTRUTURA,
+    DSSUBGRUPOESTRUTURA: item.DSSUBGRUPOESTRUTURA,
+    IDPRODUTO: item.IDPRODUTO,
+    DSNOME: item.DSNOME,
+    NUCODBARRAS: item.NUCODBARRAS,
+    selecionado: produtoSelecionadoEstProdDestino?.some(
+      selecionadoItem => String(selecionadoItem.IDPRODUTO) == String(item.IDPRODUTO)
+    ) ?? false
+  }));
   
   
-  useEffect(() => {
-    if (dados?.length > 0) {
-      const todosSelecionados = dados.every(item => 
-        produtoSelecionadoEstProdDestino?.some(selected => 
-          String(selected.IDPRODUTO) === String(item.IDPRODUTO)
-        )
-      );
-      setSelectAllChecked(todosSelecionados);
-    }
-  }, [produtoSelecionadoEstProdDestino, dados]);
 
   
-  const handleCheckboxChangeDestino = (id) => {
-    const produtoSelecionado = dados.find(item => String(item.IDPRODUTO) === String(id));
-    
-    if (!produtoSelecionado) {
-      console.warn('Produto não encontrado:', id);
-      return;
-    }
-    
+  const handleCheckboxChangeDestino = (produto) => {
     setProdutoSelecionadoEstProdutoDestino(prevState => {
-      const existe = prevState.some(item => String(item.IDPRODUTO) === String(id));
+      const existe = prevState.some(item => String(item.IDPRODUTO) === String(produto.IDPRODUTO));
       if (existe) {
-        // Remover produto
-        return prevState.filter(item => String(item.IDPRODUTO) !== String(id));
-      } else {
-        // Adicionar produto
-        return [...prevState, produtoSelecionado];
-      }
+        return prevState.filter(item => String(item.IDPRODUTO) !== String(produto.IDPRODUTO));
+      } 
+      return [...prevState, produto];
     });
   }
   
@@ -202,8 +185,8 @@ export const ActionListaProdutosDestino = ({
           <div style={{ textAlign: 'center' }}>
             <input
               type="checkbox"
-              checked={isChecked}
-              onChange={() => handleCheckboxChangeDestino(row.IDPRODUTO)}
+              checked={row.selecionado}
+              onChange={() => handleCheckboxChangeDestino(row)}
               style={{ 
                 width: '18px', 
                 height: '18px', 
@@ -260,7 +243,7 @@ export const ActionListaProdutosDestino = ({
             scrollable
             scrollHeight="500px"
             size="small"
-            dataKey="IDPRODUTO"
+            dataKey={"rowKey"}
             selectionMode="single"
             selection={rowSelection}
             onSelectionChange={(e) => setRowSelection(e.value)}

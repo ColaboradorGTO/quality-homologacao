@@ -37,7 +37,7 @@ export const ActionListaProdutosOrigem = ({
       return [...prevState, produto];
     });
   }
-
+  console.log(novoProdutoOrigem,' novoPrd')
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
   };
@@ -148,7 +148,7 @@ export const ActionListaProdutosOrigem = ({
 
       <div className="panel">
         <div className="panel-hdr mb-4">
-          <h2>Lista de Produtos</h2>
+          <h2>Lista de Produtos </h2>
 
         </div>
         <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>

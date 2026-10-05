@@ -21,9 +21,31 @@ import { useQuery } from "react-query";
 import { ActionEstruturaProdutoOrigemModal } from "./ActionProdutosOrigem/actionEstruturaProdutoOrigemModal";
 import { ActionEstruturaProdutoDestinoModal } from "./ActionProdutosDestino/actionEstruturaProdutoDestinoModal";
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../utils/animationCarregamento"
-
+import { MECANICAS_COM_QTD_LIBERADA } from "../../../../mecanica"
 
 export const ActionPesquisaPromocao = ({ usuarioLogado }) => {
+  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
+  const [treeData, setTreeData] = useState([]);
+  const [selectedNodesOrigem, setSelectedNodesOrigem] = useState({});
+  const [selectedNodesDestino, setSelectedNodesDestino] = useState({});
+
+  useEffect(() => {
+    const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
+    if (menuSalvo) {
+      const menuParsed = JSON.parse(menuSalvo);
+      setMenuFilhoAtual(menuParsed);
+    }
+  }, []);
+  
+  const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
+    ['menus-usuario-excecao', menuFilhoAtual?.ID],
+    async () => {
+      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
+      
+      return response.data;
+    },
+    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
+  );
 
   const {
     mecanicaSelecionada,
@@ -32,10 +54,6 @@ export const ActionPesquisaPromocao = ({ usuarioLogado }) => {
     setAplicacaoDestinoSelecionada,
     tipoDescontoSelecionado,
     setTipoDescontoSelecionado,
-    fornecedorSelecionado,
-    setFornecedorSelecionado,
-    subGrupoSelecionado,
-    setSubGrupoSelecionado,
     grupoSelecionado,
     setGrupoSelecionado,
     marcaSelecionada,
@@ -48,16 +66,12 @@ export const ActionPesquisaPromocao = ({ usuarioLogado }) => {
     setDataFim,
     qtdInicio,
     setQtdInicio,
-    qtdFim,
-    setQtdFim,
     vrDesconto,
     setVrDesconto,
     porcentoDesconto,
     setPorcentoDesconto,
     valorInicio,
     setValorInicio,
-    valorFim,
-    setValorFim,
     produtoOrigem,
     setProdutoOrigem,
     fileProdutoOrigem,
@@ -70,12 +84,10 @@ export const ActionPesquisaPromocao = ({ usuarioLogado }) => {
     setDescricao,
     precoProduto,
     setPrecoProduto,
-    dadosFornecedorProduto,
     dadosGrupo,
     dadosSubGrupo,
     optionsMarcas,
     optionsEmpresas,
-    optionsMecanica,
     optionsMecanicaCompleta,
     dadosMecanicas,
     mecanicaSelecionadaEdicao,
@@ -85,12 +97,10 @@ export const ActionPesquisaPromocao = ({ usuarioLogado }) => {
     btnSalvar,
     setBtnSalvar,
     handleFileUpload,
-    mostrarProdutosSelecionados,
     dadosPromocoesAtivas,
     modalVisivel,
     setModalVisivel,
     handleSalvarMecanica,
-    mostrarProdutosPromocao,
     handlePesquisarProdutoDestino,
     handlePesquisarProdutoOrigem,
     modalProduto,
@@ -100,13 +110,11 @@ export const ActionPesquisaPromocao = ({ usuarioLogado }) => {
     setModalProdutoDestino,
     modalProdutoOrigem,
     setModalProdutoOrigem,
-    modalProdutoDaPromocao,
-    setModalProdutoDaPromocao,
     statusProdutoOrigem,
     setStatusProdutoOrigem,
     statusProdutoDestino,
     setStatusProdutoDestino,
-
+    
     produtoDestinoSelecionado,
     setProdutoDestinoSelecionado,
     produtoOrigemSelecionado,
@@ -119,19 +127,10 @@ export const ActionPesquisaPromocao = ({ usuarioLogado }) => {
     setModalPodutoSelecionadoOrigem,
     modalPodutoSelecionadoDestino,
     modalPodutoSelecionadoOrigem,
-    modalEmpresasPromocao,
-    setModalEmpresasPromocao,
-    refetchProdutosPromocoes,
-    dadosEmpresasPromocoes,
-    setDadosEmpresasPromocoes,
     mostrarProdutosSelecionadosOrigem,
     mostrarProdutosSelecionadosDestino,
     modalDocumentacao,
     setModalDocumentacao,
-    modalPodutoSelecionadoDestinoCSV,
-    setModalPodutoSelecionadoDestinoCSV,
-    modalPodutoSelecionadoOrigemCSV,
-    setModalPodutoSelecionadoOrigemCSV,
     isCheckedGrupo,
     setIsCheckedGrupo,
     isCheckedProduto,
@@ -165,26 +164,7 @@ export const ActionPesquisaPromocao = ({ usuarioLogado }) => {
     onSubmitEstrutura,
     onSubmitEstruturaProduto
 
-  } = useCreatePromocaoAtiva({});
-  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
-
-  useEffect(() => {
-    const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
-    if (menuSalvo) {
-      const menuParsed = JSON.parse(menuSalvo);
-      setMenuFilhoAtual(menuParsed);
-    }
-  }, []);
-  
-  const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
-    ['menus-usuario-excecao', menuFilhoAtual?.ID],
-    async () => {
-      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
-      
-      return response.data;
-    },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
-  );
+  } = useCreatePromocaoAtiva({usuarioLogado, optionsModulos});
 
   const customStyles = {
     option: (provided, state) => ({
@@ -219,21 +199,6 @@ export const ActionPesquisaPromocao = ({ usuarioLogado }) => {
     setAplicacaoDestinoSelecionada(selectedValue.APLICAODESTINO);
     setTipoDescontoSelecionado(selectedValue.TIPODESCONTO);
   }, []);
- 
-  // const handleChangeMecanica = useCallback((selectedValue) => {
-  //   const selectedOption = optionsMecanicaCompletaAnterior?.find(option => option.ID == selectedValue);
-
-  //   if (selectedOption) {
-  //     setMecanicaSelecionada(selectedOption.mecanica);
-  //     setMecanicaSelecionadaEdicao(selectedOption.label)
-  //     setAplicacaoDestinoSelecionada(selectedOption.aplicacaoDestino);
-  //     setTipoDescontoSelecionado(selectedOption.tipoDesconto);
-  //   }
-  //     console.log(mecanicaSelecionada, 'mecanicaSelecionada')
-  //     console.log(mecanicaSelecionadaEdicao, 'mecanicaSelecionadaEdicao')
-  //     console.log(aplicacaoDestinoSelecionada, 'aplicaoDestinoSelecionada')
-  //     console.log(tipoDescontoSelecionado, 'tipoDescontoSelecionado')
-  // }, [dadosMecanicas, setMecanicaSelecionada, setAplicacaoDestinoSelecionada, setTipoDescontoSelecionado,]);
 
   const handleEditarMecanica = () => {
     const selectedOption = dadosMecanicas.find(option => option.ID == mecanicaSelecionada);
@@ -244,7 +209,6 @@ export const ActionPesquisaPromocao = ({ usuarioLogado }) => {
       setBtnSalvar(false);
     }
   };
-
 
   useEffect(() => {
     if (tipoDescontoSelecionado == 0) {
@@ -261,11 +225,15 @@ export const ActionPesquisaPromocao = ({ usuarioLogado }) => {
       setValorInicio(0);
     }
 
-    if (mecanicaSelecionada == 1 && mecanicaSelecionadaEdicao !== "PROMOÇÃO POR EM UM PRODUTO // QUANTIDADE VALOR // VALOR FINAL") {
+    if (
+      mecanicaSelecionada == 1 &&
+      mecanicaSelecionadaEdicao !== "PROMOÇÃO POR EM UM PRODUTO // QUANTIDADE VALOR // VALOR FINAL" &&
+      !MECANICAS_COM_QTD_LIBERADA.includes(tipoPromocao)
+    ) {
       setQtdInicio(0);
     }
 
-  }, [mecanicaSelecionada, tipoDescontoSelecionado, mecanicaSelecionadaEdicao, setPrecoProduto, setVrDesconto, setValorInicio, setPorcentoDesconto]);
+  }, [mecanicaSelecionada, tipoDescontoSelecionado, mecanicaSelecionadaEdicao, tipoPromocao, setPrecoProduto, setVrDesconto, setValorInicio, setPorcentoDesconto]);
 
 
   const handleCadastrar = () => {
@@ -299,10 +267,6 @@ export const ActionPesquisaPromocao = ({ usuarioLogado }) => {
   const mostrarDocumentacao = useCallback(() => {
     setModalDocumentacao(true);
   }, []);
-
-  const [treeData, setTreeData] = useState([]);
-  const [selectedNodesOrigem, setSelectedNodesOrigem] = useState({});
-  const [selectedNodesDestino, setSelectedNodesDestino] = useState({});
 
   useEffect(() => {
     if (dadosSubGrupo.length) {
@@ -429,10 +393,6 @@ export const ActionPesquisaPromocao = ({ usuarioLogado }) => {
     setGrupoSelecionado(selectedGrupo);
     setSubGrupoOrigem(selectedSubGrupo);
     setSubGrupoProdutoOrigem(selectedSubGrupo);
-
-    // if (subGrupoOrigem.length > 0) {
-    //   refetchProdutoSubGrupoOrigem();
-    // }
   };
 
   const handleProdutoSubGrupoDestinoChange = (e) => {
@@ -458,11 +418,8 @@ export const ActionPesquisaPromocao = ({ usuarioLogado }) => {
     setGrupoSelecionado(selectedGrupo);
     setSubGrupoDestino(selectedSubGrupo);
     setSubGrupoProdutoDestino(selectedSubGrupo);
-    // if (subGrupoDestino.length > 0) {
-    //   refetchProdutoSubGrupoDestino();
-    // }
-  };
 
+  };
 
   const fetchProdutoSubGrupoDestino = async () => {
     const urlBase = `/produto-subGrupo?idSubGrupo=${subGrupoDestino.join(',')}`;
@@ -565,34 +522,16 @@ export const ActionPesquisaPromocao = ({ usuarioLogado }) => {
     setIsCheckedGrupoProduto(checked);
     if (checked) {
       setIsCheckedGrupo(false);
-      setIsCheckedProduto(false);
+      setIsCheckedProduto(true);
     }
   }
 
   const mostrarModalEstruturaDestino = () => {
     setModalEstProdDestino(true);
-    // if(dadosProdutoSubGrupoDestino.length > 0) {
-    // } else {
-    //   Swal.fire({
-    //     icon: 'warning',
-    //     title: 'Nenhum produto encontrado.',
-    //     text: 'para os subgrupos selecionados no destino',
-    //     confirmButtonText: 'OK'
-    //   })
-    // }
   }
 
   const mostrarModalEstruturaOrigem = () => {
     setModalEstProdOrigem(true);
-    // if(dadosProdutoSubGrupoOrigem.length > 0) {
-    // } else {
-    //   Swal.fire({
-    //     icon: 'warning',
-    //     title: 'Nenhum produto encontrado.',
-    //     text: 'para os subgrupos selecionados na origem',
-    //     confirmButtonText: 'OK'
-    //   })
-    // }
   }
 
 
@@ -602,18 +541,6 @@ export const ActionPesquisaPromocao = ({ usuarioLogado }) => {
         linkComponentAnterior={["Home"]}
         linkComponent={["Cadastro de Promoções"]}
         title="Cadastro de Promoções"
-
-        // InputSelectMecanicaComponent={InputSelectActionPromocao}
-        // labelSelectMecanica={"Mecanica"}
-        // optionsMecanica={dadosMecanicas?.map((item) => ({
-        //   value: item.ID,
-        //   label: `${item.ID} - ${item.DESCRICAO}`,
-        //   APLICAODESTINO: item.APLICAODESTINO,
-        //   TIPODESCONTO: item.TIPODESCONTO
-        // }))}
-        // defaultValueSelectMecanica={mecanicaSelecionada}
-        // onChangeSelectMecanica={(e) => handleChangeMecanica(e.value)}
-        // styleMecanica={customStyles}
      
         InputSelectMecanicaComponent={InputSelectActionPromocao}
         labelSelectMecanica={"Mecanica"}
@@ -667,9 +594,11 @@ export const ActionPesquisaPromocao = ({ usuarioLogado }) => {
           setQtdInicio(valor);
         }}
         readOnlyQTDInicio={
-          mecanicaSelecionada == 1 && mecanicaSelecionadaEdicao !== "PROMOÇÃO POR EM UM PRODUTO // QUANTIDADE VALOR // VALOR FINAL"
-            ? true
-            : false
+          MECANICAS_COM_QTD_LIBERADA.includes(tipoPromocao)
+            ? false
+            : mecanicaSelecionada == 1 && mecanicaSelecionadaEdicao !== "PROMOÇÃO POR EM UM PRODUTO // QUANTIDADE VALOR // VALOR FINAL"
+              ? true
+              : false
         }
         // styleQTDInicio={styleQTDInicio}
 
@@ -1001,7 +930,7 @@ export const ActionPesquisaPromocao = ({ usuarioLogado }) => {
         onButtonClickSearch={handleCadastrar}
         corSearch={"primary"}
         IconSearch={IoIosSend}
-        styleButtonSearch={isCheckedProduto ? false : true}
+        styleButtonSearch={!isCheckedProduto || isCheckedGrupoProduto}
 
         ButtonTypeEstruturaProduto={ButtonType}
         linkEstruturaProduto={"Cadastrar Por Estrutura / Produto"}
@@ -1109,6 +1038,7 @@ export const ActionPesquisaPromocao = ({ usuarioLogado }) => {
         novoProdutoEstProdDestino={novoProdutoEstProdDestino}
         setNovoProdutoEstProdDestino={setNovoProdutoEstProdDestino}
       />
+      
       <ActionDocumentacaoCriar
         show={modalDocumentacao}
         handleClose={() => setModalDocumentacao(false)}

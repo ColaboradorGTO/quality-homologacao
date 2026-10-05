@@ -174,12 +174,6 @@ export const optionsMecanica = [
     }
 ]
 
-/* 
-
-  com base na optionsMecanicaCompleta
-  quero analisar a imagem anexada e verificar, quais as mecanicas
-  que podem ser utilizadas correspondente com a imagem, ou seja quais 
-*/
 export const optionsMecanicaCompleta = [
   {
     value: 1,
@@ -452,6 +446,8 @@ export const optionsMecanicaCompleta = [
     color: "gray"
   }
 ];
+
+export const MECANICAS_COM_QTD_LIBERADA = [16, 17, 18, 22, 23, 24];
 
 export const optionsMecanicaCompletaAnterior = [
   {

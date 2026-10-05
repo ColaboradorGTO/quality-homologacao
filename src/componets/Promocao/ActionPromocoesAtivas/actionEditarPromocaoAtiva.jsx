@@ -25,7 +25,14 @@ import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../utils
 import { get } from "../../../api/funcRequest";
 
 
-export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, actionEditarVisivel, setActionEditarVisivel }) => {
+export const ActionEditarPromocaoAtiva = ({ 
+  dadosPromocao, 
+  handleClickIncluir, 
+  actionEditarVisivel, 
+  setActionEditarVisivel,
+  usuarioLogado,
+  optionsModulos 
+}) => {
 
   const {
     mecanicaSelecionada,
@@ -171,7 +178,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
     downloadPlanilhaModelo,
     onSubmitEstrutura,
     onSubmitEstruturaProduto
-  } = useUpdatePromocaoAtiva({ dadosPromocao });
+  } = useUpdatePromocaoAtiva({ dadosPromocao, usuarioLogado, optionsModulos });
 
   const customStyles = {
     option: (provided, state) => ({
@@ -185,36 +192,19 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
   };
 
   const handleChangeMecanica = useCallback((selectedValue) => {
-    // const selectedOption = optionsMecanicaCompleta?.find(option => option.value == selectedValue);
 
-    
-    // console.log(selectedOption, 'selectedOption')
-    console.log(selectedValue, 'value')
     if (selectedValue) {
       setTipoPromocao(selectedValue?.value)
       setMecanicaSelecionada(selectedValue.value);
       setMecanicaSelecionadaEdicao(selectedValue.label)
       setAplicacaoDestinoSelecionada(selectedValue.aplicacaoDestino);
       setTipoDescontoSelecionado(selectedValue.tipoDesconto);
-       console.log(mecanicaSelecionada, 'mecanica')
+     
     } else {
-      // console.log('Nenhuma opção encontrada para o valor:', selectedValue);
+      console.log('Nenhuma opção encontrada para o valor:', selectedValue);
     }
   }, [optionsMecanicaCompleta]);
 
-  // console.log(mecanicaSelecionada, 'mecanicaSelecionada')
-  // console.log(mecanicaSelecionadaEdicao, 'mecanicaSelecionadaEdicao')
-  // console.log(aplicacaoDestinoSelecionada, 'aplicaoDestinoSelecionada')
-  // console.log(tipoDescontoSelecionado, 'tipoDescontoSelecionado AQUI')
-
-  // const handleChangeMecanica = useCallback((selectedValue) => {
-
-  //     setMecanicaSelecionada(selectedValue.MECANICA);
-  //     setMecanicaSelecionadaEdicao(selectedValue.label)
-  //     setAplicacaoDestinoSelecionada(selectedValue.APLICAODESTINO);
-  //     setTipoDescontoSelecionado(selectedValue.TIPODESCONTO);
-
-  // }, []);
 
   useEffect(() => {
     if (tipoDescontoSelecionado == 0) {
@@ -278,10 +268,8 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
           setAplicacaoDestinoSelecionada(mecanica.aplicacaoDestino);
           setTipoDescontoSelecionado(mecanica.tipoDesconto);
         }
-
         return mecanica;
       }
-
     }
     return null;
   }, [mecanicaInicial, dadosMecanicas, optionsMecanica]);
@@ -289,7 +277,6 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
   const valorSelecionado = useMemo(() => {
     if (mecanicaSelecionada && optionsMecanicaCompleta.length > 0) {
       const mecanica = optionsMecanicaCompleta.find(item => item.value === mecanicaSelecionada);
-
       return mecanica ? {
         value: mecanica.value,
         label:` ${mecanica.value} - ${mecanica.label}`,
@@ -328,14 +315,11 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
       if (Array.isArray(marcaSelecionada)) {
         filtradas = empresasArray.filter(empresa =>
           marcaSelecionada.map(String).includes(String(empresa.IDGRUPOEMPRESARIAL))
-
         );
-
       } else {
         filtradas = empresasArray.filter(empresa =>
           String(empresa.IDGRUPOEMPRESARIAL) === String(marcaSelecionada)
         );
-
       }
     }
 
@@ -347,7 +331,6 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
         status: emp.STATIVO
       }));
     }
-
 
     return filtradas.map(emp => ({
       ...emp,
@@ -679,7 +662,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
     setModalEstProdOrigem(true);
   }
 
-  
+
   return (
     <Fragment>
 
@@ -759,7 +742,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
         valueInputFielDescription={descricao}
         onChangeInputFieldDescription={(e) => setDescricao(e.target.value)}
         styleDescription={{ textTransform: "uppercase" }}
-        // readOnlyDescription={true}
+        readOnlyDescription={true}
 
 
         InputSelectMarcasComponent={InputSelectActionPromocao}
@@ -997,7 +980,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
         onButtonClickSearch={handleCadastrar}
         corSearch={"primary"}
         IconSearch={IoIosSend}
-        // styleButtonSearch={isCheckedProduto ? false : true}
+        styleButtonSearch={isCheckedProduto ? false : true}
 
         ButtonTypeEstruturaProduto={ButtonType}
         linkEstruturaProduto={"Atualizar Por Estrutura / Produto"}
@@ -1022,6 +1005,12 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
         IconVisualizarProduto={GrView}
         readOnlyVisualizarProduto={isCheckedGrupo ? true : false}
 
+        ButtonTypeVisualizarSubGrupo={ButtonType}
+        linkNomeVisualizarSubGrupo={"Visualizar Sub Grupo"}
+        // onButtonClickVisualizarSubGrupo
+        corVisualizarSubGrupo={"primary"}
+        IconVisualizarSubGrupo={GrView}
+        readOnlyVisualizarSubGrupo={isCheckedGrupoProduto ? true : false}
 
         ButtonTypeTXT={ButtonType}
         linkTXT={"Documentação"}
@@ -1040,7 +1029,6 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
         corDownload={"success"}
         onButtonClickDownload={downloadPlanilhaModelo}
         IconDownload={FaDownload}
-
       />
 
       <ActionProdutoDestinoModal

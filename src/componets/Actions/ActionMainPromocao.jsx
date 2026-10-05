@@ -156,6 +156,7 @@ export const ActionMainPromocao = ({
   ButtonTypeEditarMecanica,
   ButtonTypeEmpresa,
   ButtonTypeVisualizarProduto,
+  ButtonTypeVisualizarSubGrupo,
   ButtonTypeProdutoPesquisadoOrigem,
   ButtonTypeProdutoEstruturaOrigem,
   ButtonTypeProdutoPesquisadoDestino,
@@ -173,6 +174,7 @@ export const ActionMainPromocao = ({
   linkNomeEditarMecanica,
   linkNomeEmpresa,
   linkNomeVisualizarProduto,
+  linkNomeVisualizarSubGrupo,
   linkNomeProdutoPesquisadoOrigem,
   linkNomeProdutoEstruturaOrigem,
   linkNomeProdutoPesquisadoDestino,
@@ -190,6 +192,7 @@ export const ActionMainPromocao = ({
   onButtonClickEditarMecanica,
   onButtonClickEmpresa,
   onButtonClickVisualizarProduto,
+  onButtonClickVisualizarSubGrupo,
   onButtonClickProdutoPesquisadoOrigem,
   onButtonClickProdutoEstruturaOrigem,
   onButtonClickProdutoPesquisadoDestino,
@@ -207,6 +210,7 @@ export const ActionMainPromocao = ({
   corSalvarMecanica,
   corEmpresa,
   corVisualizarProduto,
+  corVisualizarSubGrupo,
   corProdutoPesquisadoOrigem,
   corProdutoPesquisadoDestino,
   corProdutoEstruturaOrigem,
@@ -224,6 +228,7 @@ export const ActionMainPromocao = ({
   IconEditarMecanica,
   IconEmpresa,
   IconVisualizarProduto,
+  IconVisualizarSubGrupo,
   IconProdutoPesquisadoOrigem,
   IconProdutoPesquisadoDestino,
   IconProdutoEstruturaOrigem,
@@ -260,6 +265,7 @@ export const ActionMainPromocao = ({
   readOnlyProduto,
   readOnlyButtonProdutoPesquisadoDestino,
   readOnlyVisualizarProduto,
+  readOnlyVisualizarSubGrupo,
 
   defaultValueSelectCategoria,
   defaultValueSelectMarca,
@@ -969,19 +975,38 @@ export const ActionMainPromocao = ({
                   <hr style={{ borderColor: 'black', width: '100%', height: '10px' }} />
 
                   <div className="row mt-3">
-                    {ButtonTypeVisualizarProduto && (
-                      <ButtonTypeVisualizarProduto
-                        textButton={linkNomeVisualizarProduto}
-                        onClickButtonType={onButtonClickVisualizarProduto}
-                        cor={corVisualizarProduto}
-                        tipo="button"
-                        Icon={IconVisualizarProduto}
-                        iconColor="#fff"
-                        iconSize={25}
-                        disabledBTN={readOnlyVisualizarProduto}
-                      />
-                    )}
+                    <div>
+                      {ButtonTypeVisualizarProduto && (
+                        <ButtonTypeVisualizarProduto
+                          textButton={linkNomeVisualizarProduto}
+                          onClickButtonType={onButtonClickVisualizarProduto}
+                          cor={corVisualizarProduto}
+                          tipo="button"
+                          Icon={IconVisualizarProduto}
+                          iconColor="#fff"
+                          iconSize={25}
+                          disabledBTN={readOnlyVisualizarProduto}
+                        />
+                      )}
+
+                    </div>
+                    <div>
+
+                      {ButtonTypeVisualizarSubGrupo && (
+                        <ButtonTypeVisualizarSubGrupo
+                          textButton={linkNomeVisualizarSubGrupo}
+                          onClickButtonType={onButtonClickVisualizarSubGrupo}
+                          cor={corVisualizarSubGrupo}
+                          tipo="button"
+                          Icon={IconVisualizarSubGrupo}
+                          iconColor="#fff"
+                          iconSize={25}
+                          disabledBTN={readOnlyVisualizarSubGrupo}
+                        />
+                      )}
+                    </div>
                   </div>
+                 
 
 {/* <hr style={{ borderColor: 'black', width: '100%', height: '10px' }} /> */}
 
