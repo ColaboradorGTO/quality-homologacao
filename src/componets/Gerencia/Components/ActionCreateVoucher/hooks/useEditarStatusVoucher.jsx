@@ -45,8 +45,8 @@ export const useEditarStatusVoucher = ({
         setTrocaSelecionado(dadosEditarVoucher[0]?.voucher.STTIPOTROCA)
     }, [dadosEditarVoucher])
 
-    console.log(dadosEditarVoucher[0]?.voucher.STTIPOTROCA, 'troca')
-    console.log(dadosEditarVoucher[0]?.voucher.STSTATUS, 'status')
+ /*    console.log(dadosEditarVoucher[0]?.voucher.STTIPOTROCA, 'troca')
+    console.log(dadosEditarVoucher[0]?.voucher.STSTATUS, 'status') */
 
     const onSubmit = async () => {
         let STATIVO = 'True';
