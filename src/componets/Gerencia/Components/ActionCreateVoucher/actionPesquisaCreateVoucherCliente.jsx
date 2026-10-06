@@ -48,6 +48,7 @@ export const ActionPesquisaCreateVoucherCliente = ({
   const [btnVisivel, setBtnVisivel] = useState(false);
   const [selectedRows, setSelectedRows] = useState([])
   const [dadosVisualizarProdutos, setDadosVisualizarProdutos] = useState([])
+  const [dadosProdutosVendas, setDadosProdutosVendas] = useState([])
   const [tipoTrocaSelecionada, setTipoTrocaSelecionada] = useState(null);
   const [quantidade, setQuantidade] = useState(0);
   const [quantidadesProdutos, setQuantidadesProdutos] = useState({});
@@ -61,48 +62,48 @@ export const ActionPesquisaCreateVoucherCliente = ({
   }, []);
 
 
-/*   const fetchListaEmpresasVouchers = async () => {
-    try {
-      const urlApi = `/empresasVoucher?idSubGrupoEmpresa=${usuarioLogado?.IDGRUPOEMPRESARIAL}&idEmpresa=${usuarioLogado?.IDEMPRESA}`;
-      const response = await get(urlApi);
-
-      if (response.data.length && response.data.length === pageSize) {
-        let allData = [...response.data];
-        animacaoCarregamento(`Carregando... Página ${currentPage} de ${response.data.length}`, true);
-
-        async function fetchNextPage(currentPage) {
-          try {
-            currentPage++;
-            const responseNextPage = await get(`${urlApi}&page=${currentPage}`);
-            if (responseNextPage.length) {
-              allData.push(...responseNextPage.data);
-              return fetchNextPage(currentPage);
-            } else {
-              return allData;
+  /*   const fetchListaEmpresasVouchers = async () => {
+      try {
+        const urlApi = `/empresasVoucher?idSubGrupoEmpresa=${usuarioLogado?.IDGRUPOEMPRESARIAL}&idEmpresa=${usuarioLogado?.IDEMPRESA}`;
+        const response = await get(urlApi);
+  
+        if (response.data.length && response.data.length === pageSize) {
+          let allData = [...response.data];
+          animacaoCarregamento(`Carregando... Página ${currentPage} de ${response.data.length}`, true);
+  
+          async function fetchNextPage(currentPage) {
+            try {
+              currentPage++;
+              const responseNextPage = await get(`${urlApi}&page=${currentPage}`);
+              if (responseNextPage.length) {
+                allData.push(...responseNextPage.data);
+                return fetchNextPage(currentPage);
+              } else {
+                return allData;
+              }
+            } catch (error) {
+              console.error('Erro ao buscar próxima página:', error);
+              throw error;
             }
-          } catch (error) {
-            console.error('Erro ao buscar próxima página:', error);
-            throw error;
           }
+  
+          await fetchNextPage(currentPage);
+          return allData;
+        } else {
+  
+          return response.data;
         }
-
-        await fetchNextPage(currentPage);
-        return allData;
-      } else {
-
-        return response.data;
+  
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        throw error;
+      } finally {
+        fecharAnimacaoCarregamento();
       }
-
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      throw error;
-    } finally {
-      fecharAnimacaoCarregamento();
-    }
-  }; */
+    }; */
 
 
-const fetchListaEmpresasVouchers = async () => {
+  const fetchListaEmpresasVouchers = async () => {
     const urlBase = `/empresasVoucher?idSubGrupoEmpresa=${usuarioLogado?.IDGRUPOEMPRESARIAL}&idEmpresa=${usuarioLogado?.IDEMPRESA}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
@@ -183,49 +184,7 @@ const fetchListaEmpresasVouchers = async () => {
     }
   };
 
-/* const fetchListaVendasClientes = async () => {
-    const urlBase = `/lista-venda-cliente?idEmpresa=${empresaSelecionada}&idSubGrupoEmpresarial=${usuarioLogado?.IDGRUPOEMPRESARIAL}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&cpfOUidVenda=${cpf}&nnf=${numeroNF}&serie=${serie}`;
-    let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
-    urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
 
-    const controller = new AbortController();
-    let allData = [];
-
-    try {
-      animacaoCarregamento('Carregando dados...', true, true, () => controller.abort());
-
-      const primeiraPagina = 1;
-      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`, { signal: controller.signal });
-      const page = primeiraResposta.page || primeiraPagina;
-      const pageSize = primeiraResposta.pageSize || 1000;
-      const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
-      const totalPages = Math.ceil(totalRows / pageSize);
-
-      allData = [...(primeiraResposta.data || [])];
-
-      if (totalPages > 1) {
-        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
-          if (foiCancelado()) break;
-          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true, true);
-          const responsePage = await get(`${urlApi}&page=${currentPage}`, { signal: controller.signal });
-          allData.push(...(responsePage.data || []));
-        }
-      }
-
-      return allData;
-    } catch (error) {
-      if (error.code === 'ERR_CANCELED') {
-        return allData;
-      }
-      console.error('Erro ao buscar dados:', error);
-      throw error;
-    } finally {
-      fecharAnimacaoCarregamento();
-    }
-  };
- */
-
-  
   const { data: dadosVendasClientes = [], error: errorVendasClientes, isLoading: isLoadingVendas, refetch: refetchListaVendasClientes } = useQuery(
     ['lista-venda-cliente'],
     () => fetchListaVendasClientes(),
@@ -272,7 +231,7 @@ const fetchListaEmpresasVouchers = async () => {
     setTabelaVendasClientes(false);
     setTabelaVisivelVoucherSelecionados(false);
     setActionPrincipal(true);
-    setActionSecundaria(false); 
+    setActionSecundaria(false);
   }
 
   const handleClickClientes = () => {
@@ -285,11 +244,30 @@ const fetchListaEmpresasVouchers = async () => {
     refetchListaVendasClientes()
   }
 
+  const handleBack = () => {
+    setTabelaVenda(true);
+    setTabelaSecundaria(false);
+    setTabelaVisivel(false);
+    setTabelaVisivelVoucherSelecionados(false);
+    setTabelaVisivelVoucher(false)
+    setSelectedRows([]);
+
+    if (tabelaVenda === true) {
+      setTabelaVisivel(true);
+      setTabelaVendasClientes(false);
+      setTabelaVisivelVoucherSelecionados(false);
+      setActionPrincipal(true);
+      setActionSecundaria(false);
+    }
+  }
   const {
     optionsCPF,
     onCpf,
     onSubmitVoucher,
     onAuthFuncionario,
+    cpfCliente,
+
+
   } = useCriarVoucher({
     usuarioLogado,
     selectedRows,
@@ -299,9 +277,11 @@ const fetchListaEmpresasVouchers = async () => {
     quantidade,
     quantidadesProdutos,
     modalCadastroClienteCPFVoucher,
+    dadosProdutosVendas,
     setModalCadastroClienteCPFVoucher,
     setModalCadastroClienteCNPJVoucher,
-    handleClick
+    setDadosProdutosVendas,
+    handleClick,
   })
 
   return (
@@ -326,7 +306,7 @@ const fetchListaEmpresasVouchers = async () => {
         InputSelectEmpresaComponent={InputSelectAction}
         labelSelectEmpresa={"Empresa"}
         optionsEmpresas={[
-          {value: '', label: 'Todas as Empresas'},
+          { value: '', label: 'Todas as Empresas' },
           ...dadosEmpresasVoucher.map((empresa) => ({
             value: empresa.IDEMPRESA,
             label: empresa.NOFANTASIA,
@@ -366,7 +346,7 @@ const fetchListaEmpresasVouchers = async () => {
 
         ButtonTypeCancelar={ButtonType}
         linkCancelar={"Voltar"}
-        onButtonClickCancelar={handleClick}
+        onButtonClickCancelar={handleBack}
         corCancelar={"danger"}
         IconCancelar={AiOutlineDoubleLeft}
 
@@ -378,7 +358,7 @@ const fetchListaEmpresasVouchers = async () => {
         styleVendasEstrutura={btnVisivel ? { display: 'block' } : { display: 'none' }}
       />
 
-  
+
       {tabelaVendasClientes && (
 
         <ActionListaVendaCLiente
@@ -388,6 +368,8 @@ const fetchListaEmpresasVouchers = async () => {
           selectedRows={selectedRows}
           setSelectedRows={setSelectedRows}
           dadosVisualizarProdutos={dadosVisualizarProdutos}
+          dadosProdutosVendas={dadosProdutosVendas}
+          setDadosProdutosVendas={setDadosProdutosVendas}
           setDadosVisualizarProdutos={setDadosVisualizarProdutos}
           setTipoTrocaSelecionada={setTipoTrocaSelecionada}
           tipoTrocaSelecionada={tipoTrocaSelecionada}
@@ -422,6 +404,7 @@ const fetchListaEmpresasVouchers = async () => {
         handleClose={() => setModalCadastroClienteCNPJVoucher(false)}
         usuarioLogado={usuarioLogado}
         optionsModulos={optionsModulos}
+        cpfCliente={cpfCliente}
         onCpf={onCpf}
       />
 
@@ -431,6 +414,7 @@ const fetchListaEmpresasVouchers = async () => {
         usuarioLogado={usuarioLogado}
         optionsModulos={optionsModulos}
         optionsCPF={optionsCPF}
+        cpfCliente={cpfCliente}
         onCpf={onCpf}
       />
     </Fragment>

@@ -120,12 +120,12 @@ export const ActionEditarStatusVoucherModal = ({ show, handleClose, dadosEditarV
         <Modal.Body>
           <div className="mb-3">
 
-            <Message
+            {/*    <Message
               severity="error"
               text={msgUser}
             >
 
-            </Message>
+            </Message> */}
           </div>
           <form onSubmit={onSubmit}>
 
@@ -202,10 +202,12 @@ export const ActionEditarStatusVoucherModal = ({ show, handleClose, dadosEditarV
               usuarioLogado={usuarioLogado}
             />
 
-            <ActionListaVendaDestino
-              dadosEditarVoucher={dadosEditarVoucher}
-              usuarioLogado={usuarioLogado}
-            />
+            {dadosEditarVoucher[0]?.detalhedestino?.length > 0 && (
+              <ActionListaVendaDestino
+                dadosEditarVoucher={dadosEditarVoucher}
+                usuarioLogado={usuarioLogado}
+              />
+            )}
           </div>
         </Modal.Body>
         {stEdicao && (

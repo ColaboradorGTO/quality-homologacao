@@ -8,11 +8,14 @@ import { schema } from "./schemaValidationCNPJ"
 import FormField from "../../../../../Formularios/FormField"
 import { AlertError } from "../../../../../Inputs/alertError"
 import { useCadastrarClienteCNPJVoucher } from "../hooks/useCadastroClienteCNPJVoucher"
+import { useEffect } from "react"
+import { mascaraCNPJ } from "../../../../../../utils/mascaraCNPJ"
 
-export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos, onCpf }) => {
+export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos, onCpf, cpfCliente }) => {
     const { handleSubmit, formState: { errors }, clearErrors, control, setError, setValue } = useForm({
         mode: "onChange"
     });
+
     const {
         idCliente,
         tipo,
@@ -137,6 +140,11 @@ export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos,
         setTelefoneComercial('');
         handleClose();
     }
+
+    useEffect(() => {
+      setCnpj(cpfCliente ?? '');
+    }, [cpfCliente, cnpj]); 
+    
     return (
         <Fragment>
             <form onSubmit={handleSubmit(onSubmit)}>
@@ -210,7 +218,8 @@ export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos,
                                         type="text"
                                         errors={errors}
                                         clearErrors={clearErrors}
-                                        value={cnpj}
+                                        value={mascaraCNPJ(cnpj)}
+                                        readOnly={cnpj.length === 14 ? true : false}
                                         onChange={(e) => setCnpj(e.target.value)}
                                     />
                                 )}
