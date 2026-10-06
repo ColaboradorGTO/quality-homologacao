@@ -1,20 +1,28 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Swal from "sweetalert2";
-import { post, put } from "../../../../../api/funcRequest";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { put } from "../../../../../api/funcRequest";
 import { registrarLogAuditoria } from "../../../../../services/auditLog";
 
 export const useEnviarPedidoComprasADM = ({
     usuarioLogado,
-    optionsModulos
+    optionsModulos,
+    handleClick
 }) => {
     const [loading, setLoading] = useState(false);
 
 
     const enviarPedidoComprasADM = async (IDPEDIDO) => {
-        if(!optionsModulos[0]?.ALTERAR == 'True') {
 
+        if(!optionsModulos[0]?.ALTERAR == 'True') {
+            Swal.fire({
+                title: "Erro!",
+                icon: "info",
+                html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para enviar o pedido ao Compras Adm`,
+                showConfirmButton: true,
+                customClass: {
+                    container: 'custom-swal',
+                },
+            });
         }
         try {
             const confirmacao = await Swal.fire({
@@ -54,12 +62,7 @@ export const useEnviarPedidoComprasADM = ({
             if (!motivo) return;
             
             setLoading(true);
-            await registrarLogAuditoria({
-                idFuncionario: usuarioLogado.id,
-                pathFuncao: textoFuncao,
-                dados: dados
-            });
-
+            
             const dados = {
                 IDANDAMENTO: parseInt(14),
                 TXTOBSDEVPEDIDO: motivo.toUpperCase(),
@@ -67,28 +70,31 @@ export const useEnviarPedidoComprasADM = ({
             };
 
             const response = await put("/andamento-pedido/:id", dados);
-
-            const postData  = {
-                IDFUNCIONARIO: usuarioLogado?.id, 
-                PATHFUNCAO: "CADASTRO/ENVIAR PEDIDO PARA COMPRAS ADM",
-                DADOS: JSON.stringify(dados),
-                IP: ipUsuario
-            }
             
-            await post("/log-web", postData);
-            
+            await registrarLogAuditoria({
+                idFuncionario: usuarioLogado.id,
+                pathFuncao: 'CADASTRO/ENVIAR PEDIDO PARA COMPRAS ADM',
+                dados: dados
+            });
+          
             await Swal.fire({
                 icon: "success",
                 title: "Pedido Enviado!",
                 text: "O pedido foi enviado com sucesso.",
+                customClass: {
+                    container: 'custom-swal',
+                },
             });
-           
+            handleClick()
             return response.data;
         } catch (error) {
             Swal.fire({
                 icon: "error",
                 title: "Erro ao Enviar Pedido",
                 text: "Não Foi Possível Devolver o Pedido, TENTE NOVAMENTE OU ENTRE EM CONTATO COM O SUPORTE!.",
+                customClass: {
+                    container: 'custom-swal',
+                },
             });
         } finally {
             setLoading(false);

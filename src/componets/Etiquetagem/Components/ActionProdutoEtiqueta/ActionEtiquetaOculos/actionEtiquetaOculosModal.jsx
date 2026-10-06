@@ -40,8 +40,7 @@ export const ActionEtiquetaOculosModal = ({
     try {
       let startPageLabel = `
         ^XA
-        ^PR2
-        ^MD15
+        ^PON
         ^FWN
         ^PW800
         ^LL80
@@ -49,8 +48,7 @@ export const ActionEtiquetaOculosModal = ({
       `;
       const zplResetConfiguracao = `
         ^XA
-        ^PR2
-        ^MD15
+        ^MD5
         ^FWN
         ^PW800
         ^LL80
@@ -83,9 +81,9 @@ export const ActionEtiquetaOculosModal = ({
 
           dataLabelsZPL += `
             ${startPageLabel}
-            ^FO5,25^A0,40,${widthFontPrecoVenda}^FB268,1,1,C,0^FD${precoVenda}^FS
+            ^FO5,45^A0,40,${widthFontPrecoVenda}^FB268,1,1,C,0^FD${precoVenda}^FS
             ^BY1.6,3,500
-            ^FO270,10
+            ^FO290,20
             ^BEN,55,Y,N
             ^FD${codBarras}^FS
             ${endPageLabel}

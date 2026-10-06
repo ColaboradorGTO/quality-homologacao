@@ -26,16 +26,6 @@ export const FormularioEditarProdutoPedido = ({
         mode: "onChange"
     });
     const {
-        nomeMarca,
-        setNomeMarca,
-        referenciaProduto,
-        setReferenciaProduto,
-        produtoSelecionado,
-        setProdutoSelecionado,
-        reposicaoSelecionado,
-        setReposicaoSelecionado,
-        tipoCadastroSelecionado,
-        setTipoCadastroSelecionado,
         descricaoProduto,
         setDescricaoProduto,
         vrCusto,
@@ -70,39 +60,21 @@ export const FormularioEditarProdutoPedido = ({
         setEcommerceSelecionado,
         redeSocialSelecionada,
         setRedeSocialSelecionada,
-        vrBruto,
-        setVrBruto,
-        percDescontoI,
-        setPercDescontoI,
-        percDescontoII,
-        setPercDescontoII,
-        percDescontoIII,
-        setPercDescontoIII,
-        vrLiquido,
-        setVrLiquido,
-        vrSugerido,
-        setVrSugerido,
-        vrTotal,
-        setVrTotal,
-        observacao,
-        setObservacao,
+        fornecedor, 
+        setFornecedor,
         dadosCores,
         dadosUnidadeMedida,
         dadosTipoTecidos,
         dadosCategoriaPedidos,
-        dadosCategoriaPedidoGrade,
-        dadosCategoriasProdutos,
         dadosSubGrupoProduto,
         dadosFabricantePedido,
         dadosLocalExposicao,
         dadosGrade,
-        dadosProdutosPedidos,
+        dadosPedidoGrade,
         dadosVinculoEstiloGrupo,
-        optionsTipoCadastro,
+        optionsTipoPedido,
         optionsReposicao,
         atualiza_valor_QtdUnit,
-        vrSugerigoFixo,
-        setVrSugerigoFixo,
         formatarNumero,
         converterParaNumero,
         validarGradeamento,
@@ -113,16 +85,13 @@ export const FormularioEditarProdutoPedido = ({
         setErrosValidacao,
         quantidadePorTamanho,
         setQuantidadePorTamanho,
-        produtoDadosGrade,
-        setProdutoDadosGrade,
-        stReposicao,
-        setStReposicao,
         isDiversos,
         getInputStateGrade,
         onSubmit,
     } = useIncluirProduto({ 
         usuarioLogado, 
         optionsModulos, 
+        handleClose,
         dadosDetalhePedido, 
         setDadosDetalhePedido, 
         dadosDetalheGradePedido, 
@@ -131,34 +100,30 @@ export const FormularioEditarProdutoPedido = ({
         checkboxIntermediario,
         handleClickEditarPedido 
     });
-    
+
     const distribuicao = calcularDistribuicao();
 
     const handleValidatedSubmit = async () => {
         try {
             const dadosParaValidar = {
-                nomeMarcaPedido: nomeMarca,
-                referenciaProdutoPedido: referenciaProduto,
-                descricaoProdutoPedido: descricaoProduto,
-                vrHojeCusto: vrCusto,
-                vrVendaHoje: vrVenda,
                 qtd: quantidade,
                 qtdCaixa: quantidadeCaixa,
                 referenciaProduto: referencia,
-                estrututraProduto: estruturaSelecionada,
-                estiloProduto: estiloSelecionado,
-                vrBrutoProduto: vrBruto,
-                descProdI: percDescontoI,
-                descProdII: percDescontoII,
-                descProdIII: percDescontoIII,
-                vrUnitLiquidoProduto: vrLiquido,
-                vrUnitSugeridoProduto: vrSugerido,
-                vrTotalProduto: vrTotal,
-                observacaoProduto: observacao,
+                unidadeProduto: unidadeSelecionada,
+                corProduto: corSelecionada,
+                tipoProduto: tipoTecidoSelecionado,
+                categoriaProduto: categoriaGradeSelecionada,
+                localExposicaoProduto: localExposicaoSelecionado,
+                ecommerceProduto: ecommerceSelecionado,
+                redeSocialProduto: redeSocialSelecionada,
+                descricaoProdutoPedido: descricaoProduto,
+                vrHojeCusto: vrCusto,
+                vrVendaHoje: vrVenda,
+    
             }
 
             await schema.validate(dadosParaValidar, { abortEarly: false });
-
+            
             await onSubmit();
 
         } catch (validationError) {
@@ -175,7 +140,7 @@ export const FormularioEditarProdutoPedido = ({
                     }
                 });
             }
-
+           
             const errorMessages = validationError.errors || [validationError.message];
             console.log(`Erro de validação:\n${errorMessages.join('\n')}`);
         }
@@ -299,151 +264,6 @@ export const FormularioEditarProdutoPedido = ({
         <Fragment>
             <form onSubmit={handleSubmit(handleValidatedSubmit)}>
                 <div className="form-group">
-
-                    <div className="row">
-                        <div className="col-sm-12 col-xl-12">
-                            <Controller
-                                name="nomeMarcaPedido"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormField
-                                        label={"Pedido para a Marca"}
-                                        name="nomeMarcaPedido"
-                                        type="text"
-                                        value={nomeMarca}
-                                        onChange={(e) => setNomeMarca(e.target.value)}
-                                        errors={errors}
-                                        clearErrors={clearErrors}
-                                        readOnly
-                                    />
-
-                                )}
-                            />
-
-
-                        </div>
-                    </div>
-                </div>
-
-                {/* <div className="form-group">
-                    <div className="row">
-                        <div className="col-sm-6 col-xl-6">
-                            <Controller
-                                name="pesquisaProdutoPedido"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormField
-                                        label={"Pesquisar Referencia/Produto"}
-                                        name="pesquisaProdutoPedido"
-                                        type="text"
-                                        value={referenciaProduto}
-                                        onChange={(e) => setReferenciaProduto(e.target.value)}
-                                        errors={errors}
-                                        clearErrors={clearErrors}
-                                        
-                                    />
-
-                                )}
-                            />
-                        </div>
-                        <div className="col-sm-6 col-xl-6">
-                            <label className="form-label" htmlFor="tpunid">Produtos Cadastrados / Cod Barras - Nome</label>
-                            <Select
-                                id={"listprodpesqped"}
-                                value={produtoSelecionado}
-                                options={dadosProdutosPedidos.map((item) => {
-                                    return {
-                                        value: item.IDPRODUTO,
-                                        label: `${item.NUCODBARRAS} - ${item.DSNOME}`
-                                    }
-                                })}
-                                onChange={(e) => setProdutoSelecionado(e)}
-                            />
-                        </div>
-                    </div>
-                </div> */}
-
-                <div className="form-group">
-                    <div className="row">
-                        <div className="col-sm-6 col-xl-6">
-                            <label className="form-label" htmlFor="strep">Reposição</label>
-                            <Select
-                                id={"stReposicao"}
-                                options={optionsReposicao.map((item) => {
-                                    return {
-                                        value: item.value,
-                                        label: item.label
-                                    }
-                                })}
-                                value={reposicaoSelecionado}
-                                onChange={(e) => setReposicaoSelecionado(e)}
-                                isDisabled={true}
-                            />
-                        </div>
-                        <div className="col-sm-6 col-xl-6">
-                            <Controller
-                                name="descricaoProdutoPedido"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormField
-                                        label={"Descrição Produto"}
-                                        name="descricaoProdutoPedido"
-                                        type="text"
-                                        value={descricaoProduto}
-                                        onChange={(e) => setDescricaoProduto(e.target.value)}
-                                        errors={errors}
-                                        clearErrors={clearErrors}
-                                        
-                                    />
-
-                                )}
-                            />
-                        </div>
-                    </div>
-                </div>
-                <hr />
-                <div className="form-group">
-                    <div className="row">
-
-                        <div className="col-sm-3 col-xl-3">
-                            <Controller
-                                name="vrHojeCusto"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormField
-                                        label={"VR Custo"}
-                                        name="vrHojeCusto"
-                                        type="text"
-                                        value={formatMoeda(vrCusto)}
-                                        onChange={(e) => setVrCusto(e.target.value)}
-                                        errors={errors}
-                                        clearErrors={clearErrors}
-                                        readOnly={true}
-                                    />
-                                )}
-                            />
-                        </div>
-                        <div className="col-sm-3 col-xl-3">
-                            <Controller
-                                name="vrVendaHoje"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormField
-                                        label={"VR Venda"}
-                                        name="vrVendaHoje"
-                                        type="text"
-                                        value={formatMoeda(vrVenda)}
-                                        onChange={(e) => setVrVenda(e.target.value)}
-                                        errors={errors}
-                                        clearErrors={clearErrors}
-                                        readOnly={true}
-                                    />
-                                )}
-                            />
-                        </div>
-                    </div>
-                </div>
-                <div className="form-group">
                     <div className="row">
                         <div className="col-sm-2 col-xl-2">
                             <Controller
@@ -502,7 +322,73 @@ export const FormularioEditarProdutoPedido = ({
                                 )}
                             />
                         </div>
-                        <div className="col-sm-6 col-xl-6">
+
+                        <div className="col-sm-6 col-xl-3">
+                            <Controller
+                                name="descricaoProdutoPedido"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        label={"Descrição Produto"}
+                                        name="descricaoProdutoPedido"
+                                        type="text"
+                                        value={descricaoProduto}
+                                        onChange={(e) => setDescricaoProduto(e.target.value)}
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        
+                                    />
+
+                                )}
+                            />
+                        </div>
+                         
+                        <div className="col-sm-4 col-xl-3">
+                            <label className="form-label" htmlFor="tpcat">Categoria Produto</label>
+                            <Select
+                                id={"categoriaProduto"}
+                                value={categoriaGradeSelecionada}
+                                options={optionsTipoPedido?.map((item) => {
+                                    return {
+                                        value: item.value,
+                                        label: item.label
+                                    }
+                                })}
+                                onChange={(e) => setCategoriaGradeSelecionada(e)}
+                               
+                            />
+
+                        </div>
+
+                    </div>
+                </div>
+                <div className="form-group">
+                    <div className="row">
+                        
+                        <div className="col-sm-12 col-xl-7">
+                            <Controller
+                                name="fornecedorPedido"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        label={"Fonecedor"}
+                                        name="fornecedorPedido"
+                                        type="text"
+                                        value={fornecedor}
+                                        onChange={(e) => setFornecedor(e.target.value)}
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        readOnly
+                                    />
+
+                                )}
+                            />
+
+
+                        </div>
+                    
+
+                        <div className="col-sm-6 col-xl-3">
                             <label className="form-label" htmlFor="nofab">Fabricante</label>
 
                             <Select
@@ -515,13 +401,11 @@ export const FormularioEditarProdutoPedido = ({
                                     }
                                 })}
                                 onChange={(e) => setFabricanteSelecionado(e)}
+                                isDisabled={true}
                             />
                         </div>
-                    </div>
-                </div>
-                <div className="form-group">
-                    <div className="row">
-                        <div className="col-sm-4 col-xl-4">
+
+                        <div className="col-sm-4 col-xl-2">
                             <label className="form-label" htmlFor="tpunid">Unidade</label>
                             <Select
                                 id={"unidadeProduto"}
@@ -536,7 +420,11 @@ export const FormularioEditarProdutoPedido = ({
                                 
                             />
                         </div>
-                        <div className="col-sm-4 col-xl-4">
+                    </div>
+                </div>
+                <div className="form-group">
+                    <div className="row">
+                        <div className="col-sm-4 col-xl-2">
                             <label className="form-label" htmlFor="tpcor">Cor</label>
                             <SelectList
                                 id={"corProduto"}
@@ -559,7 +447,7 @@ export const FormularioEditarProdutoPedido = ({
                                 }}
                             />
                         </div>
-                        <div className="col-sm-4 col-xl-4">
+                        <div className="col-sm-4 col-xl-2">
                             <label className="form-label" htmlFor="tptecido">Tipo de Material</label>
                             <SelectList
                                 id={"tipoTecidoProduto"}
@@ -583,27 +471,7 @@ export const FormularioEditarProdutoPedido = ({
                                 }}
                             />
                         </div>
-                    </div>
-                </div>
-                <div className="form-group">
-                    <div className="row">
-                        <div className="col-sm-4 col-xl-4">
-                            <label className="form-label" htmlFor="tpcat">Categoria Grade</label>
-                            <Select
-                                id={"categoriaProduto"}
-                                value={categoriaGradeSelecionada}
-                                options={dadosGrade?.map((item) => {
-                                    return {
-                                        value: item.IDCATEGORIAPEDIDO,
-                                        label: `${item.TIPOPEDIDO} - ${item.DSCATEGORIAPEDIDO}`
-                                    }
-                                })}
-                                onChange={(e) => setCategoriaGradeSelecionada(e)}
-                               
-                            />
-
-                        </div>
-                        <div className="col-sm-4 col-xl-4">
+                        <div className="col-sm-4 col-xl-3">
                             <label className="form-label" htmlFor="estruturaProduto">Estrutura</label>
 
                             <SelectList
@@ -619,9 +487,10 @@ export const FormularioEditarProdutoPedido = ({
                                         fontSize: "14px"
                                     })
                                 }}
+                                isDisabled={true}
                             />
                         </div>
-                        <div className="col-sm-4 col-xl-4">
+                        <div className="col-sm-4 col-xl-2">
                             <label className="form-label" htmlFor="estiloProduto">Estilo</label>
                             <Select
                                 id={"estiloProduto"}
@@ -633,14 +502,10 @@ export const FormularioEditarProdutoPedido = ({
                                     }
                                 })}
                                 onChange={(e) => setEstiloSelecionado(e)}
-                      
+                                isDisabled={true}
                             />
 
                         </div>
-                    </div>
-                </div>
-                <div className="form-group">
-                    <div className="row">
                         <div className="col-sm-3 col-xl-3">
                             <label className="form-label" htmlFor="tpcatprod">Categorias</label>
                             <Select
@@ -656,6 +521,15 @@ export const FormularioEditarProdutoPedido = ({
                             
                             />
                         </div>
+                    </div>
+                </div>
+                <div className="form-group">
+                    <div className="row">
+                    
+                    </div>
+                </div>
+                <div className="form-group">
+                    <div className="row">
                         <div className="col-sm-3 col-xl-3">
                             <label className="form-label" htmlFor="locexp">Local Exposição</label>
 
@@ -672,7 +546,7 @@ export const FormularioEditarProdutoPedido = ({
                                
                             />
                         </div>
-                        <div className="col-sm-3 col-xl-3">
+                        <div className="col-sm-3 col-xl-2">
                             <label className="form-label" htmlFor="ecommercest">E-commerce</label>
 
                             <Select
@@ -687,7 +561,7 @@ export const FormularioEditarProdutoPedido = ({
                                 onChange={(e) => setEcommerceSelecionado(e)}
                             />
                         </div>
-                        <div className="col-sm-3 col-xl-3">
+                        <div className="col-sm-3 col-xl-2">
                             <label className="form-label" htmlFor="redesocialst">Rede Social</label>
 
                             <Select
@@ -702,174 +576,50 @@ export const FormularioEditarProdutoPedido = ({
                                 onChange={(e) => setRedeSocialSelecionada(e)}
                             />
                         </div>
-                    </div>
-                </div>
-                <div className="form-group">
-                    <div className="row">
-                        <div className="col-sm-2 col-xl-2">
+                        <div className="col-sm-3 col-xl-2">
                             <Controller
-                                name="vrBrutoProduto"
+                                name="vrHojeCusto"
                                 control={control}
                                 render={({ field }) => (
                                     <FormField
-                                        label={"VR Bruto"}
-                                        name="vrBrutoProduto"
+                                        label={"VR Custo"}
+                                        name="vrHojeCusto"
                                         type="text"
-                                        value={formatMoeda(vrBruto)}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
-                                            setVrBruto(val);
-                                            atualiza_valor_QtdUnit({ vrBruto: val });
-                                        }}
+                                        value={formatMoeda(vrCusto)}
+                                        onChange={(e) => setVrCusto(e.target.value)}
                                         errors={errors}
                                         clearErrors={clearErrors}
+                                        
                                     />
                                 )}
                             />
                         </div>
-                        <div className="col-sm-2 col-xl-2">
+                        <div className="col-sm-3 col-xl-2">
                             <Controller
-                                name="descProdI"
+                                name="vrVendaHoje"
                                 control={control}
                                 render={({ field }) => (
                                     <FormField
-                                        label={"Desconto I (%)"}
-                                        name="descProdI"
+                                        label={"VR Venda"}
+                                        name="vrVendaHoje"
                                         type="text"
-                                        value={percDescontoI}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
-                                            setPercDescontoI(val);
-                                            atualiza_valor_QtdUnit({ percDescontoI: val });
-                                        }}
+                                        value={formatMoeda(vrVenda)}
+                                        onChange={(e) => setVrVenda(e.target.value)}
                                         errors={errors}
                                         clearErrors={clearErrors}
-                                    />
-                                )}
-                            />
-
-                        </div>
-                        <div className="col-sm-2 col-xl-2">
-                            <Controller
-                                name="descProdII"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormField
-                                        label={"Desconto II (%)"}
-                                        name="descProdII"
-                                        type="text"
-                                        value={percDescontoII}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
-                                            setPercDescontoII(val);
-                                            atualiza_valor_QtdUnit({ percDescontoII: val });
-                                        }}
-                                        errors={errors}
-                                        clearErrors={clearErrors}
-                                    />
-                                )}
-                            />
-                        </div>
-                        <div className="col-sm-2 col-xl-2">
-                            <Controller
-                                name="descProdIII"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormField
-                                        label={"Desconto III (%)"}
-                                        name="descProdIII"
-                                        type="text"
-                                        value={percDescontoIII}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
-                                            setPercDescontoIII(val);
-                                            atualiza_valor_QtdUnit({ percDescontoIII: val });
-                                        }}
-                                        errors={errors}
-                                        clearErrors={clearErrors}
-                                    />
-                                )}
-                            />
-
-                        </div>
-                        <div className="col-sm-2 col-xl-2">
-                            <Controller
-                                name="vrUnitLiquidoProduto"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormField
-                                        label={"VR Líquido"}
-                                        name="vrUnitLiquidoProduto"
-                                        type="text"
-                                        value={formatMoeda(vrLiquido)}
-                                        onChange={(e) => setVrLiquido(formatarMoeda(e.target.value))} 
-
-                                        errors={errors}
-                                        clearErrors={clearErrors}
-                                    />
-                                )}
-                            />
-
-                        </div>
-                        <div className="col-sm-2 col-xl-2">
-                            <Controller
-                                name="vrUnitSugeridoProduto"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormField
-                                        label={"VR Sugerido"}
-                                        name="vrUnitSugeridoProduto"
-                                        type="text"
-                                        value={formatMoeda(vrSugerido)}
-                                        onChange={(e) => {
-                                            setVrSugerido(formatarMoeda(e.target.value));
-                                            setVrSugerigoFixo(e.target.value); 
-                                        }}
-                                        errors={errors}
-                                        clearErrors={clearErrors}
+                                       
                                     />
                                 )}
                             />
                         </div>
                     </div>
                 </div>
+              
+         
+
                 <div className="form-group">
                     <div className="row">
-                        <div className="col-sm-4 col-xl-4">
-                            <Controller
-                                name="vrTotalProduto"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormField
-                                        label={"VR Total"}
-                                        name="vrTotalProduto"
-                                        type="text"
-                                        value={formatMoeda(vrTotal)}
-                                        onChange={(e) => setVrTotal(formatarMoeda(e.target.value))}
-                                        readOnly
-                                        errors={errors}
-                                        clearErrors={clearErrors}
-                                    />
-                                )}
-                            />
-                        </div>
-                        <div className="col-sm-8 col-xl-8">
-                            <Controller
-                                name="observacaoProduto"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormField
-                                        label={"Observação"}
-                                        name="observacaoProduto"
-                                        type="text"
-                                        value={observacao}
-                                        onChange={(e) => setObservacao(e.target.value)}
-                                        errors={errors}
-                                        clearErrors={clearErrors}
-                                    />
-                                )}
-                            />
-                        </div>
+
                     </div>
                 </div>
                 
@@ -888,7 +638,7 @@ export const FormularioEditarProdutoPedido = ({
                             )}
 
                             <div className="d-flex flex-wrap gap-2 mt-2" style={{ maxWidth: '100%' }}>
-                                {dadosGrade?.map((item) => {
+                                {dadosPedidoGrade?.filter((item) => item.STATIVO === 'True').map((item) => {
                                     const idTamanho = String(item.IDTAMANHO);
                                     const valorAtual = Number(quantidadePorTamanho[idTamanho] || 0);
                                     const titleGrade = isDiversos(item.DSTAMANHO)
@@ -959,10 +709,10 @@ export const FormularioEditarProdutoPedido = ({
                     corFechar={"secondary"}
 
                     ButtonTypeCadastrar={ButtonTypeModal}
-                    // onClickButtonCadastrar={handleValidatedSubmit}
-                    textButtonCadastrar={"Editar"}
+                    onClickButtonCadastrar={handleValidatedSubmit}
+                    textButtonCadastrar={"Atualizar"}
                     corCadastrar={"success"}
-                    loadingTextCadastrar={"Editando..."}
+                    loadingTextCadastrar={"Atualizando..."}
                     autoLoadingCadastrar={true}
                 />
             </form>

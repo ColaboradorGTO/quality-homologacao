@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { get, post, put } from "../../../../../../../api/funcRequest";
+import { get, put } from "../../../../../../../api/funcRequest";
 import { useQuery } from "react-query";
-import axios from "axios";
 import { toFloat } from "../../../../../../../utils/toFloat";
-import { optionsReposicao, optionsTipoCadastro } from "../../../../../../../../parceiro.json"
+import { optionsReposicao, optionsTipoCadastro, optionsTipoPedido } from "../../../../../../../../parceiro.json"
 import { removerFormatacaoMoeda } from "../../../../../../../utils/formatMoeda";
 import Swal from "sweetalert2";
 
@@ -11,6 +10,7 @@ import Swal from "sweetalert2";
 export const useIncluirProduto = ({ 
     usuarioLogado, 
     optionsModulos,
+    handleClose,
     dadosDetalhePedido,
     setDadosDetalhePedido,
     dadosDetalheGradePedido,
@@ -19,11 +19,17 @@ export const useIncluirProduto = ({
     handleClickEditarPedido
 }) => {
     const [ipUsuario, setIpUsuario] = useState('');
+    const [vrBruto, setVrBruto] = useState('')
+    const [percDescontoI, setPercDescontoI] = useState('')
+    const [percDescontoII, setPercDescontoII] = useState('')
+    const [percDescontoIII, setPercDescontoIII] = useState('')
+    const [vrLiquido, setVrLiquido] = useState('')
+    const [vrSugerido, setVrSugerido] = useState('')
+    const [vrSugerigoFixo, setVrSugerigoFixo] = useState('')
+    const [vrTotal, setVrTotal] = useState('')
+
     const [nomeMarca, setNomeMarca] = useState('')
     const [referenciaProduto, setReferenciaProduto] = useState('')
-    const [produtoSelecionado, setProdutoSelecionado] = useState('')
-    const [reposicaoSelecionado, setReposicaoSelecionado] = useState('')
-    const [tipoCadastroSelecionado, setTipoCadastroSelecionado] = useState('')
     const [descricaoProduto, setDescricaoProduto] = useState('')
     const [vrCusto, setVrCusto] = useState('')
     const [vrVenda, setVrVenda] = useState('')
@@ -41,32 +47,17 @@ export const useIncluirProduto = ({
     const [localExposicaoSelecionado, setLocalExposicaoSelecionado] = useState('')
     const [ecommerceSelecionado, setEcommerceSelecionado] = useState('')
     const [redeSocialSelecionada, setRedeSocialSelecionada] = useState('')
-    const [vrBruto, setVrBruto] = useState('')
-    const [percDescontoI, setPercDescontoI] = useState('')
-    const [percDescontoII, setPercDescontoII] = useState('')
-    const [percDescontoIII, setPercDescontoIII] = useState('')
-    const [vrLiquido, setVrLiquido] = useState('')
-    const [vrSugerido, setVrSugerido] = useState('')
-    const [vrSugerigoFixo, setVrSugerigoFixo] = useState('')
-    const [vrTotal, setVrTotal] = useState('')
-    const [observacao, setObservacao] = useState('')
     const [idResumoPedido, setIdResumoPedido] = useState('')
-    const [stPedidoPorIntermediario, setStPedidoPorIntermediario] = useState('')
-    const [cadastroSelecionado, setCadastroSelecionado] = useState('')
-    const [obsFornecedor, setObsFornecedor] = useState('')
     const [quantidadePorTamanho, setQuantidadePorTamanho] = useState({});
     const [errosValidacao, setErrosValidacao] = useState([]);
     const [produtoDadosGrade, setProdutoDadosGrade] = useState([]);
     const [stReposicao, setStReposicao] = useState('False');
-    const [stRascunho, setRascunho] = useState('False');
-    const [tipoCadastro, setTipoCadastro] = useState('');
     const [tamanhoUnicoId, setTamanhoUnicoId] = useState(null);
     const [stTransformado, setStTransformado] = useState('False');
     const [tamanhosAtivosEdicao, setTamanhosAtivosEdicao] = useState(new Set());
     const [dadosPedidoAtual, setDadosPedidoAtual] = useState([])
     const [gradeDetalhes, setGradeDetalhes] = useState({});
-    const [codBarras, setCodBarras] = useState('');
-    const [idProduto, setIdProduto] = useState(null);
+    const [fornecedor, setFornecedor] = useState('');
 
     const pendingTamanhoIdRef = useRef(null);
 
@@ -74,15 +65,8 @@ export const useIncluirProduto = ({
     const { data: dadosVinculoEstiloGrupo = [], error: errorVinculoEstiloGrupo, isLoading: isLoadingVinculoEstiloGrupo, refetch: refetchVinculoEstiloGrupo } = useQuery(
         'vinculo-estilo-grupo',
         async () => { const response = await get(`/vinculo-estilo-grupo?idVinculoEstilo=${dadosDetalhePedido[0]?.IDVINCULOESTILO}`); return response.data },
-        { enabled: true }
+        { enabled: Boolean(dadosDetalhePedido[0]?.IDVINCULOESTILO) }
     );
-
-    const { data: dadosCategorias = [], error: errorCategorias, isLoading: isLoadingCategorias, refetch: refetchCategorias } = useQuery(
-        'categoriasProdutos',
-        async () => { const response = await get(`/categoriasProdutos?idTipoPedido=${dadosDetalhePedido[0]?.TPCATEGORIAPRODPEDIDO}`); return response.data },
-        { enabled: true }
-    );
-
 
     const { data: dadosCores = [], error: errorCores, isLoading: isLoadingCores, refetch: refetchCores } = useQuery(
         'listaCores',
@@ -106,19 +90,7 @@ export const useIncluirProduto = ({
     const { data: dadosCategoriaPedidos  = [], error: errorCategoriaPedidos, isLoading: isLoadingCategoriaPedidos, refetch: refetchCategoriaPedidos } = useQuery(
         'categoriasProdutos',
         async () => { const response = await get(`/categoriasProdutos?idCategoriaPedido=${dadosDetalhePedido[0]?.IDCATEGORIAPEDIDO}`); return response.data},
-        { enabled: true }
-    );
-
-    const { data: dadosCategoriaPedidoGrade  = [], error: errorCategoriaPedidoGrade, isLoading: isLoadingCategoriaPedidoGrade, refetch: refetchCategoriaPedidoGrade } = useQuery(
-        'categoria-pedido',
-        async () => { const response = await get(`/categoria-pedido?idCategoriaPedido=${dadosDetalhePedido[0]?.IDTIPOPEDIDO}`); return response.data},
-        { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 5 * 60 * 1000 }
-    );
-    
-    const { data: dadosCategoriasProdutos  = [], error: errorCategoriasProdutos, isLoading: isLoadingCategoriasProdutos, refetch: refetchCategoriasProdutos } = useQuery(
-        'categoriasProdutos',
-        async () => { const response = await get(`/categoriasProdutos?idTipoPedido=${dadosDetalhePedido[0]?.IDTIPOPEDIDO}`);  return response.data},
-        { enabled: true }
+        { enabled: Boolean(dadosDetalhePedido[0]?.IDCATEGORIAPEDIDO) }
     );
    
     const { data: dadosSubGrupoProduto  = [], error: errorSubGrupoProduto, isLoading: isLoadingSubGrupoProduto, refetch: refetchSubGrupoProduto } = useQuery(
@@ -130,7 +102,7 @@ export const useIncluirProduto = ({
     const { data: dadosFabricantePedido  = [], error: errorFabricantePedido, isLoading: isLoadingFabricantePedido, refetch: refetchFabricantePedido } = useQuery(
         'vincularFabricanteFornecedor',
         async () => { const response = await get(`/vincularFabricanteFornecedor?idFornecedorPedido=${dadosDetalhePedido[0]?.IDFORNECEDOR}`);  return response.data},
-        { enabled: true }
+        { enabled: Boolean(dadosDetalhePedido[0]?.IDFORNECEDOR) }
     );
     const { data: dadosLocalExposicao  = [], error: errorLocalExposicao, isLoading: isLoadingLocalExposicao, refetch: refetchLocalExposicao } = useQuery(
         'localExposicao',
@@ -152,40 +124,10 @@ export const useIncluirProduto = ({
         'lista-detalhe-pedidos-grade',
         async () => { 
             const response = await get(`/lista-detalhe-pedidos-grade?idDetalhePedido=${dadosDetalhePedido[0]?.IDDETPEDIDO}`);  
-            // setProdutoDadosGrade(response.data)
             return response.data
         },
-        { enabled: true }
+        { enabled: Boolean(dadosDetalhePedido[0]?.IDDETPEDIDO) }
     );
-
-    const { data: dadosProdutosPedidos  = [], error: errorProdutosPedidos, isLoading: isLoadingProdutosPedidos, refetch: refetchProdutosPedidos } = useQuery(
-        'produtos-pedido',
-        async () => { const response = await get(`/produtos-pedido?referenciaProduto=${referenciaProduto}&fornecedorPedido=`);  return response.data},
-        { enabled: referenciaProduto.length > 4 }
-    );
-
-    const getIPUsuario = async () => {
-        let usuarioIP = null;
-
-        try {
-        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
-        usuarioIP = ipWhoisData?.ip;
-        } catch (error) {
-        console.error("Erro ao buscar IP via ifconfig.me:", error);
-        }
-
-        if (!usuarioIP) {
-        try {
-            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-            usuarioIP = ipifyData?.ip;
-        } catch (error) {
-            console.error("Erro ao buscar IP via ipify.org:", error);
-        }
-        }
-        setIpUsuario(usuarioIP);
-        return usuarioIP;
-    };
-
 
     const formatarNumero = (valor, decimais = 2) => {
         if (valor === '' || valor === null || valor === undefined) return '';
@@ -237,27 +179,10 @@ export const useIncluirProduto = ({
 
     
     useEffect(() => {
-        if(dadosDetalhePedido && dadosDetalhePedido.length > 0) {
-            
-            
-            setNomeMarca(
-                dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL == 1 ? 'TO - TESOURA DE OURO' : 
-                dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL == 2 ? 'MG - MAGAZINE' : 
-                dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL == 3 ? 'YO - YORUS' : 
-                'FC - FREE CENTER'
-            )
-            setReposicaoSelecionado({
-                value: dadosDetalhePedido[0]?.STREPOSICAO, 
-                label:  dadosDetalhePedido[0]?.STREPOSICAO == 'True' ? 'SIM' : 'NÃO'
-            })
-            setCadastroSelecionado({
-                value: dadosDetalhePedido[0]?.STREPOSICAO, 
-                label:  dadosDetalhePedido[0]?.STREPOSICAO == 'True' ? 'POR REFERÊNCIA' : 'NORMAL'
-            })
-            
+        if(dadosDetalhePedido && dadosDetalhePedido.length > 0 && dadosDetalhePedido) {
+            setIdResumoPedido(dadosDetalhePedido[0]?.IDPEDIDO)
+            setFornecedor(`${dadosDetalhePedido[0]?.NORAZAOSOCIAL} - ${dadosDetalhePedido[0]?.NOFANTASIA} - ${dadosDetalhePedido[0]?.NUCNPJ}`)
             setDescricaoProduto(dadosDetalhePedido[0]?.DSPRODUTO)
-            setVrCusto(toFloat(dadosDetalhePedido[0]?.VRCUSTOPRODATUAL))
-            setVrVenda(toFloat(dadosDetalhePedido[0]?.VRVENDAPRODATUAL))
             setQuantidade(toFloat(dadosDetalhePedido[0]?.QTDTOTAL))
             setQuantidadeCaixa(toFloat(dadosDetalhePedido[0]?.NUCAIXA))
             setReferencia(dadosDetalhePedido[0]?.NUREF)
@@ -267,33 +192,25 @@ export const useIncluirProduto = ({
             setTipoTecidoSelecionado({value: dadosDetalhePedido[0]?.IDTIPOTECIDO, label: dadosDetalhePedido[0]?.DSTIPOTECIDO})
             setCategoriaGradeSelecionada({
                 value: dadosDetalhePedido[0]?.IDCATEGORIAGRADE, 
-                label: `${dadosDetalhePedido[0]?.TPCATEGORIAPRODPEDIDO} - ${dadosDetalhePedido[0]?.DSCATEGORIAPEDIDO}`
+                label: `${dadosDetalhePedido[0]?.TPCATEGORIAPRODPEDIDO} `
             })
+            
             setEstruturaSelecionada({value: dadosDetalhePedido[0]?.IDSUBGRUPOESTRUTURA, label: dadosDetalhePedido[0]?.DSSUBGRUPOESTRUTURA})
             setEstiloSelecionado({value: dadosDetalhePedido[0]?.IDESTILO, label: dadosDetalhePedido[0]?.DSESTILO})
             setCategoriaSelecionada({value: dadosDetalhePedido[0]?.IDCATEGORIAPEDIDO, label: `${dadosDetalhePedido[0]?.CATEGORIAPROD} ${dadosDetalhePedido[0]?.DSCATEGORIAPROD} - ${dadosDetalhePedido[0]?.TPCATEGORIAPROD}`})
             setLocalExposicaoSelecionado({value: dadosDetalhePedido[0]?.IDLOCALEXPOSICAO, label: dadosDetalhePedido[0]?.DSLOCALEXPOSICAO})
             setEcommerceSelecionado({value: dadosDetalhePedido[0]?.STECOMMERCE, label: dadosDetalhePedido[0]?.STECOMMERCE == 'True' ? 'SIM' : 'NÃO'})
             setRedeSocialSelecionada({value: dadosDetalhePedido[0]?.STREDESOCIAL, label: dadosDetalhePedido[0]?.STREDESOCIAL == 'True' ? 'SIM' : 'NÃO'})
-            setVrBruto(toFloat(dadosDetalhePedido[0]?.VRUNITBRUTODETALHEPEDIDO))
-            setPercDescontoI(toFloat(dadosDetalhePedido[0]?.DESC01))
-            setPercDescontoII(toFloat(dadosDetalhePedido[0]?.DESC02))
-            setPercDescontoIII(toFloat(dadosDetalhePedido[0]?.DESC03))
-            setVrLiquido(toFloat(dadosDetalhePedido[0]?.VRUNITLIQDETALHEPEDIDO))
-            setVrSugerido(toFloat(dadosDetalhePedido[0]?.VRVENDADETALHEPEDIDO))
-            setVrTotal(toFloat(dadosDetalhePedido[0]?.VRTOTALDETALHEPEDIDO))
-            setObservacao(dadosDetalhePedido[0]?.OBSPRODUTO)
-            setStPedidoPorIntermediario(dadosDetalhePedido[0]?.STPEDIDOPORINTEMEDIARIO)
-            setObsFornecedor(dadosDetalhePedido[0]?.OBSPEDIDO)
-            setRascunho(dadosDetalhePedido[0]?.STRASCUNHO)
-            setCodBarras(dadosDetalhePedido[0]?.NUCODBARRAS)
-            setIdProduto(dadosDetalhePedido[0]?.IDPRODUTO)
-            setIdResumoPedido(dadosDetalhePedido[0]?.IDPEDIDO)
+            setVrCusto(toFloat(dadosDetalhePedido[0]?.VRCUSTOPRODATUAL))
+            setVrVenda(toFloat(dadosDetalhePedido[0]?.VRVENDAPRODATUAL))
+            
+            
+            
         }
-        }, [dadosDetalhePedido]);
+    }, [dadosDetalhePedido]);
 
 
-      const handleChangeQuantidade = (idTamanho, valor) => {
+    const handleChangeQuantidade = (idTamanho, valor) => {
         const valorFormatado = formataValorGrade(valor);
 
         setQuantidadePorTamanho(prevState => ({
@@ -479,118 +396,65 @@ export const useIncluirProduto = ({
    
         return { disabled: false, readOnly: false };
     };
-   
+
+      
     const onSubmit = async () => {
-        if (stReposicao == 'False') {
-            const responseProdutoExistente = await get(`/produtos-pedido?referenciaProduto=${descricaoProduto}`);
-            if (responseProdutoExistente.data.length > 0) {
-                Swal.fire({
-                    title: 'Edite e tente novamente!',
-                    text: 'Já existe um produto cadastrado com a mesma descrição digitada!',
-                    icon: 'warning',
-                    customClass: {
-                        container: 'custom-swal',   
-                    },
-                });
-                return;
-            }
-
-            const corOriginal = dadosCores.find(c => String(c.ID_COR) === String(corSelecionada?.value));
-            const corBloqueada = String(corOriginal?.STBLOQUEADOPARACADASTROPRODUTONOVO) === 'True'
-                || ['NENHUM', 'NENHUMA'].includes((corOriginal?.DS_COR || '').trim().toUpperCase());
-            if (corBloqueada) {
-                Swal.fire({
-                    title: 'Atenção!',
-                    text: 'A Cor selecionada está bloqueada para cadastro em novos produtos!',
-                    icon: 'warning',
-                    customClass: {
-                        container: 'custom-swal',   
-                    },
-                });
-                return;
-            }
-
-            const materialOriginal = dadosTipoTecidos.find(t => String(t.IDTPTECIDO) === String(tipoTecidoSelecionado?.value));
-            const materialBloqueado = String(materialOriginal?.STBLOQUEADOPARACADASTROPRODUTONOVO) === 'True'
-                || ['NENHUM', 'NENHUMA'].includes((materialOriginal?.DSTIPOTECIDO || '').trim().toUpperCase());
-            if (materialBloqueado) {
-                Swal.fire({
-                    title: 'Atenção!',
-                    text: 'O Tipo de Material está bloqueado para cadastro em novos produtos!',
-                    icon: 'warning',
-                    customClass: {
-                        container: 'custom-swal',   
-                    },
-                });
-                return;
-            }
+        let idPedido = dadosDetalhePedido[0]?.IDPEDIDO
+        if (!validarGradeamento()) {
+            return;
         }
 
-        const validarDuplicidadePedido = await get(`/lista-detalhe-pedidos?idPedido=${idResumoPedido}&dsProduto=${descricaoProduto}&refProduto=${referenciaProduto}`);
-        if (validarDuplicidadePedido.data.length > 0) {
-            Swal.fire({
-                title: 'Este Produto já existe no pedido!',
-                text: 'Caso queira incrementar quantidade, volte e edite o item referente!',
-                icon: 'warning',
-                customClass: {
-                    container: 'custom-swal',   
-                },
-            });
+        const confirmacao = await Swal.fire({
+            icon: 'question',
+            title: 'Certeza que Deseja Finalizar a Edição?',
+            text: 'Você não poderá reverter esta ação!',
+            showCancelButton: true,
+            confirmButtonText: 'Sim, editar!',
+            cancelButtonText: 'Cancelar',
+            customClass: {
+                container: 'custom-swal',
+            },
+        });
+
+        if (!confirmacao.isConfirmed) {
             return;
         }
 
         const grade = montarPayloadGrade();
-
+        const vrCustoAtual = converterParaNumero(vrCusto);
+        const vrVendaAtual = converterParaNumero(vrVenda);
+        
         const data = {
-            idDetPedido: parseInt(dadosDetalhePedido[0]?.IDDETPEDIDO),
+            IDRESUMOPEDIDO: parseInt(dadosDetalhePedido[0]?.IDPEDIDO),
+            IDDETALHEPEDIDO: parseInt(dadosDetalhePedido[0]?.IDDETPEDIDO),
             IDCOR: parseInt(corSelecionada?.value),
-            IDSUBGRUPOESTRUTURA: parseInt(estruturaSelecionada?.value),
-            IDCATEGORIAPEDIDO: parseInt(categoriaSelecionada?.value),
+            IDCATEGORIAPEDIDO: parseInt(categoriaGradeSelecionada?.value) == 'VESTUARIO' ? 1 : 8,
             IDTIPOTECIDO: parseInt(tipoTecidoSelecionado?.value),
-            IDESTILO: parseInt(estiloSelecionado?.value),
-            IDFABRICANTE: parseInt(fabricanteSelecionado?.value),
             IDLOCALEXPOSICAO: parseInt(localExposicaoSelecionado?.value),
-            NUREF: referenciaProduto,
+            NUREF: referencia,
             DSPRODUTO: descricaoProduto,
             QTDTOTAL: parseInt(quantidade),
             NUCAIXA: parseInt(quantidadeCaixa),
             UND: parseInt(unidadeSelecionada?.value),
-            VRUNITBRUTO: parseFloat(vrBruto),
-            DESC01: parseFloat(percDescontoI),
-            DESC02: parseFloat(percDescontoII),
-            DESC03: parseFloat(percDescontoIII),
-            VRUNITLIQUIDO: parseFloat(vrLiquido),
-            VRVENDA: parseFloat(vrVenda),
-            VRTOTAL: parseFloat(vrTotal),
+            VRUNITBRUTO: vrCustoAtual,
+            VRUNITLIQUIDO: vrCustoAtual,
+            VRVENDA: vrVenda,
+            VRTOTAL: vrCusto,
             STECOMMERCE: ecommerceSelecionado?.value,
             STREDESOCIAL: redeSocialSelecionada?.value,
-            VRCUSTOPRODATUAL: removerFormatacaoMoeda(vrCusto),
-            VRVENDAPRODATUAL: removerFormatacaoMoeda(vrVenda),
-            OBSPRODUTO: observacao,
             IDCATEGORIAS: parseInt(categoriaSelecionada?.value),
-            STREPOSICAO: reposicaoSelecionado?.value,
-            NUCODBARRAS: codBarras ? codBarras : '',
-            IDPRODUTO: idProduto ? idProduto : '',
-            IDRESPATUALIZACAO: parseInt(usuarioLogado?.id),
-            GRADE: grade,
-            STPEDIDOPORINTEMEDIARIO: checkboxIntermediario ? 'True' : 'False',
+            STPEDIDOPRIMARIO: checkboxIntermediario ? 'True' : 'False',
+            DETALHEGRADE: grade,
         }
         try {
          
-            const response = await put(`/detalhe-pedido/:id`, data); 
+            const response = await put(`/item-pedido/:id`, data); 
       
-            const responsePut = await put(`/lista-pedidos/:id?IDRESUMOPEDIDO=${idResumoPedido}`);
-            const textDados = JSON.stringify(data);
-            const ipUsuario = await getIPUsuario();
-            const textoFuncao = `COMPRAS/ALTERAR PRODUTO PEDIDO`;
-            const postData = {
-                IDFUNCIONARIO: String(usuarioLogado.id),
-                PATHFUNCAO: textoFuncao,
-                DADOS: textDados,
-                IP: ipUsuario || 'Indisponível'
-            };
-
-            await post('/log-web', postData);
+            await registrarLogAuditoria({
+                idFuncionario: usuarioLogado?.id,
+                pathFuncao: 'CADASTRO/EDICAO ITEM PEDIDO',
+                dados: data
+            })
 
             Swal.fire({
                 icon: 'success',
@@ -601,24 +465,21 @@ export const useIncluirProduto = ({
                     container: 'custom-swal',   
                 },
             });
-
-            const responseUltimoPedido = await get(`/lista-detalhe-pedidos?idPedido=${idResumoPedido}&somenteGradeAtiva=True`);
+            
+            const responseUltimoPedido = await get(`/pedido-compras-detalhado?idPedido=${idPedido}`);
             setDadosPedidoAtual(responseUltimoPedido.data);
             setDadosDetalhePedido(responseUltimoPedido.data);
+          
+            handleClose()
             return response.data;
         } catch (error) {
-            
-            const textDados = JSON.stringify(data);
-            const ipUsuario = await getIPUsuario();
-            const textoFuncao = `COMPRAS / ERRO AO ALTERAR PRODUTO NO PEDIDO `;
-            const postData = {
-                IDFUNCIONARIO: String(usuarioLogado.id),
-                PATHFUNCAO: textoFuncao,
-                DADOS: textDados,
-                IP: ipUsuario || 'Indisponível'
-            };
 
-            const responsePost = await post('/log-web', postData);
+            await registrarLogAuditoria({
+                idFuncionario: usuarioLogado?.id,
+                pathFuncao: 'CADASTRO/ERRO AO EDITAR ITEM PEDIDO',
+                dados: data
+            })
+
             Swal.fire({
                 icon: 'error',
                 title: 'Erro',
@@ -627,22 +488,13 @@ export const useIncluirProduto = ({
                     container: 'custom-swal',   
                 },
             });
-
-            return responsePost.data;
+            return;
         }
     }
 
-      return {
-        nomeMarca,
-        setNomeMarca,
+    return {          
         referenciaProduto,
         setReferenciaProduto,
-        produtoSelecionado,
-        setProdutoSelecionado,
-        reposicaoSelecionado,
-        setReposicaoSelecionado,
-        tipoCadastroSelecionado,
-        setTipoCadastroSelecionado,
         descricaoProduto,
         setDescricaoProduto,
         vrCusto,
@@ -677,63 +529,48 @@ export const useIncluirProduto = ({
         setEcommerceSelecionado,
         redeSocialSelecionada,
         setRedeSocialSelecionada,
-        vrBruto,
-        setVrBruto,
-        percDescontoI,
-        setPercDescontoI,
-        percDescontoII,
-        setPercDescontoII,
-        percDescontoIII,
-        setPercDescontoIII,
-        vrLiquido,
-        setVrLiquido,
-        vrSugerido,
-        setVrSugerido,
-        vrTotal,
-        setVrTotal,
-        observacao,
-        setObservacao,
-        dadosCores,
-        dadosUnidadeMedida,
-        dadosTipoTecidos,
-        dadosCategoriaPedidos,
-        dadosCategoriaPedidoGrade,
-        dadosCategoriasProdutos,
-        dadosSubGrupoProduto,
-        dadosFabricantePedido,
-        dadosLocalExposicao,
-        dadosGrade,
-        dadosProdutosPedidos,
-        dadosVinculoEstiloGrupo,
         optionsTipoCadastro,
-        optionsReposicao,
-        atualiza_valor_QtdUnit,
         vrSugerigoFixo,
         setVrSugerigoFixo,
         formatarNumero,
         converterParaNumero,
-        validarGradeamento,
         montarPayloadGrade,
-        handleChangeQuantidade,
-        calcularDistribuicao,
-        errosValidacao,
-        setErrosValidacao,
-        quantidadePorTamanho,
-        setQuantidadePorTamanho,
         produtoDadosGrade,
         setProdutoDadosGrade,
         stReposicao,
         setStReposicao,
-        isDiversos,
-        getInputStateGrade,
         tamanhosAtivosEdicao,
         setTamanhosAtivosEdicao,
         tamanhoUnicoId,
         setTamanhoUnicoId,
         stTransformado,
         setStTransformado,
+        fornecedor, 
+        setFornecedor,
         gradeDetalhes,
         preencherGradeEdicao,
+        dadosCores,
+        dadosUnidadeMedida,
+        dadosTipoTecidos,
+        dadosCategoriaPedidos,
+        dadosSubGrupoProduto,
+        dadosFabricantePedido,
+        dadosLocalExposicao,
+        dadosGrade,
+        dadosPedidoGrade,
+        dadosVinculoEstiloGrupo,
+        optionsTipoPedido,
+        optionsReposicao,
+        atualiza_valor_QtdUnit,
+        validarGradeamento,
+        handleChangeQuantidade,
+        calcularDistribuicao,
+        errosValidacao,
+        setErrosValidacao,
+        quantidadePorTamanho,
+        setQuantidadePorTamanho,
+        isDiversos,
+        getInputStateGrade,
         onSubmit,
     }
 

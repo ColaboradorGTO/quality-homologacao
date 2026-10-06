@@ -16,99 +16,85 @@ export const ActionListaProdutosOrigem = ({
 
 }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
-  const [rowSelection, setRowSelection] = useState(null);
   const [selectAllChecked, setSelectAllChecked] = useState(false);
   const dataTableRef = useRef();
-  
-  const dados = dadosProdutoSubGrupoOrigem?.map((item, index) => {
-    let contador = index + 1;
 
-    return {
-      IDSUBGRUPO: item.IDSUBGRUPO,
-      DSGRUPOESTRUTURA: item.DSGRUPOESTRUTURA,
-      DSSUBGRUPOESTRUTURA: item.DSSUBGRUPOESTRUTURA,
-      IDPRODUTO: item.IDPRODUTO,
-      DSNOME: item.DSNOME,
-      NUCODBARRAS: item.NUCODBARRAS
-    }
-  });
+  const dados = dadosProdutoSubGrupoOrigem?.map((item, index) => ({
 
-   useEffect(() => {
-      if (dados?.length > 0) {
-        const todosSelecionados = dados.every(item => 
-          produtoSelecionadoEstProdOrigem?.some(selected => 
-            String(selected.IDPRODUTO) === String(item.IDPRODUTO)
-          )
-        );
-        setSelectAllChecked(todosSelecionados);
+
+    contador: index + 1,
+    rowKey: `${item.IDPRODUTO}_${item.NUCODBARRAS}_${index}`,
+    IDSUBGRUPO: item.IDSUBGRUPO,
+    DSGRUPOESTRUTURA: item.DSGRUPOESTRUTURA,
+    DSSUBGRUPOESTRUTURA: item.DSSUBGRUPOESTRUTURA,
+    IDPRODUTO: item.IDPRODUTO,
+    DSNOME: item.DSNOME,
+    NUCODBARRAS: item.NUCODBARRAS,
+    selecionado: produtoSelecionadoEstProdOrigem?.some(
+      selecionadoItem => String(selecionadoItem.IDPRODUTO) == String(item.IDPRODUTO)
+    ) ?? false
+
+  }));
+
+
+  const handleCheckboxChangeOrigem = (produto) => {
+
+    setProdutoSelecionadoEstProdutoOrigem(prevState => {
+      const existe = prevState.some(item => String(item.IDPRODUTO) === String(produto.IDPRODUTO));
+      if (existe) {
+
+        return prevState.filter(item => String(item.IDPRODUTO) !== String(produto.IDPRODUTO));
       }
-    }, [produtoSelecionadoEstProdOrigem, dados]);
-  
-    
-    const handleCheckboxChangeOrigem = (id) => {
-      const produtoSelecionado = dados.find(item => String(item.IDPRODUTO) === String(id));
-      
-      if (!produtoSelecionado) {
-        console.warn('Produto não encontrado:', id);
-        return;
-      }
-      
-      setProdutoSelecionadoEstProdutoOrigem(prevState => {
-        const existe = prevState.some(item => String(item.IDPRODUTO) === String(id));
-        if (existe) {
 
-          return prevState.filter(item => String(item.IDPRODUTO) !== String(id));
-        } else {
+      return [...prevState, produto];
 
-          return [...prevState, produtoSelecionado];
+    });
+  }
+
+  const onSelectAllChange = (e) => {
+    const isChecked = e.checked;
+
+    if (isChecked) {
+      Swal.fire({
+        icon: 'question',
+        title: 'Selecionar Todos os Produtos?',
+        text: `Deseja selecionar todos os ${dados?.length} produtos da lista de origem?`,
+        showConfirmButton: true,
+        showCancelButton: true,
+        showCloseButton: true,
+        confirmButtonText: 'Selecionar Todos',
+        cancelButtonText: 'Cancelar',
+        customClass: {
+          container: 'custom-swal',
+        },
+        cancelButtonColor: '#d33',
+        confirmButtonColor: '#3085d6',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          setProdutoSelecionadoEstProdutoOrigem(dados);
+        }
+      });
+    } else {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Desmarcar Todos os Produtos?',
+        text: 'Tem certeza que deseja desmarcar todos os produtos selecionados?',
+        showConfirmButton: true,
+        showCancelButton: true,
+        confirmButtonText: 'Desmarcar Todos',
+        cancelButtonText: 'Cancelar',
+        customClass: {
+          container: 'custom-swal',
+        },
+        cancelButtonColor: '#d33',
+        confirmButtonColor: '#3085d6',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          setProdutoSelecionadoEstProdutoOrigem([]);
         }
       });
     }
-    
-    const onSelectAllChange = (e) => {
-      const isChecked = e.checked;
-      
-      if (isChecked) {
-        Swal.fire({
-          icon: 'question',
-          title: 'Selecionar Todos os Produtos?',
-          text: `Deseja selecionar todos os ${dados?.length} produtos da lista de origem?`,
-          showConfirmButton: true,
-          showCancelButton: true,
-          showCloseButton: true,
-          confirmButtonText: 'Selecionar Todos',
-          cancelButtonText: 'Cancelar',
-          customClass: {
-            container: 'custom-swal',
-          },
-          cancelButtonColor: '#d33',
-          confirmButtonColor: '#3085d6',
-        }).then((result) => {
-          if (result.isConfirmed) {
-            setProdutoSelecionadoEstProdutoOrigem(dados);
-          }
-        });
-      } else {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Desmarcar Todos os Produtos?',
-          text: 'Tem certeza que deseja desmarcar todos os produtos selecionados?',
-          showConfirmButton: true,
-          showCancelButton: true,
-          confirmButtonText: 'Desmarcar Todos',
-          cancelButtonText: 'Cancelar',
-          customClass: {
-            container: 'custom-swal',
-          },
-          cancelButtonColor: '#d33',
-          confirmButtonColor: '#3085d6',
-        }).then((result) => {
-          if (result.isConfirmed) {
-            setProdutoSelecionadoEstProdutoOrigem([]);
-          }
-        });
-      }
-    }
+  }
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -155,7 +141,7 @@ export const ActionListaProdutosOrigem = ({
     XLSX.writeFile(workbook, 'produtos_sub_grupo.xlsx');
   };
 
- 
+
 
   const colunasProdutos = [
     {
@@ -198,18 +184,18 @@ export const ActionListaProdutosOrigem = ({
       field: '',
       header: 'Selecionar',
       body: row => {
-        const isChecked = produtoSelecionadoEstProdOrigem?.some(item => 
+        const isChecked = produtoSelecionadoEstProdOrigem?.some(item =>
           String(item.IDPRODUTO) === String(row.IDPRODUTO)
         );
         return (
           <div style={{ textAlign: 'center' }}>
             <input
               type="checkbox"
-              checked={isChecked}
-              onChange={() => handleCheckboxChangeOrigem(row.IDPRODUTO)}
-              style={{ 
-                width: '18px', 
-                height: '18px', 
+              checked={row.selecionado}
+              onChange={() => handleCheckboxChangeOrigem(row)}
+              style={{
+                width: '18px',
+                height: '18px',
                 cursor: 'pointer',
                 accentColor: '#7a59ad'
               }}
@@ -249,7 +235,7 @@ export const ActionListaProdutosOrigem = ({
               onChange={onSelectAllChange}
             />
             <span style={{ marginLeft: '8px', fontWeight: '500' }}>
-              {selectAllChecked 
+              {selectAllChecked
                 ? `Desmarcar Todos (${produtoSelecionadoEstProdOrigem?.length || 0}/${dados?.length} selecionados)`
                 : `Marcar Todos (${produtoSelecionadoEstProdOrigem?.length || 0}/${dados?.length} selecionados)`
               }
@@ -264,10 +250,7 @@ export const ActionListaProdutosOrigem = ({
             scrollable
             scrollHeight="500px"
             size="small"
-            dataKey="IDPRODUTO"
-            selectionMode="single"
-            selection={rowSelection}
-            onSelectionChange={(e) => setRowSelection(e.value)}
+            dataKey={"rowKey"}
             sortOrder={-1}
             paginator={true}
             rows={100}

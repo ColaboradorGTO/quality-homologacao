@@ -47,21 +47,31 @@ export const ActionListaProdutosSelecionadoDestino = ({
     doc.save('produtos_promocoes.pdf');
   };
 
+
+
   const exportToExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(dados);
+    const worksheet = XLSX.utils.json_to_sheet(produtoDestinoSelecionado?.map(item => ({
+      'Nº': item.contador,
+      'N.Itens': item.IDPRODUTO,
+      'Descrição': item.DSNOME,
+      'Código Barras': item.NUCODBARRAS,
+
+    })));
     const workbook = XLSX.utils.book_new();
-    const header = ['N.Itens', 'Código de Barras', 'Descrição'];
+    const header = ['Nº', 'N.Itens', 'Código de Barras', 'Descrição'];
     worksheet['!cols'] = [
+      { wpx: 100, caption: 'Nº' },
       { wpx: 100, caption: 'N.Itens' },
       { wpx: 200, caption: 'Código de Barras' },
       { wpx: 200, caption: 'Descrição' },
 
     ];
     XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Produtos Promoções Ativas');
-    XLSX.writeFile(workbook, 'produtos_promocoes.xlsx');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Produtos Destino');
+    XLSX.writeFile(workbook, 'produtos_destino.xlsx');
   };
-  console.log(produtoDestinoSelecionado, 'produtoDestinoSelecionado')
+
+
   useEffect(() => {
     if (
       Array.isArray(produtoDestinoSelecionado) &&
@@ -78,7 +88,7 @@ export const ActionListaProdutosSelecionadoDestino = ({
         try {
           const ids = idsParaBuscar.join(',');
 
-       
+
           // Primeira tentativa: solicitar todos de uma vez
           let response = await post(`/criar-produto-promocao-ativa`, {
             idProduto: ids,

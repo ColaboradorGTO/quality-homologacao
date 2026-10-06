@@ -27,59 +27,6 @@ import { fetchListaFabricantes, fetchListaPedidos, fetchPedidosCriados, fetchPed
 import { ActionEditarPedido } from "./ActionEditarPedido/actionEditarPedido"
 
 export const ActionPesquisaHome = ({ usuarioLogado }) => {
-  // const {
-  //   dataInicio,
-  //   setDataInicio,
-  //   dataFim,
-  //   setDataFim,
-  //   marcaSelecionada,
-  //   setMarcaSelecionada,
-  //   fornecedorSelecionado,
-  //   setFornecedorSelecionado,
-  //   fabricanteSelecionado,
-  //   setFabricanteSelecionado,
-  //   compradorSelecionado,
-  //   setCompradorSelecionado,
-  //   situacaoSelecionada,
-  //   setSituacaoSelecionada,
-  //   numeroPedido,
-  //   setNumeroPedido,
-  //   actionProdutosCriados,
-  //   setActionProdutosCriados,
-  //   tabelaPedidoPeriodo,
-  //   setTabelaPedidoPeriodo,
-  //   actionHome,
-  //   setActionHome,
-  //   actionPedidoDetalhado,
-  //   setActionPedidoDetalhado,
-  //   actionPedidoResumido,
-  //   setActionPedidoResumido,
-  //   actionListaPedidos,
-  //   setActionListaPedidos,
-  //   actionVisualizarPedido,
-  //   setActionVisualizarPedido,
-  //   actionEditarPedido,
-  //   setActionEditarPedido,
-  //   dadosListaPedidos,
-  //   //  dadosVisualizarPedido,
-  //   // setDadosVisualizarPedido,
-  //   // dadosDetalhePedido,
-  //   // setDadosDetalhePedido,
-  //   dadosPedidoResumido,
-  //   dadosPedidosDetalhados,
-  //   dadosListaProdutosCriados,
-  //   optionsModulos,
-  //   optionsEmpresas,
-  //   optionsFabricantes,
-  //   dadosFornecedores,
-  //   dadosMarcas,
-  //   dadosCompradores,
-  //   handleClick,
-  //   handleClickRelatorioResumido,
-  //   handleClickRelatorioDetalhado,
-  //   handleClickRelatorioProdutosCriados,
-  //   handleClickRelatorioDetalhadoReturn,
-  // } = usePesquisaHome({ usuarioLogado })
   const [actionHome, setActionHome] = useState(true)
   const [actionListaPedidos, setActionListaPedidos] = useState(true)
   const [actionPedidoResumido, setActionPedidoResumido] = useState(false)
@@ -184,7 +131,8 @@ export const ActionPesquisaHome = ({ usuarioLogado }) => {
   );
 
   const handleClick = () => {
-    setTabelaPedidoPeriodo(true)
+    setActionListaPedidos(true)
+    setActionProdutosCriados(false)
     refetchListaPedidos()
   }
 
@@ -192,15 +140,17 @@ export const ActionPesquisaHome = ({ usuarioLogado }) => {
     setActionPedidoResumido(true);
     setActionHome(false);
     setActionPedidoDetalhado(false);
-    setTabelaPedidoPeriodo(false)
+    setActionListaPedidos(false)
+    setActionProdutosCriados(false)
     refetchListaPedidos();
   }
 
   const handleClickRelatorioDetalhado = () => {
     setActionPedidoDetalhado(true);
     setActionPedidoResumido(false);
-    setTabelaPedidoPeriodo(false)
+    setActionListaPedidos(false)
     setActionHome(false);
+    setActionProdutosCriados(false)
     refetchPedidosDetalhados();
   }
 
@@ -208,7 +158,7 @@ export const ActionPesquisaHome = ({ usuarioLogado }) => {
     setActionProdutosCriados(true);
     setActionPedidoDetalhado(false);
     setActionPedidoResumido(false);
-    setTabelaPedidoPeriodo(false)
+    setActionListaPedidos(false)
     refetchPedidosCriados();
   }
 
@@ -360,7 +310,10 @@ export const ActionPesquisaHome = ({ usuarioLogado }) => {
       )}
 
       {actionProdutosCriados && (
-        <ActionListaProdutosCriados dadosListaProdutosCriados={dadosListaProdutosCriados} />
+        <ActionListaProdutosCriados 
+          dadosListaProdutosCriados={dadosListaProdutosCriados} 
+          dadosVisualizarPedido={dadosVisualizarPedido}  
+        />
       )}
 
      
@@ -396,8 +349,6 @@ export const ActionPesquisaHome = ({ usuarioLogado }) => {
           refetchListaPedidos={refetchListaPedidos}
         />
       )}
-
-
     </Fragment>
   )
 }

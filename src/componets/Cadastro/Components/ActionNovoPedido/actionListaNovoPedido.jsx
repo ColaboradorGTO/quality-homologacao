@@ -6,7 +6,6 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../../Tables/headerTable";
-import { dataFormatada } from "../../../../utils/dataFormatada";
 import { toFloat } from "../../../../utils/toFloat";
 import { formatMoeda } from "../../../../utils/formatMoeda";
 import { ButtonTable } from "../../../ButtonsTabela/ButtonTable";
@@ -15,9 +14,10 @@ import { BsTrash3 } from "react-icons/bs";
 import { CiEdit } from "react-icons/ci";
 import { ActionEditarItemPedidoModal } from "./ActionEditarItemDoPedidoModal/actionEditarItemPedidoModal";
 import { ActionProdutoPedidoModal } from "./ActionProdutoPedido/actionProdutoPedidoModal";
-import { get, put } from "../../../../api/funcRequest";
+import { get } from "../../../../api/funcRequest";
 import { FaLock } from "react-icons/fa";
 import Swal from "sweetalert2";
+import { useCancelarPedido } from "./hooks/useCancelarPedido";
 
 export const ActionListaNovoPedido = ({
   dadosVisualizarPedido,
@@ -34,6 +34,10 @@ export const ActionListaNovoPedido = ({
   const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
 
+  const {
+    handleClickCancelarItem
+  } = useCancelarPedido({usuarioLogado, optionsModulos})
+  
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
   };
@@ -89,7 +93,8 @@ export const ActionListaNovoPedido = ({
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Produtos Criados');
     XLSX.writeFile(workbook, 'produtos_criados.xlsx');
   };
-  console.log(dadosVisualizarPedido, 'na lista dadosVisualizarPedido')
+
+ 
   const idPedidoPrimarioPedido = Number(dadosVisualizarPedido[0]?.IDPEDIDOPRIMARIO || 0);
   const isPedidoSecundarioPedido = idPedidoPrimarioPedido > 0;
 
@@ -364,7 +369,6 @@ export const ActionListaNovoPedido = ({
   ]
 
 
-
   const handleClickEditar = (row) => {
     if (row && row.IDDETPEDIDO) {
       handleEditar(row.IDDETPEDIDO);
@@ -374,9 +378,21 @@ export const ActionListaNovoPedido = ({
   const handleEditar = async (IDDETPEDIDO) => {
     try {
       const response = await get(`/editar-item-pedido?idDetalhePedido=${IDDETPEDIDO}`);
-      setDadosItemPedido(response.data);
+      if(response.data && response.data.length > 0) {
 
-      setModalEditarItemPedido(true);
+        setDadosItemPedido(response.data);
+        setModalEditarItemPedido(true);
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Dados não encontrados',
+          text: 'Dados Não Encontrados para este pedido',
+          customClass: {
+            container:  'custom-swal'
+          }
+        })
+      }
+
     } catch (error) {
       console.error(error);
     }
@@ -391,10 +407,22 @@ export const ActionListaNovoPedido = ({
   const handleCriarProduto = async (IDDETPEDIDO) => {
     try {
       const response = await get(`/editar-item-pedido?idDetalhePedido=${IDDETPEDIDO}`);
-      setDadosItemPedidoCriar(response.data);
+      if(response.data && response.data.length > 0) {
+        
+        setDadosItemPedidoCriar(response.data);
+        setModalCriarProdutoItemPedido(true);
+        setModalIncluirProdutoPedido?.(true);
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Dados não encontrados',
+          text: 'Dados Não Encontrados para este pedido',
+          customClass: {
+            container:  'custom-swal'
+          }
+        })
+      }
 
-      setModalCriarProdutoItemPedido(true);
-      setModalIncluirProdutoPedido?.(true);
     } catch (error) {
       console.error(error);
     }
@@ -407,66 +435,6 @@ export const ActionListaNovoPedido = ({
     });
   };
 
-  const handleClickCancelarItem = async (row) => {
-    if (!row?.IDDETPEDIDO) {
-      return;
-    }
-
-    const confirmacao = await Swal.fire({
-      icon: 'question',
-      title: 'Certeza que Deseja Remover o Item/Referência do Pedido?',
-      text: 'Você não poderá reverter esta ação!',
-      showCancelButton: true,
-      confirmButtonText: 'Sim',
-      cancelButtonText: 'Cancelar',
-    });
-
-    if (!confirmacao.isConfirmed) {
-      return;
-    }
-
-    const { value: motivo } = await Swal.fire({
-      icon: 'question',
-      title: 'Motivo da Remoção do Item/Referência do Pedido?',
-      input: 'textarea',
-      inputValidator: (value) => {
-        if (!value || value.trim().length < 10) {
-          return 'Informe um motivo com no mínimo 10 caracteres';
-        }
-      },
-      showCancelButton: true,
-      confirmButtonText: 'Confirmar',
-      cancelButtonText: 'Cancelar',
-    });
-
-    if (!motivo) {
-      return;
-    }
-
-    try {
-      const dados = {
-        IDRESUMOPEDIDO: parseInt(row.IDPEDIDO),
-        IDDETALHEPEDIDO: parseInt(row.IDDETPEDIDO),
-        STCANCELADO: 'True',
-        TXTOBSCANCELAMENTO: motivo.trim().toUpperCase(),
-      };
-
-      // TODO: endpoint ainda não existe no backend Node (equivalente ao
-      // api/cadastro/remover-item-referencia-pedido.xsjs do jQuery)
-      await put('/remover-item-referencia-pedido', dados);
-
-      await Swal.fire({
-        icon: 'success',
-        title: 'Item/Referência Removido do Pedido com Sucesso!',
-      });
-    } catch (error) {
-      console.error(error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Erro ao tentar remover o Item do Pedido, recarregue e tente novamente!',
-      });
-    }
-  };
 
   return (
     <Fragment>

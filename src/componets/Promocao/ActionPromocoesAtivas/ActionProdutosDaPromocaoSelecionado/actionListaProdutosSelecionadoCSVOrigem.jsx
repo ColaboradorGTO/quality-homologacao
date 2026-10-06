@@ -119,7 +119,7 @@ export const ActionListaProdutosSelecionadoCSVOrigem = ({
    };
    fetchProdutosCompletos();
  }, [idsParaBuscar]);
-
+//  console.log(produtoOrigemSelecionado, 'produ')
  
   // Transforma o array de IDs em objetos de produto, se necessário
   let dados = [];

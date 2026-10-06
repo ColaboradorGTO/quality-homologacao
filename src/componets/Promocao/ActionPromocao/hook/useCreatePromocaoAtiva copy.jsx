@@ -4,12 +4,18 @@ import { useQuery } from "react-query"
 import Swal from "sweetalert2"
 import { getDataAtual, getDataTresMesesAtras } from "../../../../utils/dataAtual"
 import * as XLSX from 'xlsx';
-import { optionsMecanica } from "../../../../../mecanica"
+import { optionsMecanica, optionsMecanicaCompleta } from "../../../../../mecanica"
 import { useNavigate } from "react-router-dom"
 import axios from "axios";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import { sub } from "date-fns"
+
+// Total máximo de produtos permitido por promoção (planilha de origem/destino)
+const LIMITE_MAXIMO_PRODUTOS = 10000;
+// Tamanho de cada lote enviado ao backend por requisição (deve ficar alinhado
+// ao limite de 1000 produtos que o handleFileUpload já valida por arquivo)
+const TAMANHO_LOTE_PRODUTOS = 1000;
 
 export const useCreatePromocaoAtiva = ({ }) => {
   const [mecanicaSelecionada, setMecanicaSelecionada] = useState(0)
@@ -76,9 +82,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
   const [novoProdutoEstProdDestino, setNovoProdutoEstProdDestino] = useState([]);
   const [modalEstProdOrigem, setModalEstProdOrigem] = useState(false);
   const [modalEstProdDestino, setModalEstProdDestino] = useState(false);
-
-  const [produtosSubGrupoDestino, setProdutosSubGrupoDestino] = useState([]);
-  const [produtosSubGrupoOrigem, setProdutosSubGrupoOrigem] = useState([]);
+  const [tipoPromocao, setTipoPromocao] = useState('')
 
   const navigate = useNavigate();
 
@@ -115,7 +119,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
         console.error("Erro ao buscar IP via ipify.org:", error);
       }
     }
-      setIpUsuario(usuarioIP);
+    setIpUsuario(usuarioIP);
     return usuarioIP;
   };
 
@@ -151,7 +155,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
       const response = await get(`/grupoEstrutura`);
       return response.data;
     },
-    {enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000, }
+    { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000, }
   );
 
   const { data: dadosSubGrupo = [], error: errorSubGrupo, isLoading: isLoadingSubGrupo, refetch: refetchSubGrupo } = useQuery(
@@ -160,7 +164,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
       const response = await get(`/subGrupoEstrutura`);
       return response.data;
     },
-    {enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000, }
+    { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000, }
   );
 
   const { data: optionsMarcas = [], error: errorMarcas, isLoading: isLoadingMarcas, refetch: refetchMarcas } = useQuery(
@@ -203,51 +207,51 @@ export const useCreatePromocaoAtiva = ({ }) => {
     titulo.value = "Produtos da Promoção";
 
     titulo.font = {
-        bold: true,
-        size: 14,
-        color: { argb: "FFFFFFFF" }
+      bold: true,
+      size: 14,
+      color: { argb: "FFFFFFFF" }
     };
 
     titulo.alignment = {
-        horizontal: "center",
-        vertical: "middle"
+      horizontal: "center",
+      vertical: "middle"
     };
 
     titulo.fill = {
-        type: "pattern",
-        pattern: "solid",
-        fgColor: { argb: "FFFF0000" } // vermelho
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FFFF0000" } // vermelho
     };
 
     // 📌 HEADER (linha 2)
     const headers = ["ID"];
 
     headers.forEach((text, index) => {
-        const cell = worksheet.getCell(2, index + 1);
-        cell.value = text;
+      const cell = worksheet.getCell(2, index + 1);
+      cell.value = text;
 
-        cell.font = {
-            bold: true,
-            color: { argb: "FFFFFFFF" }
-        };
+      cell.font = {
+        bold: true,
+        color: { argb: "FFFFFFFF" }
+      };
 
-        cell.alignment = {
-            horizontal: "center",
-            vertical: "middle"
-        };
+      cell.alignment = {
+        horizontal: "center",
+        vertical: "middle"
+      };
 
-        cell.fill = {
-            type: "pattern",
-            pattern: "solid",
-            fgColor: { argb: "FF000000" } // preto
-        };
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FF000000" } // preto
+      };
 
-        cell.border = {
-            top: { style: "thin" },
-            left: { style: "thin" },
-            bottom: { style: "thin" },
-            right: { style: "thin" }
-        };
+      cell.border = {
+        top: { style: "thin" },
+        left: { style: "thin" },
+        bottom: { style: "thin" },
+        right: { style: "thin" }
+      };
     });
 
     // 📏 Largura da coluna A
@@ -255,31 +259,31 @@ export const useCreatePromocaoAtiva = ({ }) => {
 
     // 🔒 Validação (máx 30 caracteres)
     for (let i = 3; i <= 1000; i++) {
-        worksheet.getCell(`A${i}`).dataValidation = {
-            type: "textLength",
-            operator: "lessThanOrEqual",
-            showErrorMessage: true,
-            formulae: [30],
-            error: "Máximo de 30 caracteres permitido."
-        };
+      worksheet.getCell(`A${i}`).dataValidation = {
+        type: "textLength",
+        operator: "lessThanOrEqual",
+        showErrorMessage: true,
+        formulae: [30],
+        error: "Máximo de 30 caracteres permitido."
+      };
     }
 
     // 🎨 (Opcional) aplicar estilo nas células da coluna A
     for (let i = 3; i <= 20; i++) {
-        const cell = worksheet.getCell(`A${i}`);
+      const cell = worksheet.getCell(`A${i}`);
 
-        cell.fill = {
-            type: "pattern",
-            pattern: "solid",
-            fgColor: { argb: "FFF2F2F2" } // cinza claro
-        };
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FFF2F2F2" } // cinza claro
+      };
 
-        cell.border = {
-            top: { style: "thin" },
-            left: { style: "thin" },
-            bottom: { style: "thin" },
-            right: { style: "thin" }
-        };
+      cell.border = {
+        top: { style: "thin" },
+        left: { style: "thin" },
+        bottom: { style: "thin" },
+        right: { style: "thin" }
+      };
     }
 
     // 💾 Gerar arquivo
@@ -288,70 +292,72 @@ export const useCreatePromocaoAtiva = ({ }) => {
   };
 
   const clearFileError = (isOrigem) => {
-      // Limpa o estado do arquivo
-      if (isOrigem) {
-          setFileProdutoOrigem([]);
-      } else {
-          setFileProdutoDestino([]);
-      }
-      
-      // Limpa o input file se existir
-      const fileInputs = document.querySelectorAll('input[type="file"]');
-      fileInputs.forEach(input => {
-          if (input) {
-              input.value = '';
-          }
-      });
-  };
-  
-  const handleFileUpload = async (file, isOrigem) => {
-      try {
-          const data = await processFile(file);
+    // Limpa o estado do arquivo
+    if (isOrigem) {
+      setFileProdutoOrigem([]);
+    } else {
+      setFileProdutoDestino([]);
+    }
 
-          // ✅ VALIDAÇÃO: Limite de produtos
-          if (data.length > 1000) {
-              // ✅ LIMPA ARQUIVO quando excede limite
-              clearFileError(isOrigem);
-              
-              Swal.fire({
-                  icon: 'warning',
-                  title: 'Limite Excedido',
-                  html: `
-                      Limite máximo permitido: 1.000 produtos por promoção.<br>
+    // Limpa o input file se existir
+    const fileInputs = document.querySelectorAll('input[type="file"]');
+    fileInputs.forEach(input => {
+      if (input) {
+        input.value = '';
+      }
+    });
+  };
+
+  const handleFileUpload = async (file, isOrigem) => {
+    try {
+      const data = await processFile(file);
+
+      // ✅ VALIDAÇÃO: Limite de produtos
+      // O envio ao backend é feito em lotes de LOTE_MAXIMO_PRODUTOS (ver onSubmit),
+      // então o limite aqui é o total permitido por promoção, não por requisição.
+      if (data.length > LIMITE_MAXIMO_PRODUTOS) {
+        // ✅ LIMPA ARQUIVO quando excede limite
+        clearFileError(isOrigem);
+
+        Swal.fire({
+          icon: 'warning',
+          title: 'Limite Excedido',
+          html: `
+                      Limite máximo permitido: ${LIMITE_MAXIMO_PRODUTOS.toLocaleString('pt-BR')} produtos por promoção.<br>
                       Produtos encontrados: ${data.length}<br>
                       Caso contrário, os produtos não serão inseridos na promoção.
                   `,
-              });
-              return;
-          }
+        });
+        return;
+      }
 
-          // ✅ SUCESSO: Mostra quantos IDs foram encontrados
-          await Swal.fire({
-              icon: 'success',
-              title: 'Arquivo Processado!',
-              text: `${data.length} produtos foram encontrados na planilha`,
-              timer: 2000,
-              showConfirmButton: false
-          });
+      // ✅ SUCESSO: Mostra quantos IDs foram encontrados
+      await Swal.fire({
+        icon: 'success',
+        title: 'Arquivo Processado!',
+        text: `${data.length} produtos foram encontrados na planilha`,
+        timer: 2000,
+        showConfirmButton: false
+      });
 
-          if (isOrigem) {
-              setFileProdutoOrigem(JSON.stringify(data));
-          } else {
-              setFileProdutoDestino(JSON.stringify(data));
-          }
+      if (isOrigem) {
+        setFileProdutoOrigem(JSON.stringify(data));
+      } else {
+        setFileProdutoDestino(JSON.stringify(data));
+      }
 
-      } catch (error) {
-          console.error('Erro ao processar arquivo:', error);
-          
-          // ✅ LIMPA ARQUIVO quando há erro de validação
-          clearFileError(isOrigem);
-          
-          // ✅ ERRO ESPECÍFICO: Mostra a estrutura correta se erro de validação
-          if (error.message.includes('cabeçalho "ID"') || error.message.includes('Nenhum ID') || error.message.includes('título "Produtos da Promoção"')) {
-              Swal.fire({
-                  icon: 'error',
-                  title: 'Modelo Incorreto da Planilha!',
-                  html: `
+    } catch (error) {
+      console.error('Erro ao processar arquivo:', error);
+
+      // ✅ LIMPA ARQUIVO quando há erro de validação
+      clearFileError(isOrigem);
+
+      // ✅ ERRO ESPECÍFICO: Mostra a estrutura correta se erro de validação
+      if (error.message.includes('cabeçalho "ID"') || error.message.includes('Nenhum ID') || error.message.includes('título "Produtos da Promoção"')) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Modelo Incorreto da Planilha!',
+          html: `
                       <div style="text-align: left;">
                           <p><strong>Erro:</strong> ${error.message}</p>
                           <br>
@@ -383,17 +389,17 @@ export const useCreatePromocaoAtiva = ({ }) => {
                           <p style="color: #ff0000;"><strong>⚠️ IMPORTANTE:</strong> Use a planilha modelo baixada do sistema!</p>
                       </div>
                   `,
-                  confirmButtonText: 'Entendi'
-              });
-          } else {
-              // ✅ ERRO GENÉRICO
-              Swal.fire({
-                  icon: 'error',
-                  title: 'Erro',
-                  text: 'Falha ao processar o arquivo. Verifique o formato.',
-              });
-          }
+          confirmButtonText: 'Entendi'
+        });
+      } else {
+        // ✅ ERRO GENÉRICO
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: 'Falha ao processar o arquivo. Verifique o formato.',
+        });
       }
+    }
   };
 
   const processFile = (file) => {
@@ -444,62 +450,62 @@ export const useCreatePromocaoAtiva = ({ }) => {
     }
     return result;
   }
-  
+
   const processXLSX = (xlsxContent) => {
-      const workbook = XLSX.read(xlsxContent, { type: 'array' });
-      const sheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[sheetName];
+    const workbook = XLSX.read(xlsxContent, { type: 'array' });
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
 
-      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-      // ✅ VALIDAÇÃO: Verifica se tem dados
-      if (!jsonData || jsonData.length < 2) {
-          throw new Error('Planilha deve ter pelo menos 2 linhas (título e cabeçalho)');
+    // ✅ VALIDAÇÃO: Verifica se tem dados
+    if (!jsonData || jsonData.length < 2) {
+      throw new Error('Planilha deve ter pelo menos 2 linhas (título e cabeçalho)');
+    }
+
+    // ✅ VALIDAÇÃO: Verifica se o título está correto na primeira linha
+    const primeiraLinha = jsonData[0];
+    const titulo = primeiraLinha && primeiraLinha[0] ? primeiraLinha[0].toString().trim() : '';
+
+    if (titulo !== 'Produtos da Promoção') {
+      throw new Error('A primeira linha deve conter exatamente o título "Produtos da Promoção"');
+    }
+
+    // ✅ VALIDAÇÃO: Pega a segunda linha (cabeçalhos) - primeira linha é o título
+    const headers = jsonData[1];
+
+    // ✅ VALIDAÇÃO: Verifica se existe a coluna "ID"
+    const hasIdColumn = headers && headers.some(header =>
+      header && header.toString().toUpperCase().trim() === 'ID'
+    );
+
+    if (!hasIdColumn) {
+      throw new Error('A planilha deve ter um cabeçalho "ID" na segunda linha');
+    }
+
+    // ✅ BUSCA: Encontra o índice da coluna "ID"
+    const idColumnIndex = headers.findIndex(header =>
+      header && header.toString().toUpperCase().trim() === 'ID'
+    );
+
+    // ✅ EXTRAÇÃO: Pega apenas os IDs (pula título e cabeçalho - começa da linha 3)
+    const result = [];
+    for (let i = 2; i < jsonData.length; i++) { // Começa em 2 para pular título e cabeçalho
+      const row = jsonData[i];
+      if (row && row.length > idColumnIndex) {
+        const idValue = row[idColumnIndex]?.toString().trim();
+        if (idValue && idValue !== '') {
+          result.push(idValue);
+        }
       }
+    }
 
-      // ✅ VALIDAÇÃO: Verifica se o título está correto na primeira linha
-      const primeiraLinha = jsonData[0];
-      const titulo = primeiraLinha && primeiraLinha[0] ? primeiraLinha[0].toString().trim() : '';
-      
-      if (titulo !== 'Produtos da Promoção') {
-          throw new Error('A primeira linha deve conter exatamente o título "Produtos da Promoção"');
-      }
+    // ✅ VALIDAÇÃO: Verifica se encontrou IDs
+    if (result.length === 0) {
+      throw new Error('Nenhum ID foi encontrado na coluna ID da planilha');
+    }
 
-      // ✅ VALIDAÇÃO: Pega a segunda linha (cabeçalhos) - primeira linha é o título
-      const headers = jsonData[1];
-      
-      // ✅ VALIDAÇÃO: Verifica se existe a coluna "ID"
-      const hasIdColumn = headers && headers.some(header => 
-          header && header.toString().toUpperCase().trim() === 'ID'
-      );
-      
-      if (!hasIdColumn) {
-          throw new Error('A planilha deve ter um cabeçalho "ID" na segunda linha');
-      }
-
-      // ✅ BUSCA: Encontra o índice da coluna "ID"
-      const idColumnIndex = headers.findIndex(header => 
-          header && header.toString().toUpperCase().trim() === 'ID'
-      );
-
-      // ✅ EXTRAÇÃO: Pega apenas os IDs (pula título e cabeçalho - começa da linha 3)
-      const result = [];
-      for (let i = 2; i < jsonData.length; i++) { // Começa em 2 para pular título e cabeçalho
-          const row = jsonData[i];
-          if (row && row.length > idColumnIndex) {
-              const idValue = row[idColumnIndex]?.toString().trim();
-              if (idValue && idValue !== '') {
-                  result.push(idValue);
-              }
-          }
-      }
-
-      // ✅ VALIDAÇÃO: Verifica se encontrou IDs
-      if (result.length === 0) {
-          throw new Error('Nenhum ID foi encontrado na coluna ID da planilha');
-      }
-
-      return result;
+    return result;
   };
 
   const mostrarProdutosSelecionados = useCallback((tipo) => {
@@ -753,7 +759,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
 
     try {
 
-      const responsePromocao = await get(`/promocoes-ativas?dataPesquisaFim=${dataFim}`);
+      const responsePromocao = await get(`/promocoes-ativas?dataPesquisaInicio=${dataInicio}&dataPesquisaFim=${dataFim}`);
       const promocoesAtivas = responsePromocao.data;
       setDadosPromocoesAtivas(promocoesAtivas);
 
@@ -785,68 +791,126 @@ export const useCreatePromocaoAtiva = ({ }) => {
         return;
       }
 
-      if (descricao.length > 80) {
-          Swal.fire({
-            position: 'center',
-            icon: 'error',
-            title: 'Descrição deve ter no máximo 80 caracteres!',
-            customClass: {
-              container: 'custom-swal',
-            },
-            showConfirmButton: false,
-            timer: 3000,
-          })
-          return;
+    
+      if (dataFim < dataInicio) {
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: 'Data fim inválida!',
+          text: 'A data fim deve ser maior ou igual à data início.',
+          customClass: { container: 'custom-swal' },
+          showConfirmButton: false,
+          timer: 3000,
+        })
+        return;
       }
 
-      // if (descricao.length < 20 || descricao.length > 200) {
-      //   Swal.fire({
-      //     position: 'center',
-      //     icon: 'error',
-      //     title: 'Descrição deve ter entre 20 e 200 caracteres!',
-      //     customClass: {
-      //       container: 'custom-swal',
-      //     },
-      //     showConfirmButton: false,
-      //     timer: 3000,
-      //   })
-      //   return;
-      // }
 
-      // Considera produtos de origem e destino vindos do arquivo, input ou seleção manual
-      const produtosOrigem = 
+
+      if (descricao.length > 80) {
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: 'Descrição deve ter no máximo 80 caracteres!',
+          customClass: {
+            container: 'custom-swal',
+          },
+          showConfirmButton: false,
+          timer: 3000,
+        })
+        return;
+      }
+
+      const produtosOrigem =
         (fileProdutoOrigem && fileProdutoOrigem.length > 0)
           ? JSON.parse(fileProdutoOrigem)
           : produtoOrigem
-        ? [produtoOrigem]
-        : (produtoOrigemSelecionado && produtoOrigemSelecionado.length > 0)
-          ? produtoOrigemSelecionado
-          : [];
+            ? [produtoOrigem]
+            : (produtoOrigemSelecionado && produtoOrigemSelecionado.length > 0)
+              ? produtoOrigemSelecionado
+              : [];
 
-      const produtosDestino = 
+      const produtosDestino =
         (fileProdutoDestino && fileProdutoDestino.length > 0)
           ? JSON.parse(fileProdutoDestino)
           : produtoDestino
-        ? [produtoDestino]
-        : (produtoDestinoSelecionado && produtoDestinoSelecionado.length > 0)
-          ? produtoDestinoSelecionado
-          : [];
+            ? [produtoDestino]
+            : (produtoDestinoSelecionado && produtoDestinoSelecionado.length > 0)
+              ? produtoDestinoSelecionado
+              : [];
+
+      // Pelo menos 1 linha de origem e 1 de destino (guia, checklist item 7).
+      if (produtosOrigem.length === 0 || produtosDestino.length === 0) {
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: 'Origem e destino obrigatórios!',
+          text: 'Selecione ao menos um produto de origem e um produto de destino.',
+          customClass: { container: 'custom-swal' },
+          showConfirmButton: false,
+          timer: 3000,
+        })
+        return;
+      }
+
+      // Classificação da mecânica a partir dos campos legados (TPAPLICADOA/TPAPARTIRDE),
+      // que hoje continuam válidos para os dois motores (ver ANALISE_REGRAS_PDF_vs_CODIGO.md, seção 0).
+      const isAplicadoAQuantidade = mecanicaSelecionada == 2; // TPAPLICADOA = 2
+      const isAplicadoAValor = mecanicaSelecionada == 1;      // TPAPLICADOA = 1
+      const isACadaN = aplicacaoDestinoSelecionada == 2;      // TPAPARTIRDE = 2 ("a cada N" / último após entrada)
+
+      // Só o campo de início do tipo é preenchido; nos tipos "a cada N" por valor, N e Y coexistem.
+      const apartirDeQtdFinal = (isAplicadoAQuantidade || isACadaN) ? Number(qtdInicio) : 0;
+      const apartirDoVlrFinal = isAplicadoAValor ? Number(valorInicio) : 0;
+
+      if (isACadaN && apartirDeQtdFinal < 1) {
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: 'Atenção!',
+          text: '"A cada N" precisa de N = 1 ou mais. Com N = 0 a promoção nunca dá desconto. verifique o campo QTD Aparti de',
+          customClass: { container: 'custom-swal' },
+          showConfirmButton: false,
+          timer: 5000,
+        })
+        return;
+      }
+
+      // Só o campo de benefício do tipo é preenchido; os outros dois ficam zerados (guia, checklist item 4).
+      const vlPrecoProdutoFinal = tipoDescontoSelecionado == 0 ? Number(precoProduto) : 0;
+      const fatorPromoVlrFinal = tipoDescontoSelecionado == 1 ? Number(vrDesconto) : 0;
+      const fatorPromoPercFinal = tipoDescontoSelecionado == 2 ? Number(porcentoDesconto) : 0;
+
+      if (tipoDescontoSelecionado == 2 && !(fatorPromoPercFinal > 0 && fatorPromoPercFinal <= 100)) {
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: 'Percentual inválido!',
+          text: 'O percentual de desconto deve ser maior que 0 e no máximo 100 (100 = brinde).',
+          customClass: { container: 'custom-swal' },
+          showConfirmButton: false,
+          timer: 3000,
+        })
+        return;
+      }
+
+      // Validação de preço final/desconto vs. preço do destino mais barato: ignorada por ora.
 
       if (promocoesAtivas && promocoesAtivas.length > 0) {
         const produtoDestinoArray = Array.isArray(produtosDestino) ? produtosDestino : [produtosDestino];
         const idsResumo = promocoesAtivas.map(p => p.IDRESUMOPROMOCAOMARKETING).filter(Boolean);
         const existeAplicaoDestino = promocoesAtivas.some(ap => ap.TPAPARTIRDE == aplicacaoDestinoSelecionada);
 
-        // if (existeAplicaoDestino) {
-        //   Swal.fire({
-        //     icon: 'warning',
-        //     title: 'Aplicação de destino já existe!',
-        //     text: `Já existe uma promoção ativa com a mesma aplicação de destino nesta Empresa. Não é permitido cadastrar outra.`,
-        //     customClass: { container: 'custom-swal' },
-        //     confirmButtonText: 'OK'
-        //   });
-        //   return;
-        // }
+        if (existeAplicaoDestino) {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Aplicação de destino já existe!',
+            text: `Já existe uma promoção ativa com a mesma aplicação de destino nesta Empresa. Não é permitido cadastrar outra.`,
+            customClass: { container: 'custom-swal' },
+            confirmButtonText: 'OK'
+          });
+          return;
+        }
 
         if (idsResumo && idsResumo.length > 0) {
           const idResumo = idsResumo.join(',');
@@ -855,17 +919,69 @@ export const useCreatePromocaoAtiva = ({ }) => {
           if (!responseProdutoExistente.data) {
             throw new Error('Falha ao verificar produtos existentes');
           }
+        /* 
+            produtosExistentes preciso verificar da seguinte forma,
+            se o produto já existe na empresa da promocao, mostra o swal. alert
+            o que vai verificar se a empresa da existe é idresumopromocao, 
+            ele verifica empresaPromocaoDestino e origem para pegar os idsProdutos
+            e empres, pegar o IDEMPRESA, na origem ou destino e empresa preciso usar o mesmo IDRESUMOPROMOCAOMARKETING
+            assim esta o retorno da api
+        */
+          const produtosExistentes = []
+          responseProdutoExistente.data.forEach(promocao => {
+            if (promocao.empresaPromocaoDestino && Array.isArray(promocao.empresaPromocaoDestino)) {
+              promocao.empresaPromocaoDestino.forEach(empresaItem => {
+                if (empresaItem.det) {
+                  if (empresaItem.det.IDPRODUTO && empresaItem.det.IDPRODUTO !== null) {
+                    produtosExistentes.push(empresaItem.det.IDPRODUTO.toString());
+                  }
+                  
+                  if (empresaItem.det.IDPRODUTODESTINO && empresaItem.det.IDPRODUTODESTINO !== null) {
+                    const idsDestino = empresaItem.det.IDPRODUTODESTINO.toString().split(',');
+                    idsDestino.forEach(id => {
+                      const idLimpo = id.trim();
+                      if (idLimpo) produtosExistentes.push(idLimpo);
+                    });
+                  }
+                }
+              });
+            }
+            
+            if (promocao.empresaPromocaoOrigem && Array.isArray(promocao.empresaPromocaoOrigem)) {
+              promocao.empresaPromocaoOrigem.forEach(empresaItem => {
+                if (empresaItem.det) {
+                  if (empresaItem.det.IDPRODUTO && empresaItem.det.IDPRODUTO !== null) {
+                    produtosExistentes.push(empresaItem.det.IDPRODUTO.toString());
+                  }
+                  
+                  if (empresaItem.det.IDPRODUTOORIGEM && empresaItem.det.IDPRODUTOORIGEM !== null) {
+                    const idsOrigem = empresaItem.det.IDPRODUTOORIGEM.toString().split(',');
+                    idsOrigem.forEach(id => {
+                      const idLimpo = id.trim();
+                      if (idLimpo) produtosExistentes.push(idLimpo);
+                    });
+                  }
+                }
+              });
+            }
+          });
 
-          const produtosExistentes = responseProdutoExistente.data.detalhePromo || [];
-          const existeProduto = produtosExistentes.some(produto =>
-            produtoDestinoArray.includes(produto.IDPRODUTO)
+          const idsUnicos = [...new Set(produtosExistentes)].map(id => Number(id));
+
+          const existeProduto = idsUnicos.some(idExistente =>
+            produtoDestinoArray.some(produtoDestino => {
+              const idDestino = typeof produtoDestino === 'object' && produtoDestino !== null 
+                ? Number(produtoDestino.IDPRODUTO) 
+                : Number(produtoDestino);
+              return idExistente === idDestino;
+            })
           );
 
           if (existeProduto) {
             Swal.fire({
               icon: 'warning',
               title: 'Produto já está em uma promoção ativa!',
-              text: 'Um dos produtos destino já está vinculado a uma promoção ativa.',
+              text: `Produtos  Nº ${produtoDestinoArray.map(p => typeof p === 'object' ? p.IDPRODUTO : p).join(', ')} já está vinculado a uma promoção ativa.`,
               customClass: { container: 'custom-swal' },
               confirmButtonText: 'OK'
             });
@@ -874,8 +990,13 @@ export const useCreatePromocaoAtiva = ({ }) => {
 
           const promocoesValidas = responseProdutoExistente.data;
           const promocaoPorParesAtiva = promocoesValidas.some(promo => promo.TPAPARTIRDE == 0);
-          const promocaoPorMenosNaPrimeira = promocoesValidas.some(promo => promo.TPAPARTIRDE == 3 && promo.TPAPARTIRDE == 0);
-          const promocaoPorParesEmUmProduto = promocoesValidas.some(promo => promo.TPAPARTIRDE == 0 && promo.TPAPARTIRDE == 4);
+          // Correção: a condição original comparava o mesmo campo (TPAPARTIRDE) a dois valores
+          // com "&&", o que nunca é verdadeiro para um único registro — o check nunca disparava.
+          const promocaoPorMenosNaPrimeira = promocoesValidas.some(promo => promo.TPAPARTIRDE == 3);
+          const promocaoPorParesEmUmProduto = promocoesValidas.some(promo =>
+            (promo.TPAPARTIRDE == 0 && aplicacaoDestinoSelecionada == 4) ||
+            (promo.TPAPARTIRDE == 4 && aplicacaoDestinoSelecionada == 0)
+          );
           const descontoAtivoPromocaoPorEmpresa = promocoesValidas.some(promo => promo.TPFATORPROMO == tipoDescontoSelecionado)
 
           if (promocaoPorParesEmUmProduto) {
@@ -902,8 +1023,8 @@ export const useCreatePromocaoAtiva = ({ }) => {
 
           const promocoesValidasNaEmpresaSelecionada = [];
           responseProdutoExistente.data.forEach(item => {
-            if (Array.isArray(item.empresaPromocaoMarketing)) {
-              item.empresaPromocaoMarketing.forEach(empresa => {
+            if (Array.isArray(item.empresa)) {
+              item.empresa.forEach(empresa => {
                 if (empresa.det.IDEMPRESA == empresaSelecionada) {
                   promocoesValidasNaEmpresaSelecionada.push(empresa.det.IDEMPRESA);
                 }
@@ -997,12 +1118,12 @@ export const useCreatePromocaoAtiva = ({ }) => {
           return;
         }
 
-       
+
 
         const origemId = typeof produtosOrigem[0] === 'object' && produtosOrigem[0] !== null ? produtosOrigem[0].IDPRODUTO : produtosOrigem[0];
         const destinoId = typeof produtosDestino[0] === 'object' && produtosDestino[0] !== null ? produtosDestino[0].IDPRODUTO : produtosDestino[0];
         if (origemId !== destinoId) {
-          
+
           Swal.fire({
             position: 'center',
             icon: 'error',
@@ -1030,17 +1151,28 @@ export const useCreatePromocaoAtiva = ({ }) => {
         return [arr];
       };
 
-      const postData = {
+      const idsProdutoDestino = Array.from(new Set([
+        ...extractIds(produtosDestino),
+        ...extractIds(produtoDestinoSelecionado),
+        ...extractIds(novoProdutoDestino),
+      ]));
+      const idsProdutoOrigem = Array.from(new Set([
+        ...extractIds(produtosOrigem),
+        ...extractIds(produtoOrigemSelecionado),
+        ...extractIds(novoProdutoOrigem),
+      ].filter(Boolean)));
+
+      const basePostData = {
         TPAPARTIRDE: aplicacaoDestinoSelecionada,
         TPAPLICADOA: mecanicaSelecionada,
         TPFATORPROMO: tipoDescontoSelecionado,
-        APARTIRDEQTD: Number(qtdInicio),
-        APARTIRDOVLR: valorInicio,
-        FATORPROMOVLR: vrDesconto,
-        FATORPROMOPERC: porcentoDesconto,
-        VLPRECOPRODUTO: Number(precoProduto),
-        DTHORAINICIO: dataInicio,
-        DTHORAFIM: dataFim + ' 23:59:59',
+        APARTIRDEQTD: apartirDeQtdFinal,
+        APARTIRDOVLR: apartirDoVlrFinal,
+        FATORPROMOVLR: fatorPromoVlrFinal,
+        FATORPROMOPERC: fatorPromoPercFinal,
+        VLPRECOPRODUTO: vlPrecoProdutoFinal,
+        DTHORAINICIO: `${dataInicio} 00:00:00`,
+        DTHORAFIM: `${dataFim} 23:59:59`,
         DSPROMOCAOMARKETING: descricao.toUpperCase(),
         IDEMPRESA: empresaSelecionada,
         STATIVO: "True",
@@ -1058,670 +1190,106 @@ export const useCreatePromocaoAtiva = ({ }) => {
         IDSUBGRUPOEMORIGEM: subGrupoSelecionado,
         IDMARCAEMORIGEM: marcaOrigem,
         IDFORNECEDOREMORIGEM: fornecedorSelecionado,
-
-        IDPRODUTO: Array.from(new Set([
-          ...extractIds(produtosDestino),
-          ...extractIds(produtoDestinoSelecionado),
-          ...extractIds(novoProdutoDestino),
-        ])),
-        IDPRODUTODESTINO: Array.from(new Set([
-          ...extractIds(produtosDestino),
-          ...extractIds(produtoDestinoSelecionado),
-          ...extractIds(novoProdutoDestino),
-        ])),
-        IDPRODUTOORIGEM: Array.from(new Set([
-          ...extractIds(produtosOrigem),
-          ...extractIds(produtoOrigemSelecionado),
-          ...extractIds(novoProdutoOrigem),
-        ].filter(Boolean))),
+        NUTIPOPROMOCAO: Number(tipoPromocao)
       };
 
-      let timerInterval;
+      // Envia os produtos em lotes de até TAMANHO_LOTE_PRODUTOS para a MESMA promoção:
+      // o 1º lote cria a promoção (sem IDRESUMOPROMOCAOMARKETING) e retorna o ID criado;
+      // os lotes seguintes reenviam esse ID para apenas anexar os próximos produtos.
+      const totalProdutosEnvio = Math.max(idsProdutoDestino.length, idsProdutoOrigem.length, 1);
+      const totalLotes = Math.max(
+        1,
+        Math.ceil(totalProdutosEnvio / TAMANHO_LOTE_PRODUTOS)
+      );
+
+      const montarHtmlProgresso = (loteAtual, produtosEnviados) => {
+        const percentual = Math.min(100, Math.round((produtosEnviados / totalProdutosEnvio) * 100));
+        return `
+          <div style="text-align:left">
+            <p>Enviando lote <b>${loteAtual}</b> de <b>${totalLotes}</b></p>
+            <p>Produtos enviados: <b>${produtosEnviados}</b> de <b>${totalProdutosEnvio}</b> (faltam ${totalProdutosEnvio - produtosEnviados})</p>
+            <div style="background:#e0e0e0;border-radius:4px;overflow:hidden;height:10px;margin-top:8px;">
+              <div style="background:#3085d6;height:100%;width:${percentual}%;transition:width .3s;"></div>
+            </div>
+          </div>
+        `;
+      };
+
+      // Bloqueia completamente a tela: sem fechar por fora, sem ESC, sem botões.
       Swal.fire({
         title: 'Processando sua promoção...',
-        html: 'Aguarde enquanto enviamos os dados <b></b>',
-        timerProgressBar: true,
-        timer: 30000,
+        html: montarHtmlProgresso(1, 0),
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        allowEnterKey: false,
+        showConfirmButton: false,
+        showCancelButton: false,
+        showCloseButton: false,
         didOpen: () => {
           Swal.showLoading();
-          timerInterval = setInterval(() => {
-            const content = Swal.getHtmlContainer();
-            if (content) {
-              const b = content.querySelector('b');
-              if (b) {
-                b.textContent = `${Math.floor(Swal.getTimerLeft() / 1000)}s`;
-              }
-            }
-          }, 100);
-        },
-        willClose: () => {
-          clearInterval(timerInterval);
         }
       });
 
-      const response = await post('/criar-promocoes-ativas', postData);
+      let idPromocaoCriada = null;
+      let response = null;
 
-      Swal.fire({
-        position: 'center',
-        icon: 'success',
-        title: 'Cadastro realizado com sucesso!',
-        customClass: {
-          container: 'custom-swal',
-        },
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      try {
+        for (let lote = 0; lote < totalLotes; lote++) {
+          const inicio = lote * TAMANHO_LOTE_PRODUTOS;
+          const fim = inicio + TAMANHO_LOTE_PRODUTOS;
+          const produtosJaEnviados = Math.min(inicio, totalProdutosEnvio);
 
-      return response.data;
-    } catch (error) {
-      console.error('Erro ao cadastrar promoção:', error);
-      Swal.fire({
-        position: 'top-end',
-        icon: 'error',
-        title: 'Erro ao Cadastrar Promoção!',
-        text: error.message || 'Ocorreu um erro durante o cadastro',
-        customClass: {
-          container: 'custom-swal',
-        },
-        showConfirmButton: false,
-        timer: 3000,
-      });
-      return null;
-    }
-  };
-
-  const onSubmitEstrutura = async (data) => {
-  
-    try {
-      if (!mecanicaSelecionada) {
-        Swal.fire({
-          position: 'center',
-          icon: 'error',
-          title: 'Selecione uma mecânica!',
-          customClass: {
-            container: 'custom-swal',
-          },
-          showConfirmButton: false,
-          timer: 3000,
-        })
-        return;
-      }
-
-      if (!empresaSelecionada || empresaSelecionada.length == 0) {
-        Swal.fire({
-          position: 'center',
-          icon: 'error',
-          title: 'Selecione uma empresa!',
-          customClass: {
-            container: 'custom-swal',
-          },
-          showConfirmButton: false,
-          timer: 3000,
-        })
-        return;
-      }
-
-      if(!subGrupoDestino && !subGrupoOrigem) {
-        Swal.fire({
-          position: 'center',
-          icon: 'error',
-          title: 'Selecione um subgrupo para origem e destino!',
-          customClass: {
-            container: 'custom-swal',
-          },
-          showConfirmButton: false,
-          timer: 5000,
-        })
-        return;
-      }
-
-      if (descricao.length > 80) {
-          Swal.fire({
-            position: 'center',
-            icon: 'error',
-            title: 'Descrição deve ter no máximo 80 caracteres!',
-            customClass: {
-              container: 'custom-swal',
-            },
-            showConfirmButton: false,
-            timer: 3000,
-          })
-          return;
-      }
-
-
-      const postData = {
-        TPAPARTIRDE: aplicacaoDestinoSelecionada,
-        TPAPLICADOA: mecanicaSelecionada,
-        TPFATORPROMO: tipoDescontoSelecionado,
-        APARTIRDEQTD: Number(qtdInicio),
-        APARTIRDOVLR: valorInicio,
-        FATORPROMOVLR: vrDesconto,
-        FATORPROMOPERC: porcentoDesconto,
-        VLPRECOPRODUTO: Number(precoProduto),
-        DTHORAINICIO: dataInicio,
-        DTHORAFIM: dataFim + ' 23:59:59',
-        DSPROMOCAOMARKETING: descricao.toUpperCase(),
-        IDEMPRESA: empresaSelecionada,
-        STATIVO: "True",
-        STESTRUTURA: "True",
-        STPRODUTO: "False",
-        STESTRUTURAPRODUTO: "False",
-        STEMPRESAPROMO: "True",
-        STDETPROMOORIGEM: "True",
-        STDETPROMODESTINO: "True",
-        STDETPROMODESTINO: "True",
-        IDGRUPOEMDESTINO: grupoSelecionadoDestino,
-        IDSUBGRUPOEMDESTINO: subGrupoDestino,
-        IDMARCAEMDESTINO: marcaDestino,
-        IDFORNECEDOREMDESTINO: fornecedorSelecionado,
-        IDGRUPOEMORIGEM: grupoSelecionadoOrigem,
-        IDSUBGRUPOEMORIGEM: subGrupoOrigem,
-        IDMARCAEMORIGEM: marcaOrigem,
-        IDFORNECEDOREMORIGEM: fornecedorSelecionado,
-        IDPRODUTO: null,
-        IDPRODUTODESTINO: null,
-        IDPRODUTOORIGEM: null,
-  
-      };
-
-      let timerInterval;
-      Swal.fire({
-        title: 'Processando sua promoção...',
-        html: 'Aguarde enquanto enviamos os dados <b></b>',
-        timerProgressBar: true,
-        timer: 30000,
-        didOpen: () => {
-          Swal.showLoading();
-          timerInterval = setInterval(() => {
-            const content = Swal.getHtmlContainer();
-            if (content) {
-              const b = content.querySelector('b');
-              if (b) {
-                b.textContent = `${Math.floor(Swal.getTimerLeft() / 1000)}s`;
-              }
-            }
-          }, 100);
-        },
-        willClose: () => {
-          clearInterval(timerInterval);
-        }
-      });
-
-      const response = await post('/criar-promocoes-ativas-subGrupo', postData);
-
-      Swal.fire({
-        position: 'center',
-        icon: 'success',
-        title: 'Cadastro realizado com sucesso!',
-        customClass: {
-          container: 'custom-swal',
-        },
-        showConfirmButton: false,
-        timer: 1500,
-      });
-
-      return response.data;
-    } catch (error) {
-      console.error('Erro ao cadastrar promoção:', error);
-      Swal.fire({
-        position: 'top-end',
-        icon: 'error',
-        title: 'Erro ao Cadastrar Promoção!',
-        text: error.message || 'Ocorreu um erro durante o cadastro',
-        customClass: {
-          container: 'custom-swal',
-        },
-        showConfirmButton: false,
-        timer: 3000,
-      });
-      return null;
-    }
-  };
-
-  
-  const onSubmitEstruturaProduto = async (data) => {
-
-    try {
-
-      const responsePromocao = await get(`/promocoes-ativas?dataPesquisaFim=${dataFim}`);
-      const promocoesAtivas = responsePromocao.data;
-      setDadosPromocoesAtivas(promocoesAtivas);
-
-      if (!mecanicaSelecionada) {
-        Swal.fire({
-          position: 'center',
-          icon: 'error',
-          title: 'Selecione uma mecânica!',
-          customClass: {
-            container: 'custom-swal',
-          },
-          showConfirmButton: false,
-          timer: 3000,
-        })
-        return;
-      }
-
-      if (!empresaSelecionada || empresaSelecionada.length == 0) {
-        Swal.fire({
-          position: 'center',
-          icon: 'error',
-          title: 'Selecione uma empresa!',
-          customClass: {
-            container: 'custom-swal',
-          },
-          showConfirmButton: false,
-          timer: 3000,
-        })
-        return;
-      }
-
-      if (descricao.length > 80) {
-          Swal.fire({
-            position: 'center',
-            icon: 'error',
-            title: 'Descrição deve ter no máximo 80 caracteres!',
-            customClass: {
-              container: 'custom-swal',
-            },
-            showConfirmButton: false,
-            timer: 3000,
-          })
-          return;
-      }
-
-
-      if (promocoesAtivas && promocoesAtivas.length > 0) {
-        const produtoDestinoArray = Array.isArray(produtoSelecionadoEstProdDestino) ? produtoSelecionadoEstProdDestino : [produtoSelecionadoEstProdDestino];
-        const subGrupoProdutoOrigemArray = Array.isArray(subGrupoProdutoOrigem) ? subGrupoProdutoOrigem : [subGrupoProdutoOrigem];
-        const subGrupoProdutoDestinoArray = Array.isArray(subGrupoProdutoDestino) ? subGrupoProdutoDestino : [subGrupoProdutoDestino];
-        const idsResumo = promocoesAtivas.map(p => p.IDRESUMOPROMOCAOMARKETING).filter(Boolean);
-        const existeAplicaoDestino = promocoesAtivas.some(ap => ap.TPAPARTIRDE == aplicacaoDestinoSelecionada);
-
-        if (idsResumo && idsResumo.length > 0) {
-          const idResumo = idsResumo.join(',');
-          const responseProdutoExistente = await get(`/detalhe-promocoes-ativas?idResumoPromocao=${idResumo}&dataPesquisaFim=${dataFim}`);
-          if (!responseProdutoExistente.data) {
-            throw new Error('Falha ao verificar produtos existentes');
-          }
-          
-          const produtosExistentes = responseProdutoExistente.data.detalhePromo || [];
-          const existeProduto = produtosExistentes.some(produto =>
-            produtoDestinoArray.includes(produto.IDPRODUTO)
-          );
-          
-          if (existeProduto) {
-            Swal.fire({
-              icon: 'warning',
-              title: 'Produto já está em uma promoção ativa!',
-              text: 'Um dos produtos destino já está vinculado a uma promoção ativa.',
-              customClass: { container: 'custom-swal' },
-              confirmButtonText: 'OK'
+          if (Swal.isVisible()) {
+            Swal.update({
+              html: montarHtmlProgresso(lote + 1, produtosJaEnviados)
             });
-            return;
           }
-          
-          const normalizeToArray = (value) => {
-            if (Array.isArray(value)) return value;
-            if (value === null || value === undefined || value === "") return [];
-            return [value];
+
+          const lotePostData = {
+            ...basePostData,
+            IDPRODUTO: idsProdutoDestino.slice(inicio, fim),
+            IDPRODUTODESTINO: idsProdutoDestino.slice(inicio, fim),
+            IDPRODUTOORIGEM: idsProdutoOrigem.slice(inicio, fim),
           };
 
-          const subgruposDestinoSelecionados = normalizeToArray(subGrupoProdutoDestino)
-            .map(v => Number(v))
-            .filter(v => !Number.isNaN(v) && v !== -1);
-
-          const subgruposOrigemSelecionados = normalizeToArray(subGrupoProdutoOrigem)
-            .map(v => Number(v))
-            .filter(v => !Number.isNaN(v) && v !== -1);
-
-          const subgruposDestinoAtivos = responseProdutoExistente.data.flatMap((promo) =>
-            (promo.empresaPromocaoDestino || [])
-              .map(item => Number(item?.det?.IDSUBGRUPOEMDESTINO))
-              .filter(v => !Number.isNaN(v) && v !== -1)
-          );
-
-          const subgruposOrigemAtivos = responseProdutoExistente.data.flatMap((promo) =>
-            (promo.empresaPromocaoOrigem || [])
-              .map(item => Number(item?.det?.IDSUBGRUPOEMORIGEM))
-              .filter(v => !Number.isNaN(v) && v !== -1)
-          );
-
-          const conflitosDestino = subgruposDestinoSelecionados.filter(id => subgruposDestinoAtivos.includes(id));
-          const conflitosOrigem = subgruposOrigemSelecionados.filter(id => subgruposOrigemAtivos.includes(id));
-
-          let conflitos = Array.from(new Set([...conflitosDestino, ...conflitosOrigem]));
-
-          if (conflitos.length > 0) {
-            Swal.fire({
-              icon: "warning",
-              title: "Subgrupo já está em promoção ativa",
-              html: `
-                IDs em conflito: <b>${conflitos.join(", ")}</b><br/>
-                Ajuste os subgrupos para continuar.
-              `,
-              customClass: { container: "custom-swal" },
-              confirmButtonText: "OK"
-            });
-            return;
+          if (idPromocaoCriada) {
+            lotePostData.IDRESUMOPROMOCAOMARKETING = idPromocaoCriada;
           }
 
-          const promocoesValidas = responseProdutoExistente.data;
-          const promocaoPorParesAtiva = promocoesValidas.some(promo => promo.TPAPARTIRDE == 0);
-          const promocaoPorMenosNaPrimeira = promocoesValidas.some(promo => promo.TPAPARTIRDE == 3 && promo.TPAPARTIRDE == 0);
-          const promocaoPorParesEmUmProduto = promocoesValidas.some(promo => promo.TPAPARTIRDE == 0 && promo.TPAPARTIRDE == 4);
-          const descontoAtivoPromocaoPorEmpresa = promocoesValidas.some(promo => promo.TPFATORPROMO == tipoDescontoSelecionado)
+          response = await post('/criar-promocoes-ativas', lotePostData);
 
-          if (promocaoPorParesEmUmProduto) {
-            Swal.fire({
-              icon: 'warning',
-              title: 'Promoção por pares e em um produto não podem ser usadas juntas!',
-              text: 'Não é permitido cadastrar uma promoção por pares e em um produto ao mesmo tempo.',
-              customClass: { container: 'custom-swal' },
-              confirmButtonText: 'OK'
-            });
-            return;
-          }
+          if (!idPromocaoCriada) {
+            idPromocaoCriada = response?.data?.IDRESUMOPROMOCAOMARKETING;
 
-          if (descontoAtivoPromocaoPorEmpresa) {
-            Swal.fire({
-              icon: 'warning',
-              title: 'Tipo Desconto já ativo nesta empresa!',
-              text: 'Já existe um desconto ativo com o mesmo tipo de desconto nesta empresa. Não é permitido cadastrar outro.',
-              customClass: { container: 'custom-swal' },
-              confirmButtonText: 'OK'
-            });
-            return;
-          }
-
-          const promocoesValidasNaEmpresaSelecionada = [];
-          responseProdutoExistente.data.forEach(item => {
-            if (Array.isArray(item.empresaPromocaoMarketing)) {
-              item.empresaPromocaoMarketing.forEach(empresa => {
-                if (empresa.det.IDEMPRESA == empresaSelecionada) {
-                  promocoesValidasNaEmpresaSelecionada.push(empresa.det.IDEMPRESA);
-                }
-              });
+            if (!idPromocaoCriada) {
+              throw new Error('Não foi possível obter o ID da promoção criada para continuar o envio dos lotes.');
             }
-          })
-
-          if (promocaoPorParesAtiva) {
-            Swal.fire({
-              icon: 'warning',
-              title: 'Promoção por pares já existente!',
-              text: 'Já existe uma promoção ativa com aplicação destino por pares. Não é permitido cadastrar outra.',
-              customClass: { container: 'custom-swal' },
-              confirmButtonText: 'OK'
-            });
-            return;
           }
 
-          if (promocaoPorMenosNaPrimeira) {
-            Swal.fire({
-              icon: 'warning',
-              title: 'Promoção menos na primeira já existente!',
-              text: 'Já existe uma promoção ativa com aplicação destino menos na primeira. Não é permitido cadastrar outra.',
-              customClass: { container: 'custom-swal' },
-              confirmButtonText: 'OK'
+          const produtosEnviadosAgora = Math.min(fim, totalProdutosEnvio);
+          if (Swal.isVisible()) {
+            Swal.update({
+              html: montarHtmlProgresso(lote + 1, produtosEnviadosAgora)
             });
-            return;
-          }
-
-          if (promocoesValidasNaEmpresaSelecionada.length >= 3) {
-            Swal.fire({
-              icon: 'warning',
-              title: 'Limite atingido',
-              text: 'Já existem 3 promoções ativas nesta empresa. Não é permitido cadastrar outra..',
-              customClass: { container: 'custom-swal' },
-              confirmButtonText: 'OK'
-            });
-            return;
           }
         }
+      } finally {
+        Swal.close();
       }
-
-      if (aplicacaoDestinoSelecionada == 0 || aplicacaoDestinoSelecionada == 3) {
-        const origem = produtoSelecionadoEstProdOrigem;
-        const destino = produtoSelecionadoEstProdDestino;
-        const iguais = origem.length == destino.length && 
-          origem.every((v, i) => {
-            const idOrigem = typeof v === 'object' && v !== null ? v.IDPRODUTO : v;
-            const idDestino = typeof destino[i] === 'object' && destino[i] !== null ? destino[i].IDPRODUTO : destino[i];
-            return idOrigem === idDestino;
-          });
-
-        if (!iguais) {
-          Swal.fire({
-            position: 'center',
-            icon: 'error',
-            title: 'Erro Produtos Origem e Destino',
-            text: 'Para Mecânica por pares ou menos na primeira, os produtos de origem e destino devem ser iguais.',
-            customClass: {
-              container: 'custom-swal',
-            },
-            showConfirmButton: false,
-            timer: 15000,
-          });
-          return;
-        }
-      }
-
-      if (aplicacaoDestinoSelecionada == 1) {
-        if (produtoSelecionadoEstProdDestino.length !== produtoSelecionadoEstProdOrigem.length) {
-          Swal.fire({
-            position: 'center',
-            icon: 'error',
-            title: 'Erro Aplicação Destino',
-            text: 'Para Mecânica por todos os produtos, os produtos de origem e destino devem ser iguais.',
-            customClass: { container: 'custom-swal' },
-            showConfirmButton: false,
-            timer: 8000,
-          });
-          return;
-        }
-      }
-
-      if (aplicacaoDestinoSelecionada == 4) {
-
-        if (produtoSelecionadoEstProdDestino.length !== 1 || produtoSelecionadoEstProdOrigem.length !== 1) {
-          Swal.fire({
-            position: 'center',
-            icon: 'error',
-            title: 'Erro Aplicação Destino',
-            text: 'Para Mecânica em um produto, apenas um produto pode ser enviado tanto na origem quanto no destino.',
-            customClass: { container: 'custom-swal' },
-            showConfirmButton: false,
-            timer: 8000,
-          });
-          return;
-        }
-
-       
-
-        const origemId = typeof produtoSelecionadoEstProdOrigem[0] === 'object' && produtoSelecionadoEstProdOrigem[0] !== null ? produtoSelecionadoEstProdOrigem[0].IDPRODUTO : produtoSelecionadoEstProdOrigem[0];
-        const destinoId = typeof produtoSelecionadoEstProdDestino[0] === 'object' && produtoSelecionadoEstProdDestino[0] !== null ? produtoSelecionadoEstProdDestino[0].IDPRODUTO : produtoSelecionadoEstProdDestino[0];
-        if (origemId !== destinoId) {
-          
-          Swal.fire({
-            position: 'center',
-            icon: 'error',
-            title: 'Erro Aplicação Destino',
-            text: 'Para Mecânica em um produto, o produto de origem e destino deve ser o mesmo.',
-            customClass: { container: 'custom-swal' },
-            showConfirmButton: false,
-            timer: 8000,
-          });
-          return;
-        }
-      }
-
-      const extractIds = (arr) => {
-        if (!arr) return [];
-        if (Array.isArray(arr)) {
-          return arr
-            .map(item =>
-              typeof item === 'object' && item !== null && item.IDPRODUTO
-                ? Number(item.IDPRODUTO)
-                : Number(item)
-            )
-            .filter(Boolean);
-        }
-        if (typeof arr === 'object' && arr !== null && arr.IDPRODUTO) {
-          return [Number(arr.IDPRODUTO)];
-        }
-        return [Number(arr)];
-      };
-
-      const hasSelection = (value) => {
-        if (Array.isArray(value)) return value.length > 0;
-        return value !== null && value !== undefined && value !== "" && value !== -1;
-      };
-
-      const idsDestino = Array.from(new Set(extractIds(produtoSelecionadoEstProdDestino)));
-      const idsOrigem = Array.from(new Set(extractIds(produtoSelecionadoEstProdOrigem)));
-      const temProduto = idsDestino.length > 0 || idsOrigem.length > 0;
-
-      const temSubGrupoDestino = hasSelection(subGrupoProdutoDestino);
-      const temSubGrupoOrigem = hasSelection(subGrupoProdutoOrigem);
-      const temSubGrupo = temSubGrupoDestino || temSubGrupoOrigem;
-
-      if (temProduto && !temSubGrupo) {
-        Swal.fire({
-          position: "center",
-          icon: "warning",
-          title: "Seleção inválida",
-          text: "Para selecionar produto, é obrigatório selecionar subgrupo de origem e/ou destino.",
-          customClass: { container: "custom-swal" },
-          showConfirmButton: true
-        });
-        return;
-      }
-
-      if (!temSubGrupo && !temProduto) {
-        Swal.fire({
-          position: "center",
-          icon: "warning",
-          title: "Seleção obrigatória",
-          text: "Selecione ao menos um subgrupo (com ou sem produto).",
-          customClass: { container: "custom-swal" },
-          showConfirmButton: true
-        });
-        return;
-      }
-
-      let camposEstruturaProduto = {};
-
-      if(temSubGrupo && temProduto) {
-        camposEstruturaProduto = {
-          IDSUBGRUPOEMDESTINO: subGrupoProdutoDestino,
-          IDSUBGRUPOEMORIGEM: subGrupoProdutoOrigem,
-          IDPRODUTO: idsDestino,
-          IDPRODUTODESTINO: idsDestino,
-          IDPRODUTOORIGEM: idsOrigem,
-          STESTRUTURA: "False",
-          STPRODUTO: "False",
-          STESTRUTURAPRODUTO: "True",
-        };
-      }
-      if (!temSubGrupo && temProduto) {
-        camposEstruturaProduto = {
-          IDSUBGRUPOEMDESTINO: -1,
-          IDSUBGRUPOEMORIGEM: -1,
-          IDPRODUTO: idsDestino,
-          IDPRODUTODESTINO: idsDestino,
-          IDPRODUTOORIGEM: idsOrigem,
-          STESTRUTURA: "False",
-          STESTRUTURAPRODUTO: "False",
-          STPRODUTO: "True",
-        };
-      }
-    
-      // 2) Subgrupo selecionado e sem produto
-      if (temSubGrupo && !temProduto) {
-        camposEstruturaProduto = {
-          IDSUBGRUPOEMDESTINO: subGrupoProdutoDestino,
-          IDSUBGRUPOEMORIGEM: subGrupoProdutoOrigem,
-          IDPRODUTO: null,
-          IDPRODUTODESTINO: null,
-          IDPRODUTOORIGEM: null,
-          STESTRUTURA: "True",
-          STESTRUTURAPRODUTO: "False",
-          STPRODUTO: "False",
-        };
-      }
-
-      const postData = {
-        TPAPARTIRDE: aplicacaoDestinoSelecionada,
-        TPAPLICADOA: mecanicaSelecionada,
-        TPFATORPROMO: tipoDescontoSelecionado,
-        APARTIRDEQTD: Number(qtdInicio),
-        APARTIRDOVLR: valorInicio,
-        FATORPROMOVLR: vrDesconto,
-        FATORPROMOPERC: porcentoDesconto,
-        VLPRECOPRODUTO: Number(precoProduto),
-        DTHORAINICIO: dataInicio,
-        DTHORAFIM: dataFim + ' 23:59:59',
-        DSPROMOCAOMARKETING: descricao,
-        IDEMPRESA: empresaSelecionada,
-        STATIVO: "True",
-        STEMPRESAPROMO: "True",
-        STDETPROMOORIGEM: "True",
-        STDETPROMODESTINO: "True",
-        IDGRUPOEMDESTINO: grupoSelecionadoDestino,
-        IDMARCAEMDESTINO: marcaDestino,
-        IDFORNECEDOREMDESTINO: fornecedorSelecionado,
-        IDGRUPOEMORIGEM: grupoSelecionadoOrigem,
-        IDMARCAEMORIGEM: marcaOrigem,
-        IDFORNECEDOREMORIGEM: fornecedorSelecionado,
-        ...camposEstruturaProduto
-      };
-      // IDSUBGRUPOEMDESTINO: subGrupoProdutoDestino,
-      // IDSUBGRUPOEMORIGEM: subGrupoProdutoOrigem,
-      // IDPRODUTO: Array.from(new Set([
-      //   ...extractIds(produtoSelecionadoEstProdDestino),
-      // ])),
-      // IDPRODUTODESTINO: Array.from(new Set([
-      //   ...extractIds(produtoSelecionadoEstProdDestino),
-      // ])),
-      // IDPRODUTOORIGEM: Array.from(new Set([
-      //   ...extractIds(produtoSelecionadoEstProdOrigem),
-      // ].filter(Boolean))),
-
-      let timerInterval;
-      Swal.fire({
-        title: 'Processando sua promoção...',
-        html: 'Aguarde enquanto enviamos os dados <b></b>',
-        timerProgressBar: true,
-        timer: 30000,
-        didOpen: () => {
-          Swal.showLoading();
-          timerInterval = setInterval(() => {
-            const content = Swal.getHtmlContainer();
-            if (content) {
-              const b = content.querySelector('b');
-              if (b) {
-                b.textContent = `${Math.floor(Swal.getTimerLeft() / 1000)}s`;
-              }
-            }
-          }, 100);
-        },
-        willClose: () => {
-          clearInterval(timerInterval);
-        }
-      });
-
-      const response = await post('/criar', postData);
-      // const response = await post('/criar-promocoes-ativas-subGrupo-produto', postData);
 
       Swal.fire({
         position: 'center',
         icon: 'success',
-        title: 'Cadastro realizado com sucesso!',
+        title: totalLotes > 1
+          ? `Cadastro realizado com sucesso! (${totalLotes} lotes enviados)`
+          : 'Cadastro realizado com sucesso!',
         customClass: {
           container: 'custom-swal',
         },
         showConfirmButton: false,
-        timer: 5000,
+        timer: 1500,
+      }).then(() => {
+        window.location.reload();
       });
 
       return response.data;
@@ -1736,86 +1304,11 @@ export const useCreatePromocaoAtiva = ({ }) => {
           container: 'custom-swal',
         },
         showConfirmButton: false,
-        timer: 5000,
+        timer: 3000,
       });
       return null;
     }
   };
-
-  const handleSalvarMecanica = async () => {
-    // if(optionsModulos[0]?.ALTERAR == 'False') {
-    //     Swal.fire({
-    //     title: 'Acesso Negado',
-    //     text: 'Você não tem permissão para acessar esta funcionalidade.',
-    //     icon: 'warning',
-    //     timer: 3000,
-    //     customClass: {
-    //         container: 'custom-swal',
-    //     }
-    //     })
-    //     return;
-    // }
-    const putData = {
-      DESCRICAO: mecanicaSelecionadaEdicao,
-      APLICACAODESTINO: aplicacaoDestinoSelecionada,
-      MECANICA: mecanicaSelecionada,
-      TIPODESCONTO: tipoDescontoSelecionado
-    }
-
-    try {
-      const response = await post('/criar-mecanica', putData)
-
-      const textDados = JSON.stringify(putData)
-      let textoFuncao = 'PROMOÇÃO/CRIANDO UM NOVA MECÂNICA';
-      const ipUsuario = await getIPUsuario();
-      const postData = {
-        IDFUNCIONARIO: String(usuarioLogado.id),
-        PATHFUNCAO: textoFuncao,
-        DADOS: textDados,
-        IP: ipUsuario
-      }
-
-      Swal.fire({
-        title: 'Sucesso',
-        text: `Mecânica ${mecanicaSelecionadaEdicao} criada com sucesso!`,
-        icon: 'success',
-        timer: 3000,
-        customClass: {
-          container: 'custom-swal',
-        }
-      })
-
-      const responsePost = await post('/log-web', postData)
-      refetchMecanica();
-      return response.data;
-
-    } catch (error) {
-
-      let textoFuncao = 'PROMOÇÃO/ERRO AO CRIAR UMA NOVA MECÂNICA';
-      const ipUsuario = await getIPUsuario();
-      const postData = {
-        IDFUNCIONARIO: String(usuarioLogado.id),
-        PATHFUNCAO: textoFuncao,
-        DADOS: 'Erro ao criar mecânica',
-        IP: ipUsuario
-      }
-
-      const responsePost = await post('/log-web', postData)
-
-      Swal.fire({
-        title: 'Erro',
-        text: `Erro ao Tentar criar a mecânica ${mecanicaSelecionadaEdicao}. Verifique os dados e tente novamente.`,
-        icon: 'error',
-        timer: 3000,
-        customClass: {
-          container: 'custom-swal',
-        }
-      })
-
-      return responsePost.data;
-    }
-
-  }
 
   return {
     mecanicaSelecionada,
@@ -1868,6 +1361,7 @@ export const useCreatePromocaoAtiva = ({ }) => {
     optionsMarcas,
     optionsEmpresas,
     optionsMecanica,
+    optionsMecanicaCompleta,
     dadosMecanicas,
     mostrarProdutosSelecionados,
     handleFileUpload,
@@ -1882,7 +1376,6 @@ export const useCreatePromocaoAtiva = ({ }) => {
     setBtnSalvar,
     ipUsuario,
     usuarioLogado,
-    handleSalvarMecanica,
     onSubmit,
     dadosProdutosPesquisa,
     handlePesquisarProdutoOrigem,
@@ -1918,16 +1411,16 @@ export const useCreatePromocaoAtiva = ({ }) => {
     mostrarProdutosSelecionadosOrigem,
     mostrarProdutosSelecionadosDestino,
     modalDocumentacao,
-    modalPodutoSelecionadoDestinoCSV, 
+    modalPodutoSelecionadoDestinoCSV,
     setModalPodutoSelecionadoDestinoCSV,
-    modalPodutoSelecionadoOrigemCSV, 
+    modalPodutoSelecionadoOrigemCSV,
     setModalPodutoSelecionadoOrigemCSV,
     setModalDocumentacao,
-    isCheckedGrupo, 
+    isCheckedGrupo,
     setIsCheckedGrupo,
     isCheckedProduto,
     setIsCheckedProduto,
-    isCheckedGrupoProduto, 
+    isCheckedGrupoProduto,
     setIsCheckedGrupoProduto,
     produtoSelecionadoEstProdDestino,
     setProdutoSelecionadoEstProdutoDestino,
@@ -1949,88 +1442,9 @@ export const useCreatePromocaoAtiva = ({ }) => {
     setSubGrupoDestino,
     subGrupoOrigem,
     setSubGrupoOrigem,
-
-    produtosSubGrupoDestino,
-    setProdutosSubGrupoDestino,
-    produtosSubGrupoOrigem,
-    setProdutosSubGrupoOrigem,
+    tipoPromocao, 
+    setTipoPromocao,
     downloadPlanilhaModelo,
-    onSubmitEstrutura,
-    onSubmitEstruturaProduto
   }
 }
-/*
- esta arvore dados acho que seria o ideal pois assim aconteceria o insert de cada objeto por vez, 
- tanto para destino como para origem, veja o que você acha desta abordagem ? 
-  sendo que os campos apesar de estarem no objeto principal do resumoPromocao e não nos destalhes 
-  a lógica deles depende de como estão os detahes 
-  se for só por grupo
-    STESTRUTURA: "True",
-    STESTRUTURAPRODUTO: "False",
-    STPRODUTO: "False",
-  se for por produto
-    STESTRUTURA: "False",
-    STESTRUTURAPRODUTO: "False",
-    STPRODUTO: "True",
-  se for por estrutura e produto
-    STESTRUTURA: "True",
-    STESTRUTURAPRODUTO: "True",
-    STPRODUTO: "True"
-*/
 
-{
-  [ 
-    {
-        "IDGRUPOEMDESTINO": -1, 
-        "IDSUBGRUPOEMDESTINO": -1,
-        "IDMARCAEMDESTINO": -1, 
-        "IDFORNECEDOREMDESTINO": -1, 
-        "IDPRODUTODESTINO": [
-            11796,
-            11797,
-            11798
-        ],
-        "STDETPROMODESTINO": "True"
-    },
-  ]
-  [ 
-    {
-      "IDGRUPOEMDESTINO": -1, 
-      "IDSUBGRUPOEMDESTINO": 172,
-      "IDMARCAEMDESTINO": -1, 
-      "IDFORNECEDOREMDESTINO": -1, 
-      "IDPRODUTODESTINO": null,
-      "STDETPROMODESTINO": "True"
-    },
-  ]
-  [ 
-    {
-      "IDGRUPOEMDESTINO": -1, 
-      "IDSUBGRUPOEMDESTINO": 172,
-      "IDMARCAEMDESTINO": -1, 
-      "IDFORNECEDOREMDESTINO": -1, 
-      "IDPRODUTODESTINO": [
-        11796,
-        11797,
-        11798
-      ],
-      "STDETPROMODESTINO": "True"
-    },
-  ]
-  
-    "TPAPARTIRDE": 0,
-    "TPAPLICADOA": 2,
-    "TPFATORPROMO": 2,
-    "APARTIRDEQTD": 1,
-    "APARTIRDOVLR": 0,
-    "FATORPROMOVLR": 0,
-    "FATORPROMOPERC": 10,
-    "VLPRECOPRODUTO": 0,
-    "DTHORAINICIO": "2026-04-20",
-    "DTHORAFIM": "2026-05-20 23:59:59",
-    "DSPROMOCAOMARKETING": "teste",
-    "IDEMPRESA": [
-        54
-    ],
-    "STATIVO": "True",
-}

@@ -21,11 +21,18 @@ import { FaDownload } from "react-icons/fa6";
 import { ActionEstruturaProdutoOrigemModal } from "./ActionProdutoEstruturaOrigem/actionEstruturaProdutoOrigemModal";
 import { ActionEstruturaProdutoDestinoModal } from "./ActionProdutoEstruturaDestino/actionEstruturaProdutoDestinoModal";
 import { useQuery } from "react-query";
-import { animacaoCarregamento,fecharAnimacaoCarregamento } from "../../../utils/animationCarregamento";
+import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../utils/animationCarregamento";
 import { get } from "../../../api/funcRequest";
 
 
-export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, actionEditarVisivel, setActionEditarVisivel }) => {
+export const ActionEditarPromocaoAtiva = ({ 
+  dadosPromocao, 
+  handleClickIncluir, 
+  actionEditarVisivel, 
+  setActionEditarVisivel,
+  usuarioLogado,
+  optionsModulos 
+}) => {
 
   const {
     mecanicaSelecionada,
@@ -87,6 +94,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
     optionsMarcas,
     optionsEmpresas,
     optionsMecanica,
+    optionsMecanicaCompleta,
     dadosMecanicas,
     mecanicaSelecionadaEdicao,
     setMecanicaSelecionadaEdicao,
@@ -162,14 +170,15 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
     setSubGrupoDestino,
     subGrupoOrigem,
     setSubGrupoOrigem,
-    grupoSelecionadoOrigem, 
+    grupoSelecionadoOrigem,
     setGrupoSelecionadoOrigem,
     grupoSelecionadoDestino,
     setGrupoSelecionadoDestino,
+    tipoPromocao, setTipoPromocao,
     downloadPlanilhaModelo,
     onSubmitEstrutura,
     onSubmitEstruturaProduto
-  } = useUpdatePromocaoAtiva({ dadosPromocao });
+  } = useUpdatePromocaoAtiva({ dadosPromocao, usuarioLogado, optionsModulos });
 
   const customStyles = {
     option: (provided, state) => ({
@@ -183,50 +192,52 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
   };
 
   const handleChangeMecanica = useCallback((selectedValue) => {
-    const selectedOption = dadosMecanicas.find(option => option.ID == selectedValue);
 
-    if (selectedOption) {
-      setMecanicaSelecionada(selectedOption.ID);
-      setMecanicaSelecionadaEdicao(selectedOption.DESCRICAO)
-      setAplicacaoDestinoSelecionada(selectedOption.APLICAODESTINO);
-      setTipoDescontoSelecionado(selectedOption.TIPODESCONTO);
+    if (selectedValue) {
+      setTipoPromocao(selectedValue?.value)
+      setMecanicaSelecionada(selectedValue.value);
+      setMecanicaSelecionadaEdicao(selectedValue.label)
+      setAplicacaoDestinoSelecionada(selectedValue.aplicacaoDestino);
+      setTipoDescontoSelecionado(selectedValue.tipoDesconto);
+     
     } else {
       console.log('Nenhuma opção encontrada para o valor:', selectedValue);
     }
-  }, [mecanicaSelecionada, mecanicaSelecionadaEdicao, setMecanicaSelecionada, setAplicacaoDestinoSelecionada, setTipoDescontoSelecionado,]);
+  }, [optionsMecanicaCompleta]);
 
-  // useEffect(() => {
-  //   if (tipoDescontoSelecionado == 0) {
-  //     setVrDesconto(0);
-  //     // setValorInicio(0);
-  //     if (!dadosPromocao[0]?.FATORPROMOVLR) {
-  //       setVrDesconto(0);
-  //     }
-  //     if (!dadosPromocao[0]?.FATORPROMOPERC) {
-  //       setPorcentoDesconto(0);
-  //     }
-  //   } else if (tipoDescontoSelecionado == 1) {
-  //     if (!dadosPromocao[0]?.FATORPROMOPERC) {
-  //       setPorcentoDesconto(0);
-  //     }
-  //     setPrecoProduto(0);
-  //     // setValorInicio(0);
-  //   } else if (tipoDescontoSelecionado == 2) {
-  //     setVrDesconto(0);
-  //     setPrecoProduto(0);
-  //     // setValorInicio(0);
-  //   }
 
-  // }, [mecanicaSelecionada, tipoDescontoSelecionado, setPrecoProduto, setVrDesconto, setValorInicio, setPorcentoDesconto]);
+  useEffect(() => {
+    if (tipoDescontoSelecionado == 0) {
+      // setVrDesconto(0);
+      // setValorInicio(0);
+      if (!dadosPromocao[0]?.FATORPROMOVLR) {
+        setVrDesconto(0);
+      }
+      if (!dadosPromocao[0]?.FATORPROMOPERC) {
+        setPorcentoDesconto(0);
+      }
+    } else if (tipoDescontoSelecionado == 1) {
+      if (!dadosPromocao[0]?.FATORPROMOPERC) {
+        setPorcentoDesconto(0);
+      }
+      setPrecoProduto(0);
+      // setValorInicio(0);
+    } else if (tipoDescontoSelecionado == 2) {
+      setVrDesconto(0);
+      setPrecoProduto(0);
+      // setValorInicio(0);
+    }
+
+  }, [mecanicaSelecionada, tipoDescontoSelecionado, setPrecoProduto, setVrDesconto,  setPorcentoDesconto]);
 
   const handleCadastrar = () => {
     onSubmit();
   }
 
   const mecanicaInicial = useMemo(() => {
-    if (dadosPromocao && dadosPromocao[0] && optionsMecanica.length > 0) {
+    if (dadosPromocao && dadosPromocao[0] && optionsMecanicaCompleta.length > 0) {
       const promocao = dadosPromocao[0];
-      const mecanicaEncontrada = optionsMecanica.find(mecanica =>
+      const mecanicaEncontrada = optionsMecanicaCompleta.find(mecanica =>
         mecanica.aplicacaoDestino == promocao.TPAPARTIRDE &&
         mecanica.mecanica == promocao.TPAPLICADOA &&
         mecanica.tipoDesconto == promocao.TPFATORPROMO
@@ -239,21 +250,23 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
 
 
   const mecanicaCorrespondente = useMemo(() => {
-    if (mecanicaInicial && dadosMecanicas.length > 0) {
-      const mecanica = dadosMecanicas.find(m => {
-        const mecanicaOriginal = optionsMecanica.find(opt => opt.value === mecanicaInicial);
+    if (mecanicaInicial && optionsMecanicaCompleta.length > 0) {
+      const mecanica = optionsMecanicaCompleta.find(m => {
+        const mecanicaOriginal = optionsMecanicaCompleta.find(opt => opt.value === mecanicaInicial);
+
         return mecanicaOriginal &&
-          m.MECANICA === mecanicaOriginal.mecanica &&
-          m.APLICACAODESTINO === mecanicaOriginal.aplicacaoDestino &&
-          m.TIPODESCONTO === mecanicaOriginal.tipoDesconto;
+          m.mecanica === mecanicaOriginal.mecanica &&
+          m.aplicacaoDestino === mecanicaOriginal.aplicacaoDestino &&
+          m.tipoDesconto === mecanicaOriginal.tipoDesconto;
       });
+
 
       if (mecanica) {
         if (!mecanicaSelecionada) {
-          setMecanicaSelecionada(mecanica.ID);
-          setMecanicaSelecionadaEdicao(mecanica.DESCRICAO);
-          setAplicacaoDestinoSelecionada(mecanica.APLICACAODESTINO);
-          setTipoDescontoSelecionado(mecanica.TIPODESCONTO);
+          setMecanicaSelecionada(mecanica.value);
+          setMecanicaSelecionadaEdicao(mecanica.label);
+          setAplicacaoDestinoSelecionada(mecanica.aplicacaoDestino);
+          setTipoDescontoSelecionado(mecanica.tipoDesconto);
         }
         return mecanica;
       }
@@ -262,24 +275,25 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
   }, [mecanicaInicial, dadosMecanicas, optionsMecanica]);
 
   const valorSelecionado = useMemo(() => {
-    if (mecanicaSelecionada && dadosMecanicas.length > 0) {
-      const mecanica = dadosMecanicas.find(item => item.ID === mecanicaSelecionada);
+    if (mecanicaSelecionada && optionsMecanicaCompleta.length > 0) {
+      const mecanica = optionsMecanicaCompleta.find(item => item.value === mecanicaSelecionada);
       return mecanica ? {
-        value: mecanica.ID,
-        label: mecanica.DESCRICAO,
-        APLICAODESTINO: mecanica.APLICACAODESTINO,
-        TIPODESCONTO: mecanica.TIPODESCONTO
+        value: mecanica.value,
+        label:` ${mecanica.value} - ${mecanica.label}`,
+        APLICAODESTINO: mecanica.aplicacaoDestino,
+        TIPODESCONTO: mecanica.tipoDesconto
       } : null;
     }
+
     return null;
-  }, [mecanicaSelecionada, dadosMecanicas]);
+  }, [mecanicaSelecionada, optionsMecanicaCompleta]);
 
   useEffect(() => {
     if (mecanicaCorrespondente) {
-      setMecanicaSelecionada(mecanicaCorrespondente.ID);
-      setMecanicaSelecionadaEdicao(mecanicaCorrespondente.DESCRICAO);
-      setAplicacaoDestinoSelecionada(mecanicaCorrespondente.APLICACAODESTINO);
-      setTipoDescontoSelecionado(mecanicaCorrespondente.TIPODESCONTO);
+      setMecanicaSelecionada(mecanicaCorrespondente.value);
+      setMecanicaSelecionadaEdicao(mecanicaCorrespondente.label);
+      setAplicacaoDestinoSelecionada(mecanicaCorrespondente.aplicacaoDestino);
+      setTipoDescontoSelecionado(mecanicaCorrespondente.tipoDesconto);
     }
 
   }, [mecanicaCorrespondente]);
@@ -301,14 +315,11 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
       if (Array.isArray(marcaSelecionada)) {
         filtradas = empresasArray.filter(empresa =>
           marcaSelecionada.map(String).includes(String(empresa.IDGRUPOEMPRESARIAL))
-
         );
-
       } else {
         filtradas = empresasArray.filter(empresa =>
           String(empresa.IDGRUPOEMPRESARIAL) === String(marcaSelecionada)
         );
-
       }
     }
 
@@ -320,7 +331,6 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
         status: emp.STATIVO
       }));
     }
-
 
     return filtradas.map(emp => ({
       ...emp,
@@ -427,7 +437,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
       selectionDestino[`subgrupo_${id}`] = {
         checked: true
       };
-      
+
       const grupoPai = encontrarGrupoPai(id);
       if (grupoPai) {
         gruposDestinoParaSelecionar.add(grupoPai);
@@ -439,7 +449,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
       selectionOrigem[`subgrupo_${id}`] = {
         checked: true
       };
-      
+
       const grupoPai = encontrarGrupoPai(id);
       if (grupoPai) {
         gruposOrigemParaSelecionar.add(grupoPai);
@@ -478,7 +488,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
   const handleTreeSelectOrigemChange = (e) => {
     setSelectedNodesOrigem(e.value);
     const subgrupos = Object.keys(e.value)
-      .filter(key => key.startsWith("subgrupo_"))      .map(key => key.replace("subgrupo_", ""));
+      .filter(key => key.startsWith("subgrupo_")).map(key => key.replace("subgrupo_", ""));
     setSubGrupoOrigem(subgrupos); // 🔥 ESSENCIAL
   };
 
@@ -505,7 +515,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
     setGrupoSelecionado(selectedGrupo);
     setSubGrupoOrigem(selectedSubGrupo);
     setSubGrupoProdutoOrigem(selectedSubGrupo);
-    
+
     // if (subGrupoOrigem.length > 0) {
     //   refetchProdutoSubGrupoOrigem();
     // }
@@ -539,84 +549,84 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
     // }
   };
 
-    const fetchProdutoSubGrupoDestino = async () => {
-      const urlBase = `/produto-subGrupo?idSubGrupo=${subGrupoDestino.join(',')}`;
-      let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
-      urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
-      try {
-        animacaoCarregamento('Carregando dados...', true);
-  
-        const primeiraPagina = 1;
-        const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
-        const page = primeiraResposta.page || primeiraPagina;
-        const pageSize = primeiraResposta.pageSize || 1000;
-        const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
-        const totalPages = Math.ceil(totalRows / pageSize);
-  
-        let allData = [...(primeiraResposta.data || [])];
-  
-        if (totalPages > 1) {
-          for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
-            animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
-            const responsePage = await get(`${urlApi}&page=${currentPage}`);
-            allData.push(...(responsePage.data || []));
-          }
+  const fetchProdutoSubGrupoDestino = async () => {
+    const urlBase = `/produto-subGrupo?idSubGrupo=${subGrupoProdutoDestino.join(',')}`;
+    let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
+    urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+    try {
+      animacaoCarregamento('Carregando dados...', true);
+
+      const primeiraPagina = 1;
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const page = primeiraResposta.page || primeiraPagina;
+      const pageSize = primeiraResposta.pageSize || 1000;
+      const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
+      const totalPages = Math.ceil(totalRows / pageSize);
+
+      let allData = [...(primeiraResposta.data || [])];
+
+      if (totalPages > 1) {
+        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          allData.push(...(responsePage.data || []));
         }
-  
-        return allData;
-      } catch (error) {
-        console.error('Erro ao buscar dados da api:', error);
-        throw error;
-      } finally {
-        fecharAnimacaoCarregamento();
       }
-    };
-    
-    const { data: dadosProdutoSubGrupoDestino = [], error: errorProdutoSubGrupoDestino, isLoading: isLoadingProdutoSubGrupoDestino, refetch: refetchProdutoSubGrupoDestino } = useQuery(
-      ['produto-subGrupo', subGrupoDestino],
-      async () => fetchProdutoSubGrupoDestino(),
-      { enabled: Boolean(subGrupoDestino.length), staleTime: 1000 * 60 * 60, cacheTime: 1000 * 60 * 60, }
-    );
-  
-    const fetchProdutoSubGrupoOrigem = async () => {
-      const urlBase = `/produto-subGrupo?idSubGrupo=${subGrupoOrigem.join(',')}`;
-      let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
-      urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
-      try {
-        animacaoCarregamento('Carregando dados...', true);
-  
-        const primeiraPagina = 1;
-        const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
-        const page = primeiraResposta.page || primeiraPagina;
-        const pageSize = primeiraResposta.pageSize || 1000;
-        const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
-        const totalPages = Math.ceil(totalRows / pageSize);
-  
-        let allData = [...(primeiraResposta.data || [])];
-  
-        if (totalPages > 1) {
-          for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
-            animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
-            const responsePage = await get(`${urlApi}&page=${currentPage}`);
-            allData.push(...(responsePage.data || []));
-          }
+
+      return allData;
+    } catch (error) {
+      console.error('Erro ao buscar dados da api:', error);
+      throw error;
+    } finally {
+      fecharAnimacaoCarregamento();
+    }
+  };
+
+  const { data: dadosProdutoSubGrupoDestino = [], error: errorProdutoSubGrupoDestino, isLoading: isLoadingProdutoSubGrupoDestino, refetch: refetchProdutoSubGrupoDestino } = useQuery(
+    ['produto-subGrupo-destino', subGrupoProdutoDestino],
+    async () => fetchProdutoSubGrupoDestino(),
+    { enabled: Boolean(subGrupoProdutoDestino.length), staleTime: 1000 * 60 * 60, cacheTime: 1000 * 60 * 60, }
+  );
+
+  const fetchProdutoSubGrupoOrigem = async () => {
+    const urlBase = `/produto-subGrupo?idSubGrupo=${subGrupoProdutoOrigem.join(',')}`;
+    let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
+    urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+    try {
+      animacaoCarregamento('Carregando dados...', true);
+
+      const primeiraPagina = 1;
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
+      const page = primeiraResposta.page || primeiraPagina;
+      const pageSize = primeiraResposta.pageSize || 1000;
+      const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
+      const totalPages = Math.ceil(totalRows / pageSize);
+
+      let allData = [...(primeiraResposta.data || [])];
+
+      if (totalPages > 1) {
+        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`);
+          allData.push(...(responsePage.data || []));
         }
-  
-        return allData;
-      } catch (error) {
-        console.error('Erro ao buscar dados da api:', error);
-        throw error;
-      } finally {
-        fecharAnimacaoCarregamento();
       }
-    };
-  
-    const { data: dadosProdutoSubGrupoOrigem = [], error: errorProdutoSubGrupoOrigem, isLoading: isLoadingProdutoSubGrupoOrigem, refetch: refetchProdutoSubGrupoOrigem } = useQuery(
-      ['produto-subGrupo', subGrupoOrigem],
-      async () => fetchProdutoSubGrupoOrigem(),
-      { enabled: Boolean(subGrupoOrigem.length), staleTime: 1000 * 60 * 60, cacheTime: 1000 * 60 * 60, }
-    );
-  
+
+      return allData;
+    } catch (error) {
+      console.error('Erro ao buscar dados da api:', error);
+      throw error;
+    } finally {
+      fecharAnimacaoCarregamento();
+    }
+  };
+
+  const { data: dadosProdutoSubGrupoOrigem = [], error: errorProdutoSubGrupoOrigem, isLoading: isLoadingProdutoSubGrupoOrigem, refetch: refetchProdutoSubGrupoOrigem } = useQuery(
+    ['produto-subGrupo-origem', subGrupoProdutoOrigem],
+    async () => fetchProdutoSubGrupoOrigem(),
+    { enabled: Boolean(subGrupoProdutoOrigem.length), staleTime: 1000 * 60 * 60, cacheTime: 1000 * 60 * 60, }
+  );
+
   const handleChangeGrupo = (e) => {
     const checked = e.checked;
     setIsCheckedGrupo(checked);
@@ -652,9 +662,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
     setModalEstProdOrigem(true);
   }
 
-  console.log(isCheckedGrupo ,'grupo' )
-  console.log(isCheckedProduto, 'produto' )
-  console.log(isCheckedGrupoProduto, 'grupo produto' )
+
   return (
     <Fragment>
 
@@ -665,13 +673,13 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
 
         InputSelectMecanicaComponent={InputSelectActionPromocao}
         labelSelectMecanica={"Mecanica"}
-        optionsMecanica={dadosMecanicas.map((item) => ({
-          value: item.ID,
-          label: item.DESCRICAO,
-          APLICACAODESTINO: item.APLICACAODESTINO,
-          TIPODESCONTO: item.TIPODESCONTO
+        optionsMecanica={optionsMecanicaCompleta?.map((item) => ({
+          value: item.value,
+          label: `${item.value} - ${item.label}`,
+          APLICACAODESTINO: item.aplicacaoDestino,
+          TIPODESCONTO: item.tipoDesconto
         }))}
-        onChangeSelectMecanica={(e) => handleChangeMecanica(e.value)}
+        onChangeSelectMecanica={(e) => handleChangeMecanica(e)}
         styleMecanica={customStyles}
         defaultValueSelectMecanica={valorSelecionado}
         valueSelectMecanica={valorSelecionado}
@@ -862,7 +870,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
         onButtonClickProdutoEstruturaDestino={mostrarModalEstruturaDestino}
         corProdutoEstruturaDestino={"info"}
         IconProdutoEstruturaDestino={GrView}
-        
+
         InputGrupoEstrutura={InputFieldActionRadio}
         labelInputGrupoEstrutura={"Estrutura Mercadológica"}
         valueInputGrupoEstrutura={isCheckedGrupo}
@@ -885,7 +893,7 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
         styleEstrutura={{ display: isCheckedGrupo ? 'block' : 'none' }}
         styleEstruturaProduto={{ display: isCheckedGrupoProduto ? 'block' : 'none' }}
 
-       
+
         InputFieldProdutoOigem={InputFieldAction}
         labelInputFieldProdutoOigem={"Produto Origem"}
         valueInputFieldProdutoOigem={produtoOrigem}
@@ -973,14 +981,14 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
         corSearch={"primary"}
         IconSearch={IoIosSend}
         styleButtonSearch={isCheckedProduto ? false : true}
-        
+
         ButtonTypeEstruturaProduto={ButtonType}
         linkEstruturaProduto={"Atualizar Por Estrutura / Produto"}
         onButtonClickEstruturaProduto={onSubmitEstruturaProduto}
         corEstruturaProduto={"success"}
         IconEstruturaProduto={IoIosSend}
         disabledBTEstruturaProduto={isCheckedGrupoProduto ? false : true}
-        
+
         ButtonTypePedido={ButtonType}
         linkPedido={"Atualizar Por Estrutura"}
         onButtonClickPedido={handleCadastrarEstrutura}
@@ -997,7 +1005,13 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
         IconVisualizarProduto={GrView}
         readOnlyVisualizarProduto={isCheckedGrupo ? true : false}
 
-        
+        ButtonTypeVisualizarSubGrupo={ButtonType}
+        linkNomeVisualizarSubGrupo={"Visualizar Sub Grupo"}
+        // onButtonClickVisualizarSubGrupo
+        corVisualizarSubGrupo={"primary"}
+        IconVisualizarSubGrupo={GrView}
+        readOnlyVisualizarSubGrupo={isCheckedGrupoProduto ? true : false}
+
         ButtonTypeTXT={ButtonType}
         linkTXT={"Documentação"}
         onButtonClickTXT={mostrarDocumentacao}
@@ -1015,9 +1029,8 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
         corDownload={"success"}
         onButtonClickDownload={downloadPlanilhaModelo}
         IconDownload={FaDownload}
-
       />
-    
+
       <ActionProdutoDestinoModal
         show={modalProdutoDestino}
         handleClose={() => setModalProdutoDestino(false)}
@@ -1090,9 +1103,9 @@ export const ActionEditarPromocaoAtiva = ({ dadosPromocao, handleClickIncluir, a
         setProdutoSelecionadoEstProdutoOrigem={setProdutoSelecionadoEstProdutoOrigem}
         novoProdutoEstProdOrigem={novoProdutoEstProdOrigem}
         setNovoProdutoEstProdOrigem={setNovoProdutoEstProdOrigem}
-      />  
+      />
 
-      <ActionEstruturaProdutoDestinoModal 
+      <ActionEstruturaProdutoDestinoModal
         show={modalEstProdDestino}
         handleClose={() => setModalEstProdDestino(false)}
         dadosProdutoSubGrupoDestino={dadosProdutoSubGrupoDestino}

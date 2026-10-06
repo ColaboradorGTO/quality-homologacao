@@ -1,7 +1,6 @@
 import { Fragment, useEffect, useState } from "react"
 import { ButtonType } from "../../../../Buttons/ButtonType";
-import { MdContentCopy, MdMenu, MdMonetizationOn, MdOutlineCheck, MdOutlineCopyAll, MdOutlineEdit, MdOutlineKeyboardReturn, MdOutlinePayment, MdOutlinePictureAsPdf, MdOutlineSend, MdOutlineVisibility } from "react-icons/md";
-import { ResultadoResumo } from "../../../../ResultadoResumo/ResultadoResumo";
+import { MdContentCopy, MdMenu, MdMonetizationOn, MdOutlineCheck, MdOutlineCopyAll, MdOutlineEdit, MdOutlineKeyboardReturn, MdOutlinePayment, MdOutlinePictureAsPdf, MdOutlineSend, MdOutlineVisibility, MdLockOpen } from "react-icons/md";
 import { formatMoeda } from "../../../../../utils/formatMoeda";
 import { toFloat } from "../../../../../utils/toFloat";
 import { ActionMainNovoPedido } from "../../../../Actions/ActionMainNovoPedido";
@@ -20,6 +19,9 @@ import { get } from "../../../../../api/funcRequest";
 import { ActionPDFPedido } from "../../ActionNovoPedido/ActionPDF/actionPDFPedido";
 import { GrDocumentTxt } from "react-icons/gr";
 import Swal from "sweetalert2";
+import { ActionListaProdutosCriados } from "../actionListaProdutosCriados";
+import { SiSap } from "react-icons/si";
+
 
 export const ActionEditarPedido = ({
   usuarioLogado,
@@ -76,8 +78,10 @@ export const ActionEditarPedido = ({
     setFreteSelecionado,
     modalPedidoNota,
     setModalPedidoNota,
-    modalPedidoNotaSemPreco,
-    setModalPedidoNotaSemPreco,
+    tabelaCadastroProduto,
+    setTabelaCadastroProduto,
+    tabelaVisivel,
+    setTabelaVisivel,
     dataPesquisaFim,
     setDataPesquisaFim,
     dataPesquisaInicio,
@@ -98,8 +102,6 @@ export const ActionEditarPedido = ({
     qtdProdutos,
     setTituloSubheader,
     tituloSubheader,
-    setDadosDetalheProdutoPedido,
-    dadosDetalheProdutoPedido, 
     setCamposHabilitados,
     camposHabilitados, 
     setActionPesquisarNovoPedido,
@@ -108,43 +110,23 @@ export const ActionEditarPedido = ({
     checkboxIntermediario, 
     setBotoesVisiveis,
     botoesVisiveis, 
-    setDadosProdutosPedido,
-    dadosProdutosPedido, 
-    setBtnIncluir,
-    btnIncluir,
-    setBtnSalvar,
-    btnSalvar,
-    setBtnFechar,
-    btnFechar,
-    setBtnClonar,
-    btnClonar,
-    setBtnClonarCabecalho,
-    btnClonarCabecalho,
-    setBtnNovoPedido,
     dadosFornecedores,
     dadosComprador,
     dadosMarcas,
     dadosPagamentos,
     dadosTransportador,
-    dadosDetalhe, 
     dadosDetalhesPedidos,
-    dadosProdutosPedidos,
-    verificaDadosDoFornecedorSelecionado,
-    pendenciasFornecedor,
-    onIncluirProdutoPedido,
-    clonarCabecalho,
-    handleClonarCabecalhoPedido,
-    handleSalvarPedido,
-    handleClonarPedido,
-    handleIncluir,
+    dadosListaProdutosCriados,
     dadosUltimosPedidos,
-    dadosCabecalhoClonado,
-    handleFecharPedido,
     refetchListaCadastroProdutoPedidos,
     handleFinalizarCadastroPedido,
     refetchListaPedidosVisualizar,
-    dadosPedidos
-  } = useIncluirProutoPedido({ 
+    dadosPedidos,
+    handleEnviarAjustePedidoCompras,
+    handleMigrarPedidoSap,
+    handleAtualizarPedidoSap,
+    handleMudarStatusParaAjusteQuandoPedidoMigrado
+  } = useIncluirProutoPedido({
     usuarioLogado, 
     optionsModulos, 
     dadosVisualizarPedido, 
@@ -152,80 +134,62 @@ export const ActionEditarPedido = ({
     dadosDetalhePedido,
     refetchListaPedidos 
   });
- 
-  // const [dadosDetalheProdutoPedido, setDadosDetalheProdutoPedido] = useState([]);
-  // const [botoesVisiveis, setBotoesVisiveis] = useState({
-  //   incluir: false,
-  //   fechar: false,
-  //   salvar: false,
-  //   clonar: false,
-  //   clonarCabecalho: false,
-  //   novoPedido: true
-  // });
-  // const [actionPesquisarNovoPedido, setActionPesquisarNovoPedido] = useState(false);
-  // const [camposHabilitados, setCamposHabilitados] = useState(false);
-  // const [tituloSubheader, setTituloSubheader] = useState('');
-  // const [checkboxIntermediario, setCheckboxIntermediario] = useState({
-  //   disabled: false,
-  //   checked: false
-  // });
 
   
   useEffect(() => {
-      if (!dadosVisualizarPedido || !Array.isArray(dadosVisualizarPedido) || dadosVisualizarPedido.length === 0) {
-        return;
-      }
+    if (!dadosVisualizarPedido || !Array.isArray(dadosVisualizarPedido) || dadosVisualizarPedido.length === 0) {
+      return;
+    }
 
-      // Mesma lógica de retornoPreencherCabecalhoPedido (functionCadastro.js):
-      // esta tela é a "Cadastro dos Produtos do Pedido", cujos andamentos válidos são 4, 5, 16 e 17.
-      const dados = dadosVisualizarPedido[0];
-      const idsAndamentos = [4, 5, 16, 17];
+    const dados = dadosVisualizarPedido[0];
+    const idsAndamentos = [4, 5, 16, 17];
 
-      const idResumoPedidoAtual = String(dados?.IDPEDIDO || '');
-      const IdAndamentoPedido = Number(dados?.IDANDAMENTO) || '';
-      let DsSetorAndamentoPedido = String(dados?.DSSETOR || '');
-      const StCancelaPedido = String(dados?.STCANCELADO || 'False');
-      const stMigradoSap = dados?.STMIGRADOSAP == 'True';
-      const idPedidoPrimarioAtual = parseInt(dados?.IDPEDIDOPRIMARIO || '0', 10);
-      const isPedidoPrimario = dados?.STPEDIDOPRIMARIO == 'True';
-      const isPedidoSecundario = idPedidoPrimarioAtual > 0;
-      const isPedidoRN = isPedidoPrimario || isPedidoSecundario;
+    const idResumoPedidoAtual = String(dados?.IDPEDIDO || '');
+    const IdAndamentoPedido = Number(dados?.IDANDAMENTO) || '';
+    let DsSetorAndamentoPedido = String(dados?.DSSETOR || '');
+    const StCancelaPedido = String(dados?.STCANCELADO || 'False');
+    const stMigradoSap = dados?.STMIGRADOSAP == 'True';
+    const idPedidoPrimarioAtual = parseInt(dados?.IDPEDIDOPRIMARIO || '0', 10);
+    const isPedidoPrimario = dados?.STPEDIDOPRIMARIO == 'True';
+    const isPedidoSecundario = idPedidoPrimarioAtual > 0;
+    const isPedidoRN = isPedidoPrimario || isPedidoSecundario;
 
-      const stPermitirFecharPedido = !isPedidoSecundario && (IdAndamentoPedido === 4 || IdAndamentoPedido === 16);
-      const stPermitirMigrarPedidoSAP = !isPedidoSecundario && !stMigradoSap && IdAndamentoPedido === 5;
-      const stPermitirAtualizarPedidoSAP = !isPedidoSecundario && stMigradoSap && IdAndamentoPedido === 17;
-      const stPermitirMudarStatusParaAjusteQuandoPedidoMigrado = !isPedidoSecundario && stMigradoSap && IdAndamentoPedido === 5;
+    const stPermitirFecharPedido = !isPedidoSecundario && (IdAndamentoPedido === 4 || IdAndamentoPedido === 16);
+    const stPermitirMigrarPedidoSAP = !isPedidoSecundario && !stMigradoSap && IdAndamentoPedido === 5;
+    const stPermitirAtualizarPedidoSAP = !isPedidoSecundario && stMigradoSap && IdAndamentoPedido === 17;
+    const stPermitirMudarStatusParaAjusteQuandoPedidoMigrado = !isPedidoSecundario && stMigradoSap && IdAndamentoPedido === 5;
 
-      if (IdAndamentoPedido === 5) {
-        DsSetorAndamentoPedido = 'Inclusão Finalizada';
-      }
+    if (IdAndamentoPedido === 5) {
+      DsSetorAndamentoPedido = 'Inclusão Finalizada';
+    }
 
-      const dentroDoFluxoDeCadastro = idsAndamentos.includes(IdAndamentoPedido);
+    const dentroDoFluxoDeCadastro = idsAndamentos.includes(IdAndamentoPedido);
+    const stPedidoNaoCancelado = StCancelaPedido !== 'True';
 
-      setBotoesVisiveis({
-        incluir: true,
-        salvar: true,
-        fechar: dentroDoFluxoDeCadastro && stPermitirFecharPedido,
-        novoPedido: dentroDoFluxoDeCadastro && !isPedidoSecundario,
-        clonarCabecalho: StCancelaPedido !== 'True',
-        clonar: StCancelaPedido !== 'True',
-        mudarStatusParaAjuste: dentroDoFluxoDeCadastro && stPermitirMudarStatusParaAjusteQuandoPedidoMigrado,
-        migrarPedidoSAP: dentroDoFluxoDeCadastro && stPermitirMigrarPedidoSAP,
-        atualizarPedidoSAP: dentroDoFluxoDeCadastro && stPermitirAtualizarPedidoSAP,
-      });
+    setBotoesVisiveis({
+      incluir: stPedidoNaoCancelado,
+      salvar: stPedidoNaoCancelado,
+      fechar: stPedidoNaoCancelado && dentroDoFluxoDeCadastro && stPermitirFecharPedido,
+      novoPedido: stPedidoNaoCancelado && dentroDoFluxoDeCadastro && !isPedidoSecundario,
+      clonarCabecalho: stPedidoNaoCancelado,
+      clonar: stPedidoNaoCancelado,
+      mudarStatusParaAjuste: stPedidoNaoCancelado && dentroDoFluxoDeCadastro && stPermitirMudarStatusParaAjusteQuandoPedidoMigrado,
+      migrarPedidoSAP: stPedidoNaoCancelado && dentroDoFluxoDeCadastro && stPermitirMigrarPedidoSAP,
+      atualizarPedidoSAP: stPedidoNaoCancelado && dentroDoFluxoDeCadastro && stPermitirAtualizarPedidoSAP,
+    });
 
-      setTituloSubheader(`Cadastro dos Produtos do Pedido Nº: ${idResumoPedidoAtual} - ${DsSetorAndamentoPedido}`);
+    setTituloSubheader(`Cadastro dos Produtos do Pedido Nº: ${idResumoPedidoAtual} - ${DsSetorAndamentoPedido}`);
 
-      setCamposHabilitados(false);
+    setCamposHabilitados(false);
 
-      setCheckboxIntermediario({
-        disabled: true,
-        checked: isPedidoRN
-      });
+    setCheckboxIntermediario({
+      disabled: true,
+      checked: isPedidoRN
+    });
 
-      setIdPedidoPrimario(idPedidoPrimarioAtual);
+    setIdPedidoPrimario(idPedidoPrimarioAtual);
 
-    }, [dadosVisualizarPedido]);
+  }, [dadosVisualizarPedido]);
 
   // const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
   //   'menus-usuario-excecao',
@@ -247,12 +211,11 @@ export const ActionEditarPedido = ({
         value: dadosVisualizarPedido[0]?.IDCOMPRADOR , 
         label: dadosVisualizarPedido[0]?.NOMECOMPRADOR
       })
-    
-      // setMarcaSelecionada({value: dadosVisualizarPedido[0]?.NOFANTASIA, label: dadosVisualizarPedido[0]?.NOFANTASIA})
+   
       setMarcaSelecionada({
-                value: dadosVisualizarPedido[0]?.NOFANTASIA == 'TO - TESOURA DE OURO' ? 1 : dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL == 'MG - MAGAZINE' ? 2 : dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL == 'YO - YORUS' ? 3 : dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL == 'FC - FREE CENTER' ? 4 : null, 
-                label: dadosVisualizarPedido[0]?.NOFANTASIA
-            })
+        value: dadosVisualizarPedido[0]?.NOFANTASIA == 'TO - TESOURA DE OURO' ? 1 : dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL == 'MG - MAGAZINE' ? 2 : dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL == 'YO - YORUS' ? 3 : dadosDetalhePedido[0]?.IDGRUPOEMPRESARIAL == 'FC - FREE CENTER' ? 4 : null, 
+        label: dadosVisualizarPedido[0]?.NOFANTASIA
+      })
       setFornecedorSelecionado({
         value: dadosVisualizarPedido[0]?.IDFORNECEDOR, 
         label: `${dadosVisualizarPedido[0]?.NOFANTASIAFORNECEDOR} / / ${dadosVisualizarPedido[0]?.CNPJFORN} / / ${dadosVisualizarPedido[0]?.NOFORNECEDOR}`
@@ -293,6 +256,8 @@ export const ActionEditarPedido = ({
         : toFloat(dadosVisualizarPedido[0]?.VRTOTALLIQUIDO);
 
       setTotalLiq(totalLiquidoFinal)
+      setTotalBruto(dadosVisualizarPedido[0]?.VRTOTALBRUTO)
+      setQtdProdutos(toFloat(dadosVisualizarPedido[0]?.QTDTOTPRODUTOS))
     }
   }, [dadosVisualizarPedido, dadosDetalhePedido])
 
@@ -310,9 +275,6 @@ export const ActionEditarPedido = ({
         setActionHome(false)
         setActionPedidoResumido(false)
       }
-      console.log(response.data, 'response.data lista')
-      console.log(dadosVisualizarPedido, 'dadosVisualizarPedido lista')
-      console.log(dadosDetalhePedido, 'dadosDetalhePedido lista')
     } catch (error) {
       console.log(error, "não foi possivel pegar os dados da tabela ")
     }
@@ -321,8 +283,8 @@ export const ActionEditarPedido = ({
   const handleClickCadastroProduto = () => {
 
     refetchListaCadastroProdutoPedidos()
-    // setTabelaCadastroProduto(true)
-    // setTabelaVisivel(false)
+    setTabelaCadastroProduto(true)
+    setTabelaVisivel(false)
   }
 
   const handleClickCadstroPedidoPDF = () => {
@@ -578,7 +540,7 @@ export const ActionEditarPedido = ({
         corSearch={"primary"}
         IconSearch={MdMenu}
         styleSearch={botoesVisiveis.incluir}
-
+ 
         ButtonTypeCadastro={ButtonTypeCompras}
         linkNome={"Prévia Cadastro Produtos"}
         onButtonClickCadastro={handleClickCadastroProduto}
@@ -595,7 +557,7 @@ export const ActionEditarPedido = ({
 
         ButtonTypePedido={ButtonTypeCompras}
         linkPedido={"Enviar Para Ajuste Compras"}
-        onButtonClickPedido={handleVisualizarPedido}
+        onButtonClickPedido={handleEnviarAjustePedidoCompras}
         corPedido={"secondary"}
         IconPedido={MdOutlineSend}
         stylePedido={botoesVisiveis.novoPedido}
@@ -615,13 +577,29 @@ export const ActionEditarPedido = ({
         styleClonar={botoesVisiveis.clonar}
 
         ButtonTypeRetornar={ButtonType}
-        linkRetornar={"Voltar"}
-        onButtonClickRetornar={handleReturn}
-        corRetornar={"danger"}
-        IconRetornar={MdOutlineKeyboardReturn}
-        // styleRetornar
+        linkRetornar={"Migrar Pedido"}
+        onButtonClickRetornar={handleMigrarPedidoSap}
+        corRetornar={"primary"}
+        IconRetornar={SiSap}
+        styleRetornar={botoesVisiveis.migrarPedidoSAP}
+
+        ButtonTypeMigrar={ButtonTypeCompras}
+        linkMigrar={"Desbloquear Itens Para Ajuste"}
+        onButtonClickMigrar={handleMudarStatusParaAjusteQuandoPedidoMigrado}
+        corMigrar={"warning"}
+        IconMigrar={MdLockOpen}
+        styleMigrar={botoesVisiveis.mudarStatusParaAjuste}
+
+        ButtonTypeAtualizar={ButtonTypeCompras}
+        linkAtualizar={"Migrar Atualizações"}
+        onButtonClickAtualizar={handleAtualizarPedidoSap}
+        corAtualizar={"info"}
+        IconAtualizar={SiSap}
+        styleAtualizar={botoesVisiveis.atualizarPedidoSAP}
       />
-      <ActionListaPedidos 
+      {tabelaVisivel && ( 
+
+        <ActionListaPedidos 
           dadosDetalhePedido={dadosDetalhePedido}
           setDadosDetalhePedido={setDadosDetalhePedido}
           dadosVisualizarPedido={dadosVisualizarPedido}
@@ -633,7 +611,8 @@ export const ActionEditarPedido = ({
           checkboxIntermediario={checkboxIntermediario}
           idResumoPedido={idResumoPedido}
           setIdResumoPedido={setIdResumoPedido}
-      />
+        />
+      )}
     
       <ActionIncluirProdutoPedidoModal
         show={modalIncluirProdutoPedido}
@@ -666,8 +645,15 @@ export const ActionEditarPedido = ({
         dadosDetalhesPedidos={dadosDetalhesPedidos}
       />
 
-      {console.log(modalPedidoNota, 'modal')}
-      {console.log(dadosPedidos, 'dadosPedidos')}
+      {tabelaCadastroProduto && ( 
+
+        <ActionListaProdutosCriados 
+          dadosListaProdutosCriados={dadosListaProdutosCriados}
+          dadosVisualizarPedido={dadosVisualizarPedido}
+          usuarioLogado={usuarioLogado}
+          optionsModulos={optionsModulos}
+        />
+      )}
     </Fragment>
   )
 }

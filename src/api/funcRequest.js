@@ -19,6 +19,22 @@ export const post = async (endpoint, data) => {
 };
 
 
+export const postFile = async (endpoint, formData) => {
+  try {
+    const token = localStorage.getItem('token');
+
+    const response = await api.post(endpoint, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error(`Error in postFile request: ${error}`);
+    throw error;
+  }
+};
+
 export const put = async (endpoint, data) => {
   try {
     const token = localStorage.getItem('token');

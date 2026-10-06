@@ -118,7 +118,13 @@ export const HeaderMain = ({ optionsModulosPage }) => {
           </a>
         </div>
         <div className=" dropdown-icon-menu position-relative">
-          <button onClick={toggleSidebar} className="btn-primary btn js-waves-off" data-action="toggle" data-className="nav-function-hidden">
+          <button 
+            onClick={toggleSidebar} 
+            className="btn-primary btn js-waves-off" 
+            data-action="toggle" 
+            data-className="nav-function-hidden"
+            aria-label="menu"
+          >
             <AiOutlineMenuFold className="ni ni-menu" size={20} />
           </button>
 
