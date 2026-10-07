@@ -25,23 +25,34 @@ export const ActionImprimirVoucherModal = ({ show, handleClose, dadosImprimirVou
     documentTitle: 'voucher',
   });
 
-  const handleExportPDF = () => {
-    const doc = new jsPDF();
-    
-    doc.setFontSize(10); 
-    doc.setFont('helvetica'); 
-
-    doc.html(dataTableRef.current, {
-      callback: function (doc) {
-        doc.save("voucher.pdf");
-      },
-      x: 10,
-      y: 10,
-      html2canvas: {
-        scale: 0.3 
-      }
-    });
-  };
+  const handleExportPDF = async () => {
+      const elemento = dataTableRef.current;
+  
+      if (!elemento) return;
+  
+      const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+      });
+      const margem = 10;
+      const larguraUtil = doc.internal.pageSize.getWidth() - (margem * 2);
+  
+      await doc.html(elemento, {
+        x: margem,
+        y: margem,
+        width: larguraUtil,
+        windowWidth: elemento.scrollWidth,
+        autoPaging: 'text',
+        html2canvas: {
+          backgroundColor: '#ffffff',
+          useCORS: true,
+        },
+        callback: (pdf) => {
+          pdf.save("voucher.pdf");
+        },
+      });
+    };
 
   const dados = dadosImprimirVoucher.map((item) => {
     return {

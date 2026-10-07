@@ -32,11 +32,11 @@ export const schema = yup.object({
   enderecoCliente: yup.string()
     .required('Endereço Obrigatório')
     .test('not-ni', 'Campo pode ser vazio ou diferente de "NI"', (value) => {
-      if(!value || value === 'NI') return true;
-      return  value.length > 0;
+      if (!value || value === 'NI') return true;
+      return value.length > 0;
     })
     .test('valid-characters', 'Endereço contém caracteres inválidos', (value) => {
-      if(!value || value === 'NI') return true;
+      if (!value || value === 'NI') return true;
       return /^[A-Za-z0-9\s\-\/.,ºªÇçÁáÉéÍíÓóÚúÂâÊêÎîÔôÛûÀàÈèÌìÒòÙùÃãÕõÜü]*$/.test(value);
     })
     .test('not-only-numbers', 'Endereço não pode conter apenas números', (value) => {
@@ -62,17 +62,17 @@ export const schema = yup.object({
     }),
   complementoCliente: yup.string()
     .test('has-content', 'Campo pode estar vazio', (value) => {
-        if (!value || value.length === 0) return true;
+      if (!value || value.length === 0) return true;
 
-        return value.length > 0;
+      return value.length > 0;
     })
     .test('valid-characters', 'Complemento contém caracteres inválidos', (value) => {
-        if (!value || value.length === 0) return true;
-        return /^[A-Za-z0-9\s\-\/.,ºªÇçÁáÉéÍíÓóÚúÂâÊêÎîÔôÛûÀàÈèÌìÒòÙùÃãÕõÜü]*$/.test(value);
+      if (!value || value.length === 0) return true;
+      return /^[A-Za-z0-9\s\-\/.,ºªÇçÁáÉéÍíÓóÚúÂâÊêÎîÔôÛûÀàÈèÌìÒòÙùÃãÕõÜü]*$/.test(value);
     })
     .test('not-only-numbers', 'Complemento Inválido, verifique o endereço e tente novamente!', (value) => {
-        if (!value || value.length === 0) return true;
-        return isNaN(Number(value));
+      if (!value || value.length === 0) return true;
+      return isNaN(Number(value));
     }),
   // bairroCliente: yup.string()
   //   .required("Bairro é obrigatório")

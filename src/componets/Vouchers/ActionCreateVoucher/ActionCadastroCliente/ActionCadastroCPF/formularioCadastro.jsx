@@ -8,7 +8,6 @@ import { mascaraTelefone, removerMascaraTelefone } from "../../../../../utils/ma
 import FormField from "../../../../Formularios/FormField"
 import { schema } from "./schemaValidationCPF"
 
-
 export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos, optionsCPF }) => {
   const { register, handleSubmit, formState: { errors }, clearErrors, setError, control } = useForm({
     mode: "onChange"
@@ -116,7 +115,7 @@ export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos,
       }
 
       const errorMessages = validationError.errors || [validationError.message];
-      console.log(`Erro de validação:\n${errorMessages.join('\n')}`);
+      //console.log(`Erro de validação:\n${errorMessages.join('\n')}`);
     }
   }
 
@@ -276,15 +275,15 @@ export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos,
             <div className="col-sm-4 col-md-3 col-xl-3">
 
               <Controller
-                name="TelefoneCliente"
+                name="telefoneDoCliente"
                 control={control}
                 render={({ field }) => (
                   <FormField
-                    name="TelefoneDoCliente"
+                    name="telefoneDoCliente"
                     label={"Telefone"}
                     placeholder={"DIGITE O TELEFONE"}
                     type="text"
-                    id={"TelefoneDoCliente"}
+                    id={"telefoneDoCliente"}
                     value={mascaraTelefone(telefoneCliente)}
                     onChange={(e) => setTelefoneCliente(e.target.value)}
                     errors={errors}

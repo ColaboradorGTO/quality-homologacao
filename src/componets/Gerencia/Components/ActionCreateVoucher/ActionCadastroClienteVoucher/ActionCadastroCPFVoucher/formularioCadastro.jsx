@@ -7,9 +7,10 @@ import FormField from "../../../../../Formularios/FormField"
 import { schema } from "./schemaValidationCPF"
 import { useCadastrarClienteCPFVoucher } from "../hooks/useCadastroClienteCPFVoucher"
 import { mascaraTelefone, removerMascaraTelefone } from "../../../../../../utils/mascaraTelefone"
+import { useEffect } from "react"
 
 
-export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos, optionsCPF, onCpf }) => {
+export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos, optionsCPF, onCpf, cpfCliente }) => {
   const { register, handleSubmit, formState: { errors }, clearErrors, setError, control } = useForm({
     mode: "onChange"
   });
@@ -121,6 +122,10 @@ export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos,
     }
   }
 
+useEffect(() => {
+  setCpf(cpfCliente ?? '');
+}, [cpfCliente, setCpf]);
+
   return (
     <Fragment>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -201,7 +206,7 @@ export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos,
                     type="text"
                     value={mascaraCPF(cpf)}
                     onChange={(e) => setCpf(e.target.value)}
-                    readOnly={readOnlyCpf}
+                    readOnly={readOnlyCpf || cpf > 14 }
                     maxLength={14}
                     errors={errors}
                     clearErrors={clearErrors}
@@ -271,7 +276,7 @@ export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos,
                 )}
               />
             </div>
-            
+
             <div className="col-sm-4 col-md-3 col-xl-3">
 
               <Controller

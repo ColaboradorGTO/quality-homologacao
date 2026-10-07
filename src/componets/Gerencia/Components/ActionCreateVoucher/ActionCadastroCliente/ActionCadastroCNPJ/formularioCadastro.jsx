@@ -8,6 +8,9 @@ import { schema } from "./schemaValidationCNPJ"
 import FormField from "../../../../../Formularios/FormField"
 import { AlertError } from "../../../../../Inputs/alertError"
 import Select from "react-select"
+import { RiBallPenLine } from "react-icons/ri";
+import { useCriarVoucher } from "../../hooks/useCriarVoucher"
+
 
 export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos }) => {
     const { handleSubmit, formState: { errors }, clearErrors, control, setError, setValue } = useForm({
@@ -63,9 +66,17 @@ export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos 
         setIM,
         setIE,
         optionsIndicacaoIE,
-        onSubmit
+        onSubmit,
+        preenche_dados_registrados,
+        exibirBotaoReceita
     } = useCadastrarClienteCNPJ({ usuarioLogado, optionsModulos, handleClose });
 
+
+    const handleRefetchApiCnpj = () => {
+        if (cnpj) {
+            preenche_dados_registrados(cnpj);
+        }
+    }
 
     const handleValidatedSubmit = async () => {
         try {
@@ -200,22 +211,54 @@ export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos 
                                 )}
                             />
                         </div>
-                        <div className="col-sm-5 col-md-5 col-xl-5" >
+                        <div className="col-sm-5 col-md-5 col-xl-5">
+                            <label htmlFor="cnpjCliente" className="form-label">
+                                CNPJ*
+                            </label>
+
                             <Controller
                                 name="cnpjCliente"
                                 control={control}
                                 render={({ field }) => (
-                                    <FormField
-                                        name="cnpjCliente"
-                                        label={"CNPJ*"}
-                                        type="text"
-                                        errors={errors}
-                                        clearErrors={clearErrors}
-                                        value={cnpj}
-                                        onChange={(e) => setCnpj(e.target.value)}
-                                    />
+                                    <div className="input-group">
+                                        <input
+                                            {...field}
+                                            id="cnpjCliente"
+                                            type="text"
+                                            className="form-control"
+                                            value={cnpj}
+                                            onChange={(e) => {
+                                                field.onChange(e);
+                                                setCnpj(e.target.value);
+                                            }}
+                                        />
+                                        {exibirBotaoReceita && (
+
+                                            <button
+                                                type="button"
+                                                className="btn btn-outline-success btn-sm "
+                                                title="Atualizar dados de acordo com a receita federal"
+                                                onClick={() => {
+                                                    preenche_dados_registrados(field.value, cnpj)
+                                                }}
+
+                                            >
+                                                <RiBallPenLine
+                                                    size={18}
+                                                />
+
+                                            </button>
+                                        )}
+                                    </div>
+
                                 )}
                             />
+
+                            {errors.cnpjCliente && (
+                                <div className="text-danger">
+                                    {errors.cnpjCliente.message}
+                                </div>
+                            )}
                         </div>
                     </div>
 

@@ -158,7 +158,7 @@ export const useCadastrarClienteCNPJVoucher = ({ usuarioLogado, optionsModulos, 
     }
 
     async function getDadosCNPJComIE_API_externa(cnpj) {
-        console.log('🔥 CHAMADA API PUBLICA.WS - getDadosCNPJComIE_API_externa:', cnpj);
+        //console.log('🔥 CHAMADA API PUBLICA.WS - getDadosCNPJComIE_API_externa:', cnpj);
         try {
             const response = await axios.get(URL_PUBLICAWS.replace('{CNPJ}', cnpj));
             let status = response.data?.status || 200;
@@ -174,7 +174,7 @@ export const useCadastrarClienteCNPJVoucher = ({ usuarioLogado, optionsModulos, 
     }
 
     async function getDadosExistenciaCNPJ_API_externa(cnpj) {
-        console.log('🔥 CHAMADA API RECEITA FEDERAL - getDadosExistenciaCNPJ_API_externa:', cnpj);
+        //console.log('🔥 CHAMADA API RECEITA FEDERAL - getDadosExistenciaCNPJ_API_externa:', cnpj);
         try {
             const response = await axios.get(URL_MINHA_RECEITA.replace('{CNPJ}', cnpj));
             response.data = "API-minhareceita";
@@ -235,7 +235,7 @@ export const useCadastrarClienteCNPJVoucher = ({ usuarioLogado, optionsModulos, 
         } else {
             !stUltimaInstancia && Swal.fire({
                 title: 'Erro!',
-                text: objCliente?.message || 'Erro ao tentar preencher os dados do cliente, recarregue e tente novamente!',
+                text: objCliente?.message  || 'Erro ao tentar preencher os dados do cliente, recarregue e tente novamente!',
                 icon: 'error',
                 customClass: {
                     container: 'custom-swal',
@@ -260,14 +260,14 @@ export const useCadastrarClienteCNPJVoucher = ({ usuarioLogado, optionsModulos, 
     // Removido useEffect desnecessário que causava refetch múltiplo
 
     useEffect(() => {
-        console.log('DEBUG useEffect - CNPJ:', cnpj, 'Length:', cnpj?.length, 'optionsCNPJ:', optionsCNPJ?.length);
+        //console.log('DEBUG useEffect - CNPJ:', cnpj, 'Length:', cnpj?.length, 'optionsCNPJ:', optionsCNPJ?.length);
 
         // Só chama APIs externas se o cliente NÃO existir no banco
         if (cnpj?.length >= 14 && optionsCNPJ && optionsCNPJ.length === 0) {
-            console.log('✅ Chamando API da Receita - Cliente NÃO encontrado no banco');
+            //console.log('✅ Chamando API da Receita - Cliente NÃO encontrado no banco');
             preenche_dados_registrados([], cnpj);
         } else if (cnpj?.length >= 14 && optionsCNPJ && optionsCNPJ.length > 0) {
-            console.log('❌ NÃO chamando API da Receita - Cliente JÁ existe no banco:', optionsCNPJ[0]);
+            //console.log('❌ NÃO chamando API da Receita - Cliente JÁ existe no banco:', optionsCNPJ[0]);
             // Cliente existe no banco - não chama APIs externas
         }
 
@@ -342,7 +342,7 @@ export const useCadastrarClienteCNPJVoucher = ({ usuarioLogado, optionsModulos, 
                 customClass: { container: 'custom-swal' }
             }).then(async (result) => {
                 if (result.isConfirmed) {
-                    console.log('🔄 Buscando dados na Receita Federal para CNPJ:', cnpjEmpresaVoucher);
+                    //console.log('🔄 Buscando dados na Receita Federal para CNPJ:', cnpjEmpresaVoucher);
 
                     let status = await preenche_cadastro_empresa_com_dados_de_API_externa(cnpjEmpresaVoucher);
 
@@ -359,7 +359,7 @@ export const useCadastrarClienteCNPJVoucher = ({ usuarioLogado, optionsModulos, 
                 }
             });
         } else if (optionsCNPJ.length > 0) {
-            console.log('❌ Cliente já existe no banco - não consultando Receita Federal');
+            //console.log('❌ Cliente já existe no banco - não consultando Receita Federal');
             return; // Não executa busca na API se cliente já existe
         }
     }
@@ -395,7 +395,7 @@ export const useCadastrarClienteCNPJVoucher = ({ usuarioLogado, optionsModulos, 
                 }
             }
         } catch (e) {
-            console.log("Erro ao retornar o autocomplete pelo CEP, ERROR: " + (e?.message || e));
+            //console.log("Erro ao retornar o autocomplete pelo CEP, ERROR: " + (e?.message || e));
 
             !stUltimaInstancia && Swal.fire({
                 title: 'Erro',
@@ -411,7 +411,7 @@ export const useCadastrarClienteCNPJVoucher = ({ usuarioLogado, optionsModulos, 
         if (optionsCNPJ.length > 0) {
             const cliente = optionsCNPJ[0];
 
-            console.log('📝 Preenchendo dados do cliente existente no banco:', cliente);
+            //console.log('📝 Preenchendo dados do cliente existente no banco:', cliente);
 
             // Preenche com dados do banco - sem chamar APIs externas
             setIdCliente(cliente?.IDCLIENTE);
@@ -522,12 +522,15 @@ export const useCadastrarClienteCNPJVoucher = ({ usuarioLogado, optionsModulos, 
             await post('/log-web', postDataLog)
 
 
-            Swal.fire({
+            await Swal.fire({
                 title: isUpdate ? 'Atualização' : 'Cadastrado!',
                 text: isUpdate
                     ? `Cliente ${nomeClienteRazao} atualizado com sucesso!`
                     : `Cliente ${nomeClienteRazao} cadastrado com sucesso!`,
                 icon: 'success',
+                timer: 1500,
+                timerProgressBar: true,
+                showConfirmButton: false,
                 customClass: {
                     container: 'custom-swal',
                 }
@@ -535,7 +538,8 @@ export const useCadastrarClienteCNPJVoucher = ({ usuarioLogado, optionsModulos, 
 
             handleClose();
 
-            await onCpf();
+            // Segue direto para a criação do voucher com o CNPJ recém-cadastrado
+            await onCpf(postData.NUCPFCNPJ);
             return response.data;
         } catch (error) {
             console.error('Erro ao cadastrar cliente:', error);

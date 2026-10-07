@@ -8,6 +8,11 @@ import { ActionListaVendaDestino } from "./actionListaVendaDestino";
 
 export const ActionDetalharModal = ({ show, handleClose, dadosDetalheVoucher, usuarioLogado, optionsModulos }) => {
 
+  const temVendaDestino = dadosDetalheVoucher[0]?.detalhedestino?.length > 0;
+
+  const exibirTabelaVendaDestino =
+    dadosDetalheVoucher[0]?.voucher?.STSTATUS === 'FINALIZADO' ||
+    temVendaDestino;
 
   return (
     <Fragment>
@@ -31,11 +36,20 @@ export const ActionDetalharModal = ({ show, handleClose, dadosDetalheVoucher, us
           />
 
           <Modal.Body>
+            <ActionListaVendaOrigem
+              dadosDetalheVoucher={dadosDetalheVoucher}
+              usuarioLogado={usuarioLogado}
+              optionsModulos={optionsModulos}
+            />
 
-            <ActionListaVendaOrigem dadosDetalheVoucher={dadosDetalheVoucher} usuarioLogado={usuarioLogado} optionsModulos={optionsModulos} />
-            <ActionListaVendaDestino dadosDetalheVoucher={dadosDetalheVoucher} usuarioLogado={usuarioLogado} optionsModulos={optionsModulos} />
+            {exibirTabelaVendaDestino && (
+              <ActionListaVendaDestino
+                dadosDetalheVoucher={dadosDetalheVoucher}
+                usuarioLogado={usuarioLogado}
+                optionsModulos={optionsModulos}
+              />
+            )}
           </Modal.Body>
-
 
           <FooterModal
 

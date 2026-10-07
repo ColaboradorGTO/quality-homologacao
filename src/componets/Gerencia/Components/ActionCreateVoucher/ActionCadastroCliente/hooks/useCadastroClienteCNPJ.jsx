@@ -159,7 +159,7 @@ export const useCadastrarClienteCNPJ = ({ usuarioLogado, optionsModulos, handleC
     }
 
     async function getDadosCNPJComIE_API_externa(cnpj) {
-        console.log('🔥 CHAMADA API PUBLICA.WS - getDadosCNPJComIE_API_externa:', cnpj);
+        //console.log('🔥 CHAMADA API PUBLICA.WS - getDadosCNPJComIE_API_externa:', cnpj);
         try {
             const response = await axios.get(URL_PUBLICAWS.replace('{CNPJ}', cnpj));
             let status = response.data?.status || 200;
@@ -175,7 +175,7 @@ export const useCadastrarClienteCNPJ = ({ usuarioLogado, optionsModulos, handleC
     }
 
     async function getDadosExistenciaCNPJ_API_externa(cnpj) {
-        console.log('🔥 CHAMADA API RECEITA FEDERAL - getDadosExistenciaCNPJ_API_externa:', cnpj);
+        //console.log('🔥 CHAMADA API RECEITA FEDERAL - getDadosExistenciaCNPJ_API_externa:', cnpj);
         try {
             const response = await axios.get(URL_MINHA_RECEITA.replace('{CNPJ}', cnpj));
             response.data = "API-minhareceita";
@@ -260,14 +260,14 @@ export const useCadastrarClienteCNPJ = ({ usuarioLogado, optionsModulos, handleC
     // Removido useEffect desnecessário que causava refetch múltiplo
 
     useEffect(() => {
-        console.log('DEBUG useEffect - CNPJ:', cnpj, 'Length:', cnpj?.length, 'optionsCNPJ:', optionsCNPJ?.length);
+        //console.log('DEBUG useEffect - CNPJ:', cnpj, 'Length:', cnpj?.length, 'optionsCNPJ:', optionsCNPJ?.length);
 
         // Só chama APIs externas se o cliente NÃO existir no banco
         if (cnpj?.length >= 14 && optionsCNPJ && optionsCNPJ.length === 0) {
-            console.log('✅ Chamando API da Receita - Cliente NÃO encontrado no banco');
+            //console.log('✅ Chamando API da Receita - Cliente NÃO encontrado no banco');
             preenche_dados_registrados([], cnpj);
         } else if (cnpj?.length >= 14 && optionsCNPJ && optionsCNPJ.length > 0) {
-            console.log('❌ NÃO chamando API da Receita - Cliente JÁ existe no banco:', optionsCNPJ[0]);
+            //console.log('❌ NÃO chamando API da Receita - Cliente JÁ existe no banco:', optionsCNPJ[0]);
             // Cliente existe no banco - não chama APIs externas
         }
 
@@ -342,7 +342,7 @@ export const useCadastrarClienteCNPJ = ({ usuarioLogado, optionsModulos, handleC
                 customClass: { container: 'custom-swal' }
             }).then(async (result) => {
                 if (result.isConfirmed) {
-                    console.log('🔄 Buscando dados na Receita Federal para CNPJ:', cnpjEmpresaVoucher);
+                    //console.log('🔄 Buscando dados na Receita Federal para CNPJ:', cnpjEmpresaVoucher);
 
                     let status = await preenche_cadastro_empresa_com_dados_de_API_externa(cnpjEmpresaVoucher);
 
@@ -359,7 +359,7 @@ export const useCadastrarClienteCNPJ = ({ usuarioLogado, optionsModulos, handleC
                 }
             });
         } else if (optionsCNPJ.length > 0) {
-            console.log('❌ Cliente já existe no banco - não consultando Receita Federal');
+            // console.log('❌ Cliente já existe no banco - não consultando Receita Federal');
             return; // Não executa busca na API se cliente já existe
         }
     }
@@ -395,7 +395,7 @@ export const useCadastrarClienteCNPJ = ({ usuarioLogado, optionsModulos, handleC
                 }
             }
         } catch (e) {
-            console.log("Erro ao retornar o autocomplete pelo CEP, ERROR: " + (e?.message || e));
+            //console.log("Erro ao retornar o autocomplete pelo CEP, ERROR: " + (e?.message || e));
 
             !stUltimaInstancia && Swal.fire({
                 title: 'Erro',
@@ -411,7 +411,7 @@ export const useCadastrarClienteCNPJ = ({ usuarioLogado, optionsModulos, handleC
         if (optionsCNPJ.length > 0) {
             const cliente = optionsCNPJ[0];
 
-            console.log('📝 Preenchendo dados do cliente existente no banco:', cliente);
+            //console.log('📝 Preenchendo dados do cliente existente no banco:', cliente);
 
             // Preenche com dados do banco - sem chamar APIs externas
             setIdCliente(cliente?.IDCLIENTE);
@@ -460,6 +460,12 @@ export const useCadastrarClienteCNPJ = ({ usuarioLogado, optionsModulos, handleC
         { value: 9, label: 'Não Contribuinte Com ou Sem IE' },
     ]
 
+    const cliente = optionsCNPJ?.[0] || null;
+
+    const isClienteExistente = !!cliente?.IDCLIENTE;
+    const isCnpj = cnpj.replace(/\D/g, '').length > 11;
+
+    const exibirBotaoReceita = isClienteExistente && isCnpj;
 
     const onSubmit = async () => {
 
@@ -633,6 +639,8 @@ export const useCadastrarClienteCNPJ = ({ usuarioLogado, optionsModulos, handleC
         }
     }
 
+
+
     return {
         idCliente,
         tipo,
@@ -683,9 +691,11 @@ export const useCadastrarClienteCNPJ = ({ usuarioLogado, optionsModulos, handleC
         setCidade,
         setEstado,
         setIM,
-        setIE, 
+        setIE,
         setTelefoneComercial,
         optionsIndicacaoIE,
-        onSubmit
+        onSubmit,
+        preenche_dados_registrados,
+        exibirBotaoReceita
     }
 }
