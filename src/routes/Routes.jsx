@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Fragment, useEffect, useState, Suspense, lazy } from "react";
-import AuthProvider from "../Providers/AuthContext";
+import AuthProvider, { useAuth } from "../Providers/AuthContext";
 import { Home } from "../pages/Home";
 
 // 🚀 Lazy Loading - só carrega quando o usuário acessa
@@ -40,6 +40,7 @@ const PageLoader = () => (
 export const RoutesMain = () => {
   const [componentToShow, setComponentToShow] = useState("");
   const [usuarioLogado, setUsuarioLogado] = useState(null);
+  const { usuarioAutenticado } = useAuth();
 
   useEffect(() => {
     const usuarioArmazenado = localStorage.getItem('usuario');
@@ -49,11 +50,11 @@ export const RoutesMain = () => {
     }
   }, []);
 
-  useEffect(() => {
+  /*   useEffect(() => {
+  
+    }, [usuarioLogado]); */
 
-  }, [usuarioLogado]);
 
- 
 
   const handleShowComponent = (componentName) => {
     setComponentToShow(componentName);
@@ -63,26 +64,27 @@ export const RoutesMain = () => {
     <Suspense fallback={<PageLoader />}>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/modulo" element={usuarioLogado ? <ModuloTeste  /> : <Navigate to="/"  />} />
-        <Route path="/DashBoardFinanceiro" element={<DashBoardFinanceiro componentToShow={componentToShow} handleShowComponent={handleShowComponent}   />  } />
-        <Route path="/DashBoardAdministrativo" element={<DashBoardAdministrativo componentToShow={componentToShow} handleShowComponent={handleShowComponent}  />  } />
-        <Route path="/DashBoardGerencia" element={<DashBoardGerencia componentToShow={componentToShow} handleShowComponent={handleShowComponent}  /> } />
-        <Route path="/DashBoardInformatica" element={<DashBoardInformatica componentToShow={componentToShow} handleShowComponent={handleShowComponent}   />  } />
-        <Route path="/DashBoardContabilidade" element={ <DashBoardContabilidade componentToShow={componentToShow} handleShowComponent={handleShowComponent}  /> } />
-        <Route path="/DashBoardRecursosHumanos" element={ <DashBoardRecursosHumanos componentToShow={componentToShow} handleShowComponent={handleShowComponent}  />  } />
-        <Route path="/DashBoardPromocao" element={<DashBoardPromocao componentToShow={componentToShow} handleShowComponent={handleShowComponent}  /> }  />
-        <Route path="/DashBoardMarketing" element={ <DashBoardMarketing componentToShow={componentToShow} handleShowComponent={handleShowComponent}  /> } />
-        <Route path="/DashBoardPermissoes" element={<Permissoes  />  } />
-        <Route path="/DashBoardMalotes" element={<DashBoardMalotes componentToShow={componentToShow} handleShowComponent={handleShowComponent}   /> } />  
-        <Route path="/DashBoardVouchers" element={<DashBoardVoucher componentToShow={componentToShow} handleShowComponent={handleShowComponent}  /> } />
-        <Route path="/DashBoardMenus" element={<DashBoardMenus componentToShow={componentToShow} handleShowComponent={handleShowComponent}  /> } />
-        <Route path="/DashBoardCompras" element={<DashBoardCompras componentToShow={componentToShow} handleShowComponent={handleShowComponent}  /> } />
-        <Route path="/DashBoardComprasAdm" element={<DashBoardComprasDM componentToShow={componentToShow} handleShowComponent={handleShowComponent}  /> } />
-        <Route path="/DashBoardExpedicao" element={usuarioLogado ? <DashBoardExpedicao componentToShow={componentToShow} handleShowComponent={handleShowComponent}  /> : <Navigate to="/"/> } />
-        <Route path="/DashBoardConferenciaCega" element={usuarioLogado ? <DashBoardConferenciaCega componentToShow={componentToShow} handleShowComponent={handleShowComponent}  /> : <Navigate to="/"/>} />
-        <Route path="/DashBoardCadastro" element={<DashBoardCadastro componentToShow={componentToShow} handleShowComponent={handleShowComponent}  /> } />
-        <Route path="/DashBoardComercial" element={<DashBoardComercial componentToShow={componentToShow} handleShowComponent={handleShowComponent}  /> } />
-        <Route path="/DashBoardEtiquetagem" element={<DashBoardEtiquetagem componentToShow={componentToShow} handleShowComponent={handleShowComponent}  /> } />
+        {/* <Route path="/modulo" element={usuarioLogado ? <ModuloTeste /> : <Navigate to="/" />} /> */}
+        <Route path="/modulo" element={usuarioAutenticado ? <ModuloTeste /> : <Navigate to="/" />} />
+        <Route path="/DashBoardFinanceiro" element={<DashBoardFinanceiro componentToShow={componentToShow} handleShowComponent={handleShowComponent} />} />
+        <Route path="/DashBoardAdministrativo" element={<DashBoardAdministrativo componentToShow={componentToShow} handleShowComponent={handleShowComponent} />} />
+        <Route path="/DashBoardGerencia" element={<DashBoardGerencia componentToShow={componentToShow} handleShowComponent={handleShowComponent} />} />
+        <Route path="/DashBoardInformatica" element={<DashBoardInformatica componentToShow={componentToShow} handleShowComponent={handleShowComponent} />} />
+        <Route path="/DashBoardContabilidade" element={<DashBoardContabilidade componentToShow={componentToShow} handleShowComponent={handleShowComponent} />} />
+        <Route path="/DashBoardRecursosHumanos" element={<DashBoardRecursosHumanos componentToShow={componentToShow} handleShowComponent={handleShowComponent} />} />
+        <Route path="/DashBoardPromocao" element={<DashBoardPromocao componentToShow={componentToShow} handleShowComponent={handleShowComponent} />} />
+        <Route path="/DashBoardMarketing" element={<DashBoardMarketing componentToShow={componentToShow} handleShowComponent={handleShowComponent} />} />
+        <Route path="/DashBoardPermissoes" element={<Permissoes />} />
+        <Route path="/DashBoardMalotes" element={<DashBoardMalotes componentToShow={componentToShow} handleShowComponent={handleShowComponent} />} />
+        <Route path="/DashBoardVouchers" element={<DashBoardVoucher componentToShow={componentToShow} handleShowComponent={handleShowComponent} />} />
+        <Route path="/DashBoardMenus" element={<DashBoardMenus componentToShow={componentToShow} handleShowComponent={handleShowComponent} />} />
+        <Route path="/DashBoardCompras" element={<DashBoardCompras componentToShow={componentToShow} handleShowComponent={handleShowComponent} />} />
+        <Route path="/DashBoardComprasAdm" element={<DashBoardComprasDM componentToShow={componentToShow} handleShowComponent={handleShowComponent} />} />
+        <Route path="/DashBoardExpedicao" element={usuarioLogado ? <DashBoardExpedicao componentToShow={componentToShow} handleShowComponent={handleShowComponent} /> : <Navigate to="/" />} />
+        <Route path="/DashBoardConferenciaCega" element={usuarioLogado ? <DashBoardConferenciaCega componentToShow={componentToShow} handleShowComponent={handleShowComponent} /> : <Navigate to="/" />} />
+        <Route path="/DashBoardCadastro" element={<DashBoardCadastro componentToShow={componentToShow} handleShowComponent={handleShowComponent} />} />
+        <Route path="/DashBoardComercial" element={<DashBoardComercial componentToShow={componentToShow} handleShowComponent={handleShowComponent} />} />
+        <Route path="/DashBoardEtiquetagem" element={<DashBoardEtiquetagem componentToShow={componentToShow} handleShowComponent={handleShowComponent} />} />
       </Routes>
     </Suspense>
   );
