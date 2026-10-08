@@ -9,7 +9,7 @@ import { useQuery } from "react-query";
 import { get } from "../api/funcRequest";
 
 const ActionPesquisaFaturamentoOT = lazy(() => import("../componets/Expedicao/Components/ActionFaturamentoOT/actionPesquisaFaturamentoOT").then(module => ({ default: module.ActionPesquisaFaturamentoOT })));
-const ActionPesquisaOT = lazy(() => import("../componets/Expedicao/Components/ActionExpedicaoOrdemTransferencia/ActionPesquisaOT").then(module => ({ default: module.ActionPesquisaOT })));
+const ActionPesquisaOT = lazy(() => import("../componets/Expedicao/Components/ActionExpedicaoOrdemTransferencia/actionPesquisaOT").then(module => ({ default: module.ActionPesquisaOT })));
 const ActionStatusDivergencia = lazy(() => import("../componets/Expedicao/Components/ActionStatusDivergencia/actionPesquisaStatusDivergencia").then(module => ({ default: module.ActionStatusDivergencia })));
 
 export const DashBoardExpedicao = () => {

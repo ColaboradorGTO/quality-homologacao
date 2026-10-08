@@ -350,23 +350,17 @@ export const ActionPesquisaVendasPix = () => {
   const handleChangeEmpresa = (selectedOptions) => {
     const selectedValues = selectedOptions.map(option => option.value);
     setEmpresaSelecionada(selectedValues);
-    
   }
 
   const handleClickVendasPix = () => {
-   
-    if (marcaSelecionada) {
-      setTabelaVendasPixVisivel(true)
-      setTabelaVendasFaturaPixVisivel(false)
-      setTabelaVendasPixConsolidadoVisivel(false)
-      setTabelaVendasPixConsolidadoEmpresa(false)
-      setTabelaFaturaPixConsolidadoVisivel(false)
-      setTabelaFaturaPixConsolidadoLoja(false)
-      
-      refetchVendasPix()
-    }  else {
-      Swal.fire('Erro', 'Por favor, selecione uma Marca e datas válidas.', 'error');
-    }
+    setTabelaVendasPixVisivel(true)
+    setTabelaVendasFaturaPixVisivel(false)
+    setTabelaVendasPixConsolidadoVisivel(false)
+    setTabelaVendasPixConsolidadoEmpresa(false)
+    setTabelaFaturaPixConsolidadoVisivel(false)
+    setTabelaFaturaPixConsolidadoLoja(false)
+    
+    refetchVendasPix()
   }
 
 
@@ -395,57 +389,39 @@ export const ActionPesquisaVendasPix = () => {
 
 
   const handleClickVendasFaturaPix = () => {
-    if(marcaSelecionada) {
+    setTabelaVendasFaturaPixVisivel(true)
+    setTabelaVendasPixVisivel(false)
+    setTabelaVendasPixConsolidadoVisivel(false)
+    setTabelaFaturaPixConsolidadoVisivel(false)
+    setTabelaVendasPixConsolidadoEmpresa(false)
+    setTabelaFaturaPixConsolidadoLoja(false)
+    refetchVendasFaturaPix()  
 
-      setTabelaVendasFaturaPixVisivel(true)
-      setTabelaVendasPixVisivel(false)
-      setTabelaVendasPixConsolidadoVisivel(false)
-      setTabelaFaturaPixConsolidadoVisivel(false)
-      setTabelaVendasPixConsolidadoEmpresa(false)
-      setTabelaFaturaPixConsolidadoLoja(false)
-    
-      
-      
-      refetchVendasFaturaPix()  
-    } else {
-        Swal.fire('Erro', 'Por favor, selecione uma Marca e datas válidas.', 'error')
-    }
   }
 
 
   const handleClickVendasFaturaPixConsolidado = () => {
-    if(marcaSelecionada) {
-      setTabelaFaturaPixConsolidadoVisivel(true)
-      setTabelaVendasPixVisivel(false)
-      setTabelaVendasPixConsolidadoVisivel(false)
-      setTabelaVendasPixConsolidadoEmpresa(false)
-      setTabelaVendasFaturaPixVisivel(false)
-      setTabelaFaturaPixConsolidadoLoja(false)
-      
-      refetchVendasFaturasPixConsolidadoPeriodo()
-
-    } else {
-      Swal.fire('Erro', 'Por favor, selecione uma Marca e datas válidas.', 'error')
-    }
+    setTabelaFaturaPixConsolidadoVisivel(true)
+    setTabelaVendasPixVisivel(false)
+    setTabelaVendasPixConsolidadoVisivel(false)
+    setTabelaVendasPixConsolidadoEmpresa(false)
+    setTabelaVendasFaturaPixVisivel(false)
+    setTabelaFaturaPixConsolidadoLoja(false)
     
+    refetchVendasFaturasPixConsolidadoPeriodo()
   }
 
 
 
   const handleClickFaturaPixConsolidadoLoja = () => {
-    if(marcaSelecionada) {
-      setTabelaFaturaPixConsolidadoLoja(true)
-      setTabelaFaturaPixConsolidadoVisivel(false)
-      setTabelaVendasPixVisivel(false)
-      setTabelaVendasPixConsolidadoVisivel(false)
-      setTabelaVendasPixConsolidadoEmpresa(false)
-      setTabelaVendasFaturaPixVisivel(false)
-     
-      refetchFaturasPixConsolidadoLoja()
-      
-    } else {
-      Swal.fire('Erro', 'Por favor, selecione uma Marca e datas válidas.', 'error')
-    }
+    setTabelaFaturaPixConsolidadoLoja(true)
+    setTabelaFaturaPixConsolidadoVisivel(false)
+    setTabelaVendasPixVisivel(false)
+    setTabelaVendasPixConsolidadoVisivel(false)
+    setTabelaVendasPixConsolidadoEmpresa(false)
+    setTabelaVendasFaturaPixVisivel(false)
+    
+    refetchFaturasPixConsolidadoLoja()
   }  
 
 

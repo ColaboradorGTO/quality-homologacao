@@ -7,7 +7,7 @@ import { MenuButton } from "../componets/Buttons/menuButton";
 import { FooterMain } from "../componets/Footer";
 import { useQuery } from "react-query";
 import { get } from "../api/funcRequest";
-
+ 
 const ResumoDashBoardComercial = lazy(() => import("../componets/Comercial/Components/ResumoComercial/ResumoDashBoardComercial").then(module => ({ default: module.ResumoDashBoardComercial })));
 const ActionPesquisaMetas = lazy(() => import("../componets/Comercial/Components/ActionMetas/actionPesquisaMetas").then(module => ({ default: module.ActionPesquisaMetas })));
 const ActionPesquisaPremiacoes = lazy(() => import("../componets/Comercial/Components/ActionPremiacoes/ActionPesquisaPremiacao").then(module => ({ default: module.ActionPesquisaPremiacoes })));
@@ -136,7 +136,7 @@ export const DashBoardComercial = () => {
       component = <ActionPesquisaPrecoProdutoGrupoSubGrupo />
       break;
     case "/comercial/ActionPesquisaMetas":
-      component = <ActionPesquisaMetas />
+      component = <ActionPesquisaMetas usuarioLogado={usuarioLogado} />
       break;
     case "/comercial/ActionPesquisaPremiacoes":
       component = <ActionPesquisaPremiacoes usuarioLogado={usuarioLogado}/>

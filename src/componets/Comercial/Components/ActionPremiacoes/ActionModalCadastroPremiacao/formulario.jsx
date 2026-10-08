@@ -1,17 +1,15 @@
 import { Fragment } from "react"
 import Select from 'react-select'
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal"
-import { InputFieldModal } from "../../../../Buttons/InputFieldModal"
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal"
 import { Controller, useForm } from 'react-hook-form';
 import { AlertError } from "../../../../Inputs/alertError"
 import FormField from "../../../../Formularios/FormField"
 import { schema } from './schamaValidarFuncionario'
-import { GrFormView, GrFormViewHide } from "react-icons/gr"
-import { useState } from "react"
 import { useCadastrarPremiacoes } from "../hooks/useCadastrarPremiacoes"
 import { optionsFuncoesComercial, optionsIndicadores, optionsApuracao } from "../../../../../../parceiro.json"
 import { formatarMoeda } from "../../../../../utils/formatMoeda"
+import { ActionListaPremiacao } from "./actionListaPremiacao";
 
 export const Formulario = ({ 
   handleClose,
@@ -44,13 +42,16 @@ export const Formulario = ({
     setValorBonusJunior,
     valorBonusTodos,
     setValorBonusTodos,
+    dadosPremiacaoCadastrada,
     onSubmit
-  } = useCadastrarPremiacoes({ usuarioLogado, optionsModulos, marcaSelecionada });
+  } = useCadastrarPremiacoes({ handleClose, usuarioLogado, optionsModulos, marcaSelecionada });
     
   const handleValidatedSubmit = async () => {
     try {
       const dadosParaValidar = {
-        empresaFuncionario: empresaSelecionada,
+        funcao: funcaoSelecionada,
+        indicadores: indicadorSelecionado,
+        apuracao: apuracaoSelecionada
       }
       await schema.validate(dadosParaValidar, { abortEarly: false });
       await onSubmit();
@@ -302,6 +303,7 @@ export const Formulario = ({
 
         />
       </form>
+      <ActionListaPremiacao dadosPremiacaoCadastrada={dadosPremiacaoCadastrada} />
     </Fragment>
   )
 }
