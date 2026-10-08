@@ -8,7 +8,7 @@ import { FooterMain } from "../componets/Footer";
 import { useQuery } from "react-query";
 import { get } from "../api/funcRequest";
 
-const ActionPesquisaFaturamentoOT = lazy(() => import("../componets/Expedicao/Components/ActionFaturamentoOT/actionPesquisaFaturamentoOT").then(module => ({ default: module.ActionPesquisaFaturamentoOT })));
+const ActionPesquisaFaturamentoOT = lazy(() => import("../componets/Expedicao/Components/ActionFaturamentoOT/ActionPesquisaFaturamentoOT").then(module => ({ default: module.ActionPesquisaFaturamentoOT })));
 const ActionPesquisaOT = lazy(() => import("../componets/Expedicao/Components/ActionExpedicaoOrdemTransferencia/actionPesquisaOT").then(module => ({ default: module.ActionPesquisaOT })));
 const ActionStatusDivergencia = lazy(() => import("../componets/Expedicao/Components/ActionStatusDivergencia/actionPesquisaStatusDivergencia").then(module => ({ default: module.ActionStatusDivergencia })));
 

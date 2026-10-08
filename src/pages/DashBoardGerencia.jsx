@@ -39,7 +39,8 @@ const ActionRelatorioBI = lazy(() => import("../componets/Gerencia/Components/Ac
 const ActionPesquisaEtiquetasVolumes = lazy(() => import("../componets/Gerencia/Components/ActionEtiquetasVolumes/actionPesquisaEtiquetasVolumes").then(module => ({ default: module.ActionPesquisaEtiquetasVolumes })));
 const ActionPesquisaVendaVoucher = lazy(() => import("../componets/Gerencia/Components/ActionVendaVoucher/actionPesquisaVendaVoucher").then(module => ({ default: module.ActionPesquisaVendaVoucher })));
 const ActionPesquisaVendasDigitais = lazy(() => import("../componets/Gerencia/Components/ActionVendasDigitais/actionPesquisaVendasDigitais").then(module => ({ default: module.ActionPesquisaVendasDigitais })));
- 
+const ActionPesquisaMetas = lazy(() => import("../componets/Gerencia/Components/ActionMetas/actionPesquisaMetas").then(module => ({ default: module.ActionPesquisaMetas })));
+
 export const DashBoardGerencia = () => {
   const storedModule = localStorage.getItem('moduloselecionado');
   const selectedModule = JSON.parse(storedModule);
@@ -210,6 +211,9 @@ export const DashBoardGerencia = () => {
       break;
     case "/gerencia/ActionPesquisaVendasDigitais":
       component = <ActionPesquisaVendasDigitais usuarioLogado={usuarioLogado} optionsEmpresas={optionsEmpresas} />
+      break;
+    case "/gerencia/ActionPesquisaMetas":
+      component = <ActionPesquisaMetas usuarioLogado={usuarioLogado} optionsEmpresas={optionsEmpresas} />
       break;
     default:
       component = null;
