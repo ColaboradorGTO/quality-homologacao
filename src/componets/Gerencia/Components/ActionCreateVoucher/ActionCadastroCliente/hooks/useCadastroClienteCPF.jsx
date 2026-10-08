@@ -155,7 +155,7 @@ export const useCadastrarClienteCPF = ({ usuarioLogado, optionsModulos, handleCl
             let response = await getDadosEnderecoViaCep_API_externa(cep);
 
             if (response.status !== 200) {
-                console.log('API principal falhou, tentando API de redundância...');
+                //console.log('API principal falhou, tentando API de redundância...');
                 response = await getDadosEnderecoViaCep_API_redundancia(cep);
             }
 
@@ -196,7 +196,7 @@ export const useCadastrarClienteCPF = ({ usuarioLogado, optionsModulos, handleCl
 
     const handleBlurCpf = () => {
         if (cpf?.length >= 8) {
-            console.log('caiu aqui')
+           // console.log('caiu aqui')
             refetchCPF();
         }
     }

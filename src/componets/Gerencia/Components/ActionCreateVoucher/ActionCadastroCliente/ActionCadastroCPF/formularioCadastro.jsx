@@ -13,6 +13,7 @@ export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos,
     mode: "onChange"
   });
 
+
   const {
     idCliente,
     setIdCliente,
@@ -76,6 +77,7 @@ export const FormularioCadastro = ({ handleClose, usuarioLogado, optionsModulos,
     setCidade('');
     setEstado('');
   }
+
 
   const handleValidatedSubmit = async () => {
     try {
