@@ -179,7 +179,7 @@ export const ActionPesquisaFaturasConsolidadas = ({ usuarioLogado }) => {
 
   const {
     conferirTodas
-  } = useConsolidarTodasFaturas({ optionsModulos, usuarioLogado, handleClickConciliar, selectedItems });
+  } = useConsolidarTodasFaturas({ optionsModulos, usuarioLogado, handleClickConciliar, handleClick, selectedItems });
 
   const conferirTodasSelecionadas = () => {
 
@@ -269,7 +269,7 @@ export const ActionPesquisaFaturasConsolidadas = ({ usuarioLogado }) => {
           onButtonClickCancelar={conferirTodasSelecionadas}
           corCancelar={"warning"}
           IconCancelar={MdOutlineCloudUpload}
-          styleCancelar
+          styleCancelar = {{ display: selectedItems.length > 0 ? 'block' : 'none' }}
         />
       )}
 
@@ -279,6 +279,7 @@ export const ActionPesquisaFaturasConsolidadas = ({ usuarioLogado }) => {
           optionsModulos={optionsModulos}
           usuarioLogado={usuarioLogado}
           handleClick={handleClick}
+          handleClickConciliar={handleClickConciliar}
           selectedItems={selectedItems}
           setSelectedItems={setSelectedItems}
         />

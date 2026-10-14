@@ -9,7 +9,7 @@ import { InputSelectAction } from "../../../Inputs/InputSelectAction"
 import { ActionListaMapaCaixa } from "./actionListaMapaCaixa"
 import { ActionListaVendasRecebidoEletronico } from "./actionListaVendasRecebidoEletronico"
 import { useQuery } from 'react-query';
-import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento"
+import { animacaoCarregamento, fecharAnimacaoCarregamento, foiCancelado } from "../../../../utils/animationCarregamento"
 
 
 export const ActionPesquisaMapaCaixa = ({ usuarioLogado }) => {
@@ -58,7 +58,7 @@ export const ActionPesquisaMapaCaixa = ({ usuarioLogado }) => {
   );
 
 
-  const fetchDespesas = async () => {
+/*   const fetchDespesas = async () => {
     try {
       const urlApi = `/despesa-loja?idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
       const response = await get(urlApi);
@@ -97,6 +97,49 @@ export const ActionPesquisaMapaCaixa = ({ usuarioLogado }) => {
       fecharAnimacaoCarregamento();
     }
   }
+ */
+
+const fetchDespesas = async () => {
+    const urlBase = `/despesa-loja?idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
+    let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
+    urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+
+    const controller = new AbortController();
+    let allData = [];
+
+    try {
+      animacaoCarregamento('Carregando dados...', true, true, () => controller.abort());
+
+      const primeiraPagina = 1;
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`, { signal: controller.signal });
+      const page = primeiraResposta.page || primeiraPagina;
+      const pageSize = primeiraResposta.pageSize || 1000;
+      const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
+      const totalPages = Math.ceil(totalRows / pageSize);
+
+      allData = [...(primeiraResposta.data || [])];
+
+      if (totalPages > 1) {
+        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+          if (foiCancelado()) break;
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`, { signal: controller.signal });
+          allData.push(...(responsePage.data || []));
+        }
+      }
+
+      return allData;
+    } catch (error) {
+      if (error.code === 'ERR_CANCELED') {
+        return allData;
+      }
+      console.error('Erro ao buscar dados:', error);
+      throw error;
+    } finally {
+      fecharAnimacaoCarregamento();
+    }
+  };
+
 
   const { data: dadosDespesas = [], error: erroDespesas, isLoading: isLoadingDespesas, refetch: refetchDespesas } = useQuery(
     'despesa-loja',
@@ -105,7 +148,7 @@ export const ActionPesquisaMapaCaixa = ({ usuarioLogado }) => {
   );
 
 
-  const fetchTotalRecebidoEletronico = async () => {
+/*   const fetchTotalRecebidoEletronico = async () => {
 
     try {
       const urlApi = `/venda-recebido-eletronico?idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
@@ -143,7 +186,49 @@ export const ActionPesquisaMapaCaixa = ({ usuarioLogado }) => {
     } finally {
       fecharAnimacaoCarregamento();
     }
-  }
+  } */
+
+const fetchTotalRecebidoEletronico = async () => {
+    const urlBase = `/venda-recebido-eletronico?idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
+    let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
+    urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+
+    const controller = new AbortController();
+    let allData = [];
+
+    try {
+      animacaoCarregamento('Carregando dados...', true, true, () => controller.abort());
+
+      const primeiraPagina = 1;
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`, { signal: controller.signal });
+      const page = primeiraResposta.page || primeiraPagina;
+      const pageSize = primeiraResposta.pageSize || 1000;
+      const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
+      const totalPages = Math.ceil(totalRows / pageSize);
+
+      allData = [...(primeiraResposta.data || [])];
+
+      if (totalPages > 1) {
+        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+          if (foiCancelado()) break;
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`, { signal: controller.signal });
+          allData.push(...(responsePage.data || []));
+        }
+      }
+
+      return allData;
+    } catch (error) {
+      if (error.code === 'ERR_CANCELED') {
+        return allData;
+      }
+      console.error('Erro ao buscar dados:', error);
+      throw error;
+    } finally {
+      fecharAnimacaoCarregamento();
+    }
+  };
+
 
   const { data: dadosTotalRecebidoEletronico = [], error: erroRecebidoEletronico, isLoading: isLoadingRecebidoEletronico, refetch: refetchTotalRecebidoEletronico } = useQuery(
     'venda-recebido-eletronico',
@@ -198,7 +283,7 @@ export const ActionPesquisaMapaCaixa = ({ usuarioLogado }) => {
     { enabled: false, staleTime: 5 * 60 * 1000 }
   );
 
-  const fetchListaResumoVoucher = async () => {
+/*   const fetchListaResumoVoucher = async () => {
 
     try {
       const urlApi = `/resumo-voucher?idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
@@ -236,7 +321,49 @@ export const ActionPesquisaMapaCaixa = ({ usuarioLogado }) => {
     } finally {
       fecharAnimacaoCarregamento();
     }
-  }
+  } */
+
+
+    const fetchListaResumoVoucher = async () => {
+    const urlBase = `/resumo-voucher?idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
+    let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
+    urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+
+    const controller = new AbortController();
+    let allData = [];
+
+    try {
+      animacaoCarregamento('Carregando dados...', true, true, () => controller.abort());
+
+      const primeiraPagina = 1;
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`, { signal: controller.signal });
+      const page = primeiraResposta.page || primeiraPagina;
+      const pageSize = primeiraResposta.pageSize || 1000;
+      const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
+      const totalPages = Math.ceil(totalRows / pageSize);
+
+      allData = [...(primeiraResposta.data || [])];
+
+      if (totalPages > 1) {
+        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+          if (foiCancelado()) break;
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`, { signal: controller.signal });
+          allData.push(...(responsePage.data || []));
+        }
+      }
+
+      return allData;
+    } catch (error) {
+      if (error.code === 'ERR_CANCELED') {
+        return allData;
+      }
+      console.error('Erro ao buscar dados:', error);
+      throw error;
+    } finally {
+      fecharAnimacaoCarregamento();
+    }
+  };
 
   const { data: dadosResumoVoucher = [], error: erroVoucher, isLoading: isLoadingVoucher, refetch: refetchListaResumoVoucher } = useQuery(
     'resumo-voucher',
@@ -245,7 +372,7 @@ export const ActionPesquisaMapaCaixa = ({ usuarioLogado }) => {
   );
 
 
-  const fetchListaDetalheFatura = async () => {
+/*   const fetchListaDetalheFatura = async () => {
 
     try {
       const urlApi = `/detalhe-fatura-financeiro?idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
@@ -284,7 +411,49 @@ export const ActionPesquisaMapaCaixa = ({ usuarioLogado }) => {
     } finally {
       fecharAnimacaoCarregamento();
     }
-  }
+  } */
+
+    const fetchListaDetalheFatura = async () => {
+    const urlBase = `/detalhe-fatura-financeiro?idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
+    let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
+    urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+
+    const controller = new AbortController();
+    let allData = [];
+
+    try {
+      animacaoCarregamento('Carregando dados...', true, true, () => controller.abort());
+
+      const primeiraPagina = 1;
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`, { signal: controller.signal });
+      const page = primeiraResposta.page || primeiraPagina;
+      const pageSize = primeiraResposta.pageSize || 1000;
+      const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
+      const totalPages = Math.ceil(totalRows / pageSize);
+
+      allData = [...(primeiraResposta.data || [])];
+
+      if (totalPages > 1) {
+        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+          if (foiCancelado()) break;
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`, { signal: controller.signal });
+          allData.push(...(responsePage.data || []));
+        }
+      }
+
+      return allData;
+    } catch (error) {
+      if (error.code === 'ERR_CANCELED') {
+        return allData;
+      }
+      console.error('Erro ao buscar dados:', error);
+      throw error;
+    } finally {
+      fecharAnimacaoCarregamento();
+    }
+  };
+
 
   const { data: dadosDetalheFatura = [], error: erroFatura, isLoading: isLoadingFatura, refetch: refetchListaDetalheFatura } = useQuery(
     'detalhe-fatura-financeiro',
@@ -293,7 +462,7 @@ export const ActionPesquisaMapaCaixa = ({ usuarioLogado }) => {
   );
 
 
-  const fetchListaTotalRecebidoMapa = async () => {
+/*   const fetchListaTotalRecebidoMapa = async () => {
     try {
       const urlApi = `/venda-total-recebido-periodo?idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
       const response = await get(urlApi);
@@ -331,7 +500,49 @@ export const ActionPesquisaMapaCaixa = ({ usuarioLogado }) => {
     } finally {
       fecharAnimacaoCarregamento();
     }
-  }
+  } */
+
+    const fetchListaTotalRecebidoMapa = async () => {
+    const urlBase = `/venda-total-recebido-periodo?idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
+    let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
+    urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+
+    const controller = new AbortController();
+    let allData = [];
+
+    try {
+      animacaoCarregamento('Carregando dados...', true, true, () => controller.abort());
+
+      const primeiraPagina = 1;
+      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`, { signal: controller.signal });
+      const page = primeiraResposta.page || primeiraPagina;
+      const pageSize = primeiraResposta.pageSize || 1000;
+      const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
+      const totalPages = Math.ceil(totalRows / pageSize);
+
+      allData = [...(primeiraResposta.data || [])];
+
+      if (totalPages > 1) {
+        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
+          if (foiCancelado()) break;
+          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true, true);
+          const responsePage = await get(`${urlApi}&page=${currentPage}`, { signal: controller.signal });
+          allData.push(...(responsePage.data || []));
+        }
+      }
+
+      return allData;
+    } catch (error) {
+      if (error.code === 'ERR_CANCELED') {
+        return allData;
+      }
+      console.error('Erro ao buscar dados:', error);
+      throw error;
+    } finally {
+      fecharAnimacaoCarregamento();
+    }
+  };
+
 
   const { data: dadosTotalRecebidoPeriodo = [], error: erroRecebido, isLoading: isLoadingRecebido, refetch: refetchListaTotalRecebidoMapa } = useQuery(
     'venda-total-recebido-periodo',

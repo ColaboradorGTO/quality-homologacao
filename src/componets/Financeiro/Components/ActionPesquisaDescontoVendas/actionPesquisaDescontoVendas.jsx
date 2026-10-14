@@ -12,6 +12,7 @@ import { ActionListaDescontoMotivoVenda } from "./actionListaDescontoMotivoVenda
 import { useQuery } from 'react-query';
 import { animacaoCarregamento, fecharAnimacaoCarregamento, foiCancelado } from "../../../../utils/animationCarregamento"
 import { useFetchData, useFetchEmpresas } from "../../../../hooks/useFetchData"
+import Swal from "sweetalert2"
 
 
 export const ActionPesquisaDescontoVendas = () => {
@@ -146,7 +147,7 @@ export const ActionPesquisaDescontoVendas = () => {
 
   const fetchDescontoMotivoVendas = async () => {
     
-    const urlBase = `/desconto-motivo-vendas-adm?idEmpresa=${empresaSelecionada}&idMarca=${marcaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
+    const urlBase = `/desconto-motivo-vendas-adm?idEmpresa=${empresaSelecionada}&idMarca=${marcaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&motivoDesconto=${descontoSelecionado}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     const controller = new AbortController();
@@ -214,6 +215,7 @@ export const ActionPesquisaDescontoVendas = () => {
     if (selectId) {
       setDescontoSelecionado(selectId)
     }
+   
   }
 
   const handleClick = () => {
@@ -231,6 +233,17 @@ export const ActionPesquisaDescontoVendas = () => {
   }
 
   const handleClickPesquisaMotivo = () => {
+    if(!descontoSelecionado) {
+      Swal.fire({
+        position: 'center',
+        icon: 'info',
+        title: 'Selecione um motivo de desconto',
+        text: 'Selecione um motivo de desconto',
+        showConfirmButton: false,
+        timer: 1500
+      })
+      return
+    }
     refetchDescontoMotivoVendas(); 
     setTabelaMotivo(true)
     setTabelaSimplificada(false)

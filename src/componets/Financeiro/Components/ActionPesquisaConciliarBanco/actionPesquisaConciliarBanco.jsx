@@ -274,7 +274,7 @@ export const ActionPesquisaConciliarBanco = ({ usuarioLogado }) => {
         linkImportar={"Integrar Todos"}
         corImportar={"info"}
         onButtonClickImportar={handleSubmit}
-        styleImportar={{ display: btnVisivel ? 'block' : 'none' }}
+        styleImportar={{ display: selectedItems.length > 1 ? 'block' : 'none' }}
 
       />
 
