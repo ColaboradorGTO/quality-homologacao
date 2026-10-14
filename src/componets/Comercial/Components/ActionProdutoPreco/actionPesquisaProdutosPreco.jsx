@@ -22,15 +22,14 @@ export const ActionPesquisaProductoPreco = () => {
     { enabled: true, staleTime: 60 * 60 * 1000, }
   );
 
-  const { data: dadosEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas } = useQuery(
-    'listaEmpresaComercial',
+   const { data: dadosEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas, refetch: refetchEmpresas } = useQuery(
+    ['listaEmpresaComercial', marcaSelecionada],
     async () => {
       const response = await get(`/listaEmpresaComercial?idMarca=${marcaSelecionada}`);
       return response.data;
     },
-    { enabled: Boolean(marcaSelecionada), staleTime: 60 * 60 * 1000, }
+    { enabled: Boolean(marcaSelecionada), }
   );
-
 
   const fetchListaProdutos = async () => {
     const urlBase = `/lista-produtos?idEmpresa=${empresaSelecionada}`;
