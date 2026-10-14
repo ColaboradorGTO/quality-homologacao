@@ -132,7 +132,9 @@ export const useCancelarConsolidacaoFatura = ({optionsModulos, usuarioLogado, se
                 },
             })
 
-            handleClickConciliar();
+            if (typeof handleClickConciliar === 'function') {
+                handleClickConciliar();
+            }
             return response.data;
         } catch (error) {
             const textDados = JSON.stringify(putData)

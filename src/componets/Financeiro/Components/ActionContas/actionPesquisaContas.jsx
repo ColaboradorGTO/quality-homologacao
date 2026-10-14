@@ -27,17 +27,19 @@ export const ActionPesquisaContas = ({ usuarioLogado }) => {
   useEffect(() => {
     const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
     if (menuSalvo) {
-    const menuParsed = JSON.parse(menuSalvo);
-    setMenuFilhoAtual(menuParsed);
+      const menuParsed = JSON.parse(menuSalvo);
+      setMenuFilhoAtual(menuParsed);
     }
   }, []);
+
+
 
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
     ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
-    const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
+      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
 
-    return response.data;
+      return response.data;
     },
     { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
   );
@@ -51,17 +53,20 @@ export const ActionPesquisaContas = ({ usuarioLogado }) => {
     { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
   );
 
-  const { data: optionsContaBanco = [], error: errorOptionsContaBanco, isLoading: isLoadingOptionsContaBanco, refetch: refetchOptionsContaBanco } = useQuery(
-    'conta-banco',
+  const { data: optionsContaBanco = [], error: errorOptionsContaBanco, isLoading: isLoadingOptionsContaBanco } = useQuery(
+    ['options-conta-banco', bancoSelecionado],
     async () => {
-      const response = await get(`/conta-banco`);
+      const url = bancoSelecionado ? `/conta-banco?idBanco=${bancoSelecionado}` : `/conta-banco`;
+      const response = await get(url);
       return response.data;
     },
-    { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
+    { enabled: true, staleTime: 5 * 60 * 1000 }
   );
 
+  console.log('optionsContaBanco', optionsContaBanco)
+
   const fetchContaBanco = async () => {
-    const urlBase = `/conta-banco?idEmpresa=${empresaSelecionada}&idContaBanco=${bancoSelecionado}&idBanco=${contaSelecionada}&dsConta=${descricao}`;
+    const urlBase = `/conta-banco?idEmpresa=${empresaSelecionada}&idContaBanco=${contaSelecionada}&idBanco=${bancoSelecionado}&dsConta=${descricao}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     try {
@@ -95,17 +100,10 @@ export const ActionPesquisaContas = ({ usuarioLogado }) => {
 
   }
   const { data: dadosContaBanco = [], error: erroContaBanco, isLoading: isLoadingContaBanco, refetch: refetchContaBanco } = useQuery(
-    'conta-banco',
+    'tabela-conta-banco',
     () => fetchContaBanco(),
     { enabled: false }
   );
-
-
-  const handleChangeEmpresa = (e) => {
-    const empresa = optionsEmpresas.find((item) => item.IDEMPRESA === e.value);
-    setEmpresaSelecionada(e.value);
-    setEmpresaSelecionadaNome(empresa.NOFANTASIA);
-  }
 
 
   const handleClick = () => {
@@ -114,19 +112,20 @@ export const ActionPesquisaContas = ({ usuarioLogado }) => {
   }
 
   const handleCadastrar = () => {
-    if(optionsModulos[0]?.CRIAR == 'False') {
-        Swal.fire({
-          position: 'center',
-          icon: 'error',
-          html: `${usuarioLogado?.NOFUNCIONARIO} <br> Você não tem permissão para cadastrar uma conta bancária.`,
-          showConfirmButton: true,
-          timer: 50000
-        });
-        return;
+    if (optionsModulos[0]?.CRIAR == 'False') {
+      Swal.fire({
+        position: 'center',
+        icon: 'error',
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br> Você não tem permissão para cadastrar uma conta bancária.`,
+        showConfirmButton: true,
+        timer: 50000
+      });
+      return;
     } else {
       setModalVisivel(true);
     }
   }
+
 
   return (
 
@@ -140,13 +139,17 @@ export const ActionPesquisaContas = ({ usuarioLogado }) => {
         InputSelectEmpresaComponent={InputSelectAction}
         labelSelectEmpresa={"Bancos"}
         optionsEmpresas={[
+          { value: '', label: 'Todos' },
           ...dadosBanco.map((empresa) => ({
             value: empresa.IDBANCO,
             label: empresa.DSBANCO,
           }))
         ]}
-        valueSelectEmpresa={empresaSelecionada}
-        onChangeSelectEmpresa={handleChangeEmpresa}
+        valueSelectEmpresa={bancoSelecionado}
+        onChangeSelectEmpresa={(e) => {
+          setBancoSelecionado(e?.value || '');
+          setContaSelecionada('');
+        }}
 
         InputSelectGrupoComponent={InputSelectAction}
         labelSelectGrupo={"Contas"}
@@ -156,8 +159,8 @@ export const ActionPesquisaContas = ({ usuarioLogado }) => {
             label: conta.DSCONTABANCO,
           }))
         ]}
-        valueSelectGrupo
-        onChangeSelectGrupo
+        valueSelectGrupo={contaSelecionada}
+        onChangeSelectGrupo={(e) => setContaSelecionada(e?.value || '')}
 
         InputFieldComponent={InputField}
         labelInputField={"Código Fatura"}
@@ -183,10 +186,10 @@ export const ActionPesquisaContas = ({ usuarioLogado }) => {
         optionsModulos={optionsModulos}
         usuarioLogado={usuarioLogado}
         dadosBanco={dadosBanco}
-        handleClick={handleClick} 
+        handleClick={handleClick}
       />
 
-      <ActionCadastrarContaBancoModal 
+      <ActionCadastrarContaBancoModal
         show={modalVisivel}
         handleClose={() => setModalVisivel(false)}
         optionsModulos={optionsModulos}
