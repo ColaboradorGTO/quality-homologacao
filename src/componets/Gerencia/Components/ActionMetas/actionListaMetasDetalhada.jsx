@@ -207,9 +207,9 @@ export const ActionListaMetasDetalhadas = ({
     saveAs(new Blob([buffer]), "metas_detalhadas.xlsx");
   };
 
-  const dados = dadosMetasDetalhadas.map((item, index) => {
+  const dados = dadosDetalheMeta?.map((item, index) => {
     let contador = index + 1;
-
+    let dataMeta = item.DTMETAINICIO + ' a ' + item.DTMETAFIM;
     return {
       contador,
       IDMETASLOJA: item.IDMETASLOJA,
@@ -276,6 +276,7 @@ export const ActionListaMetasDetalhadas = ({
       VRTOTALMETAVESTUARIO: item.VRTOTALMETAVESTUARIO,
 
       STATIVO: item.STATIVO,
+      dataMeta
     };
   });
 
@@ -285,37 +286,37 @@ export const ActionListaMetasDetalhadas = ({
     <ColumnGroup  >
       <Row>
         <Column  
-          colSpan="5" 
+          colSpan="4" 
           headerStyle={{ fontSize: '1rem', textAlign: 'center', justifyContent: 'center', backgroundColor: "#7a59ad", color: 'white' }} 
           headerClassName="grupo-meta-geral"
           header="VENDAS / META GERAL" 
         />
         <Column  
-          colSpan="4" 
+          colSpan="2" 
           headerStyle={{ fontSize: '1rem', textAlign: 'center', justifyContent: 'center', backgroundColor: "#FFDB8E", color: 'black' }} 
           headerClassName="grupo-meta-geral"
           header="CALÇADOS" 
         />
         <Column  
-          colSpan="12"
+          colSpan="6"
           headerStyle={{ fontSize: '1rem', textAlign: 'center', justifyContent: 'center', backgroundColor: "#FE85BE", color: 'black' }}
           headerClassName="grupo-meta-geral" 
           header="SELEÇÃO FEMININA" 
         />
         <Column  
-          colSpan="12"
+          colSpan="6"
           headerStyle={{ fontSize: '1rem', textAlign: 'center', justifyContent: 'center', backgroundColor: "#6AB8F7", color: 'black' }}
           headerClassName="grupo-meta-geral" 
           header="SELEÇÃO MASCULINA" 
         />
         <Column  
-          colSpan="12"
+          colSpan="6"
           headerStyle={{ fontSize: '1rem', textAlign: 'center', justifyContent: 'center', backgroundColor: "#4DE5D5", color: 'black' }}
           headerClassName="grupo-meta-geral" 
           header="SELEÇÃO INFANTIL" 
         />
         <Column  
-          colSpan="4"
+          colSpan="2"
           headerStyle={{ fontSize: '1rem', textAlign: 'center', justifyContent: 'center', backgroundColor: "#7a59ad", color: 'black' }}
           headerClassName="grupo-meta-geral" 
           header="CMB" 
@@ -350,15 +351,9 @@ export const ActionListaMetasDetalhadas = ({
         />
         <Column 
           field="VRVENDAGERAL" 
-          header="Venda" 
+          header="Data Meta" 
           sortable={true} 
           style={{color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}  
-        />
-        <Column 
-          field="PERCMETAVENDAGERAL" 
-          header="% Meta" 
-          sortable={true} 
-          style={{color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
         />
         <Column 
           field="VRMETAVENDAGERAL" 
@@ -366,20 +361,7 @@ export const ActionListaMetasDetalhadas = ({
           sortable={true} 
           style={{color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}  
         />
-        
 
-        <Column 
-          field="VRVENDACALCADOS" 
-          header="Geral" 
-          sortable={true} 
-          style={{color: 'black', backgroundColor: "#FFDB8E", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}  
-        />
-        <Column 
-          field="PERCVENDACALCADOS" 
-          header="%"
-          sortable={true}
-          style={{color: 'black', backgroundColor: "#FFDB8E", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}  
-        />
         <Column 
           field="VRMETAVENDACALCADOS" 
           header="Vr Meta" 
@@ -394,220 +376,120 @@ export const ActionListaMetasDetalhadas = ({
         />
 
         <Column 
-          field="VRVENDAFEMVERINV" 
+          field="VRMETAVENDAFEMVERINV" 
           header="Verão/Inverno" 
           sortable={true} 
           style={{color: 'black', backgroundColor: "#FE85BE", border: '1px solid #e9e9e9', fontSize: '0.8rem' }} 
         />
 
         <Column 
-          field="PERCVENDAFEMVERINV" 
+          field="PERCMETAVENDAFEMVERINV" 
           header="%" 
           sortable={true} 
           style={{color: 'black', backgroundColor: "#FE85BE", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}  
         />
+
         <Column 
-          field="VRMETAVENDAFEMVERINV" 
-          header="Vr Meta" 
-          sortable={true} 
-          style={{color: 'white', backgroundColor: "#fd52a3", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}  
-        />
-        <Column 
-          field="PERCMETAVENDAFEMVERINV" 
-          header="*" 
-          sortable={true} 
-          style={{color: 'white', backgroundColor: "#fd52a3", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}  
-        />
-        <Column 
-          field="VRVENDAFEMPCINTIMA" 
+          field="VRMETAVENDAFEMPCINTIMA" 
           header="Peça Intima" 
           sortable={true} 
           style={{color: 'black', backgroundColor: "#FE85BE", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}  
         />
         <Column 
-          field="PERCVENDAFEMPCINTIMA" 
+          field="PERCMETAVENDAFEMPCINTIMA" 
           header="%" 
           sortable={true} 
           style={{color: 'black', backgroundColor: "#FE85BE", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}  
         />
+
         <Column 
-          field="VRMETAVENDAFEMPCINTIMA" 
-          header="Vr Meta" 
-          sortable={true} 
-          style={{color: 'white', backgroundColor: "#fd52a3", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}  
-        />
-        <Column 
-          field="PERCMETAVENDAFEMPCINTIMA" 
-          header="*" 
-          sortable={true} 
-          style={{color: 'white', backgroundColor: "#fd52a3", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}  
-        />
-        <Column 
-          field="VRVENDAFEMACESSORIOS" 
+          field="VRMETAVENDAFEMACESSORIOS" 
           header="Acessórios" 
           sortable={true} 
           style={{color: 'black', backgroundColor: "#FE85BE", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}  
         />
         <Column 
-          field="PERCVENDAFEMACESSORIOS" 
+          field="PERCMETAVENDAFEMACESSORIOS" 
           header="%" 
           sortable={true} 
           style={{color: 'black', backgroundColor: "#FE85BE", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}  
         />
-         <Column 
-          field="VRMETAVENDAFEMACESSORIOS" 
-          header="Vr Meta" 
-          sortable={true} 
-          style={{color: 'white', backgroundColor: "#fd52a3", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}  
-        />
-        <Column 
-          field="PERCMETAVENDAFEMACESSORIOS" 
-          header="*" 
-          sortable={true} 
-          style={{color: 'white', backgroundColor: "#fd52a3", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}  
-        />
-
 
         <Column 
-          field="VRVENDAMASCVERINV" 
+          field="VRMETAVENDAMASCVERINV" 
           header="Verão/Inverno" 
           sortable={true} 
           style={{color: 'black', backgroundColor: "#6AB8F7", border: '1px solid #e9e9e9', fontSize: '0.8rem' }} 
         />
+
         <Column 
           field="PERCVENDAMASCVERINV" 
           header="%" 
           sortable={true} 
           style={{color: 'black', backgroundColor: "#6AB8F7", border: '1px solid #e9e9e9', fontSize: '0.8rem' }} 
         />
-        <Column 
-          field="VRMETAVENDAMASCVERINV" 
-          header="Vr Meta" 
-          sortable={true} 
-          style={{color: 'white', backgroundColor: "#39A1F4", border: '1px solid #e9e9e9', fontSize: '0.8rem' }} 
-        />
-        <Column 
-          field="PERCMETAVENDAMASCVERINV" 
-          header="%" 
-          sortable={true} 
-          style={{color: 'white', backgroundColor: "#39A1F4", border: '1px solid #e9e9e9', fontSize: '0.8rem' }} 
-        />
-        <Column 
-          field="VRVENDAMASCPCINTIMA" 
-          header="Peça Intima" 
-          sortable={true} 
-          style={{color: 'black', backgroundColor: "#6AB8F7", border: '1px solid #e9e9e9', fontSize: '0.8rem' }} 
-        />
-        <Column 
-          field="PERCVENDAMASCPCINTIMA" 
-          header="%" 
-          sortable={true} 
-          style={{color: 'black', backgroundColor: "#6AB8F7", border: '1px solid #e9e9e9', fontSize: '0.8rem' }} 
-        />
+
         <Column 
           field="VRMETAVENDAMASCPCINTIMA" 
-          header="Vr Meta" 
+          header="Peça Intíma" 
           sortable={true} 
           style={{color: 'white', backgroundColor: "#39A1F4", border: '1px solid #e9e9e9', fontSize: '0.8rem' }} 
         />
+
         <Column 
           field="PERCMETAVENDAMASCPCINTIMA" 
           header="%" 
           sortable={true} 
           style={{color: 'white', backgroundColor: "#39A1F4", border: '1px solid #e9e9e9', fontSize: '0.8rem' }} 
         />
-        <Column 
-          field="VRVENDAMASCACESSORIOS" 
-          header="Acessórios" 
-          sortable={true} 
-          style={{color: 'black', backgroundColor: "#6AB8F7", border: '1px solid #e9e9e9', fontSize: '0.8rem' }} 
-        />
+
         <Column 
           field="PERCVENDAMASCACESSORIOS" 
-          header="%" 
+          header="Acesórios" 
           sortable={true} 
           style={{color: 'black', backgroundColor: "#6AB8F7", border: '1px solid #e9e9e9', fontSize: '0.8rem' }} 
         />
         <Column 
           field="VRMETAVENDAMASCACESSORIOS" 
-          header="Vr Meta" 
-          sortable={true} 
-          style={{color: 'white', backgroundColor: "#39A1F4", border: '1px solid #e9e9e9', fontSize: '0.8rem' }} 
-        />
-        <Column 
-          field="PERCMETAVENDAMASCACESSORIOS" 
           header="%" 
           sortable={true} 
           style={{color: 'white', backgroundColor: "#39A1F4", border: '1px solid #e9e9e9', fontSize: '0.8rem' }} 
         />
-
+ 
 
         <Column 
-          field="VRVENDAINFANTVERINV" 
+          field="VRMETAVENDAINFANTVERINV" 
           header="Verão/Inverno" 
           sortable={true} 
           style={{color: 'black', backgroundColor: "#4DE5D5", border: '1px solid #e9e9e9', fontSize: '0.8rem' }} 
         />
 
         <Column 
-          field="PERCVENDAINFANTVERINV" 
+          field="PERCMETAVENDAINFANTVERINV" 
           header="%" 
           sortable={true} 
           style={{color: 'black', backgroundColor: "#4DE5D5", border: '1px solid #e9e9e9', fontSize: '0.8rem' }} 
         />
+
         <Column 
-          field="VRMETAVENDAINFANTVERINV" 
-          header="Vr Meta" 
-          sortable={true} 
-          style={{color: 'black', backgroundColor: "#21DFCB", border: '1px solid #e9e9e9', fontSize: '0.8rem' }} 
-        />
-        <Column 
-          field="PERCMETAVENDAINFANTVERINV" 
-          header="%" 
-          sortable={true} 
-          style={{color: 'black', backgroundColor: "#21DFCB", border: '1px solid #e9e9e9', fontSize: '0.8rem' }} 
-        />
-        <Column 
-          field="VRVENDAINFANTPCINTIMA" 
+          field="VRMETAVENDAINFANTPCINTIMA" 
           header="Peça Intima" 
           sortable={true} 
           style={{color: 'black', backgroundColor: "#4DE5D5", border: '1px solid #e9e9e9', fontSize: '0.8rem' }} 
         />
-        <Column 
-          field="PERCVENDAINFANTPCINTIMA" 
-          header="%" 
-          sortable={true} 
-          style={{color: 'black', backgroundColor: "#4DE5D5", border: '1px solid #e9e9e9', fontSize: '0.8rem' }} 
-        />
-        <Column 
-          field="VRMETAVENDAINFANTPCINTIMA" 
-          header="Vr Meta" 
-          sortable={true} 
-          style={{color: 'black', backgroundColor: "#21DFCB", border: '1px solid #e9e9e9', fontSize: '0.8rem' }} 
-        />
+
+  
         <Column 
           field="PERCMETAVENDAINFANTPCINTIMA" 
-          header="%" 
-          sortable={true} 
-          style={{color: 'black', backgroundColor: "#21DFCB", border: '1px solid #e9e9e9', fontSize: '0.8rem' }} 
-        />
-        <Column 
-          field="VRVENDAINFANTACESSORIOS" 
-          header="Acessórios" 
-          sortable={true} 
-          style={{color: 'black', backgroundColor: "#4DE5D5", border: '1px solid #e9e9e9', fontSize: '0.8rem' }} 
-        />
-        <Column 
-          field="PERCVENDAINFANTACESSORIOS" 
           header="%" 
           sortable={true} 
           style={{color: 'black', backgroundColor: "#4DE5D5", border: '1px solid #e9e9e9', fontSize: '0.8rem' }} 
         />
         <Column 
           field="VRMETAVENDAINFANTACESSORIOS" 
-          header="Vr Meta" 
+          header="Acessórios" 
           sortable={true} 
-          style={{color: 'black', backgroundColor: "#21DFCB", border: '1px solid #e9e9e9', fontSize: '0.8rem' }} 
+          style={{color: 'black', backgroundColor: "#4DE5D5", border: '1px solid #e9e9e9', fontSize: '0.8rem' }} 
         />
         <Column 
           field="PERCMETAVENDAINFANTACESSORIOS" 
@@ -616,22 +498,10 @@ export const ActionListaMetasDetalhadas = ({
           style={{color: 'black', backgroundColor: "#21DFCB", border: '1px solid #e9e9e9', fontSize: '0.8rem' }} 
         />
 
-
-        <Column 
-          field="VRVENDACMB" 
-          header="CMB" 
-          sortable={true} 
-          style={{color: 'black', backgroundColor: "#B19DCE", border: '1px solid #e9e9e9', fontSize: '0.8rem' }} 
-        />
-        <Column 
-          field="PERCVENDACMB" 
-          header="%" 
-          sortable={true} 
-          style={{color: 'black', backgroundColor: "#B19DCE", border: '1px solid #e9e9e9', fontSize: '0.8rem' }} 
-        />
+ 
         <Column 
           field="VRMETAVENDACMB" 
-          header="Vr Meta" 
+          header="CMB" 
           sortable={true} 
           style={{color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }} 
         />
@@ -671,7 +541,7 @@ export const ActionListaMetasDetalhadas = ({
     <Fragment>
       <div className="panel" >
         <div className="panel-hdr">
-          <h2>{`Lista Metas Detalhadas do Período: ${dados[0]?.DTMETAINICIO} a ${dados[0]?.DTMETAFIM}`}</h2>
+          <h2>{`Detalhes da Meta`}</h2>
         </div>
         <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
           <HeaderTable
@@ -703,63 +573,39 @@ export const ActionListaMetasDetalhadas = ({
             filterDisplay="menu"
             showGridlines
             stripedRows
+            cellMemo={false}
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
             
             >
               <Column field="contador" header="#" body={row => <th>{row.contador}</th>} sortable={true} />
               <Column field="NOFANTASIA" header="Empresa" body={row => <p style={{fontWeight: 600, width: '250px'}} >{row.NOFANTASIA}</p>} sortable={true} />
-              <Column field="VRVENDAGERAL" header="Venda" body={row => <th>{formatMoeda(row.VRVENDAGERAL)}</th>} sortable={true} />
-              <Column field="PERCMETAVENDAGERAL" header="% Meta" body={row => <th>{parseFloat(row.PERCMETAVENDAGERAL)}%</th>} sortable={true} />
+              <Column field="dataMeta" header="Data Meta" body={row => <th>{row.dataMeta}</th>} sortable={true} />
               <Column field="VRMETAVENDAGERAL" header="Vr Meta" body={row => <th>{formatMoeda(row.VRMETAVENDAGERAL)}</th>} sortable={true} />
-             
             
-              <Column field="VRVENDACALCADOS" header="Geral" body={row => <th style={{color: '#FFA500'}}>{formatMoeda(row.VRVENDACALCADOS)}</th>} sortable={true} />
-              <Column field="PERCVENDACALCADOS" header="%" body={row => <th style={{color: '#FFA500'}}>{parseFloat(row.PERCVENDACALCADOS)}%</th>} sortable={true} />
               <Column field="VRMETAVENDACALCADOS" header="Vr Meta" body={row => <th style={{color: '#FFA500'}}>{formatMoeda(row.VRMETAVENDACALCADOS)}</th>} sortable={true} />
               <Column field="PERCMETAVENDACALCADOS" header="%" body={row => <th style={{color: '#FFA500'}}>{parseFloat(row.PERCMETAVENDACALCADOS)}%</th>} sortable={true} />
              
-              <Column field="VRVENDAFEMVERINV" header="Verão/Inverno" body={row => <th style={{color: '#FE85BE'}}>{formatMoeda(row.VRVENDAFEMVERINV)}</th>} sortable={true} />
-              <Column field="PERCVENDAFEMVERINV" header="%" body={row => <th style={{color: '#FE85BE'}}>{parseFloat(row.PERCVENDAFEMVERINV)}%</th>} sortable={true} />
               <Column field="VRMETAVENDAFEMVERINV" header="Vr Meta" body={row => <th style={{color: '#FE85BE'}}>{formatMoeda(row.VRMETAVENDAFEMVERINV)}</th>} sortable={true} />
               <Column field="PERCMETAVENDAFEMVERINV" header="%" body={row => <th style={{color: '#FE85BE'}}>{parseFloat(row.PERCMETAVENDAFEMVERINV)}%</th>} sortable={true} />
-              <Column field="VRVENDAFEMPCINTIMA" header="Peça Intima" body={row => <th style={{color: '#FE85BE'}}>{formatMoeda(row.VRVENDAFEMPCINTIMA)}</th>} sortable={true} />
-              <Column field="PERCVENDAFEMPCINTIMA" header="%" body={row => <th style={{color: '#FE85BE'}}>{parseFloat(row.PERCVENDAFEMPCINTIMA)}%</th>} sortable={true} />
               <Column field="VRMETAVENDAFEMPCINTIMA" header="Vr Meta" body={row => <th style={{color: '#FE85BE'}}>{formatMoeda(row.VRMETAVENDAFEMPCINTIMA)}</th>} sortable={true} />
-              <Column field="PERCMETAVENDAFEMPCINTIMA" header="%" body={row => <th style={{color: '#FE85BE'}}>{parseFloat(row.PERCMETAVENDAFEMPCINTIMA)}%</th>} sortable={true} />
-              <Column field="VRVENDAFEMACESSORIOS" header="Acessórios" body={row => <th style={{color: '#FE85BE'}}>{formatMoeda(row.VRVENDAFEMACESSORIOS)}</th>} sortable={true} />
-              <Column field="PERCVENDAFEMACESSORIOS" header="%" body={row => <th style={{color: '#FE85BE'}}>{parseFloat(row.PERCVENDAFEMACESSORIOS)}%</th>} sortable={true} />
+              <Column field="PERCMETAVENDAFEMPCINTIMA" header="%" body={row => <th style={{color: '#FE85BE'}}>{parseFloat(row.PERCMETAVENDAFEMPCINTIMA)}%</th>} sortable={true} />          
               <Column field="VRMETAVENDAFEMACESSORIOS" header="Vr Meta" body={row => <th style={{color: '#FE85BE'}}>{formatMoeda(row.VRMETAVENDAFEMACESSORIOS)}</th>} sortable={true} />
               <Column field="PERCMETAVENDAFEMACESSORIOS" header="%" body={row => <th style={{color: '#FE85BE'}}>{parseFloat(row.PERCMETAVENDAFEMACESSORIOS)}%</th>} sortable={true} />
            
-              <Column field="VRVENDAMASCVERINV" header="Verão/Inverno" body={row => <th style={{color: '#6AB8F7'}}>{formatMoeda(row.VRVENDAMASCVERINV)}</th>} sortable={true} />
+              <Column field="VRMETAVENDAMASCVERINV" header="Verão/Inverno" body={row => <th style={{color: '#6AB8F7'}}>{formatMoeda(row.VRMETAVENDAMASCVERINV)}</th>} sortable={true} />
               <Column field="PERCVENDAMASCVERINV" header="%" body={row => <th style={{color: '#6AB8F7'}}>{parseFloat(row.PERCVENDAMASCVERINV)}%</th>} sortable={true} />
-              <Column field="VRMETAVENDAMASCVERINV" header="Vr Meta" body={row => <th style={{color: '#6AB8F7'}}>{formatMoeda(row.VRMETAVENDAMASCVERINV)}</th>} sortable={true} />
-              <Column field="PERCMETAVENDAMASCVERINV" header="%" body={row => <th style={{color: '#6AB8F7'}}>{parseFloat(row.PERCMETAVENDAMASCVERINV)}%</th>} sortable={true} />
-              <Column field="VRVENDAMASCPCINTIMA" header="Peça Intima" body={row => <th style={{color: '#6AB8F7'}}>{formatMoeda(row.VRVENDAMASCPCINTIMA)}</th>} sortable={true} />
-              <Column field="PERCVENDAMASCPCINTIMA" header="%" body={row => <th style={{color: '#6AB8F7'}}>{parseFloat(row.PERCVENDAMASCPCINTIMA)}%</th>} sortable={true} />
               <Column field="VRMETAVENDAMASCPCINTIMA" header="Vr Meta" body={row => <th style={{color: '#6AB8F7'}}>{formatMoeda(row.VRMETAVENDAMASCPCINTIMA)}</th>} sortable={true} />
               <Column field="PERCMETAVENDAMASCPCINTIMA" header="%" body={row => <th style={{color: '#6AB8F7'}}>{parseFloat(row.PERCMETAVENDAMASCPCINTIMA)}%</th>} sortable={true} />
-              <Column field="VRVENDAMASCACESSORIOS" header="Vr Meta" body={row => <th style={{color: '#6AB8F7'}}>{formatMoeda(row.VRVENDAMASCACESSORIOS)}</th>} sortable={true} />
-              <Column field="PERCVENDAMASCACESSORIOS" header="%" body={row => <th style={{color: '#6AB8F7'}}>{parseFloat(row.PERCVENDAMASCACESSORIOS)}%</th>} sortable={true} />
               <Column field="VRMETAVENDAMASCACESSORIOS" header="Vr Meta" body={row => <th style={{color: '#39A1F4'}}>{formatMoeda(row.VRMETAVENDAMASCACESSORIOS)}</th>} sortable={true} />
-              <Column field="PERCMETAVENDAMASCACESSORIOS" header="%" body={row => <th style={{color: '#39A1F4'}}>{parseFloat(row.PERCMETAVENDAMASCACESSORIOS)}%</th>} sortable={true} />
-           
-              <Column field="VRVENDAINFANTVERINV" header="Verão/Inverno" body={row => <th style={{color: '#3cb371'}}>{formatMoeda(row.VRVENDAINFANTVERINV)}</th>} sortable={true} />
-              <Column field="PERCVENDAINFANTVERINV" header="%" body={row => <th style={{color: '#3cb371'}}>{parseFloat(row.PERCVENDAINFANTVERINV)}%</th>} sortable={true} />
-              <Column field="VRMETAVENDAINFANTVERINV" header="Vr Meta" body={row => <th style={{color: '#3cb371'}}>{formatMoeda(row.VRMETAVENDAINFANTVERINV)}</th>} sortable={true} />
+              <Column field="PERCVENDAMASCACESSORIOS" header="%" body={row => <th style={{color: '#6AB8F7'}}>{parseFloat(row.PERCVENDAMASCACESSORIOS)}%</th>} sortable={true} />
+        
+              <Column field="VRMETAVENDAINFANTVERINV" header="Verão/Inverno" body={row => <th style={{color: '#3cb371'}}>{formatMoeda(row.VRMETAVENDAINFANTVERINV)}</th>} sortable={true} />
               <Column field="PERCMETAVENDAINFANTVERINV" header="%" body={row => <th style={{color: '#3cb371'}}>{parseFloat(row.PERCMETAVENDAINFANTVERINV)}%</th>} sortable={true} />
-              <Column field="VRVENDAINFANTPCINTIMA" header="Peça Intima" body={row => <th style={{color: '#3cb371'}}>{formatMoeda(row.VRVENDAINFANTPCINTIMA)}</th>} sortable={true} />
-              <Column field="PERCVENDAINFANTPCINTIMA" header="%" body={row => <th style={{color: '#3cb371'}}>{parseFloat(row.PERCVENDAINFANTPCINTIMA)}%</th>} sortable={true} />
-              <Column field="VRMETAVENDAINFANTPCINTIMA" header="Vr Meta" body={row => <th style={{color: '#3cb371'}}>{formatMoeda(row.VRMETAVENDAINFANTPCINTIMA)}</th>} sortable={true} />
+              <Column field="VRMETAVENDAINFANTPCINTIMA" header="Peça Intima" body={row => <th style={{color: '#3cb371'}}>{formatMoeda(row.VRMETAVENDAINFANTPCINTIMA)}</th>} sortable={true} />
               <Column field="PERCMETAVENDAINFANTPCINTIMA" header="%" body={row => <th style={{color: '#3cb371'}}>{parseFloat(row.PERCMETAVENDAINFANTPCINTIMA)}%</th>} sortable={true} />
-              <Column field="VRVENDAINFANTACESSORIOS" header="Acessórios" body={row => <th style={{color: '#3cb371'}}>{formatMoeda(row.VRVENDAINFANTACESSORIOS)}</th>} sortable={true} />
-              <Column field="PERCVENDAINFANTACESSORIOS" header="%" body={row => <th style={{color: '#3cb371'}}>{parseFloat(row.PERCVENDAINFANTACESSORIOS)}%</th>} sortable={true} />
-              <Column field="VRMETAVENDAINFANTACESSORIOS" header="Vr Meta" body={row => <th style={{color: '#3cb371'}}>{formatMoeda(row.VRMETAVENDAINFANTACESSORIOS)}</th>} sortable={true} />
+              <Column field="VRMETAVENDAINFANTACESSORIOS" header="Acessórios" body={row => <th style={{color: '#3cb371'}}>{formatMoeda(row.VRMETAVENDAINFANTACESSORIOS)}</th>} sortable={true} />
               <Column field="PERCMETAVENDAINFANTACESSORIOS" header="%" body={row => <th style={{color: '#3cb371'}}>{parseFloat(row.PERCMETAVENDAINFANTACESSORIOS)}%</th>} sortable={true} />
-              
-           
-              <Column field="VRVENDACMB" header="CMB" body={row => <th style={{color: '#6a5acd'}}>{formatMoeda(row.VRVENDACMB)}</th>} sortable={true} />
-              <Column field="PERCVENDACMB" header="%" body={row => <th style={{color: '#6a5acd'}}>{parseFloat(row.PERCVENDACMB)}%</th>} sortable={true} />
+        
               <Column field="VRMETAVENDACMB" header="Vr Meta" body={row => <th style={{color: '#6a5acd'}}>{formatMoeda(row.VRMETAVENDACMB)}</th>} sortable={true} />
               <Column field="PERCMETAVENDACMB" header="%" body={row => <th style={{color: '#6a5acd'}}>{parseFloat(row.PERCMETAVENDACMB)}%</th>} sortable={true} />
            

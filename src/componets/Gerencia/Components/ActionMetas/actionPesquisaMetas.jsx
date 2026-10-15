@@ -8,7 +8,6 @@ import { InputSelectAction } from "../../../Inputs/InputSelectAction";
 import { ButtonType } from "../../../Buttons/ButtonType";
 import { getDataAtual } from "../../../../utils/dataAtual";
 import { useQuery } from "react-query";
-import { ActionListaMetasVendasResumidas } from "./actionListaMetasVendasResumidas";
 import { ActionListaMetasDetalhadas } from "./actionListaMetasDetalhada";
 import { animacaoCarregamento, fecharAnimacaoCarregamento, foiCancelado } from "../../../../utils/animationCarregamento";
 import { ActionListaCriarMetasDetalhadas } from "./actionListaCriarMetasDetalhada";
@@ -16,6 +15,10 @@ import Swal from "sweetalert2";
 import { useCadastrarMeta } from "./hooks/useCadastrarMeta";
 import { FaRegSave } from "react-icons/fa";
 import { ActionListaMetasCalcados } from "./actionListaMetasCalcados";
+import { ActionListaMetasFeminina } from "./actionListaMetasFeminina";
+import { ActionListaMetasMasculina } from "./actionListaMetasMasculina";
+import { ActionListaMetasInfantil } from "./actionListaMetasInfantil";
+import { ActionListaMetasCMB } from "./actionListaMetasCMB";
 
 
 export const ActionPesquisaMetas = ({
@@ -184,18 +187,8 @@ export const ActionPesquisaMetas = ({
         corSearch={"primary"}
         IconSearch={AiOutlineSearch}
 
-        ButtonTypeCadastro={ButtonType}
-        linkNome={"Criar Metas"}
-        onButtonClickCadastro={handleClick}
-        corCadastro={"danger"}
-        // IconCadastro
- 
-        // ButtonTypeCancelar={ButtonType}
-        // linkCancelar={"Salvar Metas"}
-        // onButtonClickCancelar={handleSalvarMetas}
-        // corCancelar={"success"}
-        // IconCancelar={FaRegSave}
-        // styleCancelar
+    
+
       />
       
 
@@ -219,26 +212,53 @@ export const ActionPesquisaMetas = ({
         />
       )}
 
-      <ActionListaMetasCalcados dadosCalcados={dadosCalcados}/>
-      {
-        tabelaVendaResumidaVisivel && (
+ 
+      <ActionListaMetasDetalhadas
+        dadosCalcados={dadosCalcados}
+        dadosFeminino={dadosFeminino}
+        dadosMasculino={dadosMasculino}
+        dadosInfantil={dadosInfantil}
+        dadosCMB={dadosCMB}
+        dadosDetalheMeta={dadosDetalheMeta}
+        dadosMetasDetalhadas={dadosMetasDetalhadas}
+      />
 
-          <ActionListaMetasVendasResumidas 
-            dadosVendasResumida={dadosVendasResumida}
-          /> 
-        )
-      }
-      {tabelaMetasVendasVisivel && (
-        <ActionListaMetasDetalhadas
-          dadosCalcados={dadosCalcados}
-          dadosFeminino={dadosFeminino}
-          dadosMasculino={dadosMasculino}
-          dadosInfantil={dadosInfantil}
-          dadosCMB={dadosCMB}
-          dadosDetalheMeta={dadosDetalheMeta}
-          dadosMetasDetalhadas={dadosMetasDetalhadas}
-        />
-      )}
+      <ActionListaMetasCalcados 
+        dadosCalcados={dadosCalcados}
+        usuarioLogado={usuarioLogado}
+        optionsModulos={optionsModulos} 
+        handleClick={handleClick}
+      />
+
+      <ActionListaMetasFeminina 
+        dadosFeminino={dadosFeminino}
+        usuarioLogado={usuarioLogado}
+        optionsModulos={optionsModulos} 
+        handleClick={handleClick}
+      />
+      <ActionListaMetasMasculina
+        dadosMasculino={dadosMasculino}
+        usuarioLogado={usuarioLogado}
+        optionsModulos={optionsModulos} 
+        handleClick={handleClick}
+      />
+
+      <ActionListaMetasInfantil
+        dadosInfantil={dadosInfantil}
+        usuarioLogado={usuarioLogado}
+        optionsModulos={optionsModulos} 
+        handleClick={handleClick}
+      />
+     
+      <ActionListaMetasCMB
+        dadosCMB={dadosCMB}
+        usuarioLogado={usuarioLogado}
+        optionsModulos={optionsModulos} 
+        handleClick={handleClick}
+      />
+
+
+      
 
     {/* {tabelaCriarMetasVendasVisivel && (
 

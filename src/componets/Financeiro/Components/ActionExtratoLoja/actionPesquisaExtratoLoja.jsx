@@ -127,11 +127,9 @@ export const ActionPesquisaExtratoLoja = ({ usuarioLogado }) => {
         InputSelectEmpresaComponent={InputSelectAction}
         labelSelectEmpresa={"Empresa"}
         optionsEmpresas={[
-
           ...optionsEmpresas.map((empresa) => ({
             value: empresa.IDEMPRESA,
             label: empresa.NOFANTASIA,
-
           }))
         ]}
         valueSelectEmpresa={empresaSelecionada}

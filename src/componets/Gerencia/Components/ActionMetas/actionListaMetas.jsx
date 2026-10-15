@@ -9,7 +9,7 @@ import * as XLSX from 'xlsx';
 import 'jspdf-autotable';
 import HeaderTable from "../../../Tables/headerTable";
 import { get } from "../../../../api/funcRequest";
-import { useCancelarMeta } from "./hooks/useCancelarMeta";
+
 
 export const ActionListaMetas = ({ 
   dadosVendasMarca,
@@ -32,9 +32,7 @@ export const ActionListaMetas = ({
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
-  const {
-    handleCancelar
-  } = useCancelarMeta({ usuarioLogado, optionsModulos, handleClick })
+ 
 
 
   const onGlobalFilterChange = (e) => {

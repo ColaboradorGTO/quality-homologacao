@@ -85,8 +85,8 @@ export const ActionListaMovimentacaoCaixaDia = ({
   const quebraCaixa = dadosQuebraCaixa.map((item) => {
 
     const quebraCaixaDinheiro = () => {
-      if (item.VRAJUSTDINHEIRO > 0) {
-        return toFloat(item.VRAJUSTDINHEIRO);
+      if (toFloat(item.VRRECDINHEIROAJUSTE) > 0) {
+        return toFloat(item.VRRECDINHEIROAJUSTE);
       } else {
         return toFloat(item.VRRECDINHEIRO);
       }
@@ -503,7 +503,7 @@ export const ActionListaMovimentacaoCaixaDia = ({
       <Row>
         <Column footer="Total Quebra (só caixas fechados): (+)" colSpan={4} style={{ textAlign: 'center' }} footerStyle={{ textAlign: 'center', color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem', fontWeight: 'bold' }} />
         <Column footer="" colSpan={10} footerStyle={{ textAlign: 'center', color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem', fontWeight: 'bold' }} />
-        <Column footer={formatMoeda(calcularTotalQuebraCaixa())} footerStyle={{ textAlign: 'center', color: 'blue', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem', fontWeight: 'bold' }} />
+        <Column footer={formatMoeda(calcularTotalQuebraCaixa())} footerStyle={{ textAlign: 'center', color: calcularTotalQuebraCaixa() < 0 ? 'red' : 'blue', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem', fontWeight: 'bold' }} />
         <Column footer="" colSpan={3} footerStyle={{ textAlign: 'center', color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem', fontWeight: 'bold' }} />
       </Row>
 

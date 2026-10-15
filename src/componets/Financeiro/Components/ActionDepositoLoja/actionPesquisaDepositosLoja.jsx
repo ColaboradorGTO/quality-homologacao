@@ -132,14 +132,12 @@ export const ActionPesquisaDepositosLoja = () => {
         optionsEmpresas={[
           { value: '', label: 'Selecionar Empresa' },
           ...dadosEmpresas?.map((item) => ({
-            
-              value: item.IDEMPRESA,
-              label: item.NOFANTASIA
-            
+            value: item.IDEMPRESA,
+            label: item.NOFANTASIA
           }))
         ]}
         valueSelectEmpresa={empresaSelecionada}
-        onChangeSelectEmpresa={(e) => handleChangeEmpresa(e)}
+        onChangeSelectEmpresa={(e) => setEmpresaSelecionada(e.value)}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}

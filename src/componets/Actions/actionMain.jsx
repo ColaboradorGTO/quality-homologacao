@@ -589,6 +589,7 @@ export const ActionMain = ({
   isDisabledGrupo,
   isDisabledMarca,
 
+  disabledBTNCadastro,
   btnVisivelEstrutura,
 
   styleCancelar,
@@ -1899,6 +1900,7 @@ export const ActionMain = ({
                         iconColor="#fff"
                         iconSize={iconSizeCadastro || 16}
                         style={styleCadastro}
+                        visibilityBTN={disabledBTNCadastro}
                       />
                     )}
 

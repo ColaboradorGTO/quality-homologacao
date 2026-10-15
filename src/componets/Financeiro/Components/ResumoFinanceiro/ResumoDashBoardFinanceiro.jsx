@@ -158,7 +158,10 @@ export const ResumoDashBoardFinaneiro = () => {
         iconColor="white"
       />
 
-      <ActionListaVendasLojasResumo dadosTotalVendasEmpresa={dadosTotalVendasEmpresa} dataPesquisa={dataPesquisa} />
+      <ActionListaVendasLojasResumo 
+        dadosTotalVendasEmpresa={dadosTotalVendasEmpresa} 
+        dataPesquisa={dataPesquisa}   
+      />
 
       <ActionListaTransacoesLojas dadosTransacoesEmpresas={dadosTransacoesEmpresas} dataPesquisa={dataPesquisa} />
     </Fragment>

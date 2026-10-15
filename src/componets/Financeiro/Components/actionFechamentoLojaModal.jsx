@@ -7,7 +7,6 @@ import { formatMoeda } from "../../../utils/formatMoeda";
 import { HeaderModal } from "../../Modais/HeaderModal/HeaderModal";
 import { FooterModal } from "../../Modais/FooterModal/footerModal";
 import { ButtonTypeModal } from "../../Buttons/ButtonTypeModal";
-import { mascaraValor } from "../../../utils/mascaraValor";
 import { dataFormatada } from "../../../utils/dataFormatada";
 import { useReactToPrint } from "react-to-print";
 import { jsPDF } from 'jspdf';
