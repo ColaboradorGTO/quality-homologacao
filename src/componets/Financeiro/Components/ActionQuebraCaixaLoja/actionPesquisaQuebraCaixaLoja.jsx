@@ -16,6 +16,7 @@ import Swal from "sweetalert2";
 import { useConferirTodasQuebras } from "./hooks/useConfeririTodasQuebras";
 import {optionsQuebraDeCaixa, optionsUF} from "../../../../../parceiro.json";
 
+
 export const ActionPesquisaQuebraCaixaLoja = ({usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
   const [tabelaVisivelPositiva, setTabelaVisivelPositiva] = useState(false);
@@ -385,7 +386,7 @@ export const ActionPesquisaQuebraCaixaLoja = ({usuarioLogado }) => {
         onButtonClickCancelar={conferirTodasSelecionadas}
         corCancelar={"warning"}
         IconCancelar={IoMdCheckmark}
-        styleCancelar
+        styleCancelar ={{ display: selectedItems.length > 0 ? 'block' : 'none' }}
       />
 
        

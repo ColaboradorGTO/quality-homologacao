@@ -25,6 +25,7 @@ export const ActionMain = ({
   iconSizeHeader,
   iconHeader,
   corHeader,
+  disabledCadastro,
 
   readOnlyDescricao,
   readOnlyPendencia,
@@ -1900,7 +1901,6 @@ export const ActionMain = ({
                         iconColor="#fff"
                         iconSize={iconSizeCadastro || 16}
                         style={styleCadastro}
-                        visibilityBTN={disabledBTNCadastro}
                       />
                     )}
 

@@ -204,20 +204,18 @@ export const ActionPesquisaVendasPixDTW = ({ usuarioLogado }) => {
 
   const handleClickVendasPix = () => {
 
-    if (marcaSelecionada) {
+   
       setTabelaVendasPixVisivel(true)
       setTabelaVendasPixCompensacao(false)
       setPixCompensacaoCapa(false)
       setPixCompensacaoCredito(false)
       refetchVendasPix()
-    } else {
-      Swal.fire('Erro', 'Por favor, selecione uma Marca e datas válidas.', 'error');
-    }
+ 
   }
 
 
   const handleClickVendasPixCompensacao = () => {
-    if (marcaSelecionada) {
+  
       setTabelaVendasPixCompensacao(true)
       setTabelaVendasPixVisivel(false)
       setPixCompensacaoCapa(false)
@@ -226,13 +224,11 @@ export const ActionPesquisaVendasPixDTW = ({ usuarioLogado }) => {
 
       refetchVendasPixCompensacao()
 
-    } else {
-      Swal.fire('Erro', 'Por favor, selecione uma Marca e datas válidas.', 'error')
-    }
+ 
   }
 
   const handleClickPixCompensacaoCapa = () => {
-    if (marcaSelecionada) {
+   
       setPixCompensacaoCapa(true)
       setPixCompensacaoCredito(false)
       setTabelaVendasPixCompensacao(false)
@@ -240,12 +236,10 @@ export const ActionPesquisaVendasPixDTW = ({ usuarioLogado }) => {
       setPixCompensacaoDebito(false)
       refetchVendasPixCompensacao()
 
-    } else {
-      Swal.fire('Erro', 'Por favor, selecione uma Marca e datas válidas.', 'error')
-    }
+
   }
   const handleClickPixCompensacaoCredito = () => {
-    if (marcaSelecionada) {
+    
       setPixCompensacaoCredito(true)
       setPixCompensacaoCapa(false)
       setTabelaVendasPixCompensacao(false)
@@ -253,12 +247,10 @@ export const ActionPesquisaVendasPixDTW = ({ usuarioLogado }) => {
       setPixCompensacaoDebito(false)
       refetchVendasPixCompensacao()
 
-    } else {
-      Swal.fire('Erro', 'Por favor, selecione uma Marca e datas válidas.', 'error')
-    }
+
   }
   const handleClickPixCompensacaoDebito = () => {
-    if (marcaSelecionada) {
+    
       setPixCompensacaoDebito(true)
       setPixCompensacaoCredito(false)
       setPixCompensacaoCapa(false)
@@ -267,9 +259,6 @@ export const ActionPesquisaVendasPixDTW = ({ usuarioLogado }) => {
       setPixCompensacaoDebito(true)
       refetchVendasPixCompensacao()
 
-    } else {
-      Swal.fire('Erro', 'Por favor, selecione uma Marca e datas válidas.', 'error')
-    }
   }
 
   const { integrarTodos } = useIntegrarTodosPagamentosPix({
@@ -277,7 +266,9 @@ export const ActionPesquisaVendasPixDTW = ({ usuarioLogado }) => {
     usuarioLogado,
     handleClickVendasPixCompensacao,
     selectedItems,
+    setSelectedItems
   })
+
 
   return (
 
@@ -373,7 +364,7 @@ export const ActionPesquisaVendasPixDTW = ({ usuarioLogado }) => {
         onButtonClickProdutoVendido={integrarTodos}
         corProdutoVendido={"primary"}
         iconProdutoVendido={BsCloudUpload}
-        styleProdutoVendido={{ display: btnVisivel ? 'block' : 'none' }}
+        styleProdutoVendido={{ display: selectedItems.length > 1 ? 'block' : 'none' }}
       />
 
       {tabelaVendasPixVisivel && (

@@ -12,7 +12,6 @@ import { animacaoCarregamento, fecharAnimacaoCarregamento, foiCancelado } from "
 import { ActionFaturaListaVendasPIXCompensacao } from "./actionListaFaturaVendasPixCompensacao"
 import { ActionFaturaListaVendasPIX } from "./actionListaFaturaVendasPix"
 
-
 export const ActionPesquisaFaturasVendasPixDTW = ({ usuarioLogado }) => {
   const [marcaSelecionada, setMarcaSelecionada] = useState('');
   const [empresaSelecionada, setEmpresaSelecionada] = useState([]);
@@ -58,7 +57,7 @@ export const ActionPesquisaFaturasVendasPixDTW = ({ usuarioLogado }) => {
     'marcasLista',
     async () => {
       const response = await get(`/marcasLista`);
-      
+
       return response.data;
     },
     { staleTime: 60 * 60 * 1000 }
@@ -72,7 +71,7 @@ export const ActionPesquisaFaturasVendasPixDTW = ({ usuarioLogado }) => {
     },
     { enabled: Boolean(marcaSelecionada), staleTime: 60 * 60 * 1000 }
   );
- 
+
   const fetchListaVendasPix = async () => {
     const urlBase = `/venda-total-fatura-pix-empresa?idMarca=${marcaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idEmpresa=${empresaSelecionada}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
@@ -113,11 +112,10 @@ export const ActionPesquisaFaturasVendasPixDTW = ({ usuarioLogado }) => {
     }
   }
 
-
   const { data: dadosFaturaVendasPix = [], error: errorVendasPix, isLoading: isLoadingVendasPix, refetch: refetchVendasPix } = useQuery(
     ['venda-total-fatura-pix-empresa'],
     () => fetchListaVendasPix(),
-    { enabled: false}
+    { enabled: false }
   );
 
   const fetchListaVendasPixCompensacao = async () => {
@@ -168,28 +166,22 @@ export const ActionPesquisaFaturasVendasPixDTW = ({ usuarioLogado }) => {
 
   const handleClickVendasPix = () => {
 
-    if (marcaSelecionada) {
-      setTabelaVendasPixVisivel(true)
-      setTabelaVendasPixCompensacao(false)
-      setPixCompensacaoCapa(false)
-      setPixCompensacaoCredito(false)
-      refetchVendasPix()
-    } else {
-      Swal.fire('Erro', 'Por favor, selecione uma Marca e datas válidas.', 'error');
-    }
+    setTabelaVendasPixVisivel(true)
+    setTabelaVendasPixCompensacao(false)
+    setPixCompensacaoCapa(false)
+    setPixCompensacaoCredito(false)
+    refetchVendasPix()
+
   }
 
   const handleClickVendasPixCompensacao = () => {
-    if (marcaSelecionada) {
-      setTabelaVendasPixCompensacao(true)
-      setTabelaVendasPixVisivel(false)
-      setPixCompensacaoCapa(false)
-      setPixCompensacaoCredito(false)
-      refetchVendasPixCompensacao()
 
-    } else {
-      Swal.fire('Erro', 'Por favor, selecione uma Marca e datas válidas.', 'error')
-    }
+    setTabelaVendasPixCompensacao(true)
+    setTabelaVendasPixVisivel(false)
+    setPixCompensacaoCapa(false)
+    setPixCompensacaoCredito(false)
+    refetchVendasPixCompensacao()
+
   }
 
 
@@ -232,8 +224,8 @@ export const ActionPesquisaFaturasVendasPixDTW = ({ usuarioLogado }) => {
         ]}
         valueSelectMarca={empresaSelecionada}
         onChangeSelectMarcas={(e) => setEmpresaSelecionada(e.value)}
-        
-        
+
+
         InputSelectEmpresaComponent={InputSelectAction}
         optionsEmpresas={[
           { value: '0', label: 'Selecione uma loja' },
@@ -245,19 +237,19 @@ export const ActionPesquisaFaturasVendasPixDTW = ({ usuarioLogado }) => {
         labelSelectEmpresa={"Por Marca"}
         valueSelectEmpresa={marcaSelecionada}
         onChangeSelectEmpresa={(e) => setMarcaSelecionada(e.value)}
-        
+
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Faturas PIX "}
         onButtonClickSearch={handleClickVendasPix}
         IconSearch={AiOutlineSearch}
         corSearch={"info"}
-        
+
         ButtonTypeCadastro={ButtonType}
         linkNome={"Compensação"}
         onButtonClickCadastro={handleClickVendasPixCompensacao}
         corCadastro={"success"}
         IconCadastro={AiOutlineSearch}
-        
+
       />
 
 
@@ -271,7 +263,9 @@ export const ActionPesquisaFaturasVendasPixDTW = ({ usuarioLogado }) => {
       )}
 
       {tabelaVendasPixCompensacao && (
-        <ActionFaturaListaVendasPIXCompensacao dadosFaturaVendasPixCompensacao={dadosFaturaVendasPixCompensacao} />
+        <ActionFaturaListaVendasPIXCompensacao
+          dadosFaturaVendasPixCompensacao={dadosFaturaVendasPixCompensacao}
+        />
       )}
 
     </Fragment>

@@ -261,6 +261,7 @@ export const ActionListaMotivoDevolucao = ({ dadosMotivoDevolucao, optionsModulo
         dadosDetalheMotivoDevolucao={dadosDetalheMotivoDevolucao}
         optionsModulos={optionsModulos}
         usuarioLogado={usuarioLogado}
+        handleClick={handleClick}
       />
 
     </Fragment>

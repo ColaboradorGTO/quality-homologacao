@@ -73,10 +73,10 @@ export const ActionPesquisaSaldoLoja = () => {
   };
 
   const handleClick = () => {
-     if (marcaSelecionada === '') {
+    if (marcaSelecionada === '') {
       Swal.fire({
         title: 'Atenção!',
-        text: `Selecione uma marca!`,
+        text: `É necessário selecionar uma marca!`,
         icon: 'warning',
         customClass: {
           container: 'custom-swal',

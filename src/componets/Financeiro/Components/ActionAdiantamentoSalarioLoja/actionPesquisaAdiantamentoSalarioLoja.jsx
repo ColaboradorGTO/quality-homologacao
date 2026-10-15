@@ -249,7 +249,7 @@ export const ActionPesquisaAdiantamentoSalarioLoja = ({usuarioLogado, ID }) => {
         onButtonClickCancelar={integrarTodasSelecionadas}
         corCancelar={"warning"}
         IconCancelar={IoMdCheckmark}
-        styleCancelar
+        styleCancelar = {{display : selectedItems.length > 1 ? 'block' : 'none'}}
       />
 
       {tabelaVisivel && (
