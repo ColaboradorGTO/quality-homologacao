@@ -619,6 +619,7 @@ export const ActionListaExtratoContaCorrenteLoja = ({
         optionsModulos={optionsModulos}
         usuarioLogado={usuarioLogado}
         dadosDeposito={dadosDeposito}
+        handleClick={handleClick}
       />
 
       <ModalCadastroDeDepositoDaLoja
@@ -627,6 +628,7 @@ export const ActionListaExtratoContaCorrenteLoja = ({
           optionsModulos={optionsModulos}
           usuarioLogado={usuarioLogado}
           empresaSelecionada={empresaSelecionada}
+          handleClick={handleClick}
         />
   
         <ModalAjusteExtratoModal
@@ -635,6 +637,7 @@ export const ActionListaExtratoContaCorrenteLoja = ({
           optionsModulos={optionsModulos}
           usuarioLogado={usuarioLogado}
           empresaSelecionada={empresaSelecionada}
+          handleClick={handleClick}
         />
     </Fragment>
 

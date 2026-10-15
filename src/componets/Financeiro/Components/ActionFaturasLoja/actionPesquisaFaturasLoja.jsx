@@ -14,6 +14,7 @@ import { useFetchData } from "../../../../hooks/useFetchData"
 import { ActionImportacaoArquivo } from "./actionImportacaoArquivo"
 import { IoMdCheckmark } from "react-icons/io"
 import { useConferirTodasFaturas } from "./hooks/useConfeririTodasFaturas"
+import { ActionImportArquivo } from "./actionImportArquivo"
 
 export const ActionPesquisaFaturasLoja = ({ usuarioLogado, ID }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
@@ -242,7 +243,7 @@ export const ActionPesquisaFaturasLoja = ({ usuarioLogado, ID }) => {
         <ActionMain
           linkComponentAnterior={["Home"]}
           linkComponent={["Lista de Faturas"]}
-          title="Faturas por Lojas e Período"
+          title="Faturas por Lojas e Período aqui"
           subTitle={empresaSelecionadaNome}
 
           InputFieldDTInicioComponent={InputField}
@@ -313,7 +314,7 @@ export const ActionPesquisaFaturasLoja = ({ usuarioLogado, ID }) => {
       )}
 
       {actionArquivo && (
-        <ActionImportacaoArquivo
+        <ActionImportArquivo
           dadosVendaMarcaPeriodo={dadosVendaMarcaPeriodo}
           actionArquivo={actionArquivo}
           setActionArquivo={setActionArquivo}

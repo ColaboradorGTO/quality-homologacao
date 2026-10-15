@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import Swal from "sweetalert2";
-import { get, post, put } from "../../../../../api/funcRequest";
+import { get, put } from "../../../../../api/funcRequest";
 import { toFloat } from "../../../../../utils/toFloat";
 import { useQuery } from "react-query";
 import { removerFormatacaoMoeda } from "../../../../../utils/formatMoeda";
@@ -32,7 +31,7 @@ const extrairDataHora = (valor) => {
     return { data, hora };
 };
 
-export const useUpdateDeposito = ({ handleClose, optionsModulos, usuarioLogado, dadosDeposito }) => {
+export const useUpdateDeposito = ({ handleClose, optionsModulos, usuarioLogado, dadosDeposito, handleClick }) => {
     const [empresa, setEmpresa] = useState('')
     const [data, setData] = useState('')
     const [hora, setHora] = useState('')
@@ -42,8 +41,6 @@ export const useUpdateDeposito = ({ handleClose, optionsModulos, usuarioLogado, 
     const [vrDeposito, setVrDeposito] = useState('')
     const [dataMovimento, setDataMovimento] = useState('')
     const [horaMovimento, setHoraMovimento] = useState('')
-    
-
 
 
     const { data: dadosContaBanco = [], error: errorContaBanco, isLoading: isLoadingContaBanco } = useQuery(
@@ -56,50 +53,50 @@ export const useUpdateDeposito = ({ handleClose, optionsModulos, usuarioLogado, 
     );
 
     useEffect(() => {
-    const deposito = dadosDeposito?.[0];
+        const deposito = dadosDeposito?.[0];
 
-    if (deposito) {
-        const depositoDataHora = extrairDataHora(
-            deposito.DTDEPCOMPLETA
-        );
+        if (deposito) {
+            const depositoDataHora = extrairDataHora(
+                deposito.DTDEPCOMPLETA
+            );
 
-        const movimentoDataHora = extrairDataHora(
-            deposito.DTMOVDEPCOMPLETA
-        );
+            const movimentoDataHora = extrairDataHora(
+                deposito.DTMOVDEPCOMPLETA
+            );
 
-        setEmpresa(deposito.NOFANTASIA);
+            setEmpresa(deposito.NOFANTASIA);
 
-        setData(depositoDataHora.data);
-        setHora(depositoDataHora.hora);
-        
-        setDataMovimento(movimentoDataHora.data);
-        setHoraMovimento(movimentoDataHora.hora);
+            setData(depositoDataHora.data);
+            setHora(depositoDataHora.hora);
+            
+            setDataMovimento(movimentoDataHora.data);
+            setHoraMovimento(movimentoDataHora.hora);
 
-        setContaSelecionada({
-            value: deposito.IDCONTABANCO,
-            label: deposito.DSCONTABANCO
-        });
+            setContaSelecionada({
+                value: deposito.IDCONTABANCO,
+                label: deposito.DSCONTABANCO
+            });
 
-        setHistorico(deposito.DSHISTORIO);
-        setDocumento(deposito.NUDOCDEPOSITO);
-        setVrDeposito(toFloat(deposito.VRDEPOSITO));
-    }
-}, [dadosDeposito]);
+            setHistorico(deposito.DSHISTORIO);
+            setDocumento(deposito.NUDOCDEPOSITO);
+            setVrDeposito(toFloat(deposito.VRDEPOSITO));
+        }
+    }, [dadosDeposito]);
 
     const onSubmit = async () => {
         if (optionsModulos[0]?.CRIAR == 'False') {
             Swal.fire({
                 position: 'center',
-                icon: 'error',
-                title: 'Erro!',
-                text: 'Você não tem permissão para criar ajuste de extrato!',
+                icon: 'warning',
+                title: 'Acesso Negado!',
+                html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para Editar Depósito!.`,
                 customClass: {
                     container: 'custom-swal',
                 },
                 showConfirmButton: false,
-                timer: 4000
+                timer: 5000
             });
-            return
+            return;
         }
 
         if(historico == '') {
@@ -147,21 +144,6 @@ export const useUpdateDeposito = ({ handleClose, optionsModulos, usuarioLogado, 
             return
         }
 
-        // if(hora == '') {
-        //     Swal.fire({
-        //         position: 'center',
-        //         icon: 'error',
-        //         title: 'Erro!',
-        //         text: 'Campo obrigatório Informe a Hora',
-        //         customClass: {
-        //             container: 'custom-swal',
-        //         },
-        //         showConfirmButton: false,
-        //         timer: 4000
-        //     });
-        //     return
-        // }
-
         if(vrDeposito == '') {
             Swal.fire({
                 position: 'center',
@@ -192,21 +174,6 @@ export const useUpdateDeposito = ({ handleClose, optionsModulos, usuarioLogado, 
             return
         }
 
-        // if(horaMovimento == '') {
-        //     Swal.fire({
-        //         position: 'center',
-        //         icon: 'error',
-        //         title: 'Erro!',
-        //         text: 'Campo obrigatório Informe a Hora Movimento',
-        //         customClass: {
-        //             container: 'custom-swal',
-        //         },
-        //         showConfirmButton: false,
-        //         timer: 4000
-        //     });
-        //     return
-        // }
-
         
         const putData = {
             IDDEPOSITOLOJA: parseInt(dadosDeposito[0]?.IDDEPOSITOLOJA),
@@ -221,6 +188,7 @@ export const useUpdateDeposito = ({ handleClose, optionsModulos, usuarioLogado, 
             STATIVO: 'True',
             STCANCELADO: 'False',
         }
+        
         try {
 
             const response = await put('/deposito-loja/:id', putData)
@@ -242,8 +210,9 @@ export const useUpdateDeposito = ({ handleClose, optionsModulos, usuarioLogado, 
                     container: 'custom-swal',
                 }
             })
+            handleClick()
             handleClose()
-            return response.data
+            return response.data;
         } catch (error) {
 
             await registrarLogAuditoria({
@@ -267,9 +236,7 @@ export const useUpdateDeposito = ({ handleClose, optionsModulos, usuarioLogado, 
             });
 
             return;
-
         }
-
     }
 
     return {

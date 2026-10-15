@@ -9,7 +9,7 @@ import { formatarMoeda } from "../../../../../utils/formatMoeda";
 import { schema } from "./schema/useDepositoSchema"
 import FormField from "../../../../Formularios/FormField";
 
-export const FormularioEditarDeposito = ({ handleClose, optionsModulos, usuarioLogado, dadosDeposito }) => {
+export const FormularioEditarDeposito = ({ handleClose, optionsModulos, usuarioLogado, dadosDeposito, handleClick }) => {
     const { register, handleSubmit, formState: { errors }, clearErrors, setError, control } = useForm({
         mode: "onChange"
     });
@@ -35,7 +35,7 @@ export const FormularioEditarDeposito = ({ handleClose, optionsModulos, usuarioL
         horaMovimento,
         dadosContaBanco,
         onSubmit,
-    } = useUpdateDeposito({ handleClose, optionsModulos, usuarioLogado, dadosDeposito });
+    } = useUpdateDeposito({ handleClose, optionsModulos, usuarioLogado, dadosDeposito, handleClick });
 
     const handleValidatedSubmit = async () => {
         try {
@@ -46,10 +46,8 @@ export const FormularioEditarDeposito = ({ handleClose, optionsModulos, usuarioL
             await schema.validate(dadosParaValidar, { abortEarly: false });
 
             await onSubmit();
-
         } catch (validationError) {
             clearErrors();
-
 
             if (validationError.inner && validationError.inner.length > 0) {
                 validationError.inner.forEach(error => {
@@ -131,28 +129,24 @@ export const FormularioEditarDeposito = ({ handleClose, optionsModulos, usuarioL
                 <div className="form-group">
                     <div className="row">
                         <div className="col-sm-6 col-xl-8">
-
-                            <InputFieldModal
-                                label={"Histórico"}
-                                type="text"
-                                id="historico"
-                                value={historico}
-                                onChangeModal={(e) => setHistorico(e.target.value)}
-                                {...register("historico", { required: "Campo obrigatório Informe o Histórico", })}
+                            <Controller
+                                name="depHistorico"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField
+                                        label={"Histórico"}
+                                        name="depHistorico"
+                                        type="text"
+                                        value={historico}
+                                        onChange={(e) => setHistorico(e.target.value)}
+                                        errors={errors}
+                                        clearErrors={clearErrors}
+                                        
+                                    />
+                                )}
                             />
                         </div>
                         <div className="col-sm-6 col-xl-4">
-
-                            <InputFieldModal
-                                label={"Nº Doc Depósito"}
-                                type="text"
-                                id="docDeposito"
-                                readOnly={false}
-                                value={documento}
-                                onChangeModal={(e) => setDocumento(e.target.value)}
-                                {...register("docDeposito", { required: "Campo obrigatório Informe o Nº Doc Depósito", })}
-                            />
-
                             <Controller
                                 name="docDeposito"
                                 control={control}
@@ -165,7 +159,7 @@ export const FormularioEditarDeposito = ({ handleClose, optionsModulos, usuarioL
                                         onChange={(e) => setDocumento(e.target.value)}
                                         errors={errors}
                                         clearErrors={clearErrors}
-                                        readOnly={true}
+                                        
                                     />
                                 )}
                             />
@@ -187,7 +181,7 @@ export const FormularioEditarDeposito = ({ handleClose, optionsModulos, usuarioL
                                         onChange={(e) => setVrDeposito(formatarMoeda(e.target.value))}
                                         errors={errors}
                                         clearErrors={clearErrors}
-                                        readOnly={true}
+                                     
                                     />
                                 )}
                             />
@@ -223,10 +217,10 @@ export const FormularioEditarDeposito = ({ handleClose, optionsModulos, usuarioL
 
                 <FooterModal
                     ButtonTypeCadastrar={ButtonTypeModal}
-                    onClickButtonCadastrar={handleSubmit(handleValidatedSubmit)}
+                    onClickButtonCadastrar={handleValidatedSubmit}
                     textButtonCadastrar={"Editar Depósito"}
                     corCadastrar={"success"}
-                    loadingTextCadastrar={"Cadastrando..."}
+                    loadingTextCadastrar={"Atualizando..."}
                     autoLoadingCadastrar={true}
 
                     ButtonTypeFechar={ButtonTypeModal}

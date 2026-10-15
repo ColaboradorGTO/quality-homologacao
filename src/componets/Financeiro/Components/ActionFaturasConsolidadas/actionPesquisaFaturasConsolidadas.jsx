@@ -253,13 +253,13 @@ export const ActionPesquisaFaturasConsolidadas = ({ usuarioLogado }) => {
           onChangeInputField={(e) => setCodigoFatura(e.target.value)}
 
           ButtonSearchComponent={ButtonType}
-          linkNomeSearch={"Pesquisar"}
+          linkNomeSearch={"Prévias Consolidações"}
           onButtonClickSearch={handleClick}
           IconSearch={AiOutlineSearch}
           corSearch={"primary"}
 
           ButtonTypeCadastro={ButtonType}
-          linkNome={"Conciliar"}
+          linkNome={"Consolidações"}
           onButtonClickCadastro={handleClickConciliar}
           corCadastro={"info"}
           IconCadastro={AiOutlineSearch}
