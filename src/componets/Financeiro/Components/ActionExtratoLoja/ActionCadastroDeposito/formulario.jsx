@@ -5,8 +5,6 @@ import { InputFieldModal } from "../../../../Buttons/InputFieldModal";
 import { useCreateDeposito } from "../hooks/useCreateDeposito";
 import { useForm, Controller } from "react-hook-form";
 import Select from 'react-select';
-import { useEffect } from "react"
-import { mascaraValor } from "../../../../../utils/mascaraValor";
 import { schema } from "./schema/useDepositoSchema"
 import { formatarMoeda } from "../../../../../utils/formatMoeda";
 
@@ -70,18 +68,6 @@ export const FormularioCadastroDeposito = ({
         }
     }
 
-    // useEffect(() => {
-    //     if (!hora) {
-    //         const now = new Date();
-    //         const formatted = now.toISOString().slice(0, 16); // "YYYY-MM-DDTHH:mm"
-    //         setHora(formatted);
-    //     }
-    // }, [hora, setHora]);
-
-    const handleValorDepositoChange = (e) => {
-        const valor = e.target.value.replace(/,/g, '.');
-        setVrDeposito(valor);
-    };
 
     return (
         <Fragment>

@@ -43,7 +43,7 @@ export const ActionListaExtratoContaCorrenteLoja = ({
 
   const {
     handleCancelar
-  } = useUpdateStatusDeposito({ optionsModulos, usuarioLogado })
+  } = useUpdateStatusDeposito({ optionsModulos, usuarioLogado, handleClick })
 
 
   const onGlobalFilterChange = (e) => {

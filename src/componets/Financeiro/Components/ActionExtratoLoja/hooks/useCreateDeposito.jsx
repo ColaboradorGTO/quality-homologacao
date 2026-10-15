@@ -6,41 +6,16 @@ import { useQuery } from "react-query";
 import { registrarLogAuditoria } from "../../../../../services/auditLog.js";
 import { removerFormatacaoMoeda } from "../../../../../utils/formatMoeda.js";
 
-const extrairDataHora = (valor) => {
-    if (!valor) {
-        return { data: '', hora: '' };
-    }
-
-    const dataCompleta = new Date(valor);
-
-    if (Number.isNaN(dataCompleta.getTime())) {
-        return { data: '', hora: '' };
-    }
-
-    const data = [
-        dataCompleta.getFullYear(),
-        String(dataCompleta.getMonth() + 1).padStart(2, '0'),
-        String(dataCompleta.getDate()).padStart(2, '0')
-    ].join('-');
-
-    const hora = [
-        String(dataCompleta.getHours()).padStart(2, '0'),
-        String(dataCompleta.getMinutes()).padStart(2, '0')
-    ].join(':');
-
-    return { data, hora };
-};
-
 export const useCreateDeposito = ({ handleClose, optionsModulos, usuarioLogado, empresaSelecionada, handleClick }) => {
-      const [empresa, setEmpresa] = useState('')
-      const [data, setData] = useState('')
-      const [hora, setHora] = useState('')
-      const [contaSelecionada, setContaSelecionada] = useState('')
-      const [historico, setHistorico] = useState('')
-      const [documento, setDocumento] = useState('')
-      const [vrDeposito, setVrDeposito] = useState('')
-      const [dataMovimento, setDataMovimento] = useState('')
-      const [horaMovimento, setHoraMovimento] = useState('')
+    const [empresa, setEmpresa] = useState('')
+    const [data, setData] = useState('')
+    const [hora, setHora] = useState('')
+    const [contaSelecionada, setContaSelecionada] = useState('')
+    const [historico, setHistorico] = useState('')
+    const [documento, setDocumento] = useState('')
+    const [vrDeposito, setVrDeposito] = useState('')
+    const [dataMovimento, setDataMovimento] = useState('')
+    const [horaMovimento, setHoraMovimento] = useState('')
 
     useEffect(() => {
         const dataAtual = getDataAtual()
@@ -50,8 +25,6 @@ export const useCreateDeposito = ({ handleClose, optionsModulos, usuarioLogado, 
         setHoraMovimento(horaAtual)
         setDataMovimento(dataAtual)
     }, [usuarioLogado]);
-
-
 
     const { data: dadosContaBanco = [], error: errorContaBanco, isLoading: isLoadingContaBanco } = useQuery(
         'contaBanco',
