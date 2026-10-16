@@ -439,6 +439,7 @@ export const ActionListaExtratoLojaTeste = ({
         usuarioLogado={usuarioLogado}
         empresaSelecionada={empresaSelecionada}
       />
+      
     </Fragment>
   );
 };

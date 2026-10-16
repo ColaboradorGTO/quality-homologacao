@@ -28,7 +28,7 @@ export const FormularioIncluirProdutoPedido = ({
         mode: "onChange"
     });
     const {
-         nomeMarca,
+        nomeMarca,
         setNomeMarca,
         referenciaProduto,
         setReferenciaProduto,

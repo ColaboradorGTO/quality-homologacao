@@ -20,7 +20,8 @@ import HeaderTable from "../../Tables/headerTable";
 export const ActionListaFechamentoDosCaixas = ({
   dadosCaixaFechados,
   usuarioLogado,
-  optionsModulos
+  optionsModulos,
+  handleClick
 }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const dataTableRef = useRef();
@@ -183,6 +184,7 @@ export const ActionListaFechamentoDosCaixas = ({
     const total = calcularTotal('TOTALFECHAMENTOFATURA');
     return total;
   }
+
   const colunaDetalheDespesas = [
     {
       field: 'IDMOVIMENTO',
@@ -271,10 +273,9 @@ export const ActionListaFechamentoDosCaixas = ({
       sortable: true,
     },
     {
-      field: 'OPTIONS',
+      field: 'OPCOES',
       header: 'Opções',
       body: row => {
-        console.log(row.STCONFERIDO, 'STCONFERIDO')
         if (row.STCONFERIDO > 0) {
           return (
             <div>
@@ -288,7 +289,6 @@ export const ActionListaFechamentoDosCaixas = ({
                 height="40px"
                 disabledBTN={optionsModulos[0]?.ALTERAR == 'False' ? true : false}
               />
-
             </div>
           )
         } else {
@@ -354,7 +354,7 @@ export const ActionListaFechamentoDosCaixas = ({
             IDFUNCIONARIO: String(usuarioLogado.id),
             PATHFUNCAO: textoFuncao,
             DADOS: textDados,
-            IP: ipUsuario || 'INDISPONIVEL',
+            IP: ipUsuario
           }
 
           const responsePost = await post('/log-web', postData)
@@ -385,75 +385,7 @@ export const ActionListaFechamentoDosCaixas = ({
       }
     });
   };
-
- /*  const handleConferir = async (row) => {
-    if (optionsModulos[0]?.ALTERAR == 'False') {
-      Swal.fire({
-        icon: 'error',
-        title: 'Acesso Negado',
-        text: 'Você não tem permissão para conferir ou abrir caixa.',
-        confirmButtonText: 'OK',
-        confirmButtonColor: '#3085d6'
-
-      })
-      return;
-    }
-
-    Swal.fire({
-      icon: 'question',
-      title: `Confimar Conferencia do Caixa `,
-      showCloseButton: true,
-      showCancelButton: true,
-      cancelButtonColor: '#FD1381',
-      confirmButtonColor: '#7352A5',
-      confirmButtonText: 'OK',
-      cancelButtonText: 'Cancelar',
-      customClass: {
-        container: 'custom-swal',
-      },
-      preConfirm: async () => {
-        try {
-          let stConferidoValue;
-          let textoFuncao = '';
-
-          if (row.STCONFERIDO == 0) {
-            stConferidoValue = 1;
-            textoFuncao = 'ADMINISTRATIVO/ABERTURA DO MOVIMENTO DE CAIXA';
-          } else {
-            stConferidoValue = 0;
-            textoFuncao = 'ADMINISTRATIVO/CONFIMAR CONFERENCIA DO MOVIMENTO DE CAIXA';
-          }
-          const putData = {
-            IDSUPERVISOR: usuarioLogado.id,
-            STCONFERIDO: String(stConferidoValue),
-            ID: row.IDMOVIMENTO,
-          };
-
-          const textDados = JSON.stringify(putData)
-          const ipUsuario = await getIPUsuario();
-
-          await put('/atualizacao-status', putData);
-
-          const postData = {
-            IDFUNCIONARIO: String(usuarioLogado.id),
-            PATHFUNCAO: textoFuncao,
-            DADOS: textDados,
-            IP: ipUsuario
-          }
-
-          const responsePost = await post('/log-web', postData)
-
-          Swal.fire('Sucesso!', 'Recompra atualizada com sucesso.', 'success');
-
-          responsePost.data;
-        } catch (error) {
-          Swal.fire('Erro!', 'Erro ao atualizar recompra.', 'error');
-        }
-      }
-    });
-
-
-  }; */
+ 
 
 
   const footerGroup = (
@@ -484,7 +416,6 @@ export const ActionListaFechamentoDosCaixas = ({
               </h2>
             </header>
 
-
             <div style={{ marginBottom: "1rem" }}>
               <HeaderTable
                 globalFilterValue={globalFilterValue}
@@ -510,6 +441,7 @@ export const ActionListaFechamentoDosCaixas = ({
                 currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
                 filterDisplay="menu"
                 showGridlines
+                cellMemo={false}
                 stripedRows
                 emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
               >

@@ -11,11 +11,11 @@ import { animacaoCarregamento, fecharAnimacaoCarregamento, foiCancelado } from "
 import { useFetchData } from "../../../../hooks/useFetchData"
 import Swal from "sweetalert2"
 import { ActionListaExtratoContaCorrenteLoja } from "./actionListaExtratoLojaCopia"
-import { IoMdAdd } from "react-icons/io"
+
 
 export const ActionPesquisaExtratoLoja = ({ usuarioLogado }) => {
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
-  const [dataPesquisaInicio, setDataPesquisaInicio] = useState(''); 
+  const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
   const [dataPesquisaFim, setDataPesquisaFim] = useState('');
   const [empresaSelecionada, setEmpresaSelecionada] = useState('');
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
@@ -29,7 +29,7 @@ export const ActionPesquisaExtratoLoja = ({ usuarioLogado }) => {
   }, [])
 
   const { data: optionsEmpresas = [], error: errorEmpresas, isLoading: isLoadingEmpresas } = useFetchData('listaEmpresasIformatica', '/listaEmpresasIformatica');
-  
+
   useEffect(() => {
     const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
     if (menuSalvo) {
@@ -41,50 +41,15 @@ export const ActionPesquisaExtratoLoja = ({ usuarioLogado }) => {
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
     ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
-      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.idFuncionario}&idMenuFilho=${menuFilhoAtual?.ID}`);
-
+      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
+    
       return response.data;
     },
     { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
   );
 
- /*  const fetchExtratoLoja = async () => {
-    const urlBase = `/lista-extrato?idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
-    let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
-    urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
-    try {
 
-      animacaoCarregamento('Carregando dados...', true);
-
-      const primeiraPagina = 1;
-      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`);
-      const page = primeiraResposta.page || primeiraPagina;
-      const pageSize = primeiraResposta.pageSize || 1000;
-      const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
-      const totalPages = Math.ceil(totalRows / pageSize);
-
-      let allData = [...(primeiraResposta.data || [])];
-
-      if (totalPages > 1) {
-        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
-          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true);
-          const responsePage = await get(`${urlApi}&page=${currentPage}`);
-          allData.push(...(responsePage.data || []));
-        }
-      }
-
-      return allData
-
-    } catch (error) {
-      console.error('Erro ao buscar dados:', error);
-      throw error;
-    } finally {
-      fecharAnimacaoCarregamento();
-    }
-  }; */
-
-
-const fetchExtratoLoja = async () => {
+  const fetchExtratoLoja = async () => {
     const urlBase = `/lista-extrato?idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
@@ -170,11 +135,9 @@ const fetchExtratoLoja = async () => {
         InputSelectEmpresaComponent={InputSelectAction}
         labelSelectEmpresa={"Empresa"}
         optionsEmpresas={[
-
           ...optionsEmpresas.map((empresa) => ({
             value: empresa.IDEMPRESA,
             label: empresa.NOFANTASIA,
-
           }))
         ]}
         valueSelectEmpresa={empresaSelecionada}
@@ -186,27 +149,25 @@ const fetchExtratoLoja = async () => {
         corSearch={"primary"}
         IconSearch={AiOutlineSearch}
 
-        ButtonTypeCadastro={ButtonType}
-        linkNome={"Cadastrar Depósitos"}
-        onButtonClickCadastro
-        corCadastro={"success"}
-        IconCadastro={IoMdAdd}
+        // ButtonTypeCadastro={ButtonType}
+        // linkNome={"Cadastrar Depósitos"}
+        // onButtonClickCadastro
+        // corCadastro={"success"}
+        // IconCadastro={IoMdAdd}
       />
 
       {tabelaVisivel && (
         <Fragment>
-         
-            <ActionListaExtratoContaCorrenteLoja
-              dadosExtratoLojaPeriodo={dadosExtratoLojaPeriodo}
-              usuarioLogado={usuarioLogado}
-              optionsModulos={optionsModulos}
-              empresaSelecionada={empresaSelecionada}
-              handleClick={handleClick}
-            />
-          
-
+          <ActionListaExtratoContaCorrenteLoja
+            dadosExtratoLojaPeriodo={dadosExtratoLojaPeriodo}
+            usuarioLogado={usuarioLogado}
+            optionsModulos={optionsModulos}
+            empresaSelecionada={empresaSelecionada}
+            handleClick={handleClick}
+          />
         </Fragment>
       )}
+
     </Fragment>
   )
 }

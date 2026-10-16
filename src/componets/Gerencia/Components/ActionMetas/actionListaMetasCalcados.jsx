@@ -1,5 +1,4 @@
 import { Fragment, useRef, useState } from "react"
-import { GrFormView } from "react-icons/gr";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { ButtonTable } from "../../../ButtonsTabela/ButtonTable";
@@ -8,17 +7,23 @@ import { jsPDF } from 'jspdf';
 import * as XLSX from 'xlsx';
 import 'jspdf-autotable';
 import HeaderTable from "../../../Tables/headerTable";
-import { get } from "../../../../api/funcRequest";
 import { formatMoeda } from "../../../../utils/formatMoeda";
+import { AiOutlineDelete } from "react-icons/ai";
+import { useCancelarMetaColaborador } from "./hooks/useCancelarMetaColaborador";
 
 
 export const ActionListaMetasCalcados = ({ 
   dadosCalcados,
+  usuarioLogado, 
+  optionsModulos, 
+  handleClick
 }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
-
+  const {
+    handleCancelar
+  } = useCancelarMetaColaborador({usuarioLogado, optionsModulos, handleClick})
 
 
   const onGlobalFilterChange = (e) => {
@@ -27,45 +32,70 @@ export const ActionListaMetasCalcados = ({
 
   const handlePrint = useReactToPrint({
     content: () => dataTableRef.current,
-    documentTitle: 'Lista Vendas Metas',
+    documentTitle: 'Lista Metas Colocaborador',
   });
 
   const exportToPDF = () => {
     const doc = new jsPDF();
     doc.autoTable({
-      head: [['Nº', 'Grupo', 'Data Início', 'Data Fim', 'Situação']],
+      head: [['Nº', 'Nome', 'Matrícula', 'Função', 'Seção', 'Vr Meta', 'Vr Alcançado', 'Situação']],
       body: dados.map(item => [
         item.contador,
-        item.DSSUBGRUPOEMPRESARIAL,
-        item.DTMETAINICIOFORMAT,
-        item.DTMETAFIMFORMAT,
-        item.STSALVO == 'True' ? 'SALVO' : 'NÃO SALVO',
+        item.NOFUNCIONARIO,
+        item.IDFUNCIONARIO,
+        item.DSFUNCAO,
+        item.NOSECAO,
+        formatMoeda(item.VRMETACOLABORADOR),
+        formatMoeda(item.VRTOTALLIQUIDOCALC),
+        item.situacao
       ]),
       horizontalPageBreak: true,
       horizontalPageBreakBehaviour: 'immediately'
     });
-    doc.save('marcas_vendas_metas.pdf');
+    doc.save('metas_colaborador.pdf');
   };
 
   const exportToExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(dados);
+    const worksheet = XLSX.utils.json_to_sheet(dados.map(item => ({
+      'Nº': item.contador,
+      'Nome': item.NOFUNCIONARIO,
+      'Matrícula': item.IDFUNCIONARIO,
+      'Função': item.DSFUNCAO,
+      'Seção': item.NOSECAO,
+      'Vr.Meta': formatMoeda(item.VRMETACOLABORADOR),
+      'Vr.Alcançado': formatMoeda(item.VRTOTALLIQUIDOCALC),
+      'Situação': item.situacao
+    })));
+
     const workbook = XLSX.utils.book_new();
-    const header = ['Nº', 'Grupo', 'Data Início', 'Data Fim', 'Situação'];
+    const header = ['Nº', 'Nome', 'Matrícula', 'Função', 'Seção', 'Vr Meta', 'Vr Alcançado', 'Situação'];
     worksheet['!cols'] = [
       { wpx: 50, caption: 'Nº' },
-      { wpx: 200, caption: 'Grupo' },
-      { wpx: 150, caption: 'Data Início' },
-      { wpx: 150, caption: 'Data Fim' },
-      { wpx: 150, caption: 'Situação' },
+      { wpx: 200, caption: 'Nome' },
+      { wpx: 100, caption: 'Matrícula' },
+      { wpx: 100, caption: 'Função' },
+      { wpx: 100, caption: 'Seção' },
+      { wpx: 100, caption: 'Vr.Meta' },
+      { wpx: 100, caption: 'Vr.Alcançado' },
+      { wpx: 100, caption: 'Situação' },
     ];
     XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Lista Vendas Metas');
-    XLSX.writeFile(workbook, 'marcas_vendas_metas.xlsx');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Lista Metas Colaborador');
+    XLSX.writeFile(workbook, 'metas_colaborador.xlsx');
   };
 
   const dados = dadosCalcados?.map((item, index) => {
     let contador = index + 1;
-    console.log(item?.vendasecaocalcados[0]?.['venda-calcados']?.VRTOTALLIQUIDOCALC, 'item')
+    let situacao;
+    let cor;
+    if(item?.metasColaborador?.VRMETACOLABORADOR > item?.vendasecaocalcados[0]?.['venda-calcados']?.VRTOTALLIQUIDOCALC) {
+      situacao = 'NÃO COMPRIDA'
+      cor = 'red'
+    } else {
+      situacao = 'CUMPRIDA'
+      cor = 'blue'
+    }
+
     return {
       contador,
       IDMETASLOJA: item?.metasColaborador?.IDMETASLOJA,
@@ -76,8 +106,9 @@ export const ActionListaMetasCalcados = ({
       DSFUNCAO: item?.metasColaborador?.DSFUNCAO,
       VRMETACOLABORADOR: item?.metasColaborador?.VRMETACOLABORADOR,
       PERCMETACOLABORADOR: item?.metasColaborador?.PERCMETACOLABORADOR,
-      VRTOTALLIQUIDOCALC: item?.vendasecaocalcados[0]?.['venda-calcados']?.VRTOTALLIQUIDOCALC
- 
+      VRTOTALLIQUIDOCALC: item?.vendasecaocalcados[0]?.['venda-calcados']?.VRTOTALLIQUIDOCALC,
+      situacao,
+      cor
     };
   });
 
@@ -125,7 +156,12 @@ export const ActionListaMetasCalcados = ({
       body: row => <th>{formatMoeda(row.VRTOTALLIQUIDOCALC)}</th>,
       sortable: true,
     },
-   
+    {
+      field: 'situacao',
+      header: 'Situação',
+      body: row => <th style={{color: row.cor}}>{row.situacao}</th>,
+      sortable: true,
+    },
     {
       field: 'STSALVO',
       header: 'Opções',
@@ -134,12 +170,12 @@ export const ActionListaMetasCalcados = ({
           <div style={{ display: "flex", justifyContent: "space-around" }}>
             <div className="p-1">
               <ButtonTable
-                titleButton={"Detalhar Metas"}
-                onClickButton={() => handleClickDetalhe(row)}
-                Icon={GrFormView}
+                titleButton={"Excluir Meta do Colaborador"}
+                onClickButton={() =>  handleCancelar(row)}
+                Icon={AiOutlineDelete}
                 iconSize={25}
                 iconColor={"#fff"}
-                cor={"info"}
+                cor={"danger"}
                 width="30px"
                 height="30px"
               />
@@ -151,44 +187,13 @@ export const ActionListaMetasCalcados = ({
     },
   ]
 
-  const handleDetalhe = async (empresa) => {
-    try {
-      const response = await get(`/detalhe-metas-loja?idMetaEmpresa=${empresa}`)
-      const responseCalcados = await get(`/metas-colaborador?idMetaLoja=${empresa}&noSecaoMetaLoja=CALÇADOS`)
-      const responseFeminino = await get(`/metas-colaborador?idMetaLoja=${empresa}&noSecaoMetaLoja=FEMININO`)
-      const responseMasculino = await get(`/metas-colaborador?idMetaLoja=${empresa}&noSecaoMetaLoja=MASCULINO`)
-      const responseInfantil = await get(`/metas-colaborador?idMetaLoja=${empresa}&noSecaoMetaLoja=INFANTIL`)
-      const responseCmb = await get(`/metas-colaborador?idMetaLoja=${empresa}&noSecaoMetaLoja=CMB`)
-      if (response.data && response.data.length > 0) {
-        setDadosDetalheMeta(response.data)
-        setDadosCalcados(responseCalcados.data)
-        setDadosFeminino(responseFeminino.data)
-        setDadosMasculino(responseMasculino.data)
-        setDadosInfantil(responseInfantil.data)
-        setDadosCMB(responseCmb.data)
-        setTabelaVendaResumidaVisivel(true);
-        setTabelaVisivel(false);
-        setTabelaMetasVendasVisivel(false);
-      }
-    } catch (error) {
-      console.error('Erro ao buscar metas resumidas: ', error);
-    }
-  };
-  
-  const handleClickDetalhe = (row) => {
-    if (row && row.IDGRUPOEMPRESA) {
-      handleDetalhe(row.IDGRUPOEMPRESA);
-    }
-  };
-
-
 
   return (
 
     <Fragment>
       <div className="panel" >
         <div className="panel-hdr">
-          <h2>Metas Marcas Período aqui</h2>
+          <h2>Metas Calçados Lista dos Colaboradores</h2>
         </div>
         <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
           <HeaderTable

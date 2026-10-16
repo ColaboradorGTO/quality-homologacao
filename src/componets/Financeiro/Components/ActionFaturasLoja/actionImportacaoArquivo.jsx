@@ -12,7 +12,7 @@ import HeaderTable from "../../../Tables/headerTable";
 import { formatMoeda } from "../../../../utils/formatMoeda";
 import { ButtonType } from "../../../Buttons/ButtonType";
 import { IoMdReturnLeft } from "react-icons/io";
-
+import { mascaraValor } from "../../../../utils/mascaraValor"
 export const ActionImportacaoArquivo = ({ 
     dadosVendaMarcaPeriodo,
     actionArquivo,
@@ -42,7 +42,7 @@ export const ActionImportacaoArquivo = ({
     const exportToPDF = () => {
         const doc = new jsPDF();
         doc.autoTable({
-            head: [['Nº', 'Data', 'Cod. Estabelecimento', 'Empresa', 'Valor Recebido', 'Valor Arquivo', 'Valor Divergente', 'Obs']],
+            head: [['#', 'Data', 'Cod. Estabelecimento', 'Empresa', 'Valor Recebido', 'Valor Arquivo', 'Valor Divergente', 'Obs']],
             body: tableData.map(item => [
                 item.contador,
                 item.data,
@@ -61,7 +61,7 @@ export const ActionImportacaoArquivo = ({
 
     const exportToExcel = () => {
         const dados = tableData.map(item => ({
-            'Nº': item.contador,
+            '#': item.contador,
             'Data': item.data,
             'Cod. Estabelecimento': item.codEstabelecimento,
             'Empresa': item.empresa,
@@ -70,11 +70,12 @@ export const ActionImportacaoArquivo = ({
             'Valor Divergente': item.valorDivergente,
             'Obs': item.observacao
         }))
+      
         const worksheet = XLSX.utils.json_to_sheet(dados);
         const workbook = XLSX.utils.book_new();
-        const header = ['Nº', 'Data', 'Cod. Estabelecimento', 'Empresa', 'Valor Recebido', 'Valor Arquivo', 'Valor Divergente', 'Obs'];
+        const header = ['#', 'Data', 'Cod. Estabelecimento', 'Empresa', 'Valor Recebido', 'Valor Arquivo', 'Valor Divergente', 'Obs'];
         worksheet['!cols'] = [
-            { wpx: 50, caption: 'Nº' },
+            { wpx: 50, caption: '#' },
             { wpx: 100, caption: 'Data' },
             { wpx: 150, caption: 'Cod. Estabelecimento' },
             { wpx: 200, caption: 'Empresa' },
@@ -115,15 +116,15 @@ export const ActionImportacaoArquivo = ({
                 let vrConcFaturaTotal = 0;
                 let CodEmpFatura = '';
                 let NoEmpFatura = '';
-
+                
                 for (let i = 1; i < lines.length - 1; i++) {
                     contadorFatura++;
                     const dadoslinha = lines[i].split(";");
-
                     let encontrouCorrespondencia = false;
-
+                    
                     for (let j = 0; j < dadosVendaMarcaPeriodo?.length; j++) {
                         const item = dadosVendaMarcaPeriodo[j];
+                        
 
                         if ((item['VRFATURA'] > 0 || item['VRFATURAPIX'] > 0) &&
                             item['CODEMPRESA'] === dadoslinha[3]) {
@@ -142,7 +143,7 @@ export const ActionImportacaoArquivo = ({
                         console.log(`Não encontrou correspondência para CODEMPRESA: ${dadoslinha[3]} - Usando dados da última correspondência encontrada`);
                     }
 
-                    const vrFatTotalArq = Number(dadoslinha[5].replace(/\./g, "").replace(",", "."));
+                    const vrFatTotalArq = Number(dadoslinha[5]?.replace(/\./g, "").replace(",", "."));
 
                     let QtdDiverg = 0;
                     let obsdiverg = '';
@@ -168,8 +169,8 @@ export const ActionImportacaoArquivo = ({
                         data: dadoslinha[0],
                         codEstabelecimento: dadoslinha[3],
                         empresa: NoEmpFatura,
-                        valorRecebido: vrConcFaturaTotal.toFixed(2),
-                        valorArquivo: Number(dadoslinha[5].replace(/\./g, "").replace(",", ".")).toFixed(2),
+                        valorRecebido: mascaraValor(vrConcFaturaTotal.toFixed(2)),
+                        valorArquivo: mascaraValor(Number(dadoslinha[5]?.replace(/\./g, "").replace(",", ".")).toFixed(2)),
                         valorDivergente: QtdDiverg.toFixed(0),
                         observacao: obsdiverg,
                         statusColor: statusColor
@@ -237,7 +238,7 @@ export const ActionImportacaoArquivo = ({
     };
 
     const valorRecebidoTemplate = (rowData) => {
-        return <span style={{ textAlign: 'right' }}>{mascaraValor(rowData.valorRecebido)}</span>;
+        return <span style={{ textAlign: 'right' }}>{rowData.valorRecebido}</span>;
     };
 
     const valorArquivoTemplate = (rowData) => {
@@ -298,20 +299,19 @@ export const ActionImportacaoArquivo = ({
         {
           field: 'valorRecebido',
           header: 'Valor Recebido',
-          body: row => <th style={{}}> {formatMoeda(row.valorRecebido)} </th>,
+          body: row => <th style={{}}> {row.valorRecebido} </th>,
           sortable: true,
         },
         {
           field: 'valorArquivo',
           header: 'Valor Arquivo',
-          body: row => <th style={{}}> {formatMoeda(row.valorArquivo)} </th>,
-          footer: <p>Total Lançamentos</p>,
+          body: row => <th style={{}}> {row.valorArquivo} </th>,
           sortable: true,
         },
         {
           field: 'valorDivergente',
           header: 'Valor Divergente',
-          body: row => <th style={{}}> {formatMoeda(row.valorDivergente)} </th>,
+          body: row => <th style={{}}> {row.valorDivergente} </th>,
           sortable: true,
         },
         {
@@ -350,12 +350,12 @@ export const ActionImportacaoArquivo = ({
                 
 
                     <div>
-
+                      
                         <FileUpload
                             ref={fileUploadRef}
                             mode="basic"
                             name="file"
-                            accept=".txt,.csv"
+                            accept=".txt,.csv, .xlsx,"
                             customUpload={true}
                             uploadHandler={customUpload}
                             auto={true}

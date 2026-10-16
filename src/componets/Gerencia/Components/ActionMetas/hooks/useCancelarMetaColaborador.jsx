@@ -9,11 +9,11 @@ const formatarDataParaEnvio = (data) => {
     return `${ano}-${mes}-${dia} 00:00:00`;
 };
 
-export const useCancelarMeta = ({ usuarioLogado, optionsModulos, handleClick }) => {
+export const useCancelarMetaColaborador = ({ usuarioLogado, optionsModulos, handleClick }) => {
     const [dadosMetas, setDadosMetas] = useState([])
 
     const handleCancelar = async (row, status) => {
-        
+      
         if (optionsModulos[0]?.ALTERAR == 'False') {
             Swal.fire({
                 icon: "error",
@@ -27,21 +27,7 @@ export const useCancelarMeta = ({ usuarioLogado, optionsModulos, handleClick }) 
         }
         
         
-        
         try {
-            const responseExistente = await get(`meta-vendas?dataPesquisaInicio=${row?.DTMETAINICIO}&dataPesquisaFim=${row?.DTMETAFIM}&idMarca=${row?.IDGRUPOEMPRESA}`)
-            const metaExistente = responseExistente.data || [];
-            setDadosMetas(metaExistente)
-            
-            if (!metaExistente.length) { 
-                await Swal.fire({ 
-                    icon: "warning", 
-                    title: "Nenhuma meta encontrada!", 
-                    text: "Não existem metas para serem canceladas.", 
-                    customClass: { container: 'custom-swal' } 
-                }); 
-                return; 
-            }
 
             let motivoCancelamento = '';
  
@@ -93,64 +79,36 @@ export const useCancelarMeta = ({ usuarioLogado, optionsModulos, handleClick }) 
 
             motivoCancelamento = motivo.trim();
 
-            const total = metaExistente.length;
-            let enviados = 0;
-            let falhas = 0;
-            const idsCancelados = [];
+              console.log(row, 'row')
+            const dados = {
+                IDMETASLOJA: parseInt(row?.IDMETASLOJA),
+                IDMETASCOLABORADOR: parseInt(row?.IDMETASCOLABORADOR),
+                DSMOTIVOCANCELAMENTO: motivoCancelamento,
+                NOSECAO: row.NOSECAO,
+                STATIVO: 'False',
+            };
 
-            Swal.fire({
-                title: 'Cancelando Metas...',
-                html: `Enviando <b>0</b> de <b>${total}</b>`,
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                showConfirmButton: false,
-                customClass: { container: 'custom-swal' },
-                didOpen: () => Swal.showLoading()
+            const response = await put("/delete-meta-colaborador/:id", dados);
+            
+            await registrarLogAuditoria({
+                idFuncionario: usuarioLogado?.id,
+                pathFuncao: 'COMERCIAL/DESATIVANDO META DE VENDAS',
+                dados: dados
             });
-
-            for (const meta of metaExistente) {
-                const dados = {
-                    IDMETASLOJA: parseInt(meta?.IDMETASLOJA),
-                    IDGRUPOEMPRESA: parseInt(meta?.IDGRUPOEMPRESA),
-                    DSMOTIVOCANCELAMENTO: motivoCancelamento,
-                    DTMETAINICIO: formatarDataParaEnvio(meta?.DTMETAINICIO),
-                    DTMETAFIM: formatarDataParaEnvio(meta?.DTMETAFIM),
-                    STATIVO: 'False',
-                };
-
-                try {
-                    await put("/delete-meta/:id", dados);
-                    enviados++;
-                    idsCancelados.push(dados.IDMETASLOJA);
-                } catch (err) {
-                    console.error(err);
-                    falhas++;
-                }
-
-                Swal.update({
-                    html: `Enviando <b>${enviados + falhas}</b> de <b>${total}</b>`
-                });
-            }
-
-            if (idsCancelados.length) {
-                await registrarLogAuditoria({
-                    idFuncionario: usuarioLogado?.id,
-                    pathFuncao: 'COMERCIAL/DESATIVANDO META DE VENDAS',
-                    dados: { IDMETASLOJA: idsCancelados }
-                });
-            }
+            
+      
 
             await Swal.fire({
-                icon: falhas ? "warning" : "success",
-                title: falhas ? "Concluído com falhas!" : "Sucesso!",
-                html: `Foram canceladas <b>${enviados}</b> de <b>${total}</b> metas.${falhas ? `<br/><b>${falhas}</b> falharam.` : ''}`,
+                icon: "success",
+                title: "Sucesso!",
+                html: `Meta Cancelado com sucesso`,
                 customClass: {
                     container: 'custom-swal'
                 }
             });
 
             handleClick();
-            return { enviados, falhas, total };
+            return response.data;
         } catch (error) {
             Swal.close();
 
