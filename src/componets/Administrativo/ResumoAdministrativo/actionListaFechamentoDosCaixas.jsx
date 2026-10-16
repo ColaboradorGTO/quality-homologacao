@@ -277,10 +277,7 @@ export const ActionListaFechamentoDosCaixas = ({
         console.log(row.STCONFERIDO, 'STCONFERIDO')
         if (row.STCONFERIDO > 0) {
           return (
-
-
             <div>
-
               <ButtonTable
                 onClickButton={() => handleConferir(row)}
                 titleButton="Abertura do Caixa na Web"
@@ -294,15 +291,12 @@ export const ActionListaFechamentoDosCaixas = ({
 
             </div>
           )
-
         } else {
           return (
             <div>
-
-
               <ButtonTable
                 onClickButton={() => handleConferir(row)}
-                titleButton="Confirmar Conferencia do Caixa"
+                titleButton="Confirmar Conferenc ia do Caixa"
                 cor="success"
                 Icon={FaCashRegister}
                 iconSize={25}
@@ -310,7 +304,6 @@ export const ActionListaFechamentoDosCaixas = ({
                 height="40px"
                 disabledBTN={optionsModulos[0]?.ALTERAR == 'False' ? true : false}
               />
-
             </div>
           )
         }
@@ -320,7 +313,81 @@ export const ActionListaFechamentoDosCaixas = ({
   ]
 
   const handleConferir = async (row) => {
-    if(optionsModulos[0]?.ALTERAR == 'False') {
+    const conferido = row.STCONFERIDO > 0;
+
+    Swal.fire({
+      icon: 'question',
+      title: conferido ? 'Confirmar Abertura do Caixa na Web?' : 'Confirmar Conferência do Caixa?',
+      showCloseButton: true,
+      showCancelButton: true,
+      cancelButtonColor: '#FD1381',
+      confirmButtonColor: '#7352A5',
+      confirmButtonText: 'OK',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        container: 'custom-swal',
+      },
+      preConfirm: async () => {
+        try {
+          let stConferidoValue;
+          let textoFuncao = '';
+
+          if (!conferido) {
+            stConferidoValue = 1;
+            textoFuncao = 'ADMINISTRATIVO/CONFIMAR CONFERENCIA DO MOVIMENTO DE CAIXA';
+          } else {
+            stConferidoValue = 0;
+            textoFuncao = 'ADMINISTRATIVO/ABERTURA DO MOVIMENTO DE CAIXA';
+          }
+          const putData = {
+            IDSUPERVISOR: usuarioLogado.id,
+            STCONFERIDO: String(stConferidoValue),
+            ID: row.IDMOVIMENTO,
+          };
+
+          const textDados = JSON.stringify(putData)
+          const ipUsuario = await getIPUsuario();
+
+          await put('/atualizacao-status', putData);
+
+          const postData = {
+            IDFUNCIONARIO: String(usuarioLogado.id),
+            PATHFUNCAO: textoFuncao,
+            DADOS: textDados,
+            IP: ipUsuario || 'INDISPONIVEL',
+          }
+
+          const responsePost = await post('/log-web', postData)
+
+          Swal.fire({
+            icon: 'success',
+            title: conferido ? 'Caixa aberto com sucesso!' : 'Caixa conferido com sucesso!',
+            showConfirmButton: false,
+            timer: 5000,
+            customClass: {
+                container: 'custom-swal',
+            }
+          });
+
+          await handleClick()
+          responsePost.data;
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: conferido ? 'Erro ao abrir o Caixa!' : 'Erro ao conferir o Caixa!',
+            showConfirmButton: false,
+            timer: 5000,
+            customClass: {
+                container: 'custom-swal',
+            }
+          });
+        }
+      }
+    });
+  };
+
+ /*  const handleConferir = async (row) => {
+    if (optionsModulos[0]?.ALTERAR == 'False') {
       Swal.fire({
         icon: 'error',
         title: 'Acesso Negado',
@@ -386,7 +453,7 @@ export const ActionListaFechamentoDosCaixas = ({
     });
 
 
-  };
+  }; */
 
 
   const footerGroup = (
@@ -417,7 +484,7 @@ export const ActionListaFechamentoDosCaixas = ({
               </h2>
             </header>
 
-          
+
             <div style={{ marginBottom: "1rem" }}>
               <HeaderTable
                 globalFilterValue={globalFilterValue}

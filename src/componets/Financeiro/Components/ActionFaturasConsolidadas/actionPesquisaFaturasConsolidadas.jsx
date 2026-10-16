@@ -26,6 +26,7 @@ export const ActionPesquisaFaturasConsolidadas = ({ usuarioLogado }) => {
   const [empresaSelecionadaNome, setEmpresaSelecionadaNome] = useState('')
   const [codigoFatura, setCodigoFatura] = useState('')
   const [selectedItems, setSelectedItems] = useState([]);
+  const [selectedItemsConciliar, setSelectedItemsConciliar] = useState([]);
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
   useEffect(() => {
@@ -39,17 +40,17 @@ export const ActionPesquisaFaturasConsolidadas = ({ usuarioLogado }) => {
   useEffect(() => {
     const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
     if (menuSalvo) {
-    const menuParsed = JSON.parse(menuSalvo);
-    setMenuFilhoAtual(menuParsed);
+      const menuParsed = JSON.parse(menuSalvo);
+      setMenuFilhoAtual(menuParsed);
     }
   }, []);
 
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
     ['menus-usuario-excecao', menuFilhoAtual?.ID],
     async () => {
-    const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
+      const response = await get(`/menus-usuario-excecao?idUsuario=${usuarioLogado?.id}&idMenuFilho=${menuFilhoAtual?.ID}`);
 
-    return response.data;
+      return response.data;
     },
     { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
   );
@@ -178,7 +179,8 @@ export const ActionPesquisaFaturasConsolidadas = ({ usuarioLogado }) => {
   }
 
   const {
-    conferirTodas
+    conferirTodas,
+    conferirTodasConsolidadas
   } = useConsolidarTodasFaturas({ optionsModulos, usuarioLogado, handleClickConciliar, handleClick, selectedItems });
 
   const conferirTodasSelecionadas = () => {
@@ -210,6 +212,40 @@ export const ActionPesquisaFaturasConsolidadas = ({ usuarioLogado }) => {
       return;
     } else {
       conferirTodas();
+    }
+
+  }
+
+
+  const conferirTodasSelecionadasConsolidacoes = () => {
+
+    if (selectedItemsConciliar.length === 0) {
+      Swal.fire({
+        position: 'center',
+        icon: 'warning',
+        title: 'Nenhuma fatura selecionada, selecione e tente novamente!',
+        text: 'Nenhuma fatura selecionada, selecione e tente novamente!',
+        showConfirmButton: true,
+        timer: 6000,
+        customClass: {
+          container: 'custom-swal',
+        },
+      });
+      return;
+    } else if (optionsModulos[0]?.ALTERAR == 'False') {
+      Swal.fire({
+        position: 'center',
+        icon: 'error',
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> você não tem permissão para conferir a fatura.`,
+        showConfirmButton: true,
+        timer: 3000,
+        customClass: {
+          container: 'custom-swal',
+        },
+      });
+      return;
+    } else {
+      conferirTodasConsolidadas();
     }
 
   }
@@ -269,7 +305,14 @@ export const ActionPesquisaFaturasConsolidadas = ({ usuarioLogado }) => {
           onButtonClickCancelar={conferirTodasSelecionadas}
           corCancelar={"warning"}
           IconCancelar={MdOutlineCloudUpload}
-          styleCancelar = {{ display: selectedItems.length > 0 ? 'block' : 'none' }}
+          styleCancelar={{ display: selectedItems.length > 0 ? 'block' : 'none' }}
+
+          ButtonTypeSalvar={ButtonType}
+          linkSalvar={"Integrar Todos"}
+          onButtonClickSalvar={conferirTodasSelecionadasConsolidacoes}
+          corSalvar={"success"}
+          IconSalvar={MdOutlineCloudUpload}
+          styleSalvar={{ display: selectedItemsConciliar.length > 0 ? 'block' : 'none' }}
         />
       )}
 
