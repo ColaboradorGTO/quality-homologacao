@@ -142,7 +142,7 @@ export const ActionPesquisaVendasPixDTW = ({ usuarioLogado }) => {
   );
 
   const fetchListaVendasPixCompensacao = async () => {
-    const urlBase = `/venda-pix-periodo?idMarca=${marcaSelecionada}&dataPesquisaInicio=${dataCompenscaoInicio}&dataPesquisaFim=${dataCompenscaoFim}&idLoja=${empresaSelecionada}&empresaLista=${empresaLivre}`;
+    const urlBase = `/venda-pix-periodo?idMarca=${marcaSelecionada}&dataCompInicio=${dataCompenscaoInicio}&dataCompFim=${dataCompenscaoFim}&idLoja=${empresaSelecionada}&empresaLista=${empresaLivre}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     const controller = new AbortController();

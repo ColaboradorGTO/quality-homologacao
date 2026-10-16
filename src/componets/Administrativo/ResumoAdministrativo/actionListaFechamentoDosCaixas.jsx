@@ -291,13 +291,12 @@ export const ActionListaFechamentoDosCaixas = ({
               />
             </div>
           )
-
         } else {
           return (
             <div>
               <ButtonTable
                 onClickButton={() => handleConferir(row)}
-                titleButton="Confirmar Conferencia do Caixa"
+                titleButton="Confirmar Conferenc ia do Caixa"
                 cor="success"
                 Icon={FaCashRegister}
                 iconSize={25}

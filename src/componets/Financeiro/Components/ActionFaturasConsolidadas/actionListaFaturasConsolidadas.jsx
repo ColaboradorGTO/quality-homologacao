@@ -30,15 +30,17 @@ export const ActionListaFaturasConsolidadas = ({
   const [rows, setRows] = useState(10);
   const [selectAllChecked, setSelectAllChecked] = useState(false);
   const [btnVisivel, setBtnVisivel] = useState(false);
+
   const dataTableRef = useRef();
 
   const {
     confirmar
-  } = useConfirmarConsolidacaoFatura({ 
-    optionsModulos, 
-    usuarioLogado, 
-    handleClickConciliar: handleClickConciliar || handleClick,
-    handleClick 
+  } = useConfirmarConsolidacaoFatura({
+    optionsModulos,
+    usuarioLogado,
+    handleClickConciliar,
+    handleClick,
+    setSelectedItems
   });
 
   const onGlobalFilterChange = (e) => {
@@ -235,7 +237,7 @@ export const ActionListaFaturasConsolidadas = ({
             checked={selectAllChecked}
             onChange={onSelectAllChange}
           />
-          <p style={{  fontSize: '1rem' }}>Marcar Todos</p>
+          <p style={{ fontSize: '1rem' }}>Marcar Todos</p>
         </div>
       ),
       body: (rowData) => {
@@ -364,7 +366,7 @@ export const ActionListaFaturasConsolidadas = ({
         </div>
 
         <div style={{ width: "100%", display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-  
+
         </div>
 
         <div className="card" ref={dataTableRef}>
