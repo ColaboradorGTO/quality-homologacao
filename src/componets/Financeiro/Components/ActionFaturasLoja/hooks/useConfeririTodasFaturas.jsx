@@ -72,11 +72,6 @@ export const useConferirTodasFaturas = ({
         }).then(async (result) => {
 
             if (result.isConfirmed) {
-<<<<<<< HEAD
-                setisSubmitting(true)
-=======
-
->>>>>>> bd2a41d7d60c5c1fe60807965fc14aabc293cf5a
                 const idsFaturas = selectedItems.map(item => item.IDDETALHEFATURA).join(',');
                 const putData = {
                     IDS_FATURAS: idsFaturas.replace(/(^,|,$)/g, ''),
@@ -87,15 +82,6 @@ export const useConferirTodasFaturas = ({
                 try {
                     setDisabledConciliar(true);
                     const response = await put('/conferencia-fatura/:id', putData)
-<<<<<<< HEAD
-             
-                    await registrarLogAuditoria({
-                        idFuncionario: usuarioLogado?.id,
-                        pathFuncao: 'FINANCEIRO/CONFERIR TODAS FATURAS SELECIONADAS',
-                        dados: putData
-                    })
-
-=======
                     const textDados = JSON.stringify(putData)
                     const ipUsuario = await getIPUsuario();
                     const postData = {
@@ -106,7 +92,6 @@ export const useConferirTodasFaturas = ({
                     }
 
                     await post('/log-web', postData)
->>>>>>> bd2a41d7d60c5c1fe60807965fc14aabc293cf5a
                     Swal.fire({
                         position: 'center',
                         icon: 'success',
@@ -121,14 +106,6 @@ export const useConferirTodasFaturas = ({
                     handleClick();
                     return response.data;
                 } catch (error) {
-<<<<<<< HEAD
-                    await registrarLogAuditoria({
-                        idFuncionario: usuarioLogado?.id,
-                        pathFuncao: 'FINANCEIRO/ERRO AO CONFERIR TODAS FATURAS SELECIONADAS',
-                        dados: putData
-                    })
-        
-=======
                     const textDados = JSON.stringify(putData)
                     const ipUsuario = await getIPUsuario();
                     const postData = {
@@ -141,7 +118,6 @@ export const useConferirTodasFaturas = ({
                     const responsePost = await post('/log-web', postData)
 
 
->>>>>>> bd2a41d7d60c5c1fe60807965fc14aabc293cf5a
                     Swal.fire({
                         position: 'center',
                         icon: 'error',
@@ -154,9 +130,7 @@ export const useConferirTodasFaturas = ({
                     });
                     console.error('Erro Conferir Todas Faturas:', error);
                     return;
-                } finally {
-                    setisSubmitting(false)
-                }
+                } 
                 finally {
                     setDisabledConciliar(false);
                 }
