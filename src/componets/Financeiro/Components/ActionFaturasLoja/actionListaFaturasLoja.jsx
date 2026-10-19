@@ -129,12 +129,6 @@ export const ActionListaFaturasLoja = ({
     }
   });
 
-
-  const podeSelecionar = (item) => {
-    return item.STCANCELADO === 'False' && item.STCONFERIDOFATURA !== 'True' && Boolean(item.IDDETALHEFATURA);
-  };
-
-
   const podeSelecionar = (item) => {
     return item.STCANCELADO === 'False' && item.STCONFERIDOFATURA !== 'True' && Boolean(item.IDDETALHEFATURA);
   };
@@ -162,10 +156,6 @@ export const ActionListaFaturasLoja = ({
 
   }, [selectedItems, dados, first, rows]);
 
-<<<<<<< HEAD
-=======
-
->>>>>>> bd2a41d7d60c5c1fe60807965fc14aabc293cf5a
   const onSelectAllChange = (e) => {
     const checked = e?.checked ?? e?.target?.checked ?? false;
     if (!checked) {
@@ -505,10 +495,7 @@ export const ActionListaFaturasLoja = ({
             filterDisplay="menu"
             sortOrder={-1}
             paginator={true}
-<<<<<<< HEAD
-=======
             cellMemo={false}
->>>>>>> bd2a41d7d60c5c1fe60807965fc14aabc293cf5a
             first={first}
             rows={rows}
             onPage={(e) => {
