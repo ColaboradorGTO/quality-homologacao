@@ -104,7 +104,7 @@ const fetchListaExtrato = async () => {
     if (e.key === 'Enter') {
       e.preventDefault();
       handleClick();
-    }
+    } 
   };
 
   return (

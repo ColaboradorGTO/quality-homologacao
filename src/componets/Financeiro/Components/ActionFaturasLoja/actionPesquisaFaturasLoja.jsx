@@ -25,6 +25,7 @@ export const ActionPesquisaFaturasLoja = ({ usuarioLogado, ID }) => {
   const [codigoFatura, setCodigoFatura] = useState('')
   const [selectedItems, setSelectedItems] = useState([]);
   const [situacao, setSituacao] = useState('Todas');
+  const [disabledConciliar, setDisabledConciliar] = useState(false);
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
 
   useEffect(() => {
@@ -167,9 +168,14 @@ export const ActionPesquisaFaturasLoja = ({ usuarioLogado, ID }) => {
   }
 
   const {
+<<<<<<< HEAD
     conferirTodas,
     isSubmitting
   } = useConferirTodasFaturas({ optionsModulos, usuarioLogado, handleClick, selectedItems });
+=======
+    conferirTodas
+  } = useConferirTodasFaturas({ optionsModulos, usuarioLogado, handleClick, selectedItems, disabledConciliar, setDisabledConciliar });
+>>>>>>> bd2a41d7d60c5c1fe60807965fc14aabc293cf5a
 
   const conferirTodasSelecionadas = () => {
 
@@ -294,8 +300,14 @@ export const ActionPesquisaFaturasLoja = ({ usuarioLogado, ID }) => {
           onButtonClickCancelar={conferirTodasSelecionadas}
           corCancelar={"warning"}
           IconCancelar={IoMdCheckmark}
+<<<<<<< HEAD
           styleCancelar = {{ display: selectedItems.length > 0 ? 'block' : 'none' }}
           disabledCancelar={isSubmitting}
+=======
+          styleCancelar={{ display: selectedItems.length > 0 ? 'block' : 'none' }}
+          disabledCancelar={disabledConciliar}
+
+>>>>>>> bd2a41d7d60c5c1fe60807965fc14aabc293cf5a
         />
       )}
 

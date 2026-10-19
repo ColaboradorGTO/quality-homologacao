@@ -5,10 +5,12 @@ import Swal from "sweetalert2";
 import { registrarLogAuditoria } from "../../../../../services/auditLog";
 
 export const useConferirTodasFaturas = ({
-    optionsModulos, 
-    usuarioLogado, 
+    optionsModulos,
+    usuarioLogado,
     handleClick,
     selectedItems,
+    disabledConferir,
+    setDisabledConciliar,
 }) => {
     const [ipUsuario, setIpUsuario] = useState('');
     const [isSubmitting, setisSubmitting] = useState(true)
@@ -16,26 +18,26 @@ export const useConferirTodasFaturas = ({
         let usuarioIP = null;
 
         try {
-        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
-        usuarioIP = ipWhoisData?.ip;
+            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+            usuarioIP = ipWhoisData?.ip;
         } catch (error) {
-        console.error("Erro ao buscar IP via ipwho.is:", error);
+            console.error("Erro ao buscar IP via ipwho.is:", error);
         }
 
         if (!usuarioIP) {
-        try {
-            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-            usuarioIP = ipifyData?.ip;
-        } catch (error) {
-            console.error("Erro ao buscar IP via ipify.org:", error);
-        }
+            try {
+                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+                usuarioIP = ipifyData?.ip;
+            } catch (error) {
+                console.error("Erro ao buscar IP via ipify.org:", error);
+            }
         }
         setIpUsuario(usuarioIP);
         return usuarioIP;
     };
 
     const conferirTodas = async (data) => {
-        if(optionsModulos[0]?.ALTERAR == 'False') {
+        if (optionsModulos[0]?.ALTERAR == 'False') {
             Swal.fire({
                 position: 'center',
                 icon: 'error',
@@ -43,7 +45,7 @@ export const useConferirTodasFaturas = ({
                 showConfirmButton: false,
                 timer: 3000,
                 customClass: {
-                    container: 'custom-swal', 
+                    container: 'custom-swal',
                 },
             });
             return;
@@ -70,17 +72,22 @@ export const useConferirTodasFaturas = ({
         }).then(async (result) => {
 
             if (result.isConfirmed) {
+<<<<<<< HEAD
                 setisSubmitting(true)
+=======
+
+>>>>>>> bd2a41d7d60c5c1fe60807965fc14aabc293cf5a
                 const idsFaturas = selectedItems.map(item => item.IDDETALHEFATURA).join(',');
-                const putData = {   
+                const putData = {
                     IDS_FATURAS: idsFaturas.replace(/(^,|,$)/g, ''),
                     STCONFERIDO: 'True',
                     IDFUNCIONARIO: parseInt(usuarioLogado.id),
                 }
-        
+
                 try {
-        
+                    setDisabledConciliar(true);
                     const response = await put('/conferencia-fatura/:id', putData)
+<<<<<<< HEAD
              
                     await registrarLogAuditoria({
                         idFuncionario: usuarioLogado?.id,
@@ -88,6 +95,18 @@ export const useConferirTodasFaturas = ({
                         dados: putData
                     })
 
+=======
+                    const textDados = JSON.stringify(putData)
+                    const ipUsuario = await getIPUsuario();
+                    const postData = {
+                        IDFUNCIONARIO: String(usuarioLogado.id),
+                        PATHFUNCAO: `FINANCEIRO/CONFERIR TODAS FATURAS SELECIONADAS`,
+                        DADOS: textDados,
+                        IP: ipUsuario || 'IP não disponível',
+                    }
+
+                    await post('/log-web', postData)
+>>>>>>> bd2a41d7d60c5c1fe60807965fc14aabc293cf5a
                     Swal.fire({
                         position: 'center',
                         icon: 'success',
@@ -95,19 +114,34 @@ export const useConferirTodasFaturas = ({
                         showConfirmButton: false,
                         timer: 3000,
                         customClass: {
-                            container: 'custom-swal', 
+                            container: 'custom-swal',
                         },
                     })
-        
+
                     handleClick();
-                    return response.data;   
+                    return response.data;
                 } catch (error) {
+<<<<<<< HEAD
                     await registrarLogAuditoria({
                         idFuncionario: usuarioLogado?.id,
                         pathFuncao: 'FINANCEIRO/ERRO AO CONFERIR TODAS FATURAS SELECIONADAS',
                         dados: putData
                     })
         
+=======
+                    const textDados = JSON.stringify(putData)
+                    const ipUsuario = await getIPUsuario();
+                    const postData = {
+                        IDFUNCIONARIO: String(usuarioLogado.id),
+                        PATHFUNCAO: `FINANCEIRO/ERRO AO CONFERIR TODAS FATURAS SELECIONADAS`,
+                        DADOS: textDados,
+                        IP: ipUsuario || 'IP não disponível',
+                    }
+
+                    const responsePost = await post('/log-web', postData)
+
+
+>>>>>>> bd2a41d7d60c5c1fe60807965fc14aabc293cf5a
                     Swal.fire({
                         position: 'center',
                         icon: 'error',
@@ -115,7 +149,7 @@ export const useConferirTodasFaturas = ({
                         showConfirmButton: false,
                         timer: 3000,
                         customClass: {
-                            container: 'custom-swal', 
+                            container: 'custom-swal',
                         },
                     });
                     console.error('Erro Conferir Todas Faturas:', error);
@@ -123,14 +157,17 @@ export const useConferirTodasFaturas = ({
                 } finally {
                     setisSubmitting(false)
                 }
+                finally {
+                    setDisabledConciliar(false);
+                }
             } else {
                 return;
             }
         });
-        
+
     }
 
-    
+
     return {
         conferirTodas,
         isSubmitting

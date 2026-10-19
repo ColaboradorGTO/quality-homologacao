@@ -26,6 +26,7 @@ export const ActionMain = ({
   iconHeader,
   corHeader,
   disabledCadastro,
+  disabledCancelar,
 
   readOnlyDescricao,
   readOnlyPendencia,
@@ -594,7 +595,6 @@ export const ActionMain = ({
   btnVisivelEstrutura,
 
   styleCancelar,
-  disabledCancelar,
   styleVendasEstrutura,
   stylePendencia,
   styleEmpresa,
@@ -2075,7 +2075,7 @@ export const ActionMain = ({
                         // nome="Vendas por Produto"
                         textButton={linkImportar}
                         onClickButtonType={onButtonClickImportar}
-                        cor= { corImportar || '"success"'}
+                        cor={corImportar || '"success"'}
                         tipo="button"
                         Icon={GoUpload}
                         iconColor="#fff"
