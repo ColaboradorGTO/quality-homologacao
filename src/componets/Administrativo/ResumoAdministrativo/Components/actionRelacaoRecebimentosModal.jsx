@@ -108,7 +108,7 @@ export const ActionRelacaoProdutosModal = ({ dadosPagamentoModal, show, handleCl
     {
       field: 'NUAUTORIZACAO',
       header: 'Autorização',
-      body: row => toFloat(row.NUAUTORIZACAO),
+      body: row => row.NUAUTORIZACAO,
       sortable: true,
     },
     {
@@ -172,7 +172,7 @@ export const ActionRelacaoProdutosModal = ({ dadosPagamentoModal, show, handleCl
                     sortable={coluna.sortable}
                     headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
                     footerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
-                    bodyStyle={{ fontSize: '0.8rem' }}
+                    bodyStyle={{ fontSize: '1rem' }}
 
                   />
                 ))}
@@ -209,7 +209,7 @@ export const ActionRelacaoProdutosModal = ({ dadosPagamentoModal, show, handleCl
                         sortable={coluna.sortable}
                         headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
                         footerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
-                        bodyStyle={{ fontSize: '0.8rem' }}
+                        bodyStyle={{ fontSize: '1rem' }}
 
                       />
                     ))}

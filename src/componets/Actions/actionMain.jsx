@@ -594,6 +594,7 @@ export const ActionMain = ({
   btnVisivelEstrutura,
 
   styleCancelar,
+  disabledCancelar,
   styleVendasEstrutura,
   stylePendencia,
   styleEmpresa,
@@ -1915,6 +1916,7 @@ export const ActionMain = ({
                         iconColor="#fff"
                         iconSize={16}
                         style={styleCancelar}
+                        disabledBTN={disabledCancelar}
                       />
                     )}
                     {ButtonTypeVendasEstrutura && (

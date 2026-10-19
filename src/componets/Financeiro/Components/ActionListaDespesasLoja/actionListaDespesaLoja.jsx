@@ -707,6 +707,7 @@ const onSelectAllChange = (e) => {
         dadosDespesasLojaDetalhe={dadosDespesasLojaDetalhe}
         usuarioLogado={usuarioLogado}
         optionsModulos={optionsModulos}
+        handleClick={handleClick}
       />
     </Fragment>
   )

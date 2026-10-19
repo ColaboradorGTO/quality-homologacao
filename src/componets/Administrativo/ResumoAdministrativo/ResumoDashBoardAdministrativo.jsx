@@ -31,7 +31,6 @@ export const ResumoDashBoardAdministrativo = ({ usuarioLogado }) => {
   const [resumoVisivel, setResumoVisivel] = useState(false);
   const [empresaSelecionada, setEmpresaSelecionada] = useState('');
   const [empresaSelecionadaNome, setEmpresaSelecionadaNome] = useState('');
-  const [dadosDetalheDespesas, setDadosDetalheDespesas] = useState([])
   const [dataPesquisa, setDataPesquisa] = useState('')
   const [dadosExtratoLojaPeriodo, setDadosExtratoLojaPeriodo] = useState([])
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
@@ -198,6 +197,15 @@ export const ResumoDashBoardAdministrativo = ({ usuarioLogado }) => {
     { enabled: false, staleTime: 60 * 60 * 1000, }
   );
 
+  const { data: dadosDetalheDespesas = [], error: errorDetalheDespesas, isLoading: isLoadingDetalheDespesas, refetch: refetchDetalheDespesas } = useQuery(
+    'detalheDespesas',
+    async () => {
+      const response = await get(`/detalheDespesas?idEmpresa=${empresaSelecionada}&dataPesquisa=${dataPesquisa}`);
+      return response.data;
+    },
+    { enabled: false, staleTime: 60 * 60 * 1000, }
+  );
+
 
   const getListaSaldoExtratoLoja = async () => {
     try {
@@ -272,6 +280,7 @@ export const ResumoDashBoardAdministrativo = ({ usuarioLogado }) => {
       refetchVendasCanceladas()
       refetchDetalheVouche()
       refetchVendasVendedor()
+      refetchDetalheDespesas()
     }
 
   }

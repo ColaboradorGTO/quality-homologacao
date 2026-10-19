@@ -2,6 +2,7 @@ import { useState } from "react";
 import { post, put } from "../../../../../api/funcRequest";
 import axios from 'axios'
 import Swal from "sweetalert2";
+import { registrarLogAuditoria } from "../../../../../services/auditLog";
 
 export const useConferirTodasFaturas = ({
     optionsModulos, 
@@ -10,7 +11,7 @@ export const useConferirTodasFaturas = ({
     selectedItems,
 }) => {
     const [ipUsuario, setIpUsuario] = useState('');
-
+    const [isSubmitting, setisSubmitting] = useState(true)
     const getIPUsuario = async () => {
         let usuarioIP = null;
 
@@ -69,7 +70,7 @@ export const useConferirTodasFaturas = ({
         }).then(async (result) => {
 
             if (result.isConfirmed) {
-            
+                setisSubmitting(true)
                 const idsFaturas = selectedItems.map(item => item.IDDETALHEFATURA).join(',');
                 const putData = {   
                     IDS_FATURAS: idsFaturas.replace(/(^,|,$)/g, ''),
@@ -80,16 +81,13 @@ export const useConferirTodasFaturas = ({
                 try {
         
                     const response = await put('/conferencia-fatura/:id', putData)
-                    const textDados = JSON.stringify(putData)
-                    const ipUsuario = await getIPUsuario();
-                    const postData = {
-                        IDFUNCIONARIO: String(usuarioLogado.id),
-                        PATHFUNCAO: `FINANCEIRO/CONFERIR TODAS FATURAS SELECIONADAS`,
-                        DADOS: textDados,
-                        IP: ipUsuario || 'IP não disponível',
-                    }
-                    
-                    await post('/log-web', postData)
+             
+                    await registrarLogAuditoria({
+                        idFuncionario: usuarioLogado?.id,
+                        pathFuncao: 'FINANCEIRO/CONFERIR TODAS FATURAS SELECIONADAS',
+                        dados: putData
+                    })
+
                     Swal.fire({
                         position: 'center',
                         icon: 'success',
@@ -104,22 +102,16 @@ export const useConferirTodasFaturas = ({
                     handleClick();
                     return response.data;   
                 } catch (error) {
-                    const textDados = JSON.stringify(putData)
-                    const ipUsuario = await getIPUsuario();
-                    const postData = {
-                        IDFUNCIONARIO: String(usuarioLogado.id),
-                        PATHFUNCAO: `FINANCEIRO/ERRO AO CONFERIR TODAS FATURAS SELECIONADAS`,
-                        DADOS: textDados,
-                        IP: ipUsuario || 'IP não disponível',
-                    }
-                    
-                    const responsePost = await post('/log-web', postData)
-        
+                    await registrarLogAuditoria({
+                        idFuncionario: usuarioLogado?.id,
+                        pathFuncao: 'FINANCEIRO/ERRO AO CONFERIR TODAS FATURAS SELECIONADAS',
+                        dados: putData
+                    })
         
                     Swal.fire({
                         position: 'center',
                         icon: 'error',
-                        title: 'Ocorreu um erro ao enviar o formulário. Por favor, tente novamente.',
+                        title: 'Ocorreu um erro ao enviar os dados. Por favor, tente novamente.',
                         showConfirmButton: false,
                         timer: 3000,
                         customClass: {
@@ -127,7 +119,9 @@ export const useConferirTodasFaturas = ({
                         },
                     });
                     console.error('Erro Conferir Todas Faturas:', error);
-                    return responsePost.data;
+                    return;
+                } finally {
+                    setisSubmitting(false)
                 }
             } else {
                 return;
@@ -139,5 +133,6 @@ export const useConferirTodasFaturas = ({
     
     return {
         conferirTodas,
+        isSubmitting
     }
 }

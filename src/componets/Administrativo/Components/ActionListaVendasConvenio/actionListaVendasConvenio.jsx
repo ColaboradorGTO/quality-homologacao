@@ -286,7 +286,7 @@ export const ActionListaVendasConvenio = ({ dadosVendasConvenio }) => {
     <ColumnGroup>
 
       <Row> 
-        <Column footer="Total Valores" colSpan={5} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem', textAlign: 'center' }} />
+        <Column footer="Total Valores" colSpan={6} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem', textAlign: 'center' }} />
         <Column footer={formatMoeda(cacularTotalValorBrutoNF())}  footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
         <Column footer={formatMoeda(cacularTotalValorDescontoNF())} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
         <Column footer={formatMoeda(cacularTotalValorLiquidoNF())} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} /> 

@@ -17,14 +17,14 @@ import { useConferirFatura } from "./hooks/useConfeririFatura";
 import { IoMdCheckmark } from "react-icons/io";
 
 
-export const ActionListaFaturasLoja = ({
-  dadosDetalheFatura,
-  optionsModulos,
-  usuarioLogado,
-  handleClick,
+export const ActionListaFaturasLoja = ({ 
+  dadosDetalheFatura, 
+  optionsModulos, 
+  usuarioLogado, 
+  handleClick, 
   selectedItems,
-  setSelectedItems,
-  situacao
+  setSelectedItems
+
 }) => {
   const [modalFaturaVisivel, setModalFaturaVisivel] = useState(false);
   const [dadosDetalheFaturaCaixa, setDadosDetalheFaturaCaixa] = useState([]);
@@ -39,7 +39,7 @@ export const ActionListaFaturasLoja = ({
   const {
     conferir
   } = useConferirFatura({ optionsModulos, usuarioLogado, handleClick, selectedItems });
-
+  
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
   };
@@ -129,34 +129,16 @@ export const ActionListaFaturasLoja = ({
     }
   });
 
-  const valorTotalCanceladas = dados.reduce((total, item) => {
-    const isCancelado = item.STCANCELADO !== 'False' && item.STCANCELADO !== false && String(item.STCANCELADO).toLowerCase() !== 'false';
-    return isCancelado ? total + (parseFloat(item.VRRECEBIDO) || 0) : total;
-  }, 0);
 
-  const valorTotalGeral = dados.reduce((total, item) => {
-    return total + (parseFloat(item.VRRECEBIDO) || 0);
-  }, 0);
-
-  const calcularTotalValorRecebido = () => {
-    const isFiltroCanceladas = situacao === 'Cancelada' || situacao === 'Cancelado' || situacao === 'Canceladas';
-
-    if (isFiltroCanceladas) {
-      return valorTotalCanceladas;
-    }
-
-    return valorTotalGeral - valorTotalCanceladas;
+  const podeSelecionar = (item) => {
+    return item.STCANCELADO === 'False' && item.STCONFERIDOFATURA !== 'True' && Boolean(item.IDDETALHEFATURA);
   };
 
   useEffect(() => {
-    const itensSelecionaveis = dados.filter(item =>
-      item.STCANCELADO === 'False' && item.STCONFERIDOFATURA !== 'True' && item.IDDETALHEFATURA
-    );
+    const itensSelecionaveis = dados.filter(podeSelecionar);
 
     const dadosPaginaAtual = dados.slice(first, first + rows);
-    const itensSelecionaveisPaginaAtual = dadosPaginaAtual.filter(item =>
-      item.STCANCELADO === 'False' && item.STCONFERIDOFATURA !== 'True' && item.IDDETALHEFATURA
-    );
+    const itensSelecionaveisPaginaAtual = dadosPaginaAtual.filter(podeSelecionar);
 
     if (selectedItems.length === 0) {
       setSelectAllChecked(false);
@@ -176,42 +158,89 @@ export const ActionListaFaturasLoja = ({
   }, [selectedItems, dados, first, rows]);
 
   const onSelectAllChange = (e) => {
-    if (e.checked) {
-      Swal.fire({
-        icon: 'question',
-        title: 'Selecione o modo de seleção',
-        text: 'Deseja selecionar todos da tabela ou somente o que está em tela?',
-        showConfirmButton: true,
-        showCancelButton: true,
-        showCloseButton: true,
-        confirmButtonText: 'Todos os registros',
-        cancelButtonText: 'Apenas o que está tela',
-        cancelButtonColor: '#2196F3',
-        allowOutsideClick: false,
-      }).then((result) => {
-        if (result.isConfirmed) {
-          const itensSelecionaveis = dados.filter(item =>
-            item.STCANCELADO === 'False' && item.STCONFERIDOFATURA !== 'True' && item.IDDETALHEFATURA
-          );
-          setBtnVisivel(true);
-          setSelectedItems([...itensSelecionaveis]);
-        } else if (result.dismiss === Swal.DismissReason.cancel) {
-          const dadosPaginaAtual = dados.slice(first, first + rows);
-
-          const itensSelecionaveisPaginaAtual = dadosPaginaAtual.filter(item =>
-            item.STCANCELADO === 'False' && item.STCONFERIDOFATURA !== 'True' && item.IDDETALHEFATURA
-          );
-          setBtnVisivel(true);
-          setSelectedItems([...itensSelecionaveisPaginaAtual]);
-        } else {
-          setBtnVisivel(false);
-          setSelectedItems([]);
-        }
-      });
-    } else {
+    const checked = e?.checked ?? e?.target?.checked ?? false;
+    if (!checked) {
       setBtnVisivel(false);
       setSelectedItems([]);
+      return;
     }
+
+    const itensSelecionaveis = dados.filter(podeSelecionar);
+
+    if (itensSelecionaveis.length === 0) {
+      Swal.fire({
+        icon: 'info',
+        title: 'Não há registros para serem selecionados.',
+        showConfirmButton: true,
+        showCloseButton: true,
+        allowOutsideClick: false,
+        confirmButtonText: 'Entendi',
+        confirmButtonColor: '#2196F3',
+      });
+      return;
+    }
+
+    const todosRegistrosNaTela =
+      first === 0 &&
+      rows >= dados.length;
+
+    if (todosRegistrosNaTela) {
+      setBtnVisivel(true);
+      setSelectedItems([...itensSelecionaveis]);
+      return;
+    }
+
+    Swal.fire({
+      icon: 'question',
+      title: 'Selecione o modo de seleção',
+      html: `
+        <div>
+          <p>Você pode selecionar apenas os registros exibidos nesta página.</p>
+          <small>
+            Para habilitar <b>Todos os registros</b>, exiba todos os registros da tabela.
+          </small>
+        </div>
+      `,
+      showConfirmButton: true,
+      showCancelButton: true,
+      showCloseButton: true,
+      confirmButtonText: 'Todos os registros',
+      cancelButtonText: 'Apenas o que está em tela',
+      confirmButtonColor: '#6c757d',
+      cancelButtonColor: '#2196F3',
+      didOpen: () => {
+        const btnTodos = Swal.getConfirmButton();
+        btnTodos.disabled = true;
+        btnTodos.style.cursor = 'not-allowed';
+        btnTodos.style.opacity = '0.6';
+      },
+      allowOutsideClick: false,
+    }).then((result) => {
+      if (result.dismiss === Swal.DismissReason.cancel) {
+        const dadosPaginaAtual = dados.slice(
+          first,
+          first + rows
+        );
+
+        const itensSelecionaveisPaginaAtual = dadosPaginaAtual.filter(podeSelecionar);
+
+        if (itensSelecionaveisPaginaAtual.length === 0) {
+          Swal.fire({
+            icon: 'info',
+            title: 'Não há registros selecionáveis nesta página.',
+            confirmButtonText: 'Entendi',
+            confirmButtonColor: '#2196F3',
+          });
+          return;
+        }
+
+        setBtnVisivel(true);
+        setSelectedItems([...itensSelecionaveisPaginaAtual]);
+      } else {
+        setBtnVisivel(false);
+        setSelectedItems([]);
+      }
+    });
   };
 
   const colunasListaFatura = [
@@ -219,12 +248,7 @@ export const ActionListaFaturasLoja = ({
       field: 'Selecione',
       selectionMode: 'multiple',
       body: (rowData) => {
-        // ========== VARIÁVEIS DE CONTROLE ==========
-        const stAtivo = rowData.STCANCELADO === 'False';
-        const stConferido = rowData.STCONFERIDOFATURA === 'True';
-
-        // ========== Só mostra checkbox se ATIVA e NÃO CONFERIDA ==========
-        if (!stAtivo || stConferido) {
+        if (!podeSelecionar(rowData)) {
           return <td></td>;
         }
 
@@ -259,19 +283,19 @@ export const ActionListaFaturasLoja = ({
     {
       field: 'NOFANTASIA',
       header: 'Empresa',
-      body: row => <p style={{ width: '180px', margin: 0, padding: 0, fontWeight: 600 }}>  {row.NOFANTASIA} </p>,
+      body: row => <p style={{width: '180px', margin: 0, padding: 0, fontWeight: 600}}>  {row.NOFANTASIA} </p>,
       sortable: true,
     },
     {
       field: 'DTPROCESSAMENTO',
       header: 'Data Recebimento',
-      body: row => <p style={{ width: '150px', margin: 0, padding: 0, fontWeight: 600 }}>  {row.DTPROCESSAMENTO}  </p>,
+      body: row => <p style={{width: '150px', margin: 0, padding: 0, fontWeight: 600}}>  {row.DTPROCESSAMENTO}  </p>,
       sortable: true,
     },
     {
       field: 'IDMOVIMENTOCAIXAWEB',
       header: 'Nº Movimento Caixa',
-      body: row => <p style={{ width: '150px', margin: 0, padding: 0, fontWeight: 600 }}>  {row.IDMOVIMENTOCAIXAWEB}</p>,
+      body: row => <p style={{width: '150px', margin: 0, padding: 0, fontWeight: 600}}>  {row.IDMOVIMENTOCAIXAWEB}</p>,
       sortable: true,
     },
     {
@@ -297,7 +321,7 @@ export const ActionListaFaturasLoja = ({
     {
       field: 'NOFUNCIONARIO',
       header: 'Recebedor',
-      body: row => <p style={{ width: '150px', margin: 0, padding: 0, fontWeight: 600 }}>  {row.NOFUNCIONARIO} </p>,
+      body: row => <p style={{width: '150px', margin: 0, padding: 0, fontWeight: 600}}>  {row.NOFUNCIONARIO} </p>,
       sortable: true,
     },
     {
@@ -306,7 +330,7 @@ export const ActionListaFaturasLoja = ({
       sortable: true,
       body: row => {
         if (row.STCANCELADO == 'False') {
-          return <p style={{ color: 'blue', width: '150px', margin: 0, padding: 0, fontWeight: 600 }}>ATIVO / {row.STCONFERIDOFATURA == 'True' ? 'CONFERIDO' : <p style={{ color: 'red', width: '150px', margin: 0, padding: 0, fontWeight: 600 }}>NÃO CONFERIDO</p>} {row.IDCONSOLIDACAOFATURA ? ' / CONSOLIDADO' : ''}</p>
+          return <p style={{ color: 'blue', width: '150px', margin: 0, padding: 0, fontWeight: 600 }}>ATIVO / {row.STCONFERIDOFATURA == 'True' ? 'CONFERIDO' : <p style={{ color: 'red',width: '150px', margin: 0, padding: 0, fontWeight: 600 }}>NÃO CONFERIDO</p>} {row.IDCONSOLIDACAOFATURA ? ' / CONSOLIDADO' : ''}</p>
 
         } else {
           return (
@@ -366,7 +390,7 @@ export const ActionListaFaturasLoja = ({
               />
             </div>
 
-
+           
             <div className="p-1">
               <ButtonTable
                 titleButton="Conferir Fatura"
@@ -472,8 +496,12 @@ export const ActionListaFaturasLoja = ({
             filterDisplay="menu"
             sortOrder={-1}
             paginator={true}
-            cellMemo={false}
-            rows={10}
+            first={first}
+            rows={rows}
+            onPage={(e) => {
+              setFirst(e.first);
+              setRows(e.rows);
+            }}
             rowsPerPageOptions={[10, 20, 50, 100, 200, 300, 500, dados.length]}
             showGridlines
             stripedRows

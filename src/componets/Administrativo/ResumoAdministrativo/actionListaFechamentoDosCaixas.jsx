@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useRef, useState } from "react"
+import React, { Fragment, useRef, useState } from "react"
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import Accordion from 'react-bootstrap/Accordion';
@@ -109,11 +109,19 @@ export const ActionListaFechamentoDosCaixas = ({
     return usuarioIP;
   };
 
+  const positivoOuZero = (valor) => {
+    const numero = toFloat(valor);
+    return numero > 0 ? numero : 0;
+  }
+
+  
+  const calcularDinheiroInformado = (item) => {
+    const ajuste = toFloat(item.TOTALFECHAMENTODINHEIROAJUSTE);
+    return ajuste > 0 ? ajuste : positivoOuZero(item.TOTALFECHAMENTODINHEIRO);
+  }
+
   const calcularTotalQuebraCaixa = (item) => {
-    return (
-      toFloat(item.TOTALFECHAMENTODINHEIRO) -
-      toFloat(item.TOTALFECHAMENTODINHEIROFISICO)
-    )
+    return calcularDinheiroInformado(item) - positivoOuZero(item.TOTALFECHAMENTODINHEIROFISICO);
   }
 
   const dados = dadosCaixaFechados.map((item, index) => {
@@ -126,8 +134,8 @@ export const ActionListaFechamentoDosCaixas = ({
       DTHORAABERTURACAIXA: item.DTHORAABERTURACAIXA,
       DTHORAFECHAMENTOCAIXA: item.DTHORAFECHAMENTOCAIXA,
       OPERADORFECHAMENTO: item.OPERADORFECHAMENTO,
-      TOTALFECHAMENTODINHEIROFISICO: item.TOTALFECHAMENTODINHEIROFISICO,
-      TOTALFECHAMENTODINHEIRO: item.TOTALFECHAMENTODINHEIRO,
+      TOTALFECHAMENTODINHEIROFISICO: positivoOuZero(item.TOTALFECHAMENTODINHEIROFISICO),
+      TOTALFECHAMENTODINHEIRO: calcularDinheiroInformado(item),
       totalQuebraCaixa: totalQuebraCaixa,
       TOTALFECHAMENTOCARTAO: item.TOTALFECHAMENTOCARTAO,
       TOTALFECHAMENTOPOS: item.TOTALFECHAMENTOPOS,

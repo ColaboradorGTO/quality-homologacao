@@ -17,7 +17,7 @@ import { optionsParcelas } from "../../../../../parceiro.json"
 export const ActionPesquisaRecebimentosLoja = () => {
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('')
   const [dataPesquisaFim, setDataPesquisaFim] = useState('')
-  const [empresaSelecionada, setEmpresaSelecionada] = useState('')
+  const [empresaSelecionada, setEmpresaSelecionada] = useState('0')
   const [marcaSelecionada, setMarcaSelecionada] = useState('')
   const [colaboradorSelecionado, setColaboradorSelecionado] = useState('')
   const [parcelaSelecionada, setParcelaSelecionada] = useState([])
@@ -103,7 +103,7 @@ const fetchListaRecebimentos = async () => {
   );
 
 const fetchListaRecebimentosOperador = async () => {
-    const urlBase = `venda-total-recebido-periodo-adm?idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idFuncionario=${colaboradorSelecionado}&dsFormaPagamento=${pagamentoSelecionado}&dsParcela=${parcelaSelecionada}&idGrupo=${marcaSelecionada}`;
+    const urlBase = `venda-total-recebido-periodo-adm?idEmpresa=${empresaSelecionada}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idFuncionario=${colaboradorSelecionado}&dsFormaPagamento=${pagamentoSelecionado}&dsParcela=${parcelaSelecionada}&idMarca=${marcaSelecionada}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
 

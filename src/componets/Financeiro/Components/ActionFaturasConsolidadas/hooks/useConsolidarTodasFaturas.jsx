@@ -1,7 +1,6 @@
-import { useState } from "react";
 import { post } from "../../../../../api/funcRequest";
-import axios from 'axios'
 import Swal from "sweetalert2";
+import { registrarLogAuditoria } from "../../../../../services/auditLog";
 
 export const useConsolidarTodasFaturas = ({
     optionsModulos,
@@ -10,30 +9,6 @@ export const useConsolidarTodasFaturas = ({
     handleClick,
     selectedItems,
 }) => {
-    const [ipUsuario, setIpUsuario] = useState('');
-
-    const getIPUsuario = async () => {
-        let usuarioIP = null;
-
-        try {
-            const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
-            usuarioIP = ipWhoisData?.ip;
-        } catch (error) {
-            console.error("Erro ao buscar IP via ifconfig.me:", error);
-        }
-
-        if (!usuarioIP) {
-            try {
-                const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
-                usuarioIP = ipifyData?.ip;
-            } catch (error) {
-                console.error("Erro ao buscar IP via ipify.org:", error);
-            }
-        }
-        setIpUsuario(usuarioIP);
-        return usuarioIP;
-    };
-
     const conferirTodas = async (rowData) => {
         if (optionsModulos[0]?.ALTERAR == 'False') {
             Swal.fire({
@@ -68,10 +43,7 @@ export const useConsolidarTodasFaturas = ({
                 document.head.appendChild(style);
             }
         }).then(async (result) => {
-
             if (result.isConfirmed) {
-
-
                 try {
                     for (let i = 0; i < selectedItems.length; i++) {
                         const rowData = selectedItems[i];
@@ -85,16 +57,14 @@ export const useConsolidarTodasFaturas = ({
                         };
 
                         const response = await post('/criar-consolidacao-faturas', putData)
-                        const textDados = JSON.stringify(putData)
-                        await getIPUsuario();
-                        const postData = {
-                            IDFUNCIONARIO: String(usuarioLogado.id),
-                            PATHFUNCAO: ``,
-                            DADOS: textDados,
-                            IP: ipUsuario || 'INDISPONIVEL'
-                        }
 
-                        await post('/log-web', postData)
+                        await registrarLogAuditoria({
+                            idFuncionario: usuarioLogado?.id,
+                            pathFuncao: 'FINANCEIRO/CONSOLIDACOES DE TODAS FATURAS',
+                            dados: putData
+                        })
+
+                        return response.data;
                     }
 
                     Swal.fire({
@@ -115,22 +85,28 @@ export const useConsolidarTodasFaturas = ({
                     }
 
                 } catch (error) {
-                    // const textDados = JSON.stringify(putData)
-                    // const ipUsuario = await getIPUsuario();
-                    // const postData = {
-                    //     IDFUNCIONARIO: String(usuarioLogado.id),
-                    //     PATHFUNCAO: `FINANCEIRO/ERRO AO INTEGRAR TODAS CONSOLIDACOES FATURAS SELECIONADAS`,
-                    //     DADOS: textDados,
-                    //     IP: ipUsuario || 'IP não disponível'
-                    // }
+                    for (let i = 0; i < selectedItems.length; i++) {
+                        const rowData = selectedItems[i];
+                        const putData = {
+                            IDEMPRESA: Number(rowData.IDEMPRESA),
+                            DTPROCESSAMENTO: rowData.DTPROCESSAMENTO,
+                            QTDTOTALFATURAS: Number(rowData.QTDFATURAS),
+                            VRTOTALRECEBIDO: Number(rowData.VRTOTAL),
+                            IDFUNCIONARIO: Number(usuarioLogado.id),
+                        };
 
-                    // const responsePost = await post('/log-web', postData)
-
+                        await registrarLogAuditoria({
+                            idFuncionario: usuarioLogado?.id,
+                            pathFuncao: 'FINANCEIRO/ERRO AO INTEGRAR TODAS CONSOLIDACOES FATURAS SELECIONADAS',
+                            dados: putData
+                        })
+                      
+                    }
 
                     Swal.fire({
                         position: 'center',
                         icon: 'error',
-                        title: 'Ocorreu um erro ao enviar o formulário. Por favor, tente novamente.',
+                        title: 'Ocorreu um erro ao tentar consolidar faturas.',
                         showConfirmButton: false,
                         timer: 3000,
                         customClass: {
@@ -138,15 +114,13 @@ export const useConsolidarTodasFaturas = ({
                         },
                     });
                     console.error('Erro Conferir Todas Faturas:', error);
-                    // return responsePost.data;
+                    return;
                 }
             } else {
                 return;
             }
         });
-
     }
-
 
     return {
         conferirTodas,

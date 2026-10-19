@@ -201,6 +201,7 @@ export const ActionPesquisaConciliarBanco = ({ usuarioLogado }) => {
 
   const {
     handleSubmit,
+    isSubmitting
   } = useIntegrarTodasConciliacoesDepositosNoSAP({ optionsModulos, usuarioLogado, handleClick, selectedItems });
 
   return (
@@ -275,7 +276,7 @@ export const ActionPesquisaConciliarBanco = ({ usuarioLogado }) => {
         corImportar={"info"}
         onButtonClickImportar={handleSubmit}
         styleImportar={{ display: selectedItems.length > 1 ? 'block' : 'none' }}
-
+        disabledCancelar={isSubmitting}
       />
 
       {tabelaVisivel && (

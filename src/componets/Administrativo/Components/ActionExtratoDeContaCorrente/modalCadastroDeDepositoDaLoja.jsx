@@ -30,9 +30,6 @@ export const ModalCadastroDeDepositoDaLoja = ({ show, handleClose }) => {
   const navigate = useNavigate();
 
 
-
-
-
   useEffect(() => {
     getIPUsuario();
   }, [usuarioLogado]);

@@ -2,7 +2,6 @@ import axios from "axios";
 import { useState } from "react";
 import Swal from "sweetalert2";
 import { post } from "../../../../../api/funcRequest";
-import { animationLodadingStart } from "../../../../../utils/animationCarregamento";
 
 export const useIntegrarConciliarDepositoNoSAP = ({ optionsModulos, usuarioLogado, handleClick }) => {
     const [ipUsuario, setIpUsuario] = useState('');
@@ -73,7 +72,7 @@ export const useIntegrarConciliarDepositoNoSAP = ({ optionsModulos, usuarioLogad
                 })
                 try {
                     const putData = {
-                        IDDEPOSITOLOJA: IDDEPOSITOLOJA,
+                        IDDEPOSITOLOJA: parseInt(IDDEPOSITOLOJA),
                     }
 
                     const response = await post('/deposito-integracao', putData)
@@ -140,8 +139,5 @@ export const useIntegrarConciliarDepositoNoSAP = ({ optionsModulos, usuarioLogad
 
     return {
         handleConciliar,
-        ipUsuario,
-        getIPUsuario,
-        setIpUsuario,
     }
 }
