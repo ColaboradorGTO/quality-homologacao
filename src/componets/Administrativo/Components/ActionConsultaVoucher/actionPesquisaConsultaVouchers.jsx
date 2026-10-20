@@ -64,42 +64,65 @@ export const ActionPesquisaConsultaVouchers = ({ usuarioLogado }) => {
     { enabled: Boolean(marcaSelecionada), staleTime: 60 * 60 * 1000, }
   );
 
-const fetchListaVouchers = async () => {
-    const urlBase = `/voucher-completo?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idSubGrupoEmpresa=${marcaSelecionada}&idEmpresa=${empresaSelecionada}`;
-    let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
-    urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
+  const fetchListaVouchers = async () => {
+    const numeroVoucherFormatado = String(numeroVoucher ?? '').trim();
+    const partesVoucher = numeroVoucherFormatado.split('-');
+
+    const voucher = partesVoucher.length > 2
+      ? partesVoucher.join('-')
+      : numeroVoucherFormatado.replace(/[^0-9]/g, '');
+
+    const idEmpresa = voucher ? '' : empresaSelecionada;
+    const dtInicio = voucher ? '' : dataPesquisaInicio;
+    const dtFim = voucher ? '' : dataPesquisaFim;
+
+    const params = new URLSearchParams({
+      dataPesquisaInicio: dtInicio,
+      dataPesquisaFim: dtFim,
+      dadosVoucher: voucher,
+      subgrupoEmpresa: marcaSelecionada,
+      idEmpresa,
+      pageSize: '20000',
+    });
 
     const controller = new AbortController();
     let allData = [];
 
     try {
-      animacaoCarregamento('Carregando dados...', true, true, () => controller.abort());
+      animacaoCarregamento(
+        'Carregando dados, aguarde...',
+        true,
+        true,
+        () => controller.abort()
+      );
 
-      const primeiraPagina = 1;
-      const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`, { signal: controller.signal });
-      const page = primeiraResposta.page || primeiraPagina;
-      const pageSize = primeiraResposta.pageSize || 1000;
-      const totalRows = primeiraResposta.rows || primeiraResposta.data?.length || 0;
-      const totalPages = Math.ceil(totalRows / pageSize);
+      const response = await get(
+        `/voucher-completo?${params.toString()}`,
+        { signal: controller.signal }
+      );
 
-      allData = [...(primeiraResposta.data || [])];
+      const resultado = response?.data ?? response;
 
-      if (totalPages > 1) {
-        for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
-          if (foiCancelado()) break;
-          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true, true);
-          const responsePage = await get(`${urlApi}&page=${currentPage}`, { signal: controller.signal });
-          allData.push(...(responsePage.data || []));
-        }
+      if (Array.isArray(resultado)) {
+        allData = resultado;
+      } else if (Array.isArray(resultado?.data)) {
+        allData = resultado.data;
       }
 
       return allData;
+
     } catch (error) {
-      if (error.code === 'ERR_CANCELED') {
+      if (
+        error.code === 'ERR_CANCELED' ||
+        error.name === 'CanceledError' ||
+        foiCancelado()
+      ) {
         return allData;
       }
-      console.error('Erro ao buscar dados:', error);
+
+      console.error('Erro ao buscar vouchers:', error);
       throw error;
+
     } finally {
       fecharAnimacaoCarregamento();
     }
@@ -115,7 +138,6 @@ const fetchListaVouchers = async () => {
     setMarcaSelecionada(e.value);
   };
 
-
   const handleChangeEmpresa = (e) => {
     if (e.value === '') {
       setEmpresaSelecionada('');
@@ -126,10 +148,67 @@ const fetchListaVouchers = async () => {
     }
   }
 
-  const handleClick = () => {
-    setTabelaVisivel(true)
-    refetchDetalheVoucherDados()
-  }
+  const handleClick = async () => {
+    const voucherDigitado = String(numeroVoucher ?? '').trim();
+    const partesVoucher = voucherDigitado.split('-');
+
+    const voucherFormatado = partesVoucher.length > 2
+      ? partesVoucher.join('-')
+      : voucherDigitado.replace(/[^0-9]/g, '');
+
+    setNumeroVoucher(voucherFormatado);
+
+    if (!voucherFormatado) {
+      const dtInicioTime = new Date(dataPesquisaInicio);
+      const dtFimTime = new Date(dataPesquisaFim);
+
+      if (
+        !dataPesquisaInicio ||
+        Number.isNaN(dtInicioTime.getTime())
+      ) {
+        await Swal.fire({
+          icon: 'error',
+          title: 'Data INÍCIO inválida!',
+        });
+
+        return;
+      }
+
+      if (
+        !dataPesquisaFim ||
+        Number.isNaN(dtFimTime.getTime())
+      ) {
+        await Swal.fire({
+          icon: 'error',
+          title: 'Data FIM inválida!',
+        });
+
+        return;
+      }
+
+      if (dtInicioTime.getTime() > dtFimTime.getTime()) {
+        await Swal.fire({
+          icon: 'error',
+          title: 'Data de início deve ser menor que a data de fim!',
+        });
+
+        return;
+      }
+    }
+
+    try {
+      setTabelaVisivel(true);
+      await refetchDetalheVoucherDados();
+    } catch (error) {
+      console.error('Erro ao pesquisar vouchers:', error);
+
+      await Swal.fire({
+        icon: 'error',
+        title: 'Erro ao pesquisar vouchers!',
+        text: 'Não foi possível carregar os dados.',
+      });
+    }
+  };
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
@@ -145,7 +224,7 @@ const fetchListaVouchers = async () => {
       <ActionMain
         linkComponentAnterior={["Home"]}
         linkComponent={["Vouchers"]}
-        title="Vouchers Emitidos"
+        title="Vouchers - Detalhado"
         subTitle={empresaSelecionadaNome}
 
         InputFieldDTInicioComponent={InputField}

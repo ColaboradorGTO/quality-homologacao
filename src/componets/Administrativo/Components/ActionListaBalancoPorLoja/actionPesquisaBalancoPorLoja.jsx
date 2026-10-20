@@ -178,6 +178,7 @@ const fetchListaBalanco = async () => {
           dadosBalanco={dadosBalanco}
           optionsModulos={optionsModulos}
           usuarioLogado={usuarioLogado}
+          handleClick={handleClick}
         />
       }
 
