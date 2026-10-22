@@ -27,6 +27,7 @@ export const ActionPesquisaConciliarBanco = ({ usuarioLogado }) => {
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
   const [selectedItems, setSelectedItems] = useState([]);
   const [btnVisivel, setBtnVisivel] = useState(false);
+  const [resetPaginacaoKey, setResetPaginacaoKey] = useState(0);
 
 
   useEffect(() => {
@@ -202,7 +203,14 @@ export const ActionPesquisaConciliarBanco = ({ usuarioLogado }) => {
   const {
     handleSubmit,
     isSubmitting
-  } = useIntegrarTodasConciliacoesDepositosNoSAP({ optionsModulos, usuarioLogado, handleClick, selectedItems });
+  } = useIntegrarTodasConciliacoesDepositosNoSAP({
+    optionsModulos,
+    usuarioLogado,
+    handleClick,
+    selectedItems,
+    setSelectedItems,
+    onIntegrado: () => setResetPaginacaoKey((k) => k + 1)
+  });
 
   return (
 
@@ -288,6 +296,7 @@ export const ActionPesquisaConciliarBanco = ({ usuarioLogado }) => {
           selectedItems={selectedItems}
           setSelectedItems={setSelectedItems}
           setBtnVisivel={setBtnVisivel}
+          resetPaginacaoKey={resetPaginacaoKey}
         />
 
       )}

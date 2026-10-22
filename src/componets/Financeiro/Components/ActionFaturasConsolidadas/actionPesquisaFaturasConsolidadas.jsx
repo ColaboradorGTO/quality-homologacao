@@ -26,7 +26,9 @@ export const ActionPesquisaFaturasConsolidadas = ({ usuarioLogado }) => {
   const [empresaSelecionadaNome, setEmpresaSelecionadaNome] = useState('')
   const [codigoFatura, setCodigoFatura] = useState('')
   const [selectedItems, setSelectedItems] = useState([]);
+  const [selectedItemsConciliar, setSelectedItemsConciliar] = useState([]);
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
+  const [resetPaginacaoKey, setResetPaginacaoKey] = useState(0);
 
   useEffect(() => {
     const dataInicial = getDataAtual();
@@ -178,8 +180,23 @@ export const ActionPesquisaFaturasConsolidadas = ({ usuarioLogado }) => {
   }
 
   const {
-    conferirTodas
-  } = useConsolidarTodasFaturas({ optionsModulos, usuarioLogado, handleClickConciliar, handleClick, selectedItems });
+    conferirTodas,
+    conferirTodasConsolidadas,
+    isSubmitting
+  } = useConsolidarTodasFaturas({ 
+    optionsModulos,
+    usuarioLogado, 
+    handleClickConciliar, 
+    handleClick, 
+    selectedItems,
+    setSelectedItems, 
+    selectedItemsConciliar, 
+    setSelectedItemsConciliar, 
+    onIntegrado: () => {
+      setSelectedItems([]);
+      setResetPaginacaoKey((k) => k + 1);
+    }
+  });
 
   const conferirTodasSelecionadas = () => {
 
@@ -210,6 +227,39 @@ export const ActionPesquisaFaturasConsolidadas = ({ usuarioLogado }) => {
       return;
     } else {
       conferirTodas();
+    }
+
+  }
+
+  const conferirTodasSelecionadasConsolidacoes = () => {
+
+    if (selectedItemsConciliar.length === 0) {
+      Swal.fire({
+        position: 'center',
+        icon: 'warning',
+        title: 'Nenhuma fatura selecionada, selecione e tente novamente!',
+        text: 'Nenhuma fatura selecionada, selecione e tente novamente!',
+        showConfirmButton: true,
+        timer: 6000,
+        customClass: {
+          container: 'custom-swal',
+        },
+      });
+      return;
+    } else if (optionsModulos[0]?.ALTERAR == 'False') {
+      Swal.fire({
+        position: 'center',
+        icon: 'error',
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> você não tem permissão para conferir a fatura.`,
+        showConfirmButton: true,
+        timer: 3000,
+        customClass: {
+          container: 'custom-swal',
+        },
+      });
+      return;
+    } else {
+      conferirTodasConsolidadas();
     }
 
   }
@@ -265,11 +315,19 @@ export const ActionPesquisaFaturasConsolidadas = ({ usuarioLogado }) => {
           IconCadastro={AiOutlineSearch}
 
           ButtonTypeCancelar={ButtonType}
-          linkCancelar={"Integrar Todos"}
+          linkCancelar={"Confirmar Todos"}
           onButtonClickCancelar={conferirTodasSelecionadas}
           corCancelar={"warning"}
           IconCancelar={MdOutlineCloudUpload}
           styleCancelar = {{ display: selectedItems.length > 0 ? 'block' : 'none' }}
+          disabledCancelar={isSubmitting}
+
+          ButtonTypeSalvar={ButtonType}
+          linkSalvar={"Integrar Todos"}
+          onButtonClickSalvar={conferirTodasSelecionadasConsolidacoes}
+          corSalvar={"success"}
+          IconSalvar={MdOutlineCloudUpload}
+          styleSalvar={{ display: selectedItemsConciliar.length > 0 ? 'block' : 'none' }}
         />
       )}
 
@@ -282,6 +340,7 @@ export const ActionPesquisaFaturasConsolidadas = ({ usuarioLogado }) => {
           handleClickConciliar={handleClickConciliar}
           selectedItems={selectedItems}
           setSelectedItems={setSelectedItems}
+          resetPaginacaoKey={resetPaginacaoKey}
         />
       )}
 
@@ -291,8 +350,8 @@ export const ActionPesquisaFaturasConsolidadas = ({ usuarioLogado }) => {
           optionsModulos={optionsModulos}
           usuarioLogado={usuarioLogado}
           handleClickConciliar={handleClickConciliar}
-          selectedItems={selectedItems}
-          setSelectedItems={setSelectedItems}
+          selectedItemsConciliar={selectedItemsConciliar}
+          setSelectedItemsConciliar={setSelectedItemsConciliar}
         />
       )}
 

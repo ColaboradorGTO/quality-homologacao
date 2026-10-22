@@ -15,6 +15,7 @@ import { useReactToPrint } from "react-to-print";
 import { MdAdd } from "react-icons/md";
 import { MdOutlineArrowBackIos } from "react-icons/md";
 import { ActionCreateCaixaModal } from "./ActionCreateCaixaModal/actionCreateCaixaModal";
+import Swal from "sweetalert2";
 
 
 export const InformaticaActionListCaixa = ({
@@ -262,7 +263,8 @@ export const InformaticaActionListCaixa = ({
             value={dados}
             size="small"
             globalFilter={globalFilterValue}
-            sortOrder={-1}
+            sortField="IDCAIXAWEB"
+            sortOrder={1}
             paginator={true}
             rows={10}
             selectionMode="single"

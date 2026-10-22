@@ -85,6 +85,7 @@ export const useConferirFatura = ({optionsModulos, usuarioLogado, selectedItems,
                     }
                     
                     await post('/log-web', postData)
+                    
                     Swal.fire({
                         position: 'center',
                         icon: 'success',

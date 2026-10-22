@@ -14,8 +14,6 @@ import { toFloat } from "../../../../utils/toFloat";
 import { useEditarDeposito } from "./hooks/useEditarDeposito";
 import { Checkbox } from "primereact/checkbox";
 import { useIntegrarConciliarDepositoNoSAP } from "./hooks/useIntegrarConciliarDepositoNoSAP";
-import { useIntegrarTodasConciliacoesDepositosNoSAP } from "./hooks/useIntegrarTodasConciliacoesDepositosNoSAP";
-import { ButtonType } from "../../../Buttons/ButtonType";
 import translateText from "../../../../utils/translateText";
 import { useCancelarConciliacaoDeposito } from "./hooks/useCancelarConciliacaoDeposito";
 
@@ -26,7 +24,8 @@ export const ActionListaConciliarPorBanco = ({
   handleClick,
   selectedItems,
   setSelectedItems,
-  setBtnVisivel
+  setBtnVisivel,
+  resetPaginacaoKey
 
 }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
@@ -35,6 +34,15 @@ export const ActionListaConciliarPorBanco = ({
   const [selectAllChecked, setSelectAllChecked] = useState(false);
   const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
+
+  const resetPaginacao = () => {
+    setFirst(0);
+    setRows(10);
+  };
+
+  useEffect(() => {
+    if (resetPaginacaoKey) resetPaginacao();
+  }, [resetPaginacaoKey]);
 
   const {
     handleCancelar
@@ -45,7 +53,7 @@ export const ActionListaConciliarPorBanco = ({
   } = useEditarDeposito({ optionsModulos, usuarioLogado, handleClick })
   const {
     handleConciliar
-  } = useIntegrarConciliarDepositoNoSAP({ optionsModulos, usuarioLogado, handleClick });
+  } = useIntegrarConciliarDepositoNoSAP({ optionsModulos, usuarioLogado, handleClick, onIntegrado: resetPaginacao });
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -110,7 +118,8 @@ export const ActionListaConciliarPorBanco = ({
   }
 
   const dadosListaConciliarBanco = dadosConciliarBanco.map((item) => {
-
+    let STATUS_TEXTO = ''
+    let SITUACAO_TEXO = ''
     return {
       IDDEPOSITOLOJA: item.IDDEPOSITOLOJA,
       DTMOVIMENTOCAIXA: item.DTMOVIMENTOCAIXA,
@@ -129,6 +138,18 @@ export const ActionListaConciliarPorBanco = ({
       DOCENTRY_SAP_CONTAS_A_RECEBER: toFloat(item.DOCENTRY_SAP_CONTAS_A_RECEBER),
       STATUS_BLOQUEIO_ATUALIZACAO: item.STATUS_BLOQUEIO_ATUALIZACAO == 'True',
       ERRORLOGSAP: item.ERRORLOGSAP,
+      STATUS_TEXTO: item.STCANCELADO === 'False' ? 'Dep. Ativo' : 'Dep. Cancelado',
+
+      SITUACAO_TEXTO:
+      item.STCONFERIDO !== 'True'
+          ? 'Não Conciliado'
+          : item.STINTEGRADOSAP === 'True' || item.STINTEGRADOSAP === true
+              ? 'Conciliado e Integrado'
+              : item.STATUS_BLOQUEIO_ATUALIZACAO === 'True' || item.STATUS_BLOQUEIO_ATUALIZACAO === true
+                  ? 'Conciliado e Aguardando na Fila de Integração'
+                  : item.ERRORLOGSAP?.length > 0
+                      ? 'Conciliado / Error ao integrar'
+                      : 'Conciliado',
 
     }
   })
@@ -345,8 +366,10 @@ export const ActionListaConciliarPorBanco = ({
       sortable: true
     },
     {
-      field: 'STCANCELADO',
+      field: 'STATUS_TEXTO',
+      sortField: 'STATUS_TEXTO',
       header: 'Status',
+      sortable: true,
       body: row => (
         <p style={{ fontWeight: 900, margin: "0px", width: "100px", color: row.STCANCELADO === 'False' ? 'blue' : 'red' }}>
           {row.STCANCELADO === 'False' ? 'Dep. Ativo' : 'Dep. Cancelado'}
@@ -354,8 +377,10 @@ export const ActionListaConciliarPorBanco = ({
       ),
     },
     {
-      field: 'STCONFERIDO',
+      field: 'SITUACAO_TEXTO',
+      sortField: 'SITUACAO_TEXTO',
       header: 'Situação',
+      sortable: true,
       body: (row) => {
         if (row.STCONFERIDO == 'True') {
 
@@ -581,7 +606,7 @@ export const ActionListaConciliarPorBanco = ({
     if (row && row.IDDEPOSITOLOJA) {
       handleConciliar(row.IDDEPOSITOLOJA);
     }
-  }
+  } 
 
   return (
     <Fragment>
@@ -625,7 +650,8 @@ export const ActionListaConciliarPorBanco = ({
             selectionMode="single"
             selection={rowSelection}
             onSelectionChange={(e) => setRowSelection(e.value)}
-            sortOrder={-1}
+            sortField=""
+            sortOrder={1}
             paginator={true}
             cellMemo={false}
             rows={rows}
@@ -641,11 +667,7 @@ export const ActionListaConciliarPorBanco = ({
             showGridlines
             stripedRows
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado </div>}
-          // rowClassName={rowData =>
-          //   selectedItems.some(item => item.IDDEPOSITOLOJA === rowData.IDDEPOSITOLOJA)
-          //     ? 'p-highlight'
-          //     : ''
-          // }
+          
           >
             {colunasConciliarBanco.map(coluna => (
               <Column

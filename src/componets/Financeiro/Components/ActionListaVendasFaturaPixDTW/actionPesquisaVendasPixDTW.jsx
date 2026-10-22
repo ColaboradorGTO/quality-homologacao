@@ -35,6 +35,7 @@ export const ActionPesquisaVendasPixDTW = ({ usuarioLogado }) => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [btnVisivel, setBtnVisivel] = useState(false);
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
+  const [resetPaginacaoKey, setResetPaginacaoKey] = useState(0);
 
   useEffect(() => {
     const dataInicial = getDataAtual();
@@ -261,12 +262,13 @@ export const ActionPesquisaVendasPixDTW = ({ usuarioLogado }) => {
 
   }
 
-  const { integrarTodos } = useIntegrarTodosPagamentosPix({
+  const { integrarTodos, isSubmitting } = useIntegrarTodosPagamentosPix({
     optionsModulos,
     usuarioLogado,
     handleClickVendasPixCompensacao,
     selectedItems,
-    setSelectedItems
+    setSelectedItems,
+    onIntegrado: () => setResetPaginacaoKey((k) => k + 1)
   })
 
 
@@ -365,6 +367,7 @@ export const ActionPesquisaVendasPixDTW = ({ usuarioLogado }) => {
         corProdutoVendido={"primary"}
         iconProdutoVendido={BsCloudUpload}
         styleProdutoVendido={{ display: selectedItems.length > 1 ? 'block' : 'none' }}
+        disabledProdutoVendido={isSubmitting}
       />
 
       {tabelaVendasPixVisivel && (
@@ -386,8 +389,10 @@ export const ActionPesquisaVendasPixDTW = ({ usuarioLogado }) => {
           btnVisivel={btnVisivel}
           setBtnVisivel={setBtnVisivel}
           handleClickVendasPixCompensacao={handleClickVendasPixCompensacao}
+          resetPaginacaoKey={resetPaginacaoKey}
         />
       )}
+      
       {pixCompensacaoCapa && (
         <ActionListaVendasPIXCompensacaoCapa dadosVendasPixCompensacao={dadosVendasPixCompensacao} />
       )}

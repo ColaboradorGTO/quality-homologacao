@@ -23,8 +23,8 @@ export const ActionListaFaturasLoja = ({
   usuarioLogado, 
   handleClick, 
   selectedItems,
-  setSelectedItems
-
+  setSelectedItems,
+  resetPaginacaoKey
 }) => {
   const [modalFaturaVisivel, setModalFaturaVisivel] = useState(false);
   const [dadosDetalheFaturaCaixa, setDadosDetalheFaturaCaixa] = useState([]);
@@ -35,6 +35,15 @@ export const ActionListaFaturasLoja = ({
   const [rows, setRows] = useState(10);
   const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
+
+  const resetPaginacao = () => {
+    setFirst(0);
+    setRows(10);
+  };
+  
+  useEffect(() => {
+    if (resetPaginacaoKey) resetPaginacao();
+  }, [resetPaginacaoKey]);
 
   const {
     conferir
@@ -128,6 +137,15 @@ export const ActionListaFaturasLoja = ({
 
     }
   });
+
+  function calcularTotalValorRecebido() {
+    return dados.reduce((total, item) => {
+      if (item.STCANCELADO == 'False') {
+        return total + (parseFloat(item.VRRECEBIDO) || 0);
+      }
+      return total;
+    }, 0);
+  }
 
   const podeSelecionar = (item) => {
     return item.STCANCELADO === 'False' && item.STCONFERIDOFATURA !== 'True' && Boolean(item.IDDETALHEFATURA);

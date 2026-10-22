@@ -27,7 +27,8 @@ export const ActionMain = ({
   corHeader,
   disabledCadastro,
   disabledCancelar,
-
+  disabledProdutoVendido,
+  
   readOnlyDescricao,
   readOnlyPendencia,
   readOnlyVendaCPFCNPJ,
@@ -1959,6 +1960,7 @@ export const ActionMain = ({
                         iconColor="#212529"
                         iconSize={16}
                         style={styleProdutoVendido}
+                        disabledBTN={disabledProdutoVendido}
                       />
                     )}
 
