@@ -24,6 +24,7 @@ import voucherImg from '../../public/img/icons/voucher.png';
 import maloteImg from '../../public/img/icons/malote.png';
 import permissoesImg from '../../public/img/icons/permissoes.png';
 import promocaoImg from '../../public/img/icons/promocao.png';
+import provisaoFinanceiraImg from '../../public/img/icons/previsao-financeira.png';
 
 
 export const ModuloTeste = () => {
@@ -39,11 +40,7 @@ export const ModuloTeste = () => {
     }
   }, []);
 
-  // useEffect(() => {
 
-  // }, [usuarioLogado]);
-
- console.log(usuarioLogado, 'usuarioLo')
   const navigate = useNavigate();
   const { data: optionsModulosPage = [], error: errorFuncionarios, isLoading: isLoadingFuncionarios, refetch: refetchFuncionarios } = useQuery(
     'menus-usuario',
@@ -67,7 +64,7 @@ export const ModuloTeste = () => {
     
     const modulos = optionsModulosPage[0]?.modulos || [];
     const moduloEncontrado = modulos.find(modulo => modulo.DSMODULO === moduloURL);
-    console.log(modulos, 'moduloEncontrado')
+
     if (moduloEncontrado) {
       localStorage.setItem('moduloselecionado', JSON.stringify(moduloEncontrado));
       setSelectedModule(moduloEncontrado);
@@ -102,7 +99,8 @@ export const ModuloTeste = () => {
     16: voucherImg,
     17: maloteImg,
     18: permissoesImg,
-    19: promocaoImg
+    19: promocaoImg,
+    20: provisaoFinanceiraImg
   };
 
 

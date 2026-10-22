@@ -53,7 +53,7 @@ export const Modulo = ({usuarioLogado}) => {
  
   const selecioneModulo = (moduloURL) => {
     const moduloSelecionado = allModulos.find((modulo) => modulo.url === moduloURL);
-    console.log(allModulos, 'modulo')
+  
     if (moduloSelecionado) {
       localStorage.setItem('moduloselecionado', JSON.stringify(moduloSelecionado));
       setSelectedModule(moduloSelecionado)
