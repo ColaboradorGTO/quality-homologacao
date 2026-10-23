@@ -110,6 +110,7 @@ export const ActionListaConferenciaCaixa = ({ dadosMovimentosCaixa, usuarioLogad
       NUNOTAFISCAL: item.NUNOTAFISCAL,
       STFECHADOMOVIMENTO: item.STFECHADOMOVIMENTO,
       STCONFERIDOMOVIMENTO: item.STCONFERIDOMOVIMENTO,
+      TOTALFECHAMENTOVRQUEBRACAIXA: item.TOTALFECHAMENTOVRQUEBRACAIXA,
       vrFechamentoQuebraCaixa: toFloat(vrFechamentoQuebraCaixa),
       vrTotalAjusteFatura: vrTotalAjusteFatura,
       vrTotalFechamentoDinheiro: toFloat(vrTotalFechamentoDinheiro),
@@ -117,6 +118,11 @@ export const ActionListaConferenciaCaixa = ({ dadosMovimentosCaixa, usuarioLogad
       contador
     }
   });
+
+
+
+
+
 
   const calcularTotalVendaDinheiro = () => {
     return dados.reduce((total, dados) => total + parseFloat(dados.TOTALFECHAMENTODINHEIROFISICO), 0);
@@ -232,21 +238,20 @@ export const ActionListaConferenciaCaixa = ({ dadosMovimentosCaixa, usuarioLogad
       ),
     },
     {
-      field: 'STFECHADOMOVIMENTO',
+      field: 'Opções',
       header: 'Opções',
       width: '300px',
 
       body: (row) => {
         const fechado = row.STFECHADOMOVIMENTO === "True";
         const conferidoZero = String(row.STCONFERIDOMOVIMENTO) === "0";
-        const conferido = !conferidoZero;
+        const conferido = Number(row.STCONFERIDOMOVIMENTO) > 0;
 
         const same2 = (a, b) => {
           const na = Number(toFloat(a));
           const nb = Number(toFloat(b));
           return Number(na.toFixed(2)) === Number(nb.toFixed(2));
         };
-
         const quebraIgual = same2(row.vrFechamentoQuebraCaixa, row.VRQUEBRAEFETIVADO);
 
         const temAjuste =

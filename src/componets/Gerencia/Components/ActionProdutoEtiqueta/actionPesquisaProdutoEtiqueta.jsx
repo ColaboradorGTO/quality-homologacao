@@ -10,7 +10,7 @@ import { GoDownload } from "react-icons/go"
 import { BsTrash3 } from "react-icons/bs"
 import { useQuery } from "react-query"
 import Swal from "sweetalert2"
-import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento"
+import { animacaoCarregamento, fecharAnimacaoCarregamento, foiCancelado } from "../../../../utils/animationCarregamento"
 
 export const ActionPesquisaProdutoEtiqueta = ({ usuarioLogado }) => {
   const [descricaoProduto, setDescricaoProduto] = useState('')
@@ -47,7 +47,7 @@ export const ActionPesquisaProdutoEtiqueta = ({ usuarioLogado }) => {
   }, [dadosListaPrecos, usuarioLogado]);
 
 
-  const fetchListaPrecosSap = async () => {
+const fetchListaPrecosSap = async () => {
     const urlBase = `/lista-produtos-etiqueta-sap?idLista=${empresaSelecionada}&idProduto=${idProduto}&descricao=${descricaoProduto}&codBarras=${codBarrasProduto}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
@@ -87,7 +87,6 @@ export const ActionPesquisaProdutoEtiqueta = ({ usuarioLogado }) => {
       fecharAnimacaoCarregamento();
     }
   };
-
 
 
   const { data: dadosListaPrecosSap = [], error: errorMalotes, isLoading: isLoadingMalotes, refetch: refetchListaPrecosSap } = useQuery(

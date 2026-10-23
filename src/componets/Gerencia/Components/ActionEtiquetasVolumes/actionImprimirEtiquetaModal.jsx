@@ -24,7 +24,7 @@ export const ActionImprimirEtiquetaModal = ({ show, handleClose, dadosAcumulador
   const dataTableRef = useRef();
 
 
-  const handlePrintZPL = async () => {
+ const handlePrintZPL = async () => {
     try {
       let etiquetasZPL = '';
       const zplResetConfiguracao = `
@@ -39,7 +39,7 @@ export const ActionImprimirEtiquetaModal = ({ show, handleClose, dadosAcumulador
         let {
           tipoSelecionado: titulo,
           empresaOrigem,
-          empresaDestinoSelecionada: empresaDestino,
+          empresaDestino,
           numeroOR,
           numeroOT,
           descricao,
@@ -48,8 +48,8 @@ export const ActionImprimirEtiquetaModal = ({ show, handleClose, dadosAcumulador
           quantidade
         } = dadosAcumuladorEtiquetas[itemIndex]
 
-        const empresaDestinada = titulo == 'DEVOLUÇÃO' ? "0101 - TO - CD (Depósito)" : empresaDestinoSelecionada?.label;
-        console.log(empresaDestinada, 'empresaDestinada')
+        const empresaDestinoSelecionada = titulo == 'DEVOLUÇÃO' ? " 0101 - TO - CD (DEPÓSITO)" : empresaDestino?.label;
+        
         const qtd = Number(quantidade) || 1;
 
         for (let i = 0; i < qtd; i++) {
@@ -85,7 +85,11 @@ export const ActionImprimirEtiquetaModal = ({ show, handleClose, dadosAcumulador
 
           ^FO180,20^FB980,2,1,L,0^FDREMETENTE: ${empresaOrigem}^FS
 
+<<<<<<< HEAD
           ^FO80,20^FB980,2,1,L,0^FDDESTINATÁRIO: ${empresaDestinada}^FS
+=======
+          ^FO80,20^FB980,2,1,L,0^FDDESTINATÁRIO: ${empresaDestinoSelecionada}^FS
+>>>>>>> ce5c53e0 (fix: ajustes de gerencia)
 
           ^CF0,40
           ^FO40,550^FDQTD: ${i + 1}/${qtd}^FS
@@ -105,8 +109,9 @@ export const ActionImprimirEtiquetaModal = ({ show, handleClose, dadosAcumulador
     }
   }
 
-  const etiquetas = dadosAcumuladorEtiquetas.flatMap((item) => {
+    const etiquetas = dadosAcumuladorEtiquetas.flatMap((item) => {
     const quantidade = Number(item.quantidade) || 1;
+    
     
     return Array.from({ length: quantidade }, (_, i) => ({
       titulo: item.tipoSelecionado,
@@ -114,14 +119,13 @@ export const ActionImprimirEtiquetaModal = ({ show, handleClose, dadosAcumulador
       categoria: item.categoria,
       numeroOR: item.numeroOR || 'N/A',
       numeroOT: item.numeroOT || 'N/A',
-      empresaDestino: item.tipoSelecionado == 'DEVOLUÇÃO' ? " 0101 - TO - CD (DEPÓSITO)" : item.empresaDestinoSelecionada?.label,
+      empresaDestino: item.tipoSelecionado == 'DEVOLUÇÃO' ? " 0101 - TO - CD (DEPÓSITO)" : item.empresaDestino,
       empresaOrigem: item.empresaOrigem,
       solicitante: item.solicitanteSelecionado,
       quantidade,
       copiaAtual: i + 1
     }))
   });
-
   const etiquetasPorPagina = chunkArray(etiquetas, 3);
   const totalPaginas = etiquetasPorPagina.length;
 
@@ -133,9 +137,8 @@ export const ActionImprimirEtiquetaModal = ({ show, handleClose, dadosAcumulador
         size="xl"
         className="modal fade"
         role="dialog"
-      >
-
-        <Modal.Body>
+        >
+      <Modal.Body>
           <header className="row" style={{ justifyContent: "space-between", marginLeft: "30px" }}>
             <div>
               <h1 className="title-modal">Etiquetas</h1>
@@ -235,6 +238,7 @@ export const ActionImprimirEtiquetaModal = ({ show, handleClose, dadosAcumulador
             ))}
           </div>
         </Modal.Body>
+
         <FooterModal
           ButtonTypeFechar={ButtonTypeModal}
           textButtonFechar={"Fechar"}

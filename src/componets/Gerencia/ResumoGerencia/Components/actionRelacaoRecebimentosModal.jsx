@@ -28,7 +28,6 @@ export const ActionRelacaoRecebimentosModal = ({ dadosPagamentoModal, show, hand
       VRTOTALVENDA: item.venda.VRTOTALVENDA,
       ULTNITEM: item.venda.ULTNITEM,
 
-    
     }
   });
 
@@ -212,7 +211,7 @@ export const ActionRelacaoRecebimentosModal = ({ dadosPagamentoModal, show, hand
                   </DataTable>
                 </div>
             </div>
-
+                      
           </Modal.Body>
 
           <FooterModal

@@ -14,7 +14,7 @@ import { ActionDetalharEmpresaModal } from "./ActionDetalharEmpresa/actionDetalh
 import { ActionEditarEmpresaModal } from "./ActionEditarEmpresa/actionEditarEmpresaModal";
 import Swal from "sweetalert2";
 
-export const ActionListaEmpresas = ({ dadosEmpresas, usuarioLogado, optionsModulos }) => {
+export const ActionListaEmpresas = ({ dadosEmpresas, usuarioLogado, optionsModulos,refetchEmpresas }) => {
   const [modalDetalheEmpresa, setModalDetalheEmpresa] = useState(false);
   const [modalEditarEmpresa, setModalEditarEmpresa] = useState(false);
   const [dadosEmpresasDetalhe, setDadosEmpresasDetalhe] = useState([]);
@@ -264,8 +264,8 @@ export const ActionListaEmpresas = ({ dadosEmpresas, usuarioLogado, optionsModul
         show={modalEditarEmpresa}
         handleClose={() => setModalEditarEmpresa(false)}
         dadosEmpresasDetalhe={dadosEmpresasDetalhe}
-        optionsModulos={optionsModulos}
         usuarioLogado={usuarioLogado}
+        refetchEmpresas={refetchEmpresas}
        
       /> 
     </Fragment>
