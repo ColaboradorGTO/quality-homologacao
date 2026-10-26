@@ -55,7 +55,7 @@ export const FormularioDetalheMalote = ({ dadosDetalhesMalote, dadosPendenciasMa
     classStatus = 'text-success';
   }
 
-
+ 
   const showConferencia = STATUSMALOTE == 'Conferido' || STATUSMALOTE == 'Enviado';
   const showDevolucao = !!DATAHORADEVOLVIDO;
   const showReenviado = !!DATAHORAREENVIADO;
