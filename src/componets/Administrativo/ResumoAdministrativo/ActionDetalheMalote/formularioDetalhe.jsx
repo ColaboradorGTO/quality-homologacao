@@ -55,14 +55,13 @@ export const FormularioDetalheMalote = ({ dadosDetalhesMalote, dadosPendenciasMa
     classStatus = 'text-success';
   }
 
-
-  const showConferencia = STATUSMALOTE === 'Conferido' || STATUSMALOTE === 'Enviado';
+ 
+  const showConferencia = STATUSMALOTE == 'Conferido' || STATUSMALOTE == 'Enviado';
   const showDevolucao = !!DATAHORADEVOLVIDO;
   const showReenviado = !!DATAHORAREENVIADO;
-  const showPendencias = PENDENCIAS?.length > 0 || STATUSMALOTE === 'Devolvido' || STATUSMALOTE !== 'Conferido';
+  const showPendencias = PENDENCIAS?.length > 0 || STATUSMALOTE == 'Devolvido' || STATUSMALOTE !== 'Conferido';
   const isReadOnly = STATUSMALOTE !== 'Devolvido';
-  console.log('dadosPendenciasMalotes', dadosPendenciasMalotes[0]);
-  console.log(dadosDetalhesMalote[0], 'dadosDetalhesMalote');
+  
   const enviarDadosMalote = (idMalote) => {
 
  
@@ -112,12 +111,14 @@ export const FormularioDetalheMalote = ({ dadosDetalhesMalote, dadosPendenciasMa
             <p style={{margin: '0px', fontSize: '16px', fontWeight: 900,}} className="text-p">Data Envio: <span className='span-print' style={{fontWeight: 500,}}>{DATAHORAENVIADO || ''}</span></p>
             <p style={{margin: '0px', fontSize: '16px', fontWeight: 900,}} className="text-p">Usuário Recepção: <span className='span-print' style={{fontWeight: 500,}}>{NOFUNCIONARIORECEPCAO || ''}</span></p>
             <p style={{margin: '0px', fontSize: '16px', fontWeight: 900,}} className="text-p">Data Recepção: <span className='span-print' style={{fontWeight: 500,}}>{DATAHORARECEBIDO || ''}</span></p>
-            {showConferencia && (
+            <p style={{margin: '0px', fontSize: '16px', fontWeight: 900,}} className="text-p">Usuário Conferência: <span className="span-print" style={{fontWeight: 500,}}>{NOFUNCIONARIOCONFERENCIA || ''}</span></p>
+            <p style={{margin: '0px', fontSize: '16px', fontWeight: 900,}} className="text-p">Data Conferência: <span className="span-print" style={{fontWeight: 500,}}>{DATAHORACONFERIDO || ''}</span></p>
+            {/* {showConferencia && (
               <>
                 <p style={{margin: '0px', fontSize: '16px', fontWeight: 900,}} className="text-p">Usuário Conferência: <span className="span-print" style={{fontWeight: 500,}}>{NOFUNCIONARIOCONFERENCIA || ''}</span></p>
                 <p style={{margin: '0px', fontSize: '16px', fontWeight: 900,}} className="text-p">Data Conferência: <span className="span-print" style={{fontWeight: 500,}}>{DATAHORACONFERIDO || ''}</span></p>
               </>
-            )}
+            )} */}
 
             {showDevolucao && (
               <>
