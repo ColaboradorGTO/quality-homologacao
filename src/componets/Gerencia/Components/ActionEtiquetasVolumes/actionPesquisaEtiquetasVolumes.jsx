@@ -32,24 +32,24 @@ export const ActionPesquisaEtiquetasVolumes = ({ usuarioLogado }) => {
     { enabled: true, staleTime: 60 * 60 * 1000, }
   );
 
-  const handleImprimir = () => {
-    if(tipoSelecionado == 'REMANEJAMENTO' && (empresaDestinoSelecionada?.value == null || empresaDestinoSelecionada?.value == undefined || empresaDestinoSelecionada?.value == '')){ 
+
+    const handleImprimir = () => {
+     if(tipoSelecionado == 'REMANEJAMENTO' && (empresaDestinoSelecionada == null || empresaDestinoSelecionada == undefined || empresaDestinoSelecionada == '')){ 
       Swal.fire({
         icon: 'error',
         title: 'Erro',
         text: 'Selecione a empresa destino novamente para remanejamento.',
       })
       return;
-    }
-
+    } 
     const dados = [{
       tipoSelecionado,
       numeroOR,
       numeroOT,
       descricao,
       categoria,
-      empresaOrigem: usuarioLogado?.NOFANTASIA,
-      empresaDestinoSelecionada: empresaDestinoSelecionada || (tipoSelecionado == 'DEVOLUÇÃO' ? "0101 - TO - CD (Depósito)" : ''),
+      empresaOrigem: usuarioLogado.NOFANTASIA,
+      empresaDestino: empresaDestinoSelecionada || '0101 - TO - CD (Depósito)',
       solicitanteSelecionado,
       quantidade: quantidade
     }];
@@ -69,13 +69,13 @@ export const ActionPesquisaEtiquetasVolumes = ({ usuarioLogado }) => {
     { value: 'Diretoria', label: 'Diretoria' },
   ]
 
-  // useEffect(() => {
-  //   if (tipoSelecionado === 'DEVOLUÇÃO') {
-  //     setSolicitanteSelecionado('');
-  //     setEmpresaDestinoSelecionada('');
-  //   }
-  // }, [tipoSelecionado, setSolicitanteSelecionado, setEmpresaDestinoSelecionada])
-  
+/*   useEffect(() => {
+    if (tipoSelecionado === 'DEVOLUÇÃO') {
+      setSolicitanteSelecionado('');
+      setEmpresaDestinoSelecionada('');
+    }
+  }, [tipoSelecionado, setSolicitanteSelecionado, setEmpresaDestinoSelecionada])
+   */
 
   const handleChangeTipoSelecionado = (e) => {
     setTipoSelecionado(e.value);

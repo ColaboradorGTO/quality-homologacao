@@ -7,6 +7,9 @@ import { MdOutlineLocalPrintshop } from "react-icons/md";
 import { isValidEAN13 } from "../../../../utils/isValidEAN13";
 import { enviarZPLParaImpressora } from "../../../../utils/labelPrinterService";
 import Swal from "sweetalert2";
+import { Modal } from 'react-bootstrap';
+import { HeaderModal } from '../../../Modais/HeaderModal/HeaderModal';
+import { FooterModal } from '../../../Modais/FooterModal/footerModal';
 
 const chunkArray = (array, size) => {
   const chunks = [];
@@ -17,9 +20,11 @@ const chunkArray = (array, size) => {
 };
 
 export const ActionImprimirEtiquetaModal = ({
+  show,
   produtosSelecionados,
   dadosAcumuladorEtiquetas,
-  copia
+  copia,
+  handleClose
 }) => {
 
   const dataTableRef = useRef();
@@ -82,28 +87,31 @@ export const ActionImprimirEtiquetaModal = ({
           let priceLength = precoVenda.length;
           let ajustePositionPrice = priceLength > 7 ? (priceLength - 7) * 15 : 0;
           let ajusteFontSizePrice = priceLength <= 11 ? 0 : 5;
-          let positionDefault = (contador * 280) + 5;
-          let positionPrice = 135 + positionDefault - ajustePositionPrice;
-          let positionTamanho = positionDefault + (tamanhoProd.length == 1 ? 15 : tamanhoProd.length == 2 ? 10 : 5 );
-          let positionCodBars = 40 + positionDefault;
+          let positionDefault = (contador * 280);
+          let positionPrice = 135 + (contador * 280) - ajustePositionPrice;
+          let positionTamanho = 10 + (contador * 280);
+          let positionCodBars = 30 + (contador * 280);
           let fontSizePrice = 35 - ajusteFontSizePrice;
           let widthBorder = 50 + ( tamanhoProd.length > 2 ? 10 : 0 );
           let abrirMaisUmaPagina = (j + 1) < qtdEtiqueta || (i + 1) < etiquetas.length;
 
-          dataLabelsZPLToPrint += `
-             ^FO${positionDefault},110^A0N,22,28^FB265,4,1,L,0^FD${descricaoProd}^FS
-          ^FO${positionDefault},210^A0N,22,20^FB265,2,0,L,0^FD${estiloProd}^FS
-          ^FO${positionDefault},260^A0N,22,20^FB265,2,0,L,0^FD${localExpProd}^FS
-          ^FO${positionDefault},285^A0N,22,28^FDTAM^FS
-          ^FO${positionDefault},302^GB${widthBorder},30,3^FS
-          ^FO${positionTamanho},309^A0N,22,28^FD${tamanhoProd}^FS
-          ^FO${positionPrice},300^A0,${fontSizePrice}^FD${precoVenda}^FS
-          ^FO${positionCodBars},335^BEN,55,Y,N^FD${codBarras}^FS
-          `;
+
+          // Adiciona comandos ZPL para a etiqueta (sem quebras de linha desnecessárias)
+          dataLabelsZPLToPrint += `^FO${positionDefault},120^A0N,20,30^FB255,4,2,L,0^FD${descricaoProd}^FS`;
+          dataLabelsZPLToPrint += `^FO${positionDefault},205^A0N,20,25^FB255,3,2,L,0^FD${estiloProd}^FS`;
+          dataLabelsZPLToPrint += `^FO${positionDefault},245^A0N,20,25^FB255,3,2,L,0^FD${localExpProd}^FS`;
+          dataLabelsZPLToPrint += `^FO${positionDefault},285^GB${widthBorder},50,3^FS`;
+          dataLabelsZPLToPrint += `^FO${positionDefault},265^A0N,22^FDTAM^FS`;
+          dataLabelsZPLToPrint += `^FO${positionPrice},300^A0,${fontSizePrice}^FD${precoVenda}^FS`;
+          dataLabelsZPLToPrint += `^FO${positionTamanho},300^A0N,22^FD${tamanhoProd}^FS`;
+          dataLabelsZPLToPrint += `^BY1.6,3,500`;
+          dataLabelsZPLToPrint += `^FO${positionCodBars},340`;
+          dataLabelsZPLToPrint += `^BEN,55,Y,N`;
+          dataLabelsZPLToPrint += `^FD${codBarras}^FS`;
 
           contador++;
 
-          
+          // Se completou 3 etiquetas por página, finaliza página
           if (contador === 3) {
             dataLabelsZPLToPrint += endPageLabel;
 
@@ -115,20 +123,20 @@ export const ActionImprimirEtiquetaModal = ({
           }
         }
       }
-  
-     
+
+      // Finaliza última página se necessário
       if (contador !== 0) {
         dataLabelsZPLToPrint += endPageLabel;
       }
 
-      
+      // Limpa formatação e cria comandos finais
       const comandosZPLFinais = dataLabelsZPLToPrint
         .replace(/^[ \t]+/gm, '')
         .replace(/^\s*$/gm, '')
-        .replace(/\n+/g, '\n')  
+        .replace(/\n+/g, '\n')  // Remove múltiplas quebras de linha
         .trim();
 
-    
+      // Validação final antes de enviar
       if (comandosZPLFinais.length < 10) {
         throw new Error('Comandos ZPL muito curtos - possível erro na geração');
       }
@@ -138,7 +146,7 @@ export const ActionImprimirEtiquetaModal = ({
       }
 
       // Envia para impressora via WebSocket
-      await enviarZPLParaImpressora(`${comandosZPLFinais}${zplResetConfiguracao}`);
+      await enviarZPLParaImpressora(comandosZPLFinais);
 
     } catch (error) {
       console.error('❌ Erro ao gerar/imprimir comandos ZPL:', error);
@@ -161,8 +169,10 @@ export const ActionImprimirEtiquetaModal = ({
       : produtosSelecionados?.length
         ? produtosSelecionados
         : [];
+
+
   const etiquetas = listaBase.flatMap((item) => {
-    const total = (item.quantidade || 1) * (Number(copia) || 1);
+    const total = (item.quantidade || 1) * (copia || 1);
 
     return Array.from({ length: total }, (_, index) => ({
       contador: index + 1,
@@ -177,17 +187,19 @@ export const ActionImprimirEtiquetaModal = ({
       DSLOCALEXPOSICAO: item.DSLOCALEXPOSICAO,
       quantidade: 1
     }));
-  })
+  });
+
 
   const etiquetasPorPagina = chunkArray(etiquetas, 3);
   const totalPaginas = etiquetasPorPagina.length;
 
   return (
+
     <Fragment>
       <header className="row" style={{ justifyContent: "space-between" }}>
         <div className="ml-3">
           <p style={{ margin: '0px' }}>Qtd: Páginas <b>{totalPaginas + ' ' + 'Páginas'}</b></p>
-          <p >Qtd Etiquetas: <b>{etiquetas.length + ' ' + 'unidades'} </b></p>
+          <p>Qtd Etiquetas: <b>{etiquetas.length} unidades</b></p>
         </div>
 
         <div className="d-flex gap-2">
@@ -260,6 +272,7 @@ export const ActionImprimirEtiquetaModal = ({
           </div>
         ))}
       </div>
+
     </Fragment>
   );
 };

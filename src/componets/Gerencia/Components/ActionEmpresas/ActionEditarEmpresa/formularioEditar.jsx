@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form"
 import { dataFormatada } from "../../../../../utils/dataFormatada"
 import { mascaraTelefone } from "../../../../../utils/mascaraTelefone"
 
-export const FormularioEditar = ({ handleClose, dadosEmpresasDetalhe, usuarioLogado, optionsModulos }) => {
+export const FormularioEditar = ({ handleClose, dadosEmpresasDetalhe, usuarioLogado, refetchEmpresas }) => {
   const { register, handleSubmit, errors } = useForm();
   const {
     grupoEmpresa,
@@ -35,7 +35,7 @@ export const FormularioEditar = ({ handleClose, dadosEmpresasDetalhe, usuarioLog
     telefone,
     setTelefone,
     onSubmit
-  } = useEditarEmpresa({dadosEmpresasDetalhe, handleClose, usuarioLogado, optionsModulos})
+  } = useEditarEmpresa({dadosEmpresasDetalhe, handleClose, usuarioLogado, refetchEmpresas});
 
   return (
     <Fragment>
@@ -177,7 +177,7 @@ export const FormularioEditar = ({ handleClose, dadosEmpresasDetalhe, usuarioLog
         </div>
         <FooterModal
           ButtonTypeCadastrar={ButtonTypeModal}
-          onClickButtonCadastrar={onSubmit}
+          onClickButtonCadastrar={handleSubmit(onSubmit)}
           textButtonCadastrar={"Atualizar"}
           corCadastrar="success"
 
