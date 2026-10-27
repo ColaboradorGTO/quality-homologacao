@@ -13,7 +13,7 @@ export function AuthProvider({ children }) {
   const [loginError, setLoginError] = useState('');
   const [usuarioAutenticado, setUsuarioAutenticado] = useState();
 
-  const TEMPO_INATIVIDADE = 60 * 60 * 1000; // 1 hora 
+ const TEMPO_INATIVIDADE = 5 * 60 * 60 * 1000; // 1 hora 
 
   const handleSenhaChange = (e) => {
     setSenha(e.target.value);
