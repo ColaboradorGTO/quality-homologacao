@@ -132,7 +132,7 @@ export const ActionListaVendasContingencia = ({ dadosVendasContigencia, optionsM
     {
       field: 'CHAVENFE',
       header: 'Chave NF',
-      body: row => <th>{row.CHAVENFE}</th>,
+      body: row => <th>{row.IDCHAVENFE.replace('NFe', '')}</th>,
       sortable: true,
     },
     {
@@ -165,7 +165,7 @@ export const ActionListaVendasContingencia = ({ dadosVendasContigencia, optionsM
             iconColor={"#fff"}
             cor={"primary"}
             width="30px"
-            height="30px" 
+            height="30px"
           />
 
         </div>
@@ -199,7 +199,7 @@ export const ActionListaVendasContingencia = ({ dadosVendasContigencia, optionsM
 
 
   const handleClickEdit = (row) => {
-    if(optionsModulos[0]?.ALTERAR == 'True') {
+    if (optionsModulos[0]?.ALTERAR == 'True') {
       if (row && row.IDVENDA) {
         handleEdit(row.IDVENDA);
       }
@@ -212,7 +212,7 @@ export const ActionListaVendasContingencia = ({ dadosVendasContigencia, optionsM
         timer: 3000,
       })
       return;
-    }  
+    }
   };
 
 
@@ -251,6 +251,7 @@ export const ActionListaVendasContingencia = ({ dadosVendasContigencia, optionsM
             filterDisplay="menu"
             showGridlines
             stripedRows
+            cellMemo={false}
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
           >
             {colunasVendasContigencia.map(coluna => (
