@@ -35,7 +35,10 @@ export const useConferirMalote = ({salvarDadosMalotes, checkedItems, handleClick
     return usuarioIP;
   };
   
-  const onSalvarMalote = async (status) => {
+  const onSalvarMalote = async (modo) => {
+    const status = modo == 'Conferência' ? 'Conferido' : 'Devolvido';
+    const observacao = observacaoFinanceiro?.trim()?.toUpperCase() || '';
+
     if(optionsModulos[0]?.ALTERAR == 'False') {
       Swal.fire({
         title: 'Erro!',
@@ -62,7 +65,7 @@ export const useConferirMalote = ({salvarDadosMalotes, checkedItems, handleClick
       }
     }
 
-    if(salvarDadosMalotes[0]?.STATUSMALOTE == 'Devolvido' && !observacaoFinanceiro.length && !checkedItems.length) {
+    if(status == 'Devolvido' && !observacao.length && !checkedItems.length) {
       Swal.fire({
         title: 'Erro!',
         text: `${usuarioLogado?.NOFUNCIONARIO},\nPara devolver o malote é necessário selecionar as pendências e/ou informar a observação!`,
@@ -77,8 +80,8 @@ export const useConferirMalote = ({salvarDadosMalotes, checkedItems, handleClick
     const putData = {
       IDMALOTE: salvarDadosMalotes[0]?.IDMALOTE,
       STATUS: status,
-      OBSERVACAOADMINISTRATIVO: observacaoFinanceiro,
-      PENDENCIAS: checkedItems.map(id => ({ IDPENDENCIA: id })),
+      OBSERVACAOADMINISTRATIVO: observacao,
+      PENDENCIAS: checkedItems.map(id => ({ IDPENDENCIA: Number(id) })),
       IDUSERULTIMAALTERACAO: usuarioLogado?.id
     };
     
