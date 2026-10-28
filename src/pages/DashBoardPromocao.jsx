@@ -82,6 +82,9 @@ export const DashBoardPromocao = ({ }) => {
     setComponentToShow(componentName);
   }
 
+  const menuFilhoResumo = selectedModule?.menuPai?.menuFilho?.find(
+    menu => menu.URL === "/promocoes/ActionPesquisaPromocao"
+  );
 
   const permissaoUsuario = selectedModule.menuPai.menuFilho;
   const {
@@ -97,7 +100,7 @@ export const DashBoardPromocao = ({ }) => {
 
   switch (componentToShow) {
     case "/promocoes/ActionPesquisaPromocao":
-      component = <ActionPesquisaPromocao usuarioLogado={usuarioLogado} ID={ID} />;
+      component = <ActionPesquisaPromocao usuarioLogado={usuarioLogado} ID={ID} menuFilhoAtual={menuFilhoResumo} />;
       break;
     case "/promocoes/ActionPesquisaPromocoesAtivas":
       component = <ActionPesquisaPromocoesAtivas usuarioLogado={usuarioLogado} ID={ID} />;
@@ -130,7 +133,7 @@ export const DashBoardPromocao = ({ }) => {
                           <div className="panel-content">
                             <Suspense fallback={<div>Loading...</div>}>
                               {actionVisivel && !resumoVisivel && !componentToShow && (
-                                <ActionPesquisaPromocao usuarioLogado={usuarioLogado}/>
+                                <ActionPesquisaPromocao usuarioLogado={usuarioLogado} menuFilhoAtual={menuFilhoResumo} />
 
                               )}
 
