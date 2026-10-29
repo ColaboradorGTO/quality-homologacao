@@ -146,7 +146,7 @@ export const ActionVendaXMLModal = ({ show, handleClose, dadosDetalheVendasXML }
               )}
             </ScrollPanel>
           </Modal.Body>
-
+ 
 
           <FooterModal
             ButtonTypeFechar={ButtonTypeModal}
