@@ -474,7 +474,7 @@ export const ActionListaVendasPIXCompensacao = ({
           </span>
         );
       },
-      sortable: false,
+      sortable: true,
     },
     {
       field: 'opcoes',
@@ -522,7 +522,7 @@ export const ActionListaVendasPIXCompensacao = ({
           </div>
         );
       },
-      sortable: false,
+      sortable: true,
     }
   ]
 

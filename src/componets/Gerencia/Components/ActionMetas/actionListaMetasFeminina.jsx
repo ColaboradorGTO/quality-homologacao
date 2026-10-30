@@ -46,7 +46,7 @@ export const ActionListaMetasFeminina = ({
         item.DSFUNCAO,
         item.NOSECAO,
         formatMoeda(item.VRMETACOLABORADOR),
-        formatMoeda(item.VRTOTALLIQUIDOCALC),
+        formatMoeda(item.VRTOTALLIQUIDOFEMININO),
         item.situacao
       ]),
       horizontalPageBreak: true,
@@ -63,7 +63,7 @@ export const ActionListaMetasFeminina = ({
       'Função': item.DSFUNCAO,
       'Seção': item.NOSECAO,
       'Vr.Meta': formatMoeda(item.VRMETACOLABORADOR),
-      'Vr.Alcançado': formatMoeda(item.VRTOTALLIQUIDOCALC),
+      'Vr.Alcançado': formatMoeda(item.VRTOTALLIQUIDOFEMININO),
       'Situação': item.situacao
     })));
 
@@ -88,7 +88,7 @@ export const ActionListaMetasFeminina = ({
     let contador = index + 1;
     let situacao;
     let cor;
-    if(item?.metasColaborador?.VRMETACOLABORADOR > item?.vendasecaocalcados[0]?.['venda-feminina']?.VRTOTALLIQUIDOCALC) {
+    if(item?.metasColaborador?.VRMETACOLABORADOR > item?.vendasecaofeminina[0]?.['venda-feminina']?.VRTOTALLIQUIDOFEMININO) {
       situacao = 'NÃO COMPRIDA'
       cor = 'red'
     } else {
@@ -106,7 +106,7 @@ export const ActionListaMetasFeminina = ({
       DSFUNCAO: item?.metasColaborador?.DSFUNCAO,
       VRMETACOLABORADOR: item?.metasColaborador?.VRMETACOLABORADOR,
       PERCMETACOLABORADOR: item?.metasColaborador?.PERCMETACOLABORADOR,
-      VRTOTALLIQUIDOCALC: item?.vendasecaocalcados[0]?.['venda-feminina']?.VRTOTALLIQUIDOCALC,
+      VRTOTALLIQUIDOFEMININO: item?.vendasecaofeminina[0]?.['venda-feminina']?.VRTOTALLIQUIDOFEMININO,
       situacao,
       cor
     };
@@ -151,9 +151,9 @@ export const ActionListaMetasFeminina = ({
       sortable: true,
     },
     {
-      field: 'VRTOTALLIQUIDOCALC',
+      field: 'VRTOTALLIQUIDOFEMININO',
       header: 'Vr Alcançado',
-      body: row => <th>{formatMoeda(row.VRTOTALLIQUIDOCALC)}</th>,
+      body: row => <th>{formatMoeda(row.VRTOTALLIQUIDOFEMININO)}</th>,
       sortable: true,
     },
     {

@@ -178,7 +178,7 @@ export const ActionListaMetas = ({
         setDadosCMB(responseCmb.data)
         setTabelaVendaResumidaVisivel(true);
         setTabelaVisivel(false);
-        setTabelaMetasVendasVisivel(false);
+        setTabelaMetasVendasVisivel(true);
       }
     } catch (error) {
       console.error('Erro ao buscar metas resumidas: ', error);
@@ -186,13 +186,10 @@ export const ActionListaMetas = ({
   };
   
   const handleClickDetalhe = (row) => {
-    console.log(row.IDMETASLOJA)
     if (row && row.IDMETASLOJA) {
       handleDetalhe(row.IDMETASLOJA);
     }
   };
-
-
 
   return (
 

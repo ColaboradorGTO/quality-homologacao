@@ -30,7 +30,7 @@ const ActionPesquisaVendasEstrutura = lazy(() => import("../componets/Gerencia/C
 const ActionPesquisaVendasDescontoFuncionario = lazy(() => import("../componets/Gerencia/Components/ActionDescontoFuncionario/actionPesquisaVendasDescontoFuncionario").then(module => ({ default: module.ActionPesquisaVendasDescontoFuncionario })));
 const ActionPesquisaEstoqueLoja = lazy(() => import("../componets/Gerencia/Components/ActionEstoqueLoja/actionPesquisaEstoqueLoja").then(module => ({ default: module.ActionPesquisaEstoqueLoja })));
 const ActionPesquisaBalancoLoja = lazy(() => import("../componets/Gerencia/Components/ActionBalancoPorLoja/actionPesquisaBalancoLoja").then(module => ({ default: module.ActionPesquisaBalancoLoja })));
-const ActionPesqvuisaEmpresas = lazy(() => import("../componets/Gerencia/Components/ActionEmpresas/actionPesquisaEmpresas").then(module => ({ default: module.ActionPesquisaEmpresas })));
+const ActionPesquisaEmpresas = lazy(() => import("../componets/Gerencia/Components/ActionEmpresas/actionPesquisaEmpresas").then(module => ({ default: module.ActionPesquisaEmpresas })));
 const ActionPesquisaConferenciaMalote = lazy(() => import("../componets/Gerencia/Components/ActionConferenciaMalote/actionPesquisaConferenciaMalote").then(module => ({ default: module.ActionPesquisaConferenciaMalote })));
 const ActionPesquisaProdutoEtiqueta = lazy(() => import("../componets/Gerencia/Components/ActionProdutoEtiqueta/actionPesquisaProdutoEtiqueta").then(module => ({ default: module.ActionPesquisaProdutoEtiqueta })));
 const ActionPesquisaEtiquetaRemarcacao = lazy(() => import("../componets/Gerencia/Components/ActionEtiquetaRemarcacao/actionPesquisaEtiquetaRemarcacao").then(module => ({ default: module.ActionPesquisaEtiquetaRemarcacao })));
@@ -103,6 +103,10 @@ export const DashBoardGerencia = () => {
     { enabled: Boolean(usuarioLogado?.id), staleTime: 5 * 60 * 1000, }
   );
 
+  const menuFilhoResumo = selectedModule?.menuPai?.menuFilho?.find(
+    menu => menu.URL === "/gerencia/ResumoDashBoardGerencia"
+  );
+
   const permissaoUsuario = selectedModule.menuPai.menuFilho;
   const {
     ID,
@@ -120,7 +124,7 @@ export const DashBoardGerencia = () => {
 
   switch (componentToShow) {
     case "/gerencia/ResumoDashBoardGerencia":
-      component = <ResumoDashBoardGerencia usuarioLogado={usuarioLogado} />;
+      component = <ResumoDashBoardGerencia usuarioLogado={usuarioLogado} menuFilhoAtual={menuFilhoResumo} />;
       break;
     case "/gerencia/ActionPesquisaProdutoEtiqueta":
       component = <ActionPesquisaProdutoEtiqueta usuarioLogado={usuarioLogado} optionsEmpresas={optionsEmpresas} />;
@@ -243,7 +247,7 @@ export const DashBoardGerencia = () => {
                           <div className="panel-content">
                             <Suspense fallback={<div>Loading...</div>}>
                               {resumoVisivel && !componentToShow && (
-                                <ResumoDashBoardGerencia usuarioLogado={usuarioLogado} />
+                                <ResumoDashBoardGerencia usuarioLogado={usuarioLogado} menuFilhoAtual={menuFilhoResumo} />
                               )}
 
                               {componentToShow && component}

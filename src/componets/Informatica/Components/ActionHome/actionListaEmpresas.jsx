@@ -87,7 +87,7 @@ export const ActionListaEmpresas = ({ dadosEmpresas, setActionVisivel, optionsMo
       IDEMPRESA: item.IDEMPRESA,
       IDCONFIGURACAO: item.IDCONFIGURACAO,
       DTVALIDADECERTIFICADOFORMATADA: item.DTVALIDADECERTIFICADOFORMATADA,
-      STLOJAABERTA: item.STLOJAABERTA
+      STLOJAABERTA: item.STLOJAABERTA == "True" ? "Aberta" : "Fechada"
 
     };
   });
@@ -101,7 +101,7 @@ export const ActionListaEmpresas = ({ dadosEmpresas, setActionVisivel, optionsMo
       width: "7%"
     },
     {
-      field: 'IDEMPRESA',
+      field: 'NOFANTASIA',
       header: 'Empresa',
       body: row => <th style={{ color: 'blue' }} >{row.NOFANTASIA}</th>,
       sortable: true,
@@ -122,7 +122,7 @@ export const ActionListaEmpresas = ({ dadosEmpresas, setActionVisivel, optionsMo
       width: "150px"
     },
     {
-      field: 'IDCONFIGURACAO',
+      field: 'DSNOMEPFX',
       header: 'Certificado',
       body: row => <th style={{ color: 'blue' }} >{row.DSNOMEPFX}</th>,
       sortable: true,
@@ -137,7 +137,7 @@ export const ActionListaEmpresas = ({ dadosEmpresas, setActionVisivel, optionsMo
     {
       field: 'STLOJAABERTA',
       header: 'ST Loja Aberta',
-      body: row => <th style={{ color: row.STLOJAABERTA == "True" ? 'blue' : 'red' }} >{row.STLOJAABERTA == "True" ? "Aberta" : "Fechada"}</th>,
+      body: row => <th style={{ color: row.STLOJAABERTA == "Aberta" ? 'blue' : 'red' }} >{row.STLOJAABERTA}</th>,
       sortable: true,
     },
     {

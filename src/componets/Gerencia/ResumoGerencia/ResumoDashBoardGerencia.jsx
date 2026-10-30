@@ -24,22 +24,13 @@ import Swal from "sweetalert2";
 import { InputSelectAction } from "../../Inputs/InputSelectAction";
 import { useFetchData } from "../../../hooks/useFetchData";
       
-export const ResumoDashBoardGerencia = ({ usuarioLogado }) => {
+export const ResumoDashBoardGerencia = ({ usuarioLogado, menuFilhoAtual }) => {
   const [actionVisivel, setActionVisivel] = useState(true);
   const [resumoVisivel, setResumoVisivel] = useState(false);
   const [dataPesquisa, setDataPesquisa] = useState('');
   const [empresaSelecionada, setEmpresaSelecionada] = useState('');
   const [dadosDespesaLoja, setDadosDespesaLoja] = useState([]);
   const [dadosExtratoLoja, setDadosExtratoLoja] = useState([]);
-  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
-
-  useEffect(() => {
-    const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
-    if (menuSalvo) {
-      const menuParsed = JSON.parse(menuSalvo);
-      setMenuFilhoAtual(menuParsed);
-    }
-  }, []);
 
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
     ['menus-usuario-excecao', menuFilhoAtual?.ID],
@@ -48,7 +39,7 @@ export const ResumoDashBoardGerencia = ({ usuarioLogado }) => {
 
       return response.data;
     },
-    { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
+    { enabled: Boolean(usuarioLogado?.id && menuFilhoAtual?.ID), staleTime: 5 * 60 * 1000, }
   );
 
   useEffect(() => {
