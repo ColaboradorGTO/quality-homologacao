@@ -12,13 +12,22 @@ import  "./styles.css";
 import { formatMoeda } from "../../../../utils/formatMoeda";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
+import { ButtonType } from "../../../Buttons/ButtonType";
+import { get } from "../../../../api/funcRequest";
+import { ActionMetasCalcadosModal } from "./MetasCalcado/actionMetasCalcadosModal";
+import Swal from "sweetalert2";
 
 export const ActionListaMetasDetalhadas = ({ 
   dadosDetalheMeta,
-  dadosMetasDetalhadas,
+  usuarioLogado,
+  optionsModulos
 }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowSelection, setRowSelection] = useState(null);
+  const [modalCalcados, setModalCalcados] = useState(null)
+  const [dadosDetalhe, setDadosDetalhe] = useState([])
+  const [secaoSelecionada, setSecaoSelecionada] = useState('')
+
   const dataTableRef = useRef();
 
   const onGlobalFilterChange = (e) => {
@@ -33,76 +42,57 @@ export const ActionListaMetasDetalhadas = ({
   const formatPercent = (value) => `${parseFloat(value || 0)}%`;
 
   const groupHeaders = [
-    { title: 'VENDAS / META GERAL', span: 5, fill: '#7a59ad', text: '#FFFFFF' },
-    { title: 'CALCADOS', span: 4, fill: '#FFDB8E', text: '#000000' },
-    { title: 'SELECAO FEMININA', span: 12, fill: '#FE85BE', text: '#000000' },
-    { title: 'SELECAO MASCULINA', span: 12, fill: '#6AB8F7', text: '#000000' },
-    { title: 'SELECAO INFANTIL', span: 12, fill: '#4DE5D5', text: '#000000' },
-    { title: 'CMB', span: 4, fill: '#7a59ad', text: '#000000' },
+    { title: 'VENDAS / META GERAL', span: 4, fill: '#7a59ad', text: '#FFFFFF' },
+    { title: 'CALCADOS', span: 2, fill: '#FFDB8E', text: '#000000' },
+    { title: 'SELECAO FEMININA', span: 6, fill: '#FE85BE', text: '#000000' },
+    { title: 'SELECAO MASCULINA', span: 6, fill: '#6AB8F7', text: '#000000' },
+    { title: 'SELECAO INFANTIL', span: 6, fill: '#4DE5D5', text: '#000000' },
+    { title: 'CMB', span: 2, fill: '#7a59ad', text: '#FFFFFF' },
     { title: 'OUTROS', span: 2, fill: '#FE85BE', text: '#000000' },
     { title: 'TOTAL', span: 1, fill: '#FFDB8E', text: '#000000' },
   ];
 
+  const moeda = (field) => (item) => formatMoeda(item[field]);
+  const percent = (field) => (item) => formatPercent(item[field]);
+
+  // Mesmas colunas (e ordem) exibidas na tabela
   const exportColumns = [
-    { field: 'contador', header: '#', fill: '#7a59ad', text: '#FFFFFF', value: (item) => item.contador },
-    { field: 'NOFANTASIA', header: 'EMPRESA', fill: '#7a59ad', text: '#FFFFFF', value: (item) => item.NOFANTASIA },
-    { field: 'VRVENDAGERAL', header: 'Venda', fill: '#7a59ad', text: '#FFFFFF', value: (item) => formatMoeda(item.VRVENDAGERAL) },
-    { field: 'PERCMETAVENDAGERAL', header: '% Meta', fill: '#7a59ad', text: '#FFFFFF', value: (item) => formatPercent(item.PERCMETAVENDAGERAL) },
-    { field: 'VRMETAVENDAGERAL', header: 'Vr Meta', fill: '#7a59ad', text: '#FFFFFF', value: (item) => formatMoeda(item.VRMETAVENDAGERAL) },
+    { header: '#', fill: '#7a59ad', text: '#FFFFFF', value: (item) => item.contador },
+    { header: 'EMPRESA', fill: '#7a59ad', text: '#FFFFFF', value: (item) => item.NOFANTASIA },
+    { header: 'Data Meta', fill: '#7a59ad', text: '#FFFFFF', value: (item) => item.dataMeta },
+    { header: 'Vr Meta', fill: '#7a59ad', text: '#FFFFFF', value: moeda('VRMETAVENDAGERAL') },
 
-    { field: 'VRVENDACALCADOS', header: 'Geral', fill: '#FFDB8E', text: '#000000', value: (item) => formatMoeda(item.VRVENDACALCADOS) },
-    { field: 'PERCVENDACALCADOS', header: '%', fill: '#FFDB8E', text: '#000000', value: (item) => formatPercent(item.PERCVENDACALCADOS) },
-    { field: 'VRMETAVENDACALCADOS', header: 'Vr Meta', fill: '#ffca5b', text: '#000000', value: (item) => formatMoeda(item.VRMETAVENDACALCADOS) },
-    { field: 'PERCMETAVENDACALCADOS', header: '%', fill: '#ffca5b', text: '#000000', value: (item) => formatPercent(item.PERCMETAVENDACALCADOS) },
+    { header: 'Vr Meta', fill: '#ffca5b', text: '#000000', value: moeda('VRMETAVENDACALCADOS') },
+    { header: '%', fill: '#ffca5b', text: '#000000', value: percent('PERCMETAVENDACALCADOS') },
 
-    { field: 'VRVENDAFEMVERINV', header: 'Verao/Inverno', fill: '#FE85BE', text: '#000000', value: (item) => formatMoeda(item.VRVENDAFEMVERINV) },
-    { field: 'PERCVENDAFEMVERINV', header: '%', fill: '#FE85BE', text: '#000000', value: (item) => formatPercent(item.PERCVENDAFEMVERINV) },
-    { field: 'VRMETAVENDAFEMVERINV', header: 'Vr Meta', fill: '#fd52a3', text: '#FFFFFF', value: (item) => formatMoeda(item.VRMETAVENDAFEMVERINV) },
-    { field: 'PERCMETAVENDAFEMVERINV', header: '*', fill: '#fd52a3', text: '#FFFFFF', value: (item) => formatPercent(item.PERCMETAVENDAFEMVERINV) },
-    { field: 'VRVENDAFEMPCINTIMA', header: 'Peca Intima', fill: '#FE85BE', text: '#000000', value: (item) => formatMoeda(item.VRVENDAFEMPCINTIMA) },
-    { field: 'PERCVENDAFEMPCINTIMA', header: '%', fill: '#FE85BE', text: '#000000', value: (item) => formatPercent(item.PERCVENDAFEMPCINTIMA) },
-    { field: 'VRMETAVENDAFEMPCINTIMA', header: 'Vr Meta', fill: '#fd52a3', text: '#FFFFFF', value: (item) => formatMoeda(item.VRMETAVENDAFEMPCINTIMA) },
-    { field: 'PERCMETAVENDAFEMPCINTIMA', header: '*', fill: '#fd52a3', text: '#FFFFFF', value: (item) => formatPercent(item.PERCMETAVENDAFEMPCINTIMA) },
-    { field: 'VRVENDAFEMACESSORIOS', header: 'Acessorios', fill: '#FE85BE', text: '#000000', value: (item) => formatMoeda(item.VRVENDAFEMACESSORIOS) },
-    { field: 'PERCVENDAFEMACESSORIOS', header: '%', fill: '#FE85BE', text: '#000000', value: (item) => formatPercent(item.PERCVENDAFEMACESSORIOS) },
-    { field: 'VRMETAVENDAFEMACESSORIOS', header: 'Vr Meta', fill: '#fd52a3', text: '#FFFFFF', value: (item) => formatMoeda(item.VRMETAVENDAFEMACESSORIOS) },
-    { field: 'PERCMETAVENDAFEMACESSORIOS', header: '*', fill: '#fd52a3', text: '#FFFFFF', value: (item) => formatPercent(item.PERCMETAVENDAFEMACESSORIOS) },
+    { header: 'Verao/Inverno', fill: '#FE85BE', text: '#000000', value: moeda('VRMETAVENDAFEMVERINV') },
+    { header: '%', fill: '#FE85BE', text: '#000000', value: percent('PERCMETAVENDAFEMVERINV') },
+    { header: 'Peca Intima', fill: '#FE85BE', text: '#000000', value: moeda('VRMETAVENDAFEMPCINTIMA') },
+    { header: '%', fill: '#FE85BE', text: '#000000', value: percent('PERCMETAVENDAFEMPCINTIMA') },
+    { header: 'Acessorios', fill: '#FE85BE', text: '#000000', value: moeda('VRMETAVENDAFEMACESSORIOS') },
+    { header: '%', fill: '#FE85BE', text: '#000000', value: percent('PERCMETAVENDAFEMACESSORIOS') },
 
-    { field: 'VRVENDAMASCVERINV', header: 'Verao/Inverno', fill: '#6AB8F7', text: '#000000', value: (item) => formatMoeda(item.VRVENDAMASCVERINV) },
-    { field: 'PERCVENDAMASCVERINV', header: '%', fill: '#6AB8F7', text: '#000000', value: (item) => formatPercent(item.PERCVENDAMASCVERINV) },
-    { field: 'VRMETAVENDAMASCVERINV', header: 'Vr Meta', fill: '#39A1F4', text: '#FFFFFF', value: (item) => formatMoeda(item.VRMETAVENDAMASCVERINV) },
-    { field: 'PERCMETAVENDAMASCVERINV', header: '%', fill: '#39A1F4', text: '#FFFFFF', value: (item) => formatPercent(item.PERCMETAVENDAMASCVERINV) },
-    { field: 'VRVENDAMASCPCINTIMA', header: 'Peca Intima', fill: '#6AB8F7', text: '#000000', value: (item) => formatMoeda(item.VRVENDAMASCPCINTIMA) },
-    { field: 'PERCVENDAMASCPCINTIMA', header: '%', fill: '#6AB8F7', text: '#000000', value: (item) => formatPercent(item.PERCVENDAMASCPCINTIMA) },
-    { field: 'VRMETAVENDAMASCPCINTIMA', header: 'Vr Meta', fill: '#39A1F4', text: '#FFFFFF', value: (item) => formatMoeda(item.VRMETAVENDAMASCPCINTIMA) },
-    { field: 'PERCMETAVENDAMASCPCINTIMA', header: '%', fill: '#39A1F4', text: '#FFFFFF', value: (item) => formatPercent(item.PERCMETAVENDAMASCPCINTIMA) },
-    { field: 'VRVENDAMASCACESSORIOS', header: 'Acessorios', fill: '#6AB8F7', text: '#000000', value: (item) => formatMoeda(item.VRVENDAMASCACESSORIOS) },
-    { field: 'PERCVENDAMASCACESSORIOS', header: '%', fill: '#6AB8F7', text: '#000000', value: (item) => formatPercent(item.PERCVENDAMASCACESSORIOS) },
-    { field: 'VRMETAVENDAMASCACESSORIOS', header: 'Vr Meta', fill: '#39A1F4', text: '#FFFFFF', value: (item) => formatMoeda(item.VRMETAVENDAMASCACESSORIOS) },
-    { field: 'PERCMETAVENDAMASCACESSORIOS', header: '%', fill: '#39A1F4', text: '#FFFFFF', value: (item) => formatPercent(item.PERCMETAVENDAMASCACESSORIOS) },
+    { header: 'Verao/Inverno', fill: '#6AB8F7', text: '#000000', value: moeda('VRMETAVENDAMASCVERINV') },
+    { header: '%', fill: '#6AB8F7', text: '#000000', value: percent('PERCVENDAMASCVERINV') },
+    { header: 'Peca Intima', fill: '#6AB8F7', text: '#000000', value: moeda('VRMETAVENDAMASCPCINTIMA') },
+    { header: '%', fill: '#6AB8F7', text: '#000000', value: percent('PERCMETAVENDAMASCPCINTIMA') },
+    { header: 'Acessorios', fill: '#6AB8F7', text: '#000000', value: moeda('VRMETAVENDAMASCACESSORIOS') },
+    { header: '%', fill: '#6AB8F7', text: '#000000', value: percent('PERCVENDAMASCACESSORIOS') },
 
-    { field: 'VRVENDAINFANTVERINV', header: 'Verao/Inverno', fill: '#4DE5D5', text: '#000000', value: (item) => formatMoeda(item.VRVENDAINFANTVERINV) },
-    { field: 'PERCVENDAINFANTVERINV', header: '%', fill: '#4DE5D5', text: '#000000', value: (item) => formatPercent(item.PERCVENDAINFANTVERINV) },
-    { field: 'VRMETAVENDAINFANTVERINV', header: 'Vr Meta', fill: '#21DFCB', text: '#000000', value: (item) => formatMoeda(item.VRMETAVENDAINFANTVERINV) },
-    { field: 'PERCMETAVENDAINFANTVERINV', header: '%', fill: '#21DFCB', text: '#000000', value: (item) => formatPercent(item.PERCMETAVENDAINFANTVERINV) },
-    { field: 'VRVENDAINFANTPCINTIMA', header: 'Peca Intima', fill: '#4DE5D5', text: '#000000', value: (item) => formatMoeda(item.VRVENDAINFANTPCINTIMA) },
-    { field: 'PERCVENDAINFANTPCINTIMA', header: '%', fill: '#4DE5D5', text: '#000000', value: (item) => formatPercent(item.PERCVENDAINFANTPCINTIMA) },
-    { field: 'VRMETAVENDAINFANTPCINTIMA', header: 'Vr Meta', fill: '#21DFCB', text: '#000000', value: (item) => formatMoeda(item.VRMETAVENDAINFANTPCINTIMA) },
-    { field: 'PERCMETAVENDAINFANTPCINTIMA', header: '%', fill: '#21DFCB', text: '#000000', value: (item) => formatPercent(item.PERCMETAVENDAINFANTPCINTIMA) },
-    { field: 'VRVENDAINFANTACESSORIOS', header: 'Acessorios', fill: '#4DE5D5', text: '#000000', value: (item) => formatMoeda(item.VRVENDAINFANTACESSORIOS) },
-    { field: 'PERCVENDAINFANTACESSORIOS', header: '%', fill: '#4DE5D5', text: '#000000', value: (item) => formatPercent(item.PERCVENDAINFANTACESSORIOS) },
-    { field: 'VRMETAVENDAINFANTACESSORIOS', header: 'Vr Meta', fill: '#21DFCB', text: '#000000', value: (item) => formatMoeda(item.VRMETAVENDAINFANTACESSORIOS) },
-    { field: 'PERCMETAVENDAINFANTACESSORIOS', header: '%', fill: '#21DFCB', text: '#000000', value: (item) => formatPercent(item.PERCMETAVENDAINFANTACESSORIOS) },
+    { header: 'Verao/Inverno', fill: '#4DE5D5', text: '#000000', value: moeda('VRMETAVENDAINFANTVERINV') },
+    { header: '%', fill: '#4DE5D5', text: '#000000', value: percent('PERCMETAVENDAINFANTVERINV') },
+    { header: 'Peca Intima', fill: '#4DE5D5', text: '#000000', value: moeda('VRMETAVENDAINFANTPCINTIMA') },
+    { header: '%', fill: '#4DE5D5', text: '#000000', value: percent('PERCMETAVENDAINFANTPCINTIMA') },
+    { header: 'Acessorios', fill: '#4DE5D5', text: '#000000', value: moeda('VRMETAVENDAINFANTACESSORIOS') },
+    { header: '%', fill: '#4DE5D5', text: '#000000', value: percent('PERCMETAVENDAINFANTACESSORIOS') },
 
-    { field: 'VRVENDACMB', header: 'CMB', fill: '#B19DCE', text: '#000000', value: (item) => formatMoeda(item.VRVENDACMB) },
-    { field: 'PERCVENDACMB', header: '%', fill: '#B19DCE', text: '#000000', value: (item) => formatPercent(item.PERCVENDACMB) },
-    { field: 'VRMETAVENDACMB', header: 'Vr Meta', fill: '#7a59ad', text: '#FFFFFF', value: (item) => formatMoeda(item.VRMETAVENDACMB) },
-    { field: 'PERCMETAVENDACMB', header: '%', fill: '#7a59ad', text: '#FFFFFF', value: (item) => formatPercent(item.PERCMETAVENDACMB) },
+    { header: 'Vr Meta', fill: '#7a59ad', text: '#FFFFFF', value: moeda('VRMETAVENDACMB') },
+    { header: '%', fill: '#7a59ad', text: '#FFFFFF', value: percent('PERCMETAVENDACMB') },
 
-    { field: 'VRMETAVENDAOUTROS', header: 'Outros', fill: '#FE85BE', text: '#000000', value: (item) => formatMoeda(item.VRMETAVENDAOUTROS) },
-    { field: 'PERCMETAVENDAOUTROS', header: '%', fill: '#FE85BE', text: '#000000', value: (item) => formatPercent(item.PERCMETAVENDAOUTROS) },
+    { header: 'Vr Meta', fill: '#FE85BE', text: '#000000', value: moeda('VRMETAVENDAOUTROS') },
+    { header: '%', fill: '#FE85BE', text: '#000000', value: percent('PERCMETAVENDAOUTROS') },
 
-    { field: 'PERCTOTALVENDA', header: '%', fill: '#FFCA5B', text: '#000000', value: (item) => formatPercent(item.PERCTOTALVENDA) },
+    { header: '%', fill: '#FFCA5B', text: '#000000', value: percent('PERCTOTALVENDA') },
   ];
 
   const exportToPDF = () => {
@@ -198,7 +188,6 @@ export const ActionListaMetasDetalhadas = ({
 
     worksheet.columns = exportColumns.map((column, index) => ({
       width: index === 1 ? 30 : 14,
-      key: column.field,
     }));
 
     worksheet.views = [{ state: 'frozen', ySplit: 2 }];
@@ -279,8 +268,6 @@ export const ActionListaMetasDetalhadas = ({
       dataMeta
     };
   });
-
-
 
   const headerGrupo = (
     <ColumnGroup  >
@@ -536,12 +523,240 @@ export const ActionListaMetasDetalhadas = ({
     </ColumnGroup>
   )
 
+  const handleCalcado = async (IDMETASLOJA, secao) => {
+    try {
+      const response = await get(`/meta-secao-calcado?idMeta=${IDMETASLOJA}`);
+      if (response.data && response.data.length > 0) {
+        setDadosDetalhe(response.data);
+        setSecaoSelecionada(secao);
+        setModalCalcados(true);
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Atenção',
+          text: 'Não tem dados cadastrados nesta seção',
+          timer: 5000,
+        })
+        return;
+      }
+    } catch (error) {
+      console.error('Erro ao buscar detalhes da venda: ', error);
+    }
+  };
+
+  const handleClickCalcado = (dados, secao) => {
+    if(optionsModulos[0].ALTERAR == 'True') {
+      if (dados && dados[0]?.IDMETASLOJA) {
+        handleCalcado(dados[0]?.IDMETASLOJA, secao);
+      }
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Atenção!',
+        text: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para acessar tela.`,
+        confirmButtonColor: '#7352A5',
+        timer: 5000,
+        customClass: {
+          container: 'custom-swal',
+        },
+      });
+    } 
+  };
+
+  const handleFeminino = async (IDMETASLOJA, secao) => {
+    try {
+      const response = await get(`/meta-secao-feminino?idMeta=${IDMETASLOJA}`);
+      if (response.data && response.data.length > 0) {
+        setDadosDetalhe(response.data);
+        setSecaoSelecionada(secao);
+        setModalCalcados(true);
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Atenção',
+          text: 'Não tem dados cadastrados nesta seção',
+          timer: 5000,
+        })
+        return;
+      }
+    } catch (error) {
+      console.error('Erro ao buscar detalhes da venda: ', error);
+    }
+  };
+
+  const handleClickFeminino = (dados, secao) => {
+    if(optionsModulos[0].ALTERAR == 'True') {
+      if (dados && dados[0]?.IDMETASLOJA) {
+        handleFeminino(dados[0]?.IDMETASLOJA, secao);
+      }
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Atenção!',
+        text: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para acessar tela.`,
+        confirmButtonColor: '#7352A5',
+        timer: 5000,
+        customClass: {
+          container: 'custom-swal',
+        },
+      });
+    } 
+  };
+
+  const handleMasculino = async (IDMETASLOJA, secao) => {
+    try {
+      const response = await get(`/meta-secao-masculino?idMeta=${IDMETASLOJA}`);
+      if (response.data && response.data.length > 0) {
+        setDadosDetalhe(response.data);
+        setSecaoSelecionada(secao);
+        setModalCalcados(true);
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Atenção',
+          text: 'Não tem dados cadastrados nesta seção',
+          timer: 5000,
+        })
+        return;
+      }
+    } catch (error) {
+      console.error('Erro ao buscar detalhes da venda: ', error);
+    }
+  };
+
+  const handleClickMasculino = (dados, secao) => {
+    if(optionsModulos[0].ALTERAR == 'True') {
+      if (dados && dados[0]?.IDMETASLOJA) {
+        handleMasculino(dados[0]?.IDMETASLOJA, secao);
+      }
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Atenção!',
+        text: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para acessar tela.`,
+        confirmButtonColor: '#7352A5',
+        timer: 5000,
+        customClass: {
+          container: 'custom-swal',
+        },
+      });
+    } 
+  };
+
+  const handleInfantil = async (IDMETASLOJA, secao) => {
+    try {
+      const response = await get(`/meta-secao-masculino?idMeta=${IDMETASLOJA}`);
+      if (response.data && response.data.length > 0) {
+        setDadosDetalhe(response.data);
+        setSecaoSelecionada(secao);
+        setModalCalcados(true);
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Atenção',
+          text: 'Não tem dados cadastrados nesta seção',
+          timer: 5000,
+        })
+        return;
+      }
+    } catch (error) {
+      console.error('Erro ao buscar detalhes da venda: ', error);
+    }
+  };
+
+  const handleClickInfantil = (dados, secao) => {
+    if(optionsModulos[0].ALTERAR == 'True') {
+      if (dados && dados[0]?.IDMETASLOJA) {
+        handleInfantil(dados[0]?.IDMETASLOJA, secao);
+      }
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Atenção!',
+        text: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para acessar tela.`,
+        confirmButtonColor: '#7352A5',
+        timer: 5000,
+        customClass: {
+          container: 'custom-swal',
+        },
+      });
+    } 
+  };
+  
+  const handleCMB = async (IDMETASLOJA, secao) => {
+    try {
+      const response = await get(`/meta-secao-cmb?idMeta=${IDMETASLOJA}`);
+      if (response.data && response.data.length > 0) {
+        setDadosDetalhe(response.data);
+        setSecaoSelecionada(secao);
+        setModalCalcados(true);
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Atenção',
+          text: 'Não tem dados cadastrados nesta seção',
+          timer: 5000,
+        })
+        return;
+      }
+    } catch (error) {
+      console.error('Erro ao buscar detalhes da venda: ', error);
+    }
+  };
+
+  const handleClickCMB = (dados, secao) => {
+    if(optionsModulos[0].ALTERAR == 'True') {
+      if (dados && dados[0]?.IDMETASLOJA) {
+        handleCMB(dados[0]?.IDMETASLOJA, secao);
+      }
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Atenção!',
+        text: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para acessar tela.`,
+        confirmButtonColor: '#7352A5',
+        timer: 5000,
+        customClass: {
+          container: 'custom-swal',
+        },
+      });
+    } 
+  };
+
   return (
 
     <Fragment>
       <div className="panel" >
         <div className="panel-hdr">
           <h2>{`Detalhes da Meta`}</h2>
+        </div>
+        <div className="row pr-3" style={{justifyContent: 'right'}}>
+          <ButtonType 
+            onClickButtonType={() => handleClickCalcado(dados, 'CALÇADOS')}
+            textButton={"Cadastrar Metas Calcados"}
+            cor={"success"}
+          />
+          <ButtonType 
+            onClickButtonType={() => handleClickFeminino(dados, 'FEMININO')}
+            textButton={"Cadastrar Metas Feminino"}
+            cor={"warning"}
+          />
+          <ButtonType 
+            onClickButtonType={() => handleClickMasculino(dados, 'MASCULINO')}
+            textButton={"Cadastrar Metas Masculino"}
+            cor={"primary"}
+          />
+          <ButtonType 
+            onClickButtonType={() => handleClickInfantil(dados, 'INFANTIL')}
+            textButton={"Cadastrar Metas Infantil"}
+            cor={"danger"}
+          />
+          <ButtonType 
+            onClickButtonType={() => handleClickCMB(dados, 'CMB')}
+            textButton={"Cadastrar Metas CMB"}
+            cor={"success"}
+          />
+
         </div>
         <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
           <HeaderTable
@@ -617,6 +832,15 @@ export const ActionListaMetasDetalhadas = ({
             </DataTable>
         </div>
       </div>
+
+      <ActionMetasCalcadosModal 
+        show={modalCalcados}
+        handleClose={() => setModalCalcados(false)}
+        dadosDetalhe={dadosDetalhe}
+        secao={secaoSelecionada}
+        usuarioLogado={usuarioLogado}
+        optionsModulos={optionsModulos}
+      />
     </Fragment>
   )
 }

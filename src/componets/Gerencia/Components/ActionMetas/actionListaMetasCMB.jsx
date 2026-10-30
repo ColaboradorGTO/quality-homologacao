@@ -88,7 +88,7 @@ export const ActionListaMetasCMB = ({
     let contador = index + 1;
     let situacao;
     let cor;
-    if(item?.metasColaborador?.VRMETACOLABORADOR > item?.vendasecaocalcados[0]?.['venda-cmb']?.VRTOTALLIQUIDOCMB) {
+    if(item?.metasColaborador?.VRMETACOLABORADOR > item?.vendasecaocmb[0]?.['venda-cmb']?.VRTOTALLIQUIDOCMB) {
       situacao = 'NÃO COMPRIDA'
       cor = 'red'
     } else {
@@ -106,7 +106,7 @@ export const ActionListaMetasCMB = ({
       DSFUNCAO: item?.metasColaborador?.DSFUNCAO,
       VRMETACOLABORADOR: item?.metasColaborador?.VRMETACOLABORADOR,
       PERCMETACOLABORADOR: item?.metasColaborador?.PERCMETACOLABORADOR,
-      VRTOTALLIQUIDOCALC: item?.vendasecaocalcados[0]?.['venda-cmb']?.VRTOTALLIQUIDOCMB,
+      VRTOTALLIQUIDOCALC: item?.vendasecaocmb[0]?.['venda-cmb']?.VRTOTALLIQUIDOCMB,
       situacao,
       cor
     };

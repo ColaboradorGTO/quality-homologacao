@@ -106,7 +106,7 @@ export const ActionListaMetasMasculina = ({
       DSFUNCAO: item?.metasColaborador?.DSFUNCAO,
       VRMETACOLABORADOR: item?.metasColaborador?.VRMETACOLABORADOR,
       PERCMETACOLABORADOR: item?.metasColaborador?.PERCMETACOLABORADOR,
-      VRTOTALLIQUIDOCALC: item?.vendasecaocalcados[0]?.['venda-masculina']?.VRTOTALLIQUIDOMASCULINO,
+      VRTOTALLIQUIDOCALC: item?.vendasecaomasculina[0]?.['venda-masculina']?.VRTOTALLIQUIDOMASCULINO,
       situacao,
       cor
     };

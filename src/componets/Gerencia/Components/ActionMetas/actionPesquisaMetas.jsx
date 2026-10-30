@@ -10,17 +10,13 @@ import { getDataAtual } from "../../../../utils/dataAtual";
 import { useQuery } from "react-query";
 import { ActionListaMetasDetalhadas } from "./actionListaMetasDetalhada";
 import { animacaoCarregamento, fecharAnimacaoCarregamento, foiCancelado } from "../../../../utils/animationCarregamento";
-import { ActionListaCriarMetasDetalhadas } from "./actionListaCriarMetasDetalhada";
-import Swal from "sweetalert2";
-import { useCadastrarMeta } from "./hooks/useCadastrarMeta";
-import { FaRegSave } from "react-icons/fa";
 import { ActionListaMetasCalcados } from "./actionListaMetasCalcados";
 import { ActionListaMetasFeminina } from "./actionListaMetasFeminina";
 import { ActionListaMetasMasculina } from "./actionListaMetasMasculina";
 import { ActionListaMetasInfantil } from "./actionListaMetasInfantil";
 import { ActionListaMetasCMB } from "./actionListaMetasCMB";
 
-
+ 
 export const ActionPesquisaMetas = ({
   usuarioLogado,
   optionsEmpresas
@@ -32,13 +28,10 @@ export const ActionPesquisaMetas = ({
   const [tabelaVendaResumidaVisivel, setTabelaVendaResumidaVisivel] = useState(false);
   const [tabelaMetasVendasVisivel, setTabelaMetasVendasVisivel] = useState(false);
   const [tabelaCriarMetasVendasVisivel, setTabelaCriarMetasVendasVisivel] = useState(false);
-  const [dadosVendasResumida, setDadosVendasResumida] = useState([]);
   const [dadosMetasDetalhadas, setDadosMetasDetalhadas] = useState([]);
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
   const [empresaSelecionada, setEmpresaSelecionada] = useState('')
   const [empresa, setEmpresa] = useState('')
-
-
   const [dadosCalcados, setDadosCalcados] = useState([])
   const [dadosFeminino, setDadosFeminino] = useState([])
   const [dadosMasculino, setDadosMasculino] = useState([])
@@ -121,20 +114,6 @@ export const ActionPesquisaMetas = ({
     { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000,}
   );
 
-  const { data: dadosMarcas = [], error: errorMarcas, isLoading: isLoadingMarcas, refetch: refetchGrupo } = useQuery(
-    'marcasLista',
-    async () => {
-      const response = await get(`/marcasLista`);
-      return response.data;
-    },
-    { staleTime: 60 * 60 * 1000, }
-  );
-
-
-
-
-
-  
   
   const handleClick = () => {
     refetchMetas()
@@ -144,8 +123,6 @@ export const ActionPesquisaMetas = ({
     setTabelaCriarMetasVendasVisivel(false)
   }
   
-
-
   return (
 
     <Fragment>
@@ -166,28 +143,24 @@ export const ActionPesquisaMetas = ({
         valueInputFieldDTFim={dataPesquisaFim}
         onChangeInputFieldDTFim={e => setDataPesquisaFim(e.target.value)}
 
-        InputSelectMarcasComponent={InputSelectAction}
-        labelSelectMarcas={"Marca"}
-        optionsMarcas={[
-          { value: '', label: 'Selecionar Marca' },
-            ...optionsEmpresas.map((marca) => {
-            return {
-              
-              value: marca.IDEMPRESA,
-              label: marca.NOFANTASIA,
-            }
-          })
+        InputSelectPendenciaComponent={InputSelectAction}
+        labelSelectPendencia="Selecione a Empresa"
+        optionsPendencia={[
+          { value: '', label: 'Todas' },
+          ...optionsEmpresas.map((empresa) => ({
+            value: empresa.IDEMPRESA,
+            label: empresa.NOFANTASIA,
+          }))
         ]}
-        valueSelectMarca={empresaSelecionada}
-        onChangeSelectMarcas={(e) => setEmpresaSelecionada(e.value)}
+        onChangeSelectPendencia={(e) => setEmpresaSelecionada(e.value)}
+        valueSelectPendencia={empresaSelecionada}
+        stylePendencia={optionsModulos[0]?.ADMINISTRADOR === "True"}
 
         ButtonSearchComponent={ButtonType}
         linkNomeSearch={"Pesquisar"}
         onButtonClickSearch={handleClick}
         corSearch={"primary"}
         IconSearch={AiOutlineSearch}
-
-    
 
       />
       
@@ -212,66 +185,58 @@ export const ActionPesquisaMetas = ({
         />
       )}
 
- 
-      <ActionListaMetasDetalhadas
-        dadosCalcados={dadosCalcados}
-        dadosFeminino={dadosFeminino}
-        dadosMasculino={dadosMasculino}
-        dadosInfantil={dadosInfantil}
-        dadosCMB={dadosCMB}
-        dadosDetalheMeta={dadosDetalheMeta}
-        dadosMetasDetalhadas={dadosMetasDetalhadas}
-      />
+      {tabelaMetasVendasVisivel && (
+        <>
+        
+          <ActionListaMetasDetalhadas
+            dadosCalcados={dadosCalcados}
+            dadosFeminino={dadosFeminino}
+            dadosMasculino={dadosMasculino}
+            dadosInfantil={dadosInfantil}
+            dadosCMB={dadosCMB}
+            dadosDetalheMeta={dadosDetalheMeta}
+            dadosMetasDetalhadas={dadosMetasDetalhadas}
+            usuarioLogado={usuarioLogado}
+            optionsModulos={optionsModulos}
+          />
+    
+          <ActionListaMetasCalcados 
+            dadosCalcados={dadosCalcados}
+            usuarioLogado={usuarioLogado}
+            optionsModulos={optionsModulos} 
+            handleClick={handleClick}
+          />
+    
+          <ActionListaMetasFeminina 
+            dadosFeminino={dadosFeminino}
+            usuarioLogado={usuarioLogado}
+            optionsModulos={optionsModulos} 
+            handleClick={handleClick}
+          />
+          <ActionListaMetasMasculina
+            dadosMasculino={dadosMasculino}
+            usuarioLogado={usuarioLogado}
+            optionsModulos={optionsModulos} 
+            handleClick={handleClick}
+          />
+    
+          <ActionListaMetasInfantil
+            dadosInfantil={dadosInfantil}
+            usuarioLogado={usuarioLogado}
+            optionsModulos={optionsModulos} 
+            handleClick={handleClick}
+          />
+        
+          <ActionListaMetasCMB
+            dadosCMB={dadosCMB}
+            usuarioLogado={usuarioLogado}
+            optionsModulos={optionsModulos} 
+            handleClick={handleClick}
+          />
+        </>
 
-      <ActionListaMetasCalcados 
-        dadosCalcados={dadosCalcados}
-        usuarioLogado={usuarioLogado}
-        optionsModulos={optionsModulos} 
-        handleClick={handleClick}
-      />
+      )}
 
-      <ActionListaMetasFeminina 
-        dadosFeminino={dadosFeminino}
-        usuarioLogado={usuarioLogado}
-        optionsModulos={optionsModulos} 
-        handleClick={handleClick}
-      />
-      <ActionListaMetasMasculina
-        dadosMasculino={dadosMasculino}
-        usuarioLogado={usuarioLogado}
-        optionsModulos={optionsModulos} 
-        handleClick={handleClick}
-      />
-
-      <ActionListaMetasInfantil
-        dadosInfantil={dadosInfantil}
-        usuarioLogado={usuarioLogado}
-        optionsModulos={optionsModulos} 
-        handleClick={handleClick}
-      />
-     
-      <ActionListaMetasCMB
-        dadosCMB={dadosCMB}
-        usuarioLogado={usuarioLogado}
-        optionsModulos={optionsModulos} 
-        handleClick={handleClick}
-      />
-
-
-      
-
-    {/* {tabelaCriarMetasVendasVisivel && (
-
-      <ActionListaCriarMetasDetalhadas
-        dadosMetasEstrutura={dadosMetasEstrutura}
-        marcaSelecionada={marcaSelecionada}
-        dataPesquisaInicio={dataPesquisaInicio}
-        dataPesquisaFim={dataPesquisaFim}
-        usuarioLogado={usuarioLogado}
-        optionsModulos={optionsModulos}
-        handleClick={handleClick}
-      />
-    )} */}
     </Fragment>
   )
 }

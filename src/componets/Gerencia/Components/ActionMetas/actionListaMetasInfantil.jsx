@@ -88,7 +88,7 @@ export const ActionListaMetasInfantil = ({
     let contador = index + 1;
     let situacao;
     let cor;
-    if(item?.metasColaborador?.VRMETACOLABORADOR > item?.vendasecaocalcados[0]?.['venda-infantil']?.VRTOTALLIQUIDOINFANTIL) {
+    if(item?.metasColaborador?.VRMETACOLABORADOR > item?.vendasecaoinfantil[0]?.['venda-infantil']?.VRTOTALLIQUIDOINFANTIL) {
       situacao = 'NÃO COMPRIDA'
       cor = 'red'
     } else {
@@ -106,7 +106,7 @@ export const ActionListaMetasInfantil = ({
       DSFUNCAO: item?.metasColaborador?.DSFUNCAO,
       VRMETACOLABORADOR: item?.metasColaborador?.VRMETACOLABORADOR,
       PERCMETACOLABORADOR: item?.metasColaborador?.PERCMETACOLABORADOR,
-      VRTOTALLIQUIDOCALC: item?.vendasecaocalcados[0]?.['venda-infantil']?.VRTOTALLIQUIDOINFANTIL,
+      VRTOTALLIQUIDOCALC: item?.vendasecaoinfantil[0]?.['venda-infantil']?.VRTOTALLIQUIDOINFANTIL,
       situacao,
       cor
     };
