@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import { put } from "../../../../../api/funcRequest";
+import axios from 'axios';
+import { post, put } from "../../../../../api/funcRequest";
 import { getDataAtual } from "../../../../../utils/dataAtual";
-import { registrarLogAuditoria } from "../../../../../services/auditLog";
 
 
 export const useEditarDescontoFuncionario = ({
@@ -20,6 +20,29 @@ export const useEditarDescontoFuncionario = ({
     const [percentualDesconto, setPercentualDesconto] = useState('');
     const [dataInicioDesconto, setDataInicioDesconto] = useState('');
     const [dataFimDesconto, setDataFimDesconto] = useState('');
+    const [ipUsuario, setIpUsuario] = useState('')
+
+    const getIPUsuario = async () => {
+        let usuarioIP = null;
+
+        try {
+        const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+        usuarioIP = ipWhoisData?.ip;
+        } catch (error) {
+        console.error("Erro ao buscar IP via ifconfig.me:", error);
+        }
+
+        if (!usuarioIP) {
+        try {
+            const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+            usuarioIP = ipifyData?.ip;
+        } catch (error) {
+            console.error("Erro ao buscar IP via ipify.org:", error);
+        }
+        }
+        setIpUsuario(usuarioIP);
+        return usuarioIP;
+    };
 
     useEffect(() => {
         const dataAtual = getDataAtual();
@@ -32,7 +55,7 @@ export const useEditarDescontoFuncionario = ({
             setEmpresa(dadosDescontoFuncionarios[0]?.NOFANTASIA);
             setCpf(dadosDescontoFuncionarios[0]?.NUCPF);
             setFuncionario(dadosDescontoFuncionarios[0]?.NOFUNCIONARIO);
-            setPercentualDesconto(dadosDescontoFuncionarios[0]?.PERCDESCUSUAUTORIZADO || "0" );
+            setPercentualDesconto(dadosDescontoFuncionarios[0]?.PERCDESCUSUAUTORIZADO || "0" );   
         }
     }, [dadosDescontoFuncionarios]);
 
@@ -63,12 +86,18 @@ export const useEditarDescontoFuncionario = ({
         try {
 
             const response = await put('/funcionarioDescontoRH/:id', putData)
+            const textDados = JSON.stringify(putData)
+            const textoFuncao = 'RH/ATUALIZAR DESCONTO FUNCIONARIO AUTORIZADO';
 
-            await registrarLogAuditoria({
-                idFuncionario: usuarioLogado.id,
-                pathFuncao: 'RH/ATUALIZAR DESCONTO FUNCIONARIO AUTORIZADO',
-                dados: putData
-            });
+            const ipUsuario = await getIPUsuario();
+            const createData = {
+                IDFUNCIONARIO: String(usuarioLogado.id),
+                PATHFUNCAO: textoFuncao,
+                DADOS: textDados,
+                IP: ipUsuario || 'INDISPONIVEL'
+            }
+
+            await post('/log-web', createData)
 
             Swal.fire({
                 title: 'Atualização',
@@ -83,12 +112,17 @@ export const useEditarDescontoFuncionario = ({
             handleClose();
             return response.data;
         } catch (error) {
-            const responsePost = await registrarLogAuditoria({
-                idFuncionario: usuarioLogado.id,
-                pathFuncao: 'RH/ERRO AO ATUALIZAR DESCONTO FUNCIONARIO',
-                dados: putData
-            });
+            const textoFuncao = 'RH/ERRO AO ATUALIZAR DESCONTO FUNCIONARIO';
+            const textDados = JSON.stringify(putData)
+            const ipUsuario = await getIPUsuario();
+            const createData = {
+                IDFUNCIONARIO: String(usuarioLogado.id),
+                PATHFUNCAO: textoFuncao,
+                DADOS: textDados,
+                IP: ipUsuario || 'INDISPONIVEL'
+            }
 
+            const responsePost = await post('/log-web', createData)
             Swal.fire({
                 title: 'Erro ao Atualizar',
                 text: 'Erro ao Tentar Atualizar',

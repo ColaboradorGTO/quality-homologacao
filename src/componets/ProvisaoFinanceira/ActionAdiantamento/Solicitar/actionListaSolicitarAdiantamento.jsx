@@ -10,11 +10,14 @@ import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import Swal from "sweetalert2";
 import { IoMdDownload } from "react-icons/io";
-import { MdEdit } from "react-icons/md";
+import { MdEdit, MdAttachFile } from "react-icons/md";
 import { ActionEditarModal } from "./EditarSolicitacao/actionEditarModal";
 import { get } from "../../../../api/funcRequest";
 import { BASE_URL } from "../../../../api/api";
-
+import { useAnexarPagamento } from "./hooks/useAnexarComprovante";
+// import nfe  from "../../../../../public/img/icons/nfe.png"
+import nfe  from "../../../../../../web/public/img/icons/nfe.png"
+import { FaFileInvoiceDollar } from "react-icons/fa6";
 
 export const ActionListaAdiantamento = ({
   dadosAdiantamentos,
@@ -30,6 +33,15 @@ export const ActionListaAdiantamento = ({
   const [anexoComprovante, setAnexoComprovante] = useState('')
   const dataTableRef = useRef();
 
+  const {
+    handleAnexarComprovante,
+    handleUploadComprovante
+  } = useAnexarPagamento({
+    dadosDetalheAdiantamento,
+    optionsModulos,
+    usuarioLogado,
+    handleClick,
+  })
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
   };
@@ -202,10 +214,36 @@ export const ActionListaAdiantamento = ({
                 onClickButton={() => handleComprovantePagamento(row.IDADIANTAMENTO)}
               // disabledBTN={!anexoNotaFiscal}
               />
-
-
             </div>
 
+            <div className="p-1">
+              <ButtonTable
+                titleButton={"Anexar Comprovante"}
+                cor={"info"}
+                Icon={MdAttachFile}
+                iconSize={20}
+                width="35px"
+                height="35px"
+                onClickButton={() => handleAnexarComprovante(row.IDADIANTAMENTO)}
+                disabledBTN={[
+                  'AGUARDANDO FINANCEIRO',
+                  'PENDENTE',
+                  'PAGO'
+                ].includes(row.STATUS?.trim().toUpperCase())}
+              />
+            </div>
+            <div className="p-1">
+              <ButtonTable
+                titleButton={"Anexar Nota Fiscal"}
+                cor={"warning"}
+                Icon={FaFileInvoiceDollar}
+                iconSize={20}
+                width="35px"
+                height="35px"
+                onClickButton={() => handleAnexarComprovante(row.IDADIANTAMENTO)}
+                disabledBTN={row.ANEXOORCAMENTO == null || row.ANEXOORCAMENTO == ''}
+              />
+            </div>
             <div className="p-1">
               <ButtonTable
                 titleButton={"Editar"}
@@ -215,7 +253,13 @@ export const ActionListaAdiantamento = ({
                 width="35px"
                 height="35px"
                 onClickButton={() => handleClickEditar(row)}
+                disabledBTN={[
+                  'AGUARDANDO FINANCEIRO',
+                  'APROVADO',
+                  'PAGO'
+                ].includes(row.STATUS?.trim().toUpperCase())}
               />
+ 
             </div>
           </div>
         )

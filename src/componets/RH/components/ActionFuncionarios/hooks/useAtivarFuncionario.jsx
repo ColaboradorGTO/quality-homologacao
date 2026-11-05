@@ -1,16 +1,39 @@
 import Swal from "sweetalert2";
-import { put } from "../../../../../api/funcRequest";
+import { post, put } from "../../../../../api/funcRequest";
 import { useEffect, useState } from "react";
 import { getDataHoraAtual } from "../../../../../utils/dataAtual";
-import { registrarLogAuditoria } from "../../../../../services/auditLog";
+import axios from 'axios';
 
 export const useAtivarFuncionario = ({ handleClose, optionsModulos, usuarioLogado, handleClick }) => {
+  const [ipUsuario, setIpUsuario] = useState('');
   const [dataAdmissao, setDataAdmissao] = useState('');
 
   useEffect(() => {
     const dataAtual = getDataHoraAtual()
     setDataAdmissao(dataAtual)
   }, [])
+
+  const getIPUsuario = async () => {
+    let usuarioIP = null;
+
+    try {
+    const { data: ipWhoisData } = await axios.get("https://ifconfig.me/ip");
+    usuarioIP = ipWhoisData?.ip;
+    } catch (error) {
+    console.error("Erro ao buscar IP via ipwho.is:", error);
+    }
+
+    if (!usuarioIP) {
+    try {
+        const { data: ipifyData } = await axios.get("https://api.ipify.org?format=json");
+        usuarioIP = ipifyData?.ip;
+    } catch (error) {
+        console.error("Erro ao buscar IP via ipify.org:", error);
+    }
+    }
+    setIpUsuario(usuarioIP);
+    return usuarioIP;
+};
 
   const handleAtivarFuncionario = async (row, status) => {
 
@@ -35,6 +58,7 @@ export const useAtivarFuncionario = ({ handleClose, optionsModulos, usuarioLogad
     try {
       const response = await put('/inativarFuncionarioRH', putData)
 
+
       Swal.fire({
         title: 'Atualização',
         text: 'Atualizção Realizada com Sucesso',
@@ -45,26 +69,46 @@ export const useAtivarFuncionario = ({ handleClose, optionsModulos, usuarioLogad
         }
       })
 
-      const textoFuncao = putData.STATIVO === 'True'
-        ? 'RH/ATIVA DESLIGAMENTO DE FUNCIONARIO'
-        : 'RH/DESLIGAMENTO DE FUNCIONARIO';
+      const textDados = JSON.stringify(putData)
+      let status = putData.STATIVO;
+      let textoFuncao;
+      if (status === 'True') {
+        textoFuncao = 'RH/ATIVA DESLIGAMENTO DE FUNCIONARIO';
+      } else {
+        textoFuncao = 'RH/DESLIGAMENTO DE FUNCIONARIO';
+      }
+      const ipUsuario = await getIPUsuario();
 
-      await registrarLogAuditoria({
-        idFuncionario: usuarioLogado.id,
-        pathFuncao: textoFuncao,
-        dados: putData
-      });
+      const createData = {
+        IDFUNCIONARIO: String(usuarioLogado.id),
+        PATHFUNCAO: textoFuncao,
+        DADOS: textDados,
+        IP: ipUsuario || 'INDISPONÍVEL'
+      }
+
+      await post('/log-web', createData)
 
       handleClick()
       return response.data;
     } catch (error) {
-      console.error('Erro ao ativar/inativar funcionário:', error);
 
-      const responsePost = await registrarLogAuditoria({
-        idFuncionario: usuarioLogado.id,
-        pathFuncao: 'RH/ERRO AO ATIVAR/INATIVAR FUNCIONARIO',
-        dados: putData
-      });
+      const putData = {
+        DATAULTIMAALTERACAO: dataAdmissao,
+        STATIVO: status ? 'True' : 'False',
+        DATA_DEMISSAO: '',
+        ID: Number(row.ID)
+      }
+      const textDados = JSON.stringify(putData)
+      const ipUsuario = await getIPUsuario();
+
+      const createData = {
+        IDFUNCIONARIO: String(usuarioLogado.id),
+        PATHFUNCAO: textoFuncao,
+        DADOS: textDados,
+        IP: ipUsuario || 'INDISPONÍVEL'
+      }
+
+      const responsePost = await post('/log-web', createData)
 
       Swal.fire({
         title: 'Erro ao Atualizar',
@@ -75,6 +119,7 @@ export const useAtivarFuncionario = ({ handleClose, optionsModulos, usuarioLogad
           container: 'custom-swal',
         }
       })
+      console.error('Erro ao parsear o usuário do localStorage:', error);
       return responsePost.data;
     }
   }
@@ -83,3 +128,4 @@ export const useAtivarFuncionario = ({ handleClose, optionsModulos, usuarioLogad
     handleAtivarFuncionario
   }
 }
+

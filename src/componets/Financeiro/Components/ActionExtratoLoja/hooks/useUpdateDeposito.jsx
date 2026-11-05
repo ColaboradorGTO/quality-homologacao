@@ -51,7 +51,8 @@ export const useUpdateDeposito = ({ handleClose, optionsModulos, usuarioLogado, 
         },
         { staleTime: 5 * 60 * 1000 }
     );
-
+ 
+    console.log(dadosDeposito?.[0], 'dadosDeposito')
     useEffect(() => {
         const deposito = dadosDeposito?.[0];
 
@@ -177,7 +178,7 @@ export const useUpdateDeposito = ({ handleClose, optionsModulos, usuarioLogado, 
         
         const putData = {
             IDDEPOSITOLOJA: parseInt(dadosDeposito[0]?.IDDEPOSITOLOJA),
-            IDEMPRESA: parseInt(empresa),
+            IDEMPRESA: parseInt(dadosDeposito[0]?.IDEMPRESA),
             IDUSR: parseInt(usuarioLogado.id),
             IDCONTABANCO: parseInt(contaSelecionada.value),
             DTDEPOSITO: `${data} ${hora}:00`,
