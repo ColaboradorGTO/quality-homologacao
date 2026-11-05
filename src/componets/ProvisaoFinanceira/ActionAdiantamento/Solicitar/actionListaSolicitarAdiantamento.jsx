@@ -15,8 +15,7 @@ import { ActionEditarModal } from "./EditarSolicitacao/actionEditarModal";
 import { get } from "../../../../api/funcRequest";
 import { BASE_URL } from "../../../../api/api";
 import { useAnexarPagamento } from "./hooks/useAnexarComprovante";
-// import nfe  from "../../../../../public/img/icons/nfe.png"
-import nfe  from "../../../../../../web/public/img/icons/nfe.png"
+
 import { FaFileInvoiceDollar } from "react-icons/fa6";
 
 export const ActionListaAdiantamento = ({
