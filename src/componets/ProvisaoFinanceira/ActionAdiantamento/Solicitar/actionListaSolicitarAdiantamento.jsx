@@ -17,6 +17,8 @@ import { BASE_URL } from "../../../../api/api";
 import { useAnexarPagamento } from "./hooks/useAnexarComprovante";
 
 import { FaFileInvoiceDollar } from "react-icons/fa6";
+import { dataFormatada, formatarDataParaBR } from "../../../../utils/dataFormatada";
+
 
 export const ActionListaAdiantamento = ({
   dadosAdiantamentos,
@@ -111,8 +113,8 @@ export const ActionListaAdiantamento = ({
       DEPARTAMENTO: item.DEPARTAMENTO,
       NUCNPJEMPRESA: item.NUCNPJEMPRESA,
       POSSUINOTAFISCAL: item.POSSUINOTAFISCAL,
-      CNPJFATURAMENTO: item.CNPJFATURAMENTO,
-      RAZAOSOCIALFATURAMENTO: item.RAZAOSOCIALFATURAMENTO,
+      CNPJFATURAMENTO: item.CNPJFATURAMENTO || item.NUCPFBENEFICIARIO,
+      RAZAOSOCIALFATURAMENTO: item.RAZAOSOCIALFATURAMENTO || item.NOBENEFICIARIO,
       VRSOLICITADO: item.VRSOLICITADO,
       DESCRICAO: item.DESCRICAO,
       ANEXOORCAMENTO: item.ANEXOORCAMENTO,
@@ -124,6 +126,7 @@ export const ActionListaAdiantamento = ({
       IDUSUARIOALTERACAO: item.IDUSUARIOALTERACAO,
       DATAALTERACAO: item.DATAALTERACAO,
       DATAFINALIZACAO: item.DATAFINALIZACAO,
+      DTPAGAMENTO: item.DTPAGAMENTO,
       STATIVO: item.STATIVO,
     }
   });
@@ -137,6 +140,18 @@ export const ActionListaAdiantamento = ({
       width: "10%"
     },
     {
+      field: 'DATACRIACAO',
+      header: 'Data Solocitação',
+      body: row => <th style={{ color: 'blue' }}>{formatarDataParaBR(row.DATACRIACAO)}</th>,
+      sortable: true,
+    },
+    {
+      field: 'DTPAGAMENTO',
+      header: 'Data Pagamento',
+      body: row => <th style={{ color: 'blue' }}>{formatarDataParaBR(row.DTPAGAMENTO)}</th>,
+      sortable: true,
+    },
+    {
       field: 'DEPARTAMENTO',
       header: 'Departamento',
       body: row => <th style={{ color: 'blue' }}>{row.DEPARTAMENTO}</th>,
@@ -145,7 +160,7 @@ export const ActionListaAdiantamento = ({
     },
     {
       field: 'CNPJFATURAMENTO',
-      header: 'CNPJ Faturado',
+      header: 'CNPJ/CPF',
       body: row => <th style={{ color: 'blue' }}>{row.CNPJFATURAMENTO}</th>,
       sortable: true,
     },
@@ -159,12 +174,6 @@ export const ActionListaAdiantamento = ({
       field: 'VRSOLICITADO',
       header: 'Vr Lançado',
       body: row => <th style={{ color: 'blue' }}>{formatMoeda(row.VRSOLICITADO)}</th>,
-      sortable: true,
-    },
-    {
-      field: 'RAZAOSOCIALFATURAMENTO',
-      header: 'Rz. Social',
-      body: row => <th style={{ color: 'blue' }}>{row.RAZAOSOCIALFATURAMENTO}</th>,
       sortable: true,
     },
     {
@@ -224,11 +233,11 @@ export const ActionListaAdiantamento = ({
                 width="35px"
                 height="35px"
                 onClickButton={() => handleAnexarComprovante(row.IDADIANTAMENTO)}
-                disabledBTN={[
-                  'AGUARDANDO FINANCEIRO',
-                  'PENDENTE',
-                  'PAGO'
-                ].includes(row.STATUS?.trim().toUpperCase())}
+                // disabledBTN={[
+                //   'AGUARDANDO FINANCEIRO',
+                //   'PENDENTE',
+                //   'PAGO'
+                // ].includes(row.STATUS?.trim().toUpperCase())}
               />
             </div>
             <div className="p-1">
@@ -252,11 +261,11 @@ export const ActionListaAdiantamento = ({
                 width="35px"
                 height="35px"
                 onClickButton={() => handleClickEditar(row)}
-                disabledBTN={[
-                  'AGUARDANDO FINANCEIRO',
-                  'APROVADO',
-                  'PAGO'
-                ].includes(row.STATUS?.trim().toUpperCase())}
+                // disabledBTN={[
+                //   'AGUARDANDO FINANCEIRO',
+                //   'APROVADO',
+                //   'PAGO'
+                // ].includes(row.STATUS?.trim().toUpperCase())}
               />
  
             </div>

@@ -25,7 +25,7 @@ export const useAnexarPagamento = ({
 }) => {
     const [anexoComprovante, setAnexoComprovante] = useState('')
     const [anexoNotaFiscal, setAnexoNotaFiscal] = useState('')
-    
+
     const tiposArquivoPermitidos = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
     async function uploadAnexoAdiantamento(arquivo) {
@@ -91,9 +91,42 @@ export const useAnexarPagamento = ({
         }
 
         const postData = {
-            IDADIANTAMENTO: dadosDetalheAdiantamento?.[0]?.IDADIANTAMENTO,
+            IDADIANTAMENTO: dadosDetalheAdiantamento[0]?.IDADIANTAMENTO,
+            STATUS: dadosDetalheAdiantamento[0]?.STATUS,
+            DEPARTAMENTO: departamento,
+            IDEMPRESA: empresaSelecionada?.value,
+            NUCNPJEMPRESA: cnpj,
+            CNPJFATURAMENTO: ehPJ ? removeMascaraCNPJ(cnpjFaturado) : '',
+            RAZAOSOCIALFATURAMENTO: ehPJ ? razaoSocialFaturamento : '',
+            VRSOLICITADO: removerFormatacaoMoeda(vrAdiantamento),
+            DESCRICAO: descricao,
+            POSSUINOTAFISCAL: possuiNota?.value,
+            ANEXOORCAMENTO: anexoOrcamento,
+            ANEXONOTAFISCAL: anexoNotaFiscal,
+            DSJUSTIFICATIVA: proposta,
+            IDUSUARIOALTERACAO: usuarioLogado?.id,
+            RAZAOSOCIALEMPRESA: razaoSocial,
+            TPBENEFICIARIO: dadosDetalheAdiantamento[0]?.TPBENEFICIARIO,
+            NUCPFBENEFICIARIO: ehPF ? removerMascaraCPF(cpfBeneficiario) : '',
+            NOBENEFICIARIO: ehPF ? nomeBeneficiario : '',
+            NURGBENEFICIARIO: ehPF ? rgBeneficiario : '',
+            EMAILBENEFICIARIO: ehPF ? emailBeneficiario : '',
+            NUCEPBENEFICIARIO: ehPF ? cepBeneficiario.replace(/\D/g, '') : '',
+            ENDERECOBENEFICIARIO: ehPF ? enderecoBeneficiario : '',
+            TELEFONEBENEFICIARIO: ehPF ? removerMascaraTelefone(telefoneBeneficiario) : '',
+            DTNASCIMENTOBENEFICIARIO: ehPF ? dtNascimentoBeneficiario : '',
+            TPDESPESA: tipoDespesa?.value,
+            NOFAVORECIDO: nomeFavorecido,
+            FORMAPAGAMENTO: formaPagamento?.value,
+            CHAVEPIX: ehPix ? chavePix : '',
+            IDBANCO: exigeDadosBancarios ? banco?.value : null,
+            NUAGENCIA: exigeDadosBancarios ? agencia : '',
+            NUCONTA: exigeDadosBancarios ? conta : '',
+            NUDIGITOCONTA: exigeDadosBancarios ? digitoConta : '',
+            UNIDADENEGOCIO: unidadeNegocio,
+            CENTROCUSTO: centroCusto,
+            DTPAGAMENTO: dtPagamento,
             ANEXOCOMPROVANTE: anexoComprovante,
-            IDUSUARIOCRIACAO: usuarioLogado?.id
         }
 
         try {

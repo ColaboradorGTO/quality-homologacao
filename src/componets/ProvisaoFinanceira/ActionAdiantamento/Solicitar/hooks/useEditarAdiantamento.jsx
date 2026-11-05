@@ -88,7 +88,6 @@ export const useEditarAdiantamento = ({
             setCnpj(detalhe?.NUCNPJEMPRESA)
             setRazaoSocial(detalhe?.RAZAOSOCIALEMPRESA || detalhe?.NOFANTASIA || '')
 
-            // Registros antigos não têm TPBENEFICIARIO: eram sempre CNPJ.
             const tipoBeneficiarioEncontrado = optionsTipoBeneficiario.find(item => item.value == (detalhe?.TPBENEFICIARIO || 'PJ'))
             setTipoBeneficiario(tipoBeneficiarioEncontrado || optionsTipoBeneficiario[0])
             setCNPJFaturado(mascaraCNPJ(detalhe?.CNPJFATURAMENTO || ''))
@@ -123,7 +122,6 @@ export const useEditarAdiantamento = ({
                 value: detalhe?.POSSUINOTAFISCAL,
                 label: detalhe?.POSSUINOTAFISCAL == 'True' ? 'SIM' : 'NÃO'
             })
-            // Mantém os anexos já enviados; só são trocados se o usuário fizer novo upload.
             setAnexoOrcamento(detalhe?.ANEXOORCAMENTO || '')
             setAnexoNotaFiscal(detalhe?.ANEXONOTAFISCAL || '')
             setProposta(detalhe?.DSJUSTIFICATIVA || '')
@@ -330,7 +328,6 @@ export const useEditarAdiantamento = ({
         const exigeDadosBancarios = ['TED', 'TRANSFERENCIA'].includes(formaPagamento?.value);
 
         const postData = {
-            // CAMPOS EXISTENTE
             IDADIANTAMENTO: dadosDetalheAdiantamento[0]?.IDADIANTAMENTO,
             STATUS: dadosDetalheAdiantamento[0]?.STATUS,
             DEPARTAMENTO: departamento,
@@ -345,11 +342,7 @@ export const useEditarAdiantamento = ({
             ANEXONOTAFISCAL: anexoNotaFiscal,
             DSJUSTIFICATIVA: proposta,
             IDUSUARIOALTERACAO: usuarioLogado?.id,
-
-            // CAMPOS A SER CRIADOS
-
             RAZAOSOCIALEMPRESA: razaoSocial,
-            // Usa o valor gravado: registros antigos não têm TPBENEFICIARIO e seguem as regras antigas na API.
             TPBENEFICIARIO: dadosDetalheAdiantamento[0]?.TPBENEFICIARIO,
             NUCPFBENEFICIARIO: ehPF ? removerMascaraCPF(cpfBeneficiario) : '',
             NOBENEFICIARIO: ehPF ? nomeBeneficiario : '',

@@ -329,8 +329,8 @@ export const useCadastrarAdiantamento = ({
                 },
             })
 
-            handleClick();
-            handleClose();
+            // handleClick();
+            // handleClose();
             return response.data;
 
         } catch (error) {

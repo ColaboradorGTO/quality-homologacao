@@ -134,6 +134,7 @@ export const Formulario = ({
     }
   }
 
+  
   return (
     <Fragment>
 
@@ -152,7 +153,7 @@ export const Formulario = ({
                     label={"Nome e Matrícula"}
                     name="nomeSolicitante"
                     type="text"
-                    value={`${dadosDetalheAdiantamento[0]?.NOFUNCIONARIO || ""} - ${dadosDetalheAdiantamento[0]?.IDUSUARIOCRIACAO || ""} `}
+                    value={`${dadosDetalheAdiantamento[0]?.NOMESOLICITANTE || ""} - ${dadosDetalheAdiantamento[0]?.MATRICULASOLICITANTE || ""} `}
                     onChange
                     errors={errors}
                     clearErrors={clearErrors}

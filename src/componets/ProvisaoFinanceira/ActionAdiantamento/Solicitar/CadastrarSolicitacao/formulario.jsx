@@ -907,8 +907,8 @@ export const Formulario = ({
           corFechar={"secondary"}
 
           ButtonTypeCadastrar={ButtonTypeModal}
-          onClickButtonCadastrar={handleSubmit(handleValidatedSubmit)}
-          tipoBtnCadastrar={"button"}
+          onClickButtonCadastrar={handleValidatedSubmit}
+          // tipoBtnCadastrar={"button"}
           textButtonCadastrar={"Cadastrar"}
           corCadastrar={"success"}
           loadingTextCadastrar={"Cadastrando..."}
