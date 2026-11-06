@@ -72,7 +72,7 @@ export const useEditarFuncionario = ({ handleClose, dadosAtualizarFuncionarios, 
   );
 
 
-   useEffect(() => {
+  useEffect(() => {
 
     if (dadosAtualizarFuncionarios[0]) {
       setEmpresaSelecionada({ value: dadosAtualizarFuncionarios[0]?.IDEMPRESA, label: dadosAtualizarFuncionarios[0]?.NOFANTASIA });
@@ -100,9 +100,9 @@ export const useEditarFuncionario = ({ handleClose, dadosAtualizarFuncionarios, 
       setRepitaSenha(dadosAtualizarFuncionarios[0].PWSENHA);
       setCPF(dadosAtualizarFuncionarios[0].NUCPF);
       setTelefone(dadosAtualizarFuncionarios[0].TELEFONE);
-      setDepartamentoSelecionado({value: dadosAtualizarFuncionarios[0].DEPARTAMENTO, label: dadosAtualizarFuncionarios[0].DEPARTAMENTO});
+      setDepartamentoSelecionado({ value: dadosAtualizarFuncionarios[0].DEPARTAMENTO, label: dadosAtualizarFuncionarios[0].DEPARTAMENTO });
     }
-  
+
   }, [dadosAtualizarFuncionarios]);
 
 
@@ -205,6 +205,9 @@ export const useEditarFuncionario = ({ handleClose, dadosAtualizarFuncionarios, 
       return;
     }
 
+   /*  const senhaInicial = String(cpfSemMascara.substring(0, 5));
+    const hashSenha = await post('/hash-senha', { senha: senhaInicial }); */
+
 
     const putData = {
       ID: Number(dadosAtualizarFuncionarios[0]?.ID),
@@ -229,7 +232,8 @@ export const useEditarFuncionario = ({ handleClose, dadosAtualizarFuncionarios, 
       IDFUNCALTERACAO: usuarioLogado.id,
       MOTIVODESC: '',
       TELEFONE: removerMascaraTelefone(telefone) || '',
-      DEPARTAMENTO: departamentoSelecionado?.value || ''
+      DEPARTAMENTO: departamentoSelecionado?.value || '',
+      //SENHAHASH: hashSenha?.hash
     }
 
     try {
@@ -268,7 +272,7 @@ export const useEditarFuncionario = ({ handleClose, dadosAtualizarFuncionarios, 
         IDFUNCIONARIO: String(usuarioLogado.id),
         PATHFUNCAO: textoFuncao,
         DADOS: textDados,
-        IP: ipUsuario
+        IP: ipUsuario || 'Indisponível'
       }
       handleClick()
       const responsePost = await post('/log-web', createData)

@@ -93,7 +93,7 @@ export const useEditarDescontoFuncionario = ({
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
-                IP: ipUsuario
+                IP: ipUsuario || 'Indisponível'
             }
 
             await post('/log-web', createData)

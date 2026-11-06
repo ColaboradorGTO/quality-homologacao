@@ -1,4 +1,4 @@
-import { Fragment } from "react"
+import { Fragment, useState } from "react"
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal"
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal"
 import { InputFieldModal } from "../../../../Buttons/InputFieldModal"
@@ -13,6 +13,7 @@ import { schema } from "./schamaValidarFuncionario";
 import { mascaraTelefone } from "../../../../../utils/mascaraTelefone";
 import { formatarMoeda } from "../../../../../utils/formatMoeda";
 import { schemaLogin } from "./schamaValidarLogin";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export const FormularioEditar = ({
   handleClose,
@@ -21,6 +22,9 @@ export const FormularioEditar = ({
   optionsModulos,
   usuarioLogado
 }) => {
+
+  const [mostrarSenha, setMostrarSenha] = useState(false);
+
   const { handleSubmit, formState: { errors }, clearErrors, control, setError, setValue } = useForm({
     mode: "onChange"
   });
@@ -85,6 +89,7 @@ export const FormularioEditar = ({
     setDepartamentoSelecionado
 
   } = useEditarFuncionario({ handleClose, dadosAtualizarFuncionarios, handleClick, optionsModulos, usuarioLogado });
+
 
   const handleValidatedLogin = async () => {
     try {
@@ -473,10 +478,10 @@ export const FormularioEditar = ({
             </div>
 
             <div className="form-group">
-              <div className="row">
+              <div className="row ">
                 <div className="col-sm-3 col-md-3 col-xl-2">
                   <InputFieldModal
-                    type={"password"}
+                    type={mostrarSenha ? "text" : "password"}
                     className="form-control input"
                     label="Senha"
                     value={senha}
@@ -486,13 +491,22 @@ export const FormularioEditar = ({
                 <div className="col-sm-4 col-md-4 col-xl-4">
 
                   <InputFieldModal
-                    type={"password"}
+                    type={mostrarSenha ? "text" : "password"}
                     className="form-control input"
                     label="Repita Senha"
                     value={repitaSenha}
                     onChangeModal={(e) => setRepitaSenha(e.target.value)}
 
                   />
+                </div>
+                <div className="col-sm-0 col-md-0 col-xl-0 d-flex align-items-end">
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-sm m-1 mr-3"
+                    onClick={() => setMostrarSenha(!mostrarSenha)}
+                  >
+                    {mostrarSenha ? <FaEyeSlash /> : <FaEye />}
+                  </button>
                 </div>
                 <div className="col-sm-4 col-md-4 col-xl-4">
                   <label className="form-label" htmlFor="stativofuncionario">Situação</label>

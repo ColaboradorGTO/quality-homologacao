@@ -1,4 +1,4 @@
-import { Fragment } from "react"
+import { Fragment, useState } from "react"
 import { Controller, useForm } from "react-hook-form";
 import Select from 'react-select';
 import { format, subDays } from "date-fns";
@@ -12,6 +12,7 @@ import { AlertError } from "../../../Inputs/alertError"
 import FormField from "../../../Formularios/FormField";
 import { formatarMoeda, removerFormatacaoMoeda } from "../../../../utils/formatMoeda";
 import { mascaraTelefone } from "../../../../utils/mascaraTelefone";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export const FormularioFuncionario = ({
   modo,
@@ -23,6 +24,7 @@ export const FormularioFuncionario = ({
   handleClick,
 }) => {
   const isCriar = modo === 'criar';
+  const [mostrarSenha, setMostrarSenha] = useState(false);
 
   const { handleSubmit, formState: { errors }, clearErrors, control, setError } = useForm({
     mode: "onChange"
@@ -487,7 +489,7 @@ export const FormularioFuncionario = ({
                 <Fragment>
                   <div className="col-sm-3 col-md-3 col-xl-2">
                     <InputFieldModal
-                      type={"password"}
+                      type={mostrarSenha ? "text" : "password"}
                       className="form-control input"
                       label="Senha"
                       value={senha}
@@ -496,12 +498,21 @@ export const FormularioFuncionario = ({
                   </div>
                   <div className="col-sm-4 col-md-4 col-xl-4">
                     <InputFieldModal
-                      type={"password"}
+                      type={mostrarSenha ? "text" : "password"}
                       className="form-control input"
                       label="Repita Senha"
                       value={repitaSenha}
                       onChangeModal={(e) => setRepitaSenha(e.target.value)}
                     />
+                  </div>
+                  <div className="col-sm-0 col-md-0 col-xl-0 d-flex align-items-end">
+                    <button
+                      type="button"
+                      className="btn btn-primary btn-sm m-1 mr-3"
+                      onClick={() => setMostrarSenha(!mostrarSenha)}
+                    >
+                      {mostrarSenha ? <FaEyeSlash /> : <FaEye />}
+                    </button>
                   </div>
                 </Fragment>
               )}

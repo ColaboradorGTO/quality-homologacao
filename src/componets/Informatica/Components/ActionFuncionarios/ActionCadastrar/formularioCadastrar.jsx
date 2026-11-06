@@ -11,7 +11,7 @@ import { AlertError } from "../../../../Inputs/alertError"
 import { format, subDays } from "date-fns";
 import FormField from "../../../../Formularios/FormField";
 import { formatarMoeda, removerFormatacaoMoeda } from "../../../../../utils/formatMoeda";
-import { mascaraTelefone } from "../../../../../utils/mascaraTelefone";
+import { mascaraTelefone, removerMascaraTelefone } from "../../../../../utils/mascaraTelefone";
 import { schemaLogin } from "./schamaValidarLogin";
 
 export const FormularioCadastrar = ({
@@ -99,7 +99,7 @@ export const FormularioCadastrar = ({
                 dataAdmissaoFuncionario: dataAdmissao,
                 cpf: cpfFuncionario,
                 nome: nomeFuncionario,
-                telefoneFuncionario: telefone,
+                telefoneFuncionario: removerMascaraTelefone(telefone),
                 departamentoFuncionario: departamentoSelecionado.value,
                 localizacaoFuncionario: localizacaoSelcionada.value,
                 salarioFuncionario: removerFormatacaoMoeda(valorSalario),

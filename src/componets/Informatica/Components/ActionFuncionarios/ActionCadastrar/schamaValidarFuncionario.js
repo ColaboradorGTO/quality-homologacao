@@ -58,10 +58,10 @@ export const schema = yup.object().shape({
     .required('Situação Obrigatória'),
 
 
-  telefoneFuncionario: yup
+   telefoneFuncionario: yup
     .string()
     .required('Telefone Obrigatório')
-    .matches(/^\d{10,11}$/, 'Telefone deve conter 10 ou 11 números'),
+    .matches(/^\d{10,14}$/, 'Telefone deve conter 10 ou 11 números'), 
 
   departamentoFuncionario: yup
     .string()

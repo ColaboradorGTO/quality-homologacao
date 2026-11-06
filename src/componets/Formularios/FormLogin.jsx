@@ -57,6 +57,7 @@ export const AuthLogin = () => {
                 loginSubmit(e);
               }
             }}
+
           />
           <div className="invalid-feedback">Digite a Senha</div>
           <div className="help-block">Sua Senha</div>

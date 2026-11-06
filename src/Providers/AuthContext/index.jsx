@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { post } from '../../api/funcRequest';
+import { get, post, put } from '../../api/funcRequest';
 import Swal from 'sweetalert2';
+import axios from 'axios';
 
 const AuthContext = createContext();
 
@@ -13,7 +14,7 @@ export function AuthProvider({ children }) {
   const [loginError, setLoginError] = useState('');
   const [usuarioAutenticado, setUsuarioAutenticado] = useState();
 
- const TEMPO_INATIVIDADE = 5 * 60 * 60 * 1000; // 1 hora 
+  const TEMPO_INATIVIDADE = 5 * 60 * 60 * 1000; // 5 horas em milissegundos
 
   const handleSenhaChange = (e) => {
     setSenha(e.target.value);
@@ -50,7 +51,11 @@ export function AuthProvider({ children }) {
       setLoading(true);
       const response = await post('/login', data);
 
+      console.log( response, 'response');
+      console.log( response?.token, 'usuario');
+      console.log( response?.usuario.token, ' token');
       if (response && response?.usuario && response?.usuario.token) {
+     // if (response  && response?.token) {
 
         localStorage.removeItem('token');
         localStorage.removeItem('usuario');
@@ -69,6 +74,22 @@ export function AuthProvider({ children }) {
         setUsuario('');
         setSenha('');
         setLoginError('');
+
+     /*    const resposta = await get(`/funcionarios-loja?byId=${usuario}`);
+        const lista = resposta?.data?.data ?? resposta?.data ?? [];
+        const funcionario = lista[0];
+
+        if (funcionario?.SENHAHASH == null || funcionario?.SENHAHASH == '' || funcionario?.SENHAHASH == undefined) {
+
+          const hashSenha = await post('/hash-senha', { senha: funcionario?.PWSENHA });
+          console.log(hashSenha, 'hashSenha');
+
+          await put('/cadastrar-hash', {
+            SENHAHASH: hashSenha?.hash,
+            ID: funcionario?.ID
+          });
+        } */
+
       } else {
         setLoginError('Resposta inválida do servidor');
         Swal.fire({
@@ -170,7 +191,6 @@ export function AuthProvider({ children }) {
         const tempoDecorrido = Date.now() - parseInt(ultimoAcesso, 10);
         if (tempoDecorrido >= TEMPO_INATIVIDADE) {
           handleLogout('inatividade');
-                console.log('Sessão expirada por inatividade.' + tempoDecorrido);
           return;
         }
       }
