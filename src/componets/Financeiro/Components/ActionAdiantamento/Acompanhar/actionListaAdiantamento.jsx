@@ -264,16 +264,19 @@ export const ActionListaAdiantamento = ({
             style={{ justifyContent: "space-between", display: 'flex' }}
           >
             <div className="p-1">
-              <ButtonTable
-                titleButton={"Aprovar Pagamento"}
-                cor={"success"}
-                Icon={MdOutlineAttachMoney}
-                iconSize={30}
-                width="35px"
-                height="35px"
-                onClickButton={() => handleClickAprovar(row)}
-              // disabledBTN={row.STATUS == 'PAGO' ? true : false}
-              />
+              {row.STATIVO == 'True' && (
+
+                <ButtonTable
+                  titleButton={"Aprovar Pagamento"}
+                  cor={"success"}
+                  Icon={MdOutlineAttachMoney}
+                  iconSize={30}
+                  width="35px"
+                  height="35px"
+                  onClickButton={() => handleClickAprovar(row)}
+                  disabledBTN={row.STATIVO == 'False' ? true : false}
+                />
+              )}
             </div>
             <div className="p-1">
               <ButtonTable

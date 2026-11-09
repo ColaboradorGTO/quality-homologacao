@@ -123,6 +123,16 @@ export const ActionPesquisaCriarAdiantamento = ({ usuarioLogado, ID }) => {
     { enabled: Boolean(departamentoUsuario) }
   );
 
+  // Sem filtro de data: qualquer nota em atraso do usuário bloqueia novas solicitações
+  const { data: possuiNotaFiscalEmAtraso = false, refetch: refetchNotaFiscalEmAtraso } = useQuery(
+    ['provisao-nota-fiscal-em-atraso', departamentoUsuario, usuarioLogado?.id],
+    async () => {
+      const response = await get(`/lista-adiantamento-departamento?status=${encodeURIComponent('NOTA FISCAL EM ATRASO')}&departamento=${encodeURIComponent(departamentoUsuario)}`);
+      return (response?.data || []).some(item => item.IDUSUARIOCRIACAO == usuarioLogado?.id);
+    },
+    { enabled: Boolean(departamentoUsuario && usuarioLogado?.id) }
+  );
+
   const pesquisaPorCard = useRef(false);
 
   useEffect(() => {
@@ -164,6 +174,7 @@ export const ActionPesquisaCriarAdiantamento = ({ usuarioLogado, ID }) => {
   const handleClick = () => {
     refetch()
     refetchCards()
+    refetchNotaFiscalEmAtraso()
   }
 
   return (
@@ -172,7 +183,7 @@ export const ActionPesquisaCriarAdiantamento = ({ usuarioLogado, ID }) => {
 
       <ActionMain
         linkComponentAnterior={["Home"]}
-        linkComponent={["Adiantamento Salarial"]}
+        linkComponent={["Adiantamentos Departamentos"]}
         title="Adiantamentos Departamentos"
 
         InputFieldDTInicioComponent={InputField}
@@ -216,15 +227,19 @@ export const ActionPesquisaCriarAdiantamento = ({ usuarioLogado, ID }) => {
         corSearch={"primary"}
         IconSearch={AiOutlineSearch}
 
-        ButtonTypeCadastro={ButtonType}
+        ButtonTypeCadastro={possuiNotaFiscalEmAtraso ? null : ButtonType}
         linkNome={"Cadastrar"}
         corCadastro={"success"}
         onButtonClickCadastro={handleShowModal}
         IconCadastro={IoMdAdd}
 
-
       />
-
+      
+        <div className="alert alert-warning" role="alert" style={{fontSize: '15px'}}>
+          <h1 style={{fontWeight: 700}}>Atenção!</h1>
+            <strong style={{fontSize: '16px'}}>{usuarioLogado?.NOFUNCIONARIO}!</strong> Você não pode solicitar adiantamento, você Possui notas fiscais em atraso, entre em contato com o Gerente do Financeiro Wendel.
+        </div>
+      
       <Cards
         dados={dadosCards}
         statusSelecionado={statusSelecionado}

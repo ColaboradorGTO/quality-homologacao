@@ -190,6 +190,16 @@ export const ActionListaAdiantamento = ({
       sortable: true,
     },
     {
+      field: 'DSJUSTIFICATIVA',
+      header: 'Justificativa',
+      body: row => (
+        <th style={{ color: 'blue' }}>
+
+          {row.DSJUSTIFICATIVA}
+        </th>
+      ),
+    },
+    {
       field: 'ANEXOORCAMENTO',
       header: 'Orçamento',
       sortable: true,
@@ -197,16 +207,6 @@ export const ActionListaAdiantamento = ({
         <th style={{ color: row.ANEXOORCAMENTO ? 'blue' : '#FD1381' }}>
 
           {row.ANEXOORCAMENTO ? 'SIM' : 'NÃO'}
-        </th>
-      ),
-    },
-    {
-      field: 'DSJUSTIFICATIVA',
-      header: 'Justificativa',
-      body: row => (
-        <th style={{ color: 'blue' }}>
-
-          {row.DSJUSTIFICATIVA}
         </th>
       ),
     },
@@ -315,6 +315,21 @@ export const ActionListaAdiantamento = ({
                       width="35px"
                       height="35px"
                       onClickButton={() => handleRecusarPagamento(row.IDADIANTAMENTO)}
+                      disabledBTN={row.STATUS == 'NOTA FISCAL EM ATRASO'}
+                    />
+                  )}
+                </div>
+                <div className="p-1">
+                  {['PAGO', 'COMPROVANTE ANEXADO', 'AGUARDANDO NOTA FISCAL', ].includes(row.STATUS) && (
+                    <ButtonTable
+                      titleButton={"Exportar Comprovante"}
+                      cor={"success"}
+                      Icon={IoMdDownload}
+                      iconSize={20}
+                      width="35px"
+                      height="35px"
+                      onClickButton={() => handleComprovantePagamento(row.IDADIANTAMENTO)}
+                      // disabledBTN={row.STATUS == 'NOTA FISCAL EM ATRASO'}
                     />
                   )}
                 </div>
@@ -592,13 +607,13 @@ export const ActionListaAdiantamento = ({
           sortable={true} 
           style={{color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}   
         />
+        <Column 
+          field="ANEXOORCAMENTO" 
+          header="Possui Orçamento" 
+          sortable={true} 
+          style={{color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}   
+        />
 
-       <Column 
-         field="ANEXOORCAMENTO" 
-         header="Possui Orçamento" 
-         sortable={true} 
-         style={{color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}   
-       />
        
 
         <Column 
