@@ -267,68 +267,73 @@ export const ActionListaAdiantamento = ({
       header: 'Opções',
       button: true,
       body: (row) => {
-        if(row.STATUS == 'AGUARDANDO FINANCEIRO'){
+        if(row.STATIVO == 'False') {
           return <div></div>
         } else {
-          return (
-            <div className="p-1 "
-              style={{ justifyContent: "space-between", display: 'flex' }}
-            >
-              <div className="p-1">
-                <ButtonTable
-                  titleButton={"Detalhes"}
-                  cor={"primary"}
-                  Icon={GrView}
-                  iconSize={20}
-                  width="35px"
-                  height="35px"
-                  onClickButton={() => handleClickVisualizar(row)}
-                />
-              </div>
 
-              <div className="p-1">
-                {row.ANEXOORCAMENTO != null && row.ANEXOORCAMENTO != '' &&  (
-
+          if(row.STATUS == 'AGUARDANDO FINANCEIRO'){
+            return <div></div>
+          } else {
+            return (
+              <div className="p-1 "
+                style={{ justifyContent: "space-between", display: 'flex' }}
+              >
+                <div className="p-1">
                   <ButtonTable
-                    titleButton={"Anexar Nota Fiscal"}
-                    cor={"warning"}
-                    Icon={FaFileInvoiceDollar}
+                    titleButton={"Detalhes"}
+                    cor={"primary"}
+                    Icon={GrView}
                     iconSize={20}
                     width="35px"
                     height="35px"
-                    onClickButton={() => handleAnexarComprovante(row.IDADIANTAMENTO)}
-                    disabledBTN={row.POSSUINOTAFISCAL == 'True'}
+                    onClickButton={() => handleClickVisualizar(row)}
                   />
-                )}
-              </div>
-              <div className="p-1">
-                {['PAGO', 'COMPROVANTE ANEXADO', 'AGUARDANDO NOTA FISCAL', 'NOTA FISCAL EM ATRASO'].includes(row.STATUS) && (
-                  <ButtonTable
-                    titleButton={"Recusar Pagamento"}
-                    cor={"danger"}
-                    Icon={MdBlock}
-                    iconSize={20}
-                    width="35px"
-                    height="35px"
-                    onClickButton={() => handleRecusarPagamento(row.IDADIANTAMENTO)}
-                  />
-                )}
-              </div>
-              <div className="p-1">
-                {!['AGUARDANDO FINANCEIRO', 'APROVADO'].includes(row.STATUS) && (
+                </div>
+  
+                <div className="p-1">
+                  {row.ANEXOORCAMENTO != null && row.ANEXOORCAMENTO != '' &&  (
+  
                     <ButtonTable
-                        titleButton={"Editar"}
-                        cor={"info"}
-                        Icon={MdEdit}
-                        iconSize={20}
-                        width="35px"
-                        height="35px"
-                        onClickButton={() => handleClickEditar(row)}
+                      titleButton={"Anexar Nota Fiscal"}
+                      cor={"warning"}
+                      Icon={FaFileInvoiceDollar}
+                      iconSize={20}
+                      width="35px"
+                      height="35px"
+                      onClickButton={() => handleAnexarComprovante(row.IDADIANTAMENTO)}
+                      // disabledBTN={row.POSSUINOTAFISCAL == 'True'}
                     />
-                )}
+                  )}
+                </div>
+                <div className="p-1">
+                  {['PAGO', 'COMPROVANTE ANEXADO', 'AGUARDANDO NOTA FISCAL', 'NOTA FISCAL EM ATRASO'].includes(row.STATUS) && (
+                    <ButtonTable
+                      titleButton={"Recusar Pagamento"}
+                      cor={"danger"}
+                      Icon={MdBlock}
+                      iconSize={20}
+                      width="35px"
+                      height="35px"
+                      onClickButton={() => handleRecusarPagamento(row.IDADIANTAMENTO)}
+                    />
+                  )}
+                </div>
+                <div className="p-1">
+                  {!['AGUARDANDO FINANCEIRO', 'APROVADO', 'PAGAMENTO RECUSADO'].includes(row.STATUS) && (
+                      <ButtonTable
+                          titleButton={"Editar"}
+                          cor={"info"}
+                          Icon={MdEdit}
+                          iconSize={20}
+                          width="35px"
+                          height="35px"
+                          onClickButton={() => handleClickEditar(row)}
+                      />
+                  )}
+                </div>
               </div>
-            </div>
-          )
+            )
+          }
         }
       },
     },

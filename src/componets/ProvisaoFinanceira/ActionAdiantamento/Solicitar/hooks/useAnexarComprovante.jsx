@@ -173,6 +173,7 @@ export const useAnexarPagamento = ({
             UNIDADENEGOCIO: detalhe?.UNIDADENEGOCIO,
             CENTROCUSTO: detalhe?.CENTROCUSTO,
             DTPAGAMENTO: detalhe?.DTPAGAMENTO,
+            STATIVO: 'False',
         }
 
         try {

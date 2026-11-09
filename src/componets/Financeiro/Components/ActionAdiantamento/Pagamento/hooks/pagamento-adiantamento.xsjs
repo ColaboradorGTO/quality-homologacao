@@ -69,13 +69,19 @@ function fnBuscarSolicitacao(conn, idAdiantamento) {
     - DTPAGAMENTO > 7 dias sem nota   => NOTA FISCAL EM ATRASO (adiantamento-departamento.xsjs GET)
 */
 function fnAtualizarStatusPorPagamento(conn, registro, idUsuario) {
-    if (!registro.STATUS) return;
+    // A observação do pagamento (DSOBSERVACAO) sempre vai para ADIANTAMENTO_SOLICITACAO.DSJUSTIFICATIVAPAGAMENTO
+    let dsJustificativaPagamento = registro.DSOBSERVACAO || null;
+
+    if (!registro.STATUS) {
+        fnAtualizarSolicitacaoPorPagamento(conn, registro.IDADIANTAMENTO, null, dsJustificativaPagamento, idUsuario);
+        return;
+    }
 
     let solicitacao = fnBuscarSolicitacao(conn, registro.IDADIANTAMENTO);
     let statusAnterior = solicitacao.status;
 
     if (registro.STATUS !== 'PAGO') {
-        fnAtualizarSolicitacaoPorPagamento(conn, registro.IDADIANTAMENTO, registro.STATUS, null, idUsuario);
+        fnAtualizarSolicitacaoPorPagamento(conn, registro.IDADIANTAMENTO, registro.STATUS, dsJustificativaPagamento, idUsuario);
         fnInserirHistoricoAdiantamento(conn, registro.IDADIANTAMENTO, statusAnterior, registro.STATUS, 'PAGAMENTO', registro.DSOBSERVACAO, idUsuario);
         return;
     }
@@ -90,22 +96,23 @@ function fnAtualizarStatusPorPagamento(conn, registro, idUsuario) {
         fnInserirHistoricoAdiantamento(conn, registro.IDADIANTAMENTO, statusPago, statusFinal, 'PAGAMENTO', 'Aguardando o solicitante anexar a nota fiscal', idUsuario);
     }
 
-    fnAtualizarSolicitacaoPorPagamento(conn, registro.IDADIANTAMENTO, statusFinal, null, idUsuario);
+    fnAtualizarSolicitacaoPorPagamento(conn, registro.IDADIANTAMENTO, statusFinal, dsJustificativaPagamento, idUsuario);
 }
 
 function fnAtualizarSolicitacaoPorPagamento(
     conn,
     idAdiantamento,
     status,
-    dsJustificativa,
+    dsJustificativaPagamento,
     idUsuarioAlteracao
 ) {
 
+    // DSJUSTIFICATIVA é a proposta do solicitante e não é alterada pelo pagamento
     let query = `
         UPDATE "VAR_DB_NAME"."ADIANTAMENTO_SOLICITACAO"
         SET
-            "STATUS" = ?,
-            "DSJUSTIFICATIVA" = IFNULL(?, "DSJUSTIFICATIVA"),
+            "STATUS" = IFNULL(?, "STATUS"),
+            "DSJUSTIFICATIVAPAGAMENTO" = ?,
             "IDUSUARIOALTERACAO" = ?,
             "DATAALTERACAO" = CURRENT_TIMESTAMP
         WHERE "IDADIANTAMENTO" = ?
@@ -113,8 +120,8 @@ function fnAtualizarSolicitacaoPorPagamento(
 
     let pStmt = conn.prepareStatement(api.replaceDbName(query));
 
-    pStmt.setString(1, status);
-    setStringOrNull(pStmt, 2, dsJustificativa);
+    setStringOrNull(pStmt, 1, status);
+    setStringOrNull(pStmt, 2, dsJustificativaPagamento);
     pStmt.setInt(3, idUsuarioAlteracao);
     pStmt.setInt(4, idAdiantamento);
 
@@ -212,7 +219,7 @@ function fnHandlePut() {
             var registro = bodyJson[i];
 
             pStmt.setInt(1, registro.IDADIANTAMENTO);
-            pStmt.setBigDecimal(2, registro.VLPAGAMENTO);
+            pStmt.setFloat(2, registro.VLPAGAMENTO);
             pStmt.setDate(3, registro.DATAPAGAMENTO);
             pStmt.setString(4, registro.FORMAPAGAMENTO || '');
             setStringOrNull(pStmt, 5, registro.NUPAGAMENTO);

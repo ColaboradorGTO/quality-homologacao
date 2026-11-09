@@ -289,7 +289,7 @@ export const useAutorizarPagamento = ({
 
         const postData = {
             IDADIANTAMENTO: dadosDetalheAdiantamento?.[0]?.IDADIANTAMENTO,
-            VLPAGAMENTO: valorPagamento,
+            VLPAGAMENTO: parseFloat(valorPagamento),
             DATAPAGAMENTO: dataPagamento,
             FORMAPAGAMENTO: formaPagamento?.value || '',
             ANEXOCOMPROVANTE: anexoComprovante,

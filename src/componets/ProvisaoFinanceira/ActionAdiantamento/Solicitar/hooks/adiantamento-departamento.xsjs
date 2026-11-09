@@ -176,6 +176,7 @@ function fnHandleGet(id) {
             ad."DTPAGAMENTO",
             ad."MATRICULASOLICITANTE",
             ad."NOMESOLICITANTE",
+            ad."DSJUSTIFICATIVAPAGAMENTO",
             MAX(pg."FORMAPAGAMENTO") AS "FORMAPAGAMENTOPAGAMENTO",
             MAX(pg."STATIVO") AS "STATUSPAGAMENTO"
         FROM "VAR_DB_NAME"."ADIANTAMENTO_SOLICITACAO" ad
@@ -251,7 +252,8 @@ function fnHandleGet(id) {
             ad."CENTROCUSTO",
             ad."DTPAGAMENTO",
             ad."MATRICULASOLICITANTE",
-            ad."NOMESOLICITANTE"
+            ad."NOMESOLICITANTE",
+            ad."DSJUSTIFICATIVAPAGAMENTO"
         ORDER BY ad."DATACRIACAO" DESC
     `;
 
