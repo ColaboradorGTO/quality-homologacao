@@ -3,6 +3,8 @@ import { ButtonTable } from "../../../../ButtonsTabela/ButtonTable"
 import { formatMoeda } from "../../../../../utils/formatMoeda"
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
+import { ColumnGroup } from "primereact/columngroup";
+import { Row } from "primereact/row";
 import HeaderTable from "../../../../Tables/headerTable"
 import { useReactToPrint } from "react-to-print";
 import { jsPDF } from 'jspdf';
@@ -13,6 +15,9 @@ import { MdEdit, MdMoneyOff, MdOutlineAttachMoney } from "react-icons/md";
 import { ActionEditarModal } from "./EditarSolicitacao/actionEditarModal";
 import { get } from "../../../../../api/funcRequest";
 import { ActionPagamentoModal } from "../Pagamento/actionPagamentoModal";
+import { formatarDataParaBR } from "../../../../../utils/dataFormatada";
+import { GrView } from "react-icons/gr";
+import { ActionDetalhesModal } from "./DetalhesSolicitacao/actionDetalhesModal";
 
 export const ActionListaAdiantamento = ({
   dadosAdiantamentos,
@@ -25,6 +30,7 @@ export const ActionListaAdiantamento = ({
   const [modalEditarVisivel, setModalEditarVisivel] = useState(false);
   const [modalPagamento, setModalPagamento] = useState(false);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [modalDetalhesVisivel, setModaDetalhesVisivel] = useState(false);
   const dataTableRef = useRef();
 
   const onGlobalFilterChange = (e) => {
@@ -98,8 +104,8 @@ export const ActionListaAdiantamento = ({
       DEPARTAMENTO: item.DEPARTAMENTO,
       NUCNPJEMPRESA: item.NUCNPJEMPRESA,
       POSSUINOTAFISCAL: item.POSSUINOTAFISCAL,
-      CNPJFATURAMENTO: item.CNPJFATURAMENTO,
-      RAZAOSOCIALFATURAMENTO: item.RAZAOSOCIALFATURAMENTO,
+      CNPJFATURAMENTO: item.CNPJFATURAMENTO || item.NUCPFBENEFICIARIO,
+      RAZAOSOCIALFATURAMENTO: item.RAZAOSOCIALFATURAMENTO || item.NOBENEFICIARIO,
       VRSOLICITADO: item.VRSOLICITADO,
       DESCRICAO: item.DESCRICAO,
       ANEXOORCAMENTO: item.ANEXOORCAMENTO,
@@ -108,12 +114,15 @@ export const ActionListaAdiantamento = ({
       DSJUSTIFICATIVA: item.DSJUSTIFICATIVA,
       IDUSUARIOCRIACAO: item.IDUSUARIOCRIACAO,
       DATACRIACAO: item.DATACRIACAO,
+      DTPAGAMENTO: item.DTPAGAMENTO,
       IDUSUARIOALTERACAO: item.IDUSUARIOALTERACAO,
       DATAALTERACAO: item.DATAALTERACAO,
       DATAFINALIZACAO: item.DATAFINALIZACAO,
       STATIVO: item.STATIVO,
       FORMAPAGAMENTO: item.FORMAPAGAMENTO,
-      STATUSPAGAMENTO: item.STATUSPAGAMENTO
+      STATUSPAGAMENTO: item.STATUSPAGAMENTO,
+      NOMESOLICITANTE: item.NOMESOLICITANTE,
+      DSJUSTIFICATIVAPAGAMENTO: item.DSJUSTIFICATIVAPAGAMENTO
     }
   });
 
@@ -128,6 +137,18 @@ export const ActionListaAdiantamento = ({
       width: "10%"
     },
     {
+      field: 'DATACRIACAO',
+      header: 'Data Solocitação',
+      body: row => <th style={{ color: 'blue' }}>{formatarDataParaBR(row.DATACRIACAO)}</th>,
+      sortable: true,
+    },
+    {
+      field: 'DTPAGAMENTO',
+      header: 'Data Pagamento',
+      body: row => <th style={{ color: 'blue' }}>{formatarDataParaBR(row.DTPAGAMENTO)}</th>,
+      sortable: true,
+    },
+    {
       field: 'DEPARTAMENTO',
       header: 'Departamento',
       body: row => <th style={{ color: 'blue' }}>{row.DEPARTAMENTO}</th>,
@@ -136,7 +157,7 @@ export const ActionListaAdiantamento = ({
     },
     {
       field: 'CNPJFATURAMENTO',
-      header: 'CNPJ Faturado',
+      header: 'CNPJ/CPF',
       body: row => <th style={{ color: 'blue' }}>{row.CNPJFATURAMENTO}</th>,
       sortable: true,
     },
@@ -153,31 +174,22 @@ export const ActionListaAdiantamento = ({
       sortable: true,
     },
     {
-      field: 'DESCRICAO',
-      header: 'Descrição',
-      sortable: true,
+      field: 'NOMESOLICITANTE',
+      header: 'Solicitante',
       body: row => (
-        <th style={{ color: 'blue', }}>
+        <th style={{ color: 'blue' }}>
 
-          {row.DESCRICAO}
+          {row.NOMESOLICITANTE}
         </th>
       ),
     },
     {
-      field: 'STATUS',
-      header: 'Status',
-      sortable: true,
+      field: 'DSJUSTIFICATIVA',
+      header: 'Justificativa',
       body: row => (
-        <th style={{
-          color: row.STATUS == 'APROVADO' ? '#1DC9B7' : 
-             row.STATUS == 'PAGO' ? '#1DC9B7' 
-            : row.STATUS == 'AGUARDANDO FINANCEIRO' ? '#6e4e9e' 
-            : row.STATUS == 'REPROVADO' ? '#FD1381' 
-            : row.STATUS == 'PENDENTE' ? '#ffc241' : '',
-          fontWeight: 700
-        }}>
+        <th style={{ color: 'blue' }}>
 
-          {row.STATUS}
+          {row.DSJUSTIFICATIVA}
         </th>
       ),
     },
@@ -204,6 +216,45 @@ export const ActionListaAdiantamento = ({
       ),
     },
     {
+      field: 'DSJUSTIFICATIVAPAGAMENTO',
+      header: 'Orçamento',
+      sortable: true,
+      body: row => (
+        <th style={{ color: 'blue' }}>
+          {row.DSJUSTIFICATIVAPAGAMENTO}
+        </th>
+      ),
+    },
+    {
+      field: 'STATUS',
+      header: 'Status',
+      sortable: true,
+      body: row => (
+        <th style={{
+            color: row.STATUS == 'Autorizado' ? '#1DC9B7' 
+            : row.STATUS == 'aguardando comprovante' ? 'blue' 
+            : row.STATUS == 'AGUARDANDO FINANCEIRO' ? '#6e4e9e' 
+            : row.STATUS == 'comprovante anexado' ? '#FD1381' 
+            : row.STATUS == 'Aguardando nota fiscal' ? '#ffc241' : row.STATUS == 'Pago' ? '#1DC9B7' : '',
+          fontWeight: 800
+        }}>
+
+          {row.STATUS}
+        </th>
+      ),
+    },
+    {
+      field: 'STATIVO',
+      header: 'Status Final',
+      sortable: true,
+      body: row => (
+        <th style={{ color: row.STATIVO == 'False' ? '#FD1381' : 'blue', fontWeight: 800  }}>
+
+          {row.STATIVO == 'False' ? 'FINALIZADO' : 'ABERTO'}
+        </th>
+      ),
+    },
+    {
       field: 'STATIVO',
       header: 'Opções',
       button: true,
@@ -221,30 +272,18 @@ export const ActionListaAdiantamento = ({
                 width="35px"
                 height="35px"
                 onClickButton={() => handleClickAprovar(row)}
-                // disabledBTN={row.STATUS == 'PAGO' ? true : false}
+              // disabledBTN={row.STATUS == 'PAGO' ? true : false}
               />
             </div>
             <div className="p-1">
               <ButtonTable
-                titleButton={"Reprovar Pagamento"}
-                cor={"danger"}
-                Icon={MdMoneyOff}
-                iconSize={30}
-                width="35px"
-                height="35px"
-                onClickButton={() => handleClickAprovar(row)}
-                // disabledBTN={row.STATUS == 'PAGO' ? false : true}
-              />
-            </div>
-            <div className="p-1">
-              <ButtonTable
-                titleButton={"Editar Solicitação"}
+                titleButton={"Detalhes"}
                 cor={"primary"}
-                Icon={MdEdit}
-                iconSize={30}
+                Icon={GrView}
+                iconSize={20}
                 width="35px"
                 height="35px"
-                onClickButton={() => handleClickEditar(row)}
+                onClickButton={() => handleClickVisualizar(row)}
               />
             </div>
           </div>
@@ -298,13 +337,13 @@ export const ActionListaAdiantamento = ({
     }
   };
 
-  const handleEditar = async (IDADIANTAMENTO) => {
+  const handleVisualizar = async (IDADIANTAMENTO) => {
     try {
       const response = await get(`/lista-adiantamento-departamento?idAdiantamento=${IDADIANTAMENTO}`);
 
       if (response.data && response.data.length > 0) {
         setDadosDetalheAdiantamento(response.data);
-        setModalEditarVisivel(true);
+        setModaDetalhesVisivel(true);
       } else {
         Swal.fire({
           position: 'center',
@@ -317,15 +356,18 @@ export const ActionListaAdiantamento = ({
         return;
       }
     } catch (error) {
-      console.error('Erro ao buscar detalhes ', error);
+      console.error('Erro ao buscar detalhes: ', error);
+      Swal.fire({
+        icon: 'info',
+        title: 'Não existe dados nesta solicitação'
+      })
     }
   };
 
-
-  const handleClickEditar = (row) => {
+  const handleClickVisualizar = (row) => {
     if (optionsModulos[0]?.ALTERAR == 'True') {
       if (row && row.IDADIANTAMENTO) {
-        handleEditar(row.IDADIANTAMENTO);
+        handleVisualizar(row.IDADIANTAMENTO);
       }
 
     } else {
@@ -335,7 +377,7 @@ export const ActionListaAdiantamento = ({
         title: 'Acesso Negado!',
         html: `${usuarioLogado?.NOFUNCIONARIO} <br> Você não tem permissão.`,
         showConfirmButton: true,
-        timer: 5000,
+        timer: 30000,
         customClass: {
           container: 'custom-swal',
         }
@@ -344,6 +386,129 @@ export const ActionListaAdiantamento = ({
   };
 
 
+  const headerGrupo = (
+    <ColumnGroup  >
+      <Row>
+        <Column
+          colSpan="11"
+          headerStyle={{ fontSize: '1rem', textAlign: 'center', justifyContent: 'center', backgroundColor: "#7a59ad", color: 'white' }}
+          headerClassName="grupo-meta-geral"
+          header="SOLICITAÇÃO"
+        />
+        <Column
+          colSpan="4"
+          headerStyle={{ fontSize: '1rem', textAlign: 'center', justifyContent: 'center', backgroundColor: "#FD1381", color: 'black' }}
+          headerClassName="grupo-meta-geral"
+          header="PAGAMENTO"
+        />
+      </Row>
+
+      <Row>
+
+        <Column
+          field="contador"
+          header="#"
+          sortable={true}
+          style={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+        />
+        <Column
+          field="DATACRIACAO"
+          header="Dt Solocitação"
+          sortable={true}
+          style={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+        />
+        <Column
+          field="DTPAGAMENTO"
+          header="Dt Pagamento"
+          sortable={true}
+          style={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+        />
+        <Column
+          field="DEPARTAMENTO"
+          header="Departamento"
+          sortable={true}
+          style={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+        />
+        <Column
+          field="CNPJFATURAMENTO"
+          header="CNPJ/CPF"
+          sortable={true}
+          style={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+        />
+        <Column
+          field="RAZAOSOCIALFATURAMENTO"
+          header="Rz. Social"
+          sortable={true}
+          style={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+        />
+        <Column
+          field="VRSOLICITADO"
+          header="Vr Lançado"
+          sortable={true}
+          style={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+        />
+        <Column
+          field="NOMESOLICITANTE"
+          header="Solicitante"
+          sortable={true}
+          style={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+        />
+
+        <Column
+          field="DSJUSTIFICATIVA"
+          header="Justificativa"
+          sortable={true}
+          style={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+        />
+
+        <Column
+          field="POSSUINOTAFISCA"
+          header="Possui Nota"
+          sortable={true}
+          style={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+        />
+
+        <Column
+          field="ANEXOORCAMENTO"
+          header="Possui Orçamento"
+          sortable={true}
+          style={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+        />
+
+       
+
+       
+        <Column
+          field="DSJUSTIFICATIVAPAGAMENTO"
+          header="Justificativa"
+          sortable={true}
+          style={{ color: 'white', backgroundColor: "#FD1381", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+        />
+        <Column
+          field="STATUS"
+          header="Status"
+          sortable={true}
+          style={{ color: 'white', backgroundColor: "#FD1381", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+        />
+
+        <Column 
+          field="STATIVO" 
+          header="Status Final" 
+          sortable={true} 
+          style={{color: 'white', backgroundColor: "#FD1381", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}   
+        />
+
+        <Column
+          field="IDADIANTAMENTO"
+          header="Opções"
+          sortable={true}
+          style={{ color: 'white', backgroundColor: "#FD1381", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+        /> 
+      </Row>
+
+
+    </ColumnGroup>
+  )
 
   return (
 
@@ -368,6 +533,7 @@ export const ActionListaAdiantamento = ({
             title="Vendas por Loja"
             value={dados}
             globalFilter={globalFilterValue}
+            headerColumnGroup={headerGrupo}
             size="small"
             sortOrder={-1}
             paginator={true}
@@ -418,7 +584,14 @@ export const ActionListaAdiantamento = ({
           optionsModulos={optionsModulos}
           usuarioLogado={usuarioLogado}
         />
+
+        <ActionDetalhesModal
+          show={modalDetalhesVisivel}
+          handleClose={() => setModaDetalhesVisivel(false)}
+          dadosDetalheAdiantamento={dadosDetalheAdiantamento}
+        />
       </div>
     </Fragment>
   )
 }
+

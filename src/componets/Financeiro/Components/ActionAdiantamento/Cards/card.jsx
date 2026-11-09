@@ -2,10 +2,15 @@ import { useState } from "react"
 import { FaCheckDouble, FaClock, FaBan, FaMoneyBillWave } from "react-icons/fa6"
 
 const CARDS = [
-    { title: 'APROVADO', label: 'Aprovados', cor: '#4de5d5', Icon: FaCheckDouble },
-    { title: 'PENDENTE', label: 'Pendentes', cor: '#ffc241', Icon: FaClock },
-    { title: 'REPROVADO', label: 'Reprovados', cor: '#fd3995', Icon: FaBan },
     { title: 'AGUARDANDO FINANCEIRO', label: 'Aguardando Financeiro', cor: '#886ab5', Icon: FaMoneyBillWave },
+    // { title: 'AUTORIZADO', label: 'Autorizado', cor: '#4de5d5', Icon: FaCheckDouble },
+    { title: 'PAGO', label: 'PAGO', cor: '#4de5d5', Icon: FaCheckDouble },
+    { title: 'AGUARDANDO COMPROVANTE', label: 'Aguardando comprovante', cor: '#ffc241', Icon: FaClock },
+    { title: 'COMPROVANTE ANEXADO', label: 'Comprovante Anexado', cor: 'blue', Icon: FaClock },
+    // { title: 'PAGO', label: 'Pago', cor: '#fd3995', Icon: FaBan },
+    { title: 'AGUARDANDO NOTA FISCAL', label: 'Aguardando Nota Fiscal', cor: '#567ebb', Icon: FaMoneyBillWave },
+    { title: 'PAGAMENTO RECUSADO', label: 'Pagamento Recusado', cor: 'black', Icon: FaMoneyBillWave },
+    { title: 'NOTA FISCAL EM ATRASO', label: 'Nota Fiscal Em Atraso', cor: '#FB0C06', Icon: FaMoneyBillWave },
 ]
 
 const resumirPorStatus = (dados) => {

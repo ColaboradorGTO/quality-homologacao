@@ -176,12 +176,12 @@ export const ActionListaAdiantamento = ({
       sortable: true,
     },
     {
-      field: 'DESCRICAO',
-      header: 'Descrição',
+      field: 'DSJUSTIFICATIVA',
+      header: 'Justificativa',
       body: row => (
         <th style={{ color: 'blue' }}>
 
-          {row.DESCRICAO}
+          {row.DSJUSTIFICATIVA}
         </th>
       ),
     },

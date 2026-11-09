@@ -11,8 +11,10 @@ import { Departamentos } from "../../../../../parceiro.json";
 import { usePesquisa } from "../hooks/usePesquisa"
 import { animacaoCarregamento, fecharAnimacaoCarregamento, foiCancelado } from "../../../../utils/animationCarregamento"
 import { get } from "../../../../api/funcRequest"
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 import { useState } from "react"
+import Swal from "sweetalert2"
+import { Cards } from "../../../Financeiro/Components/ActionAdiantamento/Cards/card"
 import { getDataAtual } from "../../../../utils/dataAtual"
 import { useQuery } from "react-query"
 
@@ -52,15 +54,31 @@ export const ActionPesquisaCriarAdiantamento = ({ usuarioLogado, ID }) => {
   );
 
 
-  const fetchListaVendasConciliacao = async () => {
-    const urlBase = `/lista-adiantamento-departamento?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&status=${statusSelecionado}&departamento=${usuarioLogado?.DEPARTAMENTO}`;
+  // Provisão Financeira: o usuário só enxerga os adiantamentos do próprio departamento
+  const departamentoUsuario = usuarioLogado?.DEPARTAMENTO || ''
+
+  const fetchListaVendasConciliacao = async (status = statusSelecionado, exibirCarregamento = true) => {
+    if (!departamentoUsuario) {
+      if (exibirCarregamento) {
+        Swal.fire({
+          position: 'center',
+          icon: 'warning',
+          title: 'Usuário sem departamento cadastrado.',
+          text: 'Não é possível listar os adiantamentos.',
+          customClass: { container: 'custom-swal' },
+        });
+      }
+      return [];
+    }
+
+    const urlBase = `/lista-adiantamento-departamento?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&status=${status}&departamento=${encodeURIComponent(departamentoUsuario)}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     const controller = new AbortController();
     let allData = [];
 
     try {
-      animacaoCarregamento('Carregando dados...', true, true, () => controller.abort());
+      if (exibirCarregamento) animacaoCarregamento('Carregando dados...', true, true, () => controller.abort());
 
       const primeiraPagina = 1;
       const primeiraResposta = await get(`${urlApi}&page=${primeiraPagina}`, { signal: controller.signal });
@@ -73,30 +91,55 @@ export const ActionPesquisaCriarAdiantamento = ({ usuarioLogado, ID }) => {
 
       if (totalPages > 1) {
         for (let currentPage = 2; currentPage <= totalPages; currentPage++) {
-          if (foiCancelado()) break;
-          animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true, true);
+          if (exibirCarregamento && foiCancelado()) break;
+          if (exibirCarregamento) animacaoCarregamento(`Página ${currentPage} de ${totalPages}`, true, true);
           const responsePage = await get(`${urlApi}&page=${currentPage}`, { signal: controller.signal });
           allData.push(...(responsePage.data || []));
         }
       }
 
-      return allData;
+      return allData.filter(item => item.DEPARTAMENTO === departamentoUsuario);
     } catch (error) {
       if (error.code === 'ERR_CANCELED') {
-        return allData;
+        return allData.filter(item => item.DEPARTAMENTO === departamentoUsuario);
       }
       console.error('Erro ao buscar dados:', error);
       throw error;
     } finally {
-      fecharAnimacaoCarregamento();
+      if (exibirCarregamento) fecharAnimacaoCarregamento();
     }
   };
 
+  // Chaves próprias da Provisão para não reaproveitar o cache da tela do Financeiro (todos os departamentos)
   const { data: dadosAdiantamentos = [], error: errorVendasConciliacao, isLoading: isLoadingVendasConciliacao, refetch } = useQuery(
-    ['lista-adiantamento-departamento'],
+    ['provisao-lista-adiantamento-departamento', departamentoUsuario],
     () => fetchListaVendasConciliacao(),
     { enabled: false }
   );
+
+  const { data: dadosCards = [], refetch: refetchCards } = useQuery(
+    ['provisao-cards-adiantamento-departamento', departamentoUsuario],
+    () => fetchListaVendasConciliacao('', false),
+    { enabled: Boolean(departamentoUsuario) }
+  );
+
+  const pesquisaPorCard = useRef(false);
+
+  useEffect(() => {
+    if (pesquisaPorCard.current) {
+      pesquisaPorCard.current = false;
+      refetch();
+    }
+  }, [statusSelecionado]);
+
+  const handleClickCard = (status) => {
+    if (status === statusSelecionado) {
+      refetch();
+      return;
+    }
+    pesquisaPorCard.current = true;
+    setStatusSelecionado(status);
+  }
 
   const handleShowModal = () => {
     setModal(true)
@@ -111,13 +154,16 @@ export const ActionPesquisaCriarAdiantamento = ({ usuarioLogado, ID }) => {
 
   const options = [
     { value: 'AGUARDANDO FINANCEIRO', label: 'AGUARDANDO FINANCEIRO' },
-    { value: 'APROVADO', label: 'APROVADO' },
-    { value: 'REPROVADO', label: 'REPROVADO' },
-    { value: 'PENDENTE', label: 'PENDENTE' }
+    { value: 'PAGO', label: 'PAGO' },
+    { value: 'COMPROVANTE ANEXADO', label: 'COMPROVANTE ANEXADO' },
+    { value: 'AGUARDANDO NOTA FISCAL', label: 'AGUARDANDO NOTA FISCAL' },
+    { value: 'PAGAMENTO RECUSADO', label: 'PAGAMENTO RECUSADO' },
+    { value: 'NOTA FISCAL EM ATRASO', label: 'NOTA FISCAL EM ATRASO' }
   ]
 
   const handleClick = () => {
     refetch()
+    refetchCards()
   }
 
   return (
@@ -144,14 +190,13 @@ export const ActionPesquisaCriarAdiantamento = ({ usuarioLogado, ID }) => {
         InputSelectMarcasComponent={InputSelectAction}
         labelSelectMarcas="Departamentos"
         optionsMarcas={[
-          { value: '', label: 'Selecione um Departamento' },
-          ...Departamentos.map((item) => ({
-            value: item.value,
-            label: item.label
-          }))
+          {
+            value: departamentoUsuario,
+            label: Departamentos.find((item) => item.value === departamentoUsuario)?.label || departamentoUsuario
+          }
         ]}
-        valueSelectMarca={departamentoSelecionado}
-        onChangeSelectMarcas={(e) => setDepartamentoSelecionado(e.value)}
+        valueSelectMarca={departamentoUsuario}
+        onChangeSelectMarcas={() => {}}
 
         InputSelectEmpresaComponent={InputSelectAction}
         onChangeSelectEmpresa={(e) => setStatusSelecionado(e.value)}
@@ -178,6 +223,12 @@ export const ActionPesquisaCriarAdiantamento = ({ usuarioLogado, ID }) => {
         IconCadastro={IoMdAdd}
 
 
+      />
+
+      <Cards
+        dados={dadosCards}
+        statusSelecionado={statusSelecionado}
+        onClickCard={handleClickCard}
       />
 
       <ActionListaAdiantamento

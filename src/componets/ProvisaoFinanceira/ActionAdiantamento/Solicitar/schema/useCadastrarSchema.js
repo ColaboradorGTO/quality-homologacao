@@ -149,9 +149,9 @@ export const schema = yup.object({
     .trim()
     .required('Unidade de Negócio é obrigatória'),
 
-    centroCusto: yup.string()
-    .trim()
-    .required('Centro de Custo é obrigatório'),
+    // centroCusto: yup.string()
+    // .trim()
+    // .required('Centro de Custo é obrigatório'),
 
     descricaoFaturamento: yup.string()
     .trim()

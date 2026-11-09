@@ -3,6 +3,8 @@ import { ButtonTable } from "../../../ButtonsTabela/ButtonTable"
 import { formatMoeda } from "../../../../utils/formatMoeda"
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
+import { ColumnGroup } from "primereact/columngroup";
+import { Row } from "primereact/row";
 import HeaderTable from "../../../Tables/headerTable"
 import { useReactToPrint } from "react-to-print";
 import { jsPDF } from 'jspdf';
@@ -10,15 +12,16 @@ import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import Swal from "sweetalert2";
 import { IoMdDownload } from "react-icons/io";
-import { MdEdit, MdAttachFile } from "react-icons/md";
+import { MdEdit, MdAttachFile, MdBlock } from "react-icons/md";
 import { ActionEditarModal } from "./EditarSolicitacao/actionEditarModal";
 import { get } from "../../../../api/funcRequest";
 import { BASE_URL } from "../../../../api/api";
 import { useAnexarPagamento } from "./hooks/useAnexarComprovante";
-
 import { FaFileInvoiceDollar } from "react-icons/fa6";
-import { dataFormatada, formatarDataParaBR } from "../../../../utils/dataFormatada";
-
+import { formatarDataParaBR } from "../../../../utils/dataFormatada";
+import { GrView } from "react-icons/gr";
+import { ActionDetalhesModal } from "./DetalhesSolicitacao/actionDetalhesModal";
+import  "./styles.css";
 
 export const ActionListaAdiantamento = ({
   dadosAdiantamentos,
@@ -31,12 +34,14 @@ export const ActionListaAdiantamento = ({
   const [dadosDetalheAdiantamento, setDadosDetalheAdiantamento] = useState([]);
   const [dadosDetalhePagamento, setDadosDetalhePagamento] = useState([]);
   const [modalEditarVisivel, setModalEditarVisivel] = useState(false);
+  const [modalDetalhesVisivel, setModaDetalhesVisivel] = useState(false);
   const [anexoComprovante, setAnexoComprovante] = useState('')
   const dataTableRef = useRef();
 
   const {
     handleAnexarComprovante,
-    handleUploadComprovante
+    handleUploadComprovante,
+    handleRecusarPagamento
   } = useAnexarPagamento({
     dadosDetalheAdiantamento,
     optionsModulos,
@@ -128,6 +133,8 @@ export const ActionListaAdiantamento = ({
       DATAFINALIZACAO: item.DATAFINALIZACAO,
       DTPAGAMENTO: item.DTPAGAMENTO,
       STATIVO: item.STATIVO,
+      NOMESOLICITANTE: item.NOMESOLICITANTE,
+      DSJUSTIFICATIVAPAGAMENTO: item.DSJUSTIFICATIVAPAGAMENTO
     }
   });
 
@@ -177,25 +184,46 @@ export const ActionListaAdiantamento = ({
       sortable: true,
     },
     {
-      field: 'DESCRICAO',
-      header: 'Descrição',
+      field: 'NOMESOLICITANTE',
+      header: 'Solicitante',
+      body: row => <th style={{ color: 'blue' }}>{row.NOMESOLICITANTE}</th>,
+      sortable: true,
+    },
+    {
+      field: 'ANEXOORCAMENTO',
+      header: 'Orçamento',
+      sortable: true,
+      body: row => (
+        <th style={{ color: row.ANEXOORCAMENTO ? 'blue' : '#FD1381' }}>
+
+          {row.ANEXOORCAMENTO ? 'SIM' : 'NÃO'}
+        </th>
+      ),
+    },
+    {
+      field: 'DSJUSTIFICATIVA',
+      header: 'Justificativa',
       body: row => (
         <th style={{ color: 'blue' }}>
 
-          {row.DESCRICAO}
+          {row.DSJUSTIFICATIVA}
         </th>
       ),
     },
     {
       field: 'STATUS',
       header: 'Status',
-       body: row => (
+      body: row => (
         <th style={{
           color: row.STATUS == 'APROVADO' ? '#1DC9B7' 
             : row.STATUS == 'AGUARDANDO FINANCEIRO' ? '#6e4e9e' 
             : row.STATUS == 'REPROVADO' ? '#FD1381' 
-            : row.STATUS == 'PENDENTE' ? '#ffc241' : '',
-          fontWeight: 700
+            : row.STATUS == 'PENDENTE' ? '#ffc241' : row.STATUS == 'PAGO' ? '#1DC9B7'
+            : row.STATUS == 'COMPROVANTE ANEXADO' ? 'blue'
+            : row.STATUS == 'AGUARDANDO NOTA FISCAL' ? '#567ebb'
+            : row.STATUS == 'PAGAMENTO RECUSADO' ? 'black'
+            : row.STATUS == 'NOTA FISCAL EM ATRASO' ? '#FB0C06' : '',
+          fontWeight: 800
         }}>
 
           {row.STATUS}
@@ -203,75 +231,105 @@ export const ActionListaAdiantamento = ({
       ),
     },
     {
+      field: 'POSSUINOTAFISCAL',
+      header: 'Possui Nota',
+      sortable: true,
+      body: row => (
+        <th style={{ color: row.POSSUINOTAFISCAL == 'True' ? 'blue' : '#FD1381' }}>
+
+          {row.POSSUINOTAFISCAL == 'True' ? 'SIM' : 'NÃO'}
+        </th>
+      ),
+    },
+    {
+      field: 'DSJUSTIFICATIVAPAGAMENTO',
+      header: 'Justificativa',
+      body: row => (
+        <th style={{ color: 'blue' }}>
+
+          {row.DSJUSTIFICATIVAPAGAMENTO}
+        </th>
+      ),
+    },
+    {
       field: 'STATIVO',
+      header: 'Status Final',
+      sortable: true,
+      body: row => (
+        <th style={{ color: row.STATIVO == 'False' ? '#FD1381' : 'blue', fontWeight: 800  }}>
+
+          {row.STATIVO == 'False' ? 'FINALIZADO' : 'ABERTO'}
+        </th>
+      ),
+    },
+    {
+      field: 'STATUS',
       header: 'Opções',
       button: true,
       body: (row) => {
-        return (
-          <div className="p-1 "
-            style={{ justifyContent: "space-between", display: 'flex' }}
-          >
-            <div className="p-1">
-              <ButtonTable
-                titleButton={"Exporta Comprovante"}
-                cor={"success"}
-                Icon={IoMdDownload}
-                iconSize={20}
-                width="35px"
-                height="35px"
-                onClickButton={() => handleComprovantePagamento(row.IDADIANTAMENTO)}
-              // disabledBTN={!anexoNotaFiscal}
-              />
-            </div>
+        if(row.STATUS == 'AGUARDANDO FINANCEIRO'){
+          return <div></div>
+        } else {
+          return (
+            <div className="p-1 "
+              style={{ justifyContent: "space-between", display: 'flex' }}
+            >
+              <div className="p-1">
+                <ButtonTable
+                  titleButton={"Detalhes"}
+                  cor={"primary"}
+                  Icon={GrView}
+                  iconSize={20}
+                  width="35px"
+                  height="35px"
+                  onClickButton={() => handleClickVisualizar(row)}
+                />
+              </div>
 
-            <div className="p-1">
-              <ButtonTable
-                titleButton={"Anexar Comprovante"}
-                cor={"info"}
-                Icon={MdAttachFile}
-                iconSize={20}
-                width="35px"
-                height="35px"
-                onClickButton={() => handleAnexarComprovante(row.IDADIANTAMENTO)}
-                // disabledBTN={[
-                //   'AGUARDANDO FINANCEIRO',
-                //   'PENDENTE',
-                //   'PAGO'
-                // ].includes(row.STATUS?.trim().toUpperCase())}
-              />
-            </div>
-            <div className="p-1">
-              <ButtonTable
-                titleButton={"Anexar Nota Fiscal"}
-                cor={"warning"}
-                Icon={FaFileInvoiceDollar}
-                iconSize={20}
-                width="35px"
-                height="35px"
-                onClickButton={() => handleAnexarComprovante(row.IDADIANTAMENTO)}
-                disabledBTN={row.ANEXOORCAMENTO == null || row.ANEXOORCAMENTO == ''}
-              />
-            </div>
-            <div className="p-1">
-              <ButtonTable
-                titleButton={"Editar"}
-                cor={"primary"}
-                Icon={MdEdit}
-                iconSize={20}
-                width="35px"
-                height="35px"
-                onClickButton={() => handleClickEditar(row)}
-                // disabledBTN={[
-                //   'AGUARDANDO FINANCEIRO',
-                //   'APROVADO',
-                //   'PAGO'
-                // ].includes(row.STATUS?.trim().toUpperCase())}
-              />
- 
-            </div>
-          </div>
-        )
+              <div className="p-1">
+                {row.ANEXOORCAMENTO != null && row.ANEXOORCAMENTO != '' &&  (
 
+                  <ButtonTable
+                    titleButton={"Anexar Nota Fiscal"}
+                    cor={"warning"}
+                    Icon={FaFileInvoiceDollar}
+                    iconSize={20}
+                    width="35px"
+                    height="35px"
+                    onClickButton={() => handleAnexarComprovante(row.IDADIANTAMENTO)}
+                    disabledBTN={row.POSSUINOTAFISCAL == 'True'}
+                  />
+                )}
+              </div>
+              <div className="p-1">
+                {['PAGO', 'COMPROVANTE ANEXADO', 'AGUARDANDO NOTA FISCAL', 'NOTA FISCAL EM ATRASO'].includes(row.STATUS) && (
+                  <ButtonTable
+                    titleButton={"Recusar Pagamento"}
+                    cor={"danger"}
+                    Icon={MdBlock}
+                    iconSize={20}
+                    width="35px"
+                    height="35px"
+                    onClickButton={() => handleRecusarPagamento(row.IDADIANTAMENTO)}
+                  />
+                )}
+              </div>
+              <div className="p-1">
+                {!['AGUARDANDO FINANCEIRO', 'APROVADO'].includes(row.STATUS) && (
+                    <ButtonTable
+                        titleButton={"Editar"}
+                        cor={"info"}
+                        Icon={MdEdit}
+                        iconSize={20}
+                        width="35px"
+                        height="35px"
+                        onClickButton={() => handleClickEditar(row)}
+                    />
+                )}
+              </div>
+            </div>
+          )
+        }
       },
     },
   ]
@@ -407,7 +465,172 @@ export const ActionListaAdiantamento = ({
     }
   };
 
+  const handleVisualizar = async (IDADIANTAMENTO) => {
+    try {
+      const response = await get(`/lista-adiantamento-departamento?idAdiantamento=${IDADIANTAMENTO}`);
 
+      if (response.data && response.data.length > 0) {
+        setDadosDetalheAdiantamento(response.data);
+        setModaDetalhesVisivel(true);
+      } else {
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: 'Detalhes não encontrados.',
+          customClass: {
+            container: 'custom-swal',
+          }
+        });
+        return;
+      }
+    } catch (error) {
+      console.error('Erro ao buscar detalhes: ', error);
+      Swal.fire({
+        icon: 'info',
+        title: 'Não existe dados nesta solicitação'
+      })
+    }
+  };
+
+  const handleClickVisualizar = (row) => {
+    if (optionsModulos[0]?.ALTERAR == 'True') {
+      if (row && row.IDADIANTAMENTO) {
+        handleVisualizar(row.IDADIANTAMENTO);
+      }
+
+    } else {
+      Swal.fire({
+        position: 'center',
+        icon: 'error',
+        title: 'Acesso Negado!',
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br> Você não tem permissão.`,
+        showConfirmButton: true,
+        timer: 30000,
+        customClass: {
+          container: 'custom-swal',
+        }
+      })
+    }
+  };
+
+  const headerGrupo = (
+    <ColumnGroup  >
+      <Row>
+        <Column  
+          colSpan="10" 
+          headerStyle={{ fontSize: '1rem', textAlign: 'center', justifyContent: 'center', backgroundColor: "#7a59ad", color: 'white' }} 
+          headerClassName="grupo-meta-geral"
+          header="SOLICITAÇÃO" 
+        />
+        <Column  
+          colSpan="5" 
+          headerStyle={{ fontSize: '1rem', textAlign: 'center', justifyContent: 'center', backgroundColor: "#FD1381", color: 'black' }} 
+          headerClassName="grupo-meta-geral"
+          header="PAGAMENTO" 
+        />
+      </Row>
+
+      <Row>
+
+        <Column 
+          field="contador" 
+          header="#" 
+          sortable={true} 
+          style={{color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}   
+        />
+        <Column 
+          field="DATACRIACAO" 
+          header="Dt Solocitação" 
+          sortable={true} 
+          style={{color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}   
+        />
+        <Column 
+          field="DTPAGAMENTO" 
+          header="Dt Pagamento" 
+          sortable={true} 
+          style={{color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}   
+        />
+        <Column 
+          field="DEPARTAMENTO" 
+          header="Departamento" 
+          sortable={true} 
+          style={{color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}   
+        />
+        <Column 
+          field="CNPJFATURAMENTO" 
+          header="CNPJ/CPF" 
+          sortable={true} 
+          style={{color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}   
+        />
+        <Column 
+          field="RAZAOSOCIALFATURAMENTO" 
+          header="Rz. Social" 
+          sortable={true} 
+          style={{color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}   
+        />
+        <Column 
+          field="VRSOLICITADO" 
+          header="Vr Lançado" 
+          sortable={true} 
+          style={{color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}   
+        />
+        <Column 
+          field="NOMESOLICITANTE" 
+          header="Solicitante" 
+          sortable={true} 
+          style={{color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}   
+        />
+        
+        <Column 
+          field="DSJUSTIFICATIVA" 
+          header="Justificativa" 
+          sortable={true} 
+          style={{color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}   
+        />
+
+       <Column 
+         field="ANEXOORCAMENTO" 
+         header="Possui Orçamento" 
+         sortable={true} 
+         style={{color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}   
+       />
+       
+
+        <Column 
+          field="STATUS" 
+          header="Status" 
+          sortable={true} 
+          style={{color: 'white', backgroundColor: "#FD1381", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}   
+        />
+        <Column 
+          field="POSSUINOTAFISCA" 
+          header="Possui Nota" 
+          sortable={true} 
+          style={{color: 'white', backgroundColor: "#FD1381", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}   
+        />
+        <Column 
+          field="DSJUSTIFICATIVAPAGAMENTO" 
+          header="Justificativa" 
+          sortable={true} 
+          style={{color: 'white', backgroundColor: "#FD1381", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}   
+        />
+        <Column 
+          field="STATIVO" 
+          header="Status Final" 
+          sortable={true} 
+          style={{color: 'white', backgroundColor: "#FD1381", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}   
+        />
+        <Column 
+          field="IDADIANTAMENTO" 
+          header="Opções" 
+          sortable={true} 
+          style={{color: 'white', backgroundColor: "#FD1381", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}   
+        />
+      </Row>
+
+    
+    </ColumnGroup>
+  )
   return (
 
     <Fragment>
@@ -432,6 +655,7 @@ export const ActionListaAdiantamento = ({
             value={dados}
             globalFilter={globalFilterValue}
             size="small"
+            headerColumnGroup={headerGrupo}
             sortOrder={-1}
             paginator={true}
             rows={10}
@@ -471,6 +695,12 @@ export const ActionListaAdiantamento = ({
           optionsModulos={optionsModulos}
           usuarioLogado={usuarioLogado}
           handleClick={handleClick}
+        />
+
+        <ActionDetalhesModal 
+          show={modalDetalhesVisivel}
+          handleClose={() => setModaDetalhesVisivel(false)}
+          dadosDetalheAdiantamento={dadosDetalheAdiantamento}
         />
       </div>
     </Fragment>

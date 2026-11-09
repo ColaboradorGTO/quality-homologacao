@@ -305,6 +305,8 @@ export const useCadastrarAdiantamento = ({
             UNIDADENEGOCIO: unidadeNegocio,
             CENTROCUSTO: centroCusto,
             DTPAGAMENTO: dtPagamento,
+            MATRICULASOLICITANTE: usuarioLogado?.id,
+            NOMESOLICITANTE: usuarioLogado?.NOFUNCIONARIO
         }
 
         try {

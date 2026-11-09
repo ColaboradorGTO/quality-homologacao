@@ -214,7 +214,6 @@ export const Formulario = ({
               <Select
                 className="basic-single"
                 classNamePrefix="select"
-                isDisabled={true}
                 name="empresaSolicitante"
                 value={empresaSelecionada}
                 options={optionsEmpresas?.map((item) => ({
@@ -248,7 +247,6 @@ export const Formulario = ({
                     onChange={(e) => setCnpj(e.target.value)}
                     errors={errors}
                     clearErrors={clearErrors}
-                    readOnly={true}
                   />
 
                 )}
@@ -268,7 +266,6 @@ export const Formulario = ({
                     onChange={(e) => setRazaoSocial(e.target.value)}
                     errors={errors}
                     clearErrors={clearErrors}
-                    readOnly={true}
                   />
 
                 )}
@@ -288,7 +285,6 @@ export const Formulario = ({
               <Select
                 className="basic-single"
                 classNamePrefix="select"
-                isDisabled={true}
                 name="tipoBeneficiario"
                 value={tipoBeneficiario}
                 options={optionsTipoBeneficiario?.map((item) => ({
@@ -318,7 +314,6 @@ export const Formulario = ({
                   <FormField
                     label={"CNPJ *"}
                     name="cnpjFaturamento"
-                    readOnly={true}
                     type="text"
                     value={cnpjFaturado}
                     onChange={(e) => setCNPJFaturado(mascaraCNPJ(e.target.value.replace(/\D/g, '').slice(0, 14)))}
@@ -336,7 +331,6 @@ export const Formulario = ({
                   <FormField
                     label={"Razão Social *"}
                     name="razaoFaturamento"
-                    readOnly={true}
                     type="text"
                     value={razaoSocialFaturamento}
                     onChange={(e) => setRazaoSocialFaturamento(e.target.value)}
@@ -355,7 +349,6 @@ export const Formulario = ({
                   <FormField
                     label={"CPF *"}
                     name="cpfBeneficiario"
-                    readOnly={true}
                     type="text"
                     value={cpfBeneficiario}
                     onChange={(e) => setCpfBeneficiario(mascaraCPF(e.target.value))}
@@ -373,7 +366,6 @@ export const Formulario = ({
                   <FormField
                     label={"Nome Completo *"}
                     name="nomeBeneficiario"
-                    readOnly={true}
                     type="text"
                     value={nomeBeneficiario}
                     onChange={(e) => setNomeBeneficiario(e.target.value)}
@@ -396,7 +388,6 @@ export const Formulario = ({
                   <FormField
                     label={"RG / Identidade *"}
                     name="rgBeneficiario"
-                    readOnly={true}
                     type="text"
                     value={rgBeneficiario}
                     onChange={(e) => setRgBeneficiario(e.target.value)}
@@ -414,7 +405,6 @@ export const Formulario = ({
                   <FormField
                     label={"Data de Nascimento *"}
                     name="dtNascimentoBeneficiario"
-                    readOnly={true}
                     type="date"
                     max={dataSolicitacao}
                     value={dtNascimentoBeneficiario}
@@ -433,7 +423,6 @@ export const Formulario = ({
                   <FormField
                     label={"Telefone *"}
                     name="telefoneBeneficiario"
-                    readOnly={true}
                     type="text"
                     value={telefoneBeneficiario}
                     onChange={(e) => setTelefoneBeneficiario(mascaraTelefone(e.target.value.replace(/\D/g, '').slice(0, 11)))}
@@ -451,7 +440,6 @@ export const Formulario = ({
                   <FormField
                     label={"E-mail *"}
                     name="emailBeneficiario"
-                    readOnly={true}
                     type="email"
                     value={emailBeneficiario}
                     onChange={(e) => setEmailBeneficiario(e.target.value)}
@@ -471,7 +459,6 @@ export const Formulario = ({
                   <FormField
                     label={"CEP *"}
                     name="cepBeneficiario"
-                    readOnly={true}
                     type="text"
                     value={cepBeneficiario}
                     onChange={(e) => setCepBeneficiario(e.target.value.replace(/\D/g, '').slice(0, 8).replace(/(\d{5})(\d)/, '$1-$2'))}
@@ -489,7 +476,6 @@ export const Formulario = ({
                   <FormField
                     label={"Endereço *"}
                     name="enderecoBeneficiario"
-                    readOnly={true}
                     type="text"
                     value={enderecoBeneficiario}
                     onChange={(e) => setEnderecoBeneficiario(e.target.value)}
@@ -512,7 +498,6 @@ export const Formulario = ({
               <Select
                 className="basic-single"
                 classNamePrefix="select"
-                isDisabled={true}
                 name="tipoDespesa"
                 value={tipoDespesa}
                 options={optionsTipoDespesa?.map((item) => ({
@@ -540,7 +525,6 @@ export const Formulario = ({
                   <FormField
                     label={"Nome do Beneficiário *"}
                     name="nomeFavorecido"
-                    readOnly={true}
                     type="text"
                     value={nomeFavorecido}
                     onChange={(e) => setNomeFavorecido(e.target.value)}
@@ -555,7 +539,6 @@ export const Formulario = ({
               <Select
                 className="basic-single"
                 classNamePrefix="select"
-                isDisabled={true}
                 name="formaPagamento"
                 value={formaPagamento}
                 options={optionsFormaPagamento?.map((item) => ({
@@ -583,7 +566,6 @@ export const Formulario = ({
                   <FormField
                     label={"Data para Pagamento *"}
                     name="dtPagamento"
-                    readOnly={true}
                     type="date"
                     min={dataSolicitacao}
                     value={dtPagamento}
@@ -607,7 +589,6 @@ export const Formulario = ({
                   <FormField
                     label={"Chave PIX *"}
                     name="chavePix"
-                    readOnly={true}
                     type="text"
                     value={chavePix}
                     onChange={(e) => setChavePix(e.target.value)}
@@ -655,7 +636,6 @@ export const Formulario = ({
                   <FormField
                     label={"Agência *"}
                     name="agencia"
-                    readOnly={true}
                     type="text"
                     value={agencia}
                     onChange={(e) => setAgencia(e.target.value.replace(/\D/g, ''))}
@@ -673,7 +653,6 @@ export const Formulario = ({
                   <FormField
                     label={"Conta *"}
                     name="conta"
-                    readOnly={true}
                     type="text"
                     value={conta}
                     onChange={(e) => setConta(e.target.value.replace(/\D/g, ''))}
@@ -691,7 +670,6 @@ export const Formulario = ({
                   <FormField
                     label={"Dígito da Conta *"}
                     name="digitoConta"
-                    readOnly={true}
                     type="text"
                     value={digitoConta}
                     onChange={(e) => setDigitoConta(e.target.value.replace(/[^0-9xX]/g, '').slice(0, 2).toUpperCase())}
@@ -714,7 +692,6 @@ export const Formulario = ({
                   <FormField
                     label={"Valor a ser Pago *"}
                     name="vrFaturamento"
-                    readOnly={true}
                     type="text"
                     value={vrAdiantamento}
                     onChange={(e) => setVrAdiantamento(formatarMoeda(e.target.value))}
@@ -732,7 +709,6 @@ export const Formulario = ({
                   <FormField
                     label={"Unidade de Negócio *"}
                     name="unidadeNegocio"
-                    readOnly={true}
                     type="text"
                     value={unidadeNegocio}
                     onChange={(e) => setUnidadeNegocio(e.target.value)}
@@ -750,12 +726,12 @@ export const Formulario = ({
                   <FormField
                     label={"Centro de Custo *"}
                     name="centroCusto"
-                    readOnly={true}
                     type="text"
-                    value={centroCusto}
+                    value={departamento}
                     onChange={(e) => setCentroCusto(e.target.value)}
                     errors={errors}
                     clearErrors={clearErrors}
+                    readOnly={true}
                   />
                 )}
               />
@@ -768,7 +744,6 @@ export const Formulario = ({
                   <FormField
                     label={"Descrição do Produto ou Serviço *"}
                     name="descricaoFaturamento"
-                    readOnly={true}
                     type="text"
                     value={descricao}
                     onChange={(e) => setDescricao(e.target.value)}
@@ -793,7 +768,6 @@ export const Formulario = ({
               <Select
                 className="basic-single"
                 classNamePrefix="select"
-                isDisabled={true}
                 name="possuiNotaFiscalFaturamento"
                 value={possuiNota}
                 options={optionsReposicao?.map((item) => ({
@@ -835,7 +809,7 @@ export const Formulario = ({
               />
             </div>
 
-            <div className="col-sm-6 col-xl-3">
+            {/* <div className="col-sm-6 col-xl-3">
               <Controller
                 name="anxNotaFiscal"
                 control={control}
@@ -851,7 +825,7 @@ export const Formulario = ({
                   />
                 )}
               />
-            </div>
+            </div> */}
 
           </div>
 

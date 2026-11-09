@@ -97,7 +97,7 @@ export const Formulario = ({
     optionsFormaPagamento,
     onSubmit
   } = useCadastrarAdiantamento({ optionsModulos, usuarioLogado, handleClose, handleClick });
-
+  console.log(usuarioLogado, 'usuario')
   const ehPJ = tipoBeneficiario?.value === 'PJ';
   const ehPF = tipoBeneficiario?.value === 'PF';
   const ehPix = formaPagamento?.value === 'PIX';
@@ -131,7 +131,7 @@ export const Formulario = ({
         digitoConta: digitoConta,
         vrFaturamento: vrAdiantamento,
         unidadeNegocio: unidadeNegocio,
-        centroCusto: centroCusto,
+        // centroCusto: centroCusto,
         descricaoFaturamento: descricao,
         possuiNotaFiscalFaturamento: possuiNota,
         orcamento: anexoOrcamento,
@@ -773,8 +773,9 @@ export const Formulario = ({
                     label={"Centro de Custo *"}
                     name="centroCusto"
                     type="text"
-                    value={centroCusto}
+                    value={usuarioLogado?.DEPARTAMENTO}
                     onChange={(e) => setCentroCusto(e.target.value)}
+                    readOnly={true}
                     errors={errors}
                     clearErrors={clearErrors}
                   />
@@ -854,7 +855,7 @@ export const Formulario = ({
               />
             </div>
 
-            {possuiNota?.value === 'True' && (
+            {/* {possuiNota?.value === 'True' && (
               <div className="col-sm-6 col-xl-3">
                 <Controller
                   name="anxNotaFiscal"
@@ -872,7 +873,7 @@ export const Formulario = ({
                   )}
                 />
               </div>
-            )}
+            )} */}
 
           </div>
 
