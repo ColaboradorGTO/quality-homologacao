@@ -145,9 +145,9 @@ export const schema = yup.object({
     .required('Valor a ser pago é obrigatório')
     .test('valor-positivo', 'Valor a ser pago deve ser maior que zero', (valor) => removerFormatacaoMoeda(valor) > 0),
 
-    unidadeNegocio: yup.string()
-    .trim()
-    .required('Unidade de Negócio é obrigatória'),
+    // unidadeNegocio: yup.string()
+    // .trim()
+    // .required('Unidade de Negócio é obrigatória'),
 
     // centroCusto: yup.string()
     // .trim()
@@ -162,8 +162,8 @@ export const schema = yup.object({
     .required('Possui Nota Fiscal é obrigatória')
     .typeError('Possui Nota Fiscal é obrigatória'),
 
-    orcamento: yup.string()
-    .required('Anexo do orçamento é obrigatório'),
+    // orcamento: yup.string()
+    // .required('Anexo do orçamento é obrigatório'),
 
     dtPagamento: yup.string()
     .required('Data para pagamento é obrigatória')

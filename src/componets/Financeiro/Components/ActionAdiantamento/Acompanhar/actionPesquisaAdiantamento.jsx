@@ -189,11 +189,11 @@ export const ActionPesquisaAdiantamento = ({ usuarioLogado, ID }) => {
         corSearch={"primary"}
         IconSearch={AiOutlineSearch}
 
-      ButtonTypeCadastro={ButtonType}
-      linkNome={"Cadastrar"}
-      corCadastro={"success"}
-      onButtonClickCadastro={handleShowModal}
-      IconCadastro={IoMdAdd}
+      // ButtonTypeCadastro={ButtonType}
+      // linkNome={"Cadastrar"}
+      // corCadastro={"success"}
+      // onButtonClickCadastro={handleShowModal}
+      // IconCadastro={IoMdAdd}
       />
       <Cards
         dados={dadosAdiantamentos}

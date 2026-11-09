@@ -130,11 +130,11 @@ export const Formulario = ({
         conta: conta,
         digitoConta: digitoConta,
         vrFaturamento: vrAdiantamento,
-        unidadeNegocio: unidadeNegocio,
+        // unidadeNegocio: unidadeNegocio,
         // centroCusto: centroCusto,
         descricaoFaturamento: descricao,
         possuiNotaFiscalFaturamento: possuiNota,
-        orcamento: anexoOrcamento,
+        // orcamento: anexoOrcamento,
         dtPagamento: dtPagamento,
       }
 

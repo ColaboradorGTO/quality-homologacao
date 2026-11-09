@@ -517,7 +517,11 @@ function fnHandlePost() {
             pStmt.setString(18, registro.FORMAPAGAMENTO);
             pStmt.setString(19, registro.CHAVEPIX);
 
-            setIntOrNull(pStmt, 20, registro.IDBANCO)
+            if (registro.IDBANCO !== null && registro.IDBANCO !== undefined && registro.IDBANCO !== '') {
+                pStmt.setInt(20, parseInt(registro.IDBANCO, 10));
+            } else {
+                pStmt.setNull(20, $.db.types.INTEGER);
+            }
             pStmt.setString(21, registro.NUAGENCIA);
             pStmt.setString(22, registro.NUCONTA);
             pStmt.setString(23, registro.NUDIGITOCONTA);
@@ -544,6 +548,8 @@ function fnHandlePost() {
 
             // Usuário responsável
             pStmt.setInt(35, registro.IDUSUARIOCRIACAO);
+            pStmt.setInt(36, registro.MATRICULASOLICITANTE);
+            pStmt.setInt(37, registro.NOMESOLICITANTE);
 
             pStmt.execute();
             fnInserirHistoricoAdiantamento(
