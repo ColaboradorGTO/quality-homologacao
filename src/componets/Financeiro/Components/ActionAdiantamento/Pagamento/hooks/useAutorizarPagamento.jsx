@@ -27,6 +27,7 @@ export const optionsStatus = [
 ]
 export const useAutorizarPagamento = ({
     dadosDetalheAdiantamento,
+    dadosDetalhePagamento,
     optionsModulos,
     usuarioLogado,
     handleClick,
@@ -92,29 +93,23 @@ export const useAutorizarPagamento = ({
         },
         { enabled: true, staleTime: 60 * 60 * 1000, cacheTime: 60 * 60 * 1000 }
     );
+  
 
     useEffect(() => {
-        if (dadosDetalheAdiantamento?.length > 0) {
-            // setValorPagamento(dadosDetalheAdiantamento[0]?.VRSOLICITADO || '')
+        if (dadosDetalheAdiantamento.length && dadosDetalhePagamento?.length > 0) {
+            setValorPagamento(dadosDetalhePagamento[0]?.VLPAGAMENTO || '')
+            setObservacao(dadosDetalhePagamento[0]?.DSOBSERVACAO)
 
-            // const empresaEncontrada = optionsEmpresas.find(item => item.IDEMPRESA == dadosDetalheAdiantamento[0]?.IDEMPRESA)
-            // setEmpresaSelecionada(
-            //     empresaEncontrada ? { value: empresaEncontrada.IDEMPRESA, label: empresaEncontrada.NOFANTASIA } : null
-            // )
-            // setRazaoSocial(dadosDetalheAdiantamento[0]?.RAZAOSOCIALFATURAMENTO);
+            const pagamentoEncontrada = optionsFormaPagamento.find(item => item.value == dadosDetalhePagamento[0]?.FORMAPAGAMENTO)
+            setFormaPagamento(
+                pagamentoEncontrada ? { value: pagamentoEncontrada.value, label: pagamentoEncontrada.label} : null
+            )
+            setAnexoComprovante(dadosDetalhePagamento[0]?.ANEXOCOMPROVANTE)
+            const statusEncontrada = optionsStatus.find(item => item.value == dadosDetalheAdiantamento[0]?.STATUS)
+            setStatusPagamento(statusEncontrada ?? null)
             
-            // setObservacao(dadosDetalheAdiantamento[0]?.DSJUSTIFICATIVA)
-            // const pagamentoEncontrada = optionsFormaPagamento.find(item => item.value == dadosDetalheAdiantamento[0]?.FORMAPAGAMENTO)
-            // setFormaPagamento(
-            //     pagamentoEncontrada ? { value: pagamentoEncontrada.value, label: pagamentoEncontrada.label} : null
-            // )
-          
-            // const statusEncontrada = optionsStatus.find(item => item.value == dadosDetalheAdiantamento[0]?.STATUS)
-            // setStatusPagamento(
-            //     statusEncontrada ? { value: statusEncontrada.STATUS, label: statusEncontrada.STATUS == 'PAGO' ? 'PAGO' : 'REPROVADO FINANCEIRO'} : null
-            // )
         }
-    }, [dadosDetalheAdiantamento])
+    }, [dadosDetalheAdiantamento, dadosDetalhePagamento])
 
        const formatarDataInput = (data) => data ? String(data).substring(0, 10) : '';
 

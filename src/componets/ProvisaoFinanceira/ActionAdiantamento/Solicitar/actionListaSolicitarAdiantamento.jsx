@@ -291,19 +291,19 @@ export const ActionListaAdiantamento = ({
                 </div>
   
                 <div className="p-1">
-                  {row.ANEXOORCAMENTO != null && row.ANEXOORCAMENTO != '' &&  (
-  
-                    <ButtonTable
-                      titleButton={"Anexar Nota Fiscal"}
-                      cor={"warning"}
-                      Icon={FaFileInvoiceDollar}
-                      iconSize={20}
-                      width="35px"
-                      height="35px"
-                      onClickButton={() => handleAnexarComprovante(row.IDADIANTAMENTO)}
-                      // disabledBTN={row.POSSUINOTAFISCAL == 'True'}
-                    />
-                  )}
+                  {row.STATUS !== 'AGUARDANDO FINANCEIRO' &&
+                    row.ANEXOORCAMENTO != null &&
+                    row.ANEXOORCAMENTO != '' && (
+                        <ButtonTable
+                            titleButton={"Anexar Nota Fiscal"}
+                            cor={"warning"}
+                            Icon={FaFileInvoiceDollar}
+                            iconSize={20}
+                            width="35px"
+                            height="35px"
+                            onClickButton={() => handleAnexarComprovante(row.IDADIANTAMENTO)}
+                        />
+                    )}
                 </div>
                 <div className="p-1">
                   {['PAGO', 'COMPROVANTE ANEXADO', 'AGUARDANDO NOTA FISCAL', 'NOTA FISCAL EM ATRASO'].includes(row.STATUS) && (

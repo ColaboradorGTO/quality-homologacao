@@ -27,6 +27,7 @@ export const ActionListaAdiantamento = ({
 }) => {
   const [rowSelection, setRowSelection] = useState(null);
   const [dadosDetalheAdiantamento, setDadosDetalheAdiantamento] = useState([]);
+  const [dadosDetalhePagamento, setDadosDetalhePagamento] = useState([]);
   const [modalEditarVisivel, setModalEditarVisivel] = useState(false);
   const [modalPagamento, setModalPagamento] = useState(false);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
@@ -264,19 +265,19 @@ export const ActionListaAdiantamento = ({
             style={{ justifyContent: "space-between", display: 'flex' }}
           >
             <div className="p-1">
-              {row.STATIVO == 'True' && (
+              {/* {row.STATIVO == 'True' && (
 
-                <ButtonTable
-                  titleButton={"Aprovar Pagamento"}
-                  cor={"success"}
-                  Icon={MdOutlineAttachMoney}
-                  iconSize={30}
-                  width="35px"
-                  height="35px"
-                  onClickButton={() => handleClickAprovar(row)}
-                  disabledBTN={row.STATIVO == 'False' ? true : false}
-                />
-              )}
+              )} */}
+              <ButtonTable
+                titleButton={"Aprovar Pagamento"}
+                cor={"success"}
+                Icon={MdOutlineAttachMoney}
+                iconSize={30}
+                width="35px"
+                height="35px"
+                onClickButton={() => handleClickAprovar(row)}
+                // disabledBTN={row.STATIVO == 'False' ? true : false}
+              />
             </div>
             <div className="p-1">
               <ButtonTable
@@ -320,9 +321,12 @@ export const ActionListaAdiantamento = ({
   const handleAprovar = async (IDADIANTAMENTO) => {
     try {
       const response = await get(`/lista-adiantamento-departamento?idAdiantamento=${IDADIANTAMENTO}`);
+      const responsePagamento = await get(`/pagamento-adiantamento?idAdiantamento=${IDADIANTAMENTO}`);
 
-      if (response.data && response.data.length > 0) {
+      if (response.data && responsePagamento.data &&  response.data.length > 0) {
         setDadosDetalheAdiantamento(response.data);
+        setDadosDetalhePagamento(responsePagamento.data);
+
         setModalPagamento(true);
       } else {
         Swal.fire({
@@ -343,7 +347,7 @@ export const ActionListaAdiantamento = ({
   const handleVisualizar = async (IDADIANTAMENTO) => {
     try {
       const response = await get(`/lista-adiantamento-departamento?idAdiantamento=${IDADIANTAMENTO}`);
-
+    
       if (response.data && response.data.length > 0) {
         setDadosDetalheAdiantamento(response.data);
         setModaDetalhesVisivel(true);
@@ -584,6 +588,7 @@ export const ActionListaAdiantamento = ({
           handleClose={() => setModalPagamento(false)}
           handleClick={handleClick}
           dadosDetalheAdiantamento={dadosDetalheAdiantamento}
+          dadosDetalhePagamento={dadosDetalhePagamento}
           optionsModulos={optionsModulos}
           usuarioLogado={usuarioLogado}
         />

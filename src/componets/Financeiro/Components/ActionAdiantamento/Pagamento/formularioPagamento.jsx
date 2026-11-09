@@ -12,6 +12,7 @@ import { mascaraCNPJ } from "../../../../../utils/mascaraCNPJ";
 export const Formulario = ({
   handleClose,
   dadosDetalheAdiantamento,
+  dadosDetalhePagamento,
   optionsModulos,
   usuarioLogado,
   handleClick
@@ -105,7 +106,7 @@ export const Formulario = ({
     optionsStatus,
     optionsEmpresas,
     onSubmit
-  } = useAutorizarPagamento({ dadosDetalheAdiantamento, optionsModulos, usuarioLogado, handleClick, handleClose });
+  } = useAutorizarPagamento({ dadosDetalheAdiantamento, dadosDetalhePagamento, optionsModulos, usuarioLogado, handleClick, handleClose });
 
   const dadosAdiantamento = dadosDetalheAdiantamento?.[0];
 
