@@ -12,7 +12,6 @@ import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import Swal from "sweetalert2";
 import { MdEdit, MdMoneyOff, MdOutlineAttachMoney } from "react-icons/md";
-import { ActionEditarModal } from "./EditarSolicitacao/actionEditarModal";
 import { get } from "../../../../../api/funcRequest";
 import { ActionPagamentoModal } from "../Pagamento/actionPagamentoModal";
 import { formatarDataParaBR } from "../../../../../utils/dataFormatada";
@@ -574,14 +573,6 @@ export const ActionListaAdiantamento = ({
           </DataTable>
         </div>
 
-        <ActionEditarModal
-          show={modalEditarVisivel}
-          handleClose={() => setModalEditarVisivel(false)}
-          handleClick={handleClick}
-          dadosDetalheAdiantamento={dadosDetalheAdiantamento}
-          optionsModulos={optionsModulos}
-          usuarioLogado={usuarioLogado}
-        />
 
         <ActionPagamentoModal
           show={modalPagamento}

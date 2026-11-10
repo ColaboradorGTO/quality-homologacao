@@ -4,7 +4,6 @@ import { InputField } from "../../../../Buttons/Input"
 import { ButtonType } from "../../../../Buttons/ButtonType"
 import { InputSelectAction } from "../../../../Inputs/InputSelectAction"
 import { AiOutlineSearch } from "react-icons/ai"
-import { ActionCadastrarModal } from "../Solicitar/CadastrarSolicitacao/actionCadastrarModal"
 import { ActionListaAdiantamento } from "./actionListaAdiantamento"
 import { Departamentos } from "../../../../../../parceiro.json";
 import { Cards } from "../Cards/card"
@@ -189,11 +188,7 @@ export const ActionPesquisaAdiantamento = ({ usuarioLogado, ID }) => {
         corSearch={"primary"}
         IconSearch={AiOutlineSearch}
 
-      // ButtonTypeCadastro={ButtonType}
-      // linkNome={"Cadastrar"}
-      // corCadastro={"success"}
-      // onButtonClickCadastro={handleShowModal}
-      // IconCadastro={IoMdAdd}
+  
       />
       <Cards
         dados={dadosAdiantamentos}
@@ -207,13 +202,6 @@ export const ActionPesquisaAdiantamento = ({ usuarioLogado, ID }) => {
         optionsModulos={optionsModulos}
         usuarioLogado={usuarioLogado}
         handleClick={handleClick}
-      />
-
-      <ActionCadastrarModal
-        show={modal}
-        handleClose={() => setModal(false)}
-        optionsModulos={optionsModulos}
-        usuarioLogado={usuarioLogado}
       />
 
     </Fragment>
