@@ -3,7 +3,6 @@ import { Modal } from "react-bootstrap"
 import { HeaderModal } from "../../../../Modais/HeaderModal/HeaderModal"
 import { FormularioEditar } from "./formularioEditar"
 
-
 export const ActionEditarPerfilModal = ({ show, handleClose, dadosEditarPermissao, handleClick, usuarioLogado }) => {
   return (
     <Fragment>

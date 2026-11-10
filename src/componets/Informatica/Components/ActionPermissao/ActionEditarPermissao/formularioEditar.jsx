@@ -2,14 +2,12 @@ import { Fragment } from "react"
 import { ButtonTypeModal } from "../../../../Buttons/ButtonTypeModal"
 import { FooterModal } from "../../../../Modais/FooterModal/footerModal"
 import { InputFieldModal } from "../../../../Buttons/InputFieldModal"
-//import { useEditarEmpresa } from "../hooks/useEditarEmpresa"
 import { Controller, useForm } from "react-hook-form"
 import { dataFormatada } from "../../../../../utils/dataFormatada"
 import Select from 'react-select';
 import { AlertError } from "../../../../Inputs/alertError"
 import FormField from "../../../../Formularios/FormField";
 import { useEditarPerfilPermissaoUsuario } from "../hooks/useEditarPerfilPermissao"
-//import { schema } from "./schemaValidarEmpresa"
 import parceiro from "./../../../../../../parceiro.json"
 
 
@@ -43,41 +41,6 @@ export const FormularioEditar = ({ handleClose, dadosEditarPermissao, handleClic
     situacao,
     ativo
   } = parceiro
-
- /*  const handleValidatedSubmit = async () => {
-    try {
-      const dadosParaValidar = {
-        situacaoSelecionada: situacao.value,
-        cepSelecionado: cep,
-        enderecoSelecionado: endereco,
-        bairroSelecionado: bairro,
-        cidadeSelecionada: cidade,
-        estadoSelecionado: uf,
-        emailSelecionado: email,
-
-      };
-
-      await schema.validate(dadosParaValidar, { abortEarly: false });
-      onSubmit(dadosParaValidar);
-    } catch (validationError) {
-      console.error('❌ Erro de validação:', validationError);
-
-      clearErrors();
-      if (validationError.inner && validationError.inner.length > 0) {
-        validationError.inner.forEach(error => {
-          if (error.path) {
-            setError(error.path, {
-              type: 'manual',
-              message: error.message
-            });
-          }
-        });
-      }
-      const errorMessages = validationError.errors || [validationError.message];
-      console.log(`Erro de validação:\n${errorMessages.join('\n')}`);
-    }
-  } */
-
 
   return (
     <Fragment>
