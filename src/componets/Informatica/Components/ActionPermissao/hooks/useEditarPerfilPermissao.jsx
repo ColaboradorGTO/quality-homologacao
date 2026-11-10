@@ -70,8 +70,6 @@ export const useEditarPerfilPermissaoUsuario = ({ dadosEditarPermissao, handleCl
 
   }, [])
 
-  console.log(situacaoSelecionada.value == 'ATIVO' ? 'True' : 'False', 'condição')
-  console.log(situacaoSelecionada.value, 'situacaoSelecionada.value ')
   const onSubmitUpdate = async (data) => {
 
     try {
@@ -134,7 +132,6 @@ export const useEditarPerfilPermissaoUsuario = ({ dadosEditarPermissao, handleCl
     if (isSubmitting) return;
 
     setIsSubmitting(true);
-    //console.log(dadosEditarPermissao[0]?.IDPERFIL, 'IDPERFIL');
     try {
       const payload = {
         IDPERFIL: dadosEditarPermissao[0]?.IDPERFIL,
