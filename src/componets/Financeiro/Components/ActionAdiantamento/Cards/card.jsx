@@ -3,13 +3,13 @@ import { FaCheckDouble, FaClock, FaBan, FaMoneyBillWave } from "react-icons/fa6"
 
 const CARDS = [
     { title: 'AGUARDANDO FINANCEIRO', label: 'Aguardando Financeiro', cor: '#886ab5', Icon: FaMoneyBillWave },
-    // { title: 'AUTORIZADO', label: 'Autorizado', cor: '#4de5d5', Icon: FaCheckDouble },
-    { title: 'PAGO', label: 'PAGO', cor: '#4de5d5', Icon: FaCheckDouble },
-    { title: 'AGUARDANDO COMPROVANTE', label: 'Aguardando comprovante', cor: '#ffc241', Icon: FaClock },
+    { title: 'AUTORIZADO', label: 'Autorizado', cor: '#4de5d5', Icon: FaCheckDouble },
+    { title: 'PAGO', label: 'PAGO', cor: '#4de5d5', Icon: FaCheckDouble, campo: 'STATUSPAGAMENTO' },
+    { title: 'PENDENTE', label: 'Aguardando comprovante', cor: '#ffc241', Icon: FaClock, campo: 'STATUSPAGAMENTO' },
+    { title: 'REPROVADO', label: 'Pagamento Recusado', cor: 'black', Icon: FaMoneyBillWave, campo: 'STATUSPAGAMENTO' },
     { title: 'COMPROVANTE ANEXADO', label: 'Comprovante Anexado', cor: 'blue', Icon: FaClock },
     // { title: 'PAGO', label: 'Pago', cor: '#fd3995', Icon: FaBan },
     { title: 'AGUARDANDO NOTA FISCAL', label: 'Aguardando Nota Fiscal', cor: '#567ebb', Icon: FaMoneyBillWave },
-    { title: 'PAGAMENTO RECUSADO', label: 'Pagamento Recusado', cor: 'black', Icon: FaMoneyBillWave },
     { title: 'NOTA FISCAL EM ATRASO', label: 'Nota Fiscal Em Atraso', cor: '#FB0C06', Icon: FaMoneyBillWave },
 ]
 
@@ -17,11 +17,13 @@ const resumirPorStatus = (dados) => {
     const resumo = {}
     CARDS.forEach(c => { resumo[c.title] = { total: 0, departamentos: {} } })
     dados.forEach(item => {
-        const r = resumo[item.STATUS]
-        if (!r) return
-        r.total++
         const dep = item.DEPARTAMENTO || 'Sem departamento'
-        r.departamentos[dep] = (r.departamentos[dep] || 0) + 1
+        CARDS.forEach(({ title, campo = 'STATUS' }) => {
+            if (item[campo] !== title) return
+            const r = resumo[title]
+            r.total++
+            r.departamentos[dep] = (r.departamentos[dep] || 0) + 1
+        })
     })
     return resumo
 }

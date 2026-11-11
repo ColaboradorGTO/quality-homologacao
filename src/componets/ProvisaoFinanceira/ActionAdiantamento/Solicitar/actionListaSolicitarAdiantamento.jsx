@@ -188,7 +188,8 @@ export const ActionListaAdiantamento = ({
       STATIVO: item.STATIVO,
       NOMESOLICITANTE: item.NOMESOLICITANTE,
       DSJUSTIFICATIVAPAGAMENTO: item.DSJUSTIFICATIVAPAGAMENTO,
-      ANEXOCOMPROVANTEPAGAMENTO: item.ANEXOCOMPROVANTEPAGAMENTO
+      ANEXOCOMPROVANTEPAGAMENTO: item.ANEXOCOMPROVANTEPAGAMENTO,
+      DTNASCIMENTOBENEFICIARIO: item.DTNASCIMENTOBENEFICIARIO
     }
   });
 
@@ -596,7 +597,7 @@ export const ActionListaAdiantamento = ({
           header="SOLICITAÇÃO" 
         />
         <Column  
-          colSpan="5" 
+          colSpan="6" 
           headerStyle={{ fontSize: '1rem', textAlign: 'center', justifyContent: 'center', backgroundColor: "#FD1381", color: 'black' }} 
           headerClassName="grupo-meta-geral"
           header="PAGAMENTO" 

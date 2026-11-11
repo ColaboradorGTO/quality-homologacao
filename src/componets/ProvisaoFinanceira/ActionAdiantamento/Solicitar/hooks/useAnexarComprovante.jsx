@@ -122,7 +122,7 @@ export const useAnexarPagamento = ({
         } catch (error) {
             console.error('Erro ao buscar detalhes do adiantamento:', error);
         }
-
+        console.log(detalhe, 'detalhe')
         if (!detalhe) {
             Swal.fire({
                 position: 'center',

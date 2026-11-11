@@ -19,6 +19,7 @@ import { GrDocumentDownload, GrView } from "react-icons/gr";
 import { ActionDetalhesModal } from "./DetalhesSolicitacao/actionDetalhesModal";
 import { IoMdDownload } from "react-icons/io";
 import { BASE_URL } from "../../../../../api/api";
+import { useAutorizar } from "./hooks/useAutorizar";
 
 export const ActionListaAdiantamento = ({
   dadosAdiantamentos,
@@ -36,6 +37,9 @@ export const ActionListaAdiantamento = ({
   const [anexoComprovante, setAnexoComprovante] = useState('')
   const dataTableRef = useRef();
 
+  const {
+    handleAutorizar
+  } =  useAutorizar({optionsModulos, usuarioLogado, handleClick})
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
   };
@@ -178,7 +182,8 @@ export const ActionListaAdiantamento = ({
       FORMAPAGAMENTO: item.FORMAPAGAMENTO,
       STATUSPAGAMENTO: item.STATUSPAGAMENTO,
       NOMESOLICITANTE: item.NOMESOLICITANTE,
-      DSJUSTIFICATIVAPAGAMENTO: item.DSJUSTIFICATIVAPAGAMENTO
+      DSJUSTIFICATIVAPAGAMENTO: item.DSJUSTIFICATIVAPAGAMENTO,
+      STATUSPAGAMENTO: item.STATUSPAGAMENTO
     }
   });
 
@@ -283,19 +288,34 @@ export const ActionListaAdiantamento = ({
     },
     {
       field: 'STATUS',
-      header: 'Status',
+      header: 'Status Solicitação',
       sortable: true,
       body: row => (
         <th style={{
-            color: row.STATUS == 'Autorizado' ? '#1DC9B7' 
-            : row.STATUS == 'aguardando comprovante' ? 'blue' 
+             color: row.STATUS == 'APROVADO' ? '#1DC9B7' 
             : row.STATUS == 'AGUARDANDO FINANCEIRO' ? '#6e4e9e' 
-            : row.STATUS == 'comprovante anexado' ? '#FD1381' 
-            : row.STATUS == 'Aguardando nota fiscal' ? '#ffc241' : row.STATUS == 'Pago' ? '#1DC9B7' : '',
+            : row.STATUS == 'REPROVADO' ? '#FD1381' 
+            : row.STATUS == 'PENDENTE' ? '#ffc241' : row.STATUS == 'PAGO' ? '#1DC9B7'
+            : row.STATUS == 'COMPROVANTE ANEXADO' ? 'blue'
+            : row.STATUS == 'AGUARDANDO NOTA FISCAL' ? '#567ebb'
+            : row.STATUS == 'PAGAMENTO RECUSADO' ? 'black'
+            : row.STATUS == 'NOTA FISCAL EM ATRASO' ? '#FB0C06' :
+            row.STATUS == 'AUTORIZADO' ? '#1DC9B7' : '',
           fontWeight: 800
         }}>
 
           {row.STATUS}
+        </th>
+      ),
+    },
+    {
+      field: 'STATUSPAGAMENTO',
+      header: 'Status Pagamento',
+      sortable: true,
+      body: row => (
+        <th style={{ color: row.STATUSPAGAMENTO == 'False' ? '#FD1381' : 'blue', fontWeight: 800  }}>
+
+          {row.STATUSPAGAMENTO}
         </th>
       ),
     },
@@ -333,6 +353,22 @@ export const ActionListaAdiantamento = ({
                   // disabledBTN={row.STATIVO == 'False' ? true : false}
                 />
               )} 
+            </div>
+            <div className="p-1">
+            
+              {row.STATIVO == 'True' &&
+                (row.ANEXOCOMPROVANTE == '' || row.ANEXOCOMPROVANTE == null) && (
+                    <ButtonTable
+                        titleButton={"Autorizar Pagamento"}
+                        cor={"danger"}
+                        Icon={MdOutlineAttachMoney}
+                        iconSize={30}
+                        width="35px"
+                        height="35px"
+                        onClickButton={() => handleAutorizar(row.IDADIANTAMENTO)}
+                    />
+                )}
+            
             </div>
             <div className="p-1">
               <ButtonTable
@@ -554,7 +590,7 @@ export const ActionListaAdiantamento = ({
           header="SOLICITAÇÃO"
         />
         <Column
-          colSpan="4"
+          colSpan="5"
           headerStyle={{ fontSize: '1rem', textAlign: 'center', justifyContent: 'center', backgroundColor: "#FD1381", color: 'black' }}
           headerClassName="grupo-meta-geral"
           header="PAGAMENTO"
@@ -644,7 +680,14 @@ export const ActionListaAdiantamento = ({
         />
         <Column
           field="STATUS"
-          header="Status"
+          header="Status Solicitação"
+          sortable={true}
+          style={{ color: 'white', backgroundColor: "#FD1381", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
+        />
+
+        <Column
+          field="STATUSPAGAMENTO"
+          header="Status Pagamento"
           sortable={true}
           style={{ color: 'white', backgroundColor: "#FD1381", border: '1px solid #e9e9e9', fontSize: '0.8rem' }}
         />

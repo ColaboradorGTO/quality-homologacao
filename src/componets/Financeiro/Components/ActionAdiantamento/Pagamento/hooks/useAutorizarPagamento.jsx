@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { get, post, postFile } from "../../../../../../api/funcRequest";
+import { get, post, put, postFile } from "../../../../../../api/funcRequest";
 import { BASE_URL } from "../../../../../../api/api";
 import Swal from "sweetalert2";
 import { registrarLogAuditoria } from "../../../../../../services/auditLog";
@@ -282,31 +282,39 @@ export const useAutorizarPagamento = ({
             return;
         }
 
+        const idPagamento = dadosDetalhePagamento?.[0]?.IDPAGAMENTO;
+        const isEdicao = !!idPagamento;
+
         const postData = {
+            ...(isEdicao && { IDPAGAMENTO: idPagamento }),
             IDADIANTAMENTO: dadosDetalheAdiantamento?.[0]?.IDADIANTAMENTO,
             VLPAGAMENTO: parseFloat(valorPagamento),
             DATAPAGAMENTO: dataPagamento,
             FORMAPAGAMENTO: formaPagamento?.value || '',
             ANEXOCOMPROVANTE: anexoComprovante,
             DSOBSERVACAO: observacao,
-            STATUS: statusPagamento?.value,
+            STPAGAMENTO: statusPagamento?.value,
             IDUSUARIOCRIACAO: usuarioLogado?.id
         }
 
         try {
 
-            const response = await post(`/pagamento-departamento`, postData)
+            const response = isEdicao
+                ? await put(`/pagamento-departamento/${idPagamento}`, postData)
+                : await post(`/pagamento-departamento`, postData)
 
             await registrarLogAuditoria({
                 idFuncionario: usuarioLogado.id,
-                pathFuncao: 'FINANCEIRO/REGISTRAR PAGAMENTO ADIANTAMENTO',
+                pathFuncao: isEdicao
+                    ? 'FINANCEIRO/ATUALIZAR PAGAMENTO ADIANTAMENTO'
+                    : 'FINANCEIRO/REGISTRAR PAGAMENTO ADIANTAMENTO',
                 dados: postData
             });
 
             Swal.fire({
                 position: 'center',
                 icon: 'success',
-                title: 'Pagamento registrado com sucesso!',
+                title: isEdicao ? 'Pagamento atualizado com sucesso!' : 'Pagamento registrado com sucesso!',
                 showConfirmButton: false,
                 timer: 5000,
                 customClass: {
@@ -321,7 +329,9 @@ export const useAutorizarPagamento = ({
         } catch (error) {
             const responsePost = await registrarLogAuditoria({
                 idFuncionario: usuarioLogado.id,
-                pathFuncao: 'FINANCEIRO/ERRO AO REGISTRAR PAGAMENTO ADIANTAMENTO',
+                pathFuncao: isEdicao
+                    ? 'FINANCEIRO/ERRO AO ATUALIZAR PAGAMENTO ADIANTAMENTO'
+                    : 'FINANCEIRO/ERRO AO REGISTRAR PAGAMENTO ADIANTAMENTO',
                 dados: postData
             });
 
