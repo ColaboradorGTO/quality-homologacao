@@ -94,7 +94,8 @@ export const useAtualizarMenuFilho = ({
     16: "IDMODULOMALOTE",
     17: "IDMODULORESUMOVENDAS",
     18: "IDPERMISSAO",
-    19: "IDMODULOPROMOCAO"
+    19: "IDMODULOPROMOCAO",
+    20: "IDMODULOPROVISAOFINANCEIRA"
   };
 
   const onSubmit = async () => {
@@ -145,6 +146,7 @@ export const useAtualizarMenuFilho = ({
         IDMODULOPROMOCAO: '',
         IDMODULO: '',
         IDPERMISSAO: '',
+        IDMODULOPROVISAOFINANCEIRA: '',
         IDMENU: moduloSelecionado?.value,
         IDMENUFILHO: idMenu,
         CRIAR: 'True',
@@ -154,7 +156,8 @@ export const useAtualizarMenuFilho = ({
         N2: 'False',
         N3: 'False',
         N4: 'False',
-        IDUSERULTIMAALTERACAO: String(usuarioLogado?.id ?? '')
+        IDUSERULTIMAALTERACAO: String(usuarioLogado?.id ?? ''),
+        STATIVO: 'True'
       };
 
       if (campoModulo) {
