@@ -134,7 +134,8 @@ export const ActionListaAdiantamento = ({
       DTPAGAMENTO: item.DTPAGAMENTO,
       STATIVO: item.STATIVO,
       NOMESOLICITANTE: item.NOMESOLICITANTE,
-      DSJUSTIFICATIVAPAGAMENTO: item.DSJUSTIFICATIVAPAGAMENTO
+      DSJUSTIFICATIVAPAGAMENTO: item.DSJUSTIFICATIVAPAGAMENTO,
+      ANEXOCOMPROVANTEPAGAMENTO: item.ANEXOCOMPROVANTEPAGAMENTO
     }
   });
 
@@ -292,8 +293,8 @@ export const ActionListaAdiantamento = ({
   
                 <div className="p-1">
                   {row.STATUS !== 'AGUARDANDO FINANCEIRO' &&
-                    row.ANEXOORCAMENTO != null &&
-                    row.ANEXOORCAMENTO != '' && (
+                    row.ANEXOCOMPROVANTEPAGAMENTO != null &&
+                    row.ANEXOCOMPROVANTEPAGAMENTO != '' && (
                         <ButtonTable
                             titleButton={"Anexar Nota Fiscal"}
                             cor={"warning"}
