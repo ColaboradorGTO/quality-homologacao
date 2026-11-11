@@ -235,10 +235,13 @@ export const ActionPesquisaCriarAdiantamento = ({ usuarioLogado, ID }) => {
 
       />
       
+      {possuiNotaFiscalEmAtraso && (
+      
         <div className="alert alert-warning" role="alert" style={{fontSize: '15px'}}>
           <h1 style={{fontWeight: 700}}>Atenção!</h1>
             <strong style={{fontSize: '16px'}}>{usuarioLogado?.NOFUNCIONARIO}!</strong> Você não pode solicitar adiantamento, você Possui notas fiscais em atraso, entre em contato com o Gerente do Financeiro Wendel.
         </div>
+      )}
       
       <Cards
         dados={dadosCards}
