@@ -237,6 +237,9 @@ export const ActionPesquisaPerfilPermissao = ({ usuarioLogado }) => {
         btnVisivel={btnVisivel}
         selectedItems={selectedItems}
         setSelectedItems={setSelectedItems}
+        usuarioOrigem={usuarioOrigem}
+        optionsModulos={optionsModulos}
+        handleClick={handleClick}
       />
 
     </Fragment>
