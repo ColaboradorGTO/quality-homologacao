@@ -44,55 +44,108 @@ export const ActionListaAdiantamento = ({
   });
 
   const exportToPDF = () => {
-    const doc = new jsPDF();
-    doc.autoTable({
-      head: [['Nº', 'Departamento', 'CNPJ Faturado', 'Rz. Social', 'Vr.Lançado', 'Decrição', 'Status', 'Possui Nota', 'Orçamento']],
-      body: dados.map(item => [
-        item.contador,
-        item.DEPARTAMENTO,
-        item.CNPJFATURAMENTO,
-        item.RAZAOSOCIALFATURAMENTO,
-        formatMoeda(item.VRSOLICITADO),
-        item.DESCRICAO,
-        item.STATUS,
-        item.POSSUINOTAFISCAL == 'True' ? 'SIM' : 'NÃO',
-        item.ANEXOORCAMENTO ? 'SIM' : 'NÃO'
-      ]),
-      horizontalPageBreak: true,
-      horizontalPageBreakBehaviour: 'immediately'
-    });
-    doc.save('adiantamento_departamento.pdf');
-  };
-
-  const exportToExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(dados.map(item => ({
-      'Nº': item.contador,
-      'Departamento': item.DEPARTAMENTO,
-      'CNPJ Faturado': item.CNPJFATURAMENTO,
-      'Rz. Social': item.RAZAOSOCIALFATURAMENTO,
-      'Vr.Lançado': formatMoeda(item.VRSOLICITADO),
-      'Decrição': item.DESCRICAO,
-      'Status': item.STATUS,
-      'Possui Nota': item.POSSUINOTAFISCAL == 'True' ? 'SIM' : 'NÃO',
-      'Orçamento': item.ANEXOORCAMENTO ? 'SIM' : 'NÃO'
-    })));
-    const workbook = XLSX.utils.book_new();
-    const header = ['Nº', 'Departamento', 'CNPJ Faturado', 'Rz. Social', 'Vr.Lançado', 'Descrição', 'Status', 'Possui Nota', 'Orçamento'];
-    worksheet['!cols'] = [
-      { wpx: 50, caption: 'Nº' },
-      { wpx: 100, caption: 'Departamento' },
-      { wpx: 100, caption: 'CNPJ Faturado' },
-      { wpx: 200, caption: 'Rz. Social' },
-      { wpx: 100, caption: 'Vr.Lançado' },
-      { wpx: 100, caption: 'Descrição' },
-      { wpx: 100, caption: 'Status' },
-      { wpx: 100, caption: 'Possui Nota' },
-      { wpx: 100, caption: 'Orçamento' },
-    ];
-    XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Adiantamento Departamento');
-    XLSX.writeFile(workbook, 'adiantamento_departamento.xlsx');
-  };
+      const doc = new jsPDF();
+      doc.autoTable({
+        head: [[
+          'Nº', 
+          'Dt Solicitação', 
+          'Dt. Pagamento', 
+          'Departamento', 
+          'CNPJ/CPF', 
+          'Rz.Social', 
+          'Vr.Lançado', 
+          'Solicitante', 
+          'Justificativa', 
+          'Possui Orçamento', 
+          'Status',
+          'Possui Nota',
+          'Justificativa',
+          'Status Final'
+        ]],
+        body: dados.map(item => [
+          item.contador,
+          item.DATACRIACAO,
+          item.DTPAGAMENTO,
+          item.DEPARTAMENTO,
+          item.CNPJFATURAMENTO || item.NUCPFBENEFICIARIO,
+          item.RAZAOSOCIALFATURAMENTO || item.NOBENEFICIARIO,
+          item.VRSOLICITADO,
+          item.NOMESOLICITANTE,
+          item.DSJUSTIFICATIVA,
+          item.ANEXOORCAMENTO ? 'SIM' : 'NÃO',
+          item.STATUS, 
+          item.POSSUINOTAFISCAL == 'True' ? 'SIM' : 'NÃO',
+          item.DSJUSTIFICATIVAPAGAMENTO,
+          item.STATIVO == 'False' ? 'FINALIZADO' : 'ABERTO'
+        ]),
+        horizontalPageBreak: true,
+        horizontalPageBreakBehaviour: 'immediately'
+      });
+      doc.save('adiantamento_departamento.pdf');
+    };
+  
+    const exportToExcel = () => {
+      const worksheet = XLSX.utils.json_to_sheet(dados.map(item => ({
+        'Nº': item.contador,
+        'Dt Solicitação': item.DATACRIACAO,
+        'Dt Pagamento': item.DTPAGAMENTO,
+        'Departamento': item.DEPARTAMENTO,
+        'CNPJ/CPF': item.CNPJFATURAMENTO || item.NUCPFBENEFICIARIO,
+        'Rz.Social': item.RAZAOSOCIALFATURAMENTO || item.NOBENEFICIARIO,
+        'Vr.Lançado': item.VRSOLICITADO,
+        'Solicitante': item.NOMESOLICITANTE,
+        'Justificativa': item.DSJUSTIFICATIVA,
+        'Possui Orçamento': item.ANEXOORCAMENTO ? 'SIM' : 'NÃO',
+        'STATUS': [
+          'AGUARDANDO FINANCEIRO',
+          'REPROVADO',
+          'PENDENTE',
+          'COMPROVANTE ANEXADO',
+          'AGUARDANDO NOTA FISCAL',
+          'PAGAMENTO RECUSADO',
+          'NOTA FISCAL EM ATRASO'
+        ].includes(item.STATUS) ? item.STATUS : '',
+        'Possui Nota': item.POSSUINOTAFISCAL == 'True' ? 'SIM' : 'NÃO',
+        'Justificativa': item.DSJUSTIFICATIVAPAGAMENTO,
+        'Status Final': item.STATIVO == 'False' ? 'FINALIZADO' : 'ABERTO'
+      })));
+      const workbook = XLSX.utils.book_new();
+      const header = [
+        'Nº', 
+        'Dt Solicitação', 
+        'Dt. Pagamento', 
+        'Departamento', 
+        'CNPJ/CPF', 
+        'Rz.Social', 
+        'Vr.Lançado', 
+        'Solicitante', 
+        'Justificativa', 
+        'Possui Orçamento', 
+        'Status',
+        'Possui Nota',
+        'Justificativa',
+        'Status Final'
+      ];
+      worksheet['!cols'] = [
+        { wpx: 50, caption: 'Nº' },
+        { wpx: 100, caption: 'Dt Solicitação' },
+        { wpx: 100, caption: 'Dt. Pagamento' },
+        { wpx: 100, caption: 'Departamento' },
+        { wpx: 100, caption: 'CNPJ/CPF' },
+        { wpx: 200, caption: 'Rz. Social' },
+        { wpx: 100, caption: 'Vr.Lançado' },
+        { wpx: 200, caption: 'Solicitante' },
+        { wpx: 100, caption: 'Justificativa' },
+        { wpx: 100, caption: 'Possui Orçamento' },
+        { wpx: 100, caption: 'Status' },
+        { wpx: 100, caption: 'Possui Nota' },
+        { wpx: 100, caption: 'Justificativa' },
+        { wpx: 100, caption: 'Status Final' },
+      ];
+      XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Adiantamento Departamento');
+      XLSX.writeFile(workbook, 'adiantamento_departamento.xlsx');
+    };
 
 
   const dados = dadosAdiantamentos.map((item, index) => {

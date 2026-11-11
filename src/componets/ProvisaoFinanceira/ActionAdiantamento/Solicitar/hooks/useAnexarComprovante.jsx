@@ -74,7 +74,7 @@ export const useAnexarPagamento = ({
         const caminhoArquivo = await uploadAnexoAdiantamento(arquivo);
         setAnexoNotaFiscal(caminhoArquivo);
     }
-    console.log(dadosDetalheAdiantamento[0], 'dados')
+   
     const handleAnexarComprovante = async (IDADIANTAMENTO) => {
         if (optionsModulos[0]?.CRIAR == 'False') {
             Swal.fire({
