@@ -363,6 +363,7 @@ export const useEditarAdiantamento = ({
             UNIDADENEGOCIO: unidadeNegocio,
             CENTROCUSTO: centroCusto,
             DTPAGAMENTO: dtPagamento,
+            STATIVO: 'True',
         }
 
         try {
