@@ -87,7 +87,7 @@ export const ActionPesquisaAdiantamento = ({ usuarioLogado, ID }) => {
   const { data: dadosAdiantamentos = [], error: errorVendasConciliacao, isLoading: isLoadingVendasConciliacao, refetch } = useQuery(
     ['lista-adiantamento-departamento'],
     () => fetchListaVendasConciliacao(),
-    { enabled: false }
+    { enabled: false, staleTime: 60 *60  }
   );
 
   const { data: dadosDashboard = [], refetch: refetchDashboard } = useQuery(
@@ -95,6 +95,15 @@ export const ActionPesquisaAdiantamento = ({ usuarioLogado, ID }) => {
     () => fetchListaVendasConciliacao('', false),
     { enabled: false }
   );
+
+  useEffect(() => {
+    const intervalo = setInterval(() => {
+      refetchDashboard();
+      refetch()
+    }, 60000);
+
+    return () => clearInterval(intervalo);
+  }, [refetchDashboard, refetch]);
 
   const pesquisaPorCard = useRef(false);
 
