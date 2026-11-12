@@ -266,7 +266,7 @@ export const useAutorizarPagamento = ({
 
     const handleExportarOrcamento = () => exportarAnexo(dadosDetalheAdiantamento?.[0]?.ANEXOORCAMENTO);
     const handleExportarNotaFiscal = () => exportarAnexo(dadosDetalheAdiantamento?.[0]?.ANEXONOTAFISCAL);
-
+ 
     const onSubmit = async () => {
         if (optionsModulos[0]?.CRIAR == 'False') {
             Swal.fire({

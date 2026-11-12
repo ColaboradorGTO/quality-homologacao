@@ -12,7 +12,7 @@ export const useAutorizar = ({
 }) => {
    
     const handleAutorizar = async (IDADIANTAMENTO) => {
-        // console.log(IDADIANTAMENTO, 'IDADI')
+  
         if (optionsModulos[0]?.CRIAR == 'False') {
             Swal.fire({
                 position: 'center',

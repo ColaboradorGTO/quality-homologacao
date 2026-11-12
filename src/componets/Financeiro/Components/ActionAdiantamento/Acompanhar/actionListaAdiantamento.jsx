@@ -35,6 +35,7 @@ export const ActionListaAdiantamento = ({
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [modalDetalhesVisivel, setModaDetalhesVisivel] = useState(false);
   const [anexoComprovante, setAnexoComprovante] = useState('')
+  const [anexoNotaFiscal, setAnexoNotaFiscal] = useState('')
   const dataTableRef = useRef();
 
   const {
@@ -395,6 +396,19 @@ export const ActionListaAdiantamento = ({
                 />
               )}
             </div>
+            <div className="p-1">
+              {['PAGO', 'AUTORIZADO', 'COMPROVANTE ANEXADO', 'AGUARDANDO NOTA FISCAL', ].includes(row.STATUS) && (
+                <ButtonTable
+                  titleButton={"Exportar Nota Fiscal"}
+                  cor={"warning"}
+                  Icon={IoMdDownload}
+                  iconSize={20}
+                  width="35px"
+                  height="35px"
+                  onClickButton={() => handleNotaFiscal(row.IDADIANTAMENTO)}
+                />
+              )}
+            </div>
           </div>
         )
 
@@ -497,88 +511,128 @@ export const ActionListaAdiantamento = ({
     }
   };
 
-   async function exportarAnexo(caminhoArquivo) {
-      if (!caminhoArquivo) {
-        Swal.fire({
-          position: 'center',
-          icon: 'info',
-          title: 'Nenhum arquivo anexado.',
-          showConfirmButton: false,
-          timer: 3000,
-          customClass: { container: 'custom-swal' },
-        });
-        return;
-      }
-  
-      const url = caminhoArquivo.startsWith('/files/')
-        ? `${BASE_URL}${caminhoArquivo}`
-        : `${BASE_URL}/download-anexo-adiantamento?path=${encodeURIComponent(caminhoArquivo)}`;
-  
-      try {
-        const response = await fetch(url);
-  
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  
-        const blob = await response.blob();
-        const nomeArquivo = caminhoArquivo.substring(caminhoArquivo.lastIndexOf('/') + 1).replace(/^\d+-/, '');
-  
-        const blobUrl = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = blobUrl;
-        link.download = nomeArquivo;
-        link.click();
-        URL.revokeObjectURL(blobUrl);
-      } catch (error) {
-        console.error('Erro ao baixar anexo:', error);
-        Swal.fire({
-          position: 'center',
-          icon: 'error',
-          title: 'Não foi possível baixar o arquivo. Por favor, tente novamente.',
-          showConfirmButton: false,
-          timer: 3000,
-          customClass: { container: 'custom-swal' },
-        });
-      }
+  async function exportarAnexo(caminhoArquivo) {
+    if (!caminhoArquivo) {
+      Swal.fire({
+        position: 'center',
+        icon: 'info',
+        title: 'Nenhum arquivo anexado.',
+        showConfirmButton: false,
+        timer: 3000,
+        customClass: { container: 'custom-swal' },
+      });
+      return;
     }
-  
-    const handleComprovantePagamento = async (IDADIANTAMENTO) => {
-      try {
-        const response = await get(`/pagamento-adiantamento?idAdiantamento=${IDADIANTAMENTO}`);
-  
-        if (response.data && response.data.length > 0) {
-          setDadosDetalhePagamento(response.data);
-  
-          const pagamentoComAnexo = response.data.find(item => item.ANEXOCOMPROVANTE);
-  
-          if (!pagamentoComAnexo) {
-            Swal.fire({
-              position: 'center',
-              icon: 'info',
-              title: 'Nenhum comprovante de Pagamento anexado para este adiantamento.',
-              showConfirmButton: false,
-              timer: 3000,
-              customClass: { container: 'custom-swal' },
-            });
-            return;
-          }
-  
-          setAnexoComprovante(pagamentoComAnexo.ANEXOCOMPROVANTE);
-          await exportarAnexo(pagamentoComAnexo.ANEXOCOMPROVANTE);
-        } else {
+
+    const url = caminhoArquivo.startsWith('/files/')
+      ? `${BASE_URL}${caminhoArquivo}`
+      : `${BASE_URL}/download-anexo-adiantamento?path=${encodeURIComponent(caminhoArquivo)}`;
+
+    try {
+      const response = await fetch(url);
+
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+      const blob = await response.blob();
+      const nomeArquivo = caminhoArquivo.substring(caminhoArquivo.lastIndexOf('/') + 1).replace(/^\d+-/, '');
+
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = nomeArquivo;
+      link.click();
+      URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error('Erro ao baixar anexo:', error);
+      Swal.fire({
+        position: 'center',
+        icon: 'error',
+        title: 'Não foi possível baixar o arquivo. Por favor, tente novamente.',
+        showConfirmButton: false,
+        timer: 3000,
+        customClass: { container: 'custom-swal' },
+      });
+    }
+  }
+
+
+  const handleComprovantePagamento = async (IDADIANTAMENTO) => {
+    try {
+      const response = await get(`/pagamento-adiantamento?idAdiantamento=${IDADIANTAMENTO}`);
+
+      if (response.data && response.data.length > 0) {
+        setDadosDetalhePagamento(response.data);
+
+        const pagamentoComAnexo = response.data.find(item => item.ANEXOCOMPROVANTE);
+
+        if (!pagamentoComAnexo) {
           Swal.fire({
             position: 'center',
-            icon: 'error',
-            title: 'Comprovante de pagamento não encontrados.',
-            customClass: {
-              container: 'custom-swal',
-            }
+            icon: 'info',
+            title: 'Nenhum comprovante de Pagamento anexado para este adiantamento.',
+            showConfirmButton: false,
+            timer: 3000,
+            customClass: { container: 'custom-swal' },
           });
           return;
         }
-      } catch (error) {
-        console.error('Erro ao buscar detalhe conta bancária: ', error);
+
+        setAnexoComprovante(pagamentoComAnexo.ANEXOCOMPROVANTE);
+        await exportarAnexo(pagamentoComAnexo.ANEXOCOMPROVANTE);
+      } else {
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: 'Comprovante de pagamento não encontrados.',
+          customClass: {
+            container: 'custom-swal',
+          }
+        });
+        return;
       }
-    };
+    } catch (error) {
+      console.error('Erro ao buscar detalhe conta bancária: ', error);
+    }
+  };
+
+  const handleNotaFiscal = async (IDADIANTAMENTO) => {
+    try {
+      const response = await get(`/lista-adiantamento-departamento?idAdiantamento=${IDADIANTAMENTO}`);
+
+      if (response.data && response.data.length > 0) {
+        setDadosDetalhePagamento(response.data);
+
+        const pagamentoComAnexo = response.data.find(item => item.ANEXONOTAFISCAL);
+        console.log(response.data, 'data')
+        if (!pagamentoComAnexo) {
+          Swal.fire({
+            position: 'center',
+            icon: 'info',
+            title: 'Nenhuma Nota Fiscal anexada para este adiantamento.',
+            showConfirmButton: false,
+            timer: 3000,
+            customClass: { container: 'custom-swal' },
+          });
+          return;
+        }
+
+        setAnexoNotaFiscal(pagamentoComAnexo.ANEXONOTAFISCAL);
+        await exportarAnexo(pagamentoComAnexo.ANEXONOTAFISCAL);
+      } else {
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: 'Nota Fiscal não encontrada.',
+          customClass: {
+            container: 'custom-swal',
+          }
+        });
+        return;
+      }
+    } catch (error) {
+      console.error('Erro ao buscar detalhe conta bancária: ', error);
+    }
+  };
 
   const headerGrupo = (
     <ColumnGroup  >
