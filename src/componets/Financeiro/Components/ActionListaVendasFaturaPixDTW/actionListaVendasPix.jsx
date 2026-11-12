@@ -11,13 +11,13 @@ import { ColumnGroup } from "primereact/columngroup";
 import { Row } from "primereact/row";
 import { useHandleDetalhar } from "./hooks/useHandleDetalhar";
 
-export const ActionListaVendasPIX = ({ dadosVendasPix, optionsModulos, usuarioLogado,handleClickVendasPix }) => {
+export const ActionListaVendasPIX = ({ dadosVendasPix, optionsModulos, usuarioLogado, handleClickVendasPix }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
-  const [selectAll, setSelectAll] = useState(false); 
+  const [selectAll, setSelectAll] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
   const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
-  const { handleDetalhar } = useHandleDetalhar({usuarioLogado, optionsModulos, handleClickVendasPix});
+  const { handleDetalhar } = useHandleDetalhar({ usuarioLogado, optionsModulos, handleClickVendasPix });
 
 
   const onGlobalFilterChange = (e) => {
@@ -36,10 +36,10 @@ export const ActionListaVendasPIX = ({ dadosVendasPix, optionsModulos, usuarioLo
       body: dadosListaVendasPix.map(item => [
         item.Numero,
         item.NOFANTASIA,
-        item.IDVENDA, 
-        item.DSTIPOPAGAMENTO, 
-        formatMoeda(item.PIX), 
-        item.DATAVENDA, 
+        item.IDVENDA,
+        item.DSTIPOPAGAMENTO,
+        formatMoeda(item.PIX),
+        item.DATAVENDA,
         item.NUAUTORIZACAO
       ]),
       horizontalPageBreak: true,
@@ -53,15 +53,15 @@ export const ActionListaVendasPIX = ({ dadosVendasPix, optionsModulos, usuarioLo
     const workbook = XLSX.utils.book_new();
     const header = ['Nº', 'Loja', 'Venda', 'Tipo', 'Valor PIX', 'Data Venda', 'Autorização'];
     worksheet['!cols'] = [
-      { wpx: 50, caption: 'Nº' }, 
+      { wpx: 50, caption: 'Nº' },
       { wpx: 200, caption: 'Loja' },
       { wpx: 100, caption: 'Venda' },
       { wpx: 80, caption: 'Tipo' },
       { wpx: 100, caption: 'Valor PIX' },
       { wpx: 100, caption: 'Data Venda' },
       { wpx: 200, caption: 'Autorização' }
-      
-    ]; 
+
+    ];
     XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' });
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Lista de Vendas Por PIX');
     XLSX.writeFile(workbook, 'vendas_pix.xlsx');
@@ -86,6 +86,9 @@ export const ActionListaVendasPIX = ({ dadosVendasPix, optionsModulos, usuarioLo
       DATAVENDA: item.DATAVENDA,
       DATA_COMPENSACAO: item.DATA_COMPENSACAO,
       NUAUTORIZACAO: item.NUAUTORIZACAO,
+      DEST_CNPJ: item.DEST_CNPJ,
+      DEST_CPF: item.DEST_CPF,
+
     }
   }) : [];
 
@@ -110,6 +113,19 @@ export const ActionListaVendasPIX = ({ dadosVendasPix, optionsModulos, usuarioLo
       sortable: true,
     },
     {
+      field: 'DEST_CPF',
+      header: 'CPF',
+      body: row => <th style={{ color: 'blue' }}>{row.DEST_CPF}</th>,
+      sortable: true,
+    },
+    {
+      field: 'DEST_CNPJ',
+      header: 'CNPJ',
+      body: row => <th style={{ color: 'blue' }}>{row.DEST_CNPJ}</th>,
+      sortable: true,
+    },
+
+    {
       field: 'DSTIPOPAGAMENTO',
       header: 'Tipo',
       body: row => <th style={{ color: 'blue' }}>{row.DSTIPOPAGAMENTO}</th>,
@@ -130,7 +146,7 @@ export const ActionListaVendasPIX = ({ dadosVendasPix, optionsModulos, usuarioLo
     {
       field: 'DATA_COMPENSACAO',
       header: 'Data Compensação',
-      body: row => <th style={{ color: 'blue' }}>{row.DATA_COMPENSACAO || 'NÃO INFORMADO' }</th>,
+      body: row => <th style={{ color: 'blue' }}>{row.DATA_COMPENSACAO || 'NÃO INFORMADO'}</th>,
       sortable: true,
     },
     {
@@ -140,7 +156,7 @@ export const ActionListaVendasPIX = ({ dadosVendasPix, optionsModulos, usuarioLo
       sortable: true,
     },
     {
-      field: 'Opcoes', 
+      field: 'Opcoes',
       header: (
         <input
           type="checkbox"
@@ -157,7 +173,7 @@ export const ActionListaVendasPIX = ({ dadosVendasPix, optionsModulos, usuarioLo
             const updatedSelectedIds = e.target.checked
               ? [...selectedIds, rowData.IDVENDA]
               : selectedIds.filter(id => id !== rowData.IDVENDA);
-    
+
             setSelectedIds(updatedSelectedIds);
             setSelectAll(updatedSelectedIds.length === dadosListaVendasPix.length);
           }}
@@ -172,7 +188,7 @@ export const ActionListaVendasPIX = ({ dadosVendasPix, optionsModulos, usuarioLo
   const footerGroup = (
     <ColumnGroup>
       <Row>
-        <Column footer="Total Vendas " colSpan={4} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem', textAlign: 'center' }} />
+        <Column footer="Total Vendas " colSpan={6} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem', textAlign: 'center' }} />
         <Column footer={formatMoeda(calcularTotalValorPix())} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem' }} />
         <Column colSpan={5} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
       </Row>
@@ -184,19 +200,19 @@ export const ActionListaVendasPIX = ({ dadosVendasPix, optionsModulos, usuarioLo
       handleDetalhar(selectedIds, 'True');
     }
   }, [selectedIds]);
-  
+
 
   const handleSelectAll = (isChecked) => {
     setSelectAll(isChecked);
-  
+
     const updatedSelectedIds = isChecked ? dadosListaVendasPix.map(item => item.IDVENDA) : [];
     setSelectedIds(updatedSelectedIds);
-  
+
     if (updatedSelectedIds.length > 0) {
       handleDetalhar(updatedSelectedIds, 'True');
     }
   };
-  
+
 
   return (
 
@@ -240,8 +256,9 @@ export const ActionListaVendasPIX = ({ dadosVendasPix, optionsModulos, usuarioLo
                     footerColumnGroup={footerGroup}
                     showGridlines
                     stripedRows
+                    cellMemo={false}
                     emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
-           
+
                   >
 
                     {colunasVendasPix.map(coluna => (
