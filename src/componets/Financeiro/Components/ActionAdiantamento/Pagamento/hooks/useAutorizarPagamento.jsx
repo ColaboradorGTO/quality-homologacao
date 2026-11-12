@@ -105,7 +105,7 @@ export const useAutorizarPagamento = ({
                 pagamentoEncontrada ? { value: pagamentoEncontrada.value, label: pagamentoEncontrada.label} : null
             )
             setAnexoComprovante(dadosDetalhePagamento[0]?.ANEXOCOMPROVANTE)
-            const statusEncontrada = optionsStatus.find(item => item.value == dadosDetalheAdiantamento[0]?.STATUS)
+            const statusEncontrada = optionsStatus.find(item => item.value == (dadosDetalhePagamento[0]?.STPAGAMENTO || dadosDetalheAdiantamento[0]?.STATUS))
             setStatusPagamento(statusEncontrada ?? null)
             
         }

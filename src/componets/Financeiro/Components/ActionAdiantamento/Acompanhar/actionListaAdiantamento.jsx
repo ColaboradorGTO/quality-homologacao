@@ -383,7 +383,7 @@ export const ActionListaAdiantamento = ({
             </div>
        
             <div className="p-1">
-              {['PAGO', 'COMPROVANTE ANEXADO', 'AGUARDANDO NOTA FISCAL', ].includes(row.STATUS) && (
+              {['PAGO', 'AUTORIZADO', 'COMPROVANTE ANEXADO', 'AGUARDANDO NOTA FISCAL', ].includes(row.STATUS) && (
                 <ButtonTable
                   titleButton={"Exportar Comprovante"}
                   cor={"info"}

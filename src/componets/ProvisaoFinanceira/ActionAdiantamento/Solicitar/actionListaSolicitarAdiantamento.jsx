@@ -201,6 +201,7 @@ export const ActionListaAdiantamento = ({
       sortable: true,
       width: "10%"
     },
+
     {
       field: 'DATACRIACAO',
       header: 'Data Solocitação',
@@ -323,7 +324,19 @@ export const ActionListaAdiantamento = ({
       button: true,
       body: (row) => {
         if(row.STATIVO == 'False') {
-          return <div></div>
+          return (
+            <div>
+              <ButtonTable
+                  titleButton={"Exportar Comprovante"}
+                  cor={"success"}
+                  Icon={IoMdDownload}
+                  iconSize={20}
+                  width="35px"
+                  height="35px"
+                  onClickButton={() => handleComprovantePagamento(row.IDADIANTAMENTO)}
+                />
+            </div>
+          )
         } else {
 
           if(row.STATUS == 'AGUARDANDO FINANCEIRO'){
