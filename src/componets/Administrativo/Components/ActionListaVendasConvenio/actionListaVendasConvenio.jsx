@@ -28,7 +28,7 @@ export const ActionListaVendasConvenio = ({ dadosVendasConvenio }) => {
   const exportToPDF = () => {
     const doc = new jsPDF();
     doc.autoTable({
-      head: [['ID','Loja','Data','CPF', 'Funcionário', 'Vr.Bruto NF', 'Vr.Desconto NF', 'Vr.Líquido NF', 'Vr.Bruto', 'Vr.Desconto', 'Vr.Líquido', 'Vr.Dinheiro', 'Vr.Cartão', 'Vr.POS', 'Vr.Voucher','Vr.Convênio']],
+      head: [['ID', 'Loja', 'Data', 'CPF', 'Funcionário', 'Vr.Bruto NF', 'Vr.Desconto NF', 'Vr.Líquido NF', 'Vr.Bruto', 'Vr.Desconto', 'Vr.Líquido', 'Vr.Dinheiro', 'Vr.Cartão', 'Vr.POS', 'Vr.Voucher', 'Vr.Convênio']],
       body: dadosListaConvenio.map(item => [
         item.contador,
         item.NOFANTASIA,
@@ -57,24 +57,24 @@ export const ActionListaVendasConvenio = ({ dadosVendasConvenio }) => {
   const exportToExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(dadosListaConvenio);
     const workbook = XLSX.utils.book_new();
-    const header = ['ID','Loja','Data','CPF', 'Funcionário', 'Vr.Bruto NF', 'Vr.Desconto NF', 'Vr.Líquido NF', 'Vr.Bruto', 'Vr.Desconto', 'Vr.Líquido', 'Vr.Dinheiro', 'Vr.Cartão', 'Vr.POS', 'Vr.Voucher','Vr.Convênio'];
+    const header = ['ID', 'Loja', 'Data', 'CPF', 'Funcionário', 'Vr.Bruto NF', 'Vr.Desconto NF', 'Vr.Líquido NF', 'Vr.Bruto', 'Vr.Desconto', 'Vr.Líquido', 'Vr.Dinheiro', 'Vr.Cartão', 'Vr.POS', 'Vr.Voucher', 'Vr.Convênio'];
     worksheet['!cols'] = [
-      {wpx: 50, caption: 'Nº'},
-      {wpx: 200, caption: 'Loja'},
-      {wpx: 100, caption: 'Data'},
-      {wpx: 100, caption: 'CPF'},
-      {wpx: 250, caption: 'Funcionário'},
-      {wpx: 100, caption: 'Vr.Bruto NF'},
-      {wpx: 100, caption: 'Vr.Desconto NF'},
-      {wpx: 100, caption: 'Vr.Líquido NF'},
-      {wpx: 100, caption: 'Vr.Bruto'},
-      {wpx: 100, caption: 'Vr.Desconto'},
-      {wpx: 100, caption: 'Vr.Líquido'},
-      {wpx: 100, caption: 'Vr.Dinheiro'},
-      {wpx: 100, caption: 'Vr.Cartão'},
-      {wpx: 100, caption: 'Vr.POS'},
-      {wpx: 100, caption: 'Vr.Voucher'},
-      {wpx: 100, caption: 'Vr.Convênio'}
+      { wpx: 50, caption: 'Nº' },
+      { wpx: 200, caption: 'Loja' },
+      { wpx: 100, caption: 'Data' },
+      { wpx: 100, caption: 'CPF' },
+      { wpx: 250, caption: 'Funcionário' },
+      { wpx: 100, caption: 'Vr.Bruto NF' },
+      { wpx: 100, caption: 'Vr.Desconto NF' },
+      { wpx: 100, caption: 'Vr.Líquido NF' },
+      { wpx: 100, caption: 'Vr.Bruto' },
+      { wpx: 100, caption: 'Vr.Desconto' },
+      { wpx: 100, caption: 'Vr.Líquido' },
+      { wpx: 100, caption: 'Vr.Dinheiro' },
+      { wpx: 100, caption: 'Vr.Cartão' },
+      { wpx: 100, caption: 'Vr.POS' },
+      { wpx: 100, caption: 'Vr.Voucher' },
+      { wpx: 100, caption: 'Vr.Convênio' }
     ];
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Venda Conv Desc Funcionario');
     XLSX.writeFile(workbook, 'vendas_convenio_desconto_funcionario.xlsx');
@@ -83,7 +83,7 @@ export const ActionListaVendasConvenio = ({ dadosVendasConvenio }) => {
   const calcularTotal = (field) => {
     return dadosListaConvenio.reduce((total, item) => total + toFloat(item[field]), 0);
   };
-  
+
   const cacularTotalValorBrutoNF = () => {
     const total = calcularTotal('VPROD');
     return total
@@ -160,7 +160,8 @@ export const ActionListaVendasConvenio = ({ dadosVendasConvenio }) => {
       VRRECVOUCHER: item.VRRECVOUCHER,
       VRRECCONVENIO: item.VRRECCONVENIO,
       NumeroVenda: item.NumeroVenda,
-      
+      DEST_CNPJ: item.DEST_CNPJ,
+
       VRRECCHEQUE: item.VRRECCHEQUE,
     }
   });
@@ -169,139 +170,146 @@ export const ActionListaVendasConvenio = ({ dadosVendasConvenio }) => {
     {
       field: 'contador',
       header: 'ID',
-      body: row => <th style={{ }}> {row.contador} </th>,
+      body: row => <th style={{}}> {row.contador} </th>,
       sortable: true,
     },
     {
       field: 'NOFANTASIA',
       header: 'Loja',
-      body: row => <p style={{fontWeight: '600',  width: '200px', margin: '0px' }}> {row.NOFANTASIA}</p>,
+      body: row => <p style={{ fontWeight: '600', width: '200px', margin: '0px' }}> {row.NOFANTASIA}</p>,
       sortable: true,
     },
-     {
+    {
       field: 'NumeroVenda',
       header: 'N° Venda',
-      body: row => <p style={{fontWeight: '600',  width: '100px', margin: '0px' }}> {row.NumeroVenda}</p>,
+      body: row => <p style={{ fontWeight: '600', width: '100px', margin: '0px' }}> {row.NumeroVenda}</p>,
       sortable: true,
     },
     {
       field: 'DTLANCAMENTO',
       header: 'Data',
-      body: row => <p style={{fontWeight: '600',  width: '150px', margin: '0px' }}> {row.DTLANCAMENTO}</p>,
+      body: row => <p style={{ fontWeight: '600', width: '150px', margin: '0px' }}> {row.DTLANCAMENTO}</p>,
       sortable: true,
     },
     {
       field: 'NUCPF',
       header: 'CPF',
-      body: row => <th style={{ }}> {row.NUCPF}</th>,
+      body: row => <th style={{}}> {row.NUCPF}</th>,
+      sortable: true,
+    },
+    {
+      field: 'DEST_CNPJ',
+      header: 'CNPJ',
+      body: row => <th style={{}}>{row.DEST_CNPJ}</th>,
       sortable: true,
     },
     {
       field: 'NOFUNCIONARIO',
       header: 'Funcionário',
-      body: row => <p style={{fontWeight: '600',  width: '200px', margin: '0px' }}> {row.NOFUNCIONARIO}</p>,
+      body: row => <p style={{ fontWeight: '600', width: '200px', margin: '0px' }}> {row.NOFUNCIONARIO}</p>,
       footer: 'Total Valores',
       sortable: true,
     },
     {
       field: 'VPROD',
       header: 'Vr. Bruto NF',
-      body: row => <th style={{ }}> {formatMoeda(row.VPROD)}</th>,
+      body: row => <th style={{}}> {formatMoeda(row.VPROD)}</th>,
       footer: formatMoeda(cacularTotalValorBrutoNF()),
       sortable: true,
     },
     {
       field: 'VDESC',
       header: 'Vr. Desconto NF',
-      body: row => <th style={{ }}> {formatMoeda(row.VDESC)}</th>,
+      body: row => <th style={{}}> {formatMoeda(row.VDESC)}</th>,
       footer: formatMoeda(cacularTotalValorDescontoNF()),
       sortable: true,
     },
     {
       field: 'VNF',
       header: 'Vr Líquido NF',
-      body: row => <th style={{ }}> {formatMoeda(row.VNF)}</th>,
+      body: row => <th style={{}}> {formatMoeda(row.VNF)}</th>,
       footer: formatMoeda(cacularTotalValorLiquidoNF()),
       sortable: true,
     },
     {
       field: 'VRBRUTO',
       header: 'Vr Bruto',
-      body: row => <th style={{ }}> {formatMoeda(row.VRBRUTO)}</th>,
+      body: row => <th style={{}}> {formatMoeda(row.VRBRUTO)}</th>,
       footer: formatMoeda(cacularTotalValorBruto()),
       sortable: true,
     },
     {
       field: 'VRDESCONTO',
       header: 'Vr Desconto',
-      body: row => <th style={{ }}> {formatMoeda(row.VRDESCONTO)}</th>,
+      body: row => <th style={{}}> {formatMoeda(row.VRDESCONTO)}</th>,
       footer: formatMoeda(cacularTotalValorDesconto()),
       sortable: true,
     },
     {
       field: 'VRLIQUIDO',
       header: 'Vr Líquido',
-      body: row => <th style={{ }}> {formatMoeda(row.VRLIQUIDO)}</th>,
+      body: row => <th style={{}}> {formatMoeda(row.VRLIQUIDO)}</th>,
       footer: formatMoeda(cacularTotalValorLiquido()),
       sortable: true,
     },
     {
       field: 'VRRECDINHEIRO',
       header: 'Vr Dinheiro',
-      body: row => <th style={{ }}> {formatMoeda(row.VRRECDINHEIRO)}</th>,
+      body: row => <th style={{}}> {formatMoeda(row.VRRECDINHEIRO)}</th>,
       footer: formatMoeda(cacularTotalValorRecebidoDinheiro()),
       sortable: true,
     },
     {
       field: 'VRRECCARTAO',
       header: 'Vr Cartão',
-      body: row => <th style={{ }}> {formatMoeda(row.VRRECCARTAO)}</th>,
+      body: row => <th style={{}}> {formatMoeda(row.VRRECCARTAO)}</th>,
       footer: formatMoeda(cacularTotalValorRecebidoCartao()),
       sortable: true,
     },
     {
       field: 'VRRECPOS',
       header: 'Vr POS',
-      body: row => <th style={{ }}> {formatMoeda(row.VRRECPOS)}</th>,
+      body: row => <th style={{}}> {formatMoeda(row.VRRECPOS)}</th>,
       footer: formatMoeda(cacularTotalValorRecebidoPOS()),
       sortable: true,
     },
     {
       field: 'VRRECVOUCHER',
       header: 'Vr Voucher',
-      body: row => <th style={{ }}> {formatMoeda(row.VRRECVOUCHER)}</th>,
+      body: row => <th style={{}}> {formatMoeda(row.VRRECVOUCHER)}</th>,
       footer: formatMoeda(cacularTotalValorRecebidoVoucher()),
       sortable: true,
     },
     {
       field: 'VRRECCONVENIO',
       header: 'Vr Convênio',
-      body: row => <th style={{ }}> {formatMoeda(row.VRRECCONVENIO)}</th>,
+      body: row => <th style={{}}> {formatMoeda(row.VRRECCONVENIO)}</th>,
       footer: formatMoeda(cacularTotalValorRecebidoConvenio()),
       sortable: true,
     },
+
   ]
 
   const footerGroup = (
     <ColumnGroup>
 
-      <Row> 
-        <Column footer="Total Valores" colSpan={6} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem', textAlign: 'center' }} />
-        <Column footer={formatMoeda(cacularTotalValorBrutoNF())}  footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
+      <Row>
+        <Column footer="Total Valores" colSpan={7} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem', textAlign: 'center' }} />
+        <Column footer={formatMoeda(cacularTotalValorBrutoNF())} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
         <Column footer={formatMoeda(cacularTotalValorDescontoNF())} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
-        <Column footer={formatMoeda(cacularTotalValorLiquidoNF())} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} /> 
-        <Column footer={formatMoeda(cacularTotalValorBruto())}   footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}/>
-        <Column footer={formatMoeda(cacularTotalValorDesconto())}   footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}/>
-        <Column footer={formatMoeda(cacularTotalValorLiquido())}   footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}/>
-        <Column footer={formatMoeda(cacularTotalValorRecebidoDinheiro())}   footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}/>
-        <Column footer={formatMoeda(cacularTotalValorRecebidoCartao())}   footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}/>
-        <Column footer={formatMoeda(cacularTotalValorRecebidoPOS())}   footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}/>
-        <Column footer={formatMoeda(cacularTotalValorRecebidoVoucher())}   footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}/>
-        <Column footer={formatMoeda(cacularTotalValorRecebidoConvenio())}   footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }}/>
+        <Column footer={formatMoeda(cacularTotalValorLiquidoNF())} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
+        <Column footer={formatMoeda(cacularTotalValorBruto())} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
+        <Column footer={formatMoeda(cacularTotalValorDesconto())} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
+        <Column footer={formatMoeda(cacularTotalValorLiquido())} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
+        <Column footer={formatMoeda(cacularTotalValorRecebidoDinheiro())} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
+        <Column footer={formatMoeda(cacularTotalValorRecebidoCartao())} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
+        <Column footer={formatMoeda(cacularTotalValorRecebidoPOS())} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
+        <Column footer={formatMoeda(cacularTotalValorRecebidoVoucher())} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
+        <Column footer={formatMoeda(cacularTotalValorRecebidoConvenio())} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
       </Row>
     </ColumnGroup>
   )
- 
+
 
   return (
 

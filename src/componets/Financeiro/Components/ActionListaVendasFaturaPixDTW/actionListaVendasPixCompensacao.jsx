@@ -21,7 +21,7 @@ import { useIntegrarPagamentoPix } from "./hooks/useIntegrarPagamentoPixSAP";
 
 export const ActionListaVendasPIXCompensacao = ({
   dadosVendasPixCompensacao,
-  selectedItems, 
+  selectedItems,
   setSelectedItems,
   usuarioLogado,
   optionsModulos,
@@ -36,17 +36,17 @@ export const ActionListaVendasPIXCompensacao = ({
   const [selectAllChecked, setSelectAllChecked] = useState(false);
   const [rowSelection, setRowSelection] = useState(null);
   const dataTableRef = useRef();
-  
+
   const resetPaginacao = () => {
     setFirst(0);
     setRows(10);
   };
-  
+
   useEffect(() => {
     if (resetPaginacaoKey) resetPaginacao();
   }, [resetPaginacaoKey]);
 
-  const { handleClickIntegrar } = useIntegrarPagamentoPix({optionsModulos, usuarioLogado, handleClickVendasPixCompensacao, setSelectedItems})
+  const { handleClickIntegrar } = useIntegrarPagamentoPix({ optionsModulos, usuarioLogado, handleClickVendasPixCompensacao, setSelectedItems })
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -129,7 +129,7 @@ export const ActionListaVendasPIXCompensacao = ({
     let contador = index + 1;
     var contaDebitoSap = '1.01.01.02.0003';
     var contaCreditoSap = '1.01.01.01.9998';
- 
+
     return {
       Numero: contador,
       NOFANTASIA: item.NOFANTASIA,
@@ -145,11 +145,14 @@ export const ActionListaVendasPIXCompensacao = ({
       STATUS_BLOQUEIO_ATUALIZACAO: item.STATUS_BLOQUEIO_ATUALIZACAO == 'True',
       DOCENTRY_SAP_CONTAS_A_RECEBER_PGTO_PIX: Number(item.DOCENTRY_SAP_CONTAS_A_RECEBER_PGTO_PIX || 0),
       ERROR_LOG_SAP_PIX: item.ERROR_LOG_SAP_PIX || '',
+      DEST_CNPJ: item.DEST_CNPJ,
+      DEST_CPF: item.DEST_CPF,
+
     }
   }) : [];
 
 
-  
+
   const obterStatusIntegracao = (row) => {
     const docEntryContasReceber = row.DOCENTRY_SAP_CONTAS_A_RECEBER_PGTO_PIX;
     const stEmFilaParaIntegracao = row.STATUS_BLOQUEIO_ATUALIZACAO;
@@ -186,7 +189,7 @@ export const ActionListaVendasPIXCompensacao = ({
     }
   };
 
- 
+
   const obterOpcoesDisponiveis = (row) => {
     const docEntryContasReceber = row.DOCENTRY_SAP_CONTAS_A_RECEBER_PGTO_PIX;
     const stEmFilaParaIntegracao = row.STATUS_BLOQUEIO_ATUALIZACAO;
@@ -220,7 +223,7 @@ export const ActionListaVendasPIXCompensacao = ({
 
   const handleClickStatusIntegracao = (row) => {
     const opcoes = obterOpcoesDisponiveis(row);
-    
+
     if (opcoes.tipoStatus === 'info') {
       Swal.fire({
         icon: 'info',
@@ -240,21 +243,21 @@ export const ActionListaVendasPIXCompensacao = ({
 
 
   useEffect(() => {
-    const itensSelecionaveis = dadosListaVendasPix.filter(item => 
+    const itensSelecionaveis = dadosListaVendasPix.filter(item =>
       item.DOCENTRY_SAP_CONTAS_A_RECEBER_PGTO_PIX === 0
     );
 
     const dadosPaginaAtual = dadosListaVendasPix.slice(first, first + rows);
-    const itensSelecionaveisPaginaAtual = dadosPaginaAtual.filter(item => 
+    const itensSelecionaveisPaginaAtual = dadosPaginaAtual.filter(item =>
       item.DOCENTRY_SAP_CONTAS_A_RECEBER_PGTO_PIX === 0
     );
 
-    if(selectedItems.length == 0) {
+    if (selectedItems.length == 0) {
       setSelectAllChecked(false);
     } else if (
-      selectedItems.length === itensSelecionaveis.length || 
-       (selectedItems.length === itensSelecionaveisPaginaAtual.length &&
-        itensSelecionaveisPaginaAtual.length > 0 && 
+      selectedItems.length === itensSelecionaveis.length ||
+      (selectedItems.length === itensSelecionaveisPaginaAtual.length &&
+        itensSelecionaveisPaginaAtual.length > 0 &&
         itensSelecionaveisPaginaAtual.every(item =>
           selectedItems.some(selected => selected.IDVENDAPAGAMENTO === item.IDVENDAPAGAMENTO)
         ))
@@ -274,7 +277,7 @@ export const ActionListaVendasPIXCompensacao = ({
       return;
     }
 
-    const itensSelecionaveis = dadosListaVendasPix.filter(item => 
+    const itensSelecionaveis = dadosListaVendasPix.filter(item =>
       item.DOCENTRY_SAP_CONTAS_A_RECEBER_PGTO_PIX === 0
     );
 
@@ -333,7 +336,7 @@ export const ActionListaVendasPIXCompensacao = ({
           first + rows
         );
 
-        const itensSelecionaveisPaginaAtual = dadosPaginaAtual.filter(item => 
+        const itensSelecionaveisPaginaAtual = dadosPaginaAtual.filter(item =>
           item.DOCENTRY_SAP_CONTAS_A_RECEBER_PGTO_PIX === 0
         );
 
@@ -355,7 +358,7 @@ export const ActionListaVendasPIXCompensacao = ({
       }
     });
   };
-  
+
   const colunasVendasPix = [
     {
       field: 'Selecione',
@@ -369,7 +372,7 @@ export const ActionListaVendasPIXCompensacao = ({
         </div>
       ),
       body: (rowData) => {
-      
+
         if (rowData.DOCENTRY_SAP_CONTAS_A_RECEBER_PGTO_PIX !== 0) {
           return <th></th>;
         }
@@ -393,7 +396,7 @@ export const ActionListaVendasPIXCompensacao = ({
                 }
                 setSelectedItems(_selectedItems);
               }}
-              />
+            />
           </div>
         );
       },
@@ -417,6 +420,21 @@ export const ActionListaVendasPIXCompensacao = ({
       body: row => <th style={{ color: '#212529', width: 100 }}>{row.IDVENDA}</th>,
       sortable: true,
     },
+
+    {
+      field: 'DEST_CPF',
+      header: 'CPF',
+      body: row => <th style={{ color: '#212529', width: 100 }}>{row.DEST_CPF}</th>,
+      sortable: true,
+    },
+    {
+      field: 'DEST_CNPJ',
+      header: 'CNPJ',
+      body: row => <th style={{ color: '#212529', width: 100 }}>{row.DEST_CNPJ}</th>,
+      sortable: true,
+    },
+
+
     {
       field: 'DSTIPOPAGAMENTO',
       header: 'Tipo',
@@ -465,9 +483,9 @@ export const ActionListaVendasPIXCompensacao = ({
       body: (row) => {
         const status = obterStatusIntegracao(row);
         return (
-          <span 
-            className={`${status.cor} fw-900`} 
-            style={{ fontSize: '12px', cursor: 'pointer' }} 
+          <span
+            className={`${status.cor} fw-900`}
+            style={{ fontSize: '12px', cursor: 'pointer' }}
             title={status.titulo}
           >
             <b>{status.texto}</b>
@@ -529,7 +547,7 @@ export const ActionListaVendasPIXCompensacao = ({
   const footerGroup = (
     <ColumnGroup>
       <Row>
-        <Column footer="Total Vendas " colSpan={5} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem', textAlign: 'center' }} />
+        <Column footer="Total Vendas " colSpan={7} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem', textAlign: 'center' }} />
         <Column footer={formatMoeda(calcularTotalValorPix())} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem' }} />
         <Column colSpan={7} footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '0.8rem' }} />
       </Row>

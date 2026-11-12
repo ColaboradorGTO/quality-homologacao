@@ -137,7 +137,9 @@ const fetchListaVendasMarca = async () => {
       />
 
       {tabelaVisivel &&
-        <ActionListaVendasMarca dadosVendasMarca={dadosVendasMarca}/>
+        <ActionListaVendasMarca 
+        dadosVendasMarca={dadosVendasMarca}
+        />
       }
 
     </Fragment>
