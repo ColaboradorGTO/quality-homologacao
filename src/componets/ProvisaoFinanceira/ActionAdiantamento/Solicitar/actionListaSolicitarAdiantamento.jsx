@@ -36,6 +36,7 @@ export const ActionListaAdiantamento = ({
   const [modalEditarVisivel, setModalEditarVisivel] = useState(false);
   const [modalDetalhesVisivel, setModaDetalhesVisivel] = useState(false);
   const [anexoComprovante, setAnexoComprovante] = useState('')
+  const [anexoNotaFiscal, setAnexoNotaFiscal] = useState('')
   const dataTableRef = useRef();
 
   const {
@@ -325,16 +326,32 @@ export const ActionListaAdiantamento = ({
       body: (row) => {
         if(row.STATIVO == 'False') {
           return (
-            <div>
-              <ButtonTable
-                  titleButton={"Exportar Comprovante"}
-                  cor={"success"}
-                  Icon={IoMdDownload}
-                  iconSize={20}
-                  width="35px"
-                  height="35px"
-                  onClickButton={() => handleComprovantePagamento(row.IDADIANTAMENTO)}
-                />
+            <div style={{ justifyContent: "space-between", display: 'flex' }}>
+
+              <div className="p-1">
+                <ButtonTable
+                    titleButton={"Exportar Comprovante"}
+                    cor={"success"}
+                    Icon={IoMdDownload}
+                    iconSize={20}
+                    width="35px"
+                    height="35px"
+                    onClickButton={() => handleComprovantePagamento(row.IDADIANTAMENTO)}
+                  />
+
+              </div>
+              <div className="p-1">
+                  <ButtonTable
+                    titleButton={"Exportar Nota Fiscal"}
+                    cor={"warning"}
+                    Icon={IoMdDownload}
+                    iconSize={20}
+                    width="35px"
+                    height="35px"
+                    onClickButton={() => handleNotaFiscal(row.IDADIANTAMENTO)}
+                  />
+
+              </div>
             </div>
           )
         } else {
@@ -420,7 +437,7 @@ export const ActionListaAdiantamento = ({
       },
     },
   ]
-
+ 
   async function exportarAnexo(caminhoArquivo) {
     if (!caminhoArquivo) {
       Swal.fire({
@@ -493,6 +510,45 @@ export const ActionListaAdiantamento = ({
           position: 'center',
           icon: 'error',
           title: 'Comprovante de pagamento não encontrados.',
+          customClass: {
+            container: 'custom-swal',
+          }
+        });
+        return;
+      }
+    } catch (error) {
+      console.error('Erro ao buscar detalhe conta bancária: ', error);
+    }
+  };
+
+  const handleNotaFiscal = async (IDADIANTAMENTO) => {
+    try {
+      const response = await get(`/lista-adiantamento-departamento?idAdiantamento=${IDADIANTAMENTO}`);
+
+      if (response.data && response.data.length > 0) {
+        setDadosDetalhePagamento(response.data);
+
+        const pagamentoComAnexo = response.data.find(item => item.ANEXONOTAFISCAL);
+        console.log(response.data, 'data')
+        if (!pagamentoComAnexo) {
+          Swal.fire({
+            position: 'center',
+            icon: 'info',
+            title: 'Nenhuma Nota Fiscal anexada para este adiantamento.',
+            showConfirmButton: false,
+            timer: 3000,
+            customClass: { container: 'custom-swal' },
+          });
+          return;
+        }
+
+        setAnexoNotaFiscal(pagamentoComAnexo.ANEXONOTAFISCAL);
+        await exportarAnexo(pagamentoComAnexo.ANEXONOTAFISCAL);
+      } else {
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: 'Nota Fiscal não encontrada.',
           customClass: {
             container: 'custom-swal',
           }

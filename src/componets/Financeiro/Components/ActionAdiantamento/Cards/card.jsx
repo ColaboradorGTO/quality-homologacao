@@ -9,7 +9,7 @@ const CARDS = [
     { title: 'REPROVADO', label: 'Pagamento Recusado', cor: 'black', Icon: FaMoneyBillWave, campo: 'STATUSPAGAMENTO' },
     { title: 'COMPROVANTE ANEXADO', label: 'Comprovante Anexado', cor: 'blue', Icon: FaClock },
     // { title: 'PAGO', label: 'Pago', cor: '#fd3995', Icon: FaBan },
-    { title: 'AGUARDANDO NOTA FISCAL', label: 'Aguardando Nota Fiscal', cor: '#567ebb', Icon: FaMoneyBillWave },
+    { title: 'AGUARDANDO NOTA FISCAL', label: 'Aguardando Nota Fiscal', cor: '#567ebb', Icon: FaMoneyBillWave, inclui: ['COMPROVANTE ANEXADO'] },
     { title: 'NOTA FISCAL EM ATRASO', label: 'Nota Fiscal Em Atraso', cor: '#FB0C06', Icon: FaMoneyBillWave },
 ]
 
@@ -18,8 +18,8 @@ const resumirPorStatus = (dados) => {
     CARDS.forEach(c => { resumo[c.title] = { total: 0, departamentos: {} } })
     dados.forEach(item => {
         const dep = item.DEPARTAMENTO || 'Sem departamento'
-        CARDS.forEach(({ title, campo = 'STATUS' }) => {
-            if (item[campo] !== title) return
+        CARDS.forEach(({ title, campo = 'STATUS', inclui = [] }) => {
+            if (item[campo] !== title && !inclui.includes(item[campo])) return
             const r = resumo[title]
             r.total++
             r.departamentos[dep] = (r.departamentos[dep] || 0) + 1
