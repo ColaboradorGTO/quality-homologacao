@@ -13,14 +13,14 @@ import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import Swal from "sweetalert2";
 
-export const ActionListaVendasVouchers = ({ 
-  dadosVendasClientes, 
+export const ActionListaVendasVouchers = ({
+  dadosVendasClientes,
   tabelaPrincipal,
   setTabelaPrincipal,
   tabelaSecundaria,
   setTabelaSecundaria,
   setBtnVisivel
- }) => {
+}) => {
   const [dadosVisualizarProdutos, setDadosVisualizarProdutos] = useState([])
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [rowSelection, setRowSelection] = useState(null);
@@ -85,7 +85,7 @@ export const ActionListaVendasVouchers = ({
     let diasAposCompra;
     let stCortesia;
     let stDefeito;
-    
+
     // Status da situação da venda
     let situacaoVenda = item.venda.STCANCELADO == 'False' ? 'Ativa' : 'Cancelada';
     let nomeCliente = item.venda.DEST_CPF ? item.venda.DSNOMERAZAOSOCIAL + " " + item.venda.DSAPELIDONOMEFANTASIA : item.venda.DSNOMERAZAOSOCIAL;
@@ -109,6 +109,8 @@ export const ActionListaVendasVouchers = ({
       diasAposCompra: DIFERENCAEMDIAS,
       stCortesia: stCortesia = DIFERENCAEMDIAS <= 32 ? 'Válida' : 'Inválida',
       stDefeito: stDefeito = DIFERENCAEMDIAS <= 90 ? 'Válida' : 'Inválida',
+      DEST_CNPJ: item.venda.DEST_CNPJ,
+      DEST_CPF: item.venda.DEST_CPF,
     }
   });
 
@@ -131,6 +133,19 @@ export const ActionListaVendasVouchers = ({
       body: row => <th >{row.IDVENDA}</th>,
       sortable: true,
     },
+    {
+      field: 'DEST_CPF',
+      header: 'CPF',
+      body: row => <th style={{}}>{row.DEST_CPF}</th>,
+      sortable: true,
+    },
+    {
+      field: 'DEST_CNPJ',
+      header: 'CNPJ',
+      body: row => <th style={{}}>{row.DEST_CNPJ}</th>,
+      sortable: true,
+    },
+
     {
       field: 'DTHORAFECHAMENTO',
       header: 'Data',
@@ -197,14 +212,14 @@ export const ActionListaVendasVouchers = ({
       Swal.fire({
         icon: 'warning',
         title: 'Atenção!',
-        html:'Venda dentro do prazo de troca! Não há necessidade de autorização para efetuar a troca! <br/> Se não for o caso, verifique os dados da venda!',
+        html: 'Venda dentro do prazo de troca! Não há necessidade de autorização para efetuar a troca! <br/> Se não for o caso, verifique os dados da venda!',
         confirmButtonText: 'OK',
         confirmButtonColor: '#886ab5',
         customClass: {
           container: 'custom-swal',
         },
       })
-      return 
+      return
     }
     try {
       const response = await get(`/lista-venda-cliente?idVenda=${IDVENDA}`)
@@ -218,7 +233,7 @@ export const ActionListaVendasVouchers = ({
       console.log(error, "não foi possivel pegar os dados da tabela ")
     }
   }
-  
+
 
   const dadosProdutos = dadosVisualizarProdutos.flatMap((item) => {
     const { venda, detalhe } = item;
@@ -291,7 +306,7 @@ export const ActionListaVendasVouchers = ({
 
   });
 
- const getTituloDinamico = () => {
+  const getTituloDinamico = () => {
     if (!dadosProdutosVenda[0]) return null;
 
     const { IDVENDA, DIFERENCAEMDIAS } = dadosProdutosVenda[0];
@@ -302,7 +317,7 @@ export const ActionListaVendasVouchers = ({
       return (
         <h2>
           <span className="fw-500">
-            <i>  Produtos _ Venda: {IDVENDA}  </i>  &#160;&#160; 
+            <i>  Produtos _ Venda: {IDVENDA}  </i>  &#160;&#160;
             <i className="todosTrocados text-danger h4">Todos os Produtos Desta Venda Já Foram Trocados</i>
           </span>
         </h2>
@@ -311,9 +326,9 @@ export const ActionListaVendasVouchers = ({
       return (
         <h2>
           <span className="fw-500">
-            <i>  Produtos - Venda: {IDVENDA}  </i>  &#160;&#160; 
-            <i 
-              className="text-danger h4" 
+            <i>  Produtos - Venda: {IDVENDA}  </i>  &#160;&#160;
+            <i
+              className="text-danger h4"
               title="Dias Passados Após a Compra"
               onMouseOver={(e) => e.target.title = e.target.textContent}
             >
@@ -446,54 +461,54 @@ export const ActionListaVendasVouchers = ({
           <div className="panel">
             <div className="panel-hdr">
               {getTituloDinamico()}
-          
+
             </div>
-              <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
-                <HeaderTable
-                  globalFilterValue={globalFilterValue}
-                  onGlobalFilterChange={onGlobalFilterChange}
-                  handlePrint={handlePrint}
-                  exportToExcel={exportToExcel}
-                  exportToPDF={exportToPDF}
-                />
+            <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
+              <HeaderTable
+                globalFilterValue={globalFilterValue}
+                onGlobalFilterChange={onGlobalFilterChange}
+                handlePrint={handlePrint}
+                exportToExcel={exportToExcel}
+                exportToPDF={exportToPDF}
+              />
 
-              </div>
-              <div className="card">
+            </div>
+            <div className="card">
 
-                <DataTable
-                  title="Vendas Voucher por Loja"
-                  value={dadosProdutos}
-                  globalFilter={globalFilterValue}
-                  size="small"
-                  selectionMode="single"
-                  selection={rowSelection}
-                  onSelectionChange={(e) => setRowSelection(e.value)}
-                  sortOrder={-1}
-                  rowsPerPageOptions={[5, 10, 20, 50, 100, dadosProdutos.length]}
-                  paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                  currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
-                  filterDisplay="menu"
-                  showGridlines
-                  stripedRows
-                  emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
-                >
-                  {colunasVouchers2.map(coluna => (
-                    <Column
-                      key={coluna.field}
-                      field={coluna.field}
-                      header={coluna.header}
+              <DataTable
+                title="Vendas Voucher por Loja"
+                value={dadosProdutos}
+                globalFilter={globalFilterValue}
+                size="small"
+                selectionMode="single"
+                selection={rowSelection}
+                onSelectionChange={(e) => setRowSelection(e.value)}
+                sortOrder={-1}
+                rowsPerPageOptions={[5, 10, 20, 50, 100, dadosProdutos.length]}
+                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
+                filterDisplay="menu"
+                showGridlines
+                stripedRows
+                emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
+              >
+                {colunasVouchers2.map(coluna => (
+                  <Column
+                    key={coluna.field}
+                    field={coluna.field}
+                    header={coluna.header}
 
-                      body={coluna.body}
-                      footer={coluna.footer}
-                      sortable={coluna.sortable}
-                      headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '1rem' }}
-                      footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem' }}
-                      bodyStyle={{ fontSize: '1rem' }}
+                    body={coluna.body}
+                    footer={coluna.footer}
+                    sortable={coluna.sortable}
+                    headerStyle={{ color: 'white', backgroundColor: "#7a59ad", border: '1px solid #e9e9e9', fontSize: '1rem' }}
+                    footerStyle={{ color: '#212529', backgroundColor: "#e9e9e9", border: '1px solid #ccc', fontSize: '1rem' }}
+                    bodyStyle={{ fontSize: '1rem' }}
 
-                    />
-                  ))}
-                </DataTable>
-              </div>
+                  />
+                ))}
+              </DataTable>
+            </div>
           </div>
         </Fragment>
       )}
