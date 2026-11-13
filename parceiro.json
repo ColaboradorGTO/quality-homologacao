@@ -230,6 +230,11 @@
       "label": "PSF",
       "value": "PSF",
       "id": 15
+    },
+    {
+      "label": "Manutenções",
+      "value": "MANUTENCOES",
+      "id": 15
     }
   ],
   "optionsQuebraDeCaixa": [
