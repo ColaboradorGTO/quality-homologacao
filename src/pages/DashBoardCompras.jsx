@@ -27,6 +27,7 @@ const ActionPesquisaEstilos = lazy(() => import("../componets/Compras/Components
 const ActionPesquisaTiposTecidos = lazy(() => import("../componets/Compras/Components/ActionTipoTecidos/actionPesquisaTipoTecidos").then(module => ({ default: module.ActionPesquisaTiposTecidos })));
 const ActionPesquisaProdutosEntreFiliais = lazy(() => import("../componets/Compras/Components/ProdutosFiliais/actionPesquisaProdutosEntreFiliais").then(module => ({ default: module.ActionPesquisaProdutosEntreFiliais })));
 const ActionPesquisaProdutosPorPedido = lazy(() => import("../componets/Compras/Components/ProdutosPorPedido/actionPesquisaProdutosPedidos").then(module => ({ default: module.ActionPesquisaProdutosPorPedido })));
+const ActionPesquisaProdutoClube = lazy(() => import("../componets/Compras/Components/ProdutoClube/actionPesquisaProdutoClube").then(module => ({ default: module.ActionPesquisaProdutoClube })));
 
 
 export const DashBoardCompras = () => {
@@ -99,8 +100,7 @@ export const DashBoardCompras = () => {
   })).reduce((acc, curr) => {
     return { ...acc, ...curr };
   }, {});
-
-
+  
   let component = null;
 
   switch (componentToShow) {
@@ -162,6 +162,9 @@ export const DashBoardCompras = () => {
       break;
     case "/compras/ActionPesquisaProdutosPorPedido":
       component = <ActionPesquisaProdutosPorPedido />
+      break;
+    case "/compras/ActionPesquisaProdutoPrecoClube":
+      component = <ActionPesquisaProdutoClube usuarioLogado={usuarioLogado} />
       break;
     default:
       component = null;

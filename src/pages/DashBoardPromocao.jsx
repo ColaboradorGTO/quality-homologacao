@@ -10,6 +10,8 @@ import { get } from "../api/funcRequest";
 
 const ActionPesquisaPromocao = lazy(() => import("../componets/Promocao/ActionPromocao/actionPesquisaPromocao").then(module => ({ default: module.ActionPesquisaPromocao })));
 const ActionPesquisaPromocoesAtivas = lazy(() => import("../componets/Promocao/ActionPromocoesAtivas/actionPesquisaPromocoesAtivas").then(module => ({ default: module.ActionPesquisaPromocoesAtivas })));
+const ActionPesquisaProdutoClube = lazy(() => import("../componets/Promocao/ProdutoClube/actionPesquisaProdutoClube").then(module => ({ default: module.ActionPesquisaProdutoClube })));
+
 
 export const DashBoardPromocao = ({ }) => {
   const [resumoVisivel, setResumoVisivel] = useState(false);
@@ -104,6 +106,9 @@ export const DashBoardPromocao = ({ }) => {
       break;
     case "/promocoes/ActionPesquisaPromocoesAtivas":
       component = <ActionPesquisaPromocoesAtivas usuarioLogado={usuarioLogado} ID={ID} />;
+      break;
+    case "/promocoes/ActionPesquisaProdutoPrecoClube":
+      component = <ActionPesquisaProdutoClube usuarioLogado={usuarioLogado} />
       break;
     default:
       component = null;
