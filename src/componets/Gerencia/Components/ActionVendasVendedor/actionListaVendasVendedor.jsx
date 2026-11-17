@@ -74,8 +74,6 @@ export const ActionListaVendasVendedor = ({ dadosVendasVendedor }) => {
       contador,
       NOFANTASIA: item.vendedor.NOFANTASIA,
       VENDEDOR_MATRICULA: item.vendedor.VENDEDOR_MATRICULA,
-      DEST_CNPJ: item.vendedor.DEST_CNPJ,
-      DEST_CPF: item.vendedor.DEST_CPF,
       VENDEDOR_NOME: item.vendedor.VENDEDOR_NOME,
       QTDVENDIDOVENDEDOR: item.totalVendido[0].QTDVENDIDOVENDEDOR,
       TOTALVENDIDOVENDEDOR: item.totalVendido[0].TOTALVENDIDOVENDEDOR,
@@ -85,9 +83,6 @@ export const ActionListaVendasVendedor = ({ dadosVendasVendedor }) => {
 
     }
   });
-
-  console.log(dados, 'cpf ')
-  console.log(dadosVendasVendedor, 'cpf ')
 
   const calcularVendidoVendedor = () => {
     return dados.reduce((total, dados) => total + toFloat(dados.TOTALVENDIDOVENDEDOR), 0);
@@ -127,18 +122,6 @@ export const ActionListaVendasVendedor = ({ dadosVendasVendedor }) => {
       header: 'Nome',
       body: row => <th style={{ color: 'blue', width: '10rem' }}>{row.VENDEDOR_NOME}</th>,
       footer: <p>Total Vendas</p>,
-      sortable: true,
-    },
-    {
-      field: 'DEST_CPF',
-      header: 'CPF',
-      body: row => <th style={{ color: 'blue' }}>{row.DEST_CPF}</th>,
-      sortable: true,
-    },
-    {
-      field: 'DEST_CNPJ',
-      header: 'CNPJ',
-      body: row => <th style={{ color: 'blue' }}>{row.DEST_CNPJ}</th>,
       sortable: true,
     },
     {
