@@ -1,0 +1,477 @@
+import { Fragment } from "react";
+import { HeadTitleComponent } from "../HeadTitle";
+import { ButtonType } from "../Buttons/ButtonType";
+
+
+export const ActionMainProdutoClube = ({
+  title,
+  subTitle,
+  linkComponentAnterior,
+  linkComponent,
+  id,
+
+  InputFieldDTInicioComponent,
+  InputFieldDTFimComponent,
+  InputFieldProdutoOigem,
+  InputFieldProdutoDestino,
+  InputFileProdutoOigem,
+  InputFileProdutoDestino,
+  InputFieldDescription,
+
+  labelInputFieldProdutoOigem,
+  labelInputFieldProdutoDestino,
+  labelInputFileProdutoOigem,
+  labelInputFileProdutoDestino,
+  labelInputDTInicio,
+  labelInputDTFim,
+
+  valueInputFieldProdutoOigem,
+  valueInputFieldProdutoDestino,
+  valueInputFileProdutoOigem,
+  valueInputFileProdutoDestino,
+  valueInputFielDescription,
+  valueInputFieldDTInicio,
+  valueInputFieldDTFim,
+
+  onChangeInputFieldProdutoOigem,
+  onChangeInputFieldProdutoDestino,
+  onChangeInputFileProdutoOigem,
+  onChangeInputFileProdutoDestino,
+  onChangeInputFieldDescription,
+  onChangeInputFieldDTInicio,
+  onChangeInputFieldDTFim,
+
+  InputSelectMarcasComponent,
+  InputSelectEmpresaComponentAync,
+
+  labelSelectMarcas,
+  labelSelectEmpresaAsync,
+  optionsMarcas,
+  optionsEmpresasAsync,
+
+  valueSelectMarca,
+  valueSelectEmpresaAsync,
+
+  onChangeSelectMarcas,
+  onChangeSelectEmpresaAsync,
+
+  acceptFileProdutoOigem,
+  acceptFileProdutoDestino,
+
+  ButtonSearchComponent,
+  ButtonTypeCadastro,
+  ButtonTypeCancelar,
+  ButtonTypePedido,
+  ButtonTypeEstruturaProduto,
+  ButtonTypeTXT,
+  ButtonTypeVisualizarProduto,
+  ButtonTypeProdutoPesquisadoOrigem,
+  ButtonTypeProdutoPesquisadoDestino,
+  ButtonTypeRetornar,
+  ButtonTypeDownload,
+
+  linkNomeSearch,
+  linkNome,
+  linkCancelar,
+  linkPedido,
+  linkEstruturaProduto,
+  linkTXT,
+  linkNomeVisualizarProduto,
+  linkNomeProdutoPesquisadoOrigem,
+  linkNomeProdutoPesquisadoDestino,
+  linkRetornar,
+  linkDownload,
+
+  onButtonClickSearch,
+  onButtonClickCadastro,
+  onButtonClickCancelar,
+  onButtonClickPedido,
+  onButtonClickEstruturaProduto,
+  onButtonClickTXT,
+  onButtonClickVisualizarProduto,
+  onButtonClickProdutoPesquisadoOrigem,
+  onButtonClickProdutoPesquisadoDestino,
+  onButtonClickRetornar,
+  onButtonClickDownload,
+
+  corSearch,
+  corCadastro,
+  corCancelar,
+  corPedido,
+  corEstruturaProduto,
+  corTXT,
+  corVisualizarProduto,
+  corProdutoPesquisadoOrigem,
+  corProdutoPesquisadoDestino,
+  corRetornar,
+  corDownload,
+
+  IconSearch,
+  IconCadastro,
+  IconCancelar,
+  IconPedido,
+  IconEstruturaProduto,
+  IconTXT,
+  IconVisualizarProduto,
+  IconProdutoPesquisadoOrigem,
+  IconProdutoPesquisadoDestino,
+  IconRetornar,
+  IconDownload,
+
+  readOnlyMarcas,
+  readOnlyProdutoOigem,
+  readOnlyProdutoDestino,
+  readOnlyFileProdutoOigem,
+  readOnlyFileProdutoDestino,
+  readOnlyDescription,
+  readOnlyButtonProdutoPesquisadoDestino,
+  readOnlyVisualizarProduto,
+  readOnlyDTInicio,
+  readOnlyDTFim,
+
+  defaultValueSelectMarca,
+
+  tituloPromocao,
+  styleDescription,
+  styleProduto,
+  styleButtonSearch,
+  disabledBTBPedido,
+  disabledBTEstruturaProduto
+}) => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+  }
+  return (
+    <Fragment>
+      <form action="#" onSubmit={handleSubmit}>
+        <HeadTitleComponent
+          tittuloComponent={title}
+          nomeLoja={subTitle}
+          linkComponentAnterior={linkComponentAnterior}
+          linkComponent={linkComponent}
+        />
+        <div className="row">
+          <div className="col-xl-12">
+            <div id="panel-1" className="panel">
+              <div className="panel-container show">
+
+
+                <div className="panel-tag">
+                  <h2>{tituloPromocao}</h2>
+                
+
+      
+
+                   <div className="row mt-3">
+                    <div className="col-sm-6 col-md-6 col-xl-6 ">
+                      {InputFieldDTInicioComponent && (
+                        <InputFieldDTInicioComponent
+                          label={labelInputDTInicio}
+                          type="date"
+                          id={id}
+                          value={valueInputFieldDTInicio}
+                          onChange={onChangeInputFieldDTInicio}
+                          readOnly={readOnlyDTInicio}
+                        />
+                      )}
+                    </div>
+
+                    <div className="col-sm-6 col-md-6 col-xl-6 ">
+                      {InputFieldDTFimComponent && (
+                        <InputFieldDTFimComponent
+                          label={labelInputDTFim}
+                          type="date"
+                          id={id}
+                          value={valueInputFieldDTFim}
+                          onChange={onChangeInputFieldDTFim}
+                          readOnly={readOnlyDTFim}
+                        />
+                      )}
+                    </div>
+                  </div>
+                 
+                  {/* FIM FORNECEDOR */}
+                  {/* <hr style={{ borderColor: 'black', width: '100%', height: '10px' }} /> */}
+                  
+                  <div className="row mt-3" >
+
+                    <div className="col-sm-6 col-md-6 col-xl-6 ">
+
+                      {InputSelectMarcasComponent && (
+                        <InputSelectMarcasComponent
+                          label={labelSelectMarcas}
+                          readOnly={readOnlyMarcas}
+                          id={id}
+                          options={optionsMarcas}
+                          onChange={onChangeSelectMarcas}
+                          value={valueSelectMarca}
+                          defaultValue={defaultValueSelectMarca}
+                          type="select"
+                        />
+                      )}
+
+                
+                    </div>
+
+                    {InputSelectEmpresaComponentAync && (
+                      <InputSelectEmpresaComponentAync
+                      label={labelSelectEmpresaAsync}
+                      // defaultValue={defaultOptionsEmpresasAsync}
+                      value={valueSelectEmpresaAsync}
+                      optionsMultSelect={optionsEmpresasAsync}
+                      onChange={onChangeSelectEmpresaAsync}
+               
+                      isMulti={true}
+                      />
+                    )}
+                     
+                  </div>   
+
+                  <div style={styleProduto}>
+
+                    {/* <hr style={{ borderColor: 'black', width: '100%', height: '10px' }} /> */}
+
+                    {/* INICIO PRODUTO ORIGEM */}
+                      {/* <h2>Produto Origem</h2> */}
+                    <div className="row mt-3">
+
+                      {/* <div className="col-sm-6 col-md-6 col-xl-6 ">
+                        {InputFieldProdutoOigem && (
+                          <InputFieldProdutoOigem
+                            label={labelInputFieldProdutoOigem}
+                            type="text"
+                            value={valueInputFieldProdutoOigem}
+                            onChange={onChangeInputFieldProdutoOigem}
+                            readOnly={readOnlyProdutoOigem}
+                          />
+                        )}
+
+                        {ButtonTypeProdutoPesquisadoOrigem && (
+                          <ButtonTypeProdutoPesquisadoOrigem
+                            textButton={linkNomeProdutoPesquisadoOrigem}
+                            onClickButtonType={onButtonClickProdutoPesquisadoOrigem}
+                            cor={corProdutoPesquisadoOrigem}
+                            tipo="button"
+                            Icon={IconProdutoPesquisadoOrigem}
+                            iconColor="#fff"
+                            iconSize={16}
+                          />
+
+                        )}  
+                      </div> */}
+                      <div className="col-sm-6 col-md-6 col-xl-6">
+
+                        {InputFileProdutoOigem && (
+                          <InputFileProdutoOigem
+                            label={labelInputFileProdutoOigem}
+                            type="file"
+                            accpet={acceptFileProdutoOigem}
+                            value={valueInputFileProdutoOigem}
+                            onChange={onChangeInputFileProdutoOigem}
+                            readOnly={readOnlyFileProdutoOigem}
+                            disabled={readOnlyFileProdutoOigem}
+                          />
+                        )}
+                      </div>
+                      <div className="col-sm-6 col-md-6 col-xl-6">
+                        {ButtonTypeCancelar && (
+                          <ButtonTypeCancelar
+                            textButton={linkCancelar}
+                            onClickButtonType={onButtonClickCancelar}
+                            cor={corCancelar}
+                            tipo="button"
+                            Icon={IconCancelar}
+                            iconColor="#fff"
+                            iconSize={16}
+                          />
+                        )}
+                      </div>
+
+                    </div>
+                    {/* <hr style={{ borderColor: 'black', width: '100%', height: '10px' }} /> */}
+
+                    {/* FIM PRODUTO ORIGEM */}
+
+                    {/* INICIO PRODUTO DESTINO  */}
+                    {/* <h2>Produto Destino</h2> */}
+                    {/* <div className="row mt-3">
+                      <div className="col-sm-6 col-md-6 col-xl-6 ">
+
+                        {InputFieldProdutoDestino && (
+                          <InputFieldProdutoDestino
+                            label={labelInputFieldProdutoDestino}
+                            type="text"
+                            value={valueInputFieldProdutoDestino}
+                            onChange={onChangeInputFieldProdutoDestino}
+                            readOnly={readOnlyProdutoDestino}
+                          />
+                        )}
+
+                        {ButtonTypeProdutoPesquisadoDestino && (
+                          <ButtonTypeProdutoPesquisadoDestino
+                            textButton={linkNomeProdutoPesquisadoDestino}
+                            onClickButtonType={onButtonClickProdutoPesquisadoDestino}
+                            cor={corProdutoPesquisadoDestino}
+                            tipo="button"
+                            Icon={IconProdutoPesquisadoDestino}
+                            iconColor="#fff"
+                            iconSize={16}
+                            disabledBTN={readOnlyButtonProdutoPesquisadoDestino}
+                          />
+                        )}
+
+                    
+                      </div>
+
+                      <div className="col-sm-6 col-md-6 col-xl-6 ">
+                        {InputFileProdutoDestino && (
+                          <InputFileProdutoDestino
+                            label={labelInputFileProdutoDestino}
+                            type="file"
+                            accpet={acceptFileProdutoDestino}
+                            value={valueInputFileProdutoDestino}
+                            onChange={onChangeInputFileProdutoDestino}
+                            readOnly={readOnlyFileProdutoDestino}
+                            disabled={readOnlyFileProdutoDestino}
+                          />
+                        )}
+
+                        {ButtonTypeCadastro && (
+                          <ButtonTypeCadastro
+                            textButton={linkNome}
+                            onClickButtonType={onButtonClickCadastro}
+                            cor={corCadastro}
+                            tipo="button"
+                            Icon={IconCadastro}
+                            iconColor="#fff"
+                            iconSize={16}
+                          />
+                        )} 
+                        
+                      </div>
+
+                    </div> */}
+                    {/* FIM PRODUTO DESTINO */}
+                  </div>
+
+                  <hr style={{ borderColor: 'black', width: '100%', height: '10px' }} />
+
+                  <div className="row mt-3">
+                    <div>
+                      {ButtonTypeVisualizarProduto && (
+                        <ButtonTypeVisualizarProduto
+                          textButton={linkNomeVisualizarProduto}
+                          onClickButtonType={onButtonClickVisualizarProduto}
+                          cor={corVisualizarProduto}
+                          tipo="button"
+                          Icon={IconVisualizarProduto}
+                          iconColor="#fff"
+                          iconSize={25}
+                          disabledBTN={readOnlyVisualizarProduto}
+                        />
+                      )}
+
+                    </div>
+                  
+                  </div>
+                 
+
+{/* <hr style={{ borderColor: 'black', width: '100%', height: '10px' }} /> */}
+
+                  <div className="row" style={{ marginTop: '3rem' }}>
+
+                    {ButtonSearchComponent && (
+                      <ButtonType
+                        textButton={linkNomeSearch}
+                        onClickButtonType={onButtonClickSearch}
+                        cor={corSearch}
+                        tipo="button"
+                        Icon={IconSearch}
+                        iconColor="#fff"
+                        iconSize={25}
+                        disabledBTN={styleButtonSearch}
+                      />
+                    )}             
+
+                    {ButtonTypePedido && (
+                      <ButtonTypePedido
+                        textButton={linkPedido}
+                        onClickButtonType={onButtonClickPedido}
+                        // cor="danger"
+                        cor={corPedido}
+                        tipo="button"
+                        Icon={IconPedido}
+                        iconColor="#fff"
+                        iconSize={25}
+                        disabledBTN={disabledBTBPedido}
+                      />
+                    )}
+
+                    {ButtonTypeEstruturaProduto && (
+                      <ButtonTypeEstruturaProduto
+                        textButton={linkEstruturaProduto}
+                        onClickButtonType={onButtonClickEstruturaProduto}
+                        // cor="danger"
+                        cor={corEstruturaProduto}
+                        tipo="button"
+                        Icon={IconEstruturaProduto}
+                        iconColor="#fff"
+                        iconSize={25}
+                        style={{ color: 'white' }}
+                        disabledBTN={disabledBTEstruturaProduto}
+                      />
+                    )}
+
+                    {ButtonTypeTXT && (
+                      <ButtonTypeTXT
+                        textButton={linkTXT}
+                        onClickButtonType={onButtonClickTXT}
+                        // cor="danger"
+                        cor={corTXT}
+                        tipo="button"
+                        Icon={IconTXT}
+                        iconColor="#000"
+                        iconSize={25}
+                        style={{ color: 'white' }}
+                      />
+                    )}
+
+                    {ButtonTypeRetornar && (
+                      <ButtonTypeRetornar
+                        textButton={linkRetornar}
+                        onClickButtonType={onButtonClickRetornar}
+                        // cor="danger"
+                        cor={corRetornar}
+                        tipo="button"
+                        Icon={IconRetornar}
+                        iconColor="#000"
+                        iconSize={25}
+                        style={{ color: 'white' }}
+                      />
+                    )}
+                   
+                    {ButtonTypeDownload && (
+                      <ButtonTypeDownload
+                        textButton={linkDownload}
+                        onClickButtonType={onButtonClickDownload}
+                        // cor="danger"
+                        cor={corDownload}
+                        tipo="button"
+                        Icon={IconDownload}
+                        iconColor="#fff"
+                        iconSize={25}
+                        style={{ color: 'white' }}
+                      />
+                    )}
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </form>
+    </Fragment>
+  )
+}

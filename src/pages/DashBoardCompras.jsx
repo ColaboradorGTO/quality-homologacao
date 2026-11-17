@@ -99,8 +99,7 @@ export const DashBoardCompras = () => {
   })).reduce((acc, curr) => {
     return { ...acc, ...curr };
   }, {});
-
-
+  
   let component = null;
 
   switch (componentToShow) {
