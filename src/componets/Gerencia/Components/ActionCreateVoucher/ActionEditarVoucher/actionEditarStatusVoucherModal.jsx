@@ -116,15 +116,19 @@ export const ActionEditarStatusVoucherModal = ({ show, handleClose, dadosEditarV
         />
 
         <Modal.Body>
-          {/*        <div className="mb-3">
+          <div className="mb-3">
+            {msgUser !== '' &&
+              (
+                <Message
+                  severity="error"
+                  text={msgUser}
+                >
+                </Message>
+              )
+            }
 
-            <Message
-              severity="error"
-              text={msgUser}
-            >
 
-            </Message>
-          </div> */}
+          </div>
           <form onSubmit={onSubmit}>
 
             <div>
