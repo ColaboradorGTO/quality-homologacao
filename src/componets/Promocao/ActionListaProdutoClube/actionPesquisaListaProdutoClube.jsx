@@ -48,7 +48,7 @@ export const ActionPesquisaListaProdutoClube = ({ usuarioLogado }) => {
     { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
   );
 
-    const { data: optionsMarcas = [], error: errorMarcas, isLoading: isLoadingMarcas, refetch: refetchMarcas } = useQuery(
+  const { data: optionsMarcas = [], error: errorMarcas, isLoading: isLoadingMarcas, refetch: refetchMarcas } = useQuery(
     'marcasLista',
     async () => {
       const response = await get(`/marcasLista`);
@@ -76,28 +76,6 @@ export const ActionPesquisaListaProdutoClube = ({ usuarioLogado }) => {
     }
     refetchMarcas()
   }, [marcaSelecionada, refetchEmpresas]);
-
-
-
-  const handleEmpresaChange = useCallback((selectedOptions) => {
-    const values = selectedOptions.map((option) => option.value);
-    setEmpresaSelecionada(values);
-  }, [setEmpresaSelecionada]);
-
-  const empresasFiltradas = useMemo(() => {
-    const empresasArray = Array.isArray(optionsEmpresas) ? optionsEmpresas : [];
-    if (!marcaSelecionada || marcaSelecionada == "all") return empresasArray;
-    if (Array.isArray(marcaSelecionada)) {
-      return empresasArray.filter(empresa =>
-        marcaSelecionada.includes(empresa.IDGRUPOEMPRESARIAL)
-      );
-    }
-    return empresasArray.filter(empresa => empresa.IDGRUPOEMPRESARIAL === marcaSelecionada);
-  }, [optionsEmpresas, marcaSelecionada, empresaSelecionada, setEmpresaSelecionada]);
-
-  const handleCadastrar = () => {
-    onSubmit();
-  }
 
   const fetchPromocao = async () => {
     const urlBase = `/promocao-produto-clube?dataInicio=${dataInicio}&dataFim=${dataFim}&status=${status}`;
@@ -220,12 +198,41 @@ export const ActionPesquisaListaProdutoClube = ({ usuarioLogado }) => {
         });
 
         const formattedTreeData = Array.from(gruposMap.values());
-        setTreeData(formattedTreeData);
+        setTreeData([
+          { key: 'todas', label: 'Selecionar Todas' },
+          ...formattedTreeData
+        ]);
       }
     }, [optionsMarcas, optionsEmpresasTree]);
 
   const handleTreeSelectMarca = (e) => {
-    const selectedValue = e.value || {};
+    let selectedValue = e.value || {};
+    const todasAntes = Boolean(selectedNodesOrigem?.todas?.checked);
+    const todasAgora = Boolean(selectedValue?.todas?.checked);
+
+    if (todasAgora && !todasAntes) {
+      // Marcou "Selecionar Todas": marca todas as marcas e empresas
+      selectedValue = {};
+      treeData.forEach(node => {
+        selectedValue[node.key] = { checked: true, partialChecked: false };
+        (node.children || []).forEach(child => {
+          selectedValue[child.key] = { checked: true, partialChecked: false };
+        });
+      });
+    } else if (!todasAgora && todasAntes) {
+      // Desmarcou "Selecionar Todas": limpa tudo
+      selectedValue = {};
+    } else if (todasAgora && todasAntes) {
+      // Desmarcou algum item com "Selecionar Todas" marcado: tira o "Selecionar Todas"
+      const todosMarcados = treeData
+        .filter(node => node.key !== 'todas')
+        .every(node => selectedValue[node.key]?.checked);
+      if (!todosMarcados) {
+        selectedValue = { ...selectedValue };
+        delete selectedValue.todas;
+      }
+    }
+
     setSelectedNodesOrigem(selectedValue);
 
     const selectedGrupo = [];
@@ -300,35 +307,6 @@ export const ActionPesquisaListaProdutoClube = ({ usuarioLogado }) => {
             defaultValueStatus={status}
             labelSelectStatus={"Status"}
             onChangeSelectStatus={(e) => setStatus(e.value)}
-    
-            // InputSelectEmpresaComponentAync={MultSelectAction}
-            // labelSelectEmpresaAsync={"Empresa"}
-            // optionsEmpresasAsync={[
-            //   { value: "all", label: "Selecionar Todas" },
-            //   ...empresasFiltradas?.map((empresa) => ({
-            //     value: empresa.IDEMPRESA,
-            //     label: empresa.NOFANTASIA
-            //   }))
-            // ]}
-            // onChangeSelectEmpresaAsync={(selectedOptions) => {
-            //   if (selectedOptions.some((option) => option.value === "all")) {
-    
-            //     const allValues = empresasFiltradas.map((empresa) => empresa.IDEMPRESA);
-            //     setEmpresaSelecionada(allValues);
-            //   } else {
-            //     handleEmpresaChange(selectedOptions);
-            //   }
-            // }}
-            // valueSelectEmpresaAsync={
-            //   empresasFiltradas
-            //     .filter(empresa => Array.isArray(empresaSelecionada) ? empresaSelecionada.includes(empresa.IDEMPRESA) : empresaSelecionada === empresa.IDEMPRESA)
-            //     .map(empresa => ({
-            //       value: empresa.IDEMPRESA,
-            //       label: empresa.NOFANTASIA
-            //     }))
-            // }
-    
-    
     
             ButtonSearchComponent={ButtonType}
             linkNomeSearch={"Pesquisar Produto"}
