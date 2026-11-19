@@ -18,13 +18,12 @@ import { Cards } from "../../../Financeiro/Components/ActionAdiantamento/Cards/c
 import { getDataAtual } from "../../../../utils/dataAtual"
 import { useQuery } from "react-query"
 
-export const ActionPesquisaCriarAdiantamento = ({ usuarioLogado, ID }) => {
+export const ActionPesquisaCriarAdiantamento = ({ usuarioLogado, menuFilhoAtual }) => {
   const [dataPesquisaInicio, setDataPesquisaInicio] = useState('');
   const [dataPesquisaFim, setDataPesquisaFim] = useState('');
   const [empresaSelecionada, setEmpresaSelecionada] = useState('');
   const [statusSelecionado, setStatusSelecionado] = useState('');
   const [departamentoSelecionado, setDepartamentoSelecionado] = useState('')
-  const [menuFilhoAtual, setMenuFilhoAtual] = useState(null);
   const [modal, setModal] = useState(false)
   const [tabelaVisivel, setTabelaVisivel] = useState(false);
 
@@ -35,13 +34,6 @@ export const ActionPesquisaCriarAdiantamento = ({ usuarioLogado, ID }) => {
     // setDataPesquisaFim(dataFinal);
   }, [])
 
-  useEffect(() => {
-    const menuSalvo = localStorage.getItem('menuFilhoSelecionado');
-    if (menuSalvo) {
-      const menuParsed = JSON.parse(menuSalvo);
-      setMenuFilhoAtual(menuParsed);
-    }
-  }, []);
 
   const { data: optionsModulos = [], error: errorModulos, isLoading: isLoadingModulos, refetch: refetchModulos } = useQuery(
     ['menus-usuario-excecao', menuFilhoAtual?.ID],

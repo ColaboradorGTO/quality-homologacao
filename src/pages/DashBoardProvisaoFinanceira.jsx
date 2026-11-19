@@ -17,7 +17,6 @@ export const DashBoardProvisaoFinanceira = () => {
   const selectedModule = JSON.parse(storedModule);
   const [componentToShow, setComponentToShow] = useState("");
   const [menuSelected, setMenuSelected] = useState(null);
-  const navigate = useNavigate();
 
 
   useEffect(() => {
@@ -72,6 +71,11 @@ export const DashBoardProvisaoFinanceira = () => {
     setComponentToShow(componentName);
   }
   
+  
+  const menuFilhoResumo = selectedModule?.menuPai?.menuFilho?.find(
+    menu => menu.URL === "/provisaoFinanceiro/ActionPesquisaCriarAdiantamento"
+  );
+
   const permissaoUsuario = selectedModule.menuPai.menuFilho;
   const {   
     ID, 
@@ -86,7 +90,7 @@ export const DashBoardProvisaoFinanceira = () => {
 
   switch (componentToShow) {
     case "/provisaoFinanceiro/ActionPesquisaCriarAdiantamento":
-      component = <ActionPesquisaCriarAdiantamento usuarioLogado={usuarioLogado} />;
+      component = <ActionPesquisaCriarAdiantamento usuarioLogado={usuarioLogado} menuFilhoAtual={menuFilhoResumo} />;
       break;
     default:
       component = null;
@@ -116,7 +120,7 @@ export const DashBoardProvisaoFinanceira = () => {
                     <div className="panel-container show">
                       <div className="panel-content">
                         <Suspense fallback={<div>Loading...</div>}>
-                        {actionVisivel && !componentToShow && (<ActionPesquisaCriarAdiantamento usuarioLogado={usuarioLogado}  />)}
+                        {actionVisivel && !componentToShow && (<ActionPesquisaCriarAdiantamento usuarioLogado={usuarioLogado} menuFilhoAtual={menuFilhoResumo} />)}
 
                           {componentToShow && component}
                         </Suspense>

@@ -6,10 +6,24 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../Tables/headerTable";
+import { ButtonTable } from "../../ButtonsTabela/ButtonTable";
+import { GrView } from "react-icons/gr";
+import Swal from "sweetalert2";
+import { get } from "../../../api/funcRequest";
+import { MdEdit } from "react-icons/md";
 
 
-export const ActionListaPromocao = ({ dadosListaPromocao, refetchPromocao }) => {
+export const ActionListaPromocao = ({ 
+  dadosPromocao,
+  optionsModulos,
+  usuarioLogado,
+  setActionEditarVisivel,
+  setActionCriarVisivel,
+  setDetalhePromocao 
+}) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
+  // const [detalhePromocao, setDetalhePromocao] = useState([])
+  const [modalVisualizar, setModalVisualizar] = useState(true)
   const dataTableRef = useRef();
 
 
@@ -53,26 +67,26 @@ export const ActionListaPromocao = ({ dadosListaPromocao, refetchPromocao }) => 
 
 
 
-  const dados = dadosListaPromocao.map((item) => {
+  const dados = dadosPromocao?.map((item) => {
 
     return {
-      IDRESUMOPROMO: item.IDRESUMOPROMO,
-      DSPROMO: item.DSPROMO,
+      IDPROMOCAO: item.IDPROMOCAO,
+      DSPROMOCAO: item.DSPROMOCAO,
       STATIVO: item.STATIVO,
     }
   });
 
   const colunasListaPromocao = [
     {
-      field: 'IDRESUMOPROMO',
+      field: 'IDPROMOCAO',
       header: 'ID',
-      body: row => <th style={{ color: 'blue' }} >{row.IDRESUMOPROMO}</th>,
+      body: row => <th style={{ color: 'blue' }} >{row.IDPROMOCAO}</th>,
       sortable: true,
     },
     {
-      field: 'DSPROMO',
+      field: 'DSPROMOCAO',
       header: 'Descrição',
-      body: row => <th style={{ color: 'blue' }} >{row.DSPROMO}</th>,
+      body: row => <th style={{ color: 'blue' }} >{row.DSPROMOCAO}</th>,
       sortable: true,
     },
     {
@@ -80,7 +94,7 @@ export const ActionListaPromocao = ({ dadosListaPromocao, refetchPromocao }) => 
       header: 'Situação',
       body: row => (
         <th style={{ color: row.STATIVO == 'True' ? 'blue' : 'red' }}>
-          {row.STATIVO === 'True' ? 'Ativo' : 'Inativo'}
+          {row.STATIVO === 'True' ? 'Ativa' : 'Inativa'}
         </th>
 
       ),
@@ -89,20 +103,75 @@ export const ActionListaPromocao = ({ dadosListaPromocao, refetchPromocao }) => 
     {
       field: 'Detalhar',
       header: 'Detalhar',
-      body: row => <p style={{ color: 'blue' }} ></p>,
+      body: (row) => {
+        if(row.STATIVO == 'True') {
+          return (
+            <div className="p-1">
+              <ButtonTable
+                titleButton={"Editar Promoção"}
+                cor={"primary"}
+                Icon={MdEdit}
+                iconSize={20}
+                width="35px"
+                height="35px"
+                onClickButton={() => handleClickVisualizar(row)}
+              />
+            </div>
+          )
+        }
+      },
       sortable: true,
     },
   ]
 
-  // DSNOME: "Oculos De Sol HPC143 Acetad Pto/mrm Triton Eyew Un"
-  // IDPRODUTO: "000000112Un"
-  // NUCODBARRAS: "0000000002718"
-  // PRECOCUSTO: "19.00"
-  // PRECOVENDA: "119.9600"
-
-
-  const toast = useRef(null);
-  const fileInputRef = useRef(null);
+   const handleVisualizar = async (IDPROMOCAO) => {
+      try {
+        const response = await get(`/promocao-produto-clube?idPromocao=${IDPROMOCAO}`);
+  
+        if (response.data && response.data.length > 0) {
+          setDetalhePromocao(response.data);
+          setActionEditarVisivel(true);
+          setActionCriarVisivel(false)
+        } else {
+          Swal.fire({
+            position: 'center',
+            icon: 'error',
+            title: 'Detalhes não encontrados.',
+            customClass: {
+              container: 'custom-swal',
+            }
+          });
+          return;
+        }
+      } catch (error) {
+        console.error('Erro ao buscar detalhes: ', error);
+        Swal.fire({
+          icon: 'info',
+          title: 'Não existe dados nesta solicitação'
+        })
+      }
+    };
+    const handleClickVisualizar = (row) => {
+      console.log(row)
+      if (row && row.IDPROMOCAO) {
+        handleVisualizar(row.IDPROMOCAO);
+      }
+      // if (optionsModulos[0]?.ALTERAR == 'True') {
+  
+      // } else {
+      //   // Swal.fire({
+      //   //   position: 'center',
+      //   //   icon: 'error',
+      //   //   title: 'Acesso Negado!',
+      //   //   html: `${usuarioLogado?.NOFUNCIONARIO} <br> Você não tem permissão.`,
+      //   //   showConfirmButton: true,
+      //   //   timer: 30000,
+      //   //   customClass: {
+      //   //     container: 'custom-swal',
+      //   //   }
+      //   // })
+      // }
+    };
 
   return (
     <Fragment>
