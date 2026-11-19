@@ -24,6 +24,7 @@ export const ActionMainProdutoClube = ({
   labelInputFileProdutoDestino,
   labelInputDTInicio,
   labelInputDTFim,
+  labelInputFieldDescription,
 
   valueInputFieldProdutoOigem,
   valueInputFieldProdutoDestino,
@@ -41,19 +42,25 @@ export const ActionMainProdutoClube = ({
   onChangeInputFieldDTInicio,
   onChangeInputFieldDTFim,
 
+  InputSelectStatusComponent,
   InputSelectMarcasComponent,
   InputSelectEmpresaComponentAync,
 
+  labelSelectStatus,
   labelSelectMarcas,
   labelSelectEmpresaAsync,
   optionsMarcas,
   optionsEmpresasAsync,
 
+  valueSelectStatus,
   valueSelectMarca,
   valueSelectEmpresaAsync,
 
+  onChangeSelectStatus,
   onChangeSelectMarcas,
   onChangeSelectEmpresaAsync,
+
+  optionsStatus,
 
   acceptFileProdutoOigem,
   acceptFileProdutoDestino,
@@ -129,7 +136,27 @@ export const ActionMainProdutoClube = ({
   readOnlyDTInicio,
   readOnlyDTFim,
 
+  defaultValueStatus,
   defaultValueSelectMarca,
+
+  MenuTreeSelectOrigemComponent,
+  valueTreeSelectOrigem,
+  onChangeTreeSelectOrigem,
+  optionsTreeSelectOrigem,
+  placeholderTreeSelectOrigem,
+  onNodeTreeSelectOrigem,
+  onNodeTreeUnselectOrigem,
+  labelSelectSubGrupoOrigemAsync,
+
+  
+  MenuTreeSelectDestinoComponent,
+  valueTreeSelectDestino,
+  onChangeTreeSelectDestino,
+  optionsTreeSelectDestino,
+  placeholderTreeSelectDestino,
+  onNodeTreeSelectDestino,
+  onNodeTreeUnselectDestino,
+  labelSelectSubGrupoDestinoAsync,
 
   tituloPromocao,
   styleDescription,
@@ -193,6 +220,55 @@ export const ActionMainProdutoClube = ({
                   {/* FIM FORNECEDOR */}
                   {/* <hr style={{ borderColor: 'black', width: '100%', height: '10px' }} /> */}
                   
+                  <div >
+
+           
+                    <div className="row mt-3 "  >
+
+                      <div className="col-sm-6 col-md-6 col-xl-6">
+                        {MenuTreeSelectOrigemComponent && (
+                          <MenuTreeSelectOrigemComponent
+                            valueMenuSelect={valueTreeSelectOrigem}
+                            onChangeMenuSelect={onChangeTreeSelectOrigem}
+                            optionsMenuSelect={optionsTreeSelectOrigem}
+                            placeholderMenuSelect={placeholderTreeSelectOrigem}
+                            onNodeMenuSelect={onNodeTreeSelectOrigem}
+                            onNodeMenuUnselect={onNodeTreeUnselectOrigem}
+                            label={labelSelectSubGrupoOrigemAsync}
+                          />
+                        )}
+
+                      </div>
+
+                      <div className="col-sm-6 col-md-6 col-xl-6">
+                        {/* {MenuTreeSelectDestinoComponent && (
+                          <MenuTreeSelectDestinoComponent
+                            valueMenuSelect={valueTreeSelectDestino}
+                            onChangeMenuSelect={onChangeTreeSelectDestino}
+                            optionsMenuSelect={optionsTreeSelectDestino}
+                            placeholderMenuSelect={placeholderTreeSelectDestino}
+                            onNodeMenuSelect={onNodeTreeSelectDestino}
+                            onNodeMenuUnselect={onNodeTreeUnselectDestino}
+                            label={labelSelectSubGrupoDestinoAsync}
+                          />
+                        )} */}
+
+                        {InputSelectStatusComponent && (
+                          <InputSelectStatusComponent
+                            label={labelSelectStatus}
+                            // readOnly={readOnlyMarcas}
+                            // id={id}
+                            options={optionsStatus}
+                            onChange={onChangeSelectStatus}
+                            value={valueSelectStatus}
+                            defaultValue={defaultValueStatus}
+                            // type="select"
+                          />
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="row mt-3" >
 
                     <div className="col-sm-6 col-md-6 col-xl-6 ">
@@ -227,6 +303,22 @@ export const ActionMainProdutoClube = ({
                      
                   </div>   
 
+                  <div className="row mt-5">
+                    <div className="col-sm-6 col-md-12 col-xl-12 ">
+                      {InputFieldDescription && (
+                        <InputFieldDescription
+                          label={labelInputFieldDescription}
+                          type="text"
+                          value={valueInputFielDescription}
+                          onChange={onChangeInputFieldDescription}
+                          readOnly={readOnlyDescription}
+                          style={styleDescription}
+                        />
+                      )}
+
+                    </div>
+                  </div>
+
                   <div style={styleProduto}>
 
                     {/* <hr style={{ borderColor: 'black', width: '100%', height: '10px' }} /> */}
@@ -235,30 +327,6 @@ export const ActionMainProdutoClube = ({
                       {/* <h2>Produto Origem</h2> */}
                     <div className="row mt-3">
 
-                      {/* <div className="col-sm-6 col-md-6 col-xl-6 ">
-                        {InputFieldProdutoOigem && (
-                          <InputFieldProdutoOigem
-                            label={labelInputFieldProdutoOigem}
-                            type="text"
-                            value={valueInputFieldProdutoOigem}
-                            onChange={onChangeInputFieldProdutoOigem}
-                            readOnly={readOnlyProdutoOigem}
-                          />
-                        )}
-
-                        {ButtonTypeProdutoPesquisadoOrigem && (
-                          <ButtonTypeProdutoPesquisadoOrigem
-                            textButton={linkNomeProdutoPesquisadoOrigem}
-                            onClickButtonType={onButtonClickProdutoPesquisadoOrigem}
-                            cor={corProdutoPesquisadoOrigem}
-                            tipo="button"
-                            Icon={IconProdutoPesquisadoOrigem}
-                            iconColor="#fff"
-                            iconSize={16}
-                          />
-
-                        )}  
-                      </div> */}
                       <div className="col-sm-6 col-md-6 col-xl-6">
 
                         {InputFileProdutoOigem && (
@@ -354,7 +422,7 @@ export const ActionMainProdutoClube = ({
                     {/* FIM PRODUTO DESTINO */}
                   </div>
 
-                  <hr style={{ borderColor: 'black', width: '100%', height: '10px' }} />
+                  {/* <hr style={{ borderColor: 'black', width: '100%', height: '10px' }} /> */}
 
                   <div className="row mt-3">
                     <div>
@@ -388,7 +456,7 @@ export const ActionMainProdutoClube = ({
                         tipo="button"
                         Icon={IconSearch}
                         iconColor="#fff"
-                        iconSize={25}
+                        iconSize={16}
                         disabledBTN={styleButtonSearch}
                       />
                     )}             
@@ -402,7 +470,7 @@ export const ActionMainProdutoClube = ({
                         tipo="button"
                         Icon={IconPedido}
                         iconColor="#fff"
-                        iconSize={25}
+                        iconSize={16}
                         disabledBTN={disabledBTBPedido}
                       />
                     )}
@@ -416,7 +484,7 @@ export const ActionMainProdutoClube = ({
                         tipo="button"
                         Icon={IconEstruturaProduto}
                         iconColor="#fff"
-                        iconSize={25}
+                        iconSize={16}
                         style={{ color: 'white' }}
                         disabledBTN={disabledBTEstruturaProduto}
                       />
@@ -431,7 +499,7 @@ export const ActionMainProdutoClube = ({
                         tipo="button"
                         Icon={IconTXT}
                         iconColor="#000"
-                        iconSize={25}
+                        iconSize={16}
                         style={{ color: 'white' }}
                       />
                     )}
@@ -445,7 +513,7 @@ export const ActionMainProdutoClube = ({
                         tipo="button"
                         Icon={IconRetornar}
                         iconColor="#000"
-                        iconSize={25}
+                        iconSize={16}
                         style={{ color: 'white' }}
                       />
                     )}
@@ -459,7 +527,7 @@ export const ActionMainProdutoClube = ({
                         tipo="button"
                         Icon={IconDownload}
                         iconColor="#fff"
-                        iconSize={25}
+                        iconSize={16}
                         style={{ color: 'white' }}
                       />
                     )}

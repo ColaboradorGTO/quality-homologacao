@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react"
-import { get, post, put } from "../../../../api/funcRequest"
+import { get, post } from "../../../../api/funcRequest"
 import { useQuery } from "react-query"
 import Swal from "sweetalert2"
 import { getDataAtual } from "../../../../utils/dataAtual"
@@ -9,7 +9,6 @@ import { saveAs } from "file-saver";
 import { registrarLogAuditoria } from "../../../../services/auditLog"
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento"
 const LIMITE_MAXIMO_PRODUTOS = 30000;
-const TAMANHO_LOTE_PRODUTOS = 1000;
 const TAMANHO_LOTE_CONSULTA_PRODUTOS = 10;
 
 // Converte o preço vindo da planilha (número, "10,50", "1.234,56", "R$ 10,50") em número
@@ -23,25 +22,15 @@ const parsePreco = (valor) => {
 };
 
 export const useCreateProdutoClube = ({ usuarioLogado, optionsModulos }) => {
-  const [grupoSelecionadoOrigem, setGrupoSelecionadoOrigem] = useState(-1)
   const [marcaSelecionada, setMarcaSelecionada] = useState(-1)
   const [empresaSelecionada, setEmpresaSelecionada] = useState([])
   const [dataInicio, setDataInicio] = useState('')
   const [dataFim, setDataFim] = useState('')
   const [produtoOrigem, setProdutoOrigem] = useState('')
   const [fileProdutoOrigem, setFileProdutoOrigem] = useState([])
-  const [produtoDestino, setProdutoDestino] = useState('')
-  const [fileProdutoDestino, setFileProdutoDestino] = useState([])
-  const [produtoDestinoSelecionado, setProdutoDestinoSelecionado] = useState([]);
-  const [produtoOrigemSelecionado, setProdutoOrigemSelecionado] = useState([]);
-  const [novoProdutoDestino, setNovoProdutoDestino] = useState([]);
-  const [novoProdutoOrigem, setNovoProdutoOrigem] = useState([]);
-  const [modalProdutoOrigem, setModalProdutoOrigem] = useState(false);
   const [modalPodutoSelecionadoOrigem, setModalPodutoSelecionadoOrigem] = useState(false);
-  const [produtoSelecionadoEstProdDestino, setProdutoSelecionadoEstProdutoDestino] = useState([]);
-  const [produtoSelecionadoEstProdOrigem, setProdutoSelecionadoEstProdutoOrigem] = useState([]);
   const [produtosOrigemDetalhados, setProdutosOrigemDetalhados] = useState([]);
-
+  const [descricao, setDescricao] = useState('')
 
 
   useEffect(() => {
@@ -184,11 +173,9 @@ export const useCreateProdutoClube = ({ usuarioLogado, optionsModulos }) => {
     // Limpa o estado do arquivo
     if (isOrigem) {
       setFileProdutoOrigem([]);
-      setProdutoSelecionadoEstProdutoOrigem([])
       setProdutosOrigemDetalhados([])
     } else {
-      setFileProdutoDestino([]);
-      setProdutoSelecionadoEstProdutoDestino([])
+      setProdutosOrigemDetalhados([])
     }
 
     // Limpa o input file se existir
@@ -231,11 +218,9 @@ export const useCreateProdutoClube = ({ usuarioLogado, optionsModulos }) => {
 
       if (isOrigem) {
         setFileProdutoOrigem(JSON.stringify(data));
-        setProdutoSelecionadoEstProdutoOrigem(JSON.stringify(data))
         setProdutosOrigemDetalhados([])
       } else {
-        setFileProdutoDestino(JSON.stringify(data));
-        setProdutoSelecionadoEstProdutoDestino(JSON.stringify(data))
+        setProdutosOrigemDetalhados(JSON.stringify(data));
       }
 
     } catch (error) {
@@ -444,9 +429,9 @@ export const useCreateProdutoClube = ({ usuarioLogado, optionsModulos }) => {
       itens = [...itens, { IDPRODUTO: produtoOrigem, PRECO_VENDA: null }];
     }
     // Produtos selecionados via checkbox
-    if (novoProdutoOrigem && novoProdutoOrigem.length > 0) {
-      itens = [...itens, ...novoProdutoOrigem];
-    }
+    // if (novoProdutoOrigem && novoProdutoOrigem.length > 0) {
+    //   itens = [...itens, ...novoProdutoOrigem];
+    // }
 
     // Normaliza para objeto e remove duplicados pelo IDPRODUTO (mantém o primeiro preço encontrado)
     const mapaProdutos = new Map();
@@ -514,7 +499,7 @@ export const useCreateProdutoClube = ({ usuarioLogado, optionsModulos }) => {
         customClass: { container: 'custom-swal' },
       });
     }
-  }, [fileProdutoOrigem, produtoOrigem, novoProdutoOrigem, empresaSelecionada]);
+  }, [fileProdutoOrigem, empresaSelecionada]);
 
   const handleRemoverProdutoOrigem = (row) => {
     const idRemover = String(row.IDPRODUTO);
@@ -546,25 +531,19 @@ export const useCreateProdutoClube = ({ usuarioLogado, optionsModulos }) => {
   };
 
 
-
-
-  // Busca TODOS os registros já cadastrados em PRODUTOPRECOCLUBE para uma empresa (paginado)
-  const buscarProdutosClubeExistentes = async (idEmpresa) => {
-    const urlApi = `/produto-preco-clube?idEmpresa=${idEmpresa}`;
-    const primeiraResposta = await get(`${urlApi}&page=1`);
-    const pageSize = primeiraResposta?.pageSize || 1000;
-    const totalRows = primeiraResposta?.rows || primeiraResposta?.data?.length || 0;
-    const totalPages = Math.ceil(totalRows / pageSize);
-
-    const allData = [...(primeiraResposta?.data || [])];
-    for (let page = 2; page <= totalPages; page++) {
-      const responsePage = await get(`${urlApi}&page=${page}`);
-      allData.push(...(responsePage?.data || []));
-    }
-    return allData;
-  };
-
   const onSubmit = async () => {
+    if(optionsModulos[0]?.CRIAR !== 'True') {
+      Swal.fire({
+        icon: 'info',
+        title: 'Acesso Negado!',
+        html: `${usuarioLogado?.NOFUNCIONARIO} <br/> Você não tem permissão para cadastrar!`,
+        timer: 5000,
+        customClass: {
+          container: 'custom-swal',
+        },
+      })
+      return;
+    }
     try {
       if (!empresaSelecionada || empresaSelecionada.length == 0) {
         Swal.fire({
@@ -616,28 +595,34 @@ export const useCreateProdutoClube = ({ usuarioLogado, optionsModulos }) => {
       const idsEmpresas = Array.isArray(empresaSelecionada) ? empresaSelecionada : [empresaSelecionada];
       const empresasArray = Array.isArray(optionsEmpresas) ? optionsEmpresas : [];
 
-      // ✅ Monta um registro por produto x empresa, com todos os campos da tabela PRODUTOPRECOCLUBE
-      const registros = [];
+      // ✅ PRODUTOPRECOCLUBE: um registro por produto x empresa
+      const produtosClube = [];
       idsEmpresas.forEach(idEmpresa => {
         const empresa = empresasArray.find(emp => String(emp.IDEMPRESA) === String(idEmpresa));
         const idSubGrupoEmpresarial = empresa?.IDSUBGRUPOEMPRESARIAL ?? empresa?.IDGRUPOEMPRESARIAL ?? null;
 
         produtosExcel.forEach(produto => {
-          registros.push({
+          produtosClube.push({
             IDPRODUTO: String(produto.IDPRODUTO),
             PRECO_VENDA: Number(produto.PRECO_VENDA),
-            DTHORAINICIOVIGENCIA: dataInicio,
-            DTHORAFIMVIGENCIA: dataFim,
             IDSUBGRUPOEMPRESARIAL: idSubGrupoEmpresarial,
             IDEMPRESA: idEmpresa,
           });
         });
       });
 
+      // ✅ Payload único: dados da promoção + produtos
+      const payload = {
+        DSPROMOCAO: descricao ? descricao.toUpperCase() : '',
+        DTHORAINICIOVIGENCIA: dataInicio,
+        DTHORAFIMVIGENCIA: dataFim,
+        PRODUTOS: produtosClube,
+      };
+
       // Bloqueia completamente a tela: sem fechar por fora, sem ESC, sem botões.
       Swal.fire({
         title: 'Processando sua promoção...',
-        html: 'Verificando produtos já cadastrados...',
+        html: `Enviando ${produtosClube.length} produto(s) da promoção...`,
         allowOutsideClick: false,
         allowEscapeKey: false,
         allowEnterKey: false,
@@ -649,87 +634,23 @@ export const useCreateProdutoClube = ({ usuarioLogado, optionsModulos }) => {
         }
       });
 
-      let totalLotes = 0;
-      const paraAtualizar = [];
-      const paraInserir = [];
-
+      let response;
       try {
-        // ✅ VERIFICAÇÃO: produto já existe para a mesma IDEMPRESA? -> PUT, senão -> POST
-        const chavesExistentes = new Set();
-        for (let i = 0; i < idsEmpresas.length; i++) {
-          if (Swal.isVisible()) {
-            Swal.update({ html: `Verificando produtos já cadastrados... empresa ${i + 1} de ${idsEmpresas.length}` });
-          }
-          const existentes = await buscarProdutosClubeExistentes(idsEmpresas[i]);
-          existentes.forEach(item => chavesExistentes.add(`${item.IDEMPRESA}|${item.IDPRODUTO}`));
-        }
-
-        registros.forEach(registro => {
-          if (chavesExistentes.has(`${registro.IDEMPRESA}|${registro.IDPRODUTO}`)) {
-            paraAtualizar.push(registro);
-          } else {
-            paraInserir.push(registro);
-          }
-        });
-
-        const totalRegistros = registros.length;
-        totalLotes = Math.ceil(paraAtualizar.length / TAMANHO_LOTE_PRODUTOS) + Math.ceil(paraInserir.length / TAMANHO_LOTE_PRODUTOS);
-
-        const montarHtmlProgresso = (loteAtual, registrosEnviados, operacao) => {
-          const percentual = Math.min(100, Math.round((registrosEnviados / totalRegistros) * 100));
-          return `
-            <div style="text-align:left">
-              <p>${operacao} — lote <b>${loteAtual}</b> de <b>${totalLotes}</b></p>
-              <p>Novos: <b>${paraInserir.length}</b> | Atualizados: <b>${paraAtualizar.length}</b></p>
-              <p>Registros enviados: <b>${registrosEnviados}</b> de <b>${totalRegistros}</b> (faltam ${totalRegistros - registrosEnviados})</p>
-              <div style="background:#e0e0e0;border-radius:4px;overflow:hidden;height:10px;margin-top:8px;">
-                <div style="background:#3085d6;height:100%;width:${percentual}%;transition:width .3s;"></div>
-              </div>
-            </div>
-          `;
-        };
-
-        let loteAtual = 0;
-        let registrosEnviados = 0;
-
-        const enviarEmLotes = async (lista, enviarLote, operacao) => {
-          for (let inicio = 0; inicio < lista.length; inicio += TAMANHO_LOTE_PRODUTOS) {
-            const lotePostData = lista.slice(inicio, inicio + TAMANHO_LOTE_PRODUTOS);
-            loteAtual++;
-
-            if (Swal.isVisible()) {
-              Swal.update({ html: montarHtmlProgresso(loteAtual, registrosEnviados, operacao) });
-            }
-
-            await enviarLote(lotePostData);
-
-            registrosEnviados += lotePostData.length;
-            if (Swal.isVisible()) {
-              Swal.update({ html: montarHtmlProgresso(loteAtual, registrosEnviados, operacao) });
-            }
-          }
-        };
-
-        // PUT -> /produto-preco-clube/:id  |  POST -> /produto-preco-clube
-        await enviarEmLotes(
-          paraAtualizar,
-          (lotePutData) => put(`/produto-preco-clube/${encodeURIComponent(lotePutData[0].IDPRODUTO)}`, lotePutData),
-          'Atualizando (PUT)'
-        );
-        await enviarEmLotes(
-          paraInserir,
-          (lotePostData) => post('/produto-preco-clube', lotePostData),
-          'Cadastrando (POST)'
-        );
+        response = await post('/promocao-produto-clube', payload);
       } finally {
         Swal.close();
       }
+
+      const retorno = response?.retorno?.[0] ?? {};
+      const idPromocao = retorno.IDPROMOCAO ?? null;
+      const totalInseridos = retorno.inseridos ?? 0;
+      const totalAtualizados = retorno.atualizados ?? 0;
 
       Swal.fire({
         position: 'center',
         icon: 'success',
         title: 'Cadastro realizado com sucesso!',
-        html: `Novos: <b>${paraInserir.length}</b> | Atualizados: <b>${paraAtualizar.length}</b>${totalLotes > 1 ? `<br>(${totalLotes} lotes enviados)` : ''}`,
+        html: `${idPromocao ? `Promoção: <b>${idPromocao}</b><br>` : ''}Produtos enviados: <b>${produtosClube.length}</b>`,
         customClass: { container: 'custom-swal' },
         showConfirmButton: false,
         timer: 2500,
@@ -737,7 +658,7 @@ export const useCreateProdutoClube = ({ usuarioLogado, optionsModulos }) => {
         // window.location.reload();
       });
 
-      return { inseridos: paraInserir.length, atualizados: paraAtualizar.length };
+      return { idPromocao, inseridos: totalInseridos, atualizados: totalAtualizados };
     } catch (error) {
       console.error('Erro ao cadastrar promoção:', error);
       Swal.fire({
@@ -764,6 +685,8 @@ export const useCreateProdutoClube = ({ usuarioLogado, optionsModulos }) => {
     setProdutoOrigem,
     fileProdutoOrigem,
     setFileProdutoOrigem,
+    descricao,
+    setDescricao,
     optionsMarcas,
     optionsEmpresas,
     handleFileUpload,

@@ -6,11 +6,7 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../../Tables/headerTable";
-import { IoMdClose } from "react-icons/io";
-import { ButtonTable } from "../../../ButtonsTabela/ButtonTable";
 import { formatMoeda } from "../../../../utils/formatMoeda";
-
-
 
 export const ActionListaProdutos = ({
     produtosOrigemDetalhados,
@@ -56,8 +52,6 @@ export const ActionListaProdutos = ({
     });
     doc.save('produtos_promocoes.pdf');
   };
-
-
 
   const exportToExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(dados.map(item => ({
@@ -108,16 +102,16 @@ export const ActionListaProdutos = ({
     },
     {
       field: 'PRECO_VENDA',
-      header: 'Preço Venda',
-      body: row => <th>{formatarPreco(row.PRECOVENDA)}</th>,
-      sortable: true,
-    },
-    {
-      field: 'PRECO_VENDA_NOVO',
       header: 'Preço Novo',
-      body: row => <th>{formatarPreco(row.PRECO_VENDA_NOVO)}</th>,
+      body: row => <th>{formatarPreco(row.PRECO_VENDA)}</th>,
       sortable: true,
     },
+    // {
+    //   field: 'PRECO_VENDA',
+    //   header: 'Preço Venda',
+    //   body: row => <th>{formatarPreco(row.PRECOVENDA)}</th>,
+    //   sortable: true,
+    // },
     // {
     //   field: '',
     //   header: 'Opções',
