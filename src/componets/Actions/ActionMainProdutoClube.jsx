@@ -241,17 +241,6 @@ export const ActionMainProdutoClube = ({
                       </div>
 
                       <div className="col-sm-6 col-md-6 col-xl-6">
-                        {/* {MenuTreeSelectDestinoComponent && (
-                          <MenuTreeSelectDestinoComponent
-                            valueMenuSelect={valueTreeSelectDestino}
-                            onChangeMenuSelect={onChangeTreeSelectDestino}
-                            optionsMenuSelect={optionsTreeSelectDestino}
-                            placeholderMenuSelect={placeholderTreeSelectDestino}
-                            onNodeMenuSelect={onNodeTreeSelectDestino}
-                            onNodeMenuUnselect={onNodeTreeUnselectDestino}
-                            label={labelSelectSubGrupoDestinoAsync}
-                          />
-                        )} */}
 
                         {InputSelectStatusComponent && (
                           <InputSelectStatusComponent

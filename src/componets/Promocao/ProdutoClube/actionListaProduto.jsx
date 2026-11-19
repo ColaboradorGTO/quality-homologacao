@@ -102,7 +102,7 @@ export const ActionListaPromocao = ({
     },
     {
       field: 'Detalhar',
-      header: 'Detalhar',
+      header: 'Opções',
       body: (row) => {
         if(row.STATIVO == 'True') {
           return (

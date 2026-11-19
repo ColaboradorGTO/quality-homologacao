@@ -629,7 +629,7 @@ export const useEditeProdutoClube = ({detalhePromocao, usuarioLogado, optionsMod
 
       // ✅ Payload único: dados da promoção + produtos
       const payload = {
-        IDPROMOCAO: dadosPromocao[0]?.IDPROMOCAO,
+        IDPROMOCAO: detalhePromocao[0]?.IDPROMOCAO,
         DSPROMOCAO: descricao ? descricao.toUpperCase() : '',
         DTHORAINICIOVIGENCIA: dataInicio,
         DTHORAFIMVIGENCIA: dataFim,

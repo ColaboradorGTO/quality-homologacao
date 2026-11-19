@@ -244,11 +244,11 @@ export const ActionPesquisaProdutoClube = ({ usuarioLogado }) => {
             IconSearch={IoIosSend}
             // styleButtonSearch
     
-            ButtonTypePedido={ButtonType} 
-            linkPedido={"Pesquisar"}
-            onButtonClickPedido={handleClick}
-            corPedido={'info'}
-            IconPedido={FaSearch}
+            // ButtonTypePedido={ButtonType} 
+            // linkPedido={"Pesquisar"}
+            // onButtonClickPedido={handleClick}
+            // corPedido={'info'}
+            // IconPedido={FaSearch}
     
             ButtonTypeRetornar={ButtonType}
             linkRetornar={"Baixar Planilha"}

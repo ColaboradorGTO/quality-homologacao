@@ -7,13 +7,23 @@ import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../../Tables/headerTable";
 import { formatMoeda } from "../../../../utils/formatMoeda";
+import { useDesativarProdutoPrecoClube } from "../hooks/useDesativarProdutoPrecoClube";
+import { ButtonTable } from "../../../ButtonsTabela/ButtonTable";
+import { FaCheck } from "react-icons/fa";
+import { IoMdClose } from "react-icons/io";
 
 export const ActionListaProdutos = ({
     dadosProdutosPromocao,
+    optionsModulos,
+    usuarioLogado
 }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const dataTableRef = useRef();
-  console.log(dadosProdutosPromocao, 'produto')
+
+  const {
+    handleAtivarDesativar
+  } = useDesativarProdutoPrecoClube({usuarioLogado, optionsModulos})
+
   const formatarPreco = (valor) => (valor === null || valor === undefined || valor === '') ? '-' : formatMoeda(valor);
 
   const dados = dadosProdutosPromocao.map((item, index) => {
@@ -22,12 +32,16 @@ export const ActionListaProdutos = ({
     return {
       contador,
       IDPRODUTO: item.IDPRODUTO,
+      IDPROMOCAO: item.IDPROMOCAO,
+      DTHORAINICIOVIGENCIA: item.DTHORAINICIOVIGENCIA,
+      DTHORAFIMVIGENCIA: item.DTHORAFIMVIGENCIA,
       DSNOME: item.DSNOME,
       NUCODBARRAS: item.NUCODBARRAS,
       PRECO_VENDA: item.PRECO_VENDA,
       PRECOVENDA: item.PRECOVENDA,
       ENCONTRADO: item.ENCONTRADO,
-      PRECO_VENDA_NOVO: item.PRECO_VENDA_NOVO
+      PRECO_VENDA_NOVO: item.PRECO_VENDA_NOVO,
+      STATIVO: item.STATIVO,
     }
   });
 
@@ -105,33 +119,55 @@ export const ActionListaProdutos = ({
     },
     {
       field: 'PRECO_VENDA',
-      header: 'Preço Novo',
+      header: 'Preço Clube',
       body: row => <th>{formatarPreco(row.PRECO_VENDA)}</th>,
       sortable: true,
     },
-    // {
-    //   field: 'PRECO_VENDA',
-    //   header: 'Preço Venda',
-    //   body: row => <th>{formatarPreco(row.PRECOVENDA)}</th>,
-    //   sortable: true,
-    // },
-    // {
-    //   field: '',
-    //   header: 'Opções',
-    //   body: row => {
-    //     return (
-    //       <ButtonTable
-    //         titleButton={"Remover Produto"}
-    //         cor={"danger"}
-    //         Icon={IoMdClose}
-    //         iconSize={22}
-    //         onClickButton={() => handleRemoverProdutoOrigem(row)}
-    //         width="40px"
-    //         height="40px"
-    //       />
-    //     )
-    //   }
-    // }
+    {
+      field: 'PRECOVENDA',
+      header: 'Preço Produto',
+      body: row => <th>{formatarPreco(row.PRECOVENDA)}</th>,
+      sortable: true,
+    },
+    {
+      field: 'STATIVO',
+      header: 'Status',
+      body: row => <th style={{color: row.STATIVO == 'True' ? 'blue' : 'red' }}>{row.STATIVO == 'True' ? 'ATIVO' : 'INATIVO'}</th>,
+      sortable: true,
+    },
+    {
+      field: 'IDPRODUTO',
+      header: 'Opções',
+      body: row => {
+        if(row.STATIVO == 'True') {
+          return (
+            <ButtonTable
+              titleButton={"Ativar Produto"}
+              cor={"success"}
+              Icon={FaCheck}
+              iconSize={22}
+              onClickButton={() => handleAtivarDesativar(row)}
+              width="40px"
+              height="40px"
+            />
+          )
+
+        } else {
+
+          return (
+            <ButtonTable
+              titleButton={"Desativar Produto"}
+              cor={"danger"}
+              Icon={IoMdClose}
+              iconSize={22}
+              onClickButton={() => handleAtivarDesativar(row)}
+              width="40px"
+              height="40px"
+            />
+          )
+        }
+      }
+    }
   ]
 
   return (

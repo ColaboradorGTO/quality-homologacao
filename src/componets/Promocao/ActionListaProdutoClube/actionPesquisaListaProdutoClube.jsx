@@ -353,6 +353,8 @@ export const ActionPesquisaListaProdutoClube = ({ usuarioLogado }) => {
           detalhePromocao={detalhePromocao}
           optionsModulos={optionsModulos}
           usuarioLogado={usuarioLogado}
+          setActionEditarVisivel={setActionEditarVisivel}
+          setActionCriarVisivel={setActionCriarVisivel}
         />
       )} 
     </Fragment>

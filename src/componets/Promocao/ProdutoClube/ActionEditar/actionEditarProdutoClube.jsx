@@ -4,14 +4,14 @@ import { InputFieldAction } from "../../../Buttons/InputAction";
 import { InputSelectActionPromocao } from "../../../Inputs/InputSelectActionPromocao";
 import { MultSelectAction } from "../../../Select/MultSelectAction";
 import { GrFormView, GrView } from "react-icons/gr";
-import { IoIosSend } from "react-icons/io";
+import { IoIosSend, IoMdReturnLeft } from "react-icons/io";
 import { FaDownload } from "react-icons/fa6";
 import { ActionMainProdutoClube } from "../../../Actions/ActionMainProdutoClube";
 import { FaSearch } from "react-icons/fa";
 import { ActionListaProdutos } from "./actionListaProdutos";
 import { useEditeProdutoClube } from "../hooks/useEditeProdutoClube";
 
-export const ActionEditarProdutoClube = ({detalhePromocao, usuarioLogado, optionsModulos }) => {
+export const ActionEditarProdutoClube = ({detalhePromocao, usuarioLogado, optionsModulos, setActionEditarVisivel,setActionCriarVisivel }) => {
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null)
   
   useEffect(() => {
@@ -71,7 +71,8 @@ export const ActionEditarProdutoClube = ({detalhePromocao, usuarioLogado, option
 
   
   const handleClick = () => {
-    refetchPromocao()
+    setActionEditarVisivel(false)
+    setActionCriarVisivel(true)
   }
 
   return (
@@ -176,10 +177,11 @@ export const ActionEditarProdutoClube = ({detalhePromocao, usuarioLogado, option
         // styleButtonSearch
 
         ButtonTypePedido={ButtonType} 
-        linkPedido={"Pesquisar"}
+        linkPedido={"Retornar"}
         onButtonClickPedido={handleClick}
-        corPedido={'info'}
-        IconPedido={FaSearch}
+        corPedido={'danger'}
+        IconPedido={IoMdReturnLeft}
+
 
         ButtonTypeRetornar={ButtonType}
         linkRetornar={"Baixar Planilha"}
@@ -188,7 +190,7 @@ export const ActionEditarProdutoClube = ({detalhePromocao, usuarioLogado, option
         IconRetornar={FaDownload}
       />
 
-  
+        {/*  Criar um button para retornar a actionPesquisaListaProdutoClube */}
 
       <ActionListaProdutos
         dadosProdutosPromocao={dadosProdutosPromocao}
