@@ -105,8 +105,14 @@ export const ActionListaProdutos = ({
     },
     {
       field: 'PRECO_VENDA',
-      header: 'Preço Novo',
+      header: 'Preço Clube',
       body: row => <th>{formatarPreco(row.PRECO_VENDA)}</th>,
+      sortable: true,
+    },
+    {
+      field: 'PRECOVENDA',
+      header: 'Preço Produto',
+      body: row => <th>{formatarPreco(row.PRECOVENDA)}</th>,
       sortable: true,
     },
     // {
