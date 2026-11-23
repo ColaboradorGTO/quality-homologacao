@@ -7,7 +7,6 @@ import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import HeaderTable from "../../Tables/headerTable";
 import { ButtonTable } from "../../ButtonsTabela/ButtonTable";
-import { GrView } from "react-icons/gr";
 import Swal from "sweetalert2";
 import { get } from "../../../api/funcRequest";
 import { MdEdit } from "react-icons/md";
@@ -22,7 +21,6 @@ export const ActionListaPromocao = ({
   setDetalhePromocao 
 }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
-  // const [detalhePromocao, setDetalhePromocao] = useState([])
   const [modalVisualizar, setModalVisualizar] = useState(true)
   const dataTableRef = useRef();
 
@@ -73,6 +71,8 @@ export const ActionListaPromocao = ({
       IDPROMOCAO: item.IDPROMOCAO,
       DSPROMOCAO: item.DSPROMOCAO,
       STATIVO: item.STATIVO,
+      DSGRUPOEMPRESARIAL: item.DSGRUPOEMPRESARIAL,
+      IDSUBGRUPOEMPRESARIAL: item.IDSUBGRUPOEMPRESARIAL
     }
   });
 
@@ -95,6 +95,17 @@ export const ActionListaPromocao = ({
       body: row => (
         <th style={{ color: row.STATIVO == 'True' ? 'blue' : 'red' }}>
           {row.STATIVO === 'True' ? 'Ativa' : 'Inativa'}
+        </th>
+
+      ),
+      sortable: true,
+    },
+    {
+      field: 'DSGRUPOEMPRESARIAL',
+      header: 'Marca',
+      body: row => (
+        <th style={{ color: 'bue' }}>
+          {row.DSGRUPOEMPRESARIAL}
         </th>
 
       ),
@@ -126,7 +137,7 @@ export const ActionListaPromocao = ({
 
    const handleVisualizar = async (IDPROMOCAO) => {
       try {
-        const response = await get(`/promocao-produto-clube?idPromocao=${IDPROMOCAO}`);
+        const response = await get(`/detalhe-promocao-produto-clube?idPromocao=${IDPROMOCAO}`);
   
         if (response.data && response.data.length > 0) {
           setDetalhePromocao(response.data);

@@ -1,9 +1,7 @@
-import React, { Fragment, useCallback, useEffect, useMemo, useState } from "react"
+import React, { Fragment, useEffect, useState } from "react"
 import { ButtonType } from "../../Buttons/ButtonType";
 import { InputFieldAction } from "../../Buttons/InputAction";
-import { InputSelectActionPromocao } from "../../Inputs/InputSelectActionPromocao";
-import { MultSelectAction } from "../../Select/MultSelectAction";
-import { GrFormView, GrView } from "react-icons/gr";
+import { GrView } from "react-icons/gr";
 import { IoIosSend } from "react-icons/io";
 import { FaDownload } from "react-icons/fa6";
 import { get } from "../../../api/funcRequest";
@@ -12,13 +10,12 @@ import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../utils
 import { useCreateProdutoClube } from "./hooks/useCreateProdutoClube";
 import { ActionMainProdutoClube } from "../../Actions/ActionMainProdutoClube";
 import { ActionModalProduto } from "./ActionModalProduto/actionModalProduto";
-import { FaSearch } from "react-icons/fa";
 import { ActionListaPromocao } from "./actionListaProduto";
 import { ActionEditarProdutoClube } from "./ActionEditar/actionEditarProdutoClube";
+import { MenuTreeSelect } from "../../Inputs/menuTreeSelect";
 
 export const ActionPesquisaProdutoClube = ({ usuarioLogado }) => {
   const [menuFilhoAtual, setMenuFilhoAtual] = useState(null)
-  const [tableVisivel, setTableVisivel] = useState(true)
   const [actionCriarVisivel, setActionCriarVisivel] = useState(true)
   const [actionEditarVisivel, setActionEditarVisivel] = useState(false)
   const [detalhePromocao, setDetalhePromocao] = useState([])
@@ -40,9 +37,6 @@ export const ActionPesquisaProdutoClube = ({ usuarioLogado }) => {
     },
     { enabled: Boolean(usuarioLogado?.id), staleTime: 60 * 60 * 1000, }
   );
-
-
-
   const {
     marcaSelecionada,
     setMarcaSelecionada,
@@ -66,32 +60,23 @@ export const ActionPesquisaProdutoClube = ({ usuarioLogado }) => {
     handleRemoverProdutoOrigem,
     modalPodutoSelecionadoOrigem,
     setModalPodutoSelecionadoOrigem,
+    treeData, 
+    setTreeData,
+    selectedNodesOrigem, 
+    setSelectedNodesOrigem,
     onSubmit,
     downloadPlanilhaModelo,
 
-  } = useCreateProdutoClube({usuarioLogado, optionsModulos});
+  } = useCreateProdutoClube({ usuarioLogado, optionsModulos });
 
-  
 
-  const handleEmpresaChange = useCallback((selectedOptions) => {
-    const values = selectedOptions.map((option) => option.value);
-    setEmpresaSelecionada(values);
-  }, [setEmpresaSelecionada]);
+
+
 
   const handleCadastrar = () => {
     onSubmit();
   }
 
-  const empresasFiltradas = useMemo(() => {
-    const empresasArray = Array.isArray(optionsEmpresas) ? optionsEmpresas : [];
-    if (!marcaSelecionada || marcaSelecionada == "all") return empresasArray;
-    if (Array.isArray(marcaSelecionada)) {
-      return empresasArray.filter(empresa =>
-        marcaSelecionada.includes(empresa.IDGRUPOEMPRESARIAL)
-      );
-    }
-    return empresasArray.filter(empresa => empresa.IDGRUPOEMPRESARIAL === marcaSelecionada);
-  }, [optionsEmpresas, marcaSelecionada, empresaSelecionada, setEmpresaSelecionada]);
 
 
   const fetchProdutoSubGrupoDestino = async () => {
@@ -134,7 +119,105 @@ export const ActionPesquisaProdutoClube = ({ usuarioLogado }) => {
   );
 
 
-  // console.log(empresasFiltradas, 'empresasFiltradas')
+  const { data: optionsEmpresasTree = [] } = useQuery(
+    ['listaEmpresaComercialTree', optionsMarcas],
+    async () => {
+      const marcasArray = Array.isArray(optionsMarcas) ? optionsMarcas : [];
+      const respostas = await Promise.all(
+        marcasArray.map(async (marca) => {
+          const response = await get(`/listaEmpresaComercial?idMarca=${marca.IDGRUPOEMPRESARIAL}`);
+          return (response.data || []).map(empresa => ({
+            ...empresa,
+            IDGRUPOEMPRESARIAL: marca.IDGRUPOEMPRESARIAL,
+          }));
+        })
+      );
+      return respostas.flat();
+    },
+    { enabled: Array.isArray(optionsMarcas) && optionsMarcas.length > 0, staleTime: 1000 * 60 * 60 }
+  );
+
+  useEffect(() => {
+    if (Array.isArray(optionsMarcas) && optionsMarcas.length) {
+      const gruposMap = new Map();
+
+      optionsMarcas.forEach(marca => {
+        gruposMap.set(marca.IDGRUPOEMPRESARIAL, {
+          key: `grupo_${marca.IDGRUPOEMPRESARIAL}`,
+          label: marca.DSGRUPOEMPRESARIAL,
+          children: [],
+        });
+      });
+
+      optionsEmpresasTree.forEach(empresa => {
+        const grupo = gruposMap.get(empresa.IDGRUPOEMPRESARIAL);
+        if (grupo) {
+          grupo.children.push({
+            key: `subgrupo_${empresa.IDEMPRESA}`,
+            label: `${empresa.IDEMPRESA} - ${empresa.NOFANTASIA}`,
+            data: empresa
+          });
+        }
+      });
+
+      const formattedTreeData = Array.from(gruposMap.values());
+      setTreeData([
+        { key: 'todas', label: 'Selecionar Todas' },
+        ...formattedTreeData
+      ]);
+    }
+  }, [optionsMarcas, optionsEmpresasTree]);
+
+  const handleTreeSelectMarca = (e) => {
+    let selectedValue = e.value || {};
+    const todasAntes = Boolean(selectedNodesOrigem?.todas?.checked);
+    const todasAgora = Boolean(selectedValue?.todas?.checked);
+
+    if (todasAgora && !todasAntes) {
+      // Marcou "Selecionar Todas": marca todas as marcas e empresas
+      selectedValue = {};
+      treeData.forEach(node => {
+        selectedValue[node.key] = { checked: true, partialChecked: false };
+        (node.children || []).forEach(child => {
+          selectedValue[child.key] = { checked: true, partialChecked: false };
+        });
+      });
+    } else if (!todasAgora && todasAntes) {
+      // Desmarcou "Selecionar Todas": limpa tudo
+      selectedValue = {};
+    } else if (todasAgora && todasAntes) {
+      // Desmarcou algum item com "Selecionar Todas" marcado: tira o "Selecionar Todas"
+      const todosMarcados = treeData
+        .filter(node => node.key !== 'todas')
+        .every(node => selectedValue[node.key]?.checked);
+      if (!todosMarcados) {
+        selectedValue = { ...selectedValue };
+        delete selectedValue.todas;
+      }
+    }
+
+    setSelectedNodesOrigem(selectedValue);
+
+    const selectedGrupo = [];
+    const selectedSubGrupo = [];
+
+    // Considera apenas os nós totalmente marcados (ignora partialChecked)
+    Object.keys(selectedValue).forEach(key => {
+      if (!selectedValue[key]?.checked) return;
+
+      if (key.startsWith('grupo_')) {
+        const grupoId = Number(key.replace('grupo_', ''));
+        selectedGrupo.push(grupoId);
+      } else if (key.startsWith('subgrupo_')) {
+        const empresaId = Number(key.replace('subgrupo_', ''));
+        selectedSubGrupo.push(empresaId);
+      }
+    });
+
+    setMarcaSelecionada(selectedGrupo);
+    setEmpresaSelecionada(selectedSubGrupo);
+  };
+
   const handleClick = () => {
     refetchPromocao()
   }
@@ -147,74 +230,32 @@ export const ActionPesquisaProdutoClube = ({ usuarioLogado }) => {
             linkComponentAnterior={["Home"]}
             linkComponent={["Cadastro de Promoções"]}
             title="Cadastro de Promoções"
-        
-    
-    
+
+
+
             InputFieldDTInicioComponent={InputFieldAction}
             labelInputDTInicio={"Data Inicio"}
             valueInputFieldDTInicio={dataInicio}
             onChangeInputFieldDTInicio={(e) => setDataInicio(e.target.value)}
-    
+
             InputFieldDTFimComponent={InputFieldAction}
             labelInputDTFim={"Data Fim"}
             valueInputFieldDTFim={dataFim}
             onChangeInputFieldDTFim={(e) => setDataFim(e.target.value)}
-    
+
             InputFieldDescription={InputFieldAction}
             labelInputFieldDescription={"Descrição"}
             valueInputFielDescription={descricao}
             onChangeInputFieldDescription={(e) => setDescricao(e.target.value)}
             styleDescription={{ textTransform: "uppercase" }}
-    
-            InputSelectMarcasComponent={InputSelectActionPromocao}
-            labelSelectMarcas={"Marca"}
-            optionsMarcas={[
-              { value: "all", label: "Selecionar Todas" },
-              ...(Array.isArray(optionsMarcas)
-                ? optionsMarcas.map((marca) => ({
-                  value: marca.IDGRUPOEMPRESARIAL,
-                  label: marca.DSGRUPOEMPRESARIAL
-                }))
-                : [])
-            ]}
-            onChangeSelectMarcas={(e) => {
-              if (e.value === "all") {
-                const allValues = optionsMarcas?.map((marca) => marca.IDGRUPOEMPRESARIAL);
-                setMarcaSelecionada(allValues);
-              } else {
-                setMarcaSelecionada(e.value);
-              }
-            }}
-            defaultValueSelectMarca={marcaSelecionada}
-            // valueSelectMarca={marcaSelecionada}
-    
-            InputSelectEmpresaComponentAync={MultSelectAction}
-            labelSelectEmpresaAsync={"Empresa"}
-            optionsEmpresasAsync={[
-              { value: "all", label: "Selecionar Todas" },
-              ...empresasFiltradas?.map((empresa) => ({
-                value: empresa.IDEMPRESA,
-                label: empresa.NOFANTASIA
-              }))
-            ]}
-            onChangeSelectEmpresaAsync={(selectedOptions) => {
-              if (selectedOptions.some((option) => option.value === "all")) {
-    
-                const allValues = empresasFiltradas.map((empresa) => empresa.IDEMPRESA);
-                setEmpresaSelecionada(allValues);
-              } else {
-                handleEmpresaChange(selectedOptions);
-              }
-            }}
-            valueSelectEmpresaAsync={
-              empresasFiltradas
-                .filter(empresa => Array.isArray(empresaSelecionada) ? empresaSelecionada.includes(empresa.IDEMPRESA) : empresaSelecionada === empresa.IDEMPRESA)
-                .map(empresa => ({
-                  value: empresa.IDEMPRESA,
-                  label: empresa.NOFANTASIA
-                }))
-            }
-    
+
+            MenuTreeSelectOrigemComponent={MenuTreeSelect}
+            valueTreeSelectOrigem={selectedNodesOrigem}
+            onChangeTreeSelectOrigem={handleTreeSelectMarca}
+            optionsTreeSelectOrigem={treeData}
+            placeholderTreeSelectOrigem={"Selecione"}
+            labelSelectSubGrupoOrigemAsync={'Marca/Loja'}
+
             InputFileProdutoOigem={InputFieldAction}
             labelInputFileProdutoOigem={"Produto Origem"}
             acceptFileProdutoOigem=".xlsx"
@@ -227,7 +268,7 @@ export const ActionPesquisaProdutoClube = ({ usuarioLogado }) => {
               }
             }}
             readOnlyFileProdutoOigem={produtoOrigem.length > 0 ? true : false}
-    
+
             ButtonTypeCancelar={ButtonType}
             linkCancelar={"Visualizar Produtos Origem"}
             onButtonClickCancelar={() => {
@@ -236,20 +277,14 @@ export const ActionPesquisaProdutoClube = ({ usuarioLogado }) => {
             }}
             corCancelar={"danger"}
             IconCancelar={GrView}
-    
+
             ButtonSearchComponent={ButtonType}
             linkNomeSearch={"Cadastrar "}
             onButtonClickSearch={handleCadastrar}
             corSearch={"primary"}
             IconSearch={IoIosSend}
             // styleButtonSearch
-    
-            // ButtonTypePedido={ButtonType} 
-            // linkPedido={"Pesquisar"}
-            // onButtonClickPedido={handleClick}
-            // corPedido={'info'}
-            // IconPedido={FaSearch}
-    
+
             ButtonTypeRetornar={ButtonType}
             linkRetornar={"Baixar Planilha"}
             onButtonClickRetornar={downloadPlanilhaModelo}
@@ -257,18 +292,10 @@ export const ActionPesquisaProdutoClube = ({ usuarioLogado }) => {
             IconRetornar={FaDownload}
           />
 
-          <ActionListaPromocao 
-            dadosPromocao={dadosPromocao}
-            optionsModulos={optionsModulos}
-            usuarioLogado={usuarioLogado} 
-            setActionEditarVisivel={setActionEditarVisivel}
-            setActionCriarVisivel={setActionCriarVisivel}
-            setDetalhePromocao={setDetalhePromocao}
-          />
         </>
       )}
 
-      <ActionModalProduto 
+      <ActionModalProduto
         show={modalPodutoSelecionadoOrigem}
         handleClose={() => setModalPodutoSelecionadoOrigem(false)}
         produtosOrigemDetalhados={produtosOrigemDetalhados}
@@ -277,7 +304,7 @@ export const ActionPesquisaProdutoClube = ({ usuarioLogado }) => {
 
       {actionEditarVisivel && (
 
-        <ActionEditarProdutoClube 
+        <ActionEditarProdutoClube
           detalhePromocao={detalhePromocao}
           optionsModulos={optionsModulos}
           usuarioLogado={usuarioLogado}
