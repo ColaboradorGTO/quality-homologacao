@@ -13,16 +13,6 @@ const CARDS = [
     { title: 'NOTA FISCAL EM ATRASO', label: 'Nota Fiscal Em Atraso', cor: '#FB0C06', Icon: FaMoneyBillWave },
     { title: 'NOTA FISCAL ANEXADA', label: 'Nota Fiscal Anexada', cor: '#4de5d5', Icon: FaCheckDouble },
 ]
-/*
-
-Prezados, venho por meio deste solicitar uma atualização do módulo de provisão financeira,
-onde aparça o status de nota fiscal anexada e o número de notas fiscais anexadas, 
-pois o mesmo não está registrando as notas anexadas e nem as notas fiscais que estão faltando corretamente.
-
-no momento em que o solicitante anexar a nota fiscal, o status vai alterar para NOTA FISCAL ANEXADA
-limpando os os cards de COMPROVANTE ANEXADO E AGUARDANDO NOTA FISCAL
-*/
- 
 
  
 const resumirPorStatus = (dados) => {
