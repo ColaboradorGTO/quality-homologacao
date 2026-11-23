@@ -63,7 +63,9 @@ export const ActionPesquisaCriarAdiantamento = ({ usuarioLogado, menuFilhoAtual 
       return [];
     }
 
-    const urlBase = `/lista-adiantamento-departamento?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&status=${status}&departamento=${encodeURIComponent(departamentoUsuario)}`;
+    const statusPagamento = status === 'PAGO' ? 'PAGO' : '';
+    const statusFiltro = status === 'AGUARDANDO NOTA FISCAL' ? 'COMPROVANTE ANEXADO' : status === 'PAGO' ? '' : status;
+    const urlBase = `/lista-adiantamento-departamento?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&status=${statusFiltro}&statusPagamento=${statusPagamento}&departamento=${encodeURIComponent(departamentoUsuario)}`;
     let urlApi = urlBase.includes('?') ? urlBase : urlBase + '?';
     urlApi = urlApi.replace('&page=1', '').replace('page=1', '');
     const controller = new AbortController();
