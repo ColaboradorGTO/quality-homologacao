@@ -31,7 +31,8 @@ export const useCreateProdutoClube = ({ usuarioLogado, optionsModulos }) => {
   const [modalPodutoSelecionadoOrigem, setModalPodutoSelecionadoOrigem] = useState(false);
   const [produtosOrigemDetalhados, setProdutosOrigemDetalhados] = useState([]);
   const [descricao, setDescricao] = useState('')
-
+  const [treeData, setTreeData] = useState([]);
+  const [selectedNodesOrigem, setSelectedNodesOrigem] = useState(null);
 
   useEffect(() => {
     const dataInicial = getDataAtual()
@@ -593,7 +594,12 @@ export const useCreateProdutoClube = ({ usuarioLogado, optionsModulos }) => {
       }
 
       const idsEmpresas = Array.isArray(empresaSelecionada) ? empresaSelecionada : [empresaSelecionada];
-      const empresasArray = Array.isArray(optionsEmpresas) ? optionsEmpresas : [];
+
+      // ✅ Empresas vindas do MenuTreeSelect (nós "subgrupo_<IDEMPRESA>" com os dados em node.data)
+      const empresasArray = (Array.isArray(treeData) ? treeData : [])
+        .flatMap(node => node.children || [])
+        .map(child => child.data)
+        .filter(Boolean);
 
       // ✅ PRODUTOPRECOCLUBE: um registro por produto x empresa
       const produtosClube = [];
@@ -636,7 +642,7 @@ export const useCreateProdutoClube = ({ usuarioLogado, optionsModulos }) => {
 
       let response;
       try {
-        response = await post('/promocao-produto-clube', payload);
+        response = await post('/criar-promocao-produto-clube', payload);
       } finally {
         Swal.close();
       }
@@ -695,6 +701,10 @@ export const useCreateProdutoClube = ({ usuarioLogado, optionsModulos }) => {
     handleRemoverProdutoOrigem,
     modalPodutoSelecionadoOrigem,
     setModalPodutoSelecionadoOrigem,
+    treeData, 
+    setTreeData,
+    selectedNodesOrigem, 
+    setSelectedNodesOrigem,
     onSubmit,
     downloadPlanilhaModelo,
   }

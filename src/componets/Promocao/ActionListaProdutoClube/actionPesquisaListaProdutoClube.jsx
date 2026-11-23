@@ -203,7 +203,7 @@ export const ActionPesquisaListaProdutoClube = ({ usuarioLogado }) => {
           ...formattedTreeData
         ]);
       }
-    }, [optionsMarcas, optionsEmpresasTree]);
+  }, [optionsMarcas, optionsEmpresasTree]);
 
   const handleTreeSelectMarca = (e) => {
     let selectedValue = e.value || {};
@@ -360,14 +360,3 @@ export const ActionPesquisaListaProdutoClube = ({ usuarioLogado }) => {
     </Fragment>
   )
 }
-
-// 1120
-
-/* 
-  NO MEU COMPOENENTE MenuTreeSelectOrigemComponent
-  QUERO TRAZER OS CAMPOS DA MARCAS E DAS EMPRESA,
-  POR EXEMPLO MARCA 1 TRAZ TODAS AS EMPRESAS DA MARCA 1
-  por quando eu seleciona a empresa e fizer a pesquisa por produto
-  preciso dos parametros do idEmpresa
-  
-*/

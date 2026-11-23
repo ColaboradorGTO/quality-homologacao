@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react"
-import { get, post } from "../../../../api/funcRequest"
+import { get, post, put } from "../../../../api/funcRequest"
 import { useQuery } from "react-query"
 import Swal from "sweetalert2"
 import { getDataAtual } from "../../../../utils/dataAtual"
@@ -21,6 +21,20 @@ const parsePreco = (valor) => {
   return Number.isNaN(numero) ? null : numero;
 };
 
+// Junta os IDs de um campo de todas as linhas (aceita número, "1,2,3" ou array), sem duplicados
+export const extrairIds = (linhas, campo) => {
+  const ids = new Set();
+  (Array.isArray(linhas) ? linhas : []).forEach(linha => {
+    const valor = linha?.[campo];
+    const lista = Array.isArray(valor) ? valor : String(valor ?? '').split(',');
+    lista.forEach(id => {
+      const numero = Number(String(id).trim());
+      if (String(id).trim() !== '' && !Number.isNaN(numero)) ids.add(numero);
+    });
+  });
+  return Array.from(ids);
+};
+
 export const useEditeProdutoClube = ({detalhePromocao, usuarioLogado, optionsModulos }) => {
   const [marcaSelecionada, setMarcaSelecionada] = useState(-1)
   const [empresaSelecionada, setEmpresaSelecionada] = useState([])
@@ -31,7 +45,8 @@ export const useEditeProdutoClube = ({detalhePromocao, usuarioLogado, optionsMod
   const [modalPodutoSelecionadoOrigem, setModalPodutoSelecionadoOrigem] = useState(false);
   const [produtosOrigemDetalhados, setProdutosOrigemDetalhados] = useState([]);
   const [descricao, setDescricao] = useState('')
-
+  const [treeData, setTreeData] = useState([]);
+  const [selectedNodesOrigem, setSelectedNodesOrigem] = useState(null);
 
   useEffect(() => {
     const dataInicial = getDataAtual()
@@ -40,11 +55,16 @@ export const useEditeProdutoClube = ({detalhePromocao, usuarioLogado, optionsMod
     setDataFim(dataFinal)
   }, [])
 
+  console.log(detalhePromocao, 'detalhesPromocao')
   useEffect(() => {
     if(detalhePromocao.length && detalhePromocao.length > 0) {
       setDataInicio(detalhePromocao[0]?.DTHORAINICIOVIGENCIA)
       setDataFim(detalhePromocao[0]?.DTHORAFIMVIGENCIA)
       setDescricao(detalhePromocao[0]?.DSPROMOCAO)
+      // A promoção pode ter várias empresas e várias marcas (uma linha por empresa
+      // ou valores separados por vírgula): junta todas, sem repetir
+      setEmpresaSelecionada(extrairIds(detalhePromocao, 'IDEMPRESA'))
+      setMarcaSelecionada(extrairIds(detalhePromocao, 'IDGRUPOEMPRESARIAL'))
     }
   }, [])
 
@@ -608,14 +628,31 @@ export const useEditeProdutoClube = ({detalhePromocao, usuarioLogado, optionsMod
         return;
       }
 
-      const idsEmpresas = Array.isArray(empresaSelecionada) ? empresaSelecionada : [empresaSelecionada];
-      const empresasArray = Array.isArray(optionsEmpresas) ? optionsEmpresas : [];
+      // ✅ Empresas vindas do MenuTreeSelect (já inclui as da promoção + adicionadas - removidas)
+      const idsEmpresas = (Array.isArray(empresaSelecionada) ? empresaSelecionada : [empresaSelecionada])
+        .filter(id => id !== null && id !== undefined && id !== '');
+
+      // Mapa IDEMPRESA -> dados da empresa, a partir dos nós da árvore (marca > empresa)
+      const empresasTree = new Map();
+      (Array.isArray(treeData) ? treeData : []).forEach(grupo => {
+        const idGrupo = String(grupo.key || '').startsWith('grupo_') ? Number(grupo.key.replace('grupo_', '')) : null;
+        (grupo.children || []).forEach(filho => {
+          if (filho.data?.IDEMPRESA !== undefined) {
+            empresasTree.set(String(filho.data.IDEMPRESA), { ...filho.data, IDGRUPOARVORE: idGrupo });
+          }
+        });
+      });
+
+      // Fallback: empresas que já estavam na promoção (caso a árvore ainda não tenha carregado)
+      const empresasDetalhe = new Map(
+        (Array.isArray(detalhePromocao) ? detalhePromocao : []).map(linha => [String(linha.IDEMPRESA), linha])
+      );
 
       // ✅ PRODUTOPRECOCLUBE: um registro por produto x empresa
       const produtosClube = [];
       idsEmpresas.forEach(idEmpresa => {
-        const empresa = empresasArray.find(emp => String(emp.IDEMPRESA) === String(idEmpresa));
-        const idSubGrupoEmpresarial = empresa?.IDSUBGRUPOEMPRESARIAL ?? empresa?.IDGRUPOEMPRESARIAL ?? null;
+        const empresa = empresasTree.get(String(idEmpresa)) || empresasDetalhe.get(String(idEmpresa));
+        const idSubGrupoEmpresarial = empresa?.IDSUBGRUPOEMPRESARIAL ?? empresa?.IDGRUPOEMPRESARIAL ?? empresa?.IDGRUPOARVORE ?? null;
 
         produtosExcel.forEach(produto => {
           produtosClube.push({
@@ -653,7 +690,7 @@ export const useEditeProdutoClube = ({detalhePromocao, usuarioLogado, optionsMod
 
       let response;
       try {
-        response = await post('/promocao-produto-clube', payload);
+        response = await put('/promocao-produto-clube/:id', payload);
       } finally {
         Swal.close();
       }
@@ -714,6 +751,10 @@ export const useEditeProdutoClube = ({detalhePromocao, usuarioLogado, optionsMod
     setModalPodutoSelecionadoOrigem,
     downloadPlanilhaModelo,
     dadosProdutosPromocao,
+    treeData, 
+    setTreeData,
+    selectedNodesOrigem, 
+    setSelectedNodesOrigem,
     onSubmit,
   }
 }
