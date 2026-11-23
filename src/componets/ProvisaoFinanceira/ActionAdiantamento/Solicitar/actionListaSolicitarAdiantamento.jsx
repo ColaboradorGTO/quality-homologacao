@@ -529,7 +529,7 @@ export const ActionListaAdiantamento = ({
         setDadosDetalhePagamento(response.data);
 
         const pagamentoComAnexo = response.data.find(item => item.ANEXONOTAFISCAL);
-        console.log(response.data, 'data')
+      
         if (!pagamentoComAnexo) {
           Swal.fire({
             position: 'center',

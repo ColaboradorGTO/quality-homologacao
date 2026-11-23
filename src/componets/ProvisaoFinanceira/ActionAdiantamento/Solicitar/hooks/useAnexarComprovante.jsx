@@ -119,7 +119,7 @@ export const useAnexarPagamento = ({
         } catch (error) {
             console.error('Erro ao buscar detalhes do adiantamento:', error);
         }
-        console.log(detalhe, 'detalhe')
+        
         if (!detalhe) {
             Swal.fire({
                 position: 'center',
@@ -136,7 +136,7 @@ export const useAnexarPagamento = ({
 
         const postData = {
             IDADIANTAMENTO: detalhe?.IDADIANTAMENTO,
-            STATUS: detalhe?.STATUS,
+            STATUS: 'NOTA FISCAL ANEXADA',
             DEPARTAMENTO: detalhe?.DEPARTAMENTO,
             IDEMPRESA: detalhe?.IDEMPRESA,
             NUCNPJEMPRESA: detalhe?.NUCNPJEMPRESA,
