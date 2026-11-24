@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useState } from "react"
-import { get, post, put } from "../../../../api/funcRequest"
+import { get, put } from "../../../../api/funcRequest"
 import { useQuery } from "react-query"
 import Swal from "sweetalert2"
-import { getDataAtual } from "../../../../utils/dataAtual"
 import * as XLSX from 'xlsx';
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import { registrarLogAuditoria } from "../../../../services/auditLog"
 import { animacaoCarregamento, fecharAnimacaoCarregamento } from "../../../../utils/animationCarregamento"
+import { formatarDataInput, } from "../../../../utils/dataFormatada"
 const LIMITE_MAXIMO_PRODUTOS = 30000;
 const TAMANHO_LOTE_CONSULTA_PRODUTOS = 10;
 
@@ -47,27 +47,20 @@ export const useEditeProdutoClube = ({detalhePromocao, usuarioLogado, optionsMod
   const [descricao, setDescricao] = useState('')
   const [treeData, setTreeData] = useState([]);
   const [selectedNodesOrigem, setSelectedNodesOrigem] = useState(null);
-
-  useEffect(() => {
-    const dataInicial = getDataAtual()
-    const dataFinal = getDataAtual()
-    setDataInicio(dataInicial)
-    setDataFim(dataFinal)
-  }, [])
-
-  console.log(detalhePromocao, 'detalhesPromocao')
+  const [dadosPromocoesAtivas, setDadosPromocoesAtivas] = useState([])
+  
   useEffect(() => {
     if(detalhePromocao.length && detalhePromocao.length > 0) {
-      setDataInicio(detalhePromocao[0]?.DTHORAINICIOVIGENCIA)
-      setDataFim(detalhePromocao[0]?.DTHORAFIMVIGENCIA)
+      setDataInicio(formatarDataInput(detalhePromocao[0]?.DTHORAINICIOVIGENCIA))
+      setDataFim(formatarDataInput(detalhePromocao[0]?.DTHORAFIMVIGENCIA))
       setDescricao(detalhePromocao[0]?.DSPROMOCAO)
-      // A promoção pode ter várias empresas e várias marcas (uma linha por empresa
-      // ou valores separados por vírgula): junta todas, sem repetir
       setEmpresaSelecionada(extrairIds(detalhePromocao, 'IDEMPRESA'))
       setMarcaSelecionada(extrairIds(detalhePromocao, 'IDGRUPOEMPRESARIAL'))
+      
     }
   }, [])
-
+  console.log(dataInicio, 'DATAiNICIO')
+  console.log(dataFim, 'DATAFIM')
   const { data: dadosProdutosPromocao = [], error: errorPromocao, isLoading: isLoadingPromocao, refetch: refetchPromocao } = useQuery(
     'produto-preco-clube-promocao',
     async () => {
@@ -464,12 +457,7 @@ export const useEditeProdutoClube = ({detalhePromocao, usuarioLogado, optionsMod
     if (produtoOrigem) {
       itens = [...itens, { IDPRODUTO: produtoOrigem, PRECO_VENDA: null }];
     }
-    // Produtos selecionados via checkbox
-    // if (novoProdutoOrigem && novoProdutoOrigem.length > 0) {
-    //   itens = [...itens, ...novoProdutoOrigem];
-    // }
 
-    // Normaliza para objeto e remove duplicados pelo IDPRODUTO (mantém o primeiro preço encontrado)
     const mapaProdutos = new Map();
     itens.filter(Boolean).forEach(item => {
       const obj = typeof item === 'object' ? item : { IDPRODUTO: item, PRECO_VENDA: null };
@@ -566,7 +554,7 @@ export const useEditeProdutoClube = ({detalhePromocao, usuarioLogado, optionsMod
     }
   };
 
-
+  
   const onSubmit = async () => {
     if(optionsModulos[0]?.ALTERAR !== 'True') {
       Swal.fire({
@@ -581,6 +569,10 @@ export const useEditeProdutoClube = ({detalhePromocao, usuarioLogado, optionsMod
       return;
     }
     try {
+      const responsePromocao = await get(`/detalhe-promocao-produto-clube?dataInicio=${dataInicio}&dataFim=${dataFim}`);
+      const promocoesAtivas = responsePromocao.data;
+      setDadosPromocoesAtivas(promocoesAtivas);
+
       if (!empresaSelecionada || empresaSelecionada.length == 0) {
         Swal.fire({
           position: 'center',
@@ -666,10 +658,11 @@ export const useEditeProdutoClube = ({detalhePromocao, usuarioLogado, optionsMod
 
       // ✅ Payload único: dados da promoção + produtos
       const payload = {
-        IDPROMOCAO: detalhePromocao[0]?.IDPROMOCAO,
         DSPROMOCAO: descricao ? descricao.toUpperCase() : '',
         DTHORAINICIOVIGENCIA: dataInicio,
         DTHORAFIMVIGENCIA: dataFim,
+        STATIVO: detalhePromocao[0]?.STATIVO,
+        IDPROMOCAO: detalhePromocao[0]?.IDPROMOCAO,
         PRODUTOS: produtosClube,
       };
 

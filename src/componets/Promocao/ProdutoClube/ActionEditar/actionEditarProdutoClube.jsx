@@ -2,8 +2,6 @@ import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } fr
 import { get } from "../../../../api/funcRequest";
 import { ButtonType } from "../../../Buttons/ButtonType";
 import { InputFieldAction } from "../../../Buttons/InputAction";
-import { InputSelectActionPromocao } from "../../../Inputs/InputSelectActionPromocao";
-import { MultSelectAction } from "../../../Select/MultSelectAction";
 import { GrView } from "react-icons/gr";
 import { IoIosSend, IoMdReturnLeft } from "react-icons/io";
 import { FaDownload } from "react-icons/fa6";
@@ -215,10 +213,14 @@ export const ActionEditarProdutoClube = ({ detalhePromocao, usuarioLogado, optio
         selectedSubGrupo.push(empresaId);
       }
     });
-
     setMarcaSelecionada(selectedGrupo);
     setEmpresaSelecionada(selectedSubGrupo);
   };
+
+  useEffect(() => {
+    console.log(marcaSelecionada, 'marca')
+    console.log(empresaSelecionada, 'empresa')
+  }, [marcaSelecionada, empresaSelecionada]);
 
   const handleClick = () => {
     setActionEditarVisivel(false)

@@ -37,11 +37,11 @@ export const ActionListaPromocao = ({
   const exportToPDF = () => {
     const doc = new jsPDF();
     doc.autoTable({
-      head: [['ID', , 'Descrição', 'Situação']],
+      head: [['Nº', 'Descrição', 'Situação']],
       body: dados.map(item => [
-        item.IDRESUMOPROMO,
-        item.DSPROMO,
-        item.STATIVO === 'True' ? 'Ativo' : 'Inativo',
+        item.IDPROMOCAO,
+        item.DSPROMOCAO,
+        item.STATIVO === 'True' ? 'ATIVA' : 'INATIVA',
       ]),
       horizontalPageBreak: true,
       horizontalPageBreakBehaviour: 'immediately'
@@ -52,9 +52,9 @@ export const ActionListaPromocao = ({
   const exportToExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(dados);
     const workbook = XLSX.utils.book_new();
-    const header = ['ID', 'Descrição', 'Situação'];
+    const header = ['N', 'Descrição', 'Situação'];
     worksheet['!cols'] = [
-      { wpx: 100, caption: 'ID Produto' },
+      { wpx: 100, caption: 'Nº' },
       { wpx: 200, caption: 'Descrição' },
       { wpx: 100, caption: 'Situação' },
     ];
@@ -79,7 +79,7 @@ export const ActionListaPromocao = ({
   const colunasListaPromocao = [
     {
       field: 'IDPROMOCAO',
-      header: 'ID',
+      header: 'Nº',
       body: row => <th style={{ color: 'blue' }} >{row.IDPROMOCAO}</th>,
       sortable: true,
     },
@@ -90,49 +90,49 @@ export const ActionListaPromocao = ({
       sortable: true,
     },
     {
-      field: 'STATIVO',
-      header: 'Situação',
-      body: row => (
-        <th style={{ color: row.STATIVO == 'True' ? 'blue' : 'red' }}>
-          {row.STATIVO === 'True' ? 'Ativa' : 'Inativa'}
-        </th>
-
-      ),
-      sortable: true,
-    },
-    {
       field: 'DSGRUPOEMPRESARIAL',
       header: 'Marca',
       body: row => (
         <th style={{ color: 'bue' }}>
           {row.DSGRUPOEMPRESARIAL}
         </th>
-
+    
       ),
       sortable: true,
     },
     {
-      field: 'Detalhar',
-      header: 'Detalhar',
-      body: (row) => {
-        if(row.STATIVO == 'True') {
-          return (
-            <div className="p-1">
-              <ButtonTable
-                titleButton={"Editar Promoção"}
-                cor={"primary"}
-                Icon={MdEdit}
-                iconSize={20}
-                width="35px"
-                height="35px"
-                onClickButton={() => handleClickVisualizar(row)}
-              />
-            </div>
-          )
-        }
-      },
+      field: 'STATIVO',
+      header: 'Situação',
+      body: row => (
+        <th style={{ color: row.STATIVO == 'True' ? 'blue' : 'red' }}>
+          {row.STATIVO === 'True' ? 'ATIVA' : 'INATIVA'}
+        </th>
+
+      ),
       sortable: true,
     },
+    // {
+    //   field: 'Detalhar',
+    //   header: 'Detalhar',
+    //   body: (row) => {
+    //     if(row.STATIVO == 'True') {
+    //       return (
+    //         <div className="p-1">
+    //           <ButtonTable
+    //             titleButton={"Editar Promoção"}
+    //             cor={"primary"}
+    //             Icon={MdEdit}
+    //             iconSize={20}
+    //             width="35px"
+    //             height="35px"
+    //             onClickButton={() => handleClickVisualizar(row)}
+    //           />
+    //         </div>
+    //       )
+    //     }
+    //   },
+    //   sortable: true,
+    // },
   ]
 
    const handleVisualizar = async (IDPROMOCAO) => {

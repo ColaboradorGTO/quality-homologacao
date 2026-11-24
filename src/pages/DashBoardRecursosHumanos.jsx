@@ -91,12 +91,15 @@ export const DashBoardRecursosHumanos = ({}) => {
     return { ...acc, ...curr };
   }, {});
 
-
+  const menuFilhoResumo = selectedModule?.menuPai?.menuFilho?.find(
+    menu => menu.URL === "/recursosHumanos/ActionPesquisaFuncionarios"
+  );
+  console.log(menuFilhoResumo, 'menu')
   let component = null;
-
+  console.log(optionsModulosPage, 'page')
   switch (componentToShow) {
     case "/recursosHumanos/ActionPesquisaFuncionarios":
-      component = <ActionPesquisaFuncionarios usuarioLogado={usuarioLogado} ID={ID} />;
+      component = <ActionPesquisaFuncionarios usuarioLogado={usuarioLogado} menuFilhoAtual={menuFilhoResumo} />;
       break;
     default:
       component = null;
@@ -127,7 +130,7 @@ export const DashBoardRecursosHumanos = ({}) => {
                       <div className="panel-content">
                         <Suspense fallback={<div>Loading...</div>}>
                         {usuarioLogado && actionVisivel && !componentToShow && (
-                          <ActionPesquisaFuncionarios usuarioLogado={usuarioLogado} ID={ID} />
+                          <ActionPesquisaFuncionarios usuarioLogado={usuarioLogado} menuFilhoAtual={menuFilhoResumo} />
                         )}
 
 
