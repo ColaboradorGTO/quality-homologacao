@@ -36,6 +36,7 @@ export const useEditarStatusVoucher = ({
         setIpUsuario(usuarioIP);
         return usuarioIP;
     };
+    //console.log(statusSelecionado, 'statusSelecionado no hook')
 
     useEffect(() => {
         setStatusSelecionado(dadosEditarVoucher[0]?.voucher.STSTATUS)
