@@ -103,9 +103,6 @@ export const useImportarCSVBI = ({ optionsModulos, handleClose, usuarioLogado })
         });
     };
 
-    console.log(file, 'File');
-    console.log(usuarioLogado.IDEMPRESA, 'usuarioLogado.id');
-
     const onSubmitArquivo = async (e) => {
 
         if (optionsModulos[0]?.CRIAR == 'False') {
@@ -153,7 +150,6 @@ export const useImportarCSVBI = ({ optionsModulos, handleClose, usuarioLogado })
             }
             for (const item of dadosArquivo) {
                 const postData = {
-                    //IDEMPRESA: usuarioLogado?.IDEMPRESA,
                     IDRELATORIOBI: parseInt(relatorioSelecionado?.value),
                     IDEMPRESA: parseInt(item.IDEMPRESA),
                     LINK: item.LINK,

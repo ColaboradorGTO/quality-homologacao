@@ -44,7 +44,6 @@ export const useCriarMenuFilho = ({
     return usuarioIP;
   };
 
-
   const modulos = {
     1: "IDMODULOADMINISTRATIVO",
     2: "IDMODULOGERENCIA",

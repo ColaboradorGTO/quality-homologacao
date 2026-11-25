@@ -73,6 +73,20 @@ export const useEditarRelatorioBi = ({
             return;
         }
 
+        if (!empresaSelecionada || !relatorioSelecionado || !statusSelecionado || !linkRelatorioBI) {
+            Swal.fire({
+                position: 'center',
+                icon: 'error',
+                title: 'Preencha todos os campos!',
+                customClass: {
+                    container: 'custom-swal',
+                },
+                showConfirmButton: false,
+                timer: 1500
+            });
+            return;
+        }
+
         const putData = {
             IDRELATORIOBI: relatorioSelecionado,
             IDEMPRESA: dadosLinkRelatorioBI[0]?.IDEMPRESA,
@@ -83,10 +97,11 @@ export const useEditarRelatorioBi = ({
         try {
 
             const response = await put('/linkRelatorioBI/:id', putData);
+            
             const textDados = JSON.stringify(putData);
             let textoFuncao = 'INFORMATICA/ATUALIZAR LINK RELATORIO BI';
             const ipUsuario = await getIPUsuario();
-            
+
             const postData = {
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
@@ -94,7 +109,7 @@ export const useEditarRelatorioBi = ({
                 IP: ipUsuario,
             };
             await post('/log-web', postData);
-            
+
             Swal.fire({
                 position: 'center',
                 icon: 'success',
@@ -105,7 +120,7 @@ export const useEditarRelatorioBi = ({
                 showConfirmButton: false,
                 timer: 1500,
             });
-            
+
             handleTabelaVisivel()
             handleClose()
             return response.data;
@@ -113,16 +128,16 @@ export const useEditarRelatorioBi = ({
         } catch (error) {
             const textDados = JSON.stringify(putData);
             let textoFuncao = 'INFORMATICA/ATUALIZAR LINK RELATORIO BI';
-    
+
             const ipUsuario = await getIPUsuario();
-    
+
             const postData = {
                 IDFUNCIONARIO: String(usuarioLogado.id),
                 PATHFUNCAO: textoFuncao,
                 DADOS: textDados,
                 IP: ipUsuario || 'INDISPONIVEL',
             };
-    
+
             const responsePost = await post('/log-web', postData);
 
             Swal.fire({

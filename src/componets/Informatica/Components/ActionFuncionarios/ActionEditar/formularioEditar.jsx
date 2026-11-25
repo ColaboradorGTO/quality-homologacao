@@ -563,15 +563,6 @@ export const FormularioEditar = ({
                       />
                     )}
                   />
-
-                  {/*          <InputFieldModal
-                  type="text"
-                  className="form-control input"
-                  label="Matrícula"
-                  value={usuario}
-                  onChangeModal={(e) => setUsuario(e.target.value)}
-                  placeholder={"Digite sua matrícula"}
-                /> */}
                 </div>
 
                 <div className="col-sm-4 col-md-4 col-xl-4">
@@ -592,15 +583,6 @@ export const FormularioEditar = ({
                       />
                     )}
                   />
-
-                  {/*             <InputFieldModal
-                    type="password"
-                    className="form-control input"
-                    label="Senha"
-                    value={senha}
-                    onChangeModal={(e) => setSenha(e.target.value)}
-                    placeholder={"Digite sua senha"}
-                  /> */}
                 </div>
               </div>
               <div className="row mt-4">
@@ -613,7 +595,6 @@ export const FormularioEditar = ({
                   ButtonTypeCadastrar={ButtonTypeModal}
                   textButtonCadastrar={"Confirmar"}
                   onClickButtonCadastrar={handleSubmit(handleValidatedLogin)}
-                  //onClickButtonCadastrar={loginConfirmacao}
                   corCadastrar="success"
 
                 />

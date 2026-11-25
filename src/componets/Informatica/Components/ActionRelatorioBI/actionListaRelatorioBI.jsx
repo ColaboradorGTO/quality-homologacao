@@ -111,6 +111,7 @@ export const ActionListaRelatorioBi = ({ dadosBI, optionsModulos, refetch, usuar
                 cor={"primary"}
                 width="40px"
                 height="40px"
+                disabledBTN={optionsModulos[0]?.ALTERAR == 'True' ? false : true}
               />
 
             </div>

@@ -168,6 +168,7 @@ export const ActionListaVendasContigencia = ({ dadosVendasContigencia }) => {
             filterDisplay="menu"
             showGridlines
             stripedRows
+            cellMemo={false}
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
           >
             {colunasContigencia.map(coluna => (

@@ -6,6 +6,7 @@ import { FooterModal } from "../../../Modais/FooterModal/footerModal";
 import { ButtonTypeModal } from "../../../Buttons/ButtonTypeModal";
 import { formatMoeda } from "../../../../utils/formatMoeda";
 import { toFloat } from "../../../../utils/toFloat";
+import { dataFormatada } from "../../../../utils/dataFormatada";
 
 export const ActionDetalheVendaModal = ({show, handleClose,dadosVendas}) => {
 

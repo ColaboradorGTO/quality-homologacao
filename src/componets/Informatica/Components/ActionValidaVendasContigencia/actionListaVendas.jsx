@@ -29,8 +29,8 @@ export const ActionListaVendas = ({ dadosVendas, usuarioLogado, optionsModulos }
   const [dadosDetalheVendasXML, setDadosDetalheVendasXML] = useState([]);
   const [dadosSefaz, setDadosSefaz] = useState(null);
   const dataTableRef = useRef();
-  const { onSubmit } = useConsultarNFCe({dadosDetalheVendasXML, usuarioLogado, optionsModulos }); 
-  const { onSubmitNFe } = useConsultarNFe({dadosDetalheVendasXML, usuarioLogado, optionsModulos }); 
+  const { onSubmit } = useConsultarNFCe({ dadosDetalheVendasXML, usuarioLogado, optionsModulos });
+  const { onSubmitNFe } = useConsultarNFe({ dadosDetalheVendasXML, usuarioLogado, optionsModulos });
 
   const onGlobalFilterChange = (e) => {
     setGlobalFilterValue(e.target.value);
@@ -224,7 +224,7 @@ export const ActionListaVendas = ({ dadosVendas, usuarioLogado, optionsModulos }
   const handleDetalheSefaz = async (IDVENDA) => {
     try {
       const response = await get(`/status-sefaz?idVenda=${IDVENDA}`)
-      
+
       if (response.data && response.data.length > 0) {
         setDadosSefaz(response.data);
         setModalConsultaSefaz(true);
@@ -293,6 +293,7 @@ export const ActionListaVendas = ({ dadosVendas, usuarioLogado, optionsModulos }
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Registros"
             filterDisplay="menu"
             showGridlines
+            cellMemo={false}
             stripedRows
             emptyMessage={<div className="dataTables_empty">Nenhum resultado encontrado</div>}
           >

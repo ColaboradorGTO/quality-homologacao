@@ -30,9 +30,6 @@ export const FormularioEditar = ({
     mode: "onChange"
   });
 
-
-
-
   const {
     moduloSelecionado,
     setModuloSelecionado,

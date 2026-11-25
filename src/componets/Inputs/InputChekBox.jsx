@@ -10,6 +10,13 @@ export const InputFieldCheckBox = ({
   checkedCheckBoxPedido,
   onChangeCheckBoxPedido
 }) => {
+
+  const [isChecked, setIsChecked] = useState(false);
+
+  const handleCheckboxChange = () => {
+    setIsChecked(!isChecked);
+  };
+
   return (
 
     <Fragment>
@@ -27,7 +34,7 @@ export const InputFieldCheckBox = ({
           disabled={disabledChecked}
           checked={checkedCheckBoxPedido ?? false}
           placeHolder={placeholder}
-          onChange={onChangeCheckBoxPedido ?? (() => {})}
+          onChange={onChangeCheckBoxPedido ?? (() => { })}
         />
         <label className="custom-label" htmlFor={id}>
           {label}
