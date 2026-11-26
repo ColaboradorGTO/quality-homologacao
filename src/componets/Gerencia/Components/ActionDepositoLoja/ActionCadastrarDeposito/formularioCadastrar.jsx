@@ -8,7 +8,7 @@ import { useCadastroDeposito } from "../hooks/useCadastrarDeposito";
 import FormField from "../../../../Formularios/FormField";
 import { AlertError } from "../../../../Inputs/alertError";
 import { schema } from "./schemaValidacaocadastroDeposito";
-import { formatarMoeda } from "../../../../../utils/formatMoeda";
+import { formatarMoeda, removerFormatacaoMoeda } from "../../../../../utils/formatMoeda";
 
 export const FormularioCadastrar = ({ handleClose, optionsModulos, usuarioLogado, handleClick }) => {
     const { handleSubmit, formState: { errors }, clearErrors, control, setError } = useForm({
@@ -44,13 +44,13 @@ export const FormularioCadastrar = ({ handleClose, optionsModulos, usuarioLogado
                 contaSelecionada: contaBancoSelecionada,
                 historicoDigitado: dsHistorio,
                 numeroDocumentoDeposito: numeroDocDeposito,
-                valorDepositoDigitado: valorDeposito,
+                valorDepositoDigitado: removerFormatacaoMoeda(valorDeposito),
                 dataMovimentoSelecionado: dataMovCaixa,
                 horaMovimentoSelecionado: horarioAtual
             };
 
             await schema.validate(dadosParaValidar, { abortEarly: false });
-           await onSubmit();
+            await onSubmit();
 
         } catch (validationError) {
             console.error('❌ Erro de validação:', validationError);
@@ -259,7 +259,7 @@ export const FormularioCadastrar = ({ handleClose, optionsModulos, usuarioLogado
                     corCadastrar="success"
                     autoLoadingCadastrar={true}
                     loadingTextCadastrar={"Cadastrando..."}
-                    
+
                     ButtonTypeFechar={ButtonTypeModal}
                     textButtonFechar={"Fechar"}
                     onClickButtonFechar={handleClose}
