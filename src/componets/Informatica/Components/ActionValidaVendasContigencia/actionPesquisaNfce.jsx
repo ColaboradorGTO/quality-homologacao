@@ -48,11 +48,11 @@ export const ActionPesquisaNfce = ({usuarioLogado, ID}) => {
   );
 
   const { data: dadosVendas = [], error: errorVendas, isLoading: isLoadingVendas, refetch: refetchListaVendas } = useQuery(
-    'validarConsulta',
+    'https://gto.api.br/validarConsulta',
     async () => {
-      const response = await get(`/validarConsulta?dataInicio=${dataInicio}&dataFim=${dataFim}&page=${page}&pageSize=${pageSize}`);
+      const response = await axios.get(`https://gto.api.br/validarConsulta?dataInicio=${dataInicio}&dataFim=${dataFim}&page=${page}&pageSize=${pageSize}`);
       
-      return response.data;
+      return response.data.data;
     },
     { enabled: false }
   );
